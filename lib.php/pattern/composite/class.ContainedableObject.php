@@ -9,7 +9,7 @@ class ContainedableObject extends NamableObject implements IContainedable
 		$this->aParent = $aParent ;
 	}
 	
-	public function getParent()
+	public function parent()
 	{
 		return $this->aParent ;
 	}

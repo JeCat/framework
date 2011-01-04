@@ -32,7 +32,7 @@ interface IContainedable extends INamable
 	
 	public function setParent(IContainer $aParent) ;
 	
-	public function getParent() ;
+	public function parent() ;
 	
 }
 

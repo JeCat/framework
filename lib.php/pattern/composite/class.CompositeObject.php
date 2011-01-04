@@ -50,7 +50,7 @@ class CompositeObject extends ContainedableObject implements IContainer
 		
 	}
 
-	public function getChild($sName) {
+	public function child($sName) {
 		// TODO Auto-generated method stub
 		
 	}

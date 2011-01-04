@@ -36,7 +36,7 @@ interface IContainer
 	
 	public function clearChildren() ;
 	
-	public function getChild($sName) ;
+	public function child($sName) ;
 	
 	public function findChildInFamily($sName) ;
 	
