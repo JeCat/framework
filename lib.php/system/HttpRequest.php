@@ -3,7 +3,7 @@ namespace jc\system ;
 
 use jcat\util\DataSrc ;
 
-class HttpRequest extends Request
+class HttpRequest extends DataSrc implements IRequest
 {
 	const GET = 1 ;
 	const POST = 2 ;
@@ -22,11 +22,11 @@ class HttpRequest extends Request
 		self::SERVER => '_SERVER' ,
 	) ;
 	
-	public function __construct()
+	public function initialize()
 	{
 		foreach(self::$arrDataSources as $sVarName)
 		{
-			$this->addChild( new DataSrc($$sVarName,true) ) ;
+			$this->addChild( $this->factory()->create('jc\\util\\DataSrc',array($$sVarName,true)) ) ;
 		}
 	}
 

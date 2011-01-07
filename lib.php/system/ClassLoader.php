@@ -1,7 +1,7 @@
 <?php
 namespace jc\system ;
 
-class ClassLoader
+class ClassLoader extends \jc\Object
 {
 	public function __construct()
 	{

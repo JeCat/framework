@@ -2,27 +2,10 @@
 namespace jc\system ;
 
 
-class Application
+use jc\Factory;
+
+class Application extends \jc\Object
 {
-	public function __construct($nRequestType=Request::TYPE_HTTP)
-	{
-		// 初始化 class loader
-		$aClassLoader = new ClassLoader() ;
-		$aClassLoader->addPackage( realpath(__DIR__.'/..').'/', "jc" ) ; // 将 jcat 加入到 class loader 中
-		$this->setClassLoader($aClassLoader) ;
-		
-		// 创建 Request/Response/AccessRouter 对象
-		$this->setRequest( Request::createRequest($nRequestType) ) ;		
-		$this->setResponse(new Response()) ;		
-		$this->setAccessRouter(new AccessRouter()) ;
-		
-		// 单件对象
-		if(!self::$theGlobalInstance)
-		{
-			self::$theGlobalInstance = $this ;
-		}
-	}
-	
 	/**
      * @return Application
      */
@@ -56,16 +39,16 @@ class Application
     }
     
 	/**
-     * @param Request
+     * @param IRequest
      */
-    public function setRequest (Request $aRequest)
+    public function setRequest (IRequest $aRequest)
     {
         $this->aRequest = $aRequest;
     }
     
 
 	/**
-     * @return Request
+     * @return IRequest
      */
     public function request ()
     {

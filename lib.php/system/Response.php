@@ -2,7 +2,8 @@
 namespace jc\system ;
 
 
-class Response {
+class Response extends \jc\Object
+{
 
 }
 

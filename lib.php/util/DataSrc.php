@@ -1,9 +1,11 @@
 <?php
 namespace jc\util ;
 
-class DataSrc implements IDataSrc
+use jc\Object;
+
+class DataSrc extends Object implements IDataSrc
 {
-	public function __construct(array &$arrDatas=null,$bByRef=false)
+	public function initialize(array &$arrDatas=null,$bByRef=false)
 	{
 		if($arrDatas!==null)
 		{

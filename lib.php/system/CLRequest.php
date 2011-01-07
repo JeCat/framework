@@ -3,12 +3,12 @@ namespace jc\system ;
 
 use jc\util\DataSrc ;
 
-class CLRequest extends Request
+class CLRequest extends DataSrc implements IRequest
 {
-	public function __construct()
+	public function initialize()
 	{
 		global $argv ;
-		$this->addChild(new DataSrc($argv,true)) ;
+		$this->addChild( $this->factory()->create('\\jc\\util\\DataSrc',array($argv,true)) ) ;
 	}
 	
 	public function defineParam($sParam,$arrCLNames,$DefaultValue=null)
