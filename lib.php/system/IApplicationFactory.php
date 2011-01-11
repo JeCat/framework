@@ -7,28 +7,28 @@ interface IApplicationFactory
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return Application
+	 * @return jc\system\Application
 	 */
 	public function application() ;
 	
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return Application
+	 * @return jc\system\Application
 	 */
 	public function createApplication() ;
 	
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return ClassLoader
+	 * @return jc\system\ClassLoader
 	 */
 	public function createClassLoader() ;
 	
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return AccessRouter
+	 * @return jc\system\AccessRouter
 	 */
 	public function createAccessRouter() ;
 	
@@ -42,7 +42,7 @@ interface IApplicationFactory
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return Response
+	 * @return jc\system\Response
 	 */
 	public function createResponse() ;
 }

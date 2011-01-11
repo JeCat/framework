@@ -1,7 +1,7 @@
 <?php
 namespace jc\system ;
 
-
+use jc\io\PrintSteam;
 use jc\lang\Factory;
 
 class Application extends \jc\lang\Factory
@@ -55,7 +55,7 @@ class Application extends \jc\lang\Factory
         return $this->aRequest;
     }
 	/**
-     * @param Response
+     * @param jc\system\Response
      */
     public function setResponse (Response $aResponse)
     {
@@ -66,7 +66,7 @@ class Application extends \jc\lang\Factory
 	/**
      * @return Response
      */
-    public function esponse ()
+    public function response ()
     {
         return $this->aResponse;
     }
@@ -84,6 +84,16 @@ class Application extends \jc\lang\Factory
     public function setAccessRouter (AccessRouter $aAccessRouter)
     {
         $this->aAccessRouter = $aAccessRouter;
+    }
+    
+    /**
+     * Enter description here ...
+     * 
+     * @return jc\io\PrintSteam
+     */
+    public function out()
+    {
+    	return $this->response()->printer() ;
     }
 	
 	private $aClassLoader ;

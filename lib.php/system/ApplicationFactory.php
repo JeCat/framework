@@ -7,44 +7,22 @@ use jc\lang\Factory;
 require_once dirname(__DIR__).'/lang/Factory.php' ;
 require_once __DIR__.'/IApplicationFactory.php' ;
 
-
-class ApplicationFactory extends \jc\lang\Factory implements IApplicationFactory
+abstract class ApplicationFactory extends \jc\lang\Factory implements IApplicationFactory
 {
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return Application
+	 * @return IApplicationFactory
 	 */
-	public function application()
+	static public function createAppFactoryAuto()
 	{
-		if( !$this->aApplication )
-		{
-			$this->aApplication = $this->createApplication() ;
-		} 
+		$sClassName = empty($_SERVER['HTTP_HOST'])? 'CLAppFactory': 'HttpAppFactory' ;
+		$sFullClassName = __NAMESPACE__.'\\'.$sClassName ;
 		
-		return $this->aApplication ;
+		require_once __DIR__.'/'.$sClassName.'.php' ;
+		return new $sFullClassName() ;
 	}
 	
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return Application
-	 */
-	public function createApplication()
-	{
-		require_once __DIR__.'/Application.php' ;
-		$aApp = $this->create(__NAMESPACE__."\\Application") ;
-		
-		// 初始化 class loader
-		$aApp->setClassLoader($this->createClassLoader()) ;
-		
-		// 创建 Request/Response/AccessRouter 对象
-		$aApp->setRequest( $this->createRequest() ) ;
-		$aApp->setResponse( $this->createResponse() ) ;		
-		$aApp->setAccessRouter( $this->createAccessRouter() ) ;
-		
-		return $aApp ;
-	}
 	
 	/**
 	 * Enter description here ...
@@ -74,21 +52,37 @@ class ApplicationFactory extends \jc\lang\Factory implements IApplicationFactory
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return IRequest
+	 * @return Application
 	 */
-	public function createRequest()
+	public function application()
 	{
-		return $this->create( empty($_SERVER['HTTP_HOST'])? IRequest::TYPE_CL: IRequest::TYPE_HTTP ) ;
+		if( !$this->aApplication )
+		{
+			$this->aApplication = $this->createApplication() ;
+		}
+		
+		return $this->aApplication ;
 	}
 
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return Response
+	 * @return Application
 	 */
-	public function createResponse()
+	public function createApplication()
 	{
-		return $this->create( __NAMESPACE__.'\\Response' ) ;
+		require_once __DIR__.'/Application.php' ;
+		$aApp = $this->create(__NAMESPACE__."\\Application") ;
+		
+		// 初始化 class loader
+		$aApp->setClassLoader($this->createClassLoader()) ;
+		
+		// 创建 Request/Response/AccessRouter 对象
+		$aApp->setRequest( $this->createRequest() ) ;
+		$aApp->setResponse( $this->createResponse() ) ;		
+		$aApp->setAccessRouter( $this->createAccessRouter() ) ;
+		
+		return $aApp ;
 	}
 	
 	private $aApplication ;

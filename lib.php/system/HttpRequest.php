@@ -1,7 +1,7 @@
 <?php
 namespace jc\system ;
 
-use jcat\util\DataSrc ;
+use jc\util\DataSrc ;
 
 class HttpRequest extends DataSrc implements IRequest
 {
