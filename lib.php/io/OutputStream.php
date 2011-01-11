@@ -24,6 +24,15 @@ class OutputStream extends Stream implements IOutputStream
 	{
 		fflush($this->hHandle) ;
 	}
-	
+
+	/**
+	 * Enter description here ...
+	 * 
+	 * @return bool
+	 */
+	public function lock()
+	{
+		flock($this->hHandle,LOCK_EX) ;
+	}
 }
 ?>

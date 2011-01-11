@@ -82,6 +82,16 @@ class InputStream extends Stream implements IInputStream
 		return feof($this->hHandle) ;
 	}
 	
+	/**
+	 * Enter description here ...
+	 * 
+	 * @return bool
+	 */
+	public function lock()
+	{
+		flock($this->hHandle,LOCK_SH) ;
+	}
+	
 }
 
 ?>

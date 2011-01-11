@@ -12,13 +12,31 @@ class Factory extends Object
 	 */
 	public function create($sClassName,array $arrArgvs=array())
 	{
+		// 创建对象
+		$aObject = self::createNewObject($sClassName,$arrArgvs) ;
+				
+		// 设置工厂对象
+		if( $aObject instanceof Object)
+		{
+			$aObject->setFactory($this) ;
+		}
+		
+		return $aObject ;
+	}
+	
+	/**
+	 * Enter description here ...
+	 * 
+	 * @return void
+	 */
+	static public function createNewObject($sClassName,array $arrArgvs=array())
+	{
 		$sClassName = strval($sClassName) ;
 		if( !class_exists($sClassName) )
 		{
 			throw new Exception("class无效：".$sClassName) ;
 		}
 		
-		// 创建对象
 		$aObject = new $sClassName ;
 		
 		if( $aObject instanceof Object )
@@ -31,9 +49,6 @@ class Factory extends Object
 					return null ;
 				}
 			}
-		
-			// 设置工厂对象
-			$aObject->setFactory($this) ;
 		}
 		
 		return $aObject ;

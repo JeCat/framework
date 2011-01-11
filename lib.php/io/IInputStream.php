@@ -1,7 +1,7 @@
 <?php
 namespace jc\io ;
 
-interface IInputStream
+interface IInputStream extends IStream
 {
 	/**
 	 * Enter description here ...

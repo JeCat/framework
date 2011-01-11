@@ -63,6 +63,33 @@ class Stream extends Object implements IClosable
 	/**
 	 * Enter description here ...
 	 * 
+	 * @return bool
+	 */
+	public function supportsLock()
+	{
+		return stream_supports_lock($this->hHandle) ;
+	}
+	
+	/**
+	 * Enter description here ...
+	 * 
+	 * @return bool
+	 */
+	abstract public function lock() ;
+	
+	/**
+	 * Enter description here ...
+	 * 
+	 * @return bool
+	 */
+	public function unlock()
+	{
+		flock($this->hHandle,LOCK_UN) ;
+	}
+	
+	/**
+	 * Enter description here ...
+	 * 
 	 * @var handle
 	 */
 	protected $hHandle ;

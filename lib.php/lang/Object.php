@@ -9,7 +9,7 @@ class Object
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return Factory
+	 * @return jc\lang\Factory
 	 */
 	public function factory()
 	{
@@ -34,6 +34,23 @@ class Object
 	public function setFactory(Factory $aFactory)
 	{
 		$this->aFactory = $aFactory ;
+	}
+	
+	/**
+	 * Enter description here ...
+	 * 
+	 * @return stdClass
+	 */
+	public function create($sClassName,array $arrArgvs=array())
+	{
+		if($this->aFactory)
+		{
+			return $this->aFactory->create($sClassName,$arrArgvs) ;
+		}
+		else
+		{
+			return Factory::createNewObject($sClassName,$arrArgvs) ;
+		}
 	}
 	
 	private $aFactory ;
