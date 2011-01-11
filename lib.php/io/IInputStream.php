@@ -36,13 +36,7 @@ interface IInputStream
 	 * 
 	 * @return void
 	 */
-	function seek($nPosition) ;
+	function seek($nPosition) ;	
 	
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return bool
-	 */
-	public function isActiving() ;
 }
 ?>

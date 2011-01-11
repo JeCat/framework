@@ -6,7 +6,7 @@ interface IOutputStream
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return void
+	 * @return int
 	 */
 	public function write($sBytes) ;
 	
@@ -16,12 +16,6 @@ interface IOutputStream
 	 * @return void
 	 */
 	public function flush() ;
-		
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return bool
-	 */
-	public function isActiving() ;
+	
 }
 ?>

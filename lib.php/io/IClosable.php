@@ -10,5 +10,13 @@ interface IClosable
 	 * @return bool
 	 */
 	public function close() ;
+
+	/**
+	 * Enter description here ...
+	 * 
+	 * @return bool
+	 */
+	public function isActiving() ;
+	
 }
 ?>
