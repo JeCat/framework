@@ -22,7 +22,7 @@ class HttpRequest extends DataSrc implements IRequest
 		self::SERVER => '_SERVER' ,
 	) ;
 	
-	public function initialize()
+	public function __construct()
 	{
 		foreach(self::$arrDataSources as $sVarName)
 		{

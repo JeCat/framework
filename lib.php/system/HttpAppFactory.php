@@ -23,9 +23,7 @@ class HttpAppFactory extends ApplicationFactory
 	 */
 	public function createResponse()
 	{
-		$aRspn = $this->create( __NAMESPACE__.'\\Response' ) ;
-		$aRspn->initialize( new HtmlPrintSteam() ) ;
-		
+		return $this->create( __NAMESPACE__.'\\Response', $this->create('jc\\io\\HtmlPrintSteam') ) ;
 		return $aRspn ;
 	}
 	

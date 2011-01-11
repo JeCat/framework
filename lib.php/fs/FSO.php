@@ -14,15 +14,6 @@ class FSO extends Object
 	{
 		$this->sPath = $sPath ;
 	}
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return void
-	 */
-	public function initialize($sPath)
-	{
-		$this->sPath = $sPath ;
-	}
 	
 	/**
 	 * Enter description here ...

@@ -23,10 +23,7 @@ class CLAppFactory extends ApplicationFactory
 	 */
 	public function createResponse()
 	{
-		$aRspn = $this->create( __NAMESPACE__.'\\Response' ) ;
-		$aRspn->initialize( new PrintSteam() ) ;
-		
-		return $aRspn ;
+		return $this->create( __NAMESPACE__.'\\Response', $this->create('jc\\io\\PrintStream') ) ;
 	}
 	
 }

@@ -2,10 +2,7 @@
 namespace jc\lang ;
 
 class Object
-{
-	public function initialize()
-	{}
-	
+{	
 	/**
 	 * Enter description here ...
 	 * 

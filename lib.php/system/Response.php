@@ -6,7 +6,7 @@ use jc\io\PrintSteam;
 
 class Response extends Object
 {	
-	public function initialize(PrintSteam $aPrinter)
+	public function __construct(PrintSteam $aPrinter)
 	{
 		$this->aPrinter = $aPrinter ;
 	}
