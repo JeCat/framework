@@ -38,5 +38,13 @@ interface IInputStream
 	 */
 	function seek($nPosition) ;	
 	
+	/**
+	 * Enter description here ...
+	 * 
+	 * @return bool
+	 */
+	public function isEnd() ;
+	
+	
 }
 ?>
