@@ -6,7 +6,7 @@ use jc\lang\Object;
 use jc\io\IClosable;
 use jc\io\IInputStream;
 
-class InputStream extends Stream implements IInputStream
+class InputStream extends Stream implements IInputStream, ILockable
 {
 	/**
 	 * Enter description here ...

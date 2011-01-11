@@ -3,7 +3,7 @@ namespace jc\io ;
 
 use jc\lang\Object;
 
-class OutputStream extends Stream implements IOutputStream
+class OutputStream extends Stream implements IOutputStream, ILockable
 {
 	/**
 	 * Enter description here ...

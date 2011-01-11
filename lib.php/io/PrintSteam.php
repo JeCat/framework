@@ -3,7 +3,7 @@ namespace jc\io ;
 
 use jc\lang\Object;
 
-class PrintSteam extends Object implements IOutputStream
+class PrintSteam extends Object implements IStream, IOutputStream
 {
 	/**
 	 * Enter description here ...
@@ -43,6 +43,16 @@ class PrintSteam extends Object implements IOutputStream
 	public function flush()
 	{
 		ob_flush() ;
+	}
+	
+	/**
+	 * Enter description here ...
+	 * 
+	 * @return bool
+	 */
+	public function supportsLock()
+	{
+		return false ;
 	}
 }
 ?>

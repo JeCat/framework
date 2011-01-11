@@ -37,21 +37,16 @@ class Factory extends Object
 			throw new Exception("class无效：".$sClassName) ;
 		}
 		
-		$aObject = new $sClassName ;
-		
-		if( $aObject instanceof Object )
+		$arrArgvs = array_values($arrArgvs) ;
+		$arrArgNameList = array() ;
+		foreach($arrArgvs as $sKey=>$Item)
 		{
-			// 初始化对象
-			if(count($arrArgvs))
-			{
-				if( call_user_func_array(array($aObject,'initialize'),$arrArgvs)===false )
-				{
-					return null ;
-				}
-			}
+			$arrArgNameList[] = "\$arrArgvs[$sKey]" ;
 		}
+		$sArgList = implode(', ',$arrArgNameList) ;
 		
-		return $aObject ;
+		
+		return eval("return new {$sClassName}({$sArgList}) ;") ;
 	}
 	
 	/**

@@ -1,21 +1,21 @@
 <?php
 namespace jc\io ;
 
-interface IOutputStream 
+interface ILockable
 {
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return int
+	 * @return bool
 	 */
-	public function write($sBytes) ;
+	public function lock() ;
 	
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return void
+	 * @return bool
 	 */
-	public function flush() ;
+	public function unlock() ;
 	
 }
 ?>
