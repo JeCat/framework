@@ -2,9 +2,9 @@
 namespace jc\system ;
 
 
-use jc\Factory;
+use jc\lang\Factory;
 
-class Application extends \jc\Object
+class Application extends \jc\lang\Factory
 {
 	/**
      * @return Application

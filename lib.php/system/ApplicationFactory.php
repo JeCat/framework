@@ -2,13 +2,13 @@
 
 namespace jc\system ;
 
-use jc\Factory;
+use jc\lang\Factory;
 
-require_once dirname(__DIR__).'/Factory.php' ;
+require_once dirname(__DIR__).'/lang/Factory.php' ;
 require_once __DIR__.'/IApplicationFactory.php' ;
 
 
-class ApplicationFactory extends \jc\Factory implements IApplicationFactory
+class ApplicationFactory extends \jc\lang\Factory implements IApplicationFactory
 {
 	/**
 	 * Enter description here ...

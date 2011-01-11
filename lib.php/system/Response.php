@@ -2,7 +2,7 @@
 namespace jc\system ;
 
 
-class Response extends \jc\Object
+class Response extends \jc\lang\Factory
 {
 
 }

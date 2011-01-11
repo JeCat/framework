@@ -1,7 +1,8 @@
 <?php
 namespace jc\util ;
 
-use jc\Object;
+use jc\lang\Factory;
+use jc\lang\Object;
 
 class DataSrc extends Object implements IDataSrc
 {

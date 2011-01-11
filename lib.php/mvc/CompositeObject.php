@@ -1,6 +1,6 @@
 <?php
 
-class CompositeObject extends \jc\Object implements ICompositable
+class CompositeObject extends \jc\lang\Factory implements ICompositable
 {
 	// implement for IContainedable //////////////////
 	public function addName($Names)

@@ -20,7 +20,7 @@ set_error_handler("jc\\__exception_error_handler",E_ALL|E_STRICT) ;
 
 
 // 加载核心类
-require_once __DIR__."/lib.php/Object.php" ;
+require_once __DIR__."/lib.php/lang/Object.php" ;
 require_once __DIR__."/lib.php/util/IDataSrc.php" ;
 require_once __DIR__."/lib.php/util/DataSrc.php" ;
 require_once __DIR__."/lib.php/system/ApplicationFactory.php" ;

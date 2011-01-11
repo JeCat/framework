@@ -1,7 +1,7 @@
 <?php
 namespace jc\mvc ;
 
-use jc\Factory ;
+use jc\lang\Factory ;
 
 class ControllerFactory extends Factory implements IControllerFactory
 {

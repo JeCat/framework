@@ -1,7 +1,7 @@
 <?php
 namespace jc\system ;
 
-class AccessRouter extends \jc\Object
+class AccessRouter extends \jc\lang\Factory
 {
     
     /**
