@@ -6,7 +6,7 @@ use jc\lang\Object;
 
 class DataSrc extends Object implements IDataSrc
 {
-	public function initialize(array &$arrDatas=null,$bByRef=false)
+	public function __construct(array &$arrDatas=null,$bByRef=false)
 	{
 		if($arrDatas!==null)
 		{
