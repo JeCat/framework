@@ -3,7 +3,7 @@ namespace jc\io ;
 
 use jc\lang\Object;
 
-class PrintSteam extends Object implements IStream, IOutputStream
+class PrintStream extends Object implements IStream, IOutputStream
 {
 	/**
 	 * Enter description here ...

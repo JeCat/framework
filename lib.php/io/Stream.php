@@ -16,15 +16,6 @@ class Stream extends Object implements IStream, IClosable
 	{
 		$this->hHandle = $hHandle ;
 	}
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return void
-	 */
-	public function initialize($hHandle=null)
-	{
-		$this->hHandle = $hHandle ;
-	}
 	
 	/**
 	 * Enter description here ...
