@@ -6,9 +6,16 @@ interface IInputStream
 	/**
 	 * Enter description here ...
 	 * 
+	 * @return int
+	 */
+	function read($nBytes) ;
+	
+	/**
+	 * Enter description here ...
+	 * 
 	 * @return string
 	 */
-	function read() ;
+	function readInString($nBytes) ;
 	
 	/**
 	 * Enter description here ...
@@ -30,6 +37,12 @@ interface IInputStream
 	 * @return void
 	 */
 	function seek($nPosition) ;
-
+	
+	/**
+	 * Enter description here ...
+	 * 
+	 * @return bool
+	 */
+	public function isActiving() ;
 }
 ?>

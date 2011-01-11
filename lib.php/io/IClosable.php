@@ -1,5 +1,5 @@
 <?php
-namespace jc\cache ;
+namespace jc\io ;
 
 interface IClosable
 {

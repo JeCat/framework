@@ -16,5 +16,12 @@ interface IOutputStream
 	 * @return void
 	 */
 	public function flush() ;
+		
+	/**
+	 * Enter description here ...
+	 * 
+	 * @return bool
+	 */
+	public function isActiving() ;
 }
 ?>
