@@ -1,12 +1,12 @@
 <?php
 namespace jc\system ;
 
+use jc\io\PrintStream;
 use jc\lang\Object ;
-use jc\io\PrintSteam;
 
 class Response extends Object
 {	
-	public function __construct(PrintSteam $aPrinter)
+	public function __construct(PrintStream $aPrinter)
 	{
 		$this->aPrinter = $aPrinter ;
 	}
