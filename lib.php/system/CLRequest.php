@@ -8,7 +8,7 @@ class CLRequest extends DataSrc implements IRequest
 	public function __construct()
 	{
 		global $argv ;
-		$this->addChild( $this->create('\\jc\\util\\DataSrc',array($argv,true)) ) ;
+		$this->addChild( $this->create('DataSrc','jc\\util',array($argv,true)) ) ;
 	}
 	
 	public function defineParam($sParam,$arrCLNames,$DefaultValue=null)

@@ -8,7 +8,7 @@ interface IControllerFactory
 	 * 
 	 * @return IController
 	 */
-	public function createController($sClassName) ;
+	public function createController($sClassName,$sNamespace='\\') ;
 	
 }
 ?>

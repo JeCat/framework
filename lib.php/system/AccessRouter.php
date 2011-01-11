@@ -125,7 +125,7 @@ class AccessRouter extends \jc\lang\Factory
     {
     	if( !$this->aControllerFactory )
     	{
-    		$this->aControllerFactory = $this->factory()->create("jc\\mvc\\ControllerFactory") ;
+    		$this->aControllerFactory = $this->factory()->create("ControllerFactory",'jc\\mvc') ;
     	}
     	
     	return $this->aControllerFactory ;

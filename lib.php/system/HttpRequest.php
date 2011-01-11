@@ -26,7 +26,7 @@ class HttpRequest extends DataSrc implements IRequest
 	{
 		foreach(self::$arrDataSources as $sVarName)
 		{
-			$this->addChild( $this->factory()->create('jc\\util\\DataSrc',array($$sVarName,true)) ) ;
+			$this->addChild( $this->factory()->create('DataSrc','jc\\util',array($$sVarName,true)) ) ;
 		}
 	}
 

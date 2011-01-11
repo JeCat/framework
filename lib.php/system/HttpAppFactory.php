@@ -13,7 +13,7 @@ class HttpAppFactory extends ApplicationFactory
 	 */
 	public function createRequest()
 	{
-		return $this->create( __NAMESPACE__.'\\HttpRequest' ) ;
+		return $this->create( 'HttpRequest', __NAMESPACE__ ) ;
 	}
 
 	/**
@@ -23,8 +23,7 @@ class HttpAppFactory extends ApplicationFactory
 	 */
 	public function createResponse()
 	{
-		return $this->create( __NAMESPACE__.'\\Response', $this->create('jc\\io\\HtmlPrintSteam') ) ;
-		return $aRspn ;
+		return $this->create( 'Response', __NAMESPACE__, array($this->create('HtmlPrintSteam','jc\\io')) ) ;
 	}
 	
 }

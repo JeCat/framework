@@ -38,15 +38,15 @@ class Object
 	 * 
 	 * @return stdClass
 	 */
-	public function create($sClassName,array $arrArgvs=array())
+	public function create($sClassName,$sNamespace='\\',array $arrArgvs=array())
 	{
 		if($this->aFactory)
 		{
-			return $this->aFactory->create($sClassName,$arrArgvs) ;
+			return $this->aFactory->create($sClassName,$sNamespace,$arrArgvs) ;
 		}
 		else
 		{
-			return Factory::createNewObject($sClassName,$arrArgvs) ;
+			return Factory::createNewObject($sClassName,$sNamespace,$arrArgvs) ;
 		}
 	}
 	

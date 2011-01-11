@@ -10,9 +10,9 @@ class ControllerFactory extends Factory implements IControllerFactory
 	 * 
 	 * @return IController
 	 */
-	public function createController($sClassName)
+	public function createController($sClassName,$sNamespace='\\')
 	{
-		$aController = $this->create($sClassName) ;
+		$aController = $this->create($sClassName,$sNamespace) ;
 		
 		// other init things
 		

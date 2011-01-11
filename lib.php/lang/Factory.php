@@ -10,10 +10,10 @@ class Factory extends Object
 	 * 
 	 * @return stdClass
 	 */
-	public function create($sClassName,array $arrArgvs=array())
-	{
+	public function create($sClassName,$sNamespace='\\',array $arrArgvs=array())
+	{		
 		// 创建对象
-		$aObject = self::createNewObject($sClassName,$arrArgvs) ;
+		$aObject = self::createNewObject($sClassName,$sNamespace,$arrArgvs) ;
 				
 		// 设置工厂对象
 		if( $aObject instanceof Object)
@@ -29,12 +29,13 @@ class Factory extends Object
 	 * 
 	 * @return void
 	 */
-	static public function createNewObject($sClassName,array $arrArgvs=array())
+	static public function createNewObject($sClassName,$sNamespace,array $arrArgvs=array())
 	{
-		$sClassName = strval($sClassName) ;
-		if( !class_exists($sClassName) )
+		$sFullClassName = $sNamespace . (substr($sNamespace,strlen($sNamespace)-1,1)=='\\'? '': '\\') . $sClassName ;
+		
+		if( !class_exists($sFullClassName) )
 		{
-			throw new Exception("class无效：".$sClassName) ;
+			throw new Exception("class无效：".$sFullClassName) ;
 		}
 		
 		$arrArgvs = array_values($arrArgvs) ;
@@ -46,7 +47,7 @@ class Factory extends Object
 		$sArgList = implode(', ',$arrArgNameList) ;
 		
 		
-		return eval("return new {$sClassName}({$sArgList}) ;") ;
+		return eval("return new {$sFullClassName}({$sArgList}) ;") ;
 	}
 	
 	/**

@@ -33,7 +33,7 @@ abstract class ApplicationFactory extends \jc\lang\Factory implements IApplicati
 	{
 		require_once __DIR__ . '/ClassLoader.php' ;
 		
-		$aClassLoader = $this->create(__NAMESPACE__.'\\ClassLoader') ;
+		$aClassLoader = $this->create('ClassLoader',__NAMESPACE__) ;
 		$aClassLoader->addPackage( realpath(__DIR__.'/..').'/', "jc" ) ; // 将 jcat 加入到 class loader 中
 		
 		return  $aClassLoader ;
@@ -46,7 +46,7 @@ abstract class ApplicationFactory extends \jc\lang\Factory implements IApplicati
 	 */
 	public function createAccessRouter()
 	{
-		return $this->create(__NAMESPACE__.'\\AccessRouter') ;
+		return $this->create('AccessRouter',__NAMESPACE__) ;
 	}
 	
 	/**
@@ -72,7 +72,7 @@ abstract class ApplicationFactory extends \jc\lang\Factory implements IApplicati
 	public function createApplication()
 	{
 		require_once __DIR__.'/Application.php' ;
-		$aApp = $this->create(__NAMESPACE__."\\Application") ;
+		$aApp = $this->create("Application",__NAMESPACE__) ;
 		
 		// 初始化 class loader
 		$aApp->setClassLoader($this->createClassLoader()) ;

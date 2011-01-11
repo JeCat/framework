@@ -42,7 +42,7 @@ class File extends FSO
 			return null ;
 		}
 		
-		return $this->create('jc\\io\\InputStream',array($hHandle)) ;		
+		return $this->create('InputStream','jc\\io',array($hHandle)) ;		
 	}
 	
 	/**
@@ -58,7 +58,7 @@ class File extends FSO
 			return null ;
 		}
 		
-		return $this->create('jc\\io\\InputStream',array($hHandle)) ;
+		return $this->create('InputStream','jc\\io',array($hHandle)) ;
 	}
 	
 }

@@ -13,7 +13,7 @@ class CLAppFactory extends ApplicationFactory
 	 */
 	public function createRequest()
 	{
-		return $this->create( __NAMESPACE__.'\\CLRequest' ) ;
+		return $this->create( 'CLRequest', __NAMESPACE__ ) ;
 	}
 
 	/**
@@ -23,7 +23,7 @@ class CLAppFactory extends ApplicationFactory
 	 */
 	public function createResponse()
 	{
-		return $this->create( __NAMESPACE__.'\\Response', $this->create('jc\\io\\PrintStream') ) ;
+		return $this->create( 'Response', __NAMESPACE__, array($this->create('PrintStream','jc\\io')) ) ;
 	}
 	
 }
