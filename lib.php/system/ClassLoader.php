@@ -8,19 +8,7 @@ class ClassLoader extends \jc\lang\Factory
 		spl_autoload_register( array($this,"Autoload") ) ;
 		
 		// OOXX.php
-		$this->addClassFilenameWrapper(function($sClassName){
-			return "{$sClassName}.php" ;
-		}) ;
-		
-		// class.OOXX.php
-		$this->addClassFilenameWrapper(function($sClassName){
-			return "class.{$sClassName}.php" ;
-		}) ;
-		
-		// interface.OOXX.php
-		$this->addClassFilenameWrapper(function($sClassName){
-			return "{$sClassName}.php" ;
-		}) ;
+		$this->addClassFilenameWrapper(array(__CLASS__,'classFilenameWrapper')) ;
 	}
 
 	public function addPackage($sFolder,$sNamespace='') 
@@ -33,6 +21,10 @@ class ClassLoader extends \jc\lang\Factory
 		$this->arrClassFilenameWraps[] = $func ;
 	}
 	
+	static public function classFilenameWrapper($sClassName)
+	{
+		return "{$sClassName}.php" ;
+	}
 	
 	public function autoload($sClassFullName)
 	{
@@ -62,7 +54,8 @@ class ClassLoader extends \jc\lang\Factory
 		
 		foreach($this->arrClassFilenameWraps as $func)
 		{
-			$sClassFilePath = $this->arrPackages[$sNamespace]."/".$sSubNamespace.$func($sClassName) ;
+			$sClassFilePath = $this->arrPackages[$sNamespace]."/".$sSubNamespace
+								. call_user_func_array($func, array($sClassName)) ;
 			
 			if( is_file($sClassFilePath) )
 			{

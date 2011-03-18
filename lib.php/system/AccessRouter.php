@@ -3,7 +3,26 @@ namespace jc\system ;
 
 class AccessRouter extends \jc\lang\Factory
 {
+    /**
+     * Enter description here ...
+     * 
+     * @return string
+     */
+    public function defaultController()
+    {
+    	return $this->sDefaultControllerName ;
+    }
     
+    /**
+     * Enter description here ...
+     * 
+     * @return void
+     */
+    public function setDefaultController($sControllerName)
+    {
+    	$this->sDefaultControllerName = (string)$sControllerName ;
+    }
+        
     /**
      * Enter description here ...
      * 
@@ -106,13 +125,24 @@ class AccessRouter extends \jc\lang\Factory
      * 
      * @return void
      */
-    public function createController(IRequest $aRequest)
+    public function createRequestController(IRequest $aRequest)
     {
     	$sControllerName = $aRequest->string($this->sControllerParam) ;
-    	$sControllerClass = $this->transControllerClass($sControllerName) ;
+    	return $this->createController($sControllerName) ;
+    }
+
+    /**
+     * Enter description here ...
+     * 
+     * @return void
+     */
+    public function createController($sName)
+    {
+    	$sControllerClass = $this->transControllerClass($sName) ;
     	if($sControllerClass)
-    	{    		
-    		return $this->controllerFactory()->createController($sControllerClass) ;
+    	{
+    		return new $sControllerName() ;
+    		//return $this->controllerFactory()->createController($sControllerClass) ;
     	}
     }
     
@@ -120,7 +150,7 @@ class AccessRouter extends \jc\lang\Factory
      * Enter description here ...
      * 
      * @return jc\\mvc\\ControllerFactory
-     */
+     *//*
     public function controllerFactory()
     {
     	if( !$this->aControllerFactory )
@@ -129,7 +159,7 @@ class AccessRouter extends \jc\lang\Factory
     	}
     	
     	return $this->aControllerFactory ;
-    }
+    }*/
     
     /**
      * Enter description here ...
@@ -138,8 +168,15 @@ class AccessRouter extends \jc\lang\Factory
      */
     public function transControllerClass($sControllerName)
     {
+    	// 缺省控制器
+    	if($sControllerName==null)
+    	{
+    		$sControllerName = $this->defaultController() ;
+    	}
+    	
     	// 通过名称查找注册过的控制器
-    	if( $sControllerClass=$this->controller($sControllerName) )
+    	$sControllerClass=$this->controller($sControllerName) ;
+    	if( class_exists($sControllerClass) )
     	{
     		return $sControllerClass ;
     	}
@@ -165,6 +202,7 @@ class AccessRouter extends \jc\lang\Factory
     	return ;
     }
     
+    private $sDefaultControllerName = null ;
     
 	private $sControllerParam = 'c' ;
 	

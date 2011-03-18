@@ -54,7 +54,7 @@ abstract class ApplicationFactory extends \jc\lang\Factory implements IApplicati
 	 * 
 	 * @return Application
 	 */
-	public function application()
+	public function application($bDefaultGlobal=true)
 	{
 		if( !$this->aApplication )
 		{

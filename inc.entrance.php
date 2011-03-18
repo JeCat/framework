@@ -16,7 +16,7 @@ function __exception_error_handler($errno, $errstr, $errfile, $errline )
 	
 	throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
 }
-set_error_handler("jc\\__exception_error_handler",E_ALL|E_STRICT) ;
+//set_error_handler("jc\\__exception_error_handler",E_ALL|E_STRICT) ;
 
 
 // 加载核心类

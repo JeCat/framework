@@ -25,15 +25,26 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 /*-- Project Introduce --*/
 
+namespace jc\pattern\composite ;
 
 
-interface IContainedable extends INamable
+interface IContainer
 {
 	
-	public function setParent(IContainer $aParent) ;
+	public function addChild(IContainedable $aChild,$bAdoptRelative=true) ;
 	
-	public function parent() ;
+	public function removeChild($Child) ;
 	
+	public function clearChildren() ;
+	
+	public function child($sName) ;
+	
+	public function findChildInFamily($sName) ;
+	
+	public function setChildTypes($Types) ;
+	
+	public function childrenIterator($Types=null) ;
+		
 }
 
 ?>

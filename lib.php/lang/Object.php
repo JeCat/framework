@@ -1,6 +1,8 @@
 <?php
 namespace jc\lang ;
 
+use jc\system\Application;
+
 class Object
 {	
 	/**
@@ -50,6 +52,36 @@ class Object
 		}
 	}
 	
+	/**
+	 * Enter description here ...
+	 * 
+	 * @return \jc\system\Application
+	 */
+	public function application($bDefaultGlobal=true)
+	{
+		if($this->aApplication)
+		{
+			return $this->aApplication ;
+		}
+		else 
+		{
+			return $bDefaultGlobal? \jc\system\Application::singleton(): null ;
+		}
+	}
+	
+	/**
+	 * Enter description here ...
+	 * 
+	 * @return \jc\system\Application
+	 */
+	public function setApplication(\jc\system\Application $aApp)
+	{
+		$this->aApplication = $aApp ;
+	}
+	
+	
 	private $aFactory ;
+	
+	private $aApplication ;
 }
 ?>

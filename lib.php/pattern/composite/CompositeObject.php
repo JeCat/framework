@@ -25,17 +25,26 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 /*-- Project Introduce --*/
 
+namespace jc\pattern\composite ;
 
 
 class CompositeObject extends ContainedableObject implements IContainer
-{
-	public function setChildTypes(array $arrTypes) {
-		// TODO Auto-generated method stub
-		
+{	
+	public function setChildTypes($Types)
+	{
+		$arrTypes = (array) $Types ;
+		foreach ($arrTypes as $sType)
+		{
+			$sType = strval($sType) ;
+			if( !in_array($sType,$this->arrTypes) )
+			{
+				$this->arrTypes[] = $sType ;
+			}
+		}
 	}
 	
 	// implement for IContainer //////////////////
-	public function addChild(IContainedable $aChild) {
+	public function addChild(IContainedable $aChild,$bAdoptRelative=true) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -55,18 +64,25 @@ class CompositeObject extends ContainedableObject implements IContainer
 		
 	}
 
-	public function findChildInFamily($sName) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
 	public function childrenIterator($Types = null) {
 		// TODO Auto-generated method stub
 		
 	}
 	
 	
+	
+	
+	public function findChildInFamily($sName) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public function adopt(IContainer $aParent,$bAdoptRelative=true)
+	{
+		// 
+	}
+	
+	private $arrTypes = array() ;
 
 	private $arrChildren = array() ;
 }

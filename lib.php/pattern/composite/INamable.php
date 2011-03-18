@@ -25,25 +25,21 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 /*-- Project Introduce --*/
 
+namespace jc\pattern\composite ;
 
 
-interface IContainer
+interface INamable
 {
 	
-	public function addChild(IContainedable $aChild) ;
+	public function addName($Names) ;
 	
-	public function removeChild($Child) ;
+	public function hasName($sName) ;
 	
-	public function clearChildren() ;
+	public function remove($sName) ;
 	
-	public function child($sName) ;
+	public function clearNames() ;
 	
-	public function findChildInFamily($sName) ;
-	
-	public function setChildTypes(array $arrTypes) ;
-	
-	public function childrenIterator($Types=null) ;
-	
+	public function namesIterator() ;
 	
 }
 
