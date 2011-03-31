@@ -30,7 +30,7 @@ namespace jc\pattern\composite ;
 
 class CompositeObject extends ContainedableObject implements IContainer
 {	
-	public function setChildTypes($Types)
+	public function addChildTypes($Types)
 	{
 		$arrTypes = (array) $Types ;
 		foreach ($arrTypes as $sType)

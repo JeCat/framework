@@ -41,7 +41,7 @@ interface IContainer
 	
 	public function findChildInFamily($sName) ;
 	
-	public function setChildTypes($Types) ;
+	public function addChildTypes($Types) ;
 	
 	public function childrenIterator($Types=null) ;
 		

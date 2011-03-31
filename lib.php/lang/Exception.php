@@ -8,7 +8,7 @@ class Exception extends \Exception
 	 * 
 	 * @return void
 	 */
-	public function Exception($sMessage,\Exception $aCause)
+	public function Exception($sMessage,$arrArgvs=array(),\Exception $aCause=null)
 	{
 		
 	}

@@ -50,11 +50,11 @@ class CompositeObjectTest extends PHPUnit_Framework_TestCase
     /**
      * Tests CompositeObject->setChildTypes()
      */
-    public function testSetChildTypes ()
+    public function testAddChildTypes ()
     {
-        $this->CompositeObject->setChildTypes("xxxxx") ;
-        $this->CompositeObject->setChildTypes(array("yyyyy","zzzzzz")) ;
-        $this->CompositeObject->setChildTypes(array("xxxxx","aaaaaa")) ;
+        $this->CompositeObject->addChildTypes("xxxxx") ;
+        $this->CompositeObject->addChildTypes(array("yyyyy","zzzzzz")) ;
+        $this->CompositeObject->addChildTypes(array("xxxxx","aaaaaa")) ;
         
         $this->assertAttributeEquals(array("xxxxx","yyyyy","zzzzzz","aaaaaa"),"arrTypes",$this->CompositeObject) ;
     }
