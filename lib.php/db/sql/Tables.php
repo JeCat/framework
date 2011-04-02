@@ -43,7 +43,7 @@ class Tables implements ISQLStatementFrom
 		$aJoin->addTable($sTableName,$aCri) ;
 	}
 	
-	public function MakeSQL($bFormat=false)
+	public function makeStatement($bFormat=false)
 	{		
 		$arrJoins = array() ;
 		foreach ($this->mapJoinTables as $aJoin)

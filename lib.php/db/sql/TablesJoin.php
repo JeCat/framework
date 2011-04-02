@@ -55,10 +55,10 @@ class TablesJoin implements ISQLStatement, IIteratable
 		}
 	}
 	
-	public function MakeSQL($bFormat=false)
+	public function makeStatement($bFormat=false)
 	{
 		return $this->sType . "( " . implode(", ",$this->arrTables)
-					. " ) ON " . $this->aCriteria->MakeSQLWhere($bFormat) ;
+					. " ) ON " . $this->aCriteria->makeStatementWhere($bFormat) ;
 	}
 	
 	/**
