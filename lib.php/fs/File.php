@@ -12,9 +12,7 @@ class File extends FSO
 	 */
 	public function extname()
 	{
-		$sName = name() ;
-		$nDotIdx = strrpos($sName,'.') ;
-		return ($nDotIdx===false)? '': substr($sName,$nDotIdx+1) ;
+		return FSO::extname(name()) ;
 	}
 
 	/**
@@ -24,9 +22,7 @@ class File extends FSO
 	 */
 	public function titlename()
 	{
-		$sName = name() ;
-		$nDotIdx = strrpos($sName,'.') ;
-		return ($nDotIdx===false)? $sName: substr($sName,0,$nDotIdx) ;
+		return FSO::titlename(name()) ;
 	}
 	
 	/**

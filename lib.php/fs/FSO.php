@@ -149,6 +149,28 @@ class FSO extends Object
 	
 
 	/**
+	 * Enter description here ...
+	 * 
+	 * @return string
+	 */
+	static public function extname($sFilename)
+	{
+		$nDotIdx = strrpos($sFilename,'.') ;
+		return ($nDotIdx===false)? '': substr($sFilename,$nDotIdx+1) ;
+	}
+
+	/**
+	 * Enter description here ...
+	 * 
+	 * @return string
+	 */
+	static public function titlename($sFilename)
+	{
+		$nDotIdx = strrpos($sFilename,'.') ;
+		return ($nDotIdx===false)? $sFilename: substr($sFilename,0,$nDotIdx) ;
+	}
+
+	/**
 	 * 当前文件系统，是否对文件名的大小写敏感
 	 *
 	 * @access	public

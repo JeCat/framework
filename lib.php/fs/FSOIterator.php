@@ -14,12 +14,31 @@ class FSOIterator extends \FilterIterator
 	const RETURN_DIR = 64 ;
 	const RETURN_PATH = 96 ;	// RETURN_NAME|RETURN_DIR
 	
-	const FLAG_DEFAULT = 101 ;	// FILE|FOLDER|RETURN_PATH
+	const RECURSIVE = 256 ;
+	
+	const FLAG_DEFAULT = 357 ;	// FILE|FOLDER|RETURN_PATH|RECURSIVE
 	
 	public function __construct($sFolderPath,$nFlags=self::FLAG_DEFAULT)
 	{
 		$this->nFlags = $nFlags ;
-		parent(new \DirectoryIterator($sFolderPath)) ;
+		
+		if( ($nFlags&self::RECURSIVE)==self::RECURSIVE )
+		{
+			parent(new \DirectoryIterator($sFolderPath)) ;
+		}
+		else
+		{
+			parent(new \RecursiveCachingIterator($sFolderPath)) ;
+		}
+	}
+
+	public function createFileIterator($sFolderPath)
+	{
+		return new self($sFolderPath,self::FILE|self::RETURN_PATH) ;
+	}
+	public function createFileRecursiveIterator($sFolderPath)
+	{
+		return new self($sFolderPath,self::FILE|self::RETURN_PATH|self::RECURSIVE) ;
 	}
 	
 	public function accept() 
@@ -72,6 +91,16 @@ class FSOIterator extends \FilterIterator
 		{
 			// what's wrong ?
 		}
+	}
+	
+	public function dir()
+	{
+		return dirname(parent::current()) ;
+	}
+	
+	public function filename()
+	{
+		return basename(parent::current()) ;
 	}
 	
 	public function flags()

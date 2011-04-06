@@ -2,6 +2,9 @@
 
 namespace jc\lang ;
 
+use jc\fs\FSO;
+use jc\fs\FSOIterator;
+
 class Locale
 {
 	public function __construct($sDefaultLocaleName)
@@ -44,9 +47,23 @@ class Locale
 	
 	public function loadSentenceFolder($sFolderPath)
 	{
-		if( !is_dir($sFolderPath) )
+		$aIter = FSOIterator::createFileIterator($sFolderPath) ;
+		for($aIter->rewind;$aIter->valid();$aIter->next())
 		{
+			$sFilename = $aIter->filename() ;
+			$arr=explode(".", $sFilename) ;
+			if(array_pop($arr)!='spkg')
+			{
+				continue ;
+			}
 			
+			$sLocaleName = strtolower(array_pop($arr)) ;
+			$sPackageName = implode(".", $arr) ;
+			
+			if( empty($sLocaleName) or empty($sPackageName) )
+			{
+				continue ;
+			}
 		}
 	}
 	
