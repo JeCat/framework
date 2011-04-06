@@ -1,4 +1,5 @@
 <?php
+
 namespace jc\fs ;
 
 use jc\lang\Object;
@@ -16,6 +17,23 @@ class FSO extends Object
 	public function __construct($sPath='')
 	{
 		$this->sPath = $sPath ;
+	}
+	
+	/**
+	 * Enter description here ...
+	 * 
+	 * @return FSO
+	 */
+	static public function create($sPath)
+	{
+		if(is_file($sPath))
+		{
+			return new File($sPath) ;
+		}
+		else if(is_dir($sPath))
+		{
+			return new Dir($sPath) ;
+		}
 	}
 	
 	/**
