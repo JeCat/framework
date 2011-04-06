@@ -14,6 +14,8 @@ class Select extends MultiTableStatement
 	
 	public function makeStatement($bFormat=false)
 	{
+		$this->checkValid(true) ;
+		
 		return "SELECT"
 			. $this->makeStatementPredicate($bFormat)
 			. $this->aColumns? $this->aColumns->makeStatement(): ' *'

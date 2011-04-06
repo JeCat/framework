@@ -42,6 +42,8 @@ class Insert extends StatementBase
 
 	public function makeStatement($bFormat=false)
 	{
+		$this->checkValid(true) ;
+		
 		$sStatement = 'INSERT INTO ' . $this->createTableName($this->sTableName) ;
 		
 		$arrClms = array() ;
