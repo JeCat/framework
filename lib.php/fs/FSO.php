@@ -24,7 +24,7 @@ class FSO extends Object
 	 * 
 	 * @return FSO
 	 */
-	static public function create($sPath)
+	static public function createFSO($sPath)
 	{
 		if(is_file($sPath))
 		{

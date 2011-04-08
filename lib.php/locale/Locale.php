@@ -25,7 +25,7 @@ class Locale
 	public function createLocale($sLocaleName)
 	{
 		return $this->arrLocales[$sLocaleName] = new SentenceTar($sLocaleName) ;
-	}
+	} 
 	public function addLocale($sLocaleName)
 	{
 		if( !$this->existsLocale($sLocaleName) )
@@ -64,6 +64,8 @@ class Locale
 			{
 				continue ;
 			}
+			
+			$this->loadSentencePackage($aIter->current(),$sPackageName,$sLocaleName) ;
 		}
 	}
 	
