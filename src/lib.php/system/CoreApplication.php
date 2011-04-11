@@ -1,27 +1,27 @@
 <?php
 namespace jc\system ;
 
+
 use jc\io\PrintSteam;
 use jc\lang\Factory;
+use jc\locale\LocaleManager ;
 
-class Application extends \jc\lang\Factory
+class CoreApplication extends \jc\lang\Factory
 {
-	/**
-     * @return Application
-     */
-	static public function singleton()
+	public function __construct()
 	{
-		return self::$theGlobalInstance ;
+		// 初始化 class loader
+		$aClassLoader = $this->create('ClassLoader',__NAMESPACE__) ;
+		$aClassLoader->addPackage( realpath(__DIR__.'/..').'/', "jc" ) ; // 将 jcat 加入到 class loader 中
+		$this->setClassLoader($aClassLoader) ;
+
+		// 创建 AccessRouter 对象
+		$this->setAccessRouter( $this->create('AccessRouter',__NAMESPACE__) ) ;
+		
+		// 创建 LocaleManager 对象
+		$this->setLocaleManager( $this->create('LocaleManager','jc\locale') ) ;
 	}
 	
-	/**
-     * @return void
-     */
-	static public function setSingleton(self $aInstance)
-	{
-		self::$theGlobalInstance = $aInstance ;
-	}
-
 	/**
      * @param field_type $aClassLoader
      */
@@ -85,6 +85,21 @@ class Application extends \jc\lang\Factory
     {
         $this->aAccessRouter = $aAccessRouter;
     }
+
+	/**
+     * @return jc\locale\LocaleManager
+     */
+    public function localeManager() 
+    {
+    	return $this->aLocaleManager ;
+    }
+    /**
+     * @param jc\locale\LocaleManager $aLocaleManager
+     */
+    public function setLocaleManager(LocaleManager $aLocaleManager) 
+    {
+    	$this->aLocaleManager = $aLocaleManager ;
+    }
     
     /**
      * Enter description here ...
@@ -103,6 +118,8 @@ class Application extends \jc\lang\Factory
 	private $aResponse ;
 	
 	private $aAccessRouter ;
+	
+	private $aLocaleManager ;
 	
 	static private $theGlobalInstance ; 
 

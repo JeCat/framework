@@ -1,6 +1,6 @@
 <?php
 
-namespace jc\lang ;
+namespace jc\locale ;
 
 use jc\fs\FSO;
 use jc\fs\FSOIterator;
@@ -34,7 +34,7 @@ class LocaleManager
 	public function createLocale($sLocaleName)
 	{
 		return $this->arrLocales[$sLocaleName] = new Locale($sLocaleName) ;
-	} 
+	}
 	public function addLocale($sLocaleName)
 	{
 		if( !$this->existsLocale($sLocaleName) )

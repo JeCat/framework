@@ -1,40 +1,10 @@
 <?php
 namespace jc\lang ;
 
-use jc\system\Application;
+use jc\system\Application ;
 
 class Object
-{	
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return jc\lang\Factory
-	 */
-	public function factory()
-	{
-		return $this->aFactory ;
-	}
-	
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return Factory
-	 */
-	public function rootFactory()
-	{
-		return $this->aFactory? $this->aFactory->rootFactory(): null ;
-	}
-	
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return void
-	 */
-	public function setFactory(Factory $aFactory)
-	{
-		$this->aFactory = $aFactory ;
-	}
-	
+{
 	/**
 	 * Enter description here ...
 	 * 
@@ -42,20 +12,20 @@ class Object
 	 */
 	public function create($sClassName,$sNamespace='\\',array $arrArgvs=array())
 	{
-		if($this->aFactory)
+		$aObject = Factory::createNewObject($sClassName,$sNamespace,$arrArgvs) ;
+		
+		if( $aObject instanceof self )
 		{
-			return $this->aFactory->create($sClassName,$sNamespace,$arrArgvs) ;
+			$aObject->setApplication($this->application(true)) ;
 		}
-		else
-		{
-			return Factory::createNewObject($sClassName,$sNamespace,$arrArgvs) ;
-		}
+		
+		return $aObject ;
 	}
 	
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return \jc\system\Application
+	 * @return jc\system\Application
 	 */
 	public function application($bDefaultGlobal=true)
 	{
@@ -65,23 +35,20 @@ class Object
 		}
 		else 
 		{
-			return $bDefaultGlobal? \jc\system\Application::singleton(): null ;
+			return $bDefaultGlobal? Application::singleton(): null ;
 		}
 	}
 	
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return \jc\system\Application
+	 * @return jc\system\Application
 	 */
-	public function setApplication(\jc\system\Application $aApp)
+	public function setApplication(Application $aApp)
 	{
 		$this->aApplication = $aApp ;
 	}
-	
-	
-	private $aFactory ;
-	
+
 	private $aApplication ;
 }
 ?>
