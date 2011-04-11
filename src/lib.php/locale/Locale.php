@@ -1,83 +1,90 @@
 <?php
 
-namespace jc\lang ;
+namespace jc\locale ;
 
-use jc\fs\FSO;
-use jc\fs\FSOIterator;
+use jc\lang\SentencePackage;
 
-class Locale
+class Locale implements ITranslator
 {
-	public function __construct($sDefaultLocaleName)
+	public function __construct($sLocaleName)
 	{
-		$this->setDefaultLocaleName($sDefaultLocaleName) ;
+		$this->sLocaleName = $sLocaleName ;
+	}
+	
+	public function localeName()
+	{
+		return $this->sLocaleName ;
+	}
+	
+	
+	// for language
+	public function loadSentencePackage($sPath,$sPackageName)
+	{
+		$this->arrSentencePackages[$sPackageName][] = new SentencePackage($this->localeName(), $sPackageName,$sPath) ;
 	}
 
-	public function defaultLocaleName()
+	public function sentencePackage($sName)
 	{
-		return $this->sDefaultLocaleName ;
+		return isset($this->arrSentencePackages[$sName])?end($this->arrSentencePackages[$sName]):null ;
 	}
-	public function setDefaultLocaleName($sDefaultLocaleName)
+	
+	public function removePackage($sName,$bTotal=true)
 	{
-		$this->sDefaultLocaleName = $sDefaultLocaleName ;
-		$this->addLocale($sDefaultLocaleName) ;
-	}
-
-	public function createLocale($sLocaleName)
-	{
-		return $this->arrLocales[$sLocaleName] = new SentenceTar($sLocaleName) ;
-	} 
-	public function addLocale($sLocaleName)
-	{
-		if( !$this->existsLocale($sLocaleName) )
+		if($bTotal)
 		{
-			$this->createLocale($sLocaleName) ;
+			unset($this->arrSentencePackages[$sName]) ;
+		}
+		else 
+		{
+			array_pop($this->arrSentencePackages[$sName]) ;
+			if( empty($this->arrSentencePackages[$sName]) )
+			{
+				unset($this->arrSentencePackages[$sName]) ;
+			}
+		}
+	}
+	
+	public function findSentence($sKey)
+	{
+		for(end($this->arrSentencePackages);$arrPackages=current($this->arrSentencePackages);prev($this->arrSentencePackages))
+		{
+			for(end($arrPackages);$aPackage=current($arrPackages);prev($arrPackages))
+			{
+				$sSentence = $aPackage->sentence($sKey) ;
+				if($sSentence!==null)
+				{
+					reset($this->arrSentencePackages) ;
+					return $sSentence ;
+				}
+			}
 		}
 		
-		return $this->localeTar($sLocaleName) ;
-	}
-	public function existsLocale($sLocaleName)
-	{
-		return isset($this->arrLocales[$sLocaleName]) ;
-	}
-	public function localeTar($sLocaleName)
-	{
-		return $this->arrLocales[$sLocaleName]?:null ;
+		reset($this->arrSentencePackages) ;
+		return null ;
 	}
 	
-	
-	public function loadSentenceFolder($sFolderPath)
+	public function trans($sOri,array $arrArgvs=array(),$sSavePackageName=null)
 	{
-		$aIter = FSOIterator::createFileIterator($sFolderPath) ;
-		for($aIter->rewind;$aIter->valid();$aIter->next())
+		$sSentence = $this->findSentence($sOri) ;
+		
+		if($sSentence===null)
 		{
-			$sFilename = $aIter->filename() ;
-			$arr=explode(".", $sFilename) ;
-			if(array_pop($arr)!='spkg')
+			$sSentence = $sOri ;
+			
+			$aPackage = $this->sentencePackage($sSavePackageName) ;
+			if( $aPackage )
 			{
-				continue ;
+				$aPackage->addSentence($sSentence,$sSentence) ;
 			}
-			
-			$sLocaleName = strtolower(array_pop($arr)) ;
-			$sPackageName = implode(".", $arr) ;
-			
-			if( empty($sLocaleName) or empty($sPackageName) )
-			{
-				continue ;
-			}
-			
-			$this->loadSentencePackage($aIter->current(),$sPackageName,$sLocaleName) ;
 		}
+		
+		return call_user_func_array('sprintf', array_merge(array($sOri),$arrArgvs)) ;
 	}
+
 	
-	public function loadSentencePackage($sPath,$sPackageName,$sLocaleName=null)
-	{
-		$aPackageTar = $this->addLocale($sLocaleName?:$this->sDefaultLocaleName) ;
-		$aPackageTar->loadPackage($sPath,$sPackageName) ;
-	}
+	private $sLocaleName ;
 	
-	private $sDefaultLocaleName ;
-	
-	private $arrLocales = array() ;
+	private $arrSentencePackages ;
 }
 
 ?>
