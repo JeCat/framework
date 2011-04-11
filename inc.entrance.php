@@ -20,10 +20,10 @@ function __exception_error_handler($errno, $errstr, $errfile, $errline )
 
 
 // 加载核心类
-require_once __DIR__."/lib.php/lang/Object.php" ;
-require_once __DIR__."/lib.php/util/IDataSrc.php" ;
-require_once __DIR__."/lib.php/util/DataSrc.php" ;
-require_once __DIR__."/lib.php/system/ApplicationFactory.php" ;
+require_once __DIR__."/src/lib.php/lang/Object.php" ;
+require_once __DIR__."/src/lib.php/util/IDataSrc.php" ;
+require_once __DIR__."/src/lib.php/util/DataSrc.php" ;
+require_once __DIR__."/src/lib.php/system/ApplicationFactory.php" ;
 
 
 define( __NAMESPACE__."\\VERSION", '0.6.0' ) ;
