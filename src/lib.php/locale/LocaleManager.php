@@ -19,29 +19,34 @@ class LocaleManager
 	public function setDefaultLocaleName($sDefaultLocaleName)
 	{
 		$this->sDefaultLocaleName = $sDefaultLocaleName ;
-		$this->addLanguage($sDefaultLocaleName) ;
+		$this->addLocale($sDefaultLocaleName) ;
+	}
+	
+	public function locale($sLocaleName=null)
+	{
+		if($sLocaleName===null)
+		{
+			$sLocaleName = $this->sDefaultLocaleName ;
+		}
+		return $this->arrLocales[$sLocaleName]?:null ;
 	}
 
-	public function createSentenceTar($sLocaleName)
+	public function createLocale($sLocaleName)
 	{
-		return $this->arrLocales[$sLocaleName] = new SentenceTar($sLocaleName) ;
+		return $this->arrLocales[$sLocaleName] = new Locale($sLocaleName) ;
 	} 
-	public function addLanguage($sLocaleName)
+	public function addLocale($sLocaleName)
 	{
 		if( !$this->existsLocale($sLocaleName) )
 		{
-			$this->createSentenceTar($sLocaleName) ;
+			$this->createLocale($sLocaleName) ;
 		}
 		
-		return $this->localeTar($sLocaleName) ;
+		return $this->locale($sLocaleName) ;
 	}
 	public function existsLocale($sLocaleName)
 	{
 		return isset($this->arrLocales[$sLocaleName]) ;
-	}
-	public function localeTar($sLocaleName)
-	{
-		return $this->arrLocales[$sLocaleName]?:null ;
 	}
 	
 	
@@ -71,13 +76,9 @@ class LocaleManager
 	
 	public function loadSentencePackage($sPath,$sPackageName,$sLocaleName=null)
 	{
-		$aPackageTar = $this->addLanguage($sLocaleName?:$this->sDefaultLocaleName) ;
-		$aPackageTar->loadPackage($sPath,$sPackageName) ;
-	}
-	
-	
-	public function sentence($sSentence,array $arrArgvs=array()) ;
-	
+		$aLocale = $this->addLocale($sLocaleName?:$this->sDefaultLocaleName) ;
+		$aLocale->loadSentencePackage($sPath,$sPackageName) ;
+	}	
 	
 	private $sDefaultLocaleName ;
 	

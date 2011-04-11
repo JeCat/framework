@@ -4,7 +4,7 @@ namespace jc\locale ;
 
 use jc\lang\SentencePackage;
 
-class Locale implements ITranslator
+class Locale implements ILocale
 {
 	public function __construct($sLocaleName)
 	{
@@ -81,6 +81,15 @@ class Locale implements ITranslator
 		return call_user_func_array('sprintf', array_merge(array($sOri),$arrArgvs)) ;
 	}
 
+	/**
+	 * @see jc\locale.ILocale::number()
+	 */
+	public function number($Number)
+	{
+		return $Number ;
+	}
+	
+	public function telNumber($Number) ;
 	
 	private $sLocaleName ;
 	
