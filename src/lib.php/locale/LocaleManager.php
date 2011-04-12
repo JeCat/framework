@@ -53,7 +53,7 @@ class LocaleManager
 	public function loadSentenceFolder($sFolderPath)
 	{
 		$aIter = FSOIterator::createFileIterator($sFolderPath) ;
-		for($aIter->rewind;$aIter->valid();$aIter->next())
+		for($aIter->rewind();$aIter->valid();$aIter->next())
 		{
 			$sFilename = $aIter->filename() ;
 			$arr=explode(".", $sFilename) ;

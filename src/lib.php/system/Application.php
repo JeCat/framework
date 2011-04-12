@@ -45,7 +45,7 @@ class Application extends CoreApplication
 		$aApp = new self() ;
 		
 		$aApp->setRequest($aApp->create( 'HttpRequest', __NAMESPACE__ ) ) ;
-		$aApp->setRequest($aApp->create( 'Response', __NAMESPACE__, array($this->create('HtmlPrintSteam','jc\\io'))) ) ;
+		$aApp->setResponse($aApp->create( 'Response', __NAMESPACE__, array($aApp->create('HtmlPrintStream','jc\\io'))) ) ;
 		
 		return $aApp ;		
 	}
@@ -60,7 +60,7 @@ class Application extends CoreApplication
 		$aApp = new self() ;
 		
 		$aApp->setRequest($aApp->create( 'CLRequest', __NAMESPACE__ ) ) ;
-		$aApp->setRequest($aApp->create( 'Response', __NAMESPACE__, array($this->create('PrintStream','jc\\io'))) ) ;
+		$aApp->setResponse($aApp->create( 'Response', __NAMESPACE__, array($aApp->create('PrintStream','jc\\io'))) ) ;
 		
 		return $aApp ;
 	}

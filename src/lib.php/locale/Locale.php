@@ -89,7 +89,8 @@ class Locale implements ILocale
 		return $Number ;
 	}
 	
-	public function telNumber($Number) ;
+	public function telNumber($Number)
+	{}
 	
 	private $sLocaleName ;
 	

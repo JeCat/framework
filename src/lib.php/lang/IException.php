@@ -2,9 +2,11 @@
 
 namespace jc\lang ;
 
+use jc\locale\ILocale ;
+
 interface IException
 {
-	public function message($sLanguage) ;
+	public function message(ILocale $aLocale=null) ;
 	
 	public function code() ;
 	

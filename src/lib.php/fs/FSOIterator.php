@@ -24,19 +24,19 @@ class FSOIterator extends \FilterIterator
 		
 		if( ($nFlags&self::RECURSIVE)==self::RECURSIVE )
 		{
-			parent(new \DirectoryIterator($sFolderPath)) ;
+			parent::__construct(new \DirectoryIterator($sFolderPath)) ;
 		}
 		else
 		{
-			parent(new \RecursiveCachingIterator($sFolderPath)) ;
+			parent::__construct(new \RecursiveDirectoryIterator($sFolderPath)) ;
 		}
 	}
 
-	public function createFileIterator($sFolderPath)
+	static public function createFileIterator($sFolderPath)
 	{
 		return new self($sFolderPath,self::FILE|self::RETURN_PATH) ;
 	}
-	public function createFileRecursiveIterator($sFolderPath)
+	static public function createFileRecursiveIterator($sFolderPath)
 	{
 		return new self($sFolderPath,self::FILE|self::RETURN_PATH|self::RECURSIVE) ;
 	}

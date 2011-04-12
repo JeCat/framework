@@ -11,9 +11,7 @@ class Object implements IObject
 	 * @return stdClass
 	 */
 	public function create($sClassName,$sNamespace='\\',array $arrArgvs=array())
-	{
-		Object::$funcCreate() ;
-		
+	{		
 		$aObject = Factory::createNewObject($sClassName,$sNamespace,$arrArgvs) ;
 		
 		if( $aObject instanceof IObject )
