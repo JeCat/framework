@@ -1,14 +1,10 @@
 <?php
 namespace jc\system ;
 
-
-use jc\io\IOutputStream;
-
-use jc\io\PrintSteam;
-use jc\lang\Factory;
+use jc\lang\Object;
 use jc\locale\LocaleManager ;
 
-class CoreApplication extends \jc\lang\Factory
+class CoreApplication extends Object
 {
 	public function __construct()
 	{

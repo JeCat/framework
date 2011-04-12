@@ -2,7 +2,9 @@
 
 namespace jc\lang ;
 
-interface IJeCatObject
+use jc\system\Application ;
+
+interface IObject
 {
 	/**
 	 * Enter description here ...

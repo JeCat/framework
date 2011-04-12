@@ -1,11 +1,6 @@
 <?php
 namespace jc\system ;
 
-
-use jc\io\PrintSteam;
-use jc\lang\Factory;
-use jc\locale\LocaleManager ;
-
 class Application extends CoreApplication
 {
 	/**
@@ -32,7 +27,7 @@ class Application extends CoreApplication
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return IApplicationFactory
+	 * @return Application
 	 */
 	static public function createApplication()
 	{
