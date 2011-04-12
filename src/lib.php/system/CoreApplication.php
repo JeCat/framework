@@ -22,9 +22,6 @@ class CoreApplication extends \jc\lang\Factory
 		
 		// 创建 LocaleManager 对象
 		$this->setLocaleManager( $this->create('LocaleManager','jc\locale') ) ;
-		
-		// 创建 Output 对象
-		$this->setOutput( $this->create('OutputStream','jc\io',array(fopen(STDOUT, "w"))) ) ;
 	}
 	
 	/**
@@ -105,25 +102,6 @@ class CoreApplication extends \jc\lang\Factory
     {
     	$this->aLocaleManager = $aLocaleManager ;
     }
-
-    public function output()
-    {
-    	return $this->aOutPut ;
-    }
-    public function setOutput(IOutputStream $aOutPut)
-    {
-    	$this->aOutPut = $aOutPut ;
-    }
-    
-    /**
-     * Enter description here ...
-     * 
-     * @return jc\io\PrintSteam
-     */
-    public function out()
-    {
-    	return $this->response()->printer() ;
-    }
 	
 	private $aClassLoader ;
 	
@@ -134,8 +112,6 @@ class CoreApplication extends \jc\lang\Factory
 	private $aAccessRouter ;
 	
 	private $aLocaleManager ;
-	
-	private $aOutPut ;
 	
 	static private $theGlobalInstance ; 
 

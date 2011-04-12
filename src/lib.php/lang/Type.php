@@ -83,7 +83,7 @@ class Type
 	
 	static public function reflectType($Variable)
 	{
-		$sType = detectType($Variable) ;
+		$sType = $this->detectType($Variable) ;
 		if( $sType==self::OBJECT )
 		{
 			return get_class($Variable) ;

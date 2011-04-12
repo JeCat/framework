@@ -3,7 +3,7 @@ namespace jc\lang ;
 
 use jc\system\Application ;
 
-class Object
+class Object implements IObject
 {
 	/**
 	 * Enter description here ...
@@ -12,9 +12,11 @@ class Object
 	 */
 	public function create($sClassName,$sNamespace='\\',array $arrArgvs=array())
 	{
+		Object::$funcCreate() ;
+		
 		$aObject = Factory::createNewObject($sClassName,$sNamespace,$arrArgvs) ;
 		
-		if( $aObject instanceof self )
+		if( $aObject instanceof IObject )
 		{
 			$aObject->setApplication($this->application(true)) ;
 		}

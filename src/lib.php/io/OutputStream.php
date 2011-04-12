@@ -14,7 +14,7 @@ class OutputStream extends Stream implements IOutputStream, ILockable
 	{
 		return fwrite($this->hHandle,$nLen) ;
 	}
-	
+
 	/**
 	 * Enter description here ...
 	 * 
