@@ -1,9 +1,11 @@
 <?php
 
-namespace jc\pattern\composite ;
+namespace jc\mvc ;
 
 
-class NamableObject extends \jc\lang\Object implements INamable
+use jc\pattern\composite\CompositeObject;
+
+class NamableObject extends CompositeObject implements INamable
 {
 	// implement for IContainedable //////////////////
 	public function addName($Names)

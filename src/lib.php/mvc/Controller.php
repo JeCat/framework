@@ -1,4 +1,7 @@
 <?php
+
+namespace jc\mvc ;
+
 use jc\lang\Exception;
 require_once ('lib.php/mvc/IController.php');
 /** 
@@ -6,7 +9,7 @@ require_once ('lib.php/mvc/IController.php');
  * 
  * 
  */
-class Controller extends jc\pattern\composite\CompositeObject implements IController
+class Controller extends NamableObject implements IController
 {
 	static public function type()
 	{

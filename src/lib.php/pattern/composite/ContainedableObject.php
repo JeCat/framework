@@ -2,7 +2,9 @@
 
 namespace jc\pattern\composite ;
 
-class ContainedableObject extends NamableObject implements IContainedable
+use jc\lang\Object;
+
+class ContainedableObject extends Object implements IContainedable
 {	
 	// implement for IContainedable //////////////////
 	static public function type()
