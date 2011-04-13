@@ -2,12 +2,14 @@
 
 namespace jc\ui\xhtml ;
 
-class Attributes
+use jc\ui\UIObject;
+
+class Attributes extends UIObject
 {
-	public function __construct()
-	{
-		
-	}
+	
+	
+	
+	private $arrAttributes = array() ;
 }
 
 ?>

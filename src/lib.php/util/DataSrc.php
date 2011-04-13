@@ -4,7 +4,7 @@ namespace jc\util ;
 use jc\lang\Factory;
 use jc\lang\Object;
 
-class DataSrc extends Object implements IDataSrc
+class DataSrc extends HashTable implements IDataSrc
 {
 	public function __construct(array &$arrDatas=null,$bByRef=false)
 	{
@@ -74,11 +74,6 @@ class DataSrc extends Object implements IDataSrc
 	}
 	
 	// implement ArrayAccess
-	public function offsetExists($offset)
-	{
-		return $this->has($offset) ;	
-	}
-
 	public function offsetGet($offset)
 	{	
 		if( !substr($offset,1,1)=='<' )
@@ -107,17 +102,8 @@ class DataSrc extends Object implements IDataSrc
 			return $this->get($offset) ;
 		}
 	}
-
-	public function offsetSet($offset,$value)
-	{
-		return $this->set($offset,$value) ;		
-	}
-
-	public function offsetUnset($offset) {
-		return $this->unset($offset) ;	
-	}
 	
-	// implement IDataSrc
+	// implement IHashTable
 	public function get($sName)
 	{
 		if(isset($this->arrDatas[ $sName ]))
@@ -138,25 +124,25 @@ class DataSrc extends Object implements IDataSrc
 		return null ;
 	}
 
-	public function set($sName,&$Value)
+	public function has($sName)
 	{
-		$this->arrDatas[ $sName ] = &$Value ;
+		if( parent::has($sName) )
+		{
+			return true ;
+		}
+		
+		// 从 Childs 中找数据
+		foreach($this->arrChildren as $aChild)
+		{
+			if( $aChild->has($sName) )
+			{
+				return true ;
+			}
+		}
+		
+		return false ;
 	}
 
-	public function has($sName, $Value)
-	{
-		return array_key_exists($this->arrDatas,$sName) ;
-	}
-
-	public function remove($sName)
-	{
-		unset($this->arrDatas[ $sName ]) ;
-	}
-
-	public function clear()
-	{
-		$this->arrDatas = array() ;
-	}
 
 	public function int($sName)
 	{
@@ -239,7 +225,6 @@ class DataSrc extends Object implements IDataSrc
 		return new \ArrayIterator($this->arrChildren) ;
 	}
 
-	protected $arrDatas = array() ;
 
 	protected $arrChildren = array() ;
 }
