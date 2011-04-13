@@ -2,14 +2,13 @@
 
 namespace jc\ui\xhtml ;
 
-use jc\ui\UIObject;
 
-class Attributes extends UIObject
+use jc\ui\IObject;
+use jc\util\HashTable;
+
+
+class Attributes extends HashTable implements IObject
 {
-	
-	
-	
-	private $arrAttributes = array() ;
 }
 
 ?>

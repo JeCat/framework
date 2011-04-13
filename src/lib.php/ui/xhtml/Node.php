@@ -2,9 +2,9 @@
 
 namespace jc\ui\xhtml ;
 
-use jc\ui\UIObject;
+use jc\ui\Object;
 
-class Node extends UIObject
+class Node extends Object
 {
 	public function __construct($sNodeName)
 	{
@@ -16,6 +16,11 @@ class Node extends UIObject
 		return $this->sNodeName ;
 	}
 	
+	public function setNodeName($sNodeName)
+	{
+		$this->sNodeName = $sNodeName ;
+	}
+
 	/**
 	 * return Attributes
 	 */
@@ -29,7 +34,37 @@ class Node extends UIObject
 		return $this->aAttributes ;
 	}
 	
+	public function setAttributes(Attributes $aAttributes)
+	{
+		$this->aAttributes = $aAttributes ;
+	}
+	
+	public function isSingle()
+	{
+		return $this->bSingle ;
+	}
+	
+	public function setSingle($bSingle=true)
+	{
+		$this->bSingle = $bSingle? true: false ;
+	}
+	
+	public function pre()
+	{
+		return $this->bPre ;
+	}
+	
+	public function setPre($bPre=true)
+	{
+		$this->bPre = $bPre? true: false ;
+	}
+	
+	
 	private $sNodeName ;
+	
+	private $bSingle = true ;
+	
+	private $bPre = true ;
 	
 	private $aAttributes ;
 }
