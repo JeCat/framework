@@ -2,7 +2,9 @@
 
 namespace jc\db\sql ;
 
-class Criteria implements ISQL
+use jc\lang\Object;
+
+class Criteria extends Object
 {
 	
 }

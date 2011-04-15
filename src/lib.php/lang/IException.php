@@ -16,8 +16,6 @@ interface IException
 	
 	public function trace() ;
 	
-	public function __toString() ;
-	
 }
 
 ?>

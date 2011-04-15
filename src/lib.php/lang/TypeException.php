@@ -19,7 +19,7 @@ class TypeException extends Exception
 			"变量%s类型为：%s，不满足要求的类型: %s" ,
 			($this->sVarName?:'') ,
 			Type::reflectType($this->Variable) ,
-			implode(",", $arrRequireTypes) ,
+			implode(",", $this->arrRequireTypes) ,
 		) ;
 	}
 

@@ -27,7 +27,7 @@ class Tables implements ISQLStatementFrom
 	 * @param string $sType
 	 * @return jc\sql\TablesJoin
 	 */
-	public function sqlStatementJoin($sType=ISQLFromObject::JOIN_LEFT)
+	public function sqlStatementJoin($sType=ISQLStatementFrom::JOIN_LEFT)
 	{
 		if( !isset($this->mapJoinTables[$sType]) )
 		{
@@ -37,7 +37,7 @@ class Tables implements ISQLStatementFrom
 		return $this->mapJoinTables[$sType] ;		
 	}
 	
-	public function join($sTableName,Criteria $aCri,$sType=ISQLFromObject::JOIN_LEFT)
+	public function join($sTableName,Criteria $aCri,$sType=ISQLStatementFrom::JOIN_LEFT)
 	{
 		$aJoin = $this->sqlStatementJoin($sType) ;
 		$aJoin->addTable($sTableName,$aCri) ;

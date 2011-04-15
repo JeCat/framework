@@ -11,7 +11,7 @@ class SentencePackage
 		
 		if($sPackagePath)
 		{
-			$this->loadCompiled($sPath,$bCheckSyntax=true) ;
+			$this->loadCompiled($sPackagePath,$bCheckSyntax=true) ;
 		}
 	}
 	public function __destruct()
@@ -62,16 +62,16 @@ class SentencePackage
 		$this->arrSentences = array() ;
 	}
 	
-	public function loadPackage($sPath,$bCheckSyntax=true)
+	public function loadPackage($sPath/*,$bCheckSyntax=true*/)
 	{
 		if( !is_file($sPath) or !is_readable($sPath) )
 		{
 			throw new Exception("语言包文件不存在(或无法访问)：%s", $sPath) ;
 		}
-		if( $bCheckSyntax and !php_check_syntax($sPath) )
+		/*if( $bCheckSyntax and !php_check_syntax($sPath) )
 		{
 			throw new Exception("语言包文件内容无效：%s", $sPath) ;
-		}
+		}*/
 		
 		$this->clearSentence() ;
 		

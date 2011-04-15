@@ -10,11 +10,19 @@ class OutputStream extends Stream implements IOutputStream, ILockable
 	 * 
 	 * @return int
 	 */
-	public function write($sBytes,$nLen=null)
+	public function write($Contents,$nLen=null)
 	{
-		return fwrite($this->hHandle,$nLen) ;
+		return fwrite($this->hHandle,strval($Contents),$nLen) ;
 	}
 
+	public function bufferBytes()
+	{
+		return '' ;
+	}
+	
+	public function clean()
+	{ }
+	
 	/**
 	 * Enter description here ...
 	 * 

@@ -2,7 +2,7 @@
 
 namespace jc\db\sql ;
 
-class IStatementFactory
+interface IStatementFactory
 {
 	
 }

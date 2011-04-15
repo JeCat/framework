@@ -2,6 +2,8 @@
 
 namespace jc\db\sql ;
 
+use jc\lang\Exception ;
+
 class Insert extends StatementBase
 {
 	public function __construct($sTableName="")

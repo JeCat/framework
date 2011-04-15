@@ -2,7 +2,10 @@
 
 namespace jc\mvc ;
 
+use jc\util\DataSrc;
+use jc\util\IDataSrc;
 use jc\lang\Exception;
+
 require_once ('lib.php/mvc/IController.php');
 /** 
  * @author root
@@ -48,17 +51,17 @@ class Controller extends NamableObject implements IController
     
     protected function buildParams($Params)
     {
-    	if( $Params instanceof jc\util\IDataSrc )
+    	if( $Params instanceof IDataSrc )
     	{
     		$this->aParams = $Params ;
     	}
    		else if( is_array($Params) )
     	{
-    		$this->aParams = new jc\util\DataSrc($Params) ;
+    		$this->aParams = new DataSrc($Params) ;
     	}
     	else
     	{
-    		throw new Exception(__CLASS__."对象传入的 params 参数必须为 array 或 jc\util\IDataSrc 对象") ;
+    		throw new Exception(__CLASS__."对象传入的 params 参数必须为 array 或 jc\\util\\IDataSrc 对象") ;
     	}
     }
     

@@ -2,7 +2,7 @@
 
 namespace jc\db\sql ;
 
-interface ISQLStatementFrom extends ISQL
+interface ISQLStatementFrom extends ISQLStatement
 {
 	const JOIN_LEFT = "JOIN LEFT" ;
 	const JOIN_RIGHT = "JOIN RIGHT" ;

@@ -1,6 +1,7 @@
 <?php 
 
 namespace jc\db\sql ;
+
 use jc\lang\Factory;
 
 class StatementFactory extends Factory implements IStatementFactory

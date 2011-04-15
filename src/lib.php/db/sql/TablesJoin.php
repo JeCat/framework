@@ -8,15 +8,15 @@ use jc\niy\IIteratable ;
 
 class TablesJoin implements ISQLStatement, IIteratable
 {
-	public function __construct($sType=ISQLFromObject::JOIN_LEFT)
+	public function __construct($sType=ISQLStatementFrom::JOIN_LEFT)
 	{
 		if( !in_array($sType,array(
-				ISQLFromObject::JOIN_LEFT ,
-				ISQLFromObject::JOIN_RIGHT ,
-				ISQLFromObject::JOIN_INNER ,
+				ISQLStatementFrom::JOIN_LEFT ,
+				ISQLStatementFrom::JOIN_RIGHT ,
+				ISQLStatementFrom::JOIN_INNER ,
 		)) )
 		{
-			throw new jc\lang\Exception("unknow sql join type: %s",array($sType)) ;
+			throw new Exception("unknow sql join type: %s",array($sType)) ;
 		}
 		
 		$this->sType = $sType ;
@@ -66,7 +66,7 @@ class TablesJoin implements ISQLStatement, IIteratable
 	 * 
 	 * @var string
 	 */
-	private $sType = ISQLFromObject::JOIN_LEFT ;
+	private $sType = ISQLStatementFrom::JOIN_LEFT ;
 	
 	/**
 	 * Enter description here ...

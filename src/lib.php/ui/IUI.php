@@ -17,6 +17,12 @@ interface IUI
 	public function displayer() ;
 	
 	public function setDisplayer(IDisplayer $aDisplayer) ;
+	
+	public function varMemento() ;
+	
+	public function setVarMemento(VarMemento $aVarMemento) ;
+	
+	public function display($sSourceFile) ;
 }
 
 ?>

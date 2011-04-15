@@ -15,7 +15,7 @@ class TableNamePrefix implements ITableNameFactory
 	
 	public function createTableName($sTableName)
 	{
-		if( !empty($this->sPrefix) and substr($sTableName,0,strlen($sPrefix))!=$this->sPrefix )
+		if( !empty($this->sPrefix) and substr($sTableName,0,strlen($this->sPrefix))!=$this->sPrefix )
 		{
 			return $this->sPrefix.$sTableName ;
 		}

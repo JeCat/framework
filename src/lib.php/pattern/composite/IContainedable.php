@@ -28,7 +28,7 @@
 namespace jc\pattern\composite ;
 
 
-interface IContainedable extends INamable
+interface IContainedable
 {
 	static public function type() ;
 	

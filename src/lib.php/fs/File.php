@@ -12,7 +12,7 @@ class File extends FSO
 	 */
 	public function extname()
 	{
-		return FSO::extname(name()) ;
+		return FSO::extname($this->name()) ;
 	}
 
 	/**
@@ -22,7 +22,7 @@ class File extends FSO
 	 */
 	public function titlename()
 	{
-		return FSO::titlename(name()) ;
+		return FSO::titlename($this->name()) ;
 	}
 	
 	/**

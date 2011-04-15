@@ -5,7 +5,7 @@ use jc\io\IClosable ;
 use jc\lang\Object ;
 
 
-class Stream extends Object implements IStream, IClosable
+abstract class Stream extends Object implements IStream, IClosable
 {
 	/**
 	 * Enter description here ...

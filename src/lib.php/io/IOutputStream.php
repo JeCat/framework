@@ -3,18 +3,12 @@ namespace jc\io ;
 
 interface IOutputStream 
 {
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return int
-	 */
-	public function write($sBytes) ;
+	public function write($sBytes,$nLen=null,$bFlush=false) ;
 	
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return void
-	 */
+	public function bufferBytes() ;
+	
+	public function clean() ;
+	
 	public function flush() ;
 	
 }

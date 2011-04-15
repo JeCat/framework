@@ -20,7 +20,7 @@ class Update extends MultiTableStatement
 		
 		$aCriteria = $this->criteria() ;
 		
-		$sStatement = (isReplace()? "REPLACE": "UPDATE")
+		$sStatement = ($this->isReplace()? "REPLACE": "UPDATE")
 				. $this->tables()->makeStatement($bFormat) 
 				. " SET " ;
 

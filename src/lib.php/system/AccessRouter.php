@@ -141,7 +141,7 @@ class AccessRouter extends \jc\lang\Factory
     	$sControllerClass = $this->transControllerClass($sName) ;
     	if($sControllerClass)
     	{
-    		return new $sControllerName() ;
+    		return new $sControllerClass() ;
     		//return $this->controllerFactory()->createController($sControllerClass) ;
     	}
     }
