@@ -2,8 +2,17 @@
 
 namespace jc\ui ;
 
+use jc\util\IHashTable;
+
 interface IUI
 {
+	/**
+	 * return SourceFolderManager
+	 */
+	public function sourceFileManager() ;
+	
+	public function setSourceFileManager(SourceFileManager $aSrcMgr) ;
+	
 	/**
 	 * return ICompiler
 	 */
@@ -12,17 +21,25 @@ interface IUI
 	public function setCompiler(ICompiler $aCompiler) ;
 	
 	/**
-	 * return IDisplayer
+	 * return IDisplayDevice
 	 */
-	public function displayer() ;
+	public function displayDevice() ;
 	
-	public function setDisplayer(IDisplayer $aDisplayer) ;
+	public function setDisplayDevice(IDisplayDevice $aDisplayDevice) ;
 	
-	public function varMemento() ;
+	/**
+	 * @return IHashTable
+	 */
+	public function variables() ;
 	
-	public function setVarMemento(VarMemento $aVarMemento) ;
+	public function setVariables(IHashTable $aVariables) ;
 	
-	public function display($sSourceFile) ;
+	/**
+	 * return IObject
+	 */
+	public function compile($sSourceFile) ;
+	
+	public function display($sSourceFile,IDataSrc $aVariables=null,IDisplayer $aDisplayDevice=null) ;
 }
 
 ?>

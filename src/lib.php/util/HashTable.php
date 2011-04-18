@@ -2,7 +2,9 @@
 
 namespace jc\util ;
 
-class HashTable implements IHashTable
+use jc\lang\Object;
+
+class HashTable extends Object implements IHashTable
 {
 	public function __construct(array $arrDatas=array())
 	{
@@ -15,7 +17,11 @@ class HashTable implements IHashTable
 		return $this->arrDatas[$sName]?: null ;
 	}
 
-	public function set($sName,&$Value)
+	public function set($sName,$Value)
+	{
+		$this->arrDatas[ $sName ] = $Value ;
+	}
+	public function setRef($sName,&$Value)
 	{
 		$this->arrDatas[ $sName ] = &$Value ;
 	}
@@ -55,7 +61,48 @@ class HashTable implements IHashTable
 	public function offsetUnset($offset) {
 		return $this->unset($offset) ;	
 	}
-	
+
+	// implement Iterator
+	/**
+	 * 
+	 * @return mixed
+	 */
+	public function current ()
+	{
+		return current($this->arrDatas) ;
+	}
+
+	/**
+	 * 
+	 * @return mixed
+	 */
+	public function next ()
+	{
+		return next($this->arrDatas) ;
+	}
+
+	/**
+	 * 
+	 * @return mixed
+	 */
+	public function key ()
+	{
+		return key($this->arrDatas) ;
+	}
+
+	/**
+	 * 
+	 * @return mixed
+	 */
+	public function valid ()
+	{
+		return each($this->arrDatas)!==false ;
+	}
+
+	public function rewind ()
+	{
+		return reset($this->arrDatas) ;
+	}
 	
 	protected $arrDatas = array() ;
 }

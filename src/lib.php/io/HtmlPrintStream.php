@@ -5,14 +5,12 @@ use jc\lang\Object;
 
 class HtmlPrintStream extends PrintStream implements IOutputStream
 {
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return void
-	 */
-	public function write($sBytes)
-	{
-		parent::write('<pre>'.$sBytes.'</pre>') ;
+	public function write($sBytes,$nLen=null,$bFlush=false)
+	{		
+		PrintStream::write(
+				'<pre>'.($nLen===null?$sBytes:substr($sBytes, 0, $nLen)).'</pre>'
+				, null, $bFlush
+		) ;
 	}
 }
 ?>

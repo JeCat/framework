@@ -21,11 +21,6 @@ class Response extends Object
 		return $this->aPrinter ;
 	}
 
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return jc\io\PrintSteam
-	 */
 	public function output($sBytes)
 	{
 		$this->aPrinter->write($sBytes) ;

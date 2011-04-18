@@ -4,9 +4,9 @@ namespace jc\io ;
 
 use jc\lang\Type;
 
-class AggregationOutputStream extends OutputStream
+class OutputStreamBuffer extends OutputStream
 {
-	public function __construct(IOutputStream $aPhysicalStream)
+	public function __construct(IOutputStream $aPhysicalStream=null)
 	{
 		$this->aPhysicalStream = $aPhysicalStream?:$this->application(true)->response()->printer() ;
 	}

@@ -16,6 +16,20 @@ class Dir extends FSO
 		
 		return $sNewPath ;
 	}
+	
+	static public function mkdir($sPath,$nMode=0644,$bRecursion=true)
+	{
+		if( mkdir($sPath,$nMode,$bRecursion)===false )
+		{
+			return false ;
+		}
+		
+		else 
+		{
+			chmod($sPath,$nMode) ;
+			return true ;
+		}
+	}
 } 
 
 

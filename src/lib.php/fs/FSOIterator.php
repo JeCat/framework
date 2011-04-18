@@ -21,6 +21,7 @@ class FSOIterator extends \FilterIterator
 	public function __construct($sFolderPath,$nFlags=self::FLAG_DEFAULT)
 	{
 		$this->nFlags = $nFlags ;
+		$this->sFolderPath = Dir::formatPath($sFolderPath) ;
 		
 		if( ($nFlags&self::RECURSIVE)==self::RECURSIVE )
 		{
@@ -69,17 +70,29 @@ class FSOIterator extends \FilterIterator
 	{
 		if(($this->nFlags&self::RETURN_PATH)==self::RETURN_PATH)
 		{
-			return parent::current() ;
+			$sPath = $this->sFolderPath . parent::current() ;
+			if( is_dir($sPath) )
+			{
+				$sPath.= DIRECTORY_SEPARATOR ;
+			}
+			
+			return $sPath ;
 		}
 		
 		else if(($this->nFlags&self::RETURN_NAME)==self::RETURN_NAME)
 		{
-			return basename(parent::current()) ;
+			return parent::current() ;
 		}
 		
 		else if(($this->nFlags&self::RETURN_DIR)==self::RETURN_DIR)
 		{
-			return dirname(parent::current()) ;
+			$sSubDir = dirname(parent::current()) ;
+			if($sSubDir)
+			{
+				$sSubDir.= DIRECTORY_SEPARATOR ;
+			}
+			
+			return $this->sFolderPath . $sSubDir ;
 		}
 		
 		else if($this->nFlags&self::RETURN_FSO)

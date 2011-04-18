@@ -31,47 +31,6 @@ class DataSrc extends HashTable implements IDataSrc
 		$this->arrDatas = &$arrDatas ;
 	}
 	
-	// implement Iterator
-	/**
-	 * 
-	 * @return mixed
-	 */
-	public function current ()
-	{
-		return current($this->arrDatas) ;
-	}
-
-	/**
-	 * 
-	 * @return mixed
-	 */
-	public function next ()
-	{
-		return current($this->arrDatas) ;
-	}
-
-	/**
-	 * 
-	 * @return mixed
-	 */
-	public function key ()
-	{
-		return key($this->arrDatas) ;
-	}
-
-	/**
-	 * 
-	 * @return mixed
-	 */
-	public function valid ()
-	{
-		return each($this->arrDatas)!==false ;
-	}
-
-	public function rewind ()
-	{
-		return reset($this->arrDatas) ;
-	}
 	
 	// implement ArrayAccess
 	public function offsetGet($offset)

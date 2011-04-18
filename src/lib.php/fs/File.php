@@ -3,7 +3,7 @@ namespace jc\fs ;
 
 use jc\io\InputStream;
 
-class File extends FSO
+class File extends FSO implements IFile
 {
 	/**
 	 * Enter description here ...
@@ -54,7 +54,7 @@ class File extends FSO
 			return null ;
 		}
 		
-		return $this->create('InputStream','jc\\io',array($hHandle)) ;
+		return $this->create('OutputStream','jc\\io',array($hHandle)) ;
 	}
 	
 }

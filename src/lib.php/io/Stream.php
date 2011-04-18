@@ -66,13 +66,6 @@ abstract class Stream extends Object implements IStream, IClosable
 	 * 
 	 * @return bool
 	 */
-	abstract public function lock() ;
-	
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return bool
-	 */
 	public function unlock()
 	{
 		flock($this->hHandle,LOCK_UN) ;
