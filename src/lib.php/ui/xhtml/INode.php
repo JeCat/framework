@@ -3,11 +3,14 @@
 namespace jc\ui\xhtml ;
 
 
-interface INode
+use jc\ui\IObject;
+use jc\util\IDataSrc;
+
+interface INode extends IObject
 {
-	public function nodeName() ;
+	public function tagName() ;
 	
-	public function setNodeName($sNodeName) ;
+	public function setTagName($sTagName) ;
 	
 	/**
 	 * return Attribute
@@ -23,6 +26,10 @@ interface INode
 	public function pre() ;
 	
 	public function setPre() ;
+	
+	public function isMultiLine() ;
+	
+	public function setMultiLine($bMultiLine=true) ;
 	
 }
 

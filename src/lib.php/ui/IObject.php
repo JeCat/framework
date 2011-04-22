@@ -2,11 +2,20 @@
 
 namespace jc\ui ;
 
-use jc\util\IDataSrc;
+use jc\io\IOutputStream;
 
 interface IObject
 {
-	public function render(IDisplayDevice $aDev,IDataSrc $aVariables) ;
+	/**
+	 * @return IObject
+	 */
+	public function parent() ;
+	
+	public function setParent() ;
+	
+	public function depth() ;
+	
+	public function compile(IOutputStream $aDev) ;
 }
 
 ?>

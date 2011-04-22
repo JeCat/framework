@@ -34,18 +34,10 @@ abstract class FactoryBase extends Object implements IFactory
 		$aUI->setApplication($aApp) ;
 		
 		// for SourceFileManager
-		if( $aSrcMgr=$this->createSourceFileManager() )
-		{
-			$aSrcMgr->setApplication($aApp) ;
-		}
-		$aUI->setSourceFileManager( $aSrcMgr ) ;
+		$aUI->setSourceFileManager( $this->sourceFileManager() ) ;
 		
 		// for Compiler
-		if( $aCompiler=$this->createCompiler() )
-		{
-			$aCompiler->setApplication($aApp) ;
-		}
-		$aUI->setCompiler( $aCompiler ) ;
+		$aUI->setCompiler( $this->compiler() ) ;
 		
 		// for Variables
 		if( $aVars=new HashTable() )
@@ -79,8 +71,52 @@ abstract class FactoryBase extends Object implements IFactory
 	{
 		return new SourceFileManager() ;
 	}
+
+	/**
+	 * return SourceFolderManager
+	 */
+	public function sourceFileManager()
+	{
+		if(!$this->aSourceFileManager)
+		{
+			if( $this->aSourceFileManager=$this->createSourceFileManager() )
+			{
+				$this->aSourceFileManager->setApplication($this->application(true)) ;
+			}
+		}
+		
+		return $this->aSourceFileManager ;
+	}
+	
+	public function setSourceFileManager(SourceFileManager $aSrcMgr)
+	{
+		$this->aSourceFileManager = $aSrcMgr ;
+	}
+	
+	/**
+	 * return ICompiler
+	 */
+	public function compiler()
+	{
+		if( !$this->aCompiler )
+		{
+			if( $this->aCompiler=$this->createCompiler() )
+			{
+				$this->aCompiler->setApplication($this->application(true)) ;
+			}
+		}
+		return $this->aCompiler ;
+	}
+	
+	public function setCompiler(ICompiler $aCompiler)
+	{
+		$this->aCompiler = $aCompiler ;
+	}
 	
 	static protected $aGlobalInstance ;
+	
+	private $aSourceFileManager ;
+	private $aCompiler ;
 }
 
 ?>

@@ -1,10 +1,14 @@
 <?php
 namespace jc\io ;
 
-use jc\lang\Object;
 
-class PrintStream extends Object implements IStream, IOutputStream
+class PrintStream extends OutputStream
 {
+	pubilc function __construct()
+	{
+		Stream::__construct( fopen('php://stdout','w') ) ;
+	}
+	
 	public function printvar($Variable)
 	{
 		$this->write(print_r($Variable,true)) ;
@@ -13,16 +17,6 @@ class PrintStream extends Object implements IStream, IOutputStream
 	public function println($sBytes)
 	{
 		$this->write($sBytes."\r\n") ;
-	}
-	
-	public function write($sBytes,$nLen=null,$bFlush=false)
-	{
-		echo $nLen===null? $sBytes: strlen($sBytes,0,$nLen) ;
-		
-		if($bFlush)
-		{
-			$this->flush() ;
-		}
 	}
 	
 	public function flush()
@@ -40,14 +34,14 @@ class PrintStream extends Object implements IStream, IOutputStream
 		ob_get_clean() ;
 	}
 	
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return bool
-	 */
 	public function supportsLock()
 	{
 		return false ;
+	}
+	
+	public function catchAllStdOutput()
+	{
+		
 	}
 }
 ?>

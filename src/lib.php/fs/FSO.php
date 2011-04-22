@@ -153,7 +153,7 @@ class FSO extends Object
 	 * 
 	 * @return string
 	 */
-	static public function extname($sFilename)
+	static public function getExtname($sFilename)
 	{
 		$nDotIdx = strrpos($sFilename,'.') ;
 		return ($nDotIdx===false)? '': substr($sFilename,$nDotIdx+1) ;
@@ -164,7 +164,7 @@ class FSO extends Object
 	 * 
 	 * @return string
 	 */
-	static public function titlename($sFilename)
+	static public function getTitlename($sFilename)
 	{
 		$nDotIdx = strrpos($sFilename,'.') ;
 		return ($nDotIdx===false)? $sFilename: substr($sFilename,0,$nDotIdx) ;

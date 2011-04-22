@@ -1,6 +1,8 @@
 <?php
 namespace jc\fs ;
 
+use jc\io\OutputStream;
+
 use jc\io\InputStream;
 
 class File extends FSO implements IFile
@@ -12,7 +14,7 @@ class File extends FSO implements IFile
 	 */
 	public function extname()
 	{
-		return FSO::extname($this->name()) ;
+		return FSO::getExtname($this->name()) ;
 	}
 
 	/**
@@ -22,7 +24,7 @@ class File extends FSO implements IFile
 	 */
 	public function titlename()
 	{
-		return FSO::titlename($this->name()) ;
+		return FSO::getTitlename($this->name()) ;
 	}
 	
 	/**

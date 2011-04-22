@@ -14,34 +14,29 @@ abstract class CompilerBase extends Object implements ICompiler
 	{
 		return is_file($sCompiledPath) and filemtime($sSourcePath)<=filemtime($sCompiledPath) ;
 	}
-	
+
 	/**
-	 * return jc\fs\IFile
+	 * return IFile
 	 */
 	public function createCompiledFile($sCompiledPath)
 	{
 		$sCompiledDir = dirname($sCompiledPath) ;
-		if( is_dir($sCompiledDir) )
+				
+		if( !is_dir($sCompiledDir) )
 		{
 			if( !Dir::mkdir($sCompiledDir,0777,true) )
 			{
 				throw new Exception("无法创建编译文件目录：%s",array($sCompiledDir)) ;
 			}
-			
-			return new File($sCompiledPath) ;
 		}		
-		
-		return null ;
+			
+		return new File($sCompiledPath) ;
 	}
 	
 	/**
-	 * @return IObject
+	 * @return ICompiled
 	 */
-	public function loadCompiled($sCompiledPath)
-	{
-		$aObject = @include $sCompiledPath ;
-		return ($aObject instanceof IObject)? $aObject: null ;
-	}
+	abstract function loadCompiled($sCompiledPath) ;
 	
 	public function saveCompiled(IObject $aObject,$sCompiledPath)
 	{
@@ -52,34 +47,39 @@ abstract class CompilerBase extends Object implements ICompiler
 		}
 		
 		$aWriter = $aFile->openWriter(false) ;
-		$aWriter->write("<php return unserialize(\"".addslashes(serialize($aObject))."\"); ?>") ;
+		if(!$aWriter)
+		{
+			throw new Exception("保存XHTML模板的编译文件时无法打开文件:%s",$sCompiledPath) ;
+		}
+		
+		$aObject->compile($aWriter) ;
+		$aWriter->close() ;
 	}
 	
 	/**
-	 * @return IObject
+	 * @return ICompiled
 	 */
 	public function compile($sSourcePath,$sCompiledPath)
 	{
-		if( $this->isCompiledValid($sSourcePath, $sCompiledPath) )
+		if( $this->bForceCompile or !$this->isCompiledValid($sSourcePath, $sCompiledPath) )
 		{
-			return $this->loadCompiled($sCompiledPath) ;
-		}
-		
-		else
-		{
-			$aObject = $this->compileRaw($sCompiledPath) ;
+			$aObjectTree = $this->buildObjectTree($sSourcePath) ;
 						
 			// save compiled
-			$this->saveCompiled($aObject,$sCompiledPath) ;
-			
-			return $aObject ;
+			$this->saveCompiled($aObjectTree,$sCompiledPath) ;
 		}
+		
+		return $this->loadCompiled($sCompiledPath) ;
 	}
 	
 	/**
 	 * @return IObject
 	 */
-	abstract public function compileRaw($sCompiledPath) ;
+	abstract protected function buildObjectTree($sSourcePath) ;
+	
+	
+	
+	private $bForceCompile = false ;
 }
 
 ?>

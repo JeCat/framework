@@ -38,7 +38,11 @@ abstract class Stream extends Object implements IStream, IClosable
 	 */
 	public function close()
 	{
-		fclose($this->hHandle) ;
+		if($this->isActiving())
+		{
+			fclose($this->hHandle) ;
+			$this->hHandle = null ;
+		}
 	}
 	
 	/**
@@ -71,11 +75,18 @@ abstract class Stream extends Object implements IStream, IClosable
 		flock($this->hHandle,LOCK_UN) ;
 	}
 	
-	/**
-	 * Enter description here ...
-	 * 
-	 * @var handle
-	 */
+	public function redirect(IStream $aStream)
+	{
+		$this->aRedirectStream = $aStream ;
+	}
+	public function redirectStream()
+	{
+		return $this->aRedirectStream ;
+	}
+	
 	protected $hHandle ;
+	
+	private $aRedirectStream ;
+	
 }
 ?>

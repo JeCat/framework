@@ -59,17 +59,25 @@ class UI extends JcObject
 		$this->aVariables = $aVariables ;
 	}
 	
-	/**
-	 * return IObject
-	 */
 	public function compile($sSourceFile)
 	{
+		$sSourcePath = $this->sourceFileManager()->find($sSourceFile) ;
+		$sCompiledPath = $this->sourceFileManager()->compiledPath($sSourcePath) ;
 		
+		$this->compiler()->compile($sSourcePath,$sCompiledPath) ;
+		
+		return $sCompiledPath ;
 	}
 	
 	public function display($sSourceFile,IDataSrc $aVariables=null,IDisplayer $aDisplayDevice=null)
 	{
+		$aCompiled = $this->compile($sSourceFile) ;
 		
+		if($aCompiled)
+		{
+			$aVariables->set('aUI',$this) ;
+			$aDisplayDevice->render($aCompiled,$aVariables) ;
+		}
 	}
 	
 	private $aSourceFileManager ;

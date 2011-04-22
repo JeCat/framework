@@ -28,7 +28,8 @@ class Factory extends Object
 		$sArgList = implode(', ',$arrArgNameList) ;
 		
 		
-		return eval("return new {$sFullClassName}({$sArgList}) ;") ;
+		$aOb = eval("return new {$sFullClassName}({$sArgList}) ;") ;
+		return $aOb ;
 	}
 
 }

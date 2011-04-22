@@ -10,11 +10,16 @@ class HashTable extends Object implements IHashTable
 	{
 		$this->arrDatas = $arrDatas ;
 	}
+	
+	public function isEmpty()
+	{
+		return empty($this->arrDatas) ;
+	}
 
 	// implement IHashTable
 	public function get($sName)
 	{
-		return $this->arrDatas[$sName]?: null ;
+		return isset($this->arrDatas[$sName])? $this->arrDatas[$sName]: null ;
 	}
 
 	public function set($sName,$Value)

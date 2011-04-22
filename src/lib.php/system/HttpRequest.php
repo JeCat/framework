@@ -28,7 +28,7 @@ class HttpRequest extends DataSrc implements IRequest
 		{
 			if( isset($$sVarName) )
 			{
-				$this->addChild( $this->create('DataSrc','jc\\util',array($$sVarName,true)) ) ;
+				$this->addChild( new DataSrc($$sVarName,true) ) ;
 			}
 		}
 	}

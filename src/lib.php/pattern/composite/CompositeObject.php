@@ -43,10 +43,21 @@ class CompositeObject extends ContainedableObject implements IContainer
 		}
 	}
 	
+	public function checkChildType(IContainedable $aChild)
+	{
+		$sType = call_user_func(array(get_class($aChild),'type')) ;
+		return in_array( $sType, $this->arrTypes ) ;
+	}
+	
 	// implement for IContainer //////////////////
-	public function addChild(IContainedable $aChild,$bAdoptRelative=true) {
-		// TODO Auto-generated method stub
+	public function addChild(IContainedable $aChild,$bAdoptRelative=true)
+	{
+		if( !$this->checkChildType($aChild) or $this->hasChild($aChild) )
+		{
+			return ;
+		}
 		
+		$this->arrChildren[] = $aChild ; 
 	}
 
 	public function removeChild($Child) {
@@ -58,10 +69,20 @@ class CompositeObject extends ContainedableObject implements IContainer
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public function childrenCount()
+	{
+		return count($this->arrChildren) ;
+	}
 
 	public function child($sName) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public function hasChild(IContainedable $aChild)
+	{
+		return in_array($aChild, $this->arrChildren) ;
 	}
 
 	public function childrenIterator($Types = null) {

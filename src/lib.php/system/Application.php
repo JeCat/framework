@@ -1,6 +1,8 @@
 <?php
 namespace jc\system ;
 
+use jc\io\PrintStream;
+
 class Application extends CoreApplication
 {
 	/**
@@ -31,7 +33,7 @@ class Application extends CoreApplication
 	 */
 	static public function createApplication()
 	{
-		$sFactoryMethodName = empty($_SERVER['HTTP_HOST'])? 'createHttpApplication': 'createCLApplication' ;
+		$sFactoryMethodName = empty($_SERVER['HTTP_HOST'])? 'createCLApplication': 'createHttpApplication' ;
 		return self::$sFactoryMethodName() ;
 	}
 
