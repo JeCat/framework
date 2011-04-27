@@ -37,40 +37,36 @@ class Compiler extends CompilerBase
 			throw new Exception("文件不是有效的 XHtml格式：%s",$sSourcePath) ;
 		}
 		
-		$aObjectTree = $this->buildObject($aDoc) ;
+		return $this->buildObject($aDoc) ;
 	}
 	
 	/**
 	 * @return INode
 	 */
-	protected function buildObject(\DOMNode $aSrcEle)
-	{		
-		$sClassName = $this->tagLibrary()->getClassName($aSrcEle->nodeName) ;
-		$aNode = new $sClassName($aSrcEle->nodeName) ;
-		
-		$aNode->setSingle( $this->tagLibrary()->isSingle($aSrcEle->nodeName) ) ;
-		
-		// 属性
-		$aNodeAttr = new Attributes() ;
-		if($aSrcEle->attributes)
+	protected function buildObject(\DOMNode $aSrcEle,IObject $aParent=null)
+	{	
+		$aNode = $this->createObjectFromDomNode($aSrcEle) ;	
+	
+		if($aParent)
 		{
-			foreach($aSrcEle->attributes as $aAttrEle)
-			{
-				$aNodeAttr->set($aAttrEle->name,$aAttrEle->value) ;
-			}
+			$aNode->setParent($aParent) ;
 		}
-		$aNode->setAttributes($aNodeAttr) ;
 		
 		// 子节点
 		if($aSrcEle->childNodes)
-		{
+		{			
 			foreach($aSrcEle->childNodes as $aSrcChildEle)
 			{
-				
 				switch (get_class($aSrcChildEle))
 				{
 				case 'DOMText' :
-					$aNode->addChild( new Text($aSrcChildEle->wholeText) ) ; 
+					$sText = strval($aSrcChildEle->wholeText) ;
+					if($sText)
+					{
+						$aText = new Text($sText) ;
+						$aText->setParent($aNode) ;
+						$aNode->addChild( $aText ) ; 
+					}
 					break ;
 				case 'DOMComment' :
 					$aSrcChildEle->data ; 
@@ -80,9 +76,19 @@ class Compiler extends CompilerBase
 					$aSrcChildEle->data ;
 					break ;
 					
+				case 'DOMDocumentType' :
+					if($aSrcChildEle->internalSubset)
+					{
+						$sString = $aSrcChildEle->internalSubset."\r\n" ;
+						$aText = new Text($sString,false) ;
+						$aText->setParent($aNode) ;
+						$aNode->addChild( $aText ) ;
+					}
+					break ;
+					
 				default:
-					echo "\$aSrcChildEle:",Type::reflectType($aSrcChildEle),"\r\n" ;
-					$aNode->addChild( $this->buildObject($aSrcChildEle) ) ;
+					// echo "\$aSrcChildEle:",Type::reflectType($aSrcChildEle),"\r\n" ;
+					$aNode->addChild( $this->buildObject($aSrcChildEle,$aNode) ) ;
 					break ;
 				}
 			}
@@ -90,14 +96,65 @@ class Compiler extends CompilerBase
 		
 		return $aNode ;
 	}
+	
+	/**
+	 * @return jc\ui\IObject
+	 */
+	protected function createObjectFromDomNode(\DOMNode $aSrcEle)
+	{
+		$sClassName = $this->tagLibrary()->getClassName($aSrcEle->nodeName) ;
+		$aNode = new $sClassName($aSrcEle->nodeName) ;
+		
+		if( $aNode instanceof INode )
+		{
+			$aNode->setSingle( $this->tagLibrary()->isSingle($aSrcEle->nodeName) ) ;
+		
+			// 属性
+			$aNodeAttr = new Attributes() ;
+			if($aSrcEle->attributes)
+			{
+				foreach($aSrcEle->attributes as $aAttrEle)
+				{
+					$aNodeAttr->set($aAttrEle->name,$aAttrEle->value) ;
+				}
+			}
+			$aNode->setAttributes($aNodeAttr) ;
+			
+			// single tag
+			$aNode->setSingle(
+				$this->tagLibrary()->isSingle($aSrcEle->nodeName)
+			) ;
+			
+			// inline diplay node
+			$aNode->setInline(
+				$this->tagLibrary()->isInline($aSrcEle->nodeName)
+			) ;
+			
+			// multiline
+			$aNode->setMultiLine(
+				$this->tagLibrary()->isMultiLine($aSrcEle->nodeName)
+			) ;
+		}
+		
+		return $aNode ;
+	} 
 
 	/**
 	 * @return jc\ui\ICompiled
 	 */
-	function loadCompiled($sCompiledPath)
+	public function loadCompiled($sCompiledPath)
 	{
 		return new Compiled($sCompiledPath) ;
 	}
+	
+	/*public function compileFormatTag(INode $aObject,$sTagComplited)
+	{
+		$sComplited = '' ;
+		
+		$sComplited.= $sTagComplited ;
+		
+		return $sComplited ;
+	}*/
 	
 	private $aTagLibrary ;
 }

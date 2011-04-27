@@ -1,6 +1,12 @@
 <?php
 
 namespace jc\ui\xhtml ;
+use jc\lang\Type;
+use jc\ui\ICompiler;
+
+use jc\ui\xhtml\nodes\TagLibrary;
+
+use jc\ui\IObject;
 
 use jc\io\IOutputStream;
 use jc\util\IDataSrc;
@@ -8,12 +14,15 @@ use jc\ui\Object;
 
 class Node extends Object implements INode
 {
+	const FORMAT_NEWLINE = 1 ;
+	const FORMAT_INDENT = 2 ;
+	
 	static public function type()
 	{
 		return __CLASS__ ;
 	}
 	
-	public function __construct($sTagName)
+	public function __construct($sTagName,TagLibrary $aTagLib=null)
 	{
 		$this->sTagName = $sTagName ;
 		$this->addChildTypes(__CLASS__) ;
@@ -69,10 +78,9 @@ class Node extends Object implements INode
 		$this->bPre = $bPre? true: false ;
 	}
 	
-	public function compile(IOutputStream $aDev)
-	{
-		$aDev->write( str_repeat("\t",$this->depth()) ) ;
-		$aDev->write('<') ;
+	public function compile(IOutputStream $aDev,ICompiler $aCompiler)
+	{		
+		$aDev->write("<") ;
 		$aDev->write($this->tagName()) ;
 		
 		$this->aAttributes->compile($aDev) ;
@@ -80,51 +88,89 @@ class Node extends Object implements INode
 		// 单行节点
 		if( !$this->childrenCount() and $this->isSingle() )
 		{
-			$aDev->write(" />\r\n") ;
+			$aDev->write(" />") ;
 		}
 		else 
 		{
 			$aDev->write(">") ;
 			
-			if($this->isMultiLine())
-			{
-				$aDev->write("\r\n") ;
-			}
-			
+			$nIdx = 0 ;
 			foreach ($this->childrenIterator() as $aChildNode)
 			{
-				$aChildNode->compile($aDev) ;
+				self::compileFormatForChild($aDev,$this,$aChildNode,$nIdx++) ;
+				
+				$aChildNode->compile($aDev,$aCompiler) ;
 			}
-		
+			
+			// 尾标签
 			if($this->isMultiLine())
 			{
 				$aDev->write("\r\n") ;
+				self::compileFormatIndent($aDev, $this) ;
 			}
-			
 			$aDev->write("</") ;
 			$aDev->write($this->tagName()) ;
 			$aDev->write(">") ;
 		}
 		
 	}
+	
+	
+	/**
+	 * 缩进
+	 */
+	static public function compileFormatForChild(IOutputStream $aDev,INode $aParent,IObject $aChild,$nChildIdx)
+	{
+		if( !($aChild instanceof INode) )
+		{
+			return ;
+		}
+		
+		if( ($nChildIdx==0 and $aParent->isMultiLine() )		// block节点的第一个 INode child 
+			or !$aChild->isInline() )							// 或者 block child
+		{
+			$aDev->write("\r\n") ;
+			self::compileFormatIndent($aDev, $aChild) ;
+		}
+	}
+	
+	/**
+	 * 缩进
+	 */
+	static public function compileFormatIndent(IOutputStream $aDev,INode $aNode)
+	{
+		$aDev->write( str_repeat("\t",$aNode->depth()-1) ) ;		
+	}
 
+	public function isInline()
+	{
+		return $this->bInline ;
+	}
+	public function setInline($bInline=true)
+	{
+		$this->bInline = $bInline? true: false ;
+	}
+	
+	
 	public function isMultiLine()
 	{
 		return $this->bMultiLine ;
 	}
+	
 	public function setMultiLine($bMultiLine=true)
 	{
-		$this->bMultiLine = $bMultiLine? true: false ;
+		$this->bMultiLine = $bMultiLine ;
 	}
-	
 	
 	private $sTagName ;
 	
 	private $bSingle = true ;
 	
-	private $bMultiLine = true ;
+	private $bInline = true ;
 	
 	private $bPre = true ;
+	
+	private $bMultiLine = true ;
 	
 	private $aAttributes ;
 }

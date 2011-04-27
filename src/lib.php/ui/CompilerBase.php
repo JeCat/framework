@@ -46,7 +46,8 @@ abstract class CompilerBase extends Object implements ICompiler
 			throw new Exception("保存XHTML模板的编译文件时无法打开文件:%s",$sCompiledPath) ;
 		}
 		
-		$aObject->compile($aWriter) ;
+		$aObject->compile($aWriter,$this) ;
+		$aWriter->flush() ;
 		$aWriter->close() ;
 	}
 	
@@ -72,8 +73,7 @@ abstract class CompilerBase extends Object implements ICompiler
 	abstract protected function buildObjectTree($sSourcePath) ;
 	
 	
-	
-	private $bForceCompile = false ;
+	private $bForceCompile = true ;
 }
 
 ?>

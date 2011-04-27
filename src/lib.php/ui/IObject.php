@@ -8,7 +8,7 @@ interface IObject
 {	
 	public function depth() ;
 	
-	public function compile(IOutputStream $aDev) ;
+	public function compile(IOutputStream $aDev,ICompiler $aCompiler) ;
 }
 
 ?>

@@ -23,12 +23,12 @@ class FilterMangeger extends Object implements IFilterMangeger
 	
 	public function handle()
 	{
-		if( !$this->bWorking )
-		{
-			return ;
-		}
-		
 		$arrArgvs = func_get_args() ;
+		
+		if( !$this->bWorking or empty($this->arrFilters) )
+		{
+			return $arrArgvs ;
+		}
 		
 		foreach($this->arrFilters as &$arrFilter)
 		{

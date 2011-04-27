@@ -1,7 +1,7 @@
 <?php
 namespace jc\util ;
 
-interface IDataSrc extends IHashTable, \ArrayAccess
+interface IDataSrc extends IHashTable
 {
 	public function int($sName) ;
 	public function float($sName) ;
@@ -13,8 +13,6 @@ interface IDataSrc extends IHashTable, \ArrayAccess
 	public function removeChild(IDataSrc $aParams) ;
 	public function clearChild() ;
 	
-	public function nameIterator() ;
-	public function valueIterator() ;
 	public function childIterator() ;
 }
 

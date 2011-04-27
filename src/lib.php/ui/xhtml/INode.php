@@ -27,10 +27,13 @@ interface INode extends IObject
 	
 	public function setPre() ;
 	
+	public function isInline() ;
+	
+	public function setInline($bInline=true) ;
+	
 	public function isMultiLine() ;
 	
 	public function setMultiLine($bMultiLine=true) ;
-	
 }
 
 ?>

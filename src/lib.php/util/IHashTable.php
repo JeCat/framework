@@ -2,7 +2,7 @@
 
 namespace jc\util ;
 
-interface IHashTable extends \Iterator
+interface IHashTable
 {
 	public function get($sName) ;
 	public function set($sName,$Value) ;
@@ -10,6 +10,9 @@ interface IHashTable extends \Iterator
 	public function has($sName) ;	
 	public function remove($sName) ;	
 	public function clear() ;	
+	
+	public function nameIterator() ;
+	public function valueIterator() ;
 }
 
 ?>

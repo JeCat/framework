@@ -8,13 +8,13 @@ use jc\util\HashTable;
 class Attributes extends HashTable
 {
 	public function compile(IOutputStream $aDev) 
-	{		
-		foreach ($this as $sName=>$sValue)
+	{
+		foreach ($this->nameIterator() as $sName)
 		{
-			$aDev->write(' ') ;
+			$aDev->write(" ") ;
 			$aDev->write($sName) ;
 			$aDev->write('="') ;
-			$aDev->write(addslashes($sValue)) ;
+			$aDev->write(addslashes($this->get($sName))) ;
 			$aDev->write('"') ;
 		}
 	}

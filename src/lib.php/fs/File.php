@@ -50,7 +50,7 @@ class File extends FSO implements IFile
 	 */
 	public function openWriter($bAppend=false)
 	{
-		$hHandle = fopen($this->path(),$bAppend?'w':'a') ;
+		$hHandle = fopen($this->path(),$bAppend?'a':'w') ;
 		if( !$hHandle )
 		{
 			return null ;

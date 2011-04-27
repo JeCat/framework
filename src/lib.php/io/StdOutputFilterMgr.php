@@ -10,8 +10,14 @@ class StdOutputFilterMgr extends FilterMangeger
 {
 	public function __construct()
 	{
-		ob_start(array($this,'handle')) ;
+		ob_start(array($this,'handleForStdOutput')) ;
 		$this->start() ;
+	}
+	
+	public function handleForStdOutput($sData)
+	{
+		list($sData) = $this->handle($sData) ;
+		return $sData ;
 	}
 }
 

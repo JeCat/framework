@@ -4,7 +4,7 @@ namespace jc\util ;
 use jc\lang\Factory;
 use jc\lang\Object;
 
-class DataSrc extends HashTable implements IDataSrc
+class DataSrc extends HashTable implements IDataSrc, \ArrayAccess, \Iterator
 {
 	public function __construct(array &$arrDatas=null,$bByRef=false)
 	{
@@ -158,23 +158,6 @@ class DataSrc extends HashTable implements IDataSrc
 		$this->arrChildren = array() ;
 	}	
 	
-	/**
-	 * 
-	 * @return \Iterator
-	 */
-	public function nameIterator() {
-		return new \ArrayIterator(array_keys($this->arrDatas)) ;
-	}
-
-	/**
-	 * 
-	 * @return \Iterator
-	 */
-	public function valueIterator()
-	{
-		return new \ArrayIterator(array_values($this->arrDatas)) ;
-	}
-
 	/**
 	 * 
 	 * @return \Iterator

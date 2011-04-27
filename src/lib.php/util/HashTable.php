@@ -4,7 +4,7 @@ namespace jc\util ;
 
 use jc\lang\Object;
 
-class HashTable extends Object implements IHashTable
+class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator
 {
 	public function __construct(array $arrDatas=array())
 	{
@@ -108,6 +108,25 @@ class HashTable extends Object implements IHashTable
 	{
 		return reset($this->arrDatas) ;
 	}
+	
+	
+	/**
+	 * 
+	 * @return \Iterator
+	 */
+	public function nameIterator() {
+		return new \ArrayIterator(array_keys($this->arrDatas)) ;
+	}
+
+	/**
+	 * 
+	 * @return \Iterator
+	 */
+	public function valueIterator()
+	{
+		return new \ArrayIterator(array_values($this->arrDatas)) ;
+	}
+	
 	
 	protected $arrDatas = array() ;
 }

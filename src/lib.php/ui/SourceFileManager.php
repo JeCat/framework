@@ -8,7 +8,7 @@ class SourceFileManager extends ResourceManager
 {
 	public function compiledPath($sSourcePath)
 	{
-		return dirname($sSourcePath).'/compileds/'.basename($sSourcePath) ;
+		return dirname($sSourcePath).'/compileds/'.basename($sSourcePath).'.php' ;
 	}
 }
 

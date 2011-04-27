@@ -3,8 +3,8 @@
 namespace jc\ui\xhtml ;
 
 
+use jc\ui\ICompiler;
 use jc\util\IHashTable;
-
 use jc\io\IOutputStream;
 use jc\ui\IDisplayDevice;
 use jc\ui\Object;
@@ -16,9 +16,10 @@ class Text extends Object
 		return __CLASS__ ;
 	}
 	
-	public function __construct(&$sText)
+	public function __construct(&$sText,$bHtml=true)
 	{
 		$this->setText($sText) ;
+		$this->bHtml = $bHtml ;
 	}
 
 	public function text()
@@ -35,12 +36,25 @@ class Text extends Object
 		$aDev->write($this->sText) ;
 	}
 	
-	public function compile(IOutputStream $aDev)
+	public function compile(IOutputStream $aDev,ICompiler $aCompiler)
 	{
-		$aDev->write($this->sText) ;
+		if( $this->bHtml )
+		{
+			$sText = preg_replace("/^\\s+/s", " ", $this->sText) ;
+			$sText = preg_replace("/\\s+$/s", " ", $sText) ;
+			$sText = htmlentities($sText) ;
+		}
+		else 
+		{
+			$sText = $this->sText ;
+		}
+		
+		$aDev->write($sText) ;
 	}
 	
 	private $sText ;
+	
+	private $bHtml ;
 }
 
 ?>
