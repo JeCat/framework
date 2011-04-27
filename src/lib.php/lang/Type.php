@@ -75,7 +75,7 @@ class Type
 		
 		if($bThrowException)
 		{
-			throw new TypeException(&$Variable,$Types,$sVarName) ;
+			throw new TypeException($Variable,$Types,$sVarName) ;
 		}
 		
 		return false ;

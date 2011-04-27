@@ -1,9 +1,9 @@
 <?php
 namespace jc\system ;
 
-use jc\util\DataSrc ;
+use jc\util\DataSrc;
 
-class CLRequest extends DataSrc implements IRequest
+class CLRequest extends Request
 {
 	public function __construct()
 	{

@@ -4,7 +4,7 @@ namespace jc\io ;
 
 class PrintStream extends OutputStream
 {
-	pubilc function __construct()
+	public function __construct()
 	{
 		Stream::__construct( fopen('php://stdout','w') ) ;
 	}

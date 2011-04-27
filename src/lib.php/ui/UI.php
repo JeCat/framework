@@ -2,6 +2,8 @@
 
 namespace jc\ui ;
 
+use jc\util\DataSrc;
+
 use jc\lang\Object as JcObject;
 use jc\util\IHashTable;
 
@@ -64,17 +66,25 @@ class UI extends JcObject
 		$sSourcePath = $this->sourceFileManager()->find($sSourceFile) ;
 		$sCompiledPath = $this->sourceFileManager()->compiledPath($sSourcePath) ;
 		
-		$this->compiler()->compile($sSourcePath,$sCompiledPath) ;
-		
-		return $sCompiledPath ;
+		return $this->compiler()->compile($sSourcePath,$sCompiledPath) ;
 	}
 	
-	public function display($sSourceFile,IDataSrc $aVariables=null,IDisplayer $aDisplayDevice=null)
+	public function display($sSourceFile,IHashTable $aVariables=null,IDisplayer $aDisplayDevice=null)
 	{
 		$aCompiled = $this->compile($sSourceFile) ;
 		
 		if($aCompiled)
 		{
+			if(!$aVariables)
+			{
+				$aVariables = $this->variables() ;
+			}
+			
+			if(!$aDisplayDevice)
+			{
+				$aDisplayDevice = $this->displayDevice() ;
+			}
+			
 			$aVariables->set('aUI',$this) ;
 			$aDisplayDevice->render($aCompiled,$aVariables) ;
 		}

@@ -2,7 +2,7 @@
 
 namespace jc\ui ;
 
-use jc\util\IDataSrc;
+use jc\util\IHashTable;
 
 interface IDisplayDevice
 {
@@ -12,7 +12,7 @@ interface IDisplayDevice
 	
 	public function show($bShow=true) ;
 	
-	public function render(ICompiled $aCompiled, IDataSrc $aVariables=null) ;
+	public function render(ICompiled $aCompiled, IHashTable $aVariables=null) ;
 }
 
 ?>

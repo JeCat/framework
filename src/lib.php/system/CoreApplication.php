@@ -42,11 +42,10 @@ class CoreApplication extends Object
 	/**
      * @param IRequest
      */
-    public function setRequest (IRequest $aRequest)
+    public function setRequest (Request $aRequest)
     {
         $this->aRequest = $aRequest;
     }
-    
 
 	/**
      * @return IRequest
@@ -62,7 +61,6 @@ class CoreApplication extends Object
     {
         $this->aResponse = $aResponse;
     }
-    
 
 	/**
      * @return Response

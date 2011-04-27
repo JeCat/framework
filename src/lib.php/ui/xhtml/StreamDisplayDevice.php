@@ -2,7 +2,7 @@
 
 namespace jc\ui\xhtml ;
 
-use jc\util\IDataSrc;
+use jc\util\IHashTable;
 use jc\ui\ICompiled;
 use jc\ui\IStreamDisplayDevice;
 use jc\io\OutputStreamBuffer;
@@ -24,9 +24,9 @@ class StreamDisplayDevice extends OutputStreamBuffer implements IStreamDisplayDe
 		$this->flush() ;
 	}
 	
-	public function render(ICompiled $aCompiled, IDataSrc $aVariables=null)
+	public function render(ICompiled $aCompiled, IHashTable $aVariables=null)
 	{
-		
+		$aCompiled->render($aVariables,$this) ;
 	}
 }
 

@@ -9,7 +9,6 @@ use jc\lang\Object;
 
 abstract class CompilerBase extends Object implements ICompiler
 {
-	
 	public function isCompiledValid($sSourcePath,$sCompiledPath)
 	{
 		return is_file($sCompiledPath) and filemtime($sSourcePath)<=filemtime($sCompiledPath) ;
@@ -21,22 +20,17 @@ abstract class CompilerBase extends Object implements ICompiler
 	public function createCompiledFile($sCompiledPath)
 	{
 		$sCompiledDir = dirname($sCompiledPath) ;
-				
+		
 		if( !is_dir($sCompiledDir) )
 		{
 			if( !Dir::mkdir($sCompiledDir,0777,true) )
 			{
 				throw new Exception("无法创建编译文件目录：%s",array($sCompiledDir)) ;
 			}
-		}		
-			
+		}
+
 		return new File($sCompiledPath) ;
 	}
-	
-	/**
-	 * @return ICompiled
-	 */
-	abstract function loadCompiled($sCompiledPath) ;
 	
 	public function saveCompiled(IObject $aObject,$sCompiledPath)
 	{

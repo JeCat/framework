@@ -3,7 +3,7 @@ namespace jc\system ;
 
 use jc\util\DataSrc ;
 
-class HttpRequest extends DataSrc implements IRequest
+class HttpRequest extends Request
 {
 	const GET = 1 ;
 	const POST = 2 ;

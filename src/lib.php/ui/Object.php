@@ -2,6 +2,8 @@
 
 namespace jc\ui ;
 
+use jc\pattern\composite\IContainer;
+
 use jc\pattern\composite\CompositeObject;
 
 abstract class Object extends CompositeObject implements IObject
@@ -20,7 +22,7 @@ abstract class Object extends CompositeObject implements IObject
 		return $this->aParent ;
 	}
 	
-	public function setParent(IObject $aParent)
+	public function setParent(IContainer $aParent)
 	{
 		$this->aParent = $aParent ;
 	}

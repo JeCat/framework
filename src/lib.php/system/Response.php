@@ -1,6 +1,7 @@
 <?php
 namespace jc\system ;
 
+use jc\util\IFilterMangeger;
 use jc\io\PrintStream;
 use jc\lang\Object ;
 
@@ -20,10 +21,33 @@ class Response extends Object
 	{
 		return $this->aPrinter ;
 	}
+	
+	public function setPrinter(PrintStream $aPrinter)
+	{
+		$this->aPrinter = $aPrinter ;
+	}
 
 	public function output($sBytes)
 	{
+		if( $aFilters = $this->filters() )
+		{
+			list($sBytes) = $aFilters->handle($sBytes) ;
+		}
+		
 		$this->aPrinter->write($sBytes) ;
+	}
+	
+	/**
+	 * @return IFilterMangeger
+	 */
+	public function filters()
+	{
+		return $this->aFilters ;
+	}
+	
+	public function setFilters(IFilterMangeger $aFilters)
+	{
+		$this->aFilters = $aFilters ;
 	}
 	
 	/**
@@ -32,6 +56,8 @@ class Response extends Object
 	 * @var jc\io\PrintSteam
 	 */
 	private $aPrinter ;
+	
+	private $aFilters ;
 }
 
 ?>

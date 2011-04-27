@@ -4,7 +4,7 @@ namespace jc\lang ;
 
 class TypeException extends Exception
 {
-	public function __construct($Variable,array $arrRequireTypes=array(),$sVarName=null)
+	public function __construct(&$Variable,array $arrRequireTypes=array(),$sVarName=null)
 	{
 		$this->Variable =& $Variable ;
 		$this->sVarName = $sVarName ;
