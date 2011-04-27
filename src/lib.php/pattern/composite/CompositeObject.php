@@ -59,10 +59,11 @@ class CompositeObject extends ContainedableObject implements IContainer
 	{
 		if( !$this->checkChildType($aChild) or $this->hasChild($aChild) )
 		{
-			return ;
+			return false ;
 		}
 		
-		$this->arrChildren[] = $aChild ; 
+		$this->arrChildren[] = $aChild ;
+		return true ; 
 	}
 
 	public function removeChild($Child) {

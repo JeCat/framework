@@ -61,7 +61,7 @@ class Compiler extends CompilerBase
 				{
 				case 'DOMText' :
 					$sText = strval($aSrcChildEle->wholeText) ;
-					if($sText)
+					if(!empty($sText))
 					{
 						$aText = new Text($sText) ;
 						$aText->setParent($aNode) ;

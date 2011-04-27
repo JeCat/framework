@@ -16,9 +16,9 @@ class Text extends Object
 		return __CLASS__ ;
 	}
 	
-	public function __construct(&$sText,$bHtml=true)
+	public function __construct($sText,$bHtml=true)
 	{
-		$this->setText($sText) ;
+		$this->sText = $sText ;
 		$this->bHtml = $bHtml ;
 	}
 
@@ -26,9 +26,9 @@ class Text extends Object
 	{
 		return $this->sText ;
 	}
-	public function setText(&$sText)
+	public function setText($sText)
 	{
-		$this->sText =& $sText ;
+		$this->sText = $sText ;
 	}
 	
 	public function render(IDisplayDevice $aDev,IHashTable $aVariables) 
@@ -42,13 +42,12 @@ class Text extends Object
 		{
 			$sText = preg_replace("/^\\s+/s", " ", $this->sText) ;
 			$sText = preg_replace("/\\s+$/s", " ", $sText) ;
-			$sText = htmlentities($sText) ;
+			$sText = htmlspecialchars($sText,ENT_COMPAT,'UTF-8') ;
 		}
 		else 
 		{
 			$sText = $this->sText ;
 		}
-		
 		$aDev->write($sText) ;
 	}
 	
