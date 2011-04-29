@@ -11,7 +11,10 @@ class Factory extends FactoryBase
 	 */
 	public function createCompiler()
 	{
-		return new Compiler() ;
+		$aCompiler = new Compiler() ;
+		$aCompiler->setInterpreter(new Interpreter()) ;
+		
+		return $aCompiler ;
 	}
 	
 	/**

@@ -8,6 +8,7 @@ use jc\util\IHashTable;
 use jc\io\IOutputStream;
 use jc\ui\IDisplayDevice;
 use jc\ui\Object;
+use jc\ui\xhtml\Compiler ;
 
 class Text extends Object
 {
@@ -16,10 +17,11 @@ class Text extends Object
 		return __CLASS__ ;
 	}
 	
-	public function __construct($sText,$bHtml=true)
+	public function __construct($sText,$nLine,$nPosition)
 	{
 		$this->sText = $sText ;
-		$this->bHtml = $bHtml ;
+		$this->nLine = $nLine ;
+		$this->nPosition = $nPosition ;
 	}
 
 	public function text()
@@ -31,6 +33,11 @@ class Text extends Object
 		$this->sText = $sText ;
 	}
 	
+	public function position()
+	{
+		return $this->nPosition ;
+	}
+	
 	public function render(IDisplayDevice $aDev,IHashTable $aVariables) 
 	{
 		$aDev->write($this->sText) ;
@@ -38,22 +45,29 @@ class Text extends Object
 	
 	public function compile(IOutputStream $aDev,ICompiler $aCompiler)
 	{
-		if( $this->bHtml )
+		$sText = $this->sText ;
+			
+		// 
+		if( $aCompiler instanceof Compiler )
 		{
-			$sText = preg_replace("/^\\s+/s", " ", $this->sText) ;
+			$sText = $aCompiler->expression($sText) ;
+		}
+		
+		/*if( $this->bHtml )
+		{
+			$sText = preg_replace("/^\\s+/s", " ", $sText) ;
 			$sText = preg_replace("/\\s+$/s", " ", $sText) ;
 			$sText = htmlspecialchars($sText,ENT_COMPAT,'UTF-8') ;
-		}
-		else 
-		{
-			$sText = $this->sText ;
-		}
+		}*/
+		
 		$aDev->write($sText) ;
 	}
 	
 	private $sText ;
 	
-	private $bHtml ;
+	private $nLine ;
+	
+	private $nPosition ;
 }
 
 ?>

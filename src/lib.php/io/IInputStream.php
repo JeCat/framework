@@ -1,6 +1,8 @@
 <?php
 namespace jc\io ;
 
+use jc\util\String;
+
 interface IInputStream
 {
 	/**
@@ -15,7 +17,7 @@ interface IInputStream
 	 * 
 	 * @return string
 	 */
-	function readInString($nBytes) ;
+	function readInString(String $aString,$nBytes) ;
 	
 	/**
 	 * Enter description here ...

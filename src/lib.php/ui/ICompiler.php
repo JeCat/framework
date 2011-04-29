@@ -22,6 +22,13 @@ interface ICompiler
 	 * @return IObject
 	 */
 	public function compile($sSourcePath,$sCompiledPath) ;
+	
+	/**
+	 * @return IInterpreter
+	 */
+	public function interpreter() ;
+	
+	public function setInterpreter(IInterpreter $aInterpreter) ;
 }
 
 ?>

@@ -101,7 +101,12 @@ class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator
 	 */
 	public function valid ()
 	{
-		return each($this->arrDatas)!==false ;
+		// 使用 null 作为数字索引，会被转换成空字符串 ''，因此可以使用 key()===null 来检查迭代状态
+		//
+		// $arr = array(null=>1,2,3) ;
+		// key($arr)===''
+		 
+		return key($this->arrDatas)!==null ;
 	}
 
 	public function rewind ()
@@ -127,6 +132,15 @@ class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator
 		return new \ArrayIterator(array_values($this->arrDatas)) ;
 	}
 	
+	public function add($Value)
+	{
+		$this->arrDatas[] = $Value ;
+	}
+	
+	public function reverse () 
+	{
+		krsort($this->arrDatas) ;
+	}
 	
 	protected $arrDatas = array() ;
 }

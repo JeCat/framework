@@ -1,6 +1,8 @@
 <?php
 namespace jc\ui ;
 
+use jc\util\String;
+
 use jc\fs\File;
 use jc\fs\IFile;
 use jc\lang\Exception;
@@ -57,21 +59,29 @@ abstract class CompilerBase extends Object implements ICompiler
 	public function compile($sSourcePath,$sCompiledPath)
 	{
 		if( $this->bForceCompile or !$this->isCompiledValid($sSourcePath, $sCompiledPath) )
-		{
-			$aObjectTree = $this->buildObjectTree($sSourcePath) ;
-						
+		{			
+			$aObjectTree = $this->interpreter()->parse($sSourcePath) ;
+
 			// save compiled
 			$this->saveCompiled($aObjectTree,$sCompiledPath) ;
 		}
 		
 		return $this->loadCompiled($sCompiledPath) ;
 	}
-	
+
 	/**
-	 * @return IObject
+	 * @return IInterpreter
 	 */
-	abstract protected function buildObjectTree($sSourcePath) ;
-	
+	public function interpreter()
+	{
+		return $this->aInterpreter ;
+	}
+	public function setInterpreter(IInterpreter $aInterpreter)
+	{
+		$this->aInterpreter  = $aInterpreter ;
+	}
+		
+	private $aInterpreter ;
 	
 	private $bForceCompile = true ;
 }

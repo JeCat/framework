@@ -2,6 +2,8 @@
 
 namespace jc\lang ;
 
+use jc\locale\ILocale;
+
 class TypeException extends Exception
 {
 	public function __construct(&$Variable,array $arrRequireTypes=array(),$sVarName=null)
@@ -9,11 +11,9 @@ class TypeException extends Exception
 		$this->Variable =& $Variable ;
 		$this->sVarName = $sVarName ;
 		$this->arrRequireTypes =& $arrRequireTypes ;
-		
-		Exception::__construct() ;
 	}
 	
-	public function message($sLanguage)
+	public function message(ILocale $aLocale=null)
 	{
 		return array(
 			"变量%s类型为：%s，不满足要求的类型: %s" ,

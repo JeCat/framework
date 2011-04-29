@@ -3,17 +3,20 @@
 namespace jc\ui\xhtml ;
 
 
+use jc\fs\File;
 use jc\lang\Type;
-use jc\lang\Exception;
 use jc\ui\xhtml\nodes\TagLibrary;
 use jc\ui\IObject;
 use jc\ui\CompilerBase;
+use jc\util\match\RegExp;
 
 class Compiler extends CompilerBase
 {
 	public function __construct()
 	{
 		$this->aTagLibrary = new TagLibrary() ;
+		$this->aExpressionCompiler = new ExpressionCompiler() ;
+		
 	}
 
 	public function tagLibrary()
@@ -24,21 +27,21 @@ class Compiler extends CompilerBase
 	{
 		$this->aTagLibrary = $aTagLibrary ;
 	}
-
+	
 	/**
-	 * @return IObject
+	 * @return RegExp
 	 */
-	protected function buildObjectTree($sSourcePath)
+	public function regexpFindTag()
 	{
-		$aDoc = new \DOMDocument() ;
-		
-		if(!$aDoc->loadHTMLFile($sSourcePath))
+		if(!$this->aRegexpFindTag)
 		{
-			throw new Exception("文件不是有效的 XHtml格式：%s",$sSourcePath) ;
+			$this->aRegexpFindTag = new RegExp("//") ;
 		}
-		
-		return $this->buildObject($aDoc) ;
+				
+		return $this->aRegexpFindTag ;
 	}
+
+	
 	
 	/**
 	 * @return INode
@@ -60,13 +63,13 @@ class Compiler extends CompilerBase
 				switch (get_class($aSrcChildEle))
 				{
 				case 'DOMText' :
-					$sText = strval($aSrcChildEle->wholeText) ;
-					if(!empty($sText))
-					{
+					$sText = $aSrcChildEle->wholeText ;
+					//if(!empty($sText))
+					//{
 						$aText = new Text($sText) ;
 						$aText->setParent($aNode) ;
 						$aNode->addChild( $aText ) ; 
-					}
+					//}
 					break ;
 				case 'DOMComment' :
 					$aSrcChildEle->data ; 
@@ -147,16 +150,15 @@ class Compiler extends CompilerBase
 		return new Compiled($sCompiledPath) ;
 	}
 	
-	/*public function compileFormatTag(INode $aObject,$sTagComplited)
+	public function expression($sSource)
 	{
-		$sComplited = '' ;
-		
-		$sComplited.= $sTagComplited ;
-		
-		return $sComplited ;
-	}*/
+		return $this->aExpressionCompiler->compile($sSource) ;
+	}
 	
 	private $aTagLibrary ;
+	
+	private $aExpressionCompiler ;
+	
 }
 
 ?>

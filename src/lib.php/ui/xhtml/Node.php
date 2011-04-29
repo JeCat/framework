@@ -126,12 +126,12 @@ class Node extends Object implements INode
 			return ;
 		}
 		
-		if( ($nChildIdx==0 and $aParent->isMultiLine() )		// block节点的第一个 INode child 
+		/*if( ($nChildIdx==0 and $aParent->isMultiLine() )		// block节点的第一个 INode child 
 			or !$aChild->isInline() )							// 或者 block child
 		{
 			$aDev->write("\r\n") ;
 			self::compileFormatIndent($aDev, $aChild) ;
-		}
+		}*/
 	}
 	
 	/**
@@ -139,7 +139,7 @@ class Node extends Object implements INode
 	 */
 	static public function compileFormatIndent(IOutputStream $aDev,INode $aNode)
 	{
-		$aDev->write( str_repeat("\t",$aNode->depth()-1) ) ;		
+		//$aDev->write( str_repeat("\t",$aNode->depth()-1) ) ;		
 	}
 
 	public function isInline()

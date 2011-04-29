@@ -124,6 +124,10 @@ class Type
 		{
 			return self::OBJECT ;
 		}
+		else if( $Variable===null )
+		{
+			return self::NULL ;
+		}
 	}
 }
 

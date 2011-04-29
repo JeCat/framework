@@ -20,8 +20,8 @@ class TagLibrary extends HashTable
 		parent::__construct() ;
 		
 		$this->set("#document",'jc\ui\Object') ;
-		$this->set("if",__NAMESPACE__.'\\If') ;
-		$this->set("include",__NAMESPACE__.'\\Include') ;
+		$this->set("if",__NAMESPACE__.'\\NodeIf') ;
+		$this->set("include",__NAMESPACE__.'\\NodeInclude') ;
 		
 		$this->set("html",'jc\ui\xhtml\Node',self::TS_BLOCK) ;
 		$this->set("body",'jc\ui\xhtml\Node',self::TS_BLOCK) ;

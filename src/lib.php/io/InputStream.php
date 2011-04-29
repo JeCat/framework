@@ -8,12 +8,14 @@ use jc\io\IInputStream;
 
 class InputStream extends Stream implements IInputStream, ILockable
 {
+	const MAX_READ_BYTES = 8192 ;
+	
 	/**
 	 * Enter description here ...
 	 * 
 	 * @return string
 	 */
-	function read($nBytes)
+	function read($nBytes=self::MAX_READ_BYTES,$bBlock=true)
 	{
 		if( $aStream = $this->redirectStream() )
 		{
@@ -22,7 +24,19 @@ class InputStream extends Stream implements IInputStream, ILockable
 		
 		else
 		{
-			return fread($this->hHandle,$nBytes) ;
+			if($nBytes<0)
+			{
+				$sReaded = '' ;
+				while(!feof($this->hHandle))
+				{
+					$sReaded.= fread($this->hHandle,10240) ;
+				}
+				return $sReaded ;
+			}
+			else 
+			{
+				return fread($this->hHandle,$nBytes) ;
+			}
 		}
 	}
 	
@@ -31,10 +45,10 @@ class InputStream extends Stream implements IInputStream, ILockable
 	 * 
 	 * @return int
 	 */
-	function readInString($nBytes,String $aString)
+	function readInString(String $aString,$nBytes=-1)
 	{
 		$sBytes = $this->read($nBytes) ;
-		$aString->append( &$sBytes ) ;
+		$aString->append( $sBytes ) ;
 		
 		return strlen($sBytes) ;
 	}
