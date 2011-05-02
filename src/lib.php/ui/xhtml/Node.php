@@ -1,13 +1,11 @@
 <?php
 
 namespace jc\ui\xhtml ;
+
 use jc\lang\Type;
 use jc\ui\ICompiler;
-
 use jc\ui\xhtml\nodes\TagLibrary;
-
 use jc\ui\IObject;
-
 use jc\io\IOutputStream;
 use jc\util\IDataSrc;
 use jc\ui\Object;

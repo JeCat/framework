@@ -44,7 +44,7 @@ class ResourceManager extends Object
 			}
 			else 
 			{
-				foreach ($arrFilenameWrappers as $funcFilenameWrapper)
+				foreach ($this->arrFilenameWrappers as $funcFilenameWrapper)
 				{
 					$sWrapedFilename = call_user_func_array($funcFilenameWrapper, array($sFilename)) ;
 				

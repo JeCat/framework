@@ -35,7 +35,7 @@ class OutputStreamBuffer extends OutputStream
 	{
 		$sBytes = '' ;
 		
-		foreach ($arrBuffer as $Contents)
+		foreach ($this->arrBuffer as $Contents)
 		{
 			if( is_string($Contents) )
 			{
@@ -58,7 +58,7 @@ class OutputStreamBuffer extends OutputStream
 	
 	public function flush()
 	{
-		foreach ($arrBuffer as $Contents)
+		foreach ($this->arrBuffer as $Contents)
 		{
 			if( is_string($Contents) )
 			{
