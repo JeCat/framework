@@ -11,11 +11,6 @@ use jc\lang\Object;
 
 abstract class CompilerBase extends Object implements ICompiler
 {
-	public function isCompiledValid($sSourcePath,$sCompiledPath)
-	{
-		return is_file($sCompiledPath) and filemtime($sSourcePath)<=filemtime($sCompiledPath) ;
-	}
-
 	/**
 	 * return IFile
 	 */
@@ -34,7 +29,10 @@ abstract class CompilerBase extends Object implements ICompiler
 		return new File($sCompiledPath) ;
 	}
 	
-	public function saveCompiled(IObject $aObject,$sCompiledPath)
+	/**
+	 * @return ICompiled
+	 */
+	public function compile(IObject $aObject,$sCompiledPath)
 	{
 		$aFile = $this->createCompiledFile($sCompiledPath) ;
 		if(!$aFile)
@@ -51,39 +49,10 @@ abstract class CompilerBase extends Object implements ICompiler
 		$aObject->compile($aWriter,$this) ;
 		$aWriter->flush() ;
 		$aWriter->close() ;
-	}
-	
-	/**
-	 * @return ICompiled
-	 */
-	public function compile($sSourcePath,$sCompiledPath)
-	{
-		if( $this->bForceCompile or !$this->isCompiledValid($sSourcePath, $sCompiledPath) )
-		{			
-			$aObjectTree = $this->interpreter()->parse($sSourcePath) ;
-
-			// save compiled
-			$this->saveCompiled($aObjectTree,$sCompiledPath) ;
-		}
 		
 		return $this->loadCompiled($sCompiledPath) ;
 	}
 
-	/**
-	 * @return IInterpreter
-	 */
-	public function interpreter()
-	{
-		return $this->aInterpreter ;
-	}
-	public function setInterpreter(IInterpreter $aInterpreter)
-	{
-		$this->aInterpreter  = $aInterpreter ;
-	}
-		
-	private $aInterpreter ;
-	
-	private $bForceCompile = true ;
 }
 
 ?>

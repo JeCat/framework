@@ -1,26 +1,23 @@
 <?php
 namespace jc\ui\xhtml ;
 
+use jc\ui\ICompiler;
+use jc\io\IOutputStream;
 use jc\lang\Type;
 
-use jc\lang\Object;
-
-class Tag extends Object
+class Tag extends ObjectBase
 {
 	const TYPE_HEAD = 1 ;
 	const TYPE_TAIL = 4 ;
 	const TYPE_SINGLE = 3 ;
 	
-	public function __construct($sName,$aAttrs,$sSource,$nLine,$nPosition,$nType)
-	{
-		Type::check(array("jc\\ui\\xhtml\\Attributes","null"),$aAttrs) ;
-		
+	public function __construct($sName,Attributes $aAttrs=null,$nType,$nPosition,$nEndPosition,$nLine,$sSource)
+	{		
 		$this->sName = $sName ;
-		$this->sSource = $sSource ;
-		$this->nLine = $nLine ;
-		$this->nPosition = $nPosition ;
 		$this->nType = $nType ;
 		$this->aAttrs = $aAttrs ;
+		
+		parent::__construct($nPosition, $nEndPosition, $nLine, $sSource) ;
 	}
 
 	public function name()
@@ -34,19 +31,7 @@ class Tag extends Object
 	{
 		return $this->aAttrs ;
 	}
-	public function line()
-	{
-		return $this->nLine ;
-	}
-	public function position()
-	{
-		return $this->nPosition ;
-	}
-	public function source()
-	{
-		return $this->sSource ;
-	}
-	public function type()
+	public function tagType()
 	{
 		return $this->nType ;
 	}
@@ -64,11 +49,9 @@ class Tag extends Object
 		return ($this->nType&self::TYPE_SINGLE)==self::TYPE_SINGLE ;
 	}
 	
+	
 	private $sName ;
 	private $aAttrs ;
-	private $sSource ;
-	private $nLine ;
-	private $nPosition ;
 	private $nType ;
 }
 

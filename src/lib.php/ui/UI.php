@@ -36,6 +36,19 @@ class UI extends JcObject
 	}
 	
 	/**
+	 * return IInterpreter
+	 */
+	public function interpreter()
+	{
+		return $this->aInterpreter ;
+	}
+	
+	public function setInterpreter(IInterpreter $aInterpreter)
+	{
+		$this->aInterpreter = $aInterpreter ;
+	}
+
+	/**
 	 * return IDisplayDevice
 	 */
 	public function displayDevice()
@@ -64,13 +77,26 @@ class UI extends JcObject
 	public function compile($sSourceFile)
 	{
 		$sSourcePath = $this->sourceFileManager()->find($sSourceFile) ;
+
 		$sCompiledPath = $this->sourceFileManager()->compiledPath($sSourcePath) ;
-		
-		return $this->compiler()->compile($sSourcePath,$sCompiledPath) ;
+
+		if( !$this->sourceFileManager()->isCompiledValid($sSourcePath,$sCompiledPath) )
+		{
+			// 解析
+			$aObjectTree = $this->interpreter()->parse($sSourcePath) ;
+			
+			// 编译
+			return $this->compiler()->compile($aObjectTree,$sCompiledPath) ;
+		}
+		else 
+		{
+			// 载入
+			return $this->compiler()->loadCompiled($sCompiledPath) ;
+		}
 	}
 	
 	public function display($sSourceFile,IHashTable $aVariables=null,IDisplayer $aDisplayDevice=null)
-	{
+	{		
 		$aCompiled = $this->compile($sSourceFile) ;
 		
 		if($aCompiled)
@@ -97,6 +123,8 @@ class UI extends JcObject
 	private $aDisplayDevice ;
 	
 	private $aVariables ;
+
+	private $aInterpreter ;
 }
 
 ?>

@@ -19,12 +19,16 @@ class QuotePreprocessor extends Object
 	
 	public function encode(String $aSource)
 	{
+		// token_get_all 会丢弃 <script> 后的内容，所以用 htmlspecialchars() 编码处理
+		$aSource->set(htmlspecialchars($aSource,ENT_NOQUOTES)) ;
+		
 		$aSource->insert("<?php ",0) ;
 		$aSource->append("?>") ;
 		$arrTokens = token_get_all($aSource) ;
 		array_shift($arrTokens) ;
 		array_pop($arrTokens) ;
 		$aSource->clear() ;
+		
 		
 		foreach ($arrTokens as $oneToken)
 		{
@@ -60,6 +64,8 @@ class QuotePreprocessor extends Object
 				}
 			}
 		}
+		
+		$aSource->set(htmlspecialchars_decode($aSource)) ;		
 	}
 	
 	public function decode($aSource)

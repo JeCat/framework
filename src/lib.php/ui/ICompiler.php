@@ -4,8 +4,6 @@ namespace jc\ui ;
 
 interface ICompiler
 {
-	public function isCompiledValid($sSourcePath,$sCompiledPath) ;
-	
 	/**
 	 * return jc\fs\IFile
 	 */
@@ -16,19 +14,10 @@ interface ICompiler
 	 */
 	public function loadCompiled($sCompiledPath) ;
 	
-	public function saveCompiled(IObject $aObject,$sCompiledPath) ;
-	
 	/**
-	 * @return IObject
+	 * @return ICompiled
 	 */
-	public function compile($sSourcePath,$sCompiledPath) ;
-	
-	/**
-	 * @return IInterpreter
-	 */
-	public function interpreter() ;
-	
-	public function setInterpreter(IInterpreter $aInterpreter) ;
+	public function compile(IObject $aObject,$sCompiledPath) ;
 }
 
 ?>

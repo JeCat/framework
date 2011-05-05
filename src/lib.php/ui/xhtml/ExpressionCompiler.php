@@ -48,11 +48,11 @@ class ExpressionCompiler extends Object
 			{
 			// 执行	
 			case '?' :
-				$sCompiled = "<?php echo " . $this->compileExpression($sExpression,false) . " ;?>" ;
+				$sCompiled = "<?php " . $this->compileExpression($sExpression,false) . " ;?>" ;
 				 
 			// 输出
 			case '=' :
-				$sCompiled = "<?php " . $this->compileExpression($sExpression,true) . " ;?>" ;
+				$sCompiled = "<?php echo " . $this->compileExpression($sExpression,true) . " ;?>" ;
 			}
 			
 			$sSource = substr_replace($sSource,$sCompiled,$aRes->position(),$aRes->length()) ;

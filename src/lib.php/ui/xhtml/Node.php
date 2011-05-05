@@ -8,169 +8,74 @@ use jc\ui\xhtml\nodes\TagLibrary;
 use jc\ui\IObject;
 use jc\io\IOutputStream;
 use jc\util\IDataSrc;
-use jc\ui\Object;
 
-class Node extends Object implements INode
-{
-	const FORMAT_NEWLINE = 1 ;
-	const FORMAT_INDENT = 2 ;
-	
+class Node extends ObjectBase
+{	
 	static public function type()
 	{
 		return __CLASS__ ;
 	}
 	
-	public function __construct($sTagName,TagLibrary $aTagLib=null)
+	public function __construct(Tag $aHeadTag, Tag $aTailTag=null)
 	{
-		$this->sTagName = $sTagName ;
-		$this->addChildTypes(__CLASS__) ;
-		$this->addChildTypes(__NAMESPACE__.'\\Text') ;
-		parent::__construct() ;
-	}
-	
-	public function tagName()
-	{
-		return $this->sTagName ;
-	}
-	
-	public function setTagName($sTagName)
-	{
-		$this->sTagName = $sTagName ;
+		$this->aHeadTag = $aHeadTag ;
+		$this->aTailTag = $aTailTag ;
+		
+		$this->setPosition(
+			$this->aHeadTag->position()
+		) ;
+		
+		$this->setLine(
+			$this->aHeadTag->line()
+		) ;
+		
+		parent::__construct($this->position(),$this->endPosition(),$this->line(),'') ;
 	}
 
-	/**
-	 * return Attributes
-	 */
-	public function attributes()
+	public function position()
 	{
-		if(!$this->aAttributes)
-		{
-			$this->aAttributes = new Attributes() ;
-		}
-		
-		return $this->aAttributes ;
+		return $this->aHeadTag->position() ;
 	}
-	
-	public function setAttributes(Attributes $aAttributes)
+
+	public function endPosition()
 	{
-		$this->aAttributes = $aAttributes ;
+		return $this->aTailTag?
+				$this->aTailTag->endPosition() :
+				$this->aHeadTag->endPosition() ;
 	}
-	
-	public function isSingle()
+
+	public function line()
 	{
-		return $this->bSingle ;
+		return $this->aHeadTag->line() ;	
 	}
-	
-	public function setSingle($bSingle=true)
+
+	public function tagName()
 	{
-		$this->bSingle = $bSingle? true: false ;
-	}
-	
-	public function pre()
-	{
-		return $this->bPre ;
-	}
-	
-	public function setPre($bPre=true)
-	{
-		$this->bPre = $bPre? true: false ;
+		return $this->aHeadTag->name() ;
 	}
 	
 	public function compile(IOutputStream $aDev,ICompiler $aCompiler)
-	{		
-		$aDev->write("<") ;
-		$aDev->write($this->tagName()) ;
+	{
+		$this->aHeadTag->compile($aDev,$aCompiler) ;
 		
-		$this->aAttributes->compile($aDev) ;
-		
-		// 单行节点
-		if( !$this->childrenCount() and $this->isSingle() )
+		foreach ($this->childrenIterator() as $aChild)
 		{
-			$aDev->write(" />") ;
-		}
-		else 
-		{
-			$aDev->write(">") ;
-			
-			$nIdx = 0 ;
-			foreach ($this->childrenIterator() as $aChildNode)
-			{
-				self::compileFormatForChild($aDev,$this,$aChildNode,$nIdx++) ;
-				
-				$aChildNode->compile($aDev,$aCompiler) ;
-			}
-			
-			// 尾标签
-			if($this->isMultiLine())
-			{
-				$aDev->write("\r\n") ;
-				self::compileFormatIndent($aDev, $this) ;
-			}
-			$aDev->write("</") ;
-			$aDev->write($this->tagName()) ;
-			$aDev->write(">") ;
+			$aChild->compile($aDev,$aCompiler) ;
 		}
 		
-	}
-	
-	
-	/**
-	 * 缩进
-	 */
-	static public function compileFormatForChild(IOutputStream $aDev,INode $aParent,IObject $aChild,$nChildIdx)
-	{
-		if( !($aChild instanceof INode) )
+		if($this->aTailTag)
 		{
-			return ;
+			$this->aTailTag->compile($aDev,$aCompiler) ;
 		}
 		
-		/*if( ($nChildIdx==0 and $aParent->isMultiLine() )		// block节点的第一个 INode child 
-			or !$aChild->isInline() )							// 或者 block child
-		{
-			$aDev->write("\r\n") ;
-			self::compileFormatIndent($aDev, $aChild) ;
-		}*/
-	}
-	
-	/**
-	 * 缩进
-	 */
-	static public function compileFormatIndent(IOutputStream $aDev,INode $aNode)
-	{
-		//$aDev->write( str_repeat("\t",$aNode->depth()-1) ) ;		
-	}
-
-	public function isInline()
-	{
-		return $this->bInline ;
-	}
-	public function setInline($bInline=true)
-	{
-		$this->bInline = $bInline? true: false ;
+		return ;		
 	}
 	
 	
-	public function isMultiLine()
-	{
-		return $this->bMultiLine ;
-	}
+	private $aHeadTag ;
 	
-	public function setMultiLine($bMultiLine=true)
-	{
-		$this->bMultiLine = $bMultiLine ;
-	}
+	private $aTailTag ;	
 	
-	private $sTagName ;
-	
-	private $bSingle = true ;
-	
-	private $bInline = true ;
-	
-	private $bPre = true ;
-	
-	private $bMultiLine = true ;
-	
-	private $aAttributes ;
 }
 
 ?>

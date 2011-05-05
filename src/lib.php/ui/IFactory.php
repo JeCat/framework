@@ -22,6 +22,11 @@ interface IFactory
 	 * return ICompiler
 	 */
 	public function createCompiler() ;
+		
+	/**
+	 * return IInterpreter
+	 */
+	public function createInterpreter() ;
 	
 	/**
 	 * return IDisplayDevice

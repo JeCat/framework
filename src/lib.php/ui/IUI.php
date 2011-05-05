@@ -14,6 +14,13 @@ interface IUI
 	public function setSourceFileManager(SourceFileManager $aSrcMgr) ;
 	
 	/**
+	 * return IInterpreter
+	 */
+	public function interpreter() ;
+	
+	public function setInterpreter(IInterpreter $aInterpreter) ;
+	
+	/**
 	 * return ICompiler
 	 */
 	public function compiler() ;

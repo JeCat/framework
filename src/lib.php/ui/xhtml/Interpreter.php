@@ -6,6 +6,7 @@ use jc\lang\Object ;
 use jc\util\match\RegExp;
 use jc\util\String;
 use jc\lang\Exception;
+use jc\ui\xhtml\nodes\TagLibrary;
 
 class Interpreter extends Object implements IInterpreter
 {
@@ -20,6 +21,15 @@ class Interpreter extends Object implements IInterpreter
 		$this->aRegextParseTagAttributes = new RegExp("|([\\w_\\.\\-]+)\\s*=\\s*([\"'])([^\"']+)\\2|s") ;
 	}	
 
+	public function tagLibrary()
+	{
+		return $this->aTagLibrary ;
+	}
+	public function setTagLibrary(TagLibrary $aTagLibrary)
+	{
+		$this->aTagLibrary = $aTagLibrary ;
+	}
+	
 	/**
 	 * return IObject
 	 */
@@ -39,7 +49,18 @@ class Interpreter extends Object implements IInterpreter
 		// parse text
 		$arrTexts = $this->parseTexts($aSource,$arrTags) ;
 		
+		// build nodes
 		$arrNodes = $this->buildNodes($arrTags,$sSourcePath) ;
+		
+		
+		// merge nodes and texts
+		$aRoot = new TransparentObject(0,$aSource->length()-1,0,'') ;
+		foreach(array_merge($arrNodes,$arrTexts) as $aObject)
+		{
+			$aRoot->addChild($aObject) ;
+		}
+		
+		return $aRoot ;
 	}
 	
 	public function parseTags(String $aSource)
@@ -61,16 +82,15 @@ class Interpreter extends Object implements IInterpreter
 					) ;
 				}
 			}
-			
-			$sTagSource = $this->aQuotePreprocessor->decode($aRes->result()) ;
-						
+
 			$arrTags[ $aRes->position() ] = new Tag(
 				$aRes->result(1)
 				, $aAttrs 
-				, $sTagSource
-				, substr_count($aSource,"\n",0,$aRes->position()+1)
-				, $aRes->position()
 				, ($aRes->result(3)=='/')? Tag::TYPE_SINGLE: Tag::TYPE_HEAD
+				, $aRes->position()
+				, $aRes->position() + $aRes->length() - 1
+				, substr_count($aSource,"\n",0,$aRes->position()+1)
+				, $this->aQuotePreprocessor->decode($aRes->result())
 			) ;
 		}
 		
@@ -80,10 +100,11 @@ class Interpreter extends Object implements IInterpreter
 			$arrTags[ $aRes->position() ] = new Tag(
 				$aRes->result(1)
 				, null 
-				, $aRes->result()
-				, substr_count($aSource,"\n",0,$aRes->position()+1)
-				, $aRes->position()
 				, Tag::TYPE_TAIL
+				, $aRes->position()
+				, $aRes->position() + $aRes->length() - 1
+				, substr_count($aSource,"\n",0,$aRes->position()+1)
+				, $this->aQuotePreprocessor->decode($aRes->result())
 			) ;
 		}
 		
@@ -103,17 +124,20 @@ class Interpreter extends Object implements IInterpreter
 			if( $nLen )
 			{
 				$sTextSource = $this->aQuotePreprocessor->decode(substr($aSource,$nIdx,$nLen)) ;
-				$arrTexts[] = new Text( $sTextSource, substr_count($aSource,"\n",0,$nIdx+1), $nIdx ) ;
+				$nLine = substr_count($aSource,"\n",0,$nIdx+1) ;
+				$nEndPosition = $aTag->position() - 1 ;
+				
+				$arrTexts[] = new Text($nIdx,$nEndPosition,$nLine,$sTextSource) ;
 			}
 			
-			$nIdx = $aTag->position() + strlen($aTag->source()) ;
+			$nIdx = $aTag->endPosition() + 1 ;
 		}
 		
 		// last pice
-		if( $nIdx<$aSource->length() )
+		if( $nIdx<$aSource->length()-1 )
 		{
 			$sTextSource = $this->aQuotePreprocessor->decode(substr($aSource,$nIdx)) ;
-			$arrTexts[] = new Text( $sTextSource, substr_count($aSource,"\n",0,$nIdx+1), $nIdx ) ;
+			$arrTexts[] = new Text($nIdx,$aSource->length()-1,substr_count($aSource,"\n",0,$nIdx+1),$sTextSource) ;
 		}
 		
 		return $arrTexts ;
@@ -128,7 +152,7 @@ class Interpreter extends Object implements IInterpreter
 		{
 			if( $aTag->isSingle() )
 			{
-				$arrNodes[] = $aTag ;
+				$arrNodes[] = new Node($aTag) ;
 			}
 			else if( $aTag->isHead() )
 			{
@@ -187,12 +211,12 @@ class Interpreter extends Object implements IInterpreter
 		
 		return $arrNodes ;
 	}
-	
-	
-	protected function buildTree(array $aObject)
-	{
 		
+	public function preprocessor ()
+	{
+		return $this->aQuotePreprocessor ;
 	}
+	
 	private $aQuotePreprocessor ;
 	
 	private $aRegextFindHeadTags ;
@@ -200,6 +224,9 @@ class Interpreter extends Object implements IInterpreter
 	private $aRegextFindTailTags ;
 	
 	private $aRegextParseTagAttributes ;
+	
+	private $aTagLibrary ;
+	
 }
 
 ?>

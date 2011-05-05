@@ -35,6 +35,9 @@ abstract class FactoryBase extends Object implements IFactory
 		// for SourceFileManager
 		$aUI->setSourceFileManager( $this->sourceFileManager() ) ;
 		
+		// for Interpreter
+		$aUI->setInterpreter( $this->interpreter() ) ;
+
 		// for Compiler
 		$aUI->setCompiler( $this->compiler() ) ;
 		
@@ -112,10 +115,31 @@ abstract class FactoryBase extends Object implements IFactory
 		$this->aCompiler = $aCompiler ;
 	}
 	
+	/**
+	 * return IInterpreter
+	 */
+	public function interpreter()
+	{
+		if( !$this->aInterpreter )
+		{
+			if( $this->aInterpreter=$this->createInterpreter() )
+			{
+				$this->aInterpreter->setApplication($this->application(true)) ;
+			}
+		}
+		return $this->aInterpreter ;
+	}
+	
+	public function setInterpreter(IInterpreter $aInterpreter)
+	{
+		$this->aInterpreter = $aInterpreter ;
+	}
+	
 	static protected $aGlobalInstance ;
 	
 	private $aSourceFileManager ;
 	private $aCompiler ;
+	private $aInterpreter ;
 }
 
 ?>
