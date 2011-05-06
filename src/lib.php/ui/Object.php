@@ -33,11 +33,16 @@ class Object extends CompositeObject implements IObject
 		return $aParent? $aParent->depth()+1: 0 ;
 	}
 	
-	public function compile(IOutputStream $aDev,ICompiler $aCompiler)
+	public function compile(IOutputStream $aDev)
 	{
-		foreach ($this->childrenIterator() as $aChild)
+		$this->compileChildren($aDev) ;
+	}
+
+	protected function compileChildren(IOutputStream $aDev)
+	{
+		foreach($this->childrenIterator() as $aObject)
 		{
-			$aChild->compile($aDev,$aCompiler) ;
+			$aObject->compile($aDev) ;
 		}
 	}
 	

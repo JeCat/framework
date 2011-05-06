@@ -155,25 +155,13 @@ class ObjectBase extends Object
 		}
 	}
 
-	public function compile(IOutputStream $aDev,ICompiler $aCompiler)
+	public function compile(IOutputStream $aDev)
 	{
 		$sText = $this->source() ;
+		$sText = ExpressionCompiler::compile($sText) ;
+		$aDev->write($sText) ;
 		
-		if($sText)
-		{
-			$sText = ExpressionCompiler::compile($sText) ;
-			$aDev->write($sText) ;
-		}
-		
-		$this->compileChildren($aDev,$aCompiler) ;
-	}
-	
-	public function compileChildren(IOutputStream $aDev,ICompiler $aCompiler)
-	{
-		foreach($this->childrenIterator() as $aObject)
-		{
-			$aObject->compile($aDev,$aCompiler) ;
-		}
+		$this->compileChildren($aDev) ;
 	}
 	
 	private $nPosition = -1 ;

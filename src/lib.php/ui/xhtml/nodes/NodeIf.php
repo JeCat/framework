@@ -8,7 +8,7 @@ use jc\io\IOutputStream;
 
 class NodeIf extends Node
 {
-	public function compile(IOutputStream $aDev,ICompiler $aCompiler)
+	public function compile(IOutputStream $aDev)
 	{
 		$aDev->write('<?php if(') ;
 		
@@ -20,7 +20,7 @@ class NodeIf extends Node
 		
 		$aDev->write("){ ?>") ;
 		
-		$this->compileChildren($aDev,$aCompiler) ;
+		$this->compileChildren($aDev) ;
 		
 		$aDev->write("<?php } ?>") ;
 	}

@@ -54,21 +54,16 @@ class Node extends ObjectBase
 		return $this->aHeadTag->name() ;
 	}
 	
-	public function compile(IOutputStream $aDev,ICompiler $aCompiler)
+	public function compile(IOutputStream $aDev)
 	{
-		$this->aHeadTag->compile($aDev,$aCompiler) ;
+		$this->aHeadTag->compile($aDev) ;
 		
-		foreach ($this->childrenIterator() as $aChild)
-		{
-			$aChild->compile($aDev,$aCompiler) ;
-		}
+		$this->compileChildren($aDev) ;
 		
 		if($this->aTailTag)
 		{
-			$this->aTailTag->compile($aDev,$aCompiler) ;
-		}
-		
-		return ;		
+			$this->aTailTag->compile($aDev) ;
+		}	
 	}
 	
 	/**

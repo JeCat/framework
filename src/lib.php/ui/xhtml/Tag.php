@@ -49,7 +49,7 @@ class Tag extends ObjectBase
 		return ($this->nType&self::TYPE_SINGLE)==self::TYPE_SINGLE ;
 	}
 	
-	public function compile(IOutputStream $aDev,ICompiler $aCompiler)
+	public function compile(IOutputStream $aDev)
 	{
 		$aDev->write('<') ;
 		if( $this->isTail() )
