@@ -21,6 +21,9 @@ class Interpreter extends Object implements IInterpreter
 		$this->aRegextParseTagAttributes = new RegExp("|([\\w_\\.\\-]+)\\s*=\\s*([\"'])([^\"']+)\\2|s") ;
 	}	
 
+	/**
+	 * @return TagLibrary
+	 */
 	public function tagLibrary()
 	{
 		return $this->aTagLibrary ;
@@ -54,7 +57,7 @@ class Interpreter extends Object implements IInterpreter
 		
 		
 		// merge nodes and texts
-		$aRoot = new TransparentObject(0,$aSource->length()-1,0,'') ;
+		$aRoot = new ObjectBase(0,$aSource->length()-1,0,'') ;
 		foreach(array_merge($arrNodes,$arrTexts) as $aObject)
 		{
 			$aRoot->addChild($aObject) ;
@@ -71,7 +74,11 @@ class Interpreter extends Object implements IInterpreter
 		foreach($this->aRegextFindHeadTags->match($aSource) as $aRes)
 		{
 			$aAttrs = new Attributes() ;
-			$sAttributes = trim($aRes->result(2)) ;
+			
+			$sAttrsSrc = $this->aQuotePreprocessor->decode($aRes->result(2)) ;
+			$aAttrs->setSource($sAttrsSrc) ;
+			
+			$sAttributes = trim($sAttrsSrc) ;
 			if($sAttributes)
 			{
 				foreach($this->aRegextParseTagAttributes->match($sAttributes) as $aAttrRes)
@@ -99,7 +106,7 @@ class Interpreter extends Object implements IInterpreter
 		{
 			$arrTags[ $aRes->position() ] = new Tag(
 				$aRes->result(1)
-				, null 
+				, new Attributes() 
 				, Tag::TYPE_TAIL
 				, $aRes->position()
 				, $aRes->position() + $aRes->length() - 1
@@ -152,7 +159,7 @@ class Interpreter extends Object implements IInterpreter
 		{
 			if( $aTag->isSingle() )
 			{
-				$arrNodes[] = new Node($aTag) ;
+				$arrNodes[] = $this->createNode($aTag) ;
 			}
 			else if( $aTag->isHead() )
 			{
@@ -189,7 +196,7 @@ class Interpreter extends Object implements IInterpreter
 					)) ;
 				}
 				
-				$arrNodes[] = new Node($aHeadTag,$aTag) ;
+				$arrNodes[] = $this->createNode($aHeadTag,$aTag) ;
 			}
 		}
 		
@@ -215,6 +222,16 @@ class Interpreter extends Object implements IInterpreter
 	public function preprocessor ()
 	{
 		return $this->aQuotePreprocessor ;
+	}
+	
+	/**
+	 * @return Node
+	 */
+	public function createNode(Tag $aHeadTag,Tag $aTailTag=null)
+	{
+		$sClassName = $this->tagLibrary()->getClassName( $aHeadTag->name() ) ;
+		
+		return new $sClassName($aHeadTag,$aTailTag) ;
 	}
 	
 	private $aQuotePreprocessor ;

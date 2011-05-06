@@ -3,9 +3,9 @@
 namespace jc\ui\xhtml ;
 
 use jc\lang\Type;
-use jc\ui\ICompiler;
 use jc\ui\xhtml\nodes\TagLibrary;
 use jc\ui\IObject;
+use jc\ui\ICompiler;
 use jc\io\IOutputStream;
 use jc\util\IDataSrc;
 
@@ -71,6 +71,27 @@ class Node extends ObjectBase
 		return ;		
 	}
 	
+	/**
+	 * @return Tag
+	 */
+	public function headTag()
+	{
+		return $this->aHeadTag ;
+	}
+	/**
+	 * @return Tag
+	 */
+	public function tailTag()
+	{
+		return $this->aTailTag ;
+	}
+	/**
+	 * @return Attributes
+	 */
+	public function attributes()
+	{
+		return $this->headTag()->attributes() ;
+	}
 	
 	private $aHeadTag ;
 	

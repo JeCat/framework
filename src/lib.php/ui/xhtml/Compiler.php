@@ -12,11 +12,6 @@ use jc\util\match\RegExp;
 
 class Compiler extends CompilerBase
 {
-	public function __construct()
-	{
-		$this->aExpressionCompiler = new ExpressionCompiler() ;
-	}
-
 	/**
 	 * @return jc\ui\ICompiled
 	 */
@@ -24,24 +19,6 @@ class Compiler extends CompilerBase
 	{
 		return new Compiled($sCompiledPath) ;
 	}
-	
-	public function compileExpression($sSource)
-	{
-		return $this->aExpressionCompiler->compile($sSource) ;
-	}
-	
-	public function expressionCompiler()
-	{
-		return $this->aExpressionCompiler ;
-	}
-	
-	public function setExpressionCompiler(ExpressionCompiler $aExpressionCompiler)
-	{
-		$this->aExpressionCompiler = $aExpressionCompiler ;
-	}
-	
-	private $aExpressionCompiler ;
-	
 }
 
 ?>

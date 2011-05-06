@@ -11,8 +11,8 @@ class Tag extends ObjectBase
 	const TYPE_TAIL = 4 ;
 	const TYPE_SINGLE = 3 ;
 	
-	public function __construct($sName,Attributes $aAttrs=null,$nType,$nPosition,$nEndPosition,$nLine,$sSource)
-	{		
+	public function __construct($sName,Attributes $aAttrs,$nType,$nPosition,$nEndPosition,$nLine,$sSource)
+	{
 		$this->sName = $sName ;
 		$this->nType = $nType ;
 		$this->aAttrs = $aAttrs ;
@@ -49,6 +49,25 @@ class Tag extends ObjectBase
 		return ($this->nType&self::TYPE_SINGLE)==self::TYPE_SINGLE ;
 	}
 	
+	public function compile(IOutputStream $aDev,ICompiler $aCompiler)
+	{
+		$aDev->write('<') ;
+		if( $this->isTail() )
+		{
+			$aDev->write('/') ;
+		}
+		
+		$aDev->write($this->name()) ;
+		
+		$aDev->write($this->attributes()->source()) ;
+		
+		if( $this->isSingle() )
+		{
+			$aDev->write(' /') ;
+		}
+		
+		$aDev->write('>') ;
+	}
 	
 	private $sName ;
 	private $aAttrs ;

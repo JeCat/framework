@@ -159,12 +159,21 @@ class ObjectBase extends Object
 	{
 		$sText = $this->source() ;
 		
-		if($aCompiler instanceof Compiler)
+		if($sText)
 		{
-			$sText = $aCompiler->compileExpression($sText) ;
+			$sText = ExpressionCompiler::compile($sText) ;
+			$aDev->write($sText) ;
 		}
 		
-		$aDev->write($sText) ;
+		$this->compileChildren($aDev,$aCompiler) ;
+	}
+	
+	public function compileChildren(IOutputStream $aDev,ICompiler $aCompiler)
+	{
+		foreach($this->childrenIterator() as $aObject)
+		{
+			$aObject->compile($aDev,$aCompiler) ;
+		}
 	}
 	
 	private $nPosition = -1 ;
