@@ -9,11 +9,33 @@ use jc\util\IHashTable;
 
 class UI extends JcObject
 {
+	public function __construct(IFactory $aFactory)
+	{
+		$this->setFactory($aFactory) ;
+	}
+	
+	/**
+	 * return IFactory
+	 */
+	public function factory()
+	{
+		return $this->aFactory ;
+	}
+	
+	public function setFactory(IFactory $aFactory)
+	{
+		$this->aFactory = $aFactory ;
+	}
+	
 	/**
 	 * return SourceFolderManager
 	 */
 	public function sourceFileManager()
 	{
+		if(!$this->aSourceFileManager)
+		{
+			$this->aSourceFileManager = $this->aFactory->createSourceFileManager() ;
+		}
 		return $this->aSourceFileManager ;
 	}
 	
@@ -23,29 +45,37 @@ class UI extends JcObject
 	}
 	
 	/**
-	 * return ICompiler
+	 * return CompilerManager
 	 */
-	public function compiler()
+	public function compilers()
 	{
-		return $this->aCompiler ;
+		if(!$this->aCompilers)
+		{
+			$this->aCompilers = $this->aFactory->createCompilerManager() ;
+		}
+		return $this->aCompilers ;
 	}
 	
-	public function setCompiler(ICompiler $aCompiler)
+	public function setCompilers(CompilerManager $aCompilers)
 	{
-		$this->aCompiler = $aCompiler ;
+		$this->aCompilers = $aCompilers ;
 	}
 	
 	/**
-	 * return IInterpreter
+	 * return InterpreterManager
 	 */
-	public function interpreter()
+	public function interpreters()
 	{
-		return $this->aInterpreter ;
+		if(!$this->aInterpreters)
+		{
+			$this->aInterpreters = $this->aFactory->createInterpreterManager() ;
+		}
+		return $this->aInterpreters ;
 	}
 	
-	public function setInterpreter(IInterpreter $aInterpreter)
+	public function setInterpreters(InterpreterManager $aInterpreters)
 	{
-		$this->aInterpreter = $aInterpreter ;
+		$this->aInterpreters = $aInterpreters ;
 	}
 
 	/**
@@ -83,10 +113,10 @@ class UI extends JcObject
 		if( !$this->sourceFileManager()->isCompiledValid($sSourcePath,$sCompiledPath) )
 		{
 			// 解析
-			$aObjectTree = $this->interpreter()->parse($sSourcePath) ;
+			$aObjectTree = $this->interpreters()->parse($sSourcePath) ;
 			
 			// 编译
-			return $this->compiler()->compile($aObjectTree,$sCompiledPath) ;
+			return $this->compilers()->compile($aObjectTree,$sCompiledPath) ;
 		}
 		else 
 		{
@@ -118,13 +148,13 @@ class UI extends JcObject
 	
 	private $aSourceFileManager ;
 	
-	private $aCompiler ;
-	
-	private $aDisplayDevice ;
+	private $aCompilers ;
 	
 	private $aVariables ;
 
-	private $aInterpreter ;
+	private $aInterpreters ;
+	
+	private $aDisplayDevice ;
 }
 
 ?>

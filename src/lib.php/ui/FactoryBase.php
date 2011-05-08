@@ -8,138 +8,92 @@ use jc\lang\Object;
 abstract class FactoryBase extends Object implements IFactory 
 {
 	/**
-	 * (static 延迟绑定，在子类生效)
-	 * @return IFactory
-	 */
-	static public function singleton()
-	{
-		if( !self::$aGlobalInstance )
-		{
-			$sClassName = get_called_class() ;
-			self::$aGlobalInstance = new $sClassName() ;
-		}
-		
-		return self::$aGlobalInstance ;
-	}
-	
-	/**
-	 * return IUI
+	 * return UI
 	 */
 	public function create()
 	{
-		$aApp = $this->application(true) ;
-		
-		$aUI = $this->createUI() ;
-		$aUI->setApplication($aApp) ;
-		
-		// for SourceFileManager
-		$aUI->setSourceFileManager( $this->sourceFileManager() ) ;
-		
-		// for Interpreter
-		$aUI->setInterpreter( $this->interpreter() ) ;
-
-		// for Compiler
-		$aUI->setCompiler( $this->compiler() ) ;
-		
-		// for Variables
-		if( $aVars=new HashTable() )
-		{
-			$aVars->setApplication($aApp) ;
-		}
-		$aUI->setVariables( $aVars ) ;
-		
-		// for display device
-		if( $aDev=$this->createDisplayDevice() )
-		{
-			$aDev->setApplication($aApp) ;
-		}
-		$aUI->setDisplayDevice( $aDev ) ;
+		$aUI = new UI($this) ;
+		$aUI->setApplication($this->application(true)) ;
 
 		return $aUI ;
 	}
-	
-	/**
-	 * return IUI
-	 */
-	public function createUI()
-	{
-		return new UI() ;
-	}
 
 	/**
-	 * return ICompiler
+	 * return SourceFileManager
 	 */
 	public function createSourceFileManager()
 	{
-		return new SourceFileManager() ;
+		return $this->sourceFileManager() ;
 	}
-
 	/**
-	 * return SourceFolderManager
+	 * @return SourceFileManager
 	 */
 	public function sourceFileManager()
 	{
 		if(!$this->aSourceFileManager)
 		{
-			if( $this->aSourceFileManager=$this->createSourceFileManager() )
-			{
-				$this->aSourceFileManager->setApplication($this->application(true)) ;
-			}
+			$this->aSourceFileManager = SourceFileManager::singleton(true) ;
+			$this->aSourceFileManager->setApplication($this->application(true)) ;
 		}
 		
 		return $this->aSourceFileManager ;
 	}
-	
 	public function setSourceFileManager(SourceFileManager $aSrcMgr)
 	{
 		$this->aSourceFileManager = $aSrcMgr ;
 	}
 	
 	/**
-	 * return ICompiler
+	 * return CompilerManager
 	 */
-	public function compiler()
+	public function createCompilerManager()
 	{
-		if( !$this->aCompiler )
-		{
-			if( $this->aCompiler=$this->createCompiler() )
-			{
-				$this->aCompiler->setApplication($this->application(true)) ;
-			}
-		}
-		return $this->aCompiler ;
+		return $this->compilerManager() ;
 	}
-	
-	public function setCompiler(ICompiler $aCompiler)
+	/**
+	 * @return CompilerManager
+	 */
+	public function compilerManager()
 	{
-		$this->aCompiler = $aCompiler ;
+		if( !$this->aCompilers )
+		{
+			$this->aCompilers = CompilerManager::singleton(true) ;
+			$this->aCompilers->setApplication($this->application(true)) ;
+		}
+		return $this->aCompilers ;
+	}
+	public function setCompilerManager(CompilerManager $aCompilers)
+	{
+		$this->aCompilers = $aCompilers ;
 	}
 	
 	/**
-	 * return IInterpreter
+	 * return InterpreterManager
 	 */
-	public function interpreter()
+	public function createInterpreterManager()
 	{
-		if( !$this->aInterpreter )
+		return $this->interpreterManager() ;
+	}
+	/**
+	 * @return InterpreterManager
+	 */
+	public function interpreterManager()
+	{
+		if( !$this->aInterpreters )
 		{
-			if( $this->aInterpreter=$this->createInterpreter() )
-			{
-				$this->aInterpreter->setApplication($this->application(true)) ;
-			}
+			$this->aInterpreters = InterpreterManager::singleton(true) ;
+			$this->aInterpreters->setApplication($this->application(true)) ;
 		}
-		return $this->aInterpreter ;
+		return $this->aInterpreters ;
 	}
-	
-	public function setInterpreter(IInterpreter $aInterpreter)
+	public function setInterpreter(InterpreterManager $aInterpreters)
 	{
-		$this->aInterpreter = $aInterpreter ;
+		$this->aInterpreters = $aInterpreters ;
 	}
 	
-	static protected $aGlobalInstance ;
-	
-	private $aSourceFileManager ;
-	private $aCompiler ;
-	private $aInterpreter ;
+	protected $aSourceFileManager ;
+	protected $aCompilers ;
+	protected $aInterpreters ;
 }
 
 ?>

@@ -2,9 +2,10 @@
 
 namespace jc\ui ;
 
+use jc\pattern\composite\IContainer;
 use jc\io\IOutputStream;
 
-interface IObject
+interface IObject extends IContainer
 {	
 	public function depth() ;
 	

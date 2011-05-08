@@ -4,29 +4,24 @@ namespace jc\ui ;
 interface IFactory
 {
 	/**
-	 * return IUI
+	 * return UI
 	 */
 	public function create() ;
 	
 	/**
-	 * return ICompiler
+	 * return ISourceFileManager
 	 */
 	public function createSourceFileManager() ;
 	
 	/**
-	 * return IUI
+	 * return CompilerManager
 	 */
-	public function createUI() ;
-	
-	/**
-	 * return ICompiler
-	 */
-	public function createCompiler() ;
+	public function createCompilerManager() ;
 		
 	/**
-	 * return IInterpreter
+	 * return InterpreterManager
 	 */
-	public function createInterpreter() ;
+	public function createInterpreterManager() ;	
 	
 	/**
 	 * return IDisplayDevice

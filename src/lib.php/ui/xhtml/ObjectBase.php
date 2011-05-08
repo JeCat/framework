@@ -157,11 +157,16 @@ class ObjectBase extends Object
 
 	public function compile(IOutputStream $aDev)
 	{
-		$sText = $this->source() ;
-		$sText = ExpressionCompiler::compile($sText) ;
-		$aDev->write($sText) ;
-		
-		$this->compileChildren($aDev) ;
+		if( $this->childrenCount() )
+		{
+			$this->compileChildren($aDev) ;
+		}
+		else
+		{
+			$sText = $this->source() ;
+			$sText = ExpressionCompiler::compile($sText) ;
+			$aDev->write($sText) ;
+		}
 	}
 	
 	private $nPosition = -1 ;

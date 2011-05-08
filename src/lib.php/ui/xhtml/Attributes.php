@@ -23,24 +23,27 @@ class Attributes extends HashTable
 	{
 		return $this->bool($sName.'.express')?
 			$this->expression($sName) :
-			parent::get($sName) ;
+			(($aText=parent::get($sName))?$aText->source():null) ;
 	}
 	
 	public function bool($sName)
 	{
-		return in_array( strtolower(parent::get(sName)),self::$arrFalseValues,true) ;
+		return in_array( strtolower(
+				$aText=parent::get($sName))?$aText->source():''
+				, self::$arrFalseValues
+				, true ) ;
 	}
 	public function int($sName)
 	{
-		return intval(parent::get(sName)) ;
+		return ($aText=parent::get($sName))?intval($aText->source()):0 ;
 	}
 	public function float($sName)
 	{
-		return floatval(parent::get(sName)) ;
+		return ($aText=parent::get($sName))?floatval($aText->source()):0 ;
 	}
 	public function expression($sName)
 	{
-		return ExpressionCompiler::compileExpression(parent::get(sName)) ;
+		return ($aText=parent::get($sName))? ExpressionCompiler::compileExpression($aText->source()): null ;
 	}
 	
 	public function source()

@@ -1,12 +1,11 @@
 <?php
 namespace jc\ui ;
 
+use jc\util\String;
+
 interface IInterpreter
 {
-	/**
-	 * return IObject
-	 */
-	public function parse($sSourcePath) ; 
+	public function parse(String $aSource,IObject $aObjectContainer,$sSourcePath) ; 
 }
 
 ?>

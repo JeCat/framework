@@ -88,6 +88,19 @@ class Node extends ObjectBase
 		return $this->headTag()->attributes() ;
 	}
 	
+	public function childrenIterator($nType=null)
+	{
+		$aIter = new \MultipleIterator(\MultipleIterator::MIT_NEED_ALL) ;
+		
+		// 属性
+		$aIter->attachIterator($this->aHeadTag->attributes()->valueIterator()) ;
+		
+		// children
+		$aIter->attachIterator(parent::childrenIterator(nType)) ;
+		
+		return $aIter ;
+	}
+	
 	private $aHeadTag ;
 	
 	private $aTailTag ;	

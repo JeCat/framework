@@ -1,23 +1,34 @@
 <?php
 
-namespace jc\ui\xhtml ;
+namespace jc\ui\xhtml\parsers ;
 
+use jc\ui\IObject;
+use jc\ui\IInterpreter;
 use jc\util\match\Result;
-
 use jc\util\match\RegExp;
-
 use jc\util\String;
 use jc\lang\Object;
 
-class QuotePreprocessor extends Object
+class Preprocessor extends Object implements IInterpreter
 {
 	public function __construct()
 	{
 		$sMark = md5(__CLASS__) ;
 		$this->aRegextFindEncode = new RegExp("/~\\*\\*{$sMark}\\{\\[(.+?)\\]\\}{$sMark}\\*\\*~/s") ;
 	}
-	
-	public function encode(String $aSource)
+
+	public function parse(String $aSource,IObject $aObjectContainer,$sSourcePath)
+	{
+		// 统一换行符
+		$aSource->replace("\r\n","\n") ;
+		$aSource->replace("\r","\n") ;
+		$aSource->replace("\n","\r\n") ;
+		
+		 // 引号
+		self::quoteEncode($aSource) ;
+	}
+
+	static public function quoteEncode(String $aSource)
 	{
 		// token_get_all 会丢弃 <script> 后的内容，所以用 htmlspecialchars() 编码处理
 		$aSource->set(htmlspecialchars($aSource,ENT_NOQUOTES)) ;
@@ -68,7 +79,7 @@ class QuotePreprocessor extends Object
 		$aSource->set(htmlspecialchars_decode($aSource)) ;		
 	}
 	
-	public function decode($aSource)
+	public function quoteDecode($aSource)
 	{
 		return $this->aRegextFindEncode->callbackReplace($aSource,function(Result $aRes){
 			return base64_decode($aRes->result(1)) ;

@@ -8,22 +8,35 @@ use jc\ui\FactoryBase;
 class Factory extends FactoryBase 
 {	
 	/**
-	 * return ICompiler
+	 * return SourceFileManager
 	 */
-	public function createCompiler()
+	public function interpreterManager()
 	{
-		return new Compiler() ;
+		if(!$this->aInterpreters)
+		{
+			$aInterpreters = parent::interpreterManager() ;
+			
+			// 注册  parser
+			$aInterpreters->add(parsers\NodeParser::singleton()) ;
+			$aInterpreters->add(parsers\MarkParser::singleton()) ;
+			$aInterpreters->add(parsers\TreeBuilder::singleton()) ;
+		}
+		
+		return $this->aInterpreters ;
 	}
 	
 	/**
-	 * return ICompiler
+	 * return SourceFileManager
 	 */
-	public function createInterpreter()
+	public function compilerManager()
 	{
-		$aInterpreter = new Interpreter() ;
-		$aInterpreter->setTagLibrary($this->tagLibrary()) ;
+		if(!$this->aCompilers)
+		{
+			$aCompilers = parent::compilerManager() ;
+			
+		}
 		
-		return $aInterpreter ;
+		return $this->aCompilers ;
 	}
 	
 	/**
@@ -33,27 +46,6 @@ class Factory extends FactoryBase
 	{
 		return new StreamDisplayDevice() ;
 	}
-	
-	/**
-	 * @return TagLibrary
-	 */
-	public function tagLibrary()
-	{
-		if( !$this->aTagLibrary )
-		{
-			$this->aTagLibrary = new TagLibrary() ;
-		}
-		return $this->aTagLibrary ;
-	}
-	
-	public function setTagLibrary(TagLibrary $aTagLibrary)
-	{
-		$this->aTagLibrary = $aTagLibrary ;
-	}
-		
-	private $aTagLibrary ;
-	
-	static protected $aGlobalInstance ;
 }
 
 ?>
