@@ -218,6 +218,12 @@ class Interpreter extends Object implements IInterpreter
 		
 		return $arrNodes ;
 	}
+	
+	protected function createNode(Tag $aHeadTag,Tag $aTailTag=null)
+	{
+		$sClassName = $this->aTagLibrary->getClassName($aHeadTag->name()) ;
+		return new $sClassName($aHeadTag,$aTailTag) ;
+	}
 		
 	public function preprocessor ()
 	{

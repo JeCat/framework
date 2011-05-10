@@ -2,12 +2,12 @@
 namespace jc\ui ;
 
 use jc\lang\Exception;
-use jc\lang\Object;
+use jc\lang\Object as JcObject;
 use jc\fs\File;
 use jc\fs\Dir;
 use jc\fs\IFile;
 
-class CompilerManager extends Object
+class CompilerManager extends JcObject
 {
 	public function add(ICompiler $aCompiler)
 	{

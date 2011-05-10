@@ -59,7 +59,7 @@ class Tag extends ObjectBase
 		
 		$aDev->write($this->name()) ;
 		
-		$aDev->write($this->attributes()->source()) ;
+		$this->attributes()->compile($aDev) ;
 		
 		if( $this->isSingle() )
 		{

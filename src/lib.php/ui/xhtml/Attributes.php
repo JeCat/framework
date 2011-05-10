@@ -28,7 +28,7 @@ class Attributes extends HashTable
 	
 	public function bool($sName)
 	{
-		return in_array( strtolower(
+		return !in_array( strtolower(
 				$aText=parent::get($sName))?$aText->source():''
 				, self::$arrFalseValues
 				, true ) ;
@@ -44,6 +44,10 @@ class Attributes extends HashTable
 	public function expression($sName)
 	{
 		return ($aText=parent::get($sName))? ExpressionCompiler::compileExpression($aText->source()): null ;
+	}
+	public function object($sName)
+	{
+		return parent::get($sName) ;
 	}
 	
 	public function source()

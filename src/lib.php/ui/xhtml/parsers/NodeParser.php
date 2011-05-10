@@ -1,6 +1,14 @@
 <?php
 namespace jc\ui\xhtml\parsers ;
 
+use jc\util\match\Result;
+
+use jc\util\match\RegExp;
+
+use jc\ui\xhtml\Attributes;
+
+use jc\ui\xhtml\Text;
+
 use jc\lang\Exception;
 use jc\ui\xhtml\Node;
 use jc\ui\xhtml\Tag;
@@ -11,13 +19,23 @@ use jc\util\String;
 
 class NodeParser extends Object implements IInterpreter
 {
+	public function __construct()
+	{
+		$sMark = md5(__CLASS__) ;
+		$this->aRegextFindQuote = new RegExp("/~\\*\\*{$sMark}\\{\\[(.+?)\\]\\}{$sMark}\\*\\*~/s") ;
+		
+		$this->aRegextFindHeadTags = new RegExp("|<([\\w:_\\-]+)([^>]*?)(/)?>|s") ;
+		$this->aRegextFindTailTags = new RegExp("|</([\\w:_\\-]+)>|s") ;
+		$this->aRegextParseTagAttributes = new RegExp("|([\\w_\\.\\-]+)\\s*=\\s*([\"'])([^\"']+)\\2|s") ;
+	}
+	
 	/**
 	 * return IObject
 	 */
 	public function parse(String $aSource,IObject $aObjectContainer,$sSourcePath)
 	{
 		// 前处理
-		$this->preprocessor() ;
+		$this->preprocessor($aSource) ;
 		
 		// parse tags
 		$arrTags = $this->parseTags($aSource) ;
@@ -53,19 +71,32 @@ class NodeParser extends Object implements IInterpreter
 		// head(single) tags
 		foreach($this->aRegextFindHeadTags->match($aSource) as $aRes)
 		{
+			$nTagPos = $aRes->position() ;
+			$nTagEndPos = $nTagPos + $aRes->length() - 1 ;
+			$nTagLine = substr_count($aSource,"\n",0,$aRes->position()+1) ;
+			
+			
 			$aAttrs = new Attributes() ;
 			
+			$nAttrsStartPos = $aRes->position(2) ;
 			$sAttrsSrc = self::quoteDecode($aRes->result(2)) ;
 			$aAttrs->setSource($sAttrsSrc) ;
-			
 			$sAttributes = trim($sAttrsSrc) ;
 			if($sAttributes)
 			{
 				foreach($this->aRegextParseTagAttributes->match($sAttributes) as $aAttrRes)
 				{
+					$nAttrPos = $aAttrRes->position(3) ; 
+					$nAttrEndPos = $nAttrPos + $aAttrRes->length(3) - 1 ;
+					$sAttrSource = $aAttrRes->result() ;
+
+					$nAttrLine = $nTagLine + substr_count($sAttributes,"\n",1,$nAttrPos) ;
+					
 					$aAttrs->set(
 						$aAttrRes->result(1)
-						, new Text( self::quoteDecode($aAttrRes->result(3)) )
+						, new Text(
+							$nAttrsStartPos+$nAttrPos, $nAttrsStartPos+$nAttrEndPos, $nAttrLine, self::quoteDecode($aAttrRes->result(3))
+						)
 					) ;
 				}
 			}
@@ -74,9 +105,9 @@ class NodeParser extends Object implements IInterpreter
 				$aRes->result(1)
 				, $aAttrs 
 				, ($aRes->result(3)=='/')? Tag::TYPE_SINGLE: Tag::TYPE_HEAD
-				, $aRes->position()
-				, $aRes->position() + $aRes->length() - 1
-				, substr_count($aSource,"\n",0,$aRes->position()+1)
+				, $nTagPos
+				, $nTagEndPos
+				, $nTagLine
 				, self::quoteDecode($aRes->result())
 			) ;
 		}
@@ -252,11 +283,18 @@ class NodeParser extends Object implements IInterpreter
 	
 	public function quoteDecode($aSource)
 	{
-		return $this->aRegextFindEncode->callbackReplace($aSource,function(Result $aRes){
+		return $this->aRegextFindQuote->callbackReplace($aSource,function(Result $aRes){
 			return base64_decode($aRes->result(1)) ;
 		}) ;
 	}
 	
+	private $aRegextFindQuote ;
+	
+	private $aRegextFindHeadTags ;
+	
+	private $aRegextFindTailTags ;
+	
+	private $aRegextParseTagAttributes ;
 }
 
 ?>

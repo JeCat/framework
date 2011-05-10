@@ -2,6 +2,8 @@
 
 namespace jc\ui\xhtml ;
 
+use jc\util\CombinedIterator;
+
 use jc\lang\Type;
 use jc\ui\xhtml\nodes\TagLibrary;
 use jc\ui\IObject;
@@ -57,8 +59,11 @@ class Node extends ObjectBase
 	public function compile(IOutputStream $aDev)
 	{
 		$this->aHeadTag->compile($aDev) ;
-		
-		$this->compileChildren($aDev) ;
+	
+		foreach(parent::childrenIterator() as $aObject)
+		{
+			$aObject->compile($aDev) ;
+		}
 		
 		if($this->aTailTag)
 		{
@@ -90,16 +95,12 @@ class Node extends ObjectBase
 	
 	public function childrenIterator($nType=null)
 	{
-		$aIter = new \MultipleIterator(\MultipleIterator::MIT_NEED_ALL) ;
-		
-		// 属性
-		$aIter->attachIterator($this->aHeadTag->attributes()->valueIterator()) ;
-		
-		// children
-		$aIter->attachIterator(parent::childrenIterator(nType)) ;
-		
-		return $aIter ;
+		return new CombinedIterator(
+			$this->aHeadTag->attributes()->valueIterator()		// 属性
+			, parent::childrenIterator($nType)					// children
+		) ;
 	}
+	
 	
 	private $aHeadTag ;
 	

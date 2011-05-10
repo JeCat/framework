@@ -106,8 +106,8 @@ class ObjectBase extends Object
 		$arrNewList = array() ;
 		$aUIObject = $aChild ;
 
-		foreach($this->childrenIterator() as $aMyUIObject)
-		{	
+		foreach(parent::childrenIterator() as $aMyUIObject)
+		{
 			if($aUIObject)
 			{				
 				switch( $aMyUIObject->locate($aUIObject) )
