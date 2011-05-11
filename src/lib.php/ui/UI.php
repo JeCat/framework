@@ -2,8 +2,8 @@
 
 namespace jc\ui ;
 
+use jc\io\IOutputStream;
 use jc\util\DataSrc;
-
 use jc\lang\Object as JcObject;
 use jc\util\IHashTable;
 
@@ -104,46 +104,43 @@ class UI extends JcObject
 		$this->aVariables = $aVariables ;
 	}
 	
-	public function compile($sSourceFile)
+	public function compile($sCompiledPath,$sSourceFile)
 	{
-		$sSourcePath = $this->sourceFileManager()->find($sSourceFile) ;
-
-		$sCompiledPath = $this->sourceFileManager()->compiledPath($sSourcePath) ;
-
-		if( !$this->sourceFileManager()->isCompiledValid($sSourcePath,$sCompiledPath) )
-		{
-			// 解析
-			$aObjectTree = $this->interpreters()->parse($sSourcePath) ;
-			
-			// 编译
-			return $this->compilers()->compile($aObjectTree,$sCompiledPath) ;
-		}
-		else 
-		{
-			// 载入
-			return $this->compiler()->loadCompiled($sCompiledPath) ;
-		}
+		// 解析
+		$aObjectTree = $this->interpreters()->parse($sSourcePath) ;
+		
+		// 编译
+		$this->compilers()->compile($aObjectTree,$sCompiledPath) ;
 	}
 	
-	public function display($sSourceFile,IHashTable $aVariables=null,IDisplayer $aDisplayDevice=null)
-	{		
-		$aCompiled = $this->compile($sSourceFile) ;
+	public function render($sCompiledPath)
+	{
 		
-		if($aCompiled)
+	}
+	
+	public function display($sSourceFile,IHashTable $aVariables=null,IOutputStream $aDevice=null)
+	{
+		// 编译
+		$sSourcePath = $this->sourceFileManager()->find($sSourceFile) ;
+		$sCompiledPath = $this->sourceFileManager()->compiledPath($sSourcePath) ;
+		if( !$this->sourceFileManager()->isCompiledValid($sSourcePath,$sCompiledPath) )
 		{
-			if(!$aVariables)
-			{
-				$aVariables = $this->variables() ;
-			}
-			
-			if(!$aDisplayDevice)
-			{
-				$aDisplayDevice = $this->displayDevice() ;
-			}
-			
-			$aVariables->set('aUI',$this) ;
-			$aDisplayDevice->render($aCompiled,$aVariables) ;
+			$this->compile($sSourceFile) ;
 		}
+		
+		// render
+		if(!$aVariables)
+		{
+			$aVariables = $this->variables() ;
+		}
+		
+		if(!$aDevice)
+		{
+			$aDevice = $this->application()->response()->printer() ;
+		}
+		
+		$aVariables->set('aUI',$this) ;
+		// $aDisplayDevice->render($aCompiled,$aVariables) ;
 	}
 	
 	private $aSourceFileManager ;
@@ -153,8 +150,6 @@ class UI extends JcObject
 	private $aVariables ;
 
 	private $aInterpreters ;
-	
-	private $aDisplayDevice ;
 }
 
 ?>

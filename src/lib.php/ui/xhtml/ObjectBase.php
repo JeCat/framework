@@ -155,19 +155,6 @@ class ObjectBase extends Object
 		}
 	}
 
-	public function compile(IOutputStream $aDev)
-	{
-		if( $this->childrenCount() )
-		{
-			$this->compileChildren($aDev) ;
-		}
-		else
-		{
-			$sText = $this->source() ;
-			$sText = ExpressionCompiler::compile($sText) ;
-			$aDev->write($sText) ;
-		}
-	}
 	
 	private $nPosition = -1 ;
 	

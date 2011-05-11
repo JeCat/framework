@@ -1,0 +1,33 @@
+<?php
+namespace jc\ui\xhtml\compiler ;
+
+use jc\ui\xhtml\Node;
+use jc\lang\Type;
+use jc\ui\ICompiler;
+use jc\io\IOutputStream;
+
+
+class IfNodeCompiler extends NodeCompiler 
+{
+	public function compile(IObject $aObject,IOutputStream $aDev,CompilerManager $aCompilerManager)
+	{
+		Type::check("jc\\ui\\xhtml\\Node",$aObject) ;
+		
+		$aDev->write('<?php if(') ;
+		
+		$aDev->write(
+			ExpressionCompiler::compileExpression(
+				$aObject->attributes()->source()
+			)
+		) ;
+		
+		$aDev->write("){ ?>") ;
+		
+		$this->compileChildren($aDev) ;
+		
+		$aDev->write("<?php } ?>") ;
+	}
+
+}
+
+?>

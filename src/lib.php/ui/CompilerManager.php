@@ -9,23 +9,14 @@ use jc\fs\IFile;
 
 class CompilerManager extends JcObject
 {
-	public function add(ICompiler $aCompiler)
+	public function add($sObjectClass,$sCompilerClass)
 	{
-		$this->arrCompilers[] = $aCompiler ;
+		$this->arrCompilers[$sObjectClass] = $sCompilerClass ;
 	}
 	
-	public function remove(ICompiler $aCompiler)
+	public function remove($sObjectClass)
 	{
-		for( end($this->arrCompilers); current($this->arrCompilers); prev($this->arrCompilers) )
-		{
-			if(current($this->arrCompilers)===$aCompiler)
-			{
-				unset( $this->arrCompilers[ key($this->arrCompilers) ] ) ;
-				return true ;
-			}
-		}
-		
-		return false ;
+		unset($this->arrCompilers[$sObjectClass]) ;
 	}
 	
 	public function clear()
@@ -33,9 +24,23 @@ class CompilerManager extends JcObject
 		$this->arrCompilers = array() ;
 	}
 	
-	public function iterate()
+	/**
+	 * @return ICompiler
+	 */
+	public function compiler(IObject $aObject)
 	{
-		return new \ArrayIterator($this->arrCompilers) ;
+		$sObjectClass = get_class($aObject) ;
+		if( !isset($this->arrCompilers[$sObjectClass]) )
+		{
+			return null ;
+		}
+		
+		if( is_string($this->arrCompilers[$sObjectClass]) )
+		{
+			$this->arrCompilers[$sObjectClass] = new $this->arrCompilers[$sObjectClass]() ;
+		}
+		
+		return $this->arrCompilers[$sObjectClass] ;
 	}
 	
 	/**
@@ -55,11 +60,15 @@ class CompilerManager extends JcObject
 			throw new Exception("保存XHTML模板的编译文件时无法打开文件:%s",$sCompiledPath) ;
 		}
 		
-		$aObject->compile($aWriter) ;
-		$aWriter->flush() ;
-		$aWriter->close() ;
+		$aCompiler = $this->compiler($aObject) ;
+		$aCompiler->compile($aObject,$aWriter,$this) ;
 		
-		return $this->loadCompiled($sCompiledPath) ;
+		$aWriter->close() ;
+	}
+	
+	protected function compileObject(IObject $aObject,OutputStream $aWriter)
+	{
+		
 	}
 	
 	/**

@@ -48,27 +48,7 @@ class Tag extends ObjectBase
 	{
 		return ($this->nType&self::TYPE_SINGLE)==self::TYPE_SINGLE ;
 	}
-	
-	public function compile(IOutputStream $aDev)
-	{
-		$aDev->write('<') ;
-		if( $this->isTail() )
-		{
-			$aDev->write('/') ;
-		}
 		
-		$aDev->write($this->name()) ;
-		
-		$this->attributes()->compile($aDev) ;
-		
-		if( $this->isSingle() )
-		{
-			$aDev->write(' /') ;
-		}
-		
-		$aDev->write('>') ;
-	}
-	
 	private $sName ;
 	private $aAttrs ;
 	private $nType ;

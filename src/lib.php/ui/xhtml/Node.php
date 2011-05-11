@@ -56,20 +56,6 @@ class Node extends ObjectBase
 		return $this->aHeadTag->name() ;
 	}
 	
-	public function compile(IOutputStream $aDev)
-	{
-		$this->aHeadTag->compile($aDev) ;
-	
-		foreach(parent::childrenIterator() as $aObject)
-		{
-			$aObject->compile($aDev) ;
-		}
-		
-		if($this->aTailTag)
-		{
-			$this->aTailTag->compile($aDev) ;
-		}	
-	}
 	
 	/**
 	 * @return Tag
@@ -101,6 +87,10 @@ class Node extends ObjectBase
 		) ;
 	}
 	
+	public function childElementsIterator()
+	{
+		return parent::childrenIterator() ;
+	}
 	
 	private $aHeadTag ;
 	
