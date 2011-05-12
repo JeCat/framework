@@ -70,6 +70,21 @@ class Text extends ObjectBase
 			$this->setSource('') ;
 		}
 	}
+	
+	public function innerIntersect(ObjectBase $aChild)
+	{
+		$aChild->setPosition(
+			$this->position() + $aChild->position()
+		) ;
+		
+		$aChild->setEndPosition(
+			$this->position() + $aChild->endPosition()
+		) ;
+		
+		$aChild->setLine(
+			$this->line() + $aChild->line()
+		) ;
+	}
 }
 
 ?>
