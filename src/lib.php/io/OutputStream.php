@@ -14,12 +14,11 @@ class OutputStream extends Stream implements IOutputStream, ILockable
 	{
 		if( $aStream = $this->redirectStream() )
 		{
-			return $aStream->write($Contents,$nLen,$bFlush) ;
+			$aStream->write($Contents,$nLen,$bFlush) ;
 		}
 		
 		else
-		{
-		
+		{		
 			$nRet = ($nLen===null)?
 				fwrite($this->hHandle,strval($Contents)) :
 				fwrite($this->hHandle,strval($Contents),$nLen) ;
@@ -28,9 +27,6 @@ class OutputStream extends Stream implements IOutputStream, ILockable
 			{
 				$this->flush() ;
 			}
-			
-			return $nRet ;
-		
 		}
 	}
 

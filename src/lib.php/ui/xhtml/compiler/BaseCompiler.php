@@ -5,21 +5,21 @@ use jc\ui\ICompiler;
 use jc\lang\Object as JcObject;
 use jc\lang\Type;
 use jc\io\IOutputStream;
+use jc\ui\CompilerManager;
+use jc\ui\IObject;
 
 class BaseCompiler extends JcObject implements ICompiler
 {
 	public function compile(IObject $aObject,IOutputStream $aDev,CompilerManager $aCompilerManager)
-	{
-		Type::check("jc\\ui\\xhtml\\ObjectBase",$aObject) ;
-		
-		if( $aObject->childrenCount() )
+	{	
+		if( $aObject instanceof \jc\ui\xhtml\ObjectBase and !$aObject->childrenCount() )
 		{
-			$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
+			$aDev->write($aObject->source()) ;
 		}
 		
 		else 
 		{
-			$aDev->write($aObject->source()) ;
+			$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
 		}
 	}
 	

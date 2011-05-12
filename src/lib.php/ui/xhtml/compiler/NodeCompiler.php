@@ -5,6 +5,8 @@ use jc\ui\xhtml\Tag;
 use jc\ui\xhtml\Node;
 use jc\lang\Type;
 use jc\io\IOutputStream;
+use jc\ui\CompilerManager;
+use jc\ui\IObject;
 
 class NodeCompiler extends BaseCompiler
 {
@@ -14,7 +16,7 @@ class NodeCompiler extends BaseCompiler
 		
 		if( $aCompiler=$this->subCompiler($aObject) )
 		{
-			$aCompiler->compile($aObject,$aDev) ;
+			$aCompiler->compile($aObject,$aDev,$aCompilerManager) ;
 		}
 		
 		else 
@@ -23,7 +25,7 @@ class NodeCompiler extends BaseCompiler
 			
 			if( $aTailTag = $aObject->tailTag() )
 			{
-				$this->compileChildren($aObject->headTag(), $aDev, $aCompilerManager) ;
+				$this->compileChildren($aObject, $aDev, $aCompilerManager) ;
 				
 				$this->compileTag($aTailTag, $aDev, $aCompilerManager) ;
 			}

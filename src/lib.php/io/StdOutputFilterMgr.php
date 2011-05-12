@@ -13,11 +13,12 @@ class StdOutputFilterMgr extends FilterMangeger
 		ob_start(array($this,'handleForStdOutput')) ;
 		$this->start() ;
 	}
-	
+		
 	public function handleForStdOutput($sData)
 	{
-		list($sData) = $this->handle($sData) ;
-		return $sData ;
+		$Ret = $this->handle($sData) ;
+		
+		return (is_array($Ret) and isset($Ret[0]))? $Ret[0]: null ;
 	}
 }
 

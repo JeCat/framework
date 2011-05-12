@@ -8,6 +8,11 @@ class PrintStream extends OutputStream
 	{
 		Stream::__construct( fopen('php://stdout','w') ) ;
 	}
+
+	public function __destruct()
+	{
+		ob_flush() ;
+	}
 	
 	public function printvar($Variable)
 	{

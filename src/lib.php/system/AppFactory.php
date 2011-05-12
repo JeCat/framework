@@ -72,7 +72,9 @@ abstract class AppFactory extends Object
 	public function createResponse(CoreApplication $aApp,PrintStream $aPrinter)
 	{
 		$aRespn = $aApp->create( 'Response', __NAMESPACE__, array($aPrinter) ) ;
-		$aRespn->setFilters($aApp->create( 'StdOutputFilterMgr', 'jc\io' ) ) ;
+		
+		$aFilter = $aApp->create('StdOutputFilterMgr','jc\io') ;
+		$aRespn->setFilters($aFilter) ;
 		
 		return $aRespn ;
 	}

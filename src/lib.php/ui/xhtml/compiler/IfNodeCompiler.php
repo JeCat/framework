@@ -5,6 +5,8 @@ use jc\ui\xhtml\Node;
 use jc\lang\Type;
 use jc\ui\ICompiler;
 use jc\io\IOutputStream;
+use jc\ui\CompilerManager;
+use jc\ui\IObject;
 
 
 class IfNodeCompiler extends NodeCompiler 
@@ -14,16 +16,10 @@ class IfNodeCompiler extends NodeCompiler
 		Type::check("jc\\ui\\xhtml\\Node",$aObject) ;
 		
 		$aDev->write('<?php if(') ;
-		
-		$aDev->write(
-			ExpressionCompiler::compileExpression(
-				$aObject->attributes()->source()
-			)
-		) ;
-		
+		$aDev->write( $aObject->attributes()->source() ) ;
 		$aDev->write("){ ?>") ;
 		
-		$this->compileChildren($aDev) ;
+		$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
 		
 		$aDev->write("<?php } ?>") ;
 	}

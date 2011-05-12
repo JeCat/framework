@@ -29,24 +29,22 @@ class CompilerManager extends JcObject
 	 */
 	public function compiler(IObject $aObject)
 	{
-		$sObjectClass = get_class($aObject) ;
-		if( !isset($this->arrCompilers[$sObjectClass]) )
+		for(end($this->arrCompilers);$Compiler=current($this->arrCompilers);prev($this->arrCompilers))
 		{
-			return null ;
+			$sObjectClass = key($this->arrCompilers) ;
+			
+			if( $aObject instanceof $sObjectClass )
+			{
+				return is_string($Compiler)?
+						$this->arrCompilers[$sObjectClass]=new $Compiler(): $Compiler ;
+			}
 		}
-		
-		if( is_string($this->arrCompilers[$sObjectClass]) )
-		{
-			$this->arrCompilers[$sObjectClass] = new $this->arrCompilers[$sObjectClass]() ;
-		}
-		
-		return $this->arrCompilers[$sObjectClass] ;
 	}
 	
 	/**
 	 * @return ICompiled
 	 */
-	public function compile(IObject $aObject,$sCompiledPath)
+	public function compile(IObject $aObjectContainer,$sCompiledPath)
 	{
 		$aFile = $this->createCompiledFile($sCompiledPath) ;
 		if(!$aFile)
@@ -60,8 +58,14 @@ class CompilerManager extends JcObject
 			throw new Exception("保存XHTML模板的编译文件时无法打开文件:%s",$sCompiledPath) ;
 		}
 		
-		$aCompiler = $this->compiler($aObject) ;
-		$aCompiler->compile($aObject,$aWriter,$this) ;
+		foreach($aObjectContainer->childrenIterator() as $aObject)
+		{
+			$aCompiler = $this->compiler($aObject) ;
+			if($aCompiler)
+			{
+				$aCompiler->compile($aObject,$aWriter,$this) ;
+			}
+		}
 		
 		$aWriter->close() ;
 	}

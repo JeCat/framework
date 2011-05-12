@@ -2,6 +2,8 @@
 
 namespace jc\ui ;
 
+use jc\util\HashTable;
+
 use jc\io\IOutputStream;
 use jc\util\DataSrc;
 use jc\lang\Object as JcObject;
@@ -79,16 +81,16 @@ class UI extends JcObject
 	}
 
 	/**
-	 * return IDisplayDevice
+	 * return IOutputStream
 	 */
-	public function displayDevice()
+	public function outputDevice()
 	{
-		return $this->aDisplayDevice ;
+		return $this->aOutputDevice ;
 	}
 	
-	public function setDisplayDevice(IDisplayDevice $aDisplayDevice)
+	public function setOutputDevice(IOutputStream $aOutputDevice)
 	{
-		$this->aDisplayDevice = $aDisplayDevice ;
+		$this->aOutputDevice = $aOutputDevice ;
 	}
 	
 	/**
@@ -96,6 +98,10 @@ class UI extends JcObject
 	 */
 	public function variables()
 	{
+		if(!$this->aVariables)
+		{
+			$this->aVariables = new HashTable() ;
+		}
 		return $this->aVariables ;
 	}
 	
@@ -104,18 +110,41 @@ class UI extends JcObject
 		$this->aVariables = $aVariables ;
 	}
 	
-	public function compile($sCompiledPath,$sSourceFile)
+	public function compile($sSourcePath,$sCompiledPath)
 	{
 		// 解析
-		$aObjectTree = $this->interpreters()->parse($sSourcePath) ;
+		$aObjectContainer = $this->interpreters()->parse($sSourcePath) ;
 		
 		// 编译
-		$this->compilers()->compile($aObjectTree,$sCompiledPath) ;
+		$this->compilers()->compile($aObjectContainer,$sCompiledPath) ;
 	}
 	
-	public function render($sCompiledPath)
+	public function render($sCompiledPath,IHashTable $aVariables=null,IOutputStream $aDevice=null)
 	{
+		if(!$aVariables)
+		{
+			$aVariables = $this->variables() ;
+		}
 		
+		if(!$aDevice)
+		{
+			$aDevice = $this->outputDevice() ;
+		}
+		
+		// 拦截 output
+		if($aDevice)
+		{
+			$aOutputFilters = $this->application(true)->response()->filters() ;
+			$aOutputFilters->add( array($aDevice,'write') ) ;
+		}
+		
+		include $sCompiledPath ;
+		
+		// 解除拦截
+		if($aDevice)
+		{
+			$aOutputFilters->remove( array($aDevice,'write') ) ;
+		}
 	}
 	
 	public function display($sSourceFile,IHashTable $aVariables=null,IOutputStream $aDevice=null)
@@ -125,22 +154,11 @@ class UI extends JcObject
 		$sCompiledPath = $this->sourceFileManager()->compiledPath($sSourcePath) ;
 		if( !$this->sourceFileManager()->isCompiledValid($sSourcePath,$sCompiledPath) )
 		{
-			$this->compile($sSourceFile) ;
+			$this->compile($sSourcePath,$sCompiledPath) ;
 		}
 		
 		// render
-		if(!$aVariables)
-		{
-			$aVariables = $this->variables() ;
-		}
-		
-		if(!$aDevice)
-		{
-			$aDevice = $this->application()->response()->printer() ;
-		}
-		
-		$aVariables->set('aUI',$this) ;
-		// $aDisplayDevice->render($aCompiled,$aVariables) ;
+		$this->render($sCompiledPath,$aVariables,$aDevice) ;
 	}
 	
 	private $aSourceFileManager ;
@@ -148,6 +166,8 @@ class UI extends JcObject
 	private $aCompilers ;
 	
 	private $aVariables ;
+	
+	private $aOutputDevice ;
 
 	private $aInterpreters ;
 }

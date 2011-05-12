@@ -38,7 +38,7 @@ class Factory extends FactoryBase
 			
 			// 注册 compiler
 			$aCompilers->add(__NAMESPACE__.'\\Mark',__NAMESPACE__.'\\compiler\\Mark') ;
-			$aCompilers->add(__NAMESPACE__.'\\ObjectBase',__NAMESPACE__.'\\compiler\\Mark') ;
+			$aCompilers->add(__NAMESPACE__.'\\ObjectBase',__NAMESPACE__.'\\compiler\\BaseCompiler') ;
 			
 			// Node Compiler
 			$aNodeCompiler = NodeCompiler::singleton() ;
