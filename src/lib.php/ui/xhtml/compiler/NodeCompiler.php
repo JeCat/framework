@@ -49,7 +49,17 @@ class NodeCompiler extends BaseCompiler
 			$aDev->write(" ") ;
 			$aDev->write($sName) ;
 			$aDev->write('="') ;
-			$aDev->write(addslashes($aAttrs->get($sName))) ;
+			
+			$aValue = $aAttrs->object($sName) ;
+			if( $aAttrCompiler = $aCompilerManager->compiler($aValue) )
+			{
+				$aAttrCompiler->compile($aValue,$aDev,$aCompilerManager) ;
+			}
+			else 
+			{
+				$aDev->write(addslashes($aAttrs->get($sName))) ;
+			}
+		
 			$aDev->write('"') ;
 		}
 		

@@ -89,20 +89,18 @@ class NodeParser extends Object implements IInterpreter
 			$nAttrsStartPos = $aRes->position(2) ;
 			$sAttrsSrc = self::quoteDecode($aRes->result(2)) ;
 			$aAttrs->setSource($sAttrsSrc) ;
-			$sAttributes = trim($sAttrsSrc) ;
-			if($sAttributes)
+			if(trim($sAttrsSrc))
 			{
-				foreach($this->aRegextParseTagAttributes->match($sAttributes) as $aAttrRes)
+				foreach($this->aRegextParseTagAttributes->match($aRes->result(2)) as $aAttrRes)
 				{
 					$nAttrPos = $aAttrRes->position(3) ; 
 					$nAttrEndPos = $nAttrPos + $aAttrRes->length(3) - 1 ;
-					$sAttrSource = $aAttrRes->result() ;
-					$nAttrLine = $nTagLine + ObjectBase::getLine($sAttributes,$nAttrPos,1) ;
+					$sAttrSource = self::quoteDecode($aAttrRes->result(3)) ;
 					
 					$aAttrs->set(
 						$aAttrRes->result(1)
 						, new Text(
-							$nAttrsStartPos+$nAttrPos, $nAttrsStartPos+$nAttrEndPos, $nAttrLine, self::quoteDecode($aAttrRes->result(3))
+							$nAttrsStartPos+$nAttrPos, $nAttrsStartPos+$nAttrEndPos, $nTagLine, $sAttrSource
 						)
 					) ;
 				}
