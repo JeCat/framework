@@ -1,5 +1,5 @@
 <?php
-namespace jc\ui\xhtml\compiler ;
+namespace jc\ui\xhtml\compiler\node ;
 
 use jc\ui\xhtml\Node;
 use jc\lang\Type;
@@ -7,9 +7,10 @@ use jc\ui\ICompiler;
 use jc\io\IOutputStream;
 use jc\ui\CompilerManager;
 use jc\ui\IObject;
+use jc\ui\xhtml\compiler\NodeCompiler;
 
 
-class IfNodeCompiler extends NodeCompiler 
+class IfCompiler extends NodeCompiler 
 {
 	public function compile(IObject $aObject,IOutputStream $aDev,CompilerManager $aCompilerManager)
 	{

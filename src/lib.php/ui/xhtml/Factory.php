@@ -43,8 +43,16 @@ class Factory extends FactoryBase
 			$aNodeCompiler = NodeCompiler::singleton() ;
 			$aCompilers->add(__NAMESPACE__.'\\Node',$aNodeCompiler) ;
 			
-			$aNodeCompiler->addSubCompiler('if',__NAMESPACE__."\\compiler\\IfNodeCompiler") ;
-			$aNodeCompiler->addSubCompiler('for',__NAMESPACE__."\\compiler\\ForNodeCompiler") ;
+			$aNodeCompiler->addSubCompiler('if',__NAMESPACE__."\\compiler\\node\\IfCompiler") ;
+			$aNodeCompiler->addSubCompiler('else',__NAMESPACE__."\\compiler\\node\\ElseCompiler") ;
+			$aNodeCompiler->addSubCompiler('elseif',__NAMESPACE__."\\compiler\\node\\ElseIfCompiler") ;
+			$aNodeCompiler->addSubCompiler('for',__NAMESPACE__."\\compiler\\node\\ForCompiler") ;
+			$aNodeCompiler->addSubCompiler('loop',__NAMESPACE__."\\compiler\\node\\LoopCompiler") ;
+			$aNodeCompiler->addSubCompiler('while',__NAMESPACE__."\\compiler\\node\\WhileCompiler") ;
+			$aNodeCompiler->addSubCompiler('include',__NAMESPACE__."\\compiler\\node\\IncludeCompiler") ;
+			$aNodeCompiler->addSubCompiler('function',__NAMESPACE__."\\compiler\\node\\FunctionCompiler") ;
+			$aNodeCompiler->addSubCompiler('continue',__NAMESPACE__."\\compiler\\node\\ContinueCompiler") ;
+			$aNodeCompiler->addSubCompiler('break',__NAMESPACE__."\\compiler\\node\\BreakCompiler") ;
 			
 		}
 		
