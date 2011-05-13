@@ -1,45 +1,16 @@
 <?php
 
-namespace jc\ui\xhtml ;
+namespace jc\ui\xhtml\compiler ;
 
-use jc\util\match\RegExp;
-use jc\lang\Object ;
+use jc\io\IOutputStream;
+use jc\ui\CompilerManager;
+use jc\ui\IObject;
 
-class ExpressionCompiler extends Object
+class ExpressionCompiler extends BaseCompiler
 {
-	static public function compile($sSource)
+	public function compile(IObject $aObject,IOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		$aRegexpFoundExpression = new RegExp("/\\{([\\*=\\?])(.+)\\}/s") ;
-		
-		$aResSet = $aRegexpFoundExpression->match($sSource) ;
-		$aResSet->reverse() ;
-		foreach( $aResSet as $aRes )
-		{
-			$sType = $aRes->result(1) ;
-			
-			// 注释
-			if($sType=='*')
-			{
-				return '' ;
-			}
-			
-			$sExpression = $aRes->result(2) ;
-			
-			switch ($sType)
-			{
-			// 执行	
-			case '?' :
-				$sCompiled = "<?php " . self::compileExpression($sExpression,false) . " ;?>" ;
-				 
-			// 输出
-			case '=' :
-				$sCompiled = "<?php echo " . self::compileExpression($sExpression,true) . " ;?>" ;
-			}
-			
-			$sSource = substr_replace($sSource,$sCompiled,$aRes->position(),$aRes->length()) ;
-		}
-		
-		return $sSource ;
+		$aDev->write(self::compileExpression($aObject->source())) ;
 	}
 
 	static public function compileExpression($sSource)
@@ -113,9 +84,6 @@ class ExpressionCompiler extends Object
 		
 		return "eval(\"" . $sCompiled . "\")" ;
 	}
-	
-	private $aRegexpFoundExpression ;
-	private $aRegexpFoundVariable ;
 	
 	static private $nStackVarId = 0 ;
 }

@@ -21,7 +21,6 @@ class Factory extends FactoryBase
 			// 注册  parser
 			$aInterpreters->add(parsers\NodeParser::singleton()) ;
 			$aInterpreters->add(parsers\MarkParser::singleton()) ;
-			$aInterpreters->add(parsers\TreeBuilder::singleton()) ;
 		}
 		
 		return $this->aInterpreters ;
@@ -37,8 +36,8 @@ class Factory extends FactoryBase
 			$aCompilers = parent::compilerManager() ;
 			
 			// 注册 compiler
-			$aCompilers->add(__NAMESPACE__.'\\Mark',__NAMESPACE__.'\\compiler\\Mark') ;
 			$aCompilers->add(__NAMESPACE__.'\\ObjectBase',__NAMESPACE__.'\\compiler\\BaseCompiler') ;
+			$aCompilers->add(__NAMESPACE__.'\\Mark',__NAMESPACE__.'\\compiler\\MarkCompiler') ;
 			
 			// Node Compiler
 			$aNodeCompiler = NodeCompiler::singleton() ;

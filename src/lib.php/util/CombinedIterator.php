@@ -73,7 +73,7 @@ class CombinedIterator extends Object implements \Iterator
 			
 			if( $aIterator=next($this->arrIterators) )
 			{
-				reset($aIterator) ;
+				$aIterator->rewind() ;
 			}
 			
 		} while( $aIterator and !$aIterator->valid() ) ;
@@ -84,7 +84,21 @@ class CombinedIterator extends Object implements \Iterator
 	public function rewind()
 	{
 		$aIterator = reset($this->arrIterators) ;
-		return $aIterator? $aIterator->rewind(): null ;
+		if(!$aIterator)
+		{
+			return null ;
+		}
+		
+		if(!$aIterator->valid())
+		{
+			$aIterator = $this->nextIterator() ;
+			if(!$aIterator)
+			{
+				return null ;
+			}
+		}
+		
+		return $aIterator->rewind() ;
 	}
 	public function valid()
 	{

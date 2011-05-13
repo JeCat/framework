@@ -1,9 +1,12 @@
 <?php
 namespace jc\ui\xhtml\parsers ;
 
+use jc\ui\xhtml\ObjectBase;
+
 use jc\util\match\RegExp;
 use jc\ui\xhtml\Mark;
 use jc\ui\xhtml\Text;
+use jc\ui\xhtml\Node;
 use jc\ui\IObject;
 use jc\ui\IInterpreter;
 use jc\lang\Object;
@@ -32,17 +35,21 @@ class MarkParser extends Object implements IInterpreter
 		}
 	}
 	
-	protected function parseMark(Text $aChild)
+	protected function parseMark(Text $aText)
 	{
-		foreach($this->aRegexpFoundExpression->match($aChild->source()) as $aRes)
+		foreach($this->aRegexpFoundExpression->match($aText->source()) as $aRes)
 		{
-			$nPosition = $aChild->position()+$aRes->position() ;
-			$nEndPosition = $nPosition + $aRes->length() - 1 ;
-			$nLine = $aChild->line() + substr_count($aChild->source(),"\n",1,$aRes->position()) ;
-			
-			$aChild->addChild(
-				new Mark($aRes->result(1), $nPosition, $nEndPosition, $nLine, $aRes->result())
+			$aMark = new Mark(
+					$aRes->result(1)
+					, $aRes->position()
+					, $aRes->position()+$aRes->length()-1
+					, ObjectBase::getLine( $aText->source(), $aRes->position() )
+					, $aRes->result(2)
 			) ;
+			
+			ObjectBase::globalLocate($aText,$aMark) ;
+			
+			$aText->addChild($aMark) ;
 		}
 	}
 	  

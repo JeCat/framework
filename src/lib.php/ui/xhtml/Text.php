@@ -49,41 +49,26 @@ class Text extends ObjectBase
 			$sSource = $this->source() ;
 			
 			// 之前的文本
-			$sBeforeText = substr( $sSource, 0, $aChild->position()-$this->position()+1 ) ;
+			$sBeforeText = substr( $sSource, 0, $aChild->position()-$this->position() ) ;
 			if( $sBeforeText )
 			{
-				$this->addChild( new Text($this->position(), $aChild->position()-1, $this->line(), $sBeforeText) ) ;
+				parent::addChild( new Text($this->position(), $aChild->position()-1, $this->line(), $sBeforeText) ) ;
 			}
 			
 			// UI对象
-			$this->addChild( $aChild ) ;
+			parent::addChild( $aChild ) ;
 		
 			// 之后的文本
 			$sAfterText = substr( $sSource, $aChild->endPosition()-$this->position()+1 ) ;
 			if( $sAfterText )
 			{
 				$nAfterTextLine = $aChild->line()+substr_count($aChild->source(),"\n") ; // $aChild所在行数 + $aChild内的换行符出现次数
-				$this->addChild( new Text($aChild->endPosition()+1, $this->endPosition(), $nAfterTextLine, $sAfterText) ) ;
+				parent::addChild( new Text($aChild->endPosition()+1, $this->endPosition(), $nAfterTextLine, $sAfterText) ) ;
 			}
 			
 			// 清空自己的source ，仅仅作为一个聚合对象
 			$this->setSource('') ;
 		}
-	}
-	
-	public function innerIntersect(ObjectBase $aChild)
-	{
-		$aChild->setPosition(
-			$this->position() + $aChild->position()
-		) ;
-		
-		$aChild->setEndPosition(
-			$this->position() + $aChild->endPosition()
-		) ;
-		
-		$aChild->setLine(
-			$this->line() + $aChild->line()
-		) ;
 	}
 }
 

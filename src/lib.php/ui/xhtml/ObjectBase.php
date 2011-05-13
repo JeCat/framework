@@ -156,6 +156,29 @@ class ObjectBase extends Object
 	}
 
 	
+	/**
+	 * 从相对parent的位置，转换到全局位置
+	 */
+	static public function globalLocate(ObjectBase $aParent,ObjectBase $aChild)
+	{
+		$aChild->setPosition(
+			$aParent->position() + $aChild->position()
+		) ;
+		
+		$aChild->setEndPosition(
+			$aParent->position() + $aChild->endPosition()
+		) ;
+		
+		$aChild->setLine(
+			$aParent->line() + $aChild->line()
+		) ;
+	}
+	
+	static public function getLine($sSource,$nObjectPos,$nFindStart=0)
+	{
+		return substr_count($sSource,"\n",$nFindStart,($nObjectPos+1)-$nFindStart+1) ;
+	}
+	
 	private $nPosition = -1 ;
 	
 	private $nEndPosition = -1 ;

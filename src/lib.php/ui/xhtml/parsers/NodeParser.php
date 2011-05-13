@@ -1,6 +1,8 @@
 <?php
 namespace jc\ui\xhtml\parsers ;
 
+use jc\ui\xhtml\ObjectBase;
+
 use jc\util\match\Result;
 
 use jc\util\match\RegExp;
@@ -46,8 +48,14 @@ class NodeParser extends Object implements IInterpreter
 		// build nodes
 		$arrNodes = $this->buildNodes($arrTags,$sSourcePath) ;
 		
-		// merge nodes and texts
+		// build tree
+		$aRoot = new ObjectBase(0,$aSource->length()-1,0,'') ;
 		foreach(array_merge($arrNodes,$arrTexts) as $aObject)
+		{
+			$aRoot->addChild($aObject) ;
+		}
+		$aObjectContainer->clearChildren() ;
+		foreach($aRoot->childrenIterator() as $aObject)
 		{
 			$aObjectContainer->addChild($aObject) ;
 		}
@@ -73,9 +81,9 @@ class NodeParser extends Object implements IInterpreter
 		{
 			$nTagPos = $aRes->position() ;
 			$nTagEndPos = $nTagPos + $aRes->length() - 1 ;
-			$nTagLine = substr_count($aSource,"\n",0,$aRes->position()+1) ;
+			$nTagLine = ObjectBase::getLine($aSource,$aRes->position()) ;
 			
-			
+			// attribute /////////////////////////////////////////////////////////////
 			$aAttrs = new Attributes() ;
 			
 			$nAttrsStartPos = $aRes->position(2) ;
@@ -89,8 +97,7 @@ class NodeParser extends Object implements IInterpreter
 					$nAttrPos = $aAttrRes->position(3) ; 
 					$nAttrEndPos = $nAttrPos + $aAttrRes->length(3) - 1 ;
 					$sAttrSource = $aAttrRes->result() ;
-
-					$nAttrLine = $nTagLine + substr_count($sAttributes,"\n",1,$nAttrPos) ;
+					$nAttrLine = $nTagLine + ObjectBase::getLine($sAttributes,$nAttrPos,1) ;
 					
 					$aAttrs->set(
 						$aAttrRes->result(1)
@@ -100,6 +107,7 @@ class NodeParser extends Object implements IInterpreter
 					) ;
 				}
 			}
+			///////////////////////////////////////////////////////////////
 
 			$arrTags[ $aRes->position() ] = new Tag(
 				$aRes->result(1)
