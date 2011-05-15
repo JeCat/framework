@@ -83,14 +83,14 @@ class UI extends JcObject
 	/**
 	 * return IOutputStream
 	 */
-	public function outputDevice()
+	public function outputStream()
 	{
-		return $this->aOutputDevice ;
+		return $this->aOutputStream ;
 	}
 	
-	public function setOutputDevice(IOutputStream $aOutputDevice)
+	public function setOutputStream(IOutputStream $aOutputStream)
 	{
-		$this->aOutputDevice = $aOutputDevice ;
+		$this->aOutputStream = $aOutputStream ;
 	}
 	
 	/**
@@ -128,7 +128,7 @@ class UI extends JcObject
 		
 		if(!$aDevice)
 		{
-			$aDevice = $this->outputDevice() ;
+			$aDevice = $this->OutputStream() ;
 		}
 		
 		// 拦截 output
@@ -167,7 +167,7 @@ class UI extends JcObject
 	
 	private $aVariables ;
 	
-	private $aOutputDevice ;
+	private $aOutputStream ;
 
 	private $aInterpreters ;
 }

@@ -30,8 +30,6 @@ namespace jc\pattern\composite ;
 
 interface IContainedable
 {
-	static public function type() ;
-	
 	public function setParent(IContainer $aParent) ;
 	
 	public function parent() ;

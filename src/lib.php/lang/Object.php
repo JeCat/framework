@@ -5,6 +5,20 @@ use jc\system\Application ;
 
 class Object implements IObject
 {
+	public function __construct()
+	{
+		// ä»Žè°ƒç”¨å †æ ˆä¸Šè®¾ç½® application
+		$arrStrace = debug_backtrace() ;
+		for (end($arrStrace);$arrStack=current($arrStrace);prev($arrStrace))
+		{
+			if( !empty($arrStack['object']) and ($arrStack['object'] instanceof self) and $aApp=$arrStack['object']->application() )
+			{
+				$this->setApplication($aApp) ;
+				break ;
+			}
+		}
+	}
+		
 	/**
 	 * Enter description here ...
 	 * 
@@ -73,7 +87,7 @@ class Object implements IObject
 		
 		if( !($aInstance instanceof static) )
 		{
-			throw new Exception('%s::setSingleton() µÄ²ÎÊý±ØÐëÎª%sÀàÐÍ',array($sClass,$sClass)) ;
+			throw new Exception('%s::setSingleton() ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª%sï¿½ï¿½ï¿½ï¿½',array($sClass,$sClass)) ;
 		}
 		self::$arrGlobalInstancs[$sClass] = $aInstance ;
 	}

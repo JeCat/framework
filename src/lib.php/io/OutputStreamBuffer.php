@@ -31,21 +31,18 @@ class OutputStreamBuffer extends OutputStream
 		}
 	}
 	
+	public function __toString()
+	{
+		return bufferBytes() ;
+	}
+	
 	public function bufferBytes()
 	{
 		$sBytes = '' ;
 		
 		foreach ($this->arrBuffer as $Contents)
 		{
-			if( is_string($Contents) )
-			{
-				$sBytes+= $Contents ;
-			}
-			
-			else
-			{
-				$sBytes+= $Contents->bufferBytes() ;
-			}
+			$sBytes+= strval($Contents) ;
 		}
 		
 		return $sBytes ;

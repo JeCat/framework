@@ -30,28 +30,30 @@ namespace jc\pattern\composite ;
 
 class CompositeObject extends ContainedableObject implements IContainer
 {	
-	public function addChildTypes($Types)
+	public function addChildClass($sClassName)
 	{
-		$arrTypes = (array) $Types ;
-		foreach ($arrTypes as $sType)
+		if( !in_array($sClassName,$this->arrChildClasses) )
 		{
-			$sType = strval($sType) ;
-			if( !in_array($sType,$this->arrTypes) )
-			{
-				$this->arrTypes[] = $sType ;
-			}
+			$this->arrChildClasses[] = $sClassName ;
 		}
 	}
 	
 	public function checkChildType(IContainedable $aChild)
 	{
-		if( in_array('*', $this->arrTypes) )
+		if( in_array('*', $this->arrChildClasses) )
 		{
 			return true ;
 		}
 		
-		$sType = call_user_func(array(get_class($aChild),'type')) ;
-		return in_array( $sType, $this->arrTypes ) ;
+		foreach( $this->arrChildClasses as $sClassName)
+		{
+			if( $aChild instanceof $sClassName )
+			{
+				return true ;
+			}
+		}
+		
+		return false ;
 	}
 	
 	// implement for IContainer //////////////////
@@ -91,25 +93,13 @@ class CompositeObject extends ContainedableObject implements IContainer
 		return in_array($aChild, $this->arrChildren,true) ;
 	}
 
-	public function childrenIterator($Types = null)
+	public function childrenIterator($Classes = null)
 	{
 		return new \ArrayIterator($this->arrChildren) ;		
 	}
 	
 	
-	
-	
-	public function findChildInFamily($sName) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public function adopt(IContainer $aParent,$bAdoptRelative=true)
-	{
-		// 
-	}
-	
-	private $arrTypes = array() ;
+	private $arrChildClasses = array() ;
 
 	private $arrChildren = array() ;
 }

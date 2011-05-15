@@ -30,7 +30,6 @@ namespace jc\pattern\composite ;
 
 interface IContainer
 {
-	
 	public function addChild(IContainedable $aChild,$bAdoptRelative=true) ;
 	
 	public function removeChild($Child) ;
@@ -39,11 +38,7 @@ interface IContainer
 	
 	public function childrenCount() ;
 	
-	public function child($sName) ;
-	
-	public function findChildInFamily($sName) ;
-	
-	public function addChildTypes($Types) ;
+	public function addChildClass($sClassName) ;
 	
 	public function childrenIterator($Types=null) ;
 		
