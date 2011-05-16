@@ -2,13 +2,12 @@
 namespace jc\mvc ;
 
 use jc\pattern\Container;
-
 use jc\util\HashTable;
 use jc\io\OutputStreamBuffer;
-use jc\pattern\composite\ContainedableObject;
+use jc\pattern\composite\NamableComposite;
 use jc\ui\UI;
 
-class View extends ContainedableObject implements IView
+class View extends NamableComposite implements IView
 {
 	public function __construct($sSourceFilename,UI $aUI=null)
 	{
@@ -57,7 +56,7 @@ class View extends ContainedableObject implements IView
 	}
 	
 	/**
-	 * @return IViewOutputStream
+	 * @return OutputStreamBuffer
 	 */
 	public function outputStream()
 	{
@@ -80,7 +79,16 @@ class View extends ContainedableObject implements IView
 	
 	public function display()
 	{
+		// 找到可收容当前视图
+		if( $aContainer = $this->findDisplayContainer() )
+		{
+			$aContainer->outputStream()->write( $this->outputStream() ) ;
+		}
 		
+		else 
+		{
+			$aContainer->outputStream()->flush() ;
+		}
 	}
 	
 	public function show()
@@ -92,7 +100,19 @@ class View extends ContainedableObject implements IView
 	
 	public function findDisplayContainer()
 	{
-		// parent
+		$aParentView = $this ;
+		while( $aParentView=$aParentView->parent() )
+		{
+			foreach( $aParentView->viewContainers()->iterator() as $aViewContainer )
+			{
+				if( $aViewContainer->accept($this) )
+				{
+					return $aViewContainer ;
+				}
+			}
+		}
+		
+		return null ;
 	}
 	
 	/**
@@ -102,7 +122,7 @@ class View extends ContainedableObject implements IView
 	{
 		if( !$this->aViewContainer )
 		{
-			$this->aViewContainer = new Container('jc\\mvc\\IView') ;
+			$this->aViewContainer = new Container('jc\\mvc\\IViewContainer') ;
 		}
 		
 		return $this->aViewContainer ;

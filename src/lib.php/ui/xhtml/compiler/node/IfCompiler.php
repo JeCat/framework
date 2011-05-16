@@ -18,6 +18,10 @@ class IfCompiler extends NodeCompiler
 		$aDev->write('<?php if(') ;
 		$aDev->write( $aObject->attributes()->source() ) ;
 		$aDev->write("){ ?>") ;
+		
+		$aObject->attributes()->expression("start") ;
+		$aObject->attributes()->get("end") ;
+		$aObject->attributes()->get("step") ;
 
 		$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
 

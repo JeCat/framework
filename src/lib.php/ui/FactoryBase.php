@@ -17,7 +17,7 @@ abstract class FactoryBase extends Object implements IFactory
 
 		return $aUI ;
 	}
-
+	
 	/**
 	 * return SourceFileManager
 	 */
@@ -26,31 +26,47 @@ abstract class FactoryBase extends Object implements IFactory
 		return $this->sourceFileManager() ;
 	}
 	/**
-	 * @return SourceFileManager
+	 * return SourceFileManager
 	 */
 	public function sourceFileManager()
 	{
 		if(!$this->aSourceFileManager)
 		{
-			$this->aSourceFileManager = SourceFileManager::singleton(true) ;
-			$this->aSourceFileManager->setApplication($this->application(true)) ;
+			$this->aSourceFileManager = $this->newSourceFileManager() ;
 		}
 		
 		return $this->aSourceFileManager ;
+	}
+	/**
+	 * @return SourceFileManager
+	 */
+	public function newSourceFileManager()
+	{
+		$aSourceFileManager = SourceFileManager::singleton(true) ;
+		$aSourceFileManager->setApplication($this->application(true)) ;
+		
+		return $aSourceFileManager ;
 	}
 	public function setSourceFileManager(SourceFileManager $aSrcMgr)
 	{
 		$this->aSourceFileManager = $aSrcMgr ;
 	}
-	
+
 	/**
 	 * return CompilerManager
 	 */
 	public function createCompilerManager()
 	{
+		return $this->compilerManager() ;
+	}
+	/**
+	 * return CompilerManager
+	 */
+	public function compilerManager()
+	{
 		if( !$this->aCompilers )
 		{
-			$this->aCompilers = newCompilerManager() ;
+			$this->aCompilers = $this->newCompilerManager() ;
 		}
 		return $this->aCompilers ;
 	}
@@ -59,8 +75,10 @@ abstract class FactoryBase extends Object implements IFactory
 	 */
 	public function newCompilerManager()
 	{
-			$this->aCompilers = CompilerManager::singleton(true) ;
-			$this->aCompilers->setApplication($this->application(true)) ;
+		$aCompilers = CompilerManager::singleton(true) ;
+		$aCompilers->setApplication($this->application(true)) ;
+		
+		return $aCompilers ;
 	}
 	public function setCompilerManager(CompilerManager $aCompilers)
 	{
@@ -72,9 +90,16 @@ abstract class FactoryBase extends Object implements IFactory
 	 */
 	public function createInterpreterManager()
 	{
+		return $this->interpreterManager() ;
+	}
+	/**
+	 * return InterpreterManager
+	 */
+	public function interpreterManager()
+	{
 		if( !$this->aInterpreters )
 		{
-			$this->aInterpreters = new $this->newInterpreterManager() ;
+			$this->aInterpreters = $this->newInterpreterManager() ;
 		}
 		return $this->aInterpreters ;
 	}

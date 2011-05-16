@@ -8,6 +8,11 @@ use jc\util\HashTable;
 
 class InterpreterManager extends Container
 {
+	public function __construct()
+	{
+		$this->addAcceptClasses('jc\\ui\\IInterpreter') ;
+	}
+	
 	public function add(IInterpreter $aInterpreter)
 	{
 		parent::add($aInterpreter) ;
@@ -31,15 +36,13 @@ class InterpreterManager extends Container
 		$aSource = String::createFromFile($sSourcePath) ;
 		$aObjectContainer = new UIObject() ;
 		
-		foreach($this->arrInterpreters as $aInterpreter)
+		foreach($this->iterator() as $aInterpreter)
 		{
 			$aInterpreter->parse($aSource,$aObjectContainer,$sSourcePath) ;
 		}
 		
 		return $aObjectContainer ;
 	}
-	
-	private $arrInterpreters = array() ;
 }
 
 ?>

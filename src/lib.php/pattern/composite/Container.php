@@ -13,7 +13,10 @@ class Container extends Object
 {
 	public function __construct($Classes=null)
 	{
-		$this->addAcceptClasses($Classes) ;
+		if($Classes)
+		{
+			$this->addAcceptClasses($Classes) ;
+		}
 	}
 	
 	public function addAcceptClasses($Classes)
@@ -30,6 +33,10 @@ class Container extends Object
 	
 	public function accept($object)
 	{
+		if( empty($this->arrAcceptClasses) )
+		{
+			return true ;
+		}
 		foreach($this->arrAcceptClasses as $sClass)
 		{
 			if($sClass=='*')

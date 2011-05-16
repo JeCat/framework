@@ -10,9 +10,11 @@ class UIFactory extends Factory
 	 */
 	public function createNodeCompiler()
 	{
-		$aCompilers = parent::createNodeCompiler() ;
+		$aNodeCompilers = parent::createNodeCompiler() ;
 		
-		// $aCompilers->
+		$aNodeCompilers->addSubCompiler('if',__NAMESPACE__."\\uicompiler\\ViewCompiler") ;
+		
+		return $aNodeCompilers ;
 	}
 }
 

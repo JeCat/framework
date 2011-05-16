@@ -29,7 +29,7 @@ class Factory extends FactoryBase
 	 */
 	public function newCompilerManager()
 	{
-		$aCompilers = parent::compilerManager() ;
+		$aCompilers = parent::newCompilerManager() ;
 		
 		// 注册 compiler
 		$aCompilers->add(__NAMESPACE__.'\\ObjectBase',__NAMESPACE__.'\\compiler\\BaseCompiler') ;

@@ -29,6 +29,7 @@ interface IView extends IContainer
 	 * @return Container
 	 */
 	public function viewContainers() ;
+	
 }
 
 interface IViewContainer {
