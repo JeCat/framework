@@ -22,11 +22,6 @@ interface IFactory
 	 * return InterpreterManager
 	 */
 	public function createInterpreterManager() ;	
-	
-	/**
-	 * return IDisplayDevice
-	 */
-	public function createDisplayDevice() ;
 }
 
 ?>

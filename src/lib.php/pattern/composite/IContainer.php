@@ -30,17 +30,21 @@ namespace jc\pattern\composite ;
 
 interface IContainer
 {
-	public function addChild(IContainedable $aChild,$bAdoptRelative=true) ;
+	public function add($object,$bAdoptRelative=true) ;
 	
-	public function removeChild($Child) ;
+	public function remove($object) ;
 	
-	public function clearChildren() ;
+	public function clear() ;
 	
-	public function childrenCount() ;
+	public function count() ;
 	
-	public function addChildClass($sClassName) ;
+	public function addAcceptClasses($Classes) ;
 	
-	public function childrenIterator($Types=null) ;
+	public function accept($object) ;
+	
+	public function iterator() ;
+	
+	public function acceptClassIterator() ;
 		
 }
 

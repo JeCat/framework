@@ -58,7 +58,7 @@ class CompilerManager extends JcObject
 			throw new Exception("保存XHTML模板的编译文件时无法打开文件:%s",$sCompiledPath) ;
 		}
 		
-		foreach($aObjectContainer->childrenIterator() as $aObject)
+		foreach($aObjectContainer->iterator() as $aObject)
 		{
 			$aCompiler = $this->compiler($aObject) ;
 			if($aCompiler)
@@ -68,11 +68,6 @@ class CompilerManager extends JcObject
 		}
 		
 		$aWriter->close() ;
-	}
-	
-	protected function compileObject(IObject $aObject,OutputStream $aWriter)
-	{
-		
 	}
 	
 	/**

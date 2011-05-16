@@ -21,14 +21,16 @@ interface IView extends IContainer
 
 	public function render() ;
 	
+	public function display() ;
+	
 	public function show() ;
 	
 	/**
 	 * @return Container
 	 */
 	public function viewContainers() ;
-	
-	public function findContainer() ;
 }
 
+interface IViewContainer {
+}
 ?>

@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc ;
 
+use jc\pattern\Container;
+
 use jc\util\HashTable;
 use jc\io\OutputStreamBuffer;
 use jc\pattern\composite\ContainedableObject;
@@ -71,15 +73,46 @@ class View extends ContainedableObject implements IView
 		$this->aOutputStream = $aDev ;
 	}
 	
-	public function show()
+	public function render()
 	{
 		$this->ui()->display($this->sourceFilename(),$this->variables(),$this->OutputStream()) ;
+	}
+	
+	public function display()
+	{
+		
+	}
+	
+	public function show()
+	{
+		$this->render() ;
+		
+		$this->display() ;
+	}
+	
+	public function findDisplayContainer()
+	{
+		// parent
+	}
+	
+	/**
+	 * @return Container
+	 */
+	public function viewContainers()
+	{
+		if( !$this->aViewContainer )
+		{
+			$this->aViewContainer = new Container('jc\\mvc\\IView') ;
+		}
+		
+		return $this->aViewContainer ;
 	}
 	
 	private $sSourceFile ;
 	private $aUI ;
 	private $aOutputStream ;
 	private $aVariables ;
+	private $aViewContainer ;
 }
 
 ?>

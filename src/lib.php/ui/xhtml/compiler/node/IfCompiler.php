@@ -9,7 +9,6 @@ use jc\ui\CompilerManager;
 use jc\ui\IObject;
 use jc\ui\xhtml\compiler\NodeCompiler;
 
-
 class IfCompiler extends NodeCompiler 
 {
 	public function compile(IObject $aObject,IOutputStream $aDev,CompilerManager $aCompilerManager)

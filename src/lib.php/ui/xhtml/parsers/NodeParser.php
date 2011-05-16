@@ -54,10 +54,10 @@ class NodeParser extends Object implements IInterpreter
 		{
 			$aRoot->addChild($aObject) ;
 		}
-		$aObjectContainer->clearChildren() ;
-		foreach($aRoot->childrenIterator() as $aObject)
+		$aObjectContainer->clear() ;
+		foreach($aRoot->iterator() as $aObject)
 		{
-			$aObjectContainer->addChild($aObject) ;
+			$aObjectContainer->add($aObject) ;
 		}
 	}
 	

@@ -27,81 +27,19 @@
 
 namespace jc\pattern\composite ;
 
-
-class CompositeObject extends ContainedableObject implements IContainer
-{	
-	public function addChildClass($sClassName)
+class Composite extends Container implements IContainedable
+{
+	public function setParent(IContainer $aParent)
 	{
-		if( !in_array($sClassName,$this->arrChildClasses) )
-		{
-			$this->arrChildClasses[] = $sClassName ;
-		}
+		$this->aParent = $aParent ;
 	}
 	
-	public function checkChildType(IContainedable $aChild)
+	public function parent()
 	{
-		if( in_array('*', $this->arrChildClasses) )
-		{
-			return true ;
-		}
-		
-		foreach( $this->arrChildClasses as $sClassName)
-		{
-			if( $aChild instanceof $sClassName )
-			{
-				return true ;
-			}
-		}
-		
-		return false ;
+		return $this->aParent ;
 	}
 	
-	// implement for IContainer //////////////////
-	public function addChild(IContainedable $aChild,$bAdoptRelative=true)
-	{
-		if( !$this->checkChildType($aChild) or $this->hasChild($aChild) )
-		{
-			return false ;
-		}
-		
-		$this->arrChildren[] = $aChild ;
-		return true ; 
-	}
-
-	public function removeChild($Child) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public function clearChildren()
-	{
-		$this->arrChildren = array() ;
-	}
-	
-	public function childrenCount()
-	{
-		return count($this->arrChildren) ;
-	}
-
-	public function child($sName) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	public function hasChild(IContainedable $aChild)
-	{
-		return in_array($aChild, $this->arrChildren,true) ;
-	}
-
-	public function childrenIterator($Classes = null)
-	{
-		return new \ArrayIterator($this->arrChildren) ;		
-	}
-	
-	
-	private $arrChildClasses = array() ;
-
-	private $arrChildren = array() ;
+	private $aParent = null ;
 }
 
 ?>

@@ -4,29 +4,16 @@ namespace jc\ui ;
 
 use jc\io\IOutputStream;
 use jc\pattern\composite\IContainer;
-use jc\pattern\composite\CompositeObject;
+use jc\pattern\composite\Composite;
 
-class Object extends CompositeObject implements IObject
+class Object extends Composite implements IObject
 {
 	public function __construct()
 	{
-		$this->addChildTypes('*') ;
+		$this->addAcceptClasses('*') ;
 	}
 
-	// implement for IObject //////////////////
-	/**
-	 * @return IObject
-	 */
-	public function parent()
-	{
-		return $this->aParent ;
-	}
-	
-	public function setParent(IContainer $aParent)
-	{
-		$this->aParent = $aParent ;
-	}
-	
+	// implement for IObject //////////////////	
 	public function depth()
 	{
 		$aParent = $this->parent() ;
@@ -44,12 +31,6 @@ class Object extends CompositeObject implements IObject
 		{
 			$aObject->compile($aDev) ;
 		}
-	}
-	
-	// implement for IContainedable //////////////////
-	static public function type()
-	{
-		return __CLASS__ ;
 	}
 	
 	private $aParent ;

@@ -13,7 +13,7 @@ class Text extends ObjectBase
 	public function source()
 	{
 		// 作为聚合对象时，拼接子对象
-		if( $this->childrenCount() )
+		if( $this->count() )
 		{
 			$sSource = '' ;
 			foreach($this->childrenIterator() as $aChild)
@@ -22,20 +22,20 @@ class Text extends ObjectBase
 			}
 			return $sSource ;
 		}
-		
+			
 		else 
 		{
 			return parent::source() ;
 		}
 	}
 	
-	public function addChild(IContainedable $aChild,$bAdoptRelative=true)
+	public function add($aChild,$bAdoptRelative=true)
 	{
 		Type::check(__NAMESPACE__.'\\ObjectBase', $aChild) ;
 		
-		if( $this->childrenCount() )
+		if( $this->count() )
 		{
-			parent::addChild($aChild,$bAdoptRelative) ;
+			parent::add($aChild,$bAdoptRelative) ;
 		}
 		
 		// 切割文本
@@ -52,18 +52,18 @@ class Text extends ObjectBase
 			$sBeforeText = substr( $sSource, 0, $aChild->position()-$this->position() ) ;
 			if( $sBeforeText )
 			{
-				parent::addChild( new Text($this->position(), $aChild->position()-1, $this->line(), $sBeforeText) ) ;
+				parent::add( new Text($this->position(), $aChild->position()-1, $this->line(), $sBeforeText) ) ;
 			}
 			
 			// UI对象
-			parent::addChild( $aChild ) ;
+			parent::add( $aChild ) ;
 		
 			// 之后的文本
 			$sAfterText = substr( $sSource, $aChild->endPosition()-$this->position()+1 ) ;
 			if( $sAfterText )
 			{
 				$nAfterTextLine = $aChild->line()+substr_count($aChild->source(),"\n") ; // $aChild所在行数 + $aChild内的换行符出现次数
-				parent::addChild( new Text($aChild->endPosition()+1, $this->endPosition(), $nAfterTextLine, $sAfterText) ) ;
+				parent::add( new Text($aChild->endPosition()+1, $this->endPosition(), $nAfterTextLine, $sAfterText) ) ;
 			}
 			
 			// 清空自己的source ，仅仅作为一个聚合对象

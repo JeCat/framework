@@ -21,9 +21,9 @@ class MarkParser extends Object implements IInterpreter
 	
 	public function parse(String $aSource,IObject $aObjectContainer,$sSourcePath)
 	{
-		foreach($aObjectContainer->childrenIterator() as $aChild)
+		foreach($aObjectContainer->iterator() as $aChild)
 		{
-			if( ($aChild instanceof Text) and !$aChild->childrenCount() )
+			if( ($aChild instanceof Text) and !$aChild->count() )
 			{
 				$this->parseMark($aChild) ;
 			}

@@ -48,19 +48,19 @@ abstract class FactoryBase extends Object implements IFactory
 	 */
 	public function createCompilerManager()
 	{
-		return $this->compilerManager() ;
+		if( !$this->aCompilers )
+		{
+			$this->aCompilers = newCompilerManager() ;
+		}
+		return $this->aCompilers ;
 	}
 	/**
 	 * @return CompilerManager
 	 */
-	public function compilerManager()
+	public function newCompilerManager()
 	{
-		if( !$this->aCompilers )
-		{
 			$this->aCompilers = CompilerManager::singleton(true) ;
 			$this->aCompilers->setApplication($this->application(true)) ;
-		}
-		return $this->aCompilers ;
 	}
 	public function setCompilerManager(CompilerManager $aCompilers)
 	{
@@ -72,19 +72,21 @@ abstract class FactoryBase extends Object implements IFactory
 	 */
 	public function createInterpreterManager()
 	{
-		return $this->interpreterManager() ;
+		if( !$this->aInterpreters )
+		{
+			$this->aInterpreters = new $this->newInterpreterManager() ;
+		}
+		return $this->aInterpreters ;
 	}
 	/**
 	 * @return InterpreterManager
 	 */
-	public function interpreterManager()
+	public function newInterpreterManager()
 	{
-		if( !$this->aInterpreters )
-		{
-			$this->aInterpreters = InterpreterManager::singleton(true) ;
-			$this->aInterpreters->setApplication($this->application(true)) ;
-		}
-		return $this->aInterpreters ;
+		$aInterpreters = InterpreterManager::singleton(true) ;
+		$aInterpreters->setApplication($this->application(true)) ;
+
+		return $aInterpreters ;
 	}
 	public function setInterpreter(InterpreterManager $aInterpreters)
 	{

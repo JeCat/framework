@@ -79,17 +79,17 @@ class Node extends ObjectBase
 		return $this->headTag()->attributes() ;
 	}
 	
-	public function childrenIterator($nType=null)
+	public function iterator($nType=null)
 	{
 		return new CombinedIterator(
 			$this->aHeadTag->attributes()->valueIterator()		// 属性
-			, parent::childrenIterator($nType)					// children
+			, parent::iterator($nType)					// children
 		) ;
 	}
 	
 	public function childElementsIterator()
 	{
-		return parent::childrenIterator() ;
+		return parent::iterator() ;
 	}
 	
 	private $aHeadTag ;

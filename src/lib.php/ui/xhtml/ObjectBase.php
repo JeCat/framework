@@ -106,7 +106,7 @@ class ObjectBase extends Object
 		$arrNewList = array() ;
 		$aUIObject = $aChild ;
 
-		foreach(parent::childrenIterator() as $aMyUIObject)
+		foreach(parent::iterator() as $aMyUIObject)
 		{
 			if($aUIObject)
 			{				
@@ -148,10 +148,10 @@ class ObjectBase extends Object
 		}
 
 		// 设置新的清单
-		$this->clearChildren() ;
+		$this->clear() ;
 		foreach($arrNewList as $aObject)
 		{
-			parent::addChild($aObject) ;
+			parent::add($aObject) ;
 		}
 	}
 

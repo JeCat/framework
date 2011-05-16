@@ -1,35 +1,21 @@
 <?php
 namespace jc\ui ;
 
+use jc\pattern\composite\Container;
 use jc\util\String;
-use jc\lang\Object;
 use jc\ui\Object as UIObject;
 use jc\util\HashTable;
 
-class InterpreterManager extends Object
+class InterpreterManager extends Container
 {
 	public function add(IInterpreter $aInterpreter)
 	{
-		$this->arrInterpreters[] = $aInterpreter ;
+		parent::add($aInterpreter) ;
 	}
 	
 	public function remove(IInterpreter $aInterpreter)
 	{
-		for( end($this->arrInterpreters); current($this->arrInterpreters); prev($this->arrInterpreters) )
-		{
-			if(current($this->arrInterpreters)===$aInterpreter)
-			{
-				unset( $this->arrInterpreters[ key($this->arrInterpreters) ] ) ;
-				return true ;
-			}
-		}
-		
-		return false ;
-	}
-	
-	public function clear()
-	{
-		$this->arrInterpreters = array() ;
+		parent::add($aInterpreter) ;
 	}
 	
 	public function iterate()

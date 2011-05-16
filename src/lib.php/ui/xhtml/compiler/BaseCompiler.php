@@ -12,7 +12,7 @@ class BaseCompiler extends JcObject implements ICompiler
 {
 	public function compile(IObject $aObject,IOutputStream $aDev,CompilerManager $aCompilerManager)
 	{	
-		if( $aObject instanceof \jc\ui\xhtml\ObjectBase and !$aObject->childrenCount() )
+		if( $aObject instanceof \jc\ui\xhtml\ObjectBase and !$aObject->count() )
 		{
 			$aDev->write($aObject->source()) ;
 		}
@@ -25,7 +25,7 @@ class BaseCompiler extends JcObject implements ICompiler
 	
 	public function compileChildren(IObject $aObject,IOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		foreach ($aObject->childrenIterator() as $aChild)
+		foreach ($aObject->iterator() as $aChild)
 		{
 			if( $aCompiler = $aCompilerManager->compiler($aChild) )
 			{
