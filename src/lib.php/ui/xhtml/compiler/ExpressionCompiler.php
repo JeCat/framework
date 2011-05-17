@@ -59,7 +59,7 @@ class ExpressionCompiler extends BaseCompiler
 			else if($arrOneTkn==';')
 			{
 				$sLineCode = trim($sLineCode) ;
-				if($sLineCode)
+				if( $sLineCode!=='' or $sLineCode!==null )
 				{
 					$arrLines[] = $sLineCode ;
 					$sLineCode = '' ;
