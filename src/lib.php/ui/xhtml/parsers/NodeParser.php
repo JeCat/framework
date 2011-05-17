@@ -52,7 +52,7 @@ class NodeParser extends Object implements IInterpreter
 		$aRoot = new ObjectBase(0,$aSource->length()-1,0,'') ;
 		foreach(array_merge($arrNodes,$arrTexts) as $aObject)
 		{
-			$aRoot->addChild($aObject) ;
+			$aRoot->add($aObject) ;
 		}
 		$aObjectContainer->clear() ;
 		foreach($aRoot->iterator() as $aObject)

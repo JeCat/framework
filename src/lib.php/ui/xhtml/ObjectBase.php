@@ -99,7 +99,7 @@ class ObjectBase extends Object
 		throw new Exception('不支持交叉UI对象。') ;
 	}
 
-	public function addChild(IContainedable $aChild,$bAdoptRelative=true)
+	public function add($aChild,$bAdoptRelative=true)
 	{
 		Type::check(__NAMESPACE__."\\ObjectBase",$aChild) ;
 		
@@ -124,14 +124,14 @@ class ObjectBase extends Object
 						break ;
 						
 					case self::LOCATE_IN :
-						$aMyUIObject->addChild($aUIObject) ;
+						$aMyUIObject->add($aUIObject) ;
 						$arrNewList[] = $aMyUIObject ;
 						$aUIObject = null ;
 						break ;
 						
 					case self::LOCATE_OUT :
 
-						$aUIObject->addChild($aMyUIObject) ;
+						$aUIObject->add($aMyUIObject) ;
 						break ;
 				}
 			}

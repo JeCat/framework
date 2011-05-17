@@ -49,7 +49,7 @@ class MarkParser extends Object implements IInterpreter
 			
 			ObjectBase::globalLocate($aText,$aMark) ;
 			
-			$aText->addChild($aMark) ;
+			$aText->add($aMark) ;
 		}
 	}
 	  
