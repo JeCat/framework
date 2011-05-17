@@ -24,7 +24,7 @@ class NodeParser extends Object implements IInterpreter
 	public function __construct()
 	{
 		$sMark = md5(__CLASS__) ;
-		$this->aRegextFindQuote = new RegExp("/~\\*\\*{$sMark}\\{\\[(.+?)\\]\\}{$sMark}\\*\\*~/s") ;
+		$this->aRegextFindQuote = new RegExp("/~\\*\\*{$sMark}\\{\\[(.*?)\\]\\}{$sMark}\\*\\*~/s") ;
 		
 		$this->aRegextFindHeadTags = new RegExp("|<([\\w:_\\-]+)([^>]*?)(/)?>|s") ;
 		$this->aRegextFindTailTags = new RegExp("|</([\\w:_\\-]+)>|s") ;
