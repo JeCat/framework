@@ -12,7 +12,7 @@ class UIFactory extends Factory
 	{
 		$aNodeCompilers = parent::createNodeCompiler() ;
 		
-		$aNodeCompilers->addSubCompiler('if',__NAMESPACE__."\\uicompiler\\ViewCompiler") ;
+		$aNodeCompilers->addSubCompiler('view',__NAMESPACE__."\\uicompiler\\ViewCompiler") ;
 		
 		return $aNodeCompilers ;
 	}

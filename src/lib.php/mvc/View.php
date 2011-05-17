@@ -9,12 +9,12 @@ use jc\ui\UI;
 
 class View extends NamableComposite implements IView
 {
-	public function __construct($sSourceFilename,UI $aUI=null)
+	public function __construct($sSourceFilename=null,UI $aUI=null)
 	{
 		$this->setSourceFilename($sSourceFilename) ;
 		$this->setUi( $aUI? $aUI: UIFactory::singleton()->create() ) ;
 		
-		parent::__construct() ;
+		parent::__construct("jc\\mvc\\IView") ;
 	}
 
 	/**
@@ -74,20 +74,25 @@ class View extends NamableComposite implements IView
 	
 	public function render()
 	{
-		$this->ui()->display($this->sourceFilename(),$this->variables(),$this->OutputStream()) ;
+		$aVars = $this->variables() ;
+		$aVars->set('aView',$this) ;
+		
+		$this->ui()->display($this->sourceFilename(),$aVars,$this->OutputStream()) ;
 	}
 	
 	public function display()
 	{
 		// 找到可收容当前视图
-		if( $aContainer = $this->findDisplayContainer() )
+		if( $aParent=$this->parent() )
 		{
-			$aContainer->outputStream()->write( $this->outputStream() ) ;
+			$aParent->outputStream()->write( $this->outputStream() ) ;
 		}
 		
 		else 
 		{
-			$aContainer->outputStream()->flush() ;
+			$this->application()->response()->output(
+				$this->outputStream()->bufferBytes() 
+			) ;
 		}
 	}
 	
@@ -98,27 +103,10 @@ class View extends NamableComposite implements IView
 		$this->display() ;
 	}
 	
-	public function findDisplayContainer()
-	{
-		$aParentView = $this ;
-		while( $aParentView=$aParentView->parent() )
-		{
-			foreach( $aParentView->viewContainers()->iterator() as $aViewContainer )
-			{
-				if( $aViewContainer->accept($this) )
-				{
-					return $aViewContainer ;
-				}
-			}
-		}
-		
-		return null ;
-	}
-	
 	/**
 	 * @return Container
 	 */
-	public function viewContainers()
+	/*public function viewContainers()
 	{
 		if( !$this->aViewContainer )
 		{
@@ -126,13 +114,12 @@ class View extends NamableComposite implements IView
 		}
 		
 		return $this->aViewContainer ;
-	}
+	}*/
 	
 	private $sSourceFile ;
 	private $aUI ;
 	private $aOutputStream ;
 	private $aVariables ;
-	private $aViewContainer ;
 }
 
 ?>

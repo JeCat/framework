@@ -74,19 +74,8 @@ abstract class Stream extends Object implements IStream, IClosable
 	{
 		flock($this->hHandle,LOCK_UN) ;
 	}
-	
-	public function redirect(IStream $aStream)
-	{
-		$this->aRedirectStream = $aStream ;
-	}
-	public function redirectStream()
-	{
-		return $this->aRedirectStream ;
-	}
-	
+		
 	protected $hHandle ;
-	
-	private $aRedirectStream ;
 	
 }
 ?>

@@ -12,21 +12,18 @@ class OutputStream extends Stream implements IOutputStream, ILockable
 	 */
 	public function write($Contents,$nLen=null,$bFlush=false)
 	{
-		if( $aStream = $this->redirectStream() )
+		if($nLen===null)
 		{
-			$aStream->write($Contents,$nLen,$bFlush) ;
+			fwrite($this->hHandle,strval($Contents)) ;
+		}
+		else 
+		{
+			fwrite($this->hHandle,strval($Contents),$nLen) ;
 		}
 		
-		else
-		{		
-			$nRet = ($nLen===null)?
-				fwrite($this->hHandle,strval($Contents)) :
-				fwrite($this->hHandle,strval($Contents),$nLen) ;
-			
-			if($bFlush)
-			{
-				$this->flush() ;
-			}
+		if($bFlush)
+		{
+			$this->flush() ;
 		}
 	}
 
@@ -36,7 +33,7 @@ class OutputStream extends Stream implements IOutputStream, ILockable
 	}
 	
 	public function clean()
-	{}
+	{ }
 	
 	/**
 	 * Enter description here ...
@@ -45,10 +42,7 @@ class OutputStream extends Stream implements IOutputStream, ILockable
 	 */
 	public function flush()
 	{
-		if( !$this->redirectStream() )
-		{
-			fflush($this->hHandle) ;
-		}
+		fflush($this->hHandle) ;
 	}
 
 	/**
@@ -58,17 +52,7 @@ class OutputStream extends Stream implements IOutputStream, ILockable
 	 */
 	public function lock()
 	{
-		if( !$this->redirectStream() )
-		{
-			flock($this->hHandle,LOCK_EX) ;
-		}
-	}
-	
-	
-	public function redirect(IOutputStream $aStream)
-	{
-		parent::redirect($aStream) ;
-	}
-	
+		flock($this->hHandle,LOCK_EX) ;
+	}	
 }
 ?>

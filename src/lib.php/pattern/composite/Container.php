@@ -17,6 +17,8 @@ class Container extends Object
 		{
 			$this->addAcceptClasses($Classes) ;
 		}
+		
+		parent::__construct() ;
 	}
 	
 	public function addAcceptClasses($Classes)

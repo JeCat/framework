@@ -17,26 +17,18 @@ class InputStream extends Stream implements IInputStream, ILockable
 	 */
 	function read($nBytes=self::MAX_READ_BYTES,$bBlock=true)
 	{
-		if( $aStream = $this->redirectStream() )
+		if($nBytes<0)
 		{
-			return $aStream->fread($nBytes) ;
+			$sReaded = '' ;
+			while(!feof($this->hHandle))
+			{
+				$sReaded.= fread($this->hHandle,10240) ;
+			}
+			return $sReaded ;
 		}
-		
-		else
+		else 
 		{
-			if($nBytes<0)
-			{
-				$sReaded = '' ;
-				while(!feof($this->hHandle))
-				{
-					$sReaded.= fread($this->hHandle,10240) ;
-				}
-				return $sReaded ;
-			}
-			else 
-			{
-				return fread($this->hHandle,$nBytes) ;
-			}
+			return fread($this->hHandle,$nBytes) ;
 		}
 	}
 	
@@ -60,15 +52,7 @@ class InputStream extends Stream implements IInputStream, ILockable
 	 */
 	function reset()
 	{
-		if( $aStream = $this->redirectStream() )
-		{
-			$aStream->reset() ;
-		}
-		
-		else
-		{
-			fseek($this->hHandle,0,SEEK_SET) ;
-		}
+		fseek($this->hHandle,0,SEEK_SET) ;
 	}
 	
 	/**
@@ -78,15 +62,8 @@ class InputStream extends Stream implements IInputStream, ILockable
 	 */
 	function available()
 	{
-		if( $aStream=$this->redirectStream() )
-		{
-			return $aStream->available() ;
-		}
-		else
-		{
-			$arrInfo = stream_get_meta_data($this->hHandle) ;
-			return isset($arrInfo['unread_bytes'])? $arrInfo['unread_bytes']: -1 ;
-		}
+		$arrInfo = stream_get_meta_data($this->hHandle) ;
+		return isset($arrInfo['unread_bytes'])? $arrInfo['unread_bytes']: -1 ;
 	}
 	
 	/**
@@ -96,15 +73,7 @@ class InputStream extends Stream implements IInputStream, ILockable
 	 */
 	function seek($nPosition)
 	{
-		if( $aStream = $this->redirectStream() )
-		{
-			return $aStream->seek($nPosition) ;
-		}
-		
-		else
-		{
-			fseek($this->hHandle,$nPosition,SEEK_SET) ;
-		}
+		fseek($this->hHandle,$nPosition,SEEK_SET) ;
 	}
 	
 	/**
@@ -114,15 +83,7 @@ class InputStream extends Stream implements IInputStream, ILockable
 	 */
 	public function skip($nBytes)
 	{
-		if( $aStream = $this->redirectStream() )
-		{
-			return $aStream->skip($nBytes) ;
-		}
-		
-		else
-		{
-			fseek($this->hHandle,$nBytes,SEEK_CUR) ;
-		}
+		fseek($this->hHandle,$nBytes,SEEK_CUR) ;
 	}
 	
 	/**
@@ -132,15 +93,7 @@ class InputStream extends Stream implements IInputStream, ILockable
 	 */
 	public function isEnd()
 	{
-		if( $aStream = $this->redirectStream() )
-		{
-			return $aStream->isEnd() ;
-		}
-		
-		else
-		{
-			return feof($this->hHandle) ;
-		}
+		return feof($this->hHandle) ;
 	}
 	
 	/**
@@ -150,15 +103,7 @@ class InputStream extends Stream implements IInputStream, ILockable
 	 */
 	public function lock()
 	{
-		if( !$this->redirectStream() )
-		{
-			flock($this->hHandle,LOCK_SH) ;
-		}
-	}
-
-	public function redirect(IInputStream $aStream)
-	{
-		parent::redirect($aStream) ;
+		flock($this->hHandle,LOCK_SH) ;
 	}
 }
 

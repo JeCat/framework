@@ -34,7 +34,7 @@ interface INamable
 	
 	public function hasName($sName) ;
 	
-	public function remove($sName) ;
+	public function removeName($sName) ;
 	
 	public function clearNames() ;
 	

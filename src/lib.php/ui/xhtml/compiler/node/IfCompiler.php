@@ -1,6 +1,8 @@
 <?php
 namespace jc\ui\xhtml\compiler\node ;
 
+use jc\ui\xhtml\compiler\ExpressionCompiler;
+
 use jc\ui\xhtml\Node;
 use jc\lang\Type;
 use jc\ui\ICompiler;
@@ -16,7 +18,7 @@ class IfCompiler extends NodeCompiler
 		Type::check("jc\\ui\\xhtml\\Node",$aObject) ;
 
 		$aDev->write('<?php if(') ;
-		$aDev->write( $aObject->attributes()->source() ) ;
+		$aDev->write( ExpressionCompiler::compileExpression($aObject->attributes()->source()) ) ;
 		$aDev->write("){ ?>") ;
 		
 		$aObject->attributes()->expression("start") ;

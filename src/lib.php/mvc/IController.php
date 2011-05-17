@@ -3,7 +3,7 @@ namespace jc\mvc ;
 
 interface IController
 {
-	public function mainRun($Params) ;
+	public function mainRun($Params=null) ;
 	
 	public function process() ;
 	

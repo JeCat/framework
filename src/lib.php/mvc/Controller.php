@@ -2,56 +2,77 @@
 
 namespace jc\mvc ;
 
-use jc\util\DataSrc;
-use jc\util\IDataSrc;
+use jc\util\HashTable;
+
 use jc\lang\Exception;
 
-require_once ('lib.php/mvc/IController.php');
+use jc\pattern\composite\NamableComposite;
+
 /** 
  * @author root
  * 
  * 
  */
-class Controller extends NamableObject implements IController
+class Controller extends NamableComposite implements IController
 {
-	static public function type()
-	{
-		return __CLASS__ ;
-	} 
-	
     function __construct ()
     {
-    	$this->addChildTypes(array(
-    		__NAMESPACE__."\\IController" ,
-    		__NAMESPACE__."\\IView" ,
-    		__NAMESPACE__."\\IModal" ,
-    	)) ;
+		parent::__construct("jc\\mvc\\IController") ;
+		
+		$this->init() ;
+    }
+    
+    protected function init()
+    {}
+    
+    public function createView($sName,$sSourceFile)
+    {
+    	$aView = new View($sSourceFile) ;
+    	$aView->addName($sName) ;
+    	$this->$sName = $aView ;
+    	$this->mainView()->add( $aView, false ) ;
     }
     
     /**
-     * 
-     * @see IController::process()
+     * @return IView
      */
-    public function process ()
+    public function mainView()
     {
-    	// 遍历执行子控制器的 process 
-    	// ... ...
+    	if( !$this->aMainView )
+    	{
+    		$this->aMainView = new View() ;
+    	}
+    	
+    	return $this->aMainView ;
+    }
+    
+    public function setMainView(IView $aView)
+    {
+    	$this->aMainView = $aView ;
     }
     
     /**
      * 
      * @see IController::mainRun()
      */
-    public function mainRun ($Params)
+    public function mainRun ($Params=null)
     {
 		$this->buildParams($Params) ;
 		
+		$this->processChildren() ;
+		
 		$this->process() ;
+		
+		$this->displayViews() ;
     }
     
     protected function buildParams($Params)
     {
-    	if( $Params instanceof IDataSrc )
+    	if(empty($Params))
+    	{
+    		$this->aParams = new HashTable() ;
+    	}
+    	else if( $Params instanceof IDataSrc )
     	{
     		$this->aParams = $Params ;
     	}
@@ -64,12 +85,35 @@ class Controller extends NamableObject implements IController
     		throw new Exception(__CLASS__."对象传入的 params 参数必须为 array 或 jc\\util\\IDataSrc 对象") ;
     	}
     }
+
+    public function process ()
+    {}
+    
+    protected function processChildren()
+    {
+		foreach($this->iterator() as $aChild)
+		{
+			$aChild->process() ;
+		}
+    }
+
+    protected function displayViews()
+    {
+    	foreach( $this->mainView()->iterator() as $aView )
+    	{
+    		$aView->display() ;
+    	}
+    	
+    	$this->mainView()->display() ;
+    }
     
     /**
      * Enter description here ...
      * 
      * @var jc\util\IDataSrc
      */
-    private $aParams = null ;
+    protected $aParams = null ;
+    
+    private $aMainView = null ;
 }
 ?>

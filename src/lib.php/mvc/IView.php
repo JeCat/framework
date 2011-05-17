@@ -28,10 +28,8 @@ interface IView extends IContainer
 	/**
 	 * @return Container
 	 */
-	public function viewContainers() ;
+	// public function viewContainers() ;
 	
 }
 
-interface IViewContainer {
-}
 ?>

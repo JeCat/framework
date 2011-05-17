@@ -5,14 +5,10 @@ namespace jc\io ;
 class PrintStream extends OutputStream
 {
 	public function __construct()
-	{
-		Stream::__construct( fopen('php://stdout','w') ) ;
-	}
+	{}
 
 	public function __destruct()
-	{
-		ob_flush() ;
-	}
+	{}
 	
 	public function printvar($Variable)
 	{
@@ -23,7 +19,22 @@ class PrintStream extends OutputStream
 	{
 		$this->write($sBytes."\r\n") ;
 	}
-	
+
+	/**
+	 * Enter description here ...
+	 * 
+	 * @return int
+	 */
+	public function write($Contents,$nLen=null,$bFlush=false)
+	{
+		echo $nLen===null? strval($Contents): substr(strval($Contents),0,$nLen) ;
+		
+		if($bFlush)
+		{
+			$this->flush() ;
+		}
+	}
+
 	public function flush()
 	{
 		ob_flush() ;
@@ -44,9 +55,5 @@ class PrintStream extends OutputStream
 		return false ;
 	}
 	
-	public function catchAllStdOutput()
-	{
-		
-	}
 }
 ?>

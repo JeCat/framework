@@ -2,6 +2,8 @@
 
 namespace jc\ui ;
 
+use jc\lang\Exception;
+
 use jc\util\HashTable;
 
 use jc\io\IOutputStream;
@@ -143,6 +145,7 @@ class UI extends JcObject
 		// 解除拦截
 		if($aDevice)
 		{
+			ob_flush() ;
 			$aOutputFilters->remove( array($aDevice,'write') ) ;
 		}
 	}
@@ -151,6 +154,10 @@ class UI extends JcObject
 	{
 		// 编译
 		$sSourcePath = $this->sourceFileManager()->find($sSourceFile) ;
+		if(!$sSourcePath)
+		{
+			throw new Exception("无法找到指定的源文件：%s",$sSourceFile) ;
+		}
 		$sCompiledPath = $this->sourceFileManager()->compiledPath($sSourcePath) ;
 		if( !$this->sourceFileManager()->isCompiledValid($sSourcePath,$sCompiledPath) )
 		{
