@@ -8,19 +8,19 @@ class Object implements IObject
 	public function __construct()
 	{
 		// 从调用堆栈上设置 application
-		/*foreach(debug_backtrace() as $arrFunc)
+		foreach(debug_backtrace() as $arrFunc)
 		{
 			if( empty($arrFunc['object']) )
 			{
 				continue ;
 			}
 
-			if( ($arrFunc['object'] instanceof Object) and $aApp=$arrFunc['object']->application() )
+			if( ($arrFunc['object'] instanceof Object) and $aApp=$arrFunc['object']->application(false) )
 			{
 				$this->setApplication($aApp) ;
 				break ;
 			}
-		}*/
+		}
 	}
 
 	/**
