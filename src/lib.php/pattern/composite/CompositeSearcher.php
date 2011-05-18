@@ -29,7 +29,7 @@ class CompositeSearcher extends \ArrayIterator
 			}
 			
 			// 递归child
-			$arrRes+= self::searching($aChild,$aCallback) ;
+			$arrRes = array_merge($arrRes,self::searching($aChild,$aCallback)) ;
 		}
 		
 		return $arrRes ;

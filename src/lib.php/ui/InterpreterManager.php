@@ -13,14 +13,14 @@ class InterpreterManager extends Container
 		$this->addAcceptClasses('jc\\ui\\IInterpreter') ;
 	}
 	
-	public function add(IInterpreter $aInterpreter)
+	public function add($aInterpreter,$bAdoptRelative=true)
 	{
 		parent::add($aInterpreter) ;
 	}
 	
-	public function remove(IInterpreter $aInterpreter)
+	public function remove($aInterpreter)
 	{
-		parent::add($aInterpreter) ;
+		parent::remove($aInterpreter) ;
 	}
 	
 	public function iterate()

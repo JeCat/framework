@@ -6,7 +6,7 @@ use jc\pattern\composite\IContainer;
 interface IView extends IContainer
 {
 	/**
-	 * @return IHashTable
+	 * @return jc\util\IHashTable
 	 */
 	public function variables() ;
 	

@@ -2,6 +2,8 @@
 
 namespace jc\mvc\controller ;
 
+use jc\util\DataSrc;
+use jc\util\IDataSrc;
 use jc\util\HashTable ;
 use jc\lang\Exception ;
 use jc\mvc\view\IView ; 
@@ -27,10 +29,20 @@ class Controller extends NamableComposite implements IController
     
     public function createView($sName,$sSourceFile)
     {
-    	$aView = new View($sSourceFile) ;
+    	$this->registerView($sName,new View($sSourceFile)) ;
+    }
+    
+    public function registerView($sName,IView $aView)
+    {
     	$aView->addName($sName) ;
     	$this->$sName = $aView ;
     	$this->mainView()->add( $aView, false ) ;
+    	$aView->variables()->set("theController", $this) ;
+    }
+    
+    public function unregisterView(IView $aView)
+    {
+    	$this->mainView()->remove($aView) ;
     }
     
     /**
@@ -41,6 +53,7 @@ class Controller extends NamableComposite implements IController
     	if( !$this->aMainView )
     	{
     		$this->aMainView = new View() ;
+    		$this->aMainView->addName("controllerMainView") ;
     	}
     	
     	return $this->aMainView ;
@@ -114,7 +127,7 @@ class Controller extends NamableComposite implements IController
     
 	public function add($object,$bAdoptRelative=true)
 	{
-		parent::add($object) ;
+		parent::add($object,$bAdoptRelative) ;
 		
 		if( $bAdoptRelative and ($object instanceof IController) )
 		{

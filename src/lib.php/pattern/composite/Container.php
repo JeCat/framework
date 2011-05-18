@@ -9,7 +9,7 @@ use jc\lang\Exception;
 
 use jc\lang\Object;
 
-class Container extends Object
+class Container extends Object implements IContainer
 {
 	public function __construct($Classes=null)
 	{
