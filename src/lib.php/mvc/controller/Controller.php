@@ -5,6 +5,7 @@ namespace jc\mvc\controller ;
 use jc\util\HashTable ;
 use jc\lang\Exception ;
 use jc\mvc\view\IView ; 
+use jc\mvc\view\View ; 
 use jc\pattern\composite\NamableComposite ;
 
 /** 
@@ -16,7 +17,7 @@ class Controller extends NamableComposite implements IController
 {
     function __construct ()
     {
-		parent::__construct("jc\\mvc\\IController") ;
+		parent::__construct("jc\\mvc\\controller\\IController") ;
 		
 		$this->init() ;
     }

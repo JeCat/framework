@@ -14,7 +14,7 @@ class View extends NamableComposite implements IView
 		$this->setSourceFilename($sSourceFilename) ;
 		$this->setUi( $aUI? $aUI: UIFactory::singleton()->create() ) ;
 		
-		parent::__construct("jc\\mvc\\IView") ;
+		parent::__construct("jc\\mvc\\view\\IView") ;
 	}
 
 	/**
