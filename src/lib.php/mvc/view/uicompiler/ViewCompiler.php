@@ -1,5 +1,5 @@
 <?php
-namespace jc\mvc\uicompiler ;
+namespace jc\mvc\view\uicompiler ;
 
 use jc\lang\Type;
 use jc\ui\IObject;
@@ -14,9 +14,9 @@ class ViewCompiler extends NodeCompiler
 		Type::check("jc\\ui\\xhtml\\Node",$aObject) ;
 
 		$aDev->write("<?php ob_flush() ;\r\n") ;
-		$aDev->write("\$aViewContainer = new \\jc\\mvc\\View() ;\r\n") ;
+		$aDev->write("\$aViewContainer = new \\jc\\mvc\\view\\View() ;\r\n") ;
 		$aDev->write("\$aVariables->get('theView')->outputStream()->write(\$aViewContainer->outputStream());\r\n") ;
-		$aDev->write("foreach(new \\jc\\mvc\\VagrantViewSearcher(\$aVariables->get('theView')) as \$aVagrantView)\r\n{ \$aViewContainer->add(\$aVagrantView,true) ; }\r\n") ;
+		$aDev->write("foreach(new \\jc\\mvc\\view\\VagrantViewSearcher(\$aVariables->get('theView')) as \$aVagrantView)\r\n{ \$aViewContainer->add(\$aVagrantView,true) ; }\r\n") ;
 		$aDev->write("?>") ;
 	}
 	

@@ -1,5 +1,5 @@
 <?php
-namespace jc\mvc ;
+namespace jc\mvc\controller ;
 
 interface IController
 {

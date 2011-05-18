@@ -1,12 +1,11 @@
 <?php
 
-namespace jc\mvc ;
+namespace jc\mvc\controller ;
 
-use jc\util\HashTable;
-
-use jc\lang\Exception;
-
-use jc\pattern\composite\NamableComposite;
+use jc\util\HashTable ;
+use jc\lang\Exception ;
+use jc\mvc\view\IView ; 
+use jc\pattern\composite\NamableComposite ;
 
 /** 
  * @author root

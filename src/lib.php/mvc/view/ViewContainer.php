@@ -1,5 +1,5 @@
 <?php
-namespace jc\mvc ;
+namespace jc\mvc\view ;
 
 class ViewContainer extends View
 {
