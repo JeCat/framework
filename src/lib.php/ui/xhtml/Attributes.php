@@ -4,6 +4,7 @@ namespace jc\ui\xhtml ;
 
 use jc\io\IOutputStream;
 use jc\util\HashTable;
+use jc\ui\xhtml\compiler\ExpressionCompiler ;
 
 class Attributes extends HashTable
 {

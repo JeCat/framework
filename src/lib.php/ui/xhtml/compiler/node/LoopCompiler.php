@@ -15,14 +15,15 @@ class LoopCompiler extends NodeCompiler
 	{
 		Type::check("jc\\ui\\xhtml\\Node",$aObject) ;
 
-		$sStart = $aObject->attributes()->expression("start");
-		$sEndValue = $aObject->attributes()->expression("end") ;
-		$sStepValue = $aObject->attributes()->expression("step") ;
+		$aAttrs = $aObject->attributes() ;
+		$sStart = $aAttrs->has("start")? $aAttrs->expression("start"): '0';
+		$sEndValue = $aAttrs->expression("end") ;
+		$sStepValue = $aAttrs->has("step")? $aAttrs->expression("step"): '1' ;
 		
 		//为变量名准备唯一的标示,防止loop嵌套后出现冲突
 		$sObjId = spl_object_hash($aObject);
 		
-		$sVarName =  $aObject->attributes()->get("var") ;
+		$sVarName =  $aAttrs->get("var") ;
 		if(!$sVarName){
 			$sVarName = '__loop_idx_' . $sObjId;
 		}
@@ -44,8 +45,6 @@ class LoopCompiler extends NodeCompiler
 
 		$aDev->write("<?php } ?>") ;
 	}
-
-	
 }
 
 ?>
