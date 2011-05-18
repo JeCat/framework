@@ -99,6 +99,11 @@ class Controller extends NamableComposite implements IController
 
     protected function displayViews()
     {
+		foreach($this->iterator() as $aChild)
+		{
+			$aChild->displayViews() ;
+		}
+    	
     	foreach( $this->mainView()->iterator() as $aView )
     	{
     		$aView->display() ;
@@ -107,6 +112,16 @@ class Controller extends NamableComposite implements IController
     	$this->mainView()->display() ;
     }
     
+	public function add($object,$bAdoptRelative=true)
+	{
+		parent::add($object) ;
+		
+		if( $bAdoptRelative and ($object instanceof IController) )
+		{
+			$this->mainView()->add( $object->mainView(), true ) ;
+		}
+	}
+	
     /**
      * Enter description here ...
      * 

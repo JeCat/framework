@@ -75,7 +75,7 @@ class View extends NamableComposite implements IView
 	public function render()
 	{
 		$aVars = $this->variables() ;
-		$aVars->set('aView',$this) ;
+		$aVars->set('theView',$this) ;
 		
 		$this->ui()->display($this->sourceFilename(),$aVars,$this->OutputStream()) ;
 	}

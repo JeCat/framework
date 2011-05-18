@@ -13,8 +13,13 @@ class ExpressionCompiler extends BaseCompiler
 		$aDev->write(self::compileExpression($aObject->source())) ;
 	}
 
-	static public function compileExpression($sSource)
+	static public function compileExpression($sSource,$bEval=true,$bReturn=true)
 	{
+		if( !$bEval )
+		{
+			$bReturn = false ;
+		}
+		
 		$nStackId = self::$nStackVarId++ ;
 				
 		// 补行尾的';'
@@ -44,13 +49,28 @@ class ExpressionCompiler extends BaseCompiler
 					$sVarNameNew = '_stack'.$nStackId.'_var_'.$sVarName ;
 					
 					//
-					$arrVarDefineLines[$sVarName] = '\\$'.$sVarNameNew."=\\\$aVariables->get('{$sVarName}')" ;
-					$sLineCode.= '\\$'.$sVarNameNew ;
+					if($bEval)
+					{
+						$arrVarDefineLines[$sVarName] = '\\$'.$sVarNameNew."=\\\$aVariables->get('{$sVarName}')" ;
+						$sLineCode.= '\\$'.$sVarNameNew ;
+					}
+					else 
+					{
+						$arrVarDefineLines[$sVarName] = '$'.$sVarNameNew."=\$aVariables->get('{$sVarName}')" ;
+						$sLineCode.= '$'.$sVarNameNew ;
+					}
 				}
 				else 
 				{
 					// 转义作为字符的$ （将 \$ 替换为 \\\$）
-					$sLine = str_replace("\\\$","\\\\\\\$",$arrOneTkn[1]) ;
+					if($bEval)
+					{
+						$sLine = str_replace("\\\$","\\\\\\\$",$arrOneTkn[1]) ;
+					}
+					else 
+					{
+						$sLine = $arrOneTkn[1] ;
+					}
 					
 					$sLineCode.= $sLine ;
 				}
@@ -72,17 +92,23 @@ class ExpressionCompiler extends BaseCompiler
 		}
 		
 		// return 最末行的结果
-		$sLastLine = array_pop($arrLines) ;
-		$arrLines[] = 'return ' . $sLastLine ;
+		if( $bReturn )
+		{
+			$sLastLine = array_pop($arrLines) ;
+			$arrLines[] = 'return ' . $sLastLine ;
+		}
 		
 		// 合并 变量声明行 和 执行行
 		$arrLines = array_merge(array_values($arrVarDefineLines),$arrLines) ;
 		
 		// 
-		$sCompiled = implode(";\r\n", $arrLines).";" ;		
-		$sCompiled = addcslashes($sCompiled,'"') ;
+		$sCompiled = implode(";\r\n", $arrLines).";" ;
+		if( $bEval )
+		{
+			$sCompiled = addcslashes($sCompiled,'"') ;		
+		}
 		
-		return "eval(\"" . $sCompiled . "\")" ;
+		return $bEval? ("eval(\"" . $sCompiled . "\")"): $sCompiled ;
 	}
 	
 	static private $nStackVarId = 0 ;

@@ -16,7 +16,7 @@ class MarkCompiler extends BaseCompiler
 		{
 		// 执行	
 		case '?' :
-			$sCompiled = "<?php " . ExpressionCompiler::compileExpression($aObject->source()) . " ;?>" ;
+			$sCompiled = "<?php " . ExpressionCompiler::compileExpression($aObject->source(),false,false) . " ;?>" ;
 			break ;
 			 
 		// 输出
