@@ -33,7 +33,7 @@ class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator
 
 	public function has($sName)
 	{
-		return array_key_exists($this->arrDatas,$sName) ;
+		return array_key_exists($sName,$this->arrDatas) ;
 	}
 
 	public function remove($sName)
