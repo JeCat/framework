@@ -10,7 +10,7 @@ class MarkCompiler extends BaseCompiler
 {
 	public function compile(IObject $aObject,IOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		Type::check("jc\\ui\\xhtml\\Mark",$aObject) ;
+		Type::assert("jc\\ui\\xhtml\\Mark",$aObject,'aObject') ;
 		
 		switch ( $aObject->markType() )
 		{

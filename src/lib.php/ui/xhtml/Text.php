@@ -31,7 +31,7 @@ class Text extends ObjectBase
 	
 	public function add($aChild,$bAdoptRelative=true)
 	{
-		Type::check(__NAMESPACE__.'\\ObjectBase', $aChild) ;
+		Type::assert(__NAMESPACE__.'\\ObjectBase', $aChild, 'aChild') ;
 		
 		if( $this->count() )
 		{

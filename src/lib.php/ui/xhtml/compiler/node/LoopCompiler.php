@@ -13,7 +13,7 @@ class LoopCompiler extends NodeCompiler
 {
 	public function compile(IObject $aObject,IOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		Type::check("jc\\ui\\xhtml\\Node",$aObject) ;
+		Type::assert("jc\\ui\\xhtml\\Node",$aObject,'aObject') ;
 
 		$aAttrs = $aObject->attributes() ;
 		$sStart = $aAttrs->has("start")? $aAttrs->expression("start"): '0';
