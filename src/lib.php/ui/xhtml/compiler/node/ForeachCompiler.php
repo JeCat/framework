@@ -21,31 +21,27 @@ class ForeachCompiler extends NodeCompiler
 		$aAttrs = $aObject->attributes() ;
 		
 		$sFor = $aAttrs->expression('for');
-		$sKey = $aAttrs->has('item.ref')? $aAttrs->get('key') : '$__foreach_key_' . $sObjId;
-		$sItem = $aAttrs->has('item.ref')? $aAttrs->get('item') : '$__foreach_item_' . $sObjId;
-		$sItemRef = $aAttrs->has('item.ref')? $aAttrs->expression('item.ref') : 'true';   //是否引用元素值
-		$sDesc = $aAttrs->expression('desc')? $aAttrs->expression('desc') : 'false';    //是否反序
+		$sKey = $aAttrs->has('key')? $aAttrs->get('key') : '$__foreach_key_' . $sObjId;
+		$sItem = $aAttrs->has('item')? $aAttrs->get('item') : '$__foreach_item_' . $sObjId;
+		$sItemRef = $aAttrs->get('item.ref') != 'false' ? '&' : '';     //是否引用值
+		$sItem = $sItemRef . $sItem;
+		$sDesc = $aAttrs->has('desc')? $aAttrs->get('desc') : 'false';    //是否反序
 		$sArrName = '$__foreach_Arr_' . $sObjId;
 		
-		$aDev->write( "<?php \n") ;
-		//处理遍历数组不存在或为空
-		$aDev->write( "if(!empty($sFor)){\n") ;
-		//处理反序遍历
-		$aDev->write( "
-						if($sDesc){
-						 	$sArrName = array_reverse($sFor);
-						}else{
-							$sArrName = $sFor;
-						}
-						
-						\n") ;
-		$aDev->write( "foreach($sArrName as $sKey => "
-								. $sItemRef ? "&" : ""  //处理引用元素值   
-								. "$sItem){\n") ;
-		
+		$aDev->write("<?php
+						$sArrName = $sFor;
+						if(!empty($sArrName)){
+							if($sDesc){
+							 	$sArrName = array_reverse($sArrName);
+							}
+						foreach($sArrName as $sKey => $sItem){
+						\$aUI->variables()->set('$sKey',$sKey) ;
+						\$aUI->variables()->set('$sItem',$sKey) ;
+						?>");
+								
 		//循环体，可能会包含foreach:else标签
 		$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
-
+		
 		$aDev->write("<?php 
 							}
 						}

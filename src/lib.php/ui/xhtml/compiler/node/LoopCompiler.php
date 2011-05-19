@@ -32,18 +32,15 @@ class LoopCompiler extends NodeCompiler
 		$sEndName = '$__loop_end_' . $sObjId;
 		$sStepName = '$__loop_step_' . $sObjId ;
 		
-		$aDev->write( "<?php \n") ;
-		$aDev->write( $sEndName . ' = ' . $sEndValue . ";\n") ;
-		$aDev->write( $sStepName . ' = ' . $sStepValue . ";\n") ;
-		$aDev->write('for(') ;
-		$aDev->write($sVarName . '=' . $sStart . ';');
-		$aDev->write($sVarName . '<=' . $sEndName . ';');
-		$aDev->write($sVarName . '+=' . $sStepName );
-		$aDev->write("){ ?>") ;	
+		$aDev->write( "<?php
+								$sEndName  = $sEndValue ; 
+								$sStepName  = $sStepValue  ;
+								for( $sVarName = $sStart ; $sVarName <= $sEndName ; $sVarName += $sStepName ){  
+								?>") ;	
 		
 		$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
 
-		$aDev->write("<?php } ?>") ;
+		$aDev->write('<?php } ?>') ;
 	}
 }
 
