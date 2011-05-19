@@ -1,4 +1,4 @@
-<?php
+<!--<?php
 namespace jc\ui\xhtml\compiler\node ;
 
 use jc\ui\xhtml\Node;
@@ -19,35 +19,50 @@ class ForeachCompiler extends NodeCompiler
 		$sObjId = spl_object_hash($aObject);
 		
 		$aAttrs = $aObject->attributes() ;
-		
 		$sFor = $aAttrs->expression('for');
-		$sKey = $aAttrs->has('key')? $aAttrs->get('key') : '$__foreach_key_' . $sObjId;
-		$sItem = $aAttrs->has('item')? $aAttrs->get('item') : '$__foreach_item_' . $sObjId;
-		$sItemRef = $aAttrs->get('item.ref') != 'false' ? '&' : '';     //是否引用值
-		$sItem = $sItemRef . $sItem;
+		$bHasKey = $aAttrs->has('key');
+		$bHasItem = $aAttrs->has('item');
+		$sKey = $bHasKey? $aAttrs->get('key') : '__foreach_key_' . $sObjId;
+		$sItem = $bHasItem? $aAttrs->get('item') : '__foreach_item_' . $sObjId;
 		$sDesc = $aAttrs->has('desc')? $aAttrs->get('desc') : 'false';    //是否反序
 		$sArrName = '$__foreach_Arr_' . $sObjId;
 		
 		$aDev->write("<?php
-						$sArrName = $sFor;
-						if(!empty($sArrName)){
-							if($sDesc){
-							 	$sArrName = array_reverse($sArrName);
-							}
-						foreach($sArrName as $sKey => $sItem){
-						\$aUI->variables()->set('$sKey',$sKey) ;
-						\$aUI->variables()->set('$sItem',$sKey) ;
-						?>");
+							$sArrName = $sFor;
+							if(!empty($sArrName)){
+								if($sDesc){
+								 	$sArrName = array_reverse($sArrName);
+								}
+					");
+		if($bHasKey && $bHasItem){
+			$sKey = $aAttrs->get('key');
+			$sItem = $aAttrs->get('item');
+			$aDev->write("
+								foreach($sArrName as $sKey => $sItem){
+								\$aUI->variables()->set('$sKey',$sKey);
+								\$aUI->variables()->set('$sItem',$sItem);
+						");
+		}elseif(!$bHasKey && $bHasItem){
+			$sKey = $aAttrs->get('key');
+			$aDev->write("foreach($sArrName as ){  ");
+		}elseif(!$bHasKey && !$bHasItem){
+			$sKey = $aAttrs->get('key');
+			$aDev->write("foreach($sArrName as ){  ");
+		}
+								 	
+		$aDev->write("$aUI->variables()->set('$sKey','$'.$sKey);" );
+		$aDev->write("$aUI->variables()->set('$sKey',$sKey) ;
+		
+					}?>");
 								
 		//循环体，可能会包含foreach:else标签
 		$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
 		
 		$aDev->write("<?php 
-							}
 						}
 					 ?>") ; // end if   (如果foreach的内容包含foreach:else标签,则此处为else的end)
 		
 	}
 }
 
-?>
+?>-->
