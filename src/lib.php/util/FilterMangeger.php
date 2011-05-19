@@ -2,6 +2,10 @@
 
 namespace jc\util ;
 
+use jc\lang\Type;
+
+use jc\lang\Exception;
+
 use jc\lang\Object;
 
 class FilterMangeger extends Object implements IFilterMangeger
@@ -50,7 +54,7 @@ class FilterMangeger extends Object implements IFilterMangeger
 	{
 		if( !is_callable($callback) )
 		{
-			return ;
+			throw new Exception(__METHOD__."()的参数\$callback必须为回调函数类型，传入的类型为：%s",Type::reflectType($callback)) ;
 		}
 		
 		array_unshift($this->arrFilters,array($callback,$arrArgvs)) ;

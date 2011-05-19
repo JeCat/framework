@@ -38,8 +38,16 @@ class Type
 			self::OBJECT ,
 	) ;
 	
+
+	static public function assert($Types,& $Variable,$sVarName=null)
+	{
+		if( !self::check($Types,$Variable) )
+		{
+			throw new TypeException($Variable,$Types,$sVarName) ;
+		}
+	}
 	
-	static public function check($Types,& $Variable,$bThrowException=true,$sVarName=null)
+	static public function check($Types,& $Variable)
 	{
 		if( is_string($Types) )
 		{
@@ -72,12 +80,7 @@ class Type
 				}
 			}
 		}
-		
-		if($bThrowException)
-		{
-			throw new TypeException($Variable,$Types,$sVarName) ;
-		}
-		
+				
 		return false ;
 	}
 	

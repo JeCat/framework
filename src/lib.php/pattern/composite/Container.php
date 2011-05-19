@@ -1,12 +1,11 @@
 <?php
 namespace jc\pattern\composite ;
 
+
+use jc\util\FilterMangeger ;
 use jc\pattern\composite\IContainedable;
-
 use jc\lang\Type;
-
 use jc\lang\Exception;
-
 use jc\lang\Object;
 
 class Container extends Object implements IContainer
@@ -35,6 +34,16 @@ class Container extends Object implements IContainer
 	
 	public function accept($object)
 	{
+		if( $this->aAddFilters )
+		{
+			$object = $this->aAddFilters->handle($object) ;
+			if(!$object)
+			{
+				return false ;
+			}
+		}
+		
+		
 		if( empty($this->arrAcceptClasses) )
 		{
 			return true ;
@@ -100,9 +109,21 @@ class Container extends Object implements IContainer
 		return new \ArrayIterator($this->arrAcceptClasses) ;
 	}
 	
+	public function addFilters()
+	{
+		if(!$this->aAddFilters)
+		{
+			$this->aAddFilters = new FilterMangeger() ;
+		}
+		
+		return $this->aAddFilters ;
+	}
 	
 	private $arrObjects = array() ;
+	
 	private $arrAcceptClasses = array() ;
+	
+	private $aAddFilters ;
 }
 
 ?>

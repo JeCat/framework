@@ -2,11 +2,15 @@
 
 namespace jc\util ;
 
+use jc\lang\Exception;
+
+use jc\lang\Type;
+
 use jc\lang\Object;
 
 class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator
 {
-	public function __construct(array $arrDatas=array())
+	public function __construct(array $arrDatas=array(),$sClass=null)
 	{
 		$this->arrDatas = $arrDatas ;
 	}
@@ -24,6 +28,11 @@ class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator
 
 	public function set($sName,$Value)
 	{
+		if( $this->sClass )
+		{
+			Type::assert($this->sClass,$Value,'Value') ;
+		}
+		
 		$this->arrDatas[ $sName ] = $Value ;
 	}
 	public function setRef($sName,&$Value)
@@ -142,7 +151,18 @@ class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator
 		krsort($this->arrDatas) ;
 	}
 	
+	public function acceptClass($sClass)
+	{
+		return $this->sClass ;
+	}
+	public function setAcceptClass($sClass)
+	{
+		$this->sClass = $sClass ;
+	} 
+	
 	protected $arrDatas = array() ;
+	
+	private $sClass = array() ;
 }
 
 ?>
