@@ -1,4 +1,4 @@
-<!--<?php
+<?php
 namespace jc\ui\xhtml\compiler\node ;
 
 use jc\ui\xhtml\Node;
@@ -22,47 +22,59 @@ class ForeachCompiler extends NodeCompiler
 		$sFor = $aAttrs->expression('for');
 		$bHasKey = $aAttrs->has('key');
 		$bHasItem = $aAttrs->has('item');
-		$sKey = $bHasKey? $aAttrs->get('key') : '__foreach_key_' . $sObjId;
-		$sItem = $bHasItem? $aAttrs->get('item') : '__foreach_item_' . $sObjId;
+		$sKey = $bHasKey? $aAttrs->get('key') : '$__foreach_key_' . $sObjId;
+		$sItem = $bHasItem? $aAttrs->get('item') : '$__foreach_item_' . $sObjId;
 		$sDesc = $aAttrs->has('desc')? $aAttrs->get('desc') : 'false';    //是否反序
 		$sArrName = '$__foreach_Arr_' . $sObjId;
 		
 		$aDev->write("<?php
-							$sArrName = $sFor;
-							if(!empty($sArrName)){
-								if($sDesc){
-								 	$sArrName = array_reverse($sArrName);
-								}
+				$sArrName = $sFor;
+				if(!empty($sArrName)){
+					if($sDesc){
+					 	$sArrName = array_reverse($sArrName);
+					}
 					");
 		if($bHasKey && $bHasItem){
-			$sKey = $aAttrs->get('key');
-			$sItem = $aAttrs->get('item');
+			if(substr($sKey,0,1) == '$'){
+				$sKeyName = substr($sKey,1);
+			}else{
+				$sKeyName = $sKey;
+				$sKey = '$' . $sKey;
+			}
+			if(substr($sItem,0,1) == '$'){
+				$sItemName = substr($sItem,1);
+			}else{
+				$sItemName = $sItem;
+				$sItem = '$' . $sItem;
+			}
 			$aDev->write("
-								foreach($sArrName as $sKey => $sItem){
-								\$aUI->variables()->set('$sKey',$sKey);
-								\$aUI->variables()->set('$sItem',$sItem);
+					foreach($sArrName as $sKey => $sItem){
+						\$aVariables->set('$sKeyName',$sKey);
+						\$aVariables->set('$sItemName',$sItem);
 						");
 		}elseif(!$bHasKey && $bHasItem){
-			$sKey = $aAttrs->get('key');
-			$aDev->write("foreach($sArrName as ){  ");
+			if(substr($sItem,0,1) == '$'){
+				$sItemName = substr($sItem,1);
+			}
+			$aDev->write("
+					foreach($sArrName as $sItem){
+						\$aUI->variables()->set('$sItemName',$sItem);
+						");
 		}elseif(!$bHasKey && !$bHasItem){
-			$sKey = $aAttrs->get('key');
-			$aDev->write("foreach($sArrName as ){  ");
+			$aDev->write("
+					foreach($sArrName as $sKey => $sItem){
+						");
 		}
-								 	
-		$aDev->write("$aUI->variables()->set('$sKey','$'.$sKey);" );
-		$aDev->write("$aUI->variables()->set('$sKey',$sKey) ;
-		
-					}?>");
-								
+		$aDev->write("?>");					
 		//循环体，可能会包含foreach:else标签
 		$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
 		
 		$aDev->write("<?php 
-						}
-					 ?>") ; // end if   (如果foreach的内容包含foreach:else标签,则此处为else的end)
+					}
+				}
+			 		?>") ; // end if   (如果foreach的内容包含foreach:else标签,则此处为foreach:else的end)
 		
 	}
 }
 
-?>-->
+?>
