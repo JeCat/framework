@@ -110,7 +110,8 @@ class CoreApplication extends Object
 	
 	private $aLocaleManager ;
 	
-	static private $theGlobalInstance ; 
+	private $arrGlobalInstancs = array() ;
+	 
 
 }
 

@@ -8,18 +8,9 @@ class Object implements IObject
 	public function __construct()
 	{
 		// 从调用堆栈上设置 application
-		foreach(debug_backtrace() as $arrFunc)
+		if( $aApp = self::findApplicationOnCallStack(debug_backtrace()) )
 		{
-			if( empty($arrFunc['object']) )
-			{
-				continue ;
-			}
-
-			if( ($arrFunc['object'] instanceof Object) and $aApp=$arrFunc['object']->application(false) )
-			{
-				$this->setApplication($aApp) ;
-				break ;
-			}
+			$this->setApplication($aApp) ;
 		}
 	}
 
@@ -67,33 +58,52 @@ class Object implements IObject
 		$this->aApplication = $aApp ;
 	}
 
+
 	static public function singleton ($bCreateNew=true)
 	{
-		$sClass = get_called_class() ;
-
-		if( empty(self::$arrGlobalInstancs[$sClass]) ) 
+		// 从调用堆栈上找到 application
+		if( !$aApp = self::findApplicationOnCallStack(debug_backtrace()) )
 		{
-			if($bCreateNew)
-			{
-				self::$arrGlobalInstancs[$sClass] = new static() ;
-			}
-			else 
-			{
-				return null ;
-			}
+			throw new Exception(__METHOD__."() 无法确定所属的 Application 对象") ;
 		}
 		
-		return self::$arrGlobalInstancs[$sClass] ;
+		$sClass = get_called_class() ;
+		
+		return $aApp->singletonInstance($sClass,$bCreateNew) ;
 	}
+	
 	static public function setSingleton (self $aInstance)
 	{
 		$sClass = get_called_class() ;
 		
 		if( !($aInstance instanceof static) )
 		{
-			throw new Exception('%s::setSingleton() �Ĳ������Ϊ%s����',array($sClass,$sClass)) ;
+			throw new Exception('%s::setSingleton() 设置的单件实例必须为一个 %s 类型的对象',array($sClass,$sClass)) ;
 		}
-		self::$arrGlobalInstancs[$sClass] = $aInstance ;
+
+		// 从调用堆栈上找到 application
+		if( !$aApp = self::findApplicationOnCallStack(debug_backtrace()) )
+		{
+			throw new Exception(__METHOD__."() 无法确定所属的 Application 对象") ;
+		}
+
+		$aApp->setSingletonInstance($sClass,$aInstance) ;
+	}
+	
+	static public function findApplicationOnCallStack(array $arrCallStack)
+	{
+		foreach($arrCallStack as $arrFunc)
+		{
+			if( empty($arrFunc['object']) )
+			{
+				continue ;
+			}
+
+			if( ($arrFunc['object'] instanceof Object) and $aApp=$arrFunc['object']->application(false) )
+			{
+				return $aApp ;
+			}
+		}
 	}
 	
 	static private $arrGlobalInstancs = array() ;

@@ -3,31 +3,32 @@ namespace jc\system ;
 
 class Application extends CoreApplication
 {
-	/**
-     * @return Application
-     */
-	static public function singleton($bDefaultGlobal=true)
-	{
-		if( !self::$theGlobalInstance and $bDefaultGlobal )
+	public function singletonInstance($sClass,$bCreateNew=true)
+	{		
+		if(!isset($this->arrGlobalSingeltonInstance[$sClass]))
 		{
-			self::setSingleton(
-				AppFactory::createFactory()->create()
-			) ;
+			if($bCreateNew)
+			{
+				return $this->arrGlobalSingeltonInstance[$sClass] = new $sClass() ;
+			}
+			else
+			{
+				return null ;
+			}
+		} 
+		else 
+		{
+			return $this->arrGlobalSingeltonInstance[$sClass] ;
 		}
-		
-		return self::$theGlobalInstance ;
 	}
 	
-	/**
-     * @return void
-     */
-	static public function setSingleton(self $aInstance)
+	public function setSingletonInstance($sClass,$aInstance)
 	{
-		self::$theGlobalInstance = $aInstance ;
+		$this->arrGlobalSingeltonInstance[$sClass] = $aInstance ;
 	}
 	
 	
-	static private $theGlobalInstance ; 
+	private $arrGlobalSingeltonInstance ; 
 }
 
 ?>

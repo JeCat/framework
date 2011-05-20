@@ -85,19 +85,19 @@ class ModelPrototype extends Object
 	/**
 	 * @return \HashTable
 	 */
-	public function relations($bCreate)
+	public function associations($bCreate)
 	{
-		if( !$this->aRelations and $bCreate )
+		if( !$this->aAssociations and $bCreate )
 		{
-			$this->aRelations = new HashTable() ;
+			$this->aAssociations = new HashTable() ;
 		}
-		return $this->aRelations ;
+		return $this->aAssociations ;
 	}
 
-	public function addRelation(RelationPrototype $aRelation)
+	public function addAssociation(AssociationPrototype $aRelation)
 	{
-		$aRelations = $this->relations(true) ;
-		$aRelations->set($aRelation->modelProperty(), $aRelation) ;
+		$aAssociations = $this->associations(true) ;
+		$aAssociations->set($aRelation->modelProperty(), $aRelation) ;
 	}
 
 	private $sName ;
@@ -110,7 +110,7 @@ class ModelPrototype extends Object
 	
 	private $arrClms = array() ;
 	
-	private $aRelations ;
+	private $aAssociations ;
 	
 }
 

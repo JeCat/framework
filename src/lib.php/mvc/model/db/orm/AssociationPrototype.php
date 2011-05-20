@@ -4,16 +4,16 @@ namespace jc\mvc\model\db\orm ;
 use jc\lang\Exception;
 use jc\lang\Object;
 
-class RelationPrototype extends Object
+class AssociationPrototype extends Object
 {
 	const hasOne = 'hasOne' ;
 	const belongsTo = 'belongsTo' ;
 	const hasMany = 'hasMany' ;
 	const hasAndBelongsMany = 'hasAndBelongsMany' ;
 
-	public function __construct($sType,$sModelProperty,ModelPrototype $aFromPrototype,ModelPrototype $aToPrototype,$fromKeys,$toKeys,$fromBridgeKeys=null,$toBridgeKeys=null)
+	public function __construct($sType,$sModelProperty,ModelPrototype $aFromPrototype,ModelPrototype $aToPrototype,$fromKeys,$toKeys,$bridgeFromKeys=null,$bridgeToKeys=null)
 	{
-		if( !in_array($sType,self::$arrRelationTypes) )
+		if( !in_array($sType,self::$arrAssociationTypes) )
 		{
 			throw new Exception(__METHOD__."()参数\$sType只能接受以下值：hasOne, belongsTo, hasMany, hasAndBelongsMany; 传入值为：%s",$sType) ;
 		}
@@ -24,8 +24,8 @@ class RelationPrototype extends Object
 		$this->aToPrototype = $aToPrototype ;
 		$this->arrFromKeys = (array)$fromKeys ;
 		$this->arrToKeys = (array)$toKeys ;
-		$this->arrFromBridgeKeys = (array)$fromBridgeKeys ;
-		$this->arrToBridgeKeys = (array)$toBridgeKeys ;
+		$this->arrBridgeFromKeys = (array)$bridgeFromKeys ;
+		$this->arrBridgeToKeys = (array)$bridgeToKeys ;
 	}
 
 	public function type()
@@ -55,16 +55,21 @@ class RelationPrototype extends Object
 		return $this->arrToKeys ;
 	}
 	
-	public function fromBridgeKeys()
+	public function bridgeFromKeys()
 	{
-		return $this->arrFromBridgeKeys ;
+		return $this->arrBridgeFromKeys ;
 	}
-	public function toBridgeBridgeKeys()
+	public function bridgeToKeys()
 	{
-		return $this->arrToKeys ;
+		return $this->arrBridgeToKeys ;
 	}
 	
-	static private $arrRelationTypes = array(
+	static public allAssociationTypes()
+	{
+		return self::$arrAssociationTypes ;
+	}
+	
+	static private $arrAssociationTypes = array(
 			self::hasOne
 			, self::belongsTo
 			, self::hasMany
@@ -77,8 +82,8 @@ class RelationPrototype extends Object
 	private $aToPrototype ;
 	private $arrFromKeys ;
 	private $arrToKeys ;
-	private $arrFromBridgeKeys ;
-	private $arrToBridgeKeys ;
+	private $arrBridgeFromKeys ;
+	private $arrBridgeToKeys ;
 	
 }
 
