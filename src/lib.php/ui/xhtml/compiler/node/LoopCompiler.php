@@ -36,7 +36,7 @@ class LoopCompiler extends NodeCompiler
 								$sEndName  = $sEndValue ; 
 								$sStepName  = $sStepValue  ;
 								for( $sVarName = $sStart ; $sVarName <= $sEndName ; $sVarName += $sStepName ){  
-								?>") ;	
+						?>");
 		
 		$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
 
