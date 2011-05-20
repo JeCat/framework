@@ -45,7 +45,38 @@ class ModelAssociationMap extends Object
 	{
 		if( !$this->aModelPrototypes->has($sName) )
 		{
-			// return 
+			if(empty($this->arrOrms[$sName]))
+			{
+				throw new Exception("正在请求一个无效的orm 模型原型：%s",$sName) ;
+			}
+			$arrOrm = $this->arrOrms[$sName] ;
+
+			// 创建/保存 模型原型
+			$aPrototype = new ModelPrototype($arrOrm['name'],$arrOrm['table'],$arrOrm['keys'],$arrOrm['clms']) ;
+			$this->aModelPrototypes->set($sName,$aPrototype) ;
+			
+			// 为模型原型 创建关联原型
+			foreach(AssociationPrototype::allAssociationTypes() as $sAssoType)
+			{
+				if( !empty($arrOrm[$sAssoType]) )
+				{
+					foreach($arrOrm[$sAssoType] as $arrAsso)
+					{
+						$aAssociation = new AssociationPrototype(
+								$sAssoType
+								, $arrAsso['prop']
+								, $aPrototype
+								, $this->modelPrototype($arrAsso['model'])
+								, $arrAsso['fromk'], $arrAsso['tok']
+								, $arrAsso['bfromk'], $arrAsso['btok']
+						) ;
+						
+						$aPrototype->addAssociation($aAssociation) ;
+					}
+				}
+			}
+			
+			return $aPrototype ;
 		}
 		
 		return $this->aModelPrototypes->get($sName) ;
@@ -115,7 +146,7 @@ class ModelAssociationMap extends Object
 			{
 				continue ;
 			}
-		
+
 			if( !in_array($arrOrm[$sAssoType]) )
 			{
 				throw new Exception("orm(%s) 的 %s 属性是多项关联的聚合，必须为 array 结构；当前值的类型是：%s",$arrOrm['name'],$sAssoType,Type::reflectType($arrOrm[$sAssoType])) ;
@@ -125,16 +156,25 @@ class ModelAssociationMap extends Object
 				if( !in_array($arrAsso) )
 				{
 					throw new Exception("orm(%s)%s属性的成员必须是 array 结构，用以表示一个模型关联；当前值的类型是：%s。",$arrOrm['name'],$sAssoType,Type::reflectType($arrAsso)) ;
-				}
+				}				
 				
 				$arrAsso = self::assertOrmAssocValid($arrAsso,$sAssoType) ;
+				
+				if( $arrAsso['model'] == $arrOrm['name'] )
+				{
+					throw new Exception("遇到orm 配置错误：关联的两端不能是相同的模型原型(%s)。",$arrOrm['name']) ;
+				}
 			}
 		}
 		
 		// 可选属性
-		if( empty($arrOrm['columns']) )
+		if( empty($arrOrm['clms']) )
 		{
-			$arrOrm['columns'] = '*' ;
+			$arrOrm['clms'] = '*' ;
+		}
+		if( empty($arrOrm['class']) )
+		{
+			$arrOrm['class'] = 'jc\\mvc\\model\\db\\Model' ;
 		}
 		
 		// 统一格式

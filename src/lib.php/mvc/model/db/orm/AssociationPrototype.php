@@ -11,7 +11,7 @@ class AssociationPrototype extends Object
 	const hasMany = 'hasMany' ;
 	const hasAndBelongsMany = 'hasAndBelongsMany' ;
 
-	public function __construct($sType,$sModelProperty,ModelPrototype $aFromPrototype,ModelPrototype $aToPrototype,$fromKeys,$toKeys,$bridgeFromKeys=null,$bridgeToKeys=null)
+	public function __construct($sType,$sModelProperty,ModelPrototype $aFromPrototype,ModelPrototype $aToPrototype,$fromKeys,$toKeys)
 	{
 		if( !in_array($sType,self::$arrAssociationTypes) )
 		{
@@ -24,10 +24,15 @@ class AssociationPrototype extends Object
 		$this->aToPrototype = $aToPrototype ;
 		$this->arrFromKeys = (array)$fromKeys ;
 		$this->arrToKeys = (array)$toKeys ;
+	}
+
+	public function setBridge($sBridgeTable = $bridgeFromKeys=null,$bridgeToKeys=null)
+	{
+		$this->sBridgeTable = $sBridgeTable ;
 		$this->arrBridgeFromKeys = (array)$bridgeFromKeys ;
 		$this->arrBridgeToKeys = (array)$bridgeToKeys ;
 	}
-
+	
 	public function type()
 	{
 		return $this->sType ;
@@ -64,7 +69,7 @@ class AssociationPrototype extends Object
 		return $this->arrBridgeToKeys ;
 	}
 	
-	static public allAssociationTypes()
+	static public function allAssociationTypes()
 	{
 		return self::$arrAssociationTypes ;
 	}
@@ -80,8 +85,11 @@ class AssociationPrototype extends Object
 	private $sModelProperty ;
 	private $aFromPrototype ;
 	private $aToPrototype ;
+	
 	private $arrFromKeys ;
 	private $arrToKeys ;
+	
+	private $sBridgeTable ;
 	private $arrBridgeFromKeys ;
 	private $arrBridgeToKeys ;
 	

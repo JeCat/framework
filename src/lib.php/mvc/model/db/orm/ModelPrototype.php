@@ -94,10 +94,10 @@ class ModelPrototype extends Object
 		return $this->aAssociations ;
 	}
 
-	public function addAssociation(AssociationPrototype $aRelation)
+	public function addAssociation(AssociationPrototype $aAssociation)
 	{
 		$aAssociations = $this->associations(true) ;
-		$aAssociations->set($aRelation->modelProperty(), $aRelation) ;
+		$aAssociations->set($aAssociation->modelProperty(), $aAssociation) ;
 	}
 
 	private $sName ;
