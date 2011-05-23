@@ -3,7 +3,9 @@
 namespace jc\db\sql ;
 
 
-abstract class StatementBase implements ISQLStatement
+use jc\lang\Object;
+
+abstract class StatementBase extends Object implements ISQLStatement
 {
 	public function tableNameFactory()
 	{

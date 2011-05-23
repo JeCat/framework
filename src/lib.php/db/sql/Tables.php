@@ -37,10 +37,10 @@ class Tables implements ISQLStatementFrom
 		return $this->mapJoinTables[$sType] ;		
 	}
 	
-	public function join($sTableName,Criteria $aCri,$sType=ISQLStatementFrom::JOIN_LEFT)
+	public function join($sTableName,$criteria,$sType=ISQLStatementFrom::JOIN_LEFT)
 	{
 		$aJoin = $this->sqlStatementJoin($sType) ;
-		$aJoin->addTable($sTableName,$aCri) ;
+		$aJoin->addTable($sTableName,$criteria) ;
 	}
 	
 	public function makeStatement($bFormat=false)

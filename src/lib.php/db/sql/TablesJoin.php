@@ -28,13 +28,13 @@ class TablesJoin implements ISQLStatement, IIteratable
 		return $this->sType ;
 	}
 	
-	public function addTable($sTableName,Criteria $aCri)
+	public function addTable($sTableName,$criteria)
 	{
 		if( !in_array($sTableName, $this->arrTables) )
 		{
 			$this->arrTables[] = $sTableName ;
 		}
-		$this->aCriteria->addCriteria($aCri) ;
+		$this->aCriteria->add($criteria) ;
 	}
 	
 	public function checkValid($bThrowException=true)

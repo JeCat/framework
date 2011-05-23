@@ -2,7 +2,7 @@
 
 namespace jc\db ;
 
-interface IDBDriver
+interface IDriver
 {
 	public function error() ;
 	

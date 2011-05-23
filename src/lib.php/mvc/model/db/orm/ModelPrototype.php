@@ -25,6 +25,39 @@ class ModelPrototype extends Object
 
 		parent::__construct() ;
 	}
+	
+	/**
+	 * @return ModelPrototype
+	 */
+	static function createFromCnf(array $arrCnf,$bCheckValid=true)
+	{
+		if( $bCheckValid )
+		{
+			$arrCnf = self::assertCnfValid($arrCnf) ;
+		}
+		
+		$aPrototype = new self($arrCnf['name'],$arrCnf['table'],$arrCnf['keys'],$arrCnf['clms']) ;
+		
+		// 为模型原型 创建关联原型
+		foreach(AssociationPrototype::allAssociationTypes() as $sAssoType)
+		{
+			if( !empty($arrCnf[$sAssoType]) )
+			{
+				foreach($arrCnf[$sAssoType] as $arrAssos)
+				{
+					foreach($arrAssos as $arrOneAsso)
+					{
+						$aAssociation = AssociationPrototype::createFromCnf(
+								$arrOneAsso, $aPrototype, $sAssoType, $bCheckValid
+						) ;
+						$aPrototype->addAssociation($aAssociation) ;
+					}
+				}
+			}
+		}
+		
+		return $aPrototype ;
+	}
 
 	public function name()
 	{
@@ -100,6 +133,126 @@ class ModelPrototype extends Object
 		$aAssociations->set($aAssociation->modelProperty(), $aAssociation) ;
 	}
 
+
+	/** 
+	 * array(
+	 * 	'name' => 'xxxx' ,
+	 * 	'table' => 'xxxx' ,
+	 * 	'keys' => array('xxx') ,
+	 * 	'columns' => array('xxx') ,
+	 * 	'hasOne' => array(
+	 * 		array(
+	 * 			'model' => 'oooo',
+	 * 			'prop' => 'oooo' ,
+	 * 			'fromk' => array('xxx') ,
+	 * 			'tok' => array('xxx') ,
+	 * 		) ,
+	 * 	) ,
+	 * 	'hasAndBelongsMany' => array(
+	 * 		array(
+	 * 			'model' => 'oooo',
+	 * 			'fromk' => array('xxx') ,
+	 * 			'tok' => array('xxx') ,
+	 * 			'bridge' => 'xxx' ,
+	 * 			'bfromk' => array('xxx') ,
+	 * 			'btok' => array('xxx') ,
+	 * 		) ,
+	 * 	) ,
+	 * 
+	 * 
+	 * )
+	 */
+	static public function assertCnfValid(array $arrOrm,$bNestingModel=false)
+	{
+		// 必须属性
+		if( empty($arrOrm['name']) )
+		{
+			throw new Exception("orm 缺少 name 属性") ;
+		}
+		if( empty($arrOrm['table']) )
+		{
+			throw new Exception("orm(%s) 缺少 table 属性",$arrOrm['name']) ;
+		}
+		if( empty($arrOrm['keys']) )
+		{
+			throw new Exception("orm(%s) 缺少 keys 属性",$arrOrm['name']) ;
+		}
+		
+		// 关联
+		foreach(AssociationPrototype::allAssociationTypes() as $sAssoType)
+		{
+			if( empty($arrOrm[$sAssoType]) )
+			{
+				continue ;
+			}
+
+			if( !in_array($arrOrm[$sAssoType]) )
+			{
+				throw new Exception("orm(%s) 的 %s 属性是多项关联的聚合，必须为 array 结构；当前值的类型是：%s",$arrOrm['name'],$sAssoType,Type::reflectType($arrOrm[$sAssoType])) ;
+			}
+			foreach($arrOrm[$sAssoType] as &$arrAsso)
+			{
+				if( !in_array($arrAsso) )
+				{
+					throw new Exception("orm(%s)%s属性的成员必须是 array 结构，用以表示一个模型关联；当前值的类型是：%s。",$arrOrm['name'],$sAssoType,Type::reflectType($arrAsso)) ;
+				}				
+				
+				$arrAsso = AssociationPrototype::assertOrmAssocValid($arrAsso,$sAssoType,$bNestingModel) ;
+				
+				if( $arrAsso['model'] == $arrOrm['name'] )
+				{
+					throw new Exception("遇到orm 配置错误：关联的两端不能是相同的模型原型(%s)。",$arrOrm['name']) ;
+				}
+			}
+		}
+		
+		// 可选属性
+		if( empty($arrOrm['clms']) )
+		{
+			$arrOrm['clms'] = '*' ;
+		}
+		if( empty($arrOrm['class']) )
+		{
+			$arrOrm['class'] = 'jc\\mvc\\model\\db\\Model' ;
+		}
+		
+		// 统一格式
+		$arrOrm['columns'] = (array) $arrOrm['columns'] ;
+		
+		return $arrOrm ;
+	}
+	
+	//////////////////////////////
+	
+	/**
+	 * @return jc\db\sql\Insert
+	 */
+	public function buildSqlForInsert()
+	{
+		
+	}
+	
+	/**
+	 * @return jc\db\sql\Delete
+	 */
+	public function buildSqlForDelete()
+	{
+	}
+
+	/**
+	 * @return jc\db\sql\Select
+	 */
+	public function buildSqlForSelect()
+	{
+	}
+
+	/**
+	 * @return jc\db\sql\Update
+	 */
+	public function buildSqlForUpdate()
+	{
+	}
+	
 	private $sName ;
 	
 	private $sTableName ;

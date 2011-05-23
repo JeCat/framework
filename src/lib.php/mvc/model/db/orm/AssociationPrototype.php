@@ -25,8 +25,28 @@ class AssociationPrototype extends Object
 		$this->arrFromKeys = (array)$fromKeys ;
 		$this->arrToKeys = (array)$toKeys ;
 	}
+	
+	/**
+	 * @return AssociationPrototype
+	 */
+	static function createFromCnf(array $arrCnf,ModelPrototype $aFromPrototype,$sType,$bCheckValid=true)
+	{
+		if( $bCheckValid )
+		{
+			$arrCnf = self::assertCnfValid($arrCnf) ;
+		}
+		
+		return new self(
+			$sType
+			, $arrCnf['prop']
+			, $aFromPrototype
+			, new self($arrCnf['model'])
+			, $arrCnf['fromk'], $arrCnf['tok']
+			, $arrCnf['bfromk'], $arrCnf['btok']
+		) ;
+	}
 
-	public function setBridge($sBridgeTable = $bridgeFromKeys=null,$bridgeToKeys=null)
+	public function setBridge($sBridgeTable,$bridgeFromKeys=null,$bridgeToKeys=null)
 	{
 		$this->sBridgeTable = $sBridgeTable ;
 		$this->arrBridgeFromKeys = (array)$bridgeFromKeys ;
@@ -80,6 +100,56 @@ class AssociationPrototype extends Object
 			, self::hasMany
 			, self::hasAndBelongsMany
 	) ;
+
+	static public function assertOrmAssocValid(array $arrAsso,$sType,$bNestingModel)
+	{
+		if( in_array($sType, AssociationPrototype::allAssociationTypes()) )
+		{
+			throw new Exception("遇到无效的orm关联类型：%s；orm关联类型必须为：%s",$sType,implode(", ", AssociationPrototype::allAssociationTypes())) ;
+		}
+
+		// 必须属性
+		if( empty($arrAsso['model']) )
+		{
+			throw new Exception("orm %s 关联缺少 name 属性",$sType) ;
+		}
+		
+		// 递归检查  model 值
+		if( $bNestingModel )
+		{
+			if( !is_array($arrAsso['model']) )
+			{
+				throw new Exception("orm %s 关联的 model属性要求是一个完整的 orm config",$sType) ;			
+			}
+			
+			ModelPrototype::assertCnfValid($arrAsso['model']) ;
+		}
+		
+		if($sType==AssociationPrototype::hasAndBelongsMany)
+		{
+			if( empty($arrAsso['bridge']) )
+			{
+				throw new Exception("orm %s(%s) 缺少 bridge 属性",$sType,$arrAsso['model']) ;
+			}
+		}
+		
+		// 可选属性
+		if( empty($arrAsso['prop']) )
+		{
+			$arrAsso['prop'] = $arrAsso['model'] ;
+		}
+
+		// 统一格式
+		foreach( array('fromk','tok','bfromk','btok') as $sName )
+		{
+			if(!empty($arrAsso[$sName]))
+			{
+				$arrAsso[$sName] = (array) $arrAsso[$sName] ;
+			}
+		}
+		
+		return $arrAsso ;
+	}
 	
 	private $sType ;
 	private $sModelProperty ;

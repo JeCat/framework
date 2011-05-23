@@ -2,7 +2,7 @@
 
 namespace jc\db ;
 
-class DBDriverPDO extends \PDO implements IDBDriver
+class DriverPDO extends \PDO implements IDriver
 {
 	public function error()
 	{
