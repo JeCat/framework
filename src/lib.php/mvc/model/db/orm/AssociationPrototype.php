@@ -33,17 +33,24 @@ class AssociationPrototype extends Object
 	{
 		if( $bCheckValid )
 		{
-			$arrCnf = self::assertCnfValid($arrCnf) ;
+			$arrCnf = self::assertCnfValid($arrCnf,$sType,true) ;
 		}
 		
-		return new self(
+		$aAsso = new self(
 			$sType
 			, $arrCnf['prop']
 			, $aFromPrototype
-			, new self($arrCnf['model'])
+			, ModelPrototype::createFromCnf($arrCnf['model'])
 			, $arrCnf['fromk'], $arrCnf['tok']
-			, $arrCnf['bfromk'], $arrCnf['btok']
+			// , $arrCnf['bfromk']?:null, $arrCnf['btok']?:null
 		) ;
+		
+		if( $sType==self::hasAndBelongsMany )
+		{
+			$aAsso->setBridge($arrCnf['bridge'],$arrCnf['bfromk'],$arrCnf['btok']) ;			
+		}
+		
+		return $aAsso ;
 	}
 
 	public function setBridge($sBridgeTable,$bridgeFromKeys=null,$bridgeToKeys=null)
@@ -101,11 +108,11 @@ class AssociationPrototype extends Object
 			, self::hasAndBelongsMany
 	) ;
 
-	static public function assertOrmAssocValid(array $arrAsso,$sType,$bNestingModel)
+	static public function assertCnfValid(array $arrAsso,$sType,$bNestingModel)
 	{
-		if( in_array($sType, AssociationPrototype::allAssociationTypes()) )
+		if( !in_array($sType, AssociationPrototype::allAssociationTypes()) )
 		{
-			throw new Exception("遇到无效的orm关联类型：%s；orm关联类型必须为：%s",$sType,implode(", ", AssociationPrototype::allAssociationTypes())) ;
+			throw new Exception("遇到无效的orm关联类型：%s；orm关联类型必须为：%s",array($sType,implode(", ", AssociationPrototype::allAssociationTypes()))) ;
 		}
 
 		// 必须属性
@@ -129,7 +136,15 @@ class AssociationPrototype extends Object
 		{
 			if( empty($arrAsso['bridge']) )
 			{
-				throw new Exception("orm %s(%s) 缺少 bridge 属性",$sType,$arrAsso['model']) ;
+				throw new Exception("orm %s(%s) 缺少 bridge 属性",array($sType,$arrAsso['model'])) ;
+			}
+			if( empty($arrAsso['bfromk']) )
+			{
+				throw new Exception("orm %s(%s) 缺少 bfromk 属性",array($sType,$arrAsso['model'])) ;
+			}
+			if( empty($arrAsso['btok']) )
+			{
+				throw new Exception("orm %s(%s) 缺少 btok 属性",array($sType,$arrAsso['model'])) ;
 			}
 		}
 		

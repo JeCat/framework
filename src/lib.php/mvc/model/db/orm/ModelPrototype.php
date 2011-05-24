@@ -1,6 +1,9 @@
 <?php
 namespace jc\mvc\model\db\orm ;
 
+use jc\lang\Type;
+
+use jc\lang\Exception;
 use jc\util\HashTable;
 use jc\pattern\composite\Container;
 use jc\lang\Object;
@@ -43,15 +46,12 @@ class ModelPrototype extends Object
 		{
 			if( !empty($arrCnf[$sAssoType]) )
 			{
-				foreach($arrCnf[$sAssoType] as $arrAssos)
+				foreach($arrCnf[$sAssoType] as $arrAsso)
 				{
-					foreach($arrAssos as $arrOneAsso)
-					{
-						$aAssociation = AssociationPrototype::createFromCnf(
-								$arrOneAsso, $aPrototype, $sAssoType, $bCheckValid
-						) ;
-						$aPrototype->addAssociation($aAssociation) ;
-					}
+					$aAssociation = AssociationPrototype::createFromCnf(
+							$arrAsso, $aPrototype, $sAssoType, $bCheckValid
+					) ;
+					$aPrototype->addAssociation($aAssociation) ;
 				}
 			}
 		}
@@ -186,18 +186,18 @@ class ModelPrototype extends Object
 				continue ;
 			}
 
-			if( !in_array($arrOrm[$sAssoType]) )
+			if( !is_array($arrOrm[$sAssoType]) )
 			{
-				throw new Exception("orm(%s) 的 %s 属性是多项关联的聚合，必须为 array 结构；当前值的类型是：%s",$arrOrm['name'],$sAssoType,Type::reflectType($arrOrm[$sAssoType])) ;
+				throw new Exception("orm(%s) 的 %s 属性是多项关联的聚合，必须为 array 结构；当前值的类型是：%s",array($arrOrm['name'],$sAssoType,Type::reflectType($arrOrm[$sAssoType]))) ;
 			}
 			foreach($arrOrm[$sAssoType] as &$arrAsso)
 			{
-				if( !in_array($arrAsso) )
+				if( !is_array($arrAsso) )
 				{
-					throw new Exception("orm(%s)%s属性的成员必须是 array 结构，用以表示一个模型关联；当前值的类型是：%s。",$arrOrm['name'],$sAssoType,Type::reflectType($arrAsso)) ;
+					throw new Exception("orm(%s)%s属性的成员必须是 array 结构，用以表示一个模型关联；当前值的类型是：%s。",array($arrOrm['name'],$sAssoType,Type::reflectType($arrAsso))) ;
 				}				
 				
-				$arrAsso = AssociationPrototype::assertOrmAssocValid($arrAsso,$sAssoType,$bNestingModel) ;
+				$arrAsso = AssociationPrototype::assertCnfValid($arrAsso,$sAssoType,$bNestingModel) ;
 				
 				if( $arrAsso['model'] == $arrOrm['name'] )
 				{
@@ -217,7 +217,7 @@ class ModelPrototype extends Object
 		}
 		
 		// 统一格式
-		$arrOrm['columns'] = (array) $arrOrm['columns'] ;
+		$arrOrm['columns'] = (array) $arrOrm['clms'] ;
 		
 		return $arrOrm ;
 	}

@@ -2,22 +2,15 @@
 
 namespace jc\db\sql ;
 
+use jc\util\HashTable;
+
 use jc\lang\Exception;
 
-abstract class MultiTableStatement extends StatementBase
+abstract class MultiTableStatement extends Statement
 {
 	public function __construct($sTableName="")
 	{
 		$this->aTables = new Tables($sTableName) ;
-	}
-
-	public function tableNameFactory()
-	{
-		return $this->aTables->tableNameFactory() ;
-	}
-	public function setTableNameFactory(ITableNameFactory $aFactory)
-	{
-		$this->aTables->setTableNameFactory($aFactory) ;
 	}
 	
 	/** 
@@ -31,6 +24,20 @@ abstract class MultiTableStatement extends StatementBase
 	public function setTables(Tables $aTables)
 	{
 		$this->aTables = $aTables ;
+	}
+	
+	public function realTableName($sInputName,$bAlias=false)
+	{
+		$sTableName = $this->tableNameFactory()->tableName($sInputName) ;
+		
+		if($bAlias)
+		{
+			return $this->tables()->tableNameAliases()->get($sTableName)?: $sTableName ;
+		}
+		else
+		{
+			return  $sTableName ;
+		}
 	}
 	
 	/**
@@ -95,6 +102,7 @@ abstract class MultiTableStatement extends StatementBase
 	 * @var Criteria
 	 */
 	private $aCriteria = null ;
+	
 }
 
 ?>

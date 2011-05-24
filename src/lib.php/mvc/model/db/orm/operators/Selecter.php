@@ -1,6 +1,7 @@
 <?php
 namespace jc\mvc\model\db\orm\operations ;
 
+use jc\mvc\model\db\orm\AssociationPrototype;
 use jc\mvc\model\db\IModel;
 use jc\mvc\model\db\orm\ModelPrototype;
 use jc\db\IDriver;
@@ -19,22 +20,15 @@ class Selecter extends OperationStrategy
 				throw new Exception( "缺少有效" ) ;
 			}
 		}
-		
-		$aSelect = new Select( $aPrototype->tableName() ) ;
 
-		foreach($aPrototype->associations()->iterator() as $aAssoPrototype)
-		{
-			// 联合sql查询
-			if( in_array($aAssoPrototype->type(), array(
-					AssociationPrototype::hasOne
-					, AssociationPrototype::belongsTo
-			)) )
-			{
-				$aAssoPrototype->to
-				
-				$aSelect->tables()->join()
-			}
-		}
+		// 联合表查询 
+		$aStatement = new Select( $aPrototype->tableName() ) ;
+		$aStatement->tables()->setTableAlias( $aPrototype->name() ) ;
+
+		$this->makeStatementAssociationQuery($aPrototype,$aStatement) ;
+
+		//
+		
 	}
 }
 

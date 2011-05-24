@@ -5,7 +5,7 @@ namespace jc\db\sql ;
 use jc\lang\Exception;
 use jc\niy\IIteratable ;
 
-class TablesJoin implements ISQLStatement, IIteratable
+class TablesJoin extends SubStatement
 {
 	public function __construct($sType=Tables::JOIN_LEFT)
 	{
@@ -27,13 +27,16 @@ class TablesJoin implements ISQLStatement, IIteratable
 		return $this->sType ;
 	}
 	
-	public function addTable($sTableName,$criteria)
+	public function addTable($sTableName,$criteria=null)
 	{
 		if( !in_array($sTableName, $this->arrTables) )
 		{
 			$this->arrTables[] = $sTableName ;
 		}
-		$this->aCriteria->add($criteria) ;
+		if($criteria)
+		{
+			$this->aCriteria->add($criteria) ;
+		}
 	}
 	
 	public function checkValid($bThrowException=true)

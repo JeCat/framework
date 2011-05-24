@@ -1,10 +1,9 @@
-<?php 
-
+<?php
 namespace jc\db\sql ;
 
 use jc\lang\Exception ;
 
-class Insert extends StatementBase
+class Insert extends Statement
 {
 	public function __construct($sTableName="")
 	{
@@ -30,17 +29,16 @@ class Insert extends StatementBase
 	{
 		unset($this->mapData[$sColumnName]) ;
 	}
-	
+
 	public function data($sColumnName)
 	{
 		return isset($this->mapData[$sColumnName])? $this->mapData[$sColumnName]: null ;
 	}
-	
+
 	public function dataIterator()
 	{
 		return new \ArrayIterator($this->mapData) ;
 	}
-	
 
 	public function makeStatement($bFormat=false)
 	{

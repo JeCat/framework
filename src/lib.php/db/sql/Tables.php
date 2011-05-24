@@ -5,7 +5,7 @@ namespace jc\db\sql ;
 
 use jc\lang\Exception;
 
-class Tables extends StatementBase
+class Tables extends SubStatement
 {
 	const JOIN_LEFT = "JOIN LEFT" ;
 	const JOIN_RIGHT = "JOIN RIGHT" ;
@@ -37,11 +37,10 @@ class Tables extends StatementBase
 		{
 			$this->mapJoinTables[$sType] = new TablesJoin($sType) ;
 		}
-		
-		return $this->mapJoinTables[$sType] ;		
+		return $this->mapJoinTables[$sType] ;
 	}
 	
-	public function join($sTableName,$criteria,$sType=self::JOIN_LEFT)
+	public function join($sTableName,$criteria=null,$sType=self::JOIN_LEFT)
 	{
 		$aJoin = $this->sqlStatementJoin($sType) ;
 		$aJoin->addTable($sTableName,$criteria) ;
@@ -57,7 +56,6 @@ class Tables extends StatementBase
 				$arrJoins[] = $aJoin->MakeFormat($bFormat) ;
 			}
 		}
-		
 		return "FROM " . $this->sTableName . (empty($arrJoins)?"":(" ".implode(", ", $arrJoins))) ;
 	}
 	
@@ -71,10 +69,23 @@ class Tables extends StatementBase
 			}
 			return false ;
 		}
-		
 		return true ;		
 	}
 	
+	public function tableNameAliases()
+	{
+		if( !$this->aTableNameAliases )
+		{
+			$this->aTableNameAliases = new HashTable() ;
+		}
+		return $this->aTableNameAliases ;
+	}
+	
+	public function setTableNameAliases(HashTable $aTableNameAliases)
+	{
+		$this->aTableNameAliases = $aTableNameAliases ;
+	}
+
 	/**
 	 * Enter description here ...
 	 * 
@@ -88,6 +99,8 @@ class Tables extends StatementBase
 	 * @var array
 	 */
 	private $mapJoinTables = array() ;
+
+	private $aAliases = null ;
 }
 
 ?>

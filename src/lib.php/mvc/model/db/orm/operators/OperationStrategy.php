@@ -22,12 +22,10 @@ abstract class OperationStrategy extends Object
 
 	protected function makeStatementAssociationQuery(ModelPrototype $aPrototype,MultiTableStatement $aStatement)
 	{
-		if( $aStatement->tables()->tableName() )
-		{
-			$aStatement->tables()->setTableName($aPrototype->tableName()) ;
-		}
-		
-	
+		$sTableName = $aPrototype->tableName() ;
+		$aTables = $aStatement->tables() ;
+		$aJoin = $aTables->sqlStatementJoin() ;
+
 		foreach($aPrototype->associations()->iterator() as $aAssoPrototype)
 		{
 			// 联合sql查询
@@ -36,10 +34,19 @@ abstract class OperationStrategy extends Object
 					, AssociationPrototype::belongsTo
 			)) )
 			{
+				$sAssoTableName = $aAssoPrototype->toPrototype()->tableName() ;
 				
-				$aStatement->tables()->join($aAssoPrototype->toPrototype()->tableName(),array(
-					
-				)) ;
+				$aTables->join( $sAssoTableName ) ;
+				$aTables->setTableAlias($sAssoTableName,$aAssoPrototype->modelProperty()) ;
+				
+				$arrToKeys = $aAssoPrototype->toKeys() ;
+				foreach($aAssoPrototype->fromKeys() as $nIdx=>$sFromKey)
+				{
+					$aJoin->add( "%t.%c=%t.%c", $sTableName, $sFromKey, $sAssoTableName, $arrToKeys[$nIdx] ) ;
+				}
+				
+				// 
+				$this->makeStatementAssociationQuery($aAssoPrototype->toPrototype(),$aStatement) ;
 			}
 		}
 	}
