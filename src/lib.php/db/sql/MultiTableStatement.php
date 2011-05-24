@@ -13,7 +13,7 @@ abstract class MultiTableStatement extends StatementBase
 
 	public function tableNameFactory()
 	{
-		return $this->aTableNameFactory->tableNameFactory() ;
+		return $this->aTables->tableNameFactory() ;
 	}
 	public function setTableNameFactory(ITableNameFactory $aFactory)
 	{
@@ -21,14 +21,14 @@ abstract class MultiTableStatement extends StatementBase
 	}
 	
 	/** 
-	 * @return ISQLStatementFrom
+	 * @return Tables
 	 */
 	public function tables()
 	{
 		return $this->aTables ;
 	}
 
-	public function setTables(ISQLStatementFrom $aTables)
+	public function setTables(Tables $aTables)
 	{
 		$this->aTables = $aTables ;
 	}
@@ -38,6 +38,10 @@ abstract class MultiTableStatement extends StatementBase
 	 */
 	public function criteria()
 	{
+		if(!$this->aCriteria)
+		{
+			$this->aCriteria = new Criteria() ;
+		}
 		return $this->aCriteria ;
 	}
 
@@ -81,7 +85,7 @@ abstract class MultiTableStatement extends StatementBase
 	}
 	
 	/**
-	 * @var ISQLStatementFrom
+	 * @var Tables
 	 */
 	private $aTables = null ;
 	

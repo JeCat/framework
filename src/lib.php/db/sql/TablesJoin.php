@@ -3,17 +3,16 @@
 namespace jc\db\sql ;
 
 use jc\lang\Exception;
-
 use jc\niy\IIteratable ;
 
 class TablesJoin implements ISQLStatement, IIteratable
 {
-	public function __construct($sType=ISQLStatementFrom::JOIN_LEFT)
+	public function __construct($sType=Tables::JOIN_LEFT)
 	{
 		if( !in_array($sType,array(
-				ISQLStatementFrom::JOIN_LEFT ,
-				ISQLStatementFrom::JOIN_RIGHT ,
-				ISQLStatementFrom::JOIN_INNER ,
+				Tables::JOIN_LEFT ,
+				Tables::JOIN_RIGHT ,
+				Tables::JOIN_INNER ,
 		)) )
 		{
 			throw new Exception("unknow sql join type: %s",array($sType)) ;
@@ -66,7 +65,7 @@ class TablesJoin implements ISQLStatement, IIteratable
 	 * 
 	 * @var string
 	 */
-	private $sType = ISQLStatementFrom::JOIN_LEFT ;
+	private $sType = Tables::JOIN_LEFT ;
 	
 	/**
 	 * Enter description here ...

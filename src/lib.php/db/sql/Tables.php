@@ -5,8 +5,12 @@ namespace jc\db\sql ;
 
 use jc\lang\Exception;
 
-class Tables implements ISQLStatementFrom
+class Tables extends StatementBase
 {
+	const JOIN_LEFT = "JOIN LEFT" ;
+	const JOIN_RIGHT = "JOIN RIGHT" ;
+	const JOIN_INNER = "JOIN INNER" ;
+	
 	public function __construct($sTableName="") 
 	{
 		$this->sTableName = $sTableName ;
@@ -27,7 +31,7 @@ class Tables implements ISQLStatementFrom
 	 * @param string $sType
 	 * @return jc\sql\TablesJoin
 	 */
-	public function sqlStatementJoin($sType=ISQLStatementFrom::JOIN_LEFT)
+	public function sqlStatementJoin($sType=self::JOIN_LEFT)
 	{
 		if( !isset($this->mapJoinTables[$sType]) )
 		{
@@ -37,7 +41,7 @@ class Tables implements ISQLStatementFrom
 		return $this->mapJoinTables[$sType] ;		
 	}
 	
-	public function join($sTableName,$criteria,$sType=ISQLStatementFrom::JOIN_LEFT)
+	public function join($sTableName,$criteria,$sType=self::JOIN_LEFT)
 	{
 		$aJoin = $this->sqlStatementJoin($sType) ;
 		$aJoin->addTable($sTableName,$criteria) ;
