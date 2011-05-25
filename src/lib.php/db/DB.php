@@ -24,6 +24,13 @@ class DB
 					$sql->makeStatement(): strval($sql) ;
 	}
 	
+	public function execute($sql)
+	{
+		$sSql = ($sql instanceof Statement)?
+					$sql->makeStatement(): strval($sql) ;
+		
+	}
+	
 	private $aDriver ;
 }
 

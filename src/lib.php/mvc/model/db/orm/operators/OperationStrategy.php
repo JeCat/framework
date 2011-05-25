@@ -37,13 +37,12 @@ abstract class OperationStrategy extends Object
 			{
 				$sAssoTableName = $aAssoPrototype->toPrototype()->tableName() ;
 				
-				$aTables->join( $sAssoTableName ) ;
-				$aTables->setTableAlias($sAssoTableName,$aAssoPrototype->modelProperty()) ;
+				$aTables->join( $sAssoTableName, null, $aAssoPrototype->modelProperty() ) ;
 				
 				$arrToKeys = $aAssoPrototype->toKeys() ;
 				foreach($aAssoPrototype->fromKeys() as $nIdx=>$sFromKey)
 				{
-					$aJoin->criteria()->addExpression( "%t.%c=%t.%c", $sTableName, $sFromKey, $sAssoTableName, $arrToKeys[$nIdx] ) ;
+					$aJoin->criteria()->addExpression( "%a.%c=%a.%c", $sTableName, $sFromKey, $sAssoTableName, $arrToKeys[$nIdx] ) ;
 				}
 				
 				// 

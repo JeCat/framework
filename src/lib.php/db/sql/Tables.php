@@ -9,20 +9,29 @@ use jc\lang\Exception;
 class Tables extends SubStatement
 {
 	
-	public function __construct(IStatement $aStatement,$sTableName="") 
+	public function __construct(IStatement $aStatement,$sTableName="",$sTableAlias=null) 
 	{
-		$this->sTableName = $sTableName ;
-		
 		parent::__construct($aStatement) ;
+		
+		$this->setTableName($sTableName) ;
+		$this->setTableAlias($sTableAlias) ;
 	}
 
 	public function tableName()
 	{
 		return $this->sTableName ;
 	}
-	public function setTableName($sTableName="")
+	public function setTableName($sTableName=null)
 	{
-		$this->sTableName = $sTableName ;
+		$this->sTableName = $this->statement()->realTableName($sTableName) ;
+	}
+	public function tableAlias()
+	{
+		return $this->sTableAlias ;
+	}
+	public function setTableAlias($sTableAlias=null)
+	{
+		$this->sTableAlias = $sTableAlias ;
 	}
 	
 	/**
@@ -40,10 +49,16 @@ class Tables extends SubStatement
 		return $this->mapJoinTables[$sType] ;
 	}
 	
-	public function join($sTableName,$criteria=null,$sType=TablesJoin::JOIN_LEFT)
+	public function join($sTableName,$criteria=null,$sAlias=null,$sType=TablesJoin::JOIN_LEFT)
 	{
 		$aJoin = $this->sqlStatementJoin($sType) ;
-		$aJoin->addTable($sTableName,$criteria) ;
+		$aJoin->addTable($sTableName,$criteria,$sAlias) ;
+	}
+	public function joinByExpression($sTableName,array $arrExpression,$sAlias=null,$sType=TablesJoin::JOIN_LEFT)
+	{
+		$aJoin = $this->sqlStatementJoin($sType) ;
+		$aJoin->addTable($sTableName,null,$sAlias) ;
+		call_user_func_array(array($aJoin,'addExpression'), $arrExpression) ;
 	}
 	
 	public function makeStatement($bFormat=false)
@@ -56,7 +71,7 @@ class Tables extends SubStatement
 				$arrJoins[] = $aJoin->makeStatement($bFormat) ;
 			}
 		}
-		return "FROM " . $this->sTableName . (empty($arrJoins)?"":(" ".implode(", ", $arrJoins))) ;
+		return "FROM " . $this->sTableName .($this->sTableAlias?" AS {$this->sTableAlias}":''). (empty($arrJoins)?"":(" ".implode(", ", $arrJoins))) ;
 	}
 	
 	public function checkValid($bThrowException=true)
@@ -71,25 +86,7 @@ class Tables extends SubStatement
 		}
 		return true ;		
 	}
-	
-	public function setTableAlias($sTableName,$sAlias)
-	{
-		$this->tableNameAliases()->set($sTableName,$sAlias) ;
-	}
-	
-	public function tableNameAliases($bCreate=true)
-	{
-		if( !$this->aTableNameAliases and $bCreate )
-		{
-			$this->aTableNameAliases = new HashTable() ;
-		}
-		return $this->aTableNameAliases ;
-	}
-	
-	public function setTableNameAliases(HashTable $aTableNameAliases)
-	{
-		$this->aTableNameAliases = $aTableNameAliases ;
-	}
+
 
 	/**
 	 * Enter description here ...
@@ -98,14 +95,15 @@ class Tables extends SubStatement
 	 */
 	private $sTableName = "" ;
 	
+	private $sTableAlias = "" ;
+	
 	/**
 	 * Enter description here ...
 	 * 
 	 * @var array
 	 */
 	private $mapJoinTables = array() ;
-
-	private $aTableNameAliases = null ;
+	
 }
 
 ?>

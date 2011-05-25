@@ -27,8 +27,11 @@ class DriverPDO extends \PDO implements IDriver
 		return \PDO::lastInsertId($sName) ;
 	}
 	
-	public function query($SQLStatement)
+	public function query($statement)
 	{
+		$sSql = ($sql instanceof Statement)?
+					$sql->makeStatement(): strval($sql) ;
+
 		
 	}
 	

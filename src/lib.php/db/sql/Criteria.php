@@ -123,14 +123,22 @@ class Criteria extends SubStatement
 				// table name
 				case 't':
 					$sParam = $this->statement()->realTableName( $arrArgvs[$aReses->key()], true ) ;
+					break ;
+					
+				// table alias
+				case 'a':
+					$sParam = $arrArgvs[$aReses->key()] ;
+					break ;
 				
 				// column name
 				case 'c':
 					$sParam = $arrArgvs[$aReses->key()] ;
+					break ;
 				
 				// value
 				case 'v':
 					$sParam = addslashes($arrArgvs[$aReses->key()]) ;
+					break ;
 			}
 
 			$sExpression = substr_replace($sExpression,$sParam,$aRes->position(),$aRes->length()) ;
@@ -146,7 +154,7 @@ class Criteria extends SubStatement
 	{
 		if( !self::$aExpressionRegexp )
 		{
-			self::$aExpressionRegexp = new RegExp("/%(\{*)([tcv])(\}*)/i") ;
+			self::$aExpressionRegexp = new RegExp("/%(\{*)([tacv])(\}*)/i") ;
 		}
 		return self::$aExpressionRegexp ;
 	}

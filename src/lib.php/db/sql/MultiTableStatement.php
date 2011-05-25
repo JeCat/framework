@@ -8,9 +8,9 @@ use jc\lang\Exception;
 
 abstract class MultiTableStatement extends Statement
 {
-	public function __construct($sTableName="")
+	public function __construct($sTableName=null,$sTableAlias=null)
 	{
-		$this->aTables = new Tables($this,$sTableName) ;
+		$this->aTables = new Tables($this,$sTableName,$sTableAlias) ;
 	}
 	
 	/** 
@@ -28,18 +28,9 @@ abstract class MultiTableStatement extends Statement
 	
 	public function realTableName($sInputName,$bAlias=false)
 	{
-		$sTableName = $this->tableNameFactory()->tableName($sInputName) ;
-		
-		if($bAlias)
-		{
-			return $this->tables()->tableNameAliases()->get($sTableName)?: $sTableName ;
-		}
-		else
-		{
-			return  $sTableName ;
-		}
+		return $this->tableNameFactory()->tableName($sInputName) ;
 	}
-
+	
 	/**
 	 * @return Criteria
 	 */

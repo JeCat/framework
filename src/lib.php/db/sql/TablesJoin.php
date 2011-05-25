@@ -33,12 +33,17 @@ class TablesJoin extends SubStatement
 		return $this->sType ;
 	}
 	
-	public function addTable($sTableName,$criteria=null)
+	public function addTable($sTableName,$criteria=null,$sAlias=null)
 	{
-		if( !in_array($sTableName, $this->arrTables) )
+		$sTableName = $this->statement()->realTableName($sTableName) ;
+		
+		if(!$sAlias)
 		{
-			$this->arrTables[] = $sTableName ;
+			$sAlias = $sTableName ;
 		}
+		
+		$this->arrTables[$sAlias] = $sTableName ;
+			
 		if($criteria)
 		{
 			$this->aCriteria->add($criteria) ;
@@ -65,7 +70,19 @@ class TablesJoin extends SubStatement
 	
 	public function makeStatement($bFormat=false)
 	{
-		return $this->sType . "( " . implode(", ",$this->arrTables)
+		$aStatement = $this->statement() ;
+		$arrTables = array() ;
+		foreach( $this->arrTables as $sAlias=>$sTable )
+		{
+			if($sAlias!=$sTable)
+			{
+				$sTable.= " AS ".$sAlias ;
+			}
+			
+			$arrTables[] = $sTable ;
+		}
+		
+		return $this->sType . "( " . implode(", ",$arrTables)
 					. " ) ON ( " . $this->aCriteria->makeStatement($bFormat) ." )" ;
 	}
 	

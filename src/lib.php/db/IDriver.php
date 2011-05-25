@@ -12,7 +12,7 @@ interface IDriver
 	
 	public function lastInsertId($sName=null) ;
 	
-	public function query($SQLStatement) ;
+	public function query($statement) ;
 	
 	public function connect($sUrl,$sUsername=null,$sPassword=null,array $arrDriverOptions=array()) ;
 	
