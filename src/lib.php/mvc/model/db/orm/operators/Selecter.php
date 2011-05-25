@@ -22,9 +22,10 @@ class Selecter extends OperationStrategy
 
 		// 联合表查询 
 		$aStatement = new Select( $aPrototype->tableName() ) ;
-		$aStatement->tables()->setTableAlias( $aPrototype->name() ) ;
+		$aStatement->tables()->setTableAlias( $aPrototype->tableName(), $aPrototype->name() ) ;
 
 		$this->makeStatementAssociationQuery($aPrototype,$aStatement) ;
+		echo $aStatement->makeStatement() ;
 		
 		// $aStatement
 

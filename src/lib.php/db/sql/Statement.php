@@ -20,7 +20,7 @@ abstract class Statement extends Object implements IStatement
 	{
 		$this->aTableNameFactory = $aFactory ;
 	}
-	
+		
 	/**
 	 * Enter description here ...
 	 * 

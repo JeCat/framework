@@ -18,7 +18,7 @@ class Select extends MultiTableStatement
 		
 		return "SELECT"
 			. $this->makeStatementPredicate($bFormat)
-			. $this->aColumns? $this->aColumns->makeStatement(): ' *'
+			. ($this->aColumns? $this->aColumns->makeStatement(): ' *')
 			. parent::makeStatement($bFormat)
 			. ' ;' ;
 	}

@@ -1,6 +1,8 @@
 <?php
 namespace jc\lang ;
 
+use jc\system\AppFactory;
+
 use jc\system\Application ;
 
 class Object implements IObject
@@ -64,7 +66,7 @@ class Object implements IObject
 		// 从调用堆栈上找到 application
 		if( !$aApp = self::findApplicationOnCallStack(debug_backtrace()) )
 		{
-			throw new Exception(__METHOD__."() 无法确定所属的 Application 对象") ;
+			$aApp = Application::singleton(true) ;
 		}
 		
 		$sClass = get_called_class() ;
@@ -84,7 +86,7 @@ class Object implements IObject
 		// 从调用堆栈上找到 application
 		if( !$aApp = self::findApplicationOnCallStack(debug_backtrace()) )
 		{
-			throw new Exception(__METHOD__."() 无法确定所属的 Application 对象") ;
+			$aApp = Application::singleton(true) ;
 		}
 
 		$aApp->setSingletonInstance($sClass,$aInstance) ;

@@ -7,19 +7,25 @@ use jc\niy\IIteratable ;
 
 class TablesJoin extends SubStatement
 {
-	public function __construct($sType=Tables::JOIN_LEFT)
+	const JOIN_LEFT = "JOIN LEFT" ;
+	const JOIN_RIGHT = "JOIN RIGHT" ;
+	const JOIN_INNER = "JOIN INNER" ;
+	
+	public function __construct(IStatement $aStatement,$sType=Tables::JOIN_LEFT)
 	{
 		if( !in_array($sType,array(
-				Tables::JOIN_LEFT ,
-				Tables::JOIN_RIGHT ,
-				Tables::JOIN_INNER ,
+				self::JOIN_LEFT ,
+				self::JOIN_RIGHT ,
+				self::JOIN_INNER ,
 		)) )
 		{
 			throw new Exception("unknow sql join type: %s",array($sType)) ;
 		}
 		
 		$this->sType = $sType ;
-		$this->aCriteria = new Criteria() ;
+		$this->aCriteria = new Criteria($aStatement,$aStatement) ;
+		
+		parent::__construct($aStatement) ;
 	}
 	
 	public function type()
@@ -60,7 +66,12 @@ class TablesJoin extends SubStatement
 	public function makeStatement($bFormat=false)
 	{
 		return $this->sType . "( " . implode(", ",$this->arrTables)
-					. " ) ON " . $this->aCriteria->makeStatementWhere($bFormat) ;
+					. " ) ON ( " . $this->aCriteria->makeStatement($bFormat) ." )" ;
+	}
+	
+	public function criteria()
+	{
+		return $this->aCriteria ;
 	}
 	
 	/**
@@ -68,7 +79,7 @@ class TablesJoin extends SubStatement
 	 * 
 	 * @var string
 	 */
-	private $sType = Tables::JOIN_LEFT ;
+	private $sType = self::JOIN_LEFT ;
 	
 	/**
 	 * Enter description here ...

@@ -2,7 +2,6 @@
 namespace jc\mvc\model\db\orm ;
 
 use jc\lang\Type;
-
 use jc\lang\Exception;
 use jc\util\HashTable;
 use jc\pattern\composite\Container;
@@ -118,7 +117,7 @@ class ModelPrototype extends Object
 	/**
 	 * @return \HashTable
 	 */
-	public function associations($bCreate)
+	public function associations($bCreate=true)
 	{
 		if( !$this->aAssociations and $bCreate )
 		{

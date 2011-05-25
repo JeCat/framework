@@ -12,7 +12,7 @@ class Criteria extends SubStatement
 		$arrExpressions = array() ;
 		foreach($this->arrExpressions as $express)
 		{
-			if( in_array($express) )
+			if( is_array($express) )
 			{
 				$arrExpressions[] = $this->tancTableName($express[0])
 							." {$express[2]} '".addslashes($express[1])."'" ;
@@ -58,7 +58,7 @@ class Criteria extends SubStatement
 			{
 				$this->arrExpressions[] = $column ;
 			}
-			else if( in_array($column) )
+			else if( is_array($column) )
 			{
 				if( empty($column[1]) )
 				{

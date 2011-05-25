@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\model\db\orm\operators ;
 
+use jc\mvc\model\db\orm\AssociationPrototype;
+
 use jc\db\sql\Criteria;
 use jc\db\sql\MultiTableStatement;
 use jc\mvc\model\db\IModel;
@@ -25,7 +27,7 @@ abstract class OperationStrategy extends Object
 		$aTables = $aStatement->tables() ;
 		$aJoin = $aTables->sqlStatementJoin() ;
 
-		foreach($aPrototype->associations()->iterator() as $aAssoPrototype)
+		foreach($aPrototype->associations() as $aAssoPrototype)
 		{
 			// 联合sql查询
 			if( in_array($aAssoPrototype->type(), array(
@@ -41,7 +43,7 @@ abstract class OperationStrategy extends Object
 				$arrToKeys = $aAssoPrototype->toKeys() ;
 				foreach($aAssoPrototype->fromKeys() as $nIdx=>$sFromKey)
 				{
-					$aJoin->add( "%t.%c=%t.%c", $sTableName, $sFromKey, $sAssoTableName, $arrToKeys[$nIdx] ) ;
+					$aJoin->criteria()->add( "%t.%c=%t.%c", $sTableName, $sFromKey, $sAssoTableName, $arrToKeys[$nIdx] ) ;
 				}
 				
 				// 

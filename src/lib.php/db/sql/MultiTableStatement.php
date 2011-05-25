@@ -10,7 +10,7 @@ abstract class MultiTableStatement extends Statement
 {
 	public function __construct($sTableName="")
 	{
-		$this->aTables = new Tables($sTableName) ;
+		$this->aTables = new Tables($this,$sTableName) ;
 	}
 	
 	/** 

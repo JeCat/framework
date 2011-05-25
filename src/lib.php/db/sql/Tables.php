@@ -3,17 +3,17 @@
 namespace jc\db\sql ;
 
 
+use jc\util\HashTable;
 use jc\lang\Exception;
 
 class Tables extends SubStatement
 {
-	const JOIN_LEFT = "JOIN LEFT" ;
-	const JOIN_RIGHT = "JOIN RIGHT" ;
-	const JOIN_INNER = "JOIN INNER" ;
 	
-	public function __construct($sTableName="") 
+	public function __construct(IStatement $aStatement,$sTableName="") 
 	{
 		$this->sTableName = $sTableName ;
+		
+		parent::__construct($aStatement) ;
 	}
 
 	public function tableName()
@@ -31,16 +31,16 @@ class Tables extends SubStatement
 	 * @param string $sType
 	 * @return jc\sql\TablesJoin
 	 */
-	public function sqlStatementJoin($sType=self::JOIN_LEFT)
+	public function sqlStatementJoin($sType=TablesJoin::JOIN_LEFT)
 	{
 		if( !isset($this->mapJoinTables[$sType]) )
 		{
-			$this->mapJoinTables[$sType] = new TablesJoin($sType) ;
+			$this->mapJoinTables[$sType] = new TablesJoin($this->statement(),$sType) ;
 		}
 		return $this->mapJoinTables[$sType] ;
 	}
 	
-	public function join($sTableName,$criteria=null,$sType=self::JOIN_LEFT)
+	public function join($sTableName,$criteria=null,$sType=TablesJoin::JOIN_LEFT)
 	{
 		$aJoin = $this->sqlStatementJoin($sType) ;
 		$aJoin->addTable($sTableName,$criteria) ;
@@ -53,7 +53,7 @@ class Tables extends SubStatement
 		{
 			if( $aJoin->checkValid(false) )
 			{
-				$arrJoins[] = $aJoin->MakeFormat($bFormat) ;
+				$arrJoins[] = $aJoin->makeStatement($bFormat) ;
 			}
 		}
 		return "FROM " . $this->sTableName . (empty($arrJoins)?"":(" ".implode(", ", $arrJoins))) ;
@@ -72,9 +72,14 @@ class Tables extends SubStatement
 		return true ;		
 	}
 	
-	public function tableNameAliases()
+	public function setTableAlias($sTableName,$sAlias)
 	{
-		if( !$this->aTableNameAliases )
+		$this->tableNameAliases()->set($sTableName,$sAlias) ;
+	}
+	
+	public function tableNameAliases($bCreate=true)
+	{
+		if( !$this->aTableNameAliases and $bCreate )
 		{
 			$this->aTableNameAliases = new HashTable() ;
 		}
@@ -100,7 +105,7 @@ class Tables extends SubStatement
 	 */
 	private $mapJoinTables = array() ;
 
-	private $aAliases = null ;
+	private $aTableNameAliases = null ;
 }
 
 ?>

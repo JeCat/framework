@@ -1,7 +1,7 @@
 <?php
 namespace jc\db\sql ;
 
-class SubStatement extends Statement
+abstract class SubStatement extends Statement
 {
 	public function __construct(Statement $aStatement)
 	{
