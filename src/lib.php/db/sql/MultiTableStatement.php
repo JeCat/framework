@@ -39,7 +39,7 @@ abstract class MultiTableStatement extends Statement
 			return  $sTableName ;
 		}
 	}
-	
+
 	/**
 	 * @return Criteria
 	 */
@@ -56,9 +56,7 @@ abstract class MultiTableStatement extends Statement
 	{
 		$this->aCriteria = $aCriteria ;
 	}
-	
-	
-	
+
 	public function makeStatement($bFormat=false)
 	{
 		$sStatement = '' ;

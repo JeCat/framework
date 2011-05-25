@@ -55,7 +55,20 @@ class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator
 		$this->arrDatas = array() ;
 	}
 	
+	public function count()
+	{
+		return count($this->arrDatas) ;
+	}
 
+	public function end()
+	{
+		return end($this->arrDatas) ;
+	}
+	public function prev()
+	{
+		return prev($this->arrDatas) ;
+	}
+	
 	// implement ArrayAccess
 	public function offsetExists($offset)
 	{

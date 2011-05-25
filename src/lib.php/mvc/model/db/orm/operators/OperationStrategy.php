@@ -43,7 +43,7 @@ abstract class OperationStrategy extends Object
 				$arrToKeys = $aAssoPrototype->toKeys() ;
 				foreach($aAssoPrototype->fromKeys() as $nIdx=>$sFromKey)
 				{
-					$aJoin->criteria()->add( "%t.%c=%t.%c", $sTableName, $sFromKey, $sAssoTableName, $arrToKeys[$nIdx] ) ;
+					$aJoin->criteria()->addExpression( "%t.%c=%t.%c", $sTableName, $sFromKey, $sAssoTableName, $arrToKeys[$nIdx] ) ;
 				}
 				
 				// 

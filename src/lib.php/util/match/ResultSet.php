@@ -9,7 +9,7 @@ class ResultSet extends HashTable
 	{
 		parent::add($aResult) ;
 	}
-
+	
 	public function result($nGrp=0) 
 	{
 		if( $aRes = $this->current() )

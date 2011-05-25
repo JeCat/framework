@@ -87,7 +87,10 @@ class Criteria extends SubStatement
 	}
 	public function addExpression($sExpression/*, ...*/)
 	{
+		$arrArgs = func_get_args() ;
+		array_shift($arrArgs) ;
 		
+		$this->arrExpressions[] = $this->tancExpression($sExpression,$arrArgs) ;
 	}
 	public function clear()
 	{
@@ -107,20 +110,27 @@ class Criteria extends SubStatement
 	public function tancExpression($sExpression,$arrArgvs)
 	{
 		// find mark
-		$arrReses = self::expressionRegexp()->match($sExpression) ;
-		if( $arrReses->count()!=count($sExpression) )
+		$aReses = self::expressionRegexp()->match($sExpression) ;
+		if( $aReses->count()!=count($arrArgvs) )
 		{
-			throw new Exception("sql Criteria 的条件表达式，定义了%d处记号，传入了 %d 个参数，记号和参数的数量必须对等。",$arrReses->count(),count($sExpression)) ;
+			throw new Exception("sql Criteria 的条件表达式，定义了%d处记号，传入了 %d 个参数，记号和参数的数量必须对等。",array($aReses->count(),count($sExpression))) ;
 		}
 		
-		for ($arrReses->end();$aRes=$arrReses->current();$aRes->prev())
+		for ($aReses->end();$aRes=$aReses->current();$aReses->prev())
 		{
 			switch( strtolower($aRes->result(2)) )
 			{
+				// table name
 				case 't':
-					$sParam = $this->statement()->realTableName( $arrArgvs[$arrReses->key()], true ) ;
+					$sParam = $this->statement()->realTableName( $arrArgvs[$aReses->key()], true ) ;
+				
+				// column name
+				case 'c':
+					$sParam = $arrArgvs[$aReses->key()] ;
+				
+				// value
 				case 'v':
-					$sParam = addslashes($arrArgvs[$arrReses->key()]) ;
+					$sParam = addslashes($arrArgvs[$aReses->key()]) ;
 			}
 
 			$sExpression = substr_replace($sExpression,$sParam,$aRes->position(),$aRes->length()) ;
@@ -136,7 +146,7 @@ class Criteria extends SubStatement
 	{
 		if( !self::$aExpressionRegexp )
 		{
-			self::$aExpressionRegexp = new RegExp("/%(\{*)([tv])[\\b\\1]/i") ;
+			self::$aExpressionRegexp = new RegExp("/%(\{*)([tcv])(\}*)/i") ;
 		}
 		return self::$aExpressionRegexp ;
 	}
