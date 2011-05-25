@@ -4,6 +4,7 @@ namespace jc\db ;
 
 class DriverPDO extends \PDO implements IDriver
 {
+	public function 
 	public function error()
 	{
 		$arrErr = \PDO::errorInfo() ;
@@ -27,22 +28,15 @@ class DriverPDO extends \PDO implements IDriver
 		return \PDO::lastInsertId($sName) ;
 	}
 	
+	/**
+	 * @return jc\db\recordset\IRecordSet
+	 */
 	public function query($statement)
 	{
 		$sSql = ($sql instanceof Statement)?
 					$sql->makeStatement(): strval($sql) ;
 
-		
-	}
-	
-	public function connect($sUrl,$sUsername=null,$sPassword=null,array $arrDriverOptions=array())
-	{
-		
-	}
-	
-	public function disconnect()
-	{
-		
+		return new PDORecordSet( \PDO::query($sSql) ) ;
 	}
 }
 

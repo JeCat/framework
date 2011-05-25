@@ -1,5 +1,5 @@
 <?php
-namespace jc\db\recordset ;
+namespace jc\db ;
 
 interface IRecordSet
 {

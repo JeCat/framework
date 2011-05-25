@@ -1,5 +1,5 @@
 <?php
-namespace jc\db\recordset ;
+namespace jc\db ;
 
 
 class PDORecordSet extends RecordSet implements IRecordSet
