@@ -37,7 +37,10 @@ class DriverPDO extends \PDO implements IDriver
 		
 	}
 	
-	public function disconnect() ;
+	public function disconnect()
+	{
+		
+	}
 }
 
 ?>

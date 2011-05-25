@@ -1,5 +1,5 @@
 <?php
-namespace jc\db\sql\tablename ;
+namespace jc\db\sql ;
 
 use jc\util\FilterMangeger;
 

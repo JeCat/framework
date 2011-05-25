@@ -5,7 +5,7 @@ namespace jc\db\sql ;
 
 use jc\lang\Object;
 
-abstract class Statement extends Object implements ISQLStatement
+abstract class Statement extends Object implements IStatement
 {
 	public function tableNameFactory()
 	{
@@ -16,6 +16,11 @@ abstract class Statement extends Object implements ISQLStatement
 		return $this->aTableNameFactory ;
 	}
 
+	public function setTableNameFactory(ITableNameFactory $aFactory)
+	{
+		$this->aTableNameFactory = $aFactory ;
+	}
+	
 	/**
 	 * Enter description here ...
 	 * 

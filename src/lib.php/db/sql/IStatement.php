@@ -2,7 +2,7 @@
 
 namespace jc\db\sql ;
 
-interface ISQLStatement
+interface IStatement
 {
 	public function makeStatement($bFormat=false) ;
 	

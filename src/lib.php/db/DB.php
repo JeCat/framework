@@ -1,18 +1,30 @@
 <?php 
 
-namespace jc\db\sql ;
+namespace jc\db ;
+
+use jc\db\sql\Statement;
 
 class DB
 {
 	/**
-	 * Enter description here ...
-	 * 
-	 * @return jc\db\sql\IStatementFactory
+	 * @return IDriver
 	 */
-	public function sqlFactory()
+	public function driver()
 	{
-		
+		return $this->aDriver ;
 	}
+	public function setDriver(IDriver $aDriver)
+	{
+		$this->aDriver = $aDriver ;
+	}
+	
+	public function query($sql)
+	{
+		$sSql = ($sql instanceof Statement)?
+					$sql->makeStatement(): strval($sql) ;
+	}
+	
+	private $aDriver ;
 }
 
 ?>

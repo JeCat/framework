@@ -1,19 +1,18 @@
 <?php
-namespace jc\mvc\model\db\orm\operations ;
+namespace jc\mvc\model\db\orm\operators ;
 
 use jc\db\sql\Criteria;
-
 use jc\db\sql\MultiTableStatement;
 use jc\mvc\model\db\IModel;
 use jc\mvc\model\db\orm\ModelPrototype;
-use jc\db\IDriver;
+use jc\db\DB;
 use jc\lang\Object;
 
 abstract class OperationStrategy extends Object
 {
 	abstract public function execute(
-				IDriver $aDB
-				, IModel $aModel
+				DB $aDB
+				, IModel $aModel=null
 				, ModelPrototype $aPrototype=null
 				, $primaryKeyValues=null
 				, $sWhere=null

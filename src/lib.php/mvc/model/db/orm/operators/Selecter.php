@@ -1,23 +1,22 @@
 <?php
-namespace jc\mvc\model\db\orm\operations ;
+namespace jc\mvc\model\db\orm\operators ;
 
+use jc\db\DB;
 use jc\mvc\model\db\orm\AssociationPrototype;
 use jc\mvc\model\db\IModel;
 use jc\mvc\model\db\orm\ModelPrototype;
-use jc\db\IDriver;
 use jc\lang\Exception;
 use jc\db\sql\Select;
 
 class Selecter extends OperationStrategy
 {
-	public function execute( IDriver $aDB, IModel $aModel, ModelPrototype $aPrototype=null, $primaryKeyValues=null, $sWhere=null )
+	public function execute( DB $aDB, IModel $aModel=null, ModelPrototype $aPrototype=null, $primaryKeyValues=null, $sWhere=null )
 	{
 		if(!$aPrototype)
 		{
-			$aPrototype = $aModel->prototype() ;
-			if(!$aPrototype)
+			if( !$aModel and !$aPrototype= $aModel->prototype() )
 			{
-				throw new Exception( "缺少有效" ) ;
+				throw new Exception( "缺少有效的模型原型" ) ;
 			}
 		}
 
@@ -26,6 +25,8 @@ class Selecter extends OperationStrategy
 		$aStatement->tables()->setTableAlias( $aPrototype->name() ) ;
 
 		$this->makeStatementAssociationQuery($aPrototype,$aStatement) ;
+		
+		// $aStatement
 
 		//
 		
