@@ -14,10 +14,6 @@ interface IDriver
 	
 	public function query($statement) ;
 	
-	public function connect($sUrl,$sUsername=null,$sPassword=null,array $arrDriverOptions=array()) ;
-	
-	public function disconnect() ;
-	
 	
 	
 	// Transaction 

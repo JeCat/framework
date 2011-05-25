@@ -2,9 +2,10 @@
 
 namespace jc\db ;
 
+use jc\lang\Object;
 use jc\db\sql\Statement;
 
-class DB
+class DB extends Object
 {
 	/**
 	 * @return IDriver
@@ -20,15 +21,12 @@ class DB
 	
 	public function query($sql)
 	{
-		$sSql = ($sql instanceof Statement)?
-					$sql->makeStatement(): strval($sql) ;
+		return $this->driver()->query($sql) ;
 	}
 	
 	public function execute($sql)
 	{
-		$sSql = ($sql instanceof Statement)?
-					$sql->makeStatement(): strval($sql) ;
-		
+		return $this->driver()->execute($sql) ;
 	}
 	
 	private $aDriver ;
