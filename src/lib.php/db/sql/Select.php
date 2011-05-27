@@ -18,7 +18,7 @@ class Select extends MultiTableStatement
 		
 		return "SELECT"
 			. $this->makeStatementPredicate($bFormat)
-			. ($this->aColumns? $this->aColumns->makeStatement(): ' *')
+			. ' ' . ($this->arrColumns? implode(',', $this->arrColumns): '*')
 			. parent::makeStatement($bFormat)
 			. $this->makeStatementLimit()
 			. ' ;' ;
@@ -54,12 +54,16 @@ class Select extends MultiTableStatement
 		
 	}
 	
-	/**
-	 * Enter description here ...
-	 * 
-	 * @var Columns
-	 */
-	private $aColumns = null ;
+	public function addColumn($sClmName,$sAlias=null)
+	{
+		if($sAlias)
+		{
+			$sClmName.= " AS '".$sAlias."'" ;
+		}
+		$this->arrColumns[] = $sClmName ;
+	}
+	
+	private $arrColumns = array() ;
 	
 	
 	/**

@@ -37,7 +37,7 @@ class PDODriver extends \PDO implements IDriver
 		$sSql = ($sql instanceof Statement)?
 					$sql->makeStatement(): strval($sql) ;
 
-		if( !$result = \PDO::query($sSql) )
+		if( !$result = \PDO::query($sSql,\PDO::FETCH_ASSOC) )
 		{
 			return false ;
 		}

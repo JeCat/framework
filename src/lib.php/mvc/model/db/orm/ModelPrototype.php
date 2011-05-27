@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\model\db\orm ;
 
+use jc\db\DB;
+
 use jc\lang\Type;
 use jc\lang\Exception;
 use jc\util\HashTable;
@@ -9,7 +11,7 @@ use jc\lang\Object;
 
 class ModelPrototype extends Object
 {
-	public function __construct($sName,$sTable,$primaryKeys,$clms='*')
+	public function __construct($sName,$sTable,$primaryKeys,array $arrClms=array())
 	{
 		$this->sName = $sName ;
 		
@@ -23,7 +25,7 @@ class ModelPrototype extends Object
 		
 		$this->arrPrimaryKeys = (array)$primaryKeys ;
 		
-		$this->arrClms = (array)$clms ;
+		$this->arrClms = $arrClms ;
 
 		parent::__construct() ;
 	}
@@ -54,6 +56,12 @@ class ModelPrototype extends Object
 					$aPrototype->addAssociation($aAssociation) ;
 				}
 			}
+		}
+		
+		// 通过反射设置model prototype
+		if( empty($aPrototype->arrClms) or empty($aPrototype->arrPrimaryKeys) )
+		{
+			$aPrototype->reflectTableInfo(DB::singleton()) ;
 		}
 		
 		return $aPrototype ;
@@ -154,7 +162,7 @@ class ModelPrototype extends Object
 		{
 			throw new Exception("Model类:%s 不存在",$sClassName) ;
 		}
-		if( !is_subclass_of($sClassName,jc\mvc\model\db\IModel) )
+		if( $sClassName!="jc\\mvc\\model\\db\\Model" and !Type::hasImplements($sClassName,'jc\mvc\model\db\IModel') )
 		{
 			throw new Exception("%s 不是一个有效的Model类（必须实现 jc\mvc\model\db\IModel 接口）",$sClassName) ;
 		}
@@ -240,7 +248,7 @@ class ModelPrototype extends Object
 		// 可选属性
 		if( empty($arrOrm['clms']) )
 		{
-			$arrOrm['clms'] = '*' ;
+			$arrOrm['clms'] = array() ;
 		}
 		if( empty($arrOrm['class']) )
 		{
@@ -253,37 +261,32 @@ class ModelPrototype extends Object
 		return $arrOrm ;
 	}
 	
-	//////////////////////////////
-	
-	/**
-	 * @return jc\db\sql\Insert
-	 */
-	public function buildSqlForInsert()
+	public function reflectTableInfo(DB $aDB)
 	{
+		// 反射字段表 和 主键值
+		$aRes = $aDB->query("show columns from ".$this->tableName()) ;
+		if(!$aRes)
+		{
+			return false ;
+		}
 		
-	}
-	
-	/**
-	 * @return jc\db\sql\Delete
-	 */
-	public function buildSqlForDelete()
-	{
+		$arrClms = array() ;
+		foreach($aRes->iterator() as $arrRow)
+		{
+			$arrClms[] = $arrRow['Field'] ;
+			
+			if( $arrRow['Key']=='PRI' and empty($this->arrPrimaryKeys) )
+			{
+				$this->arrPrimaryKeys = array($arrRow['Field']) ;
+			}
+		}
+		
+		if( empty($this->arrClms) )
+		{
+			$this->arrClms = $arrClms ;
+		}
 	}
 
-	/**
-	 * @return jc\db\sql\Select
-	 */
-	public function buildSqlForSelect()
-	{
-	}
-
-	/**
-	 * @return jc\db\sql\Update
-	 */
-	public function buildSqlForUpdate()
-	{
-	}
-	
 	private $sName ;
 	
 	private $sTableName ;

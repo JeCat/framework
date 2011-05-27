@@ -7,9 +7,9 @@ use jc\niy\IIteratable ;
 
 class TablesJoin extends SubStatement
 {
-	const JOIN_LEFT = "JOIN LEFT" ;
-	const JOIN_RIGHT = "JOIN RIGHT" ;
-	const JOIN_INNER = "JOIN INNER" ;
+	const JOIN_LEFT = "LEFT JOIN" ;
+	const JOIN_RIGHT = "RIGHT JOIN" ;
+	const JOIN_INNER = "INNER JOIN" ;
 	
 	public function __construct(IStatement $aStatement,$sType=Tables::JOIN_LEFT)
 	{

@@ -132,6 +132,12 @@ class Type
 			return self::NULL ;
 		}
 	}
+	
+	static public function hasImplements($sClassName,$sInterfaceName)
+	{
+		$aRefClass = new ReflectionClass($sClassName) ;
+		return $aRefClass->implementsInterface($sInterfaceName) ;
+	}
 }
 
 ?>

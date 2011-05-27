@@ -12,7 +12,7 @@ use jc\db\sql\IDriver ;
 
 class Model extends BaseModel implements IModel
 {
-	public function __construct($prototype,$bAggregarion=false)
+	public function __construct($prototype=null,$bAggregarion=false)
 	{
 		parent::__construct($bAggregarion) ;
 		
@@ -87,7 +87,7 @@ class Model extends BaseModel implements IModel
 				continue ;
 			}
 			
-			$this->set(
+			$this->setData(
 				substr($sClm,$nPreLen), $sValue
 			) ;
 		}

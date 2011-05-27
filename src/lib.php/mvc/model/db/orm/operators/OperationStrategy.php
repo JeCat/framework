@@ -21,35 +21,6 @@ abstract class OperationStrategy extends Object
 			) ;*/
 			
 
-	protected function makeAssociationQuerySql(ModelPrototype $aPrototype,MultiTableStatement $aStatement)
-	{
-		$sTableName = $aStatement->realTableName($aPrototype->tableName()) ;
-		$aTables = $aStatement->tables() ;
-		$aJoin = $aTables->sqlStatementJoin() ;
-
-		foreach($aPrototype->associations() as $aAssoPrototype)
-		{
-			// 联合sql查询
-			if( in_array($aAssoPrototype->type(), array(
-					AssociationPrototype::hasOne
-					, AssociationPrototype::belongsTo
-			)) )
-			{
-				$sAssoTableName = $aStatement->realTableName($aAssoPrototype->toPrototype()->tableName()) ;
-				
-				$aTables->join( $sAssoTableName, null, $aAssoPrototype->modelProperty() ) ;
-				
-				$arrToKeys = $aAssoPrototype->toKeys() ;
-				foreach($aAssoPrototype->fromKeys() as $nIdx=>$sFromKey)
-				{
-					$aJoin->criteria()->add( "{$sTableName}.{$sFromKey} = {$sAssoTableName}.{$arrToKeys[$nIdx]}" ) ;
-				}
-				
-				// 
-				$this->makeAssociationQuerySql($aAssoPrototype->toPrototype(),$aStatement) ;
-			}
-		}
-	}
 	
 	protected function setCondition(Criteria $aCriteria,$keys,$values)
 	{

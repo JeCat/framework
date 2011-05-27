@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\model\db\orm\operators ;
 
+use jc\db\IRecordSet;
+
 use jc\mvc\model\db\Model;
 use jc\db\DB;
 use jc\mvc\model\db\orm\AssociationPrototype;
@@ -12,19 +14,31 @@ use jc\db\sql\Select;
 class Selecter extends OperationStrategy
 {
 	
-	public function select( DB $aDB, IModel $aModel, ModelPrototype $aPrototype, $primaryKeyValues=null, $sWhere=null )
+	public function select( DB $aDB, IModel $aModel, Select $aSelect=null, array $keyValues=null, $sWhere=null, $nLimitLen=1, $nLimitFrom=0 )
 	{
+		$aPrototype = $aModel->prototype() ;
+		
 		// 对所有1对1关系，进行递归联合查询 
 		// ---------------------------
-		//  生成 sql
-		$aStatement = new Select( $aPrototype->tableName(), $aPrototype->name() ) ;
-		$this->makeAssociationQuerySql($aPrototype,$aStatement) ;
-		$aStatement->setLimit(1,0) ;
+		//  生成 sql select
+		if(!$aSelect)
+		{
+			$aStatement = new Select( $aPrototype->tableName(), $aPrototype->name() ) ;
+		}
+		
+		// 组建 sql select
+		$this->makeAssociationQuerySql($aPrototype->name(),$aPrototype,$aStatement) ;
+		$aStatement->setLimit($nLimitLen,$nLimitFrom) ;
 		
 		// 设置主键查询条件
-		if($primaryKeyValues)
+		if( $keyValues )
 		{
-			$this->setCondition($aStatement->criteria(),$aPrototype->primaryKeys(),$primaryKeyValues) ;
+			$aCriteria = $aStatement->criteria() ;
+			$sTableAlias = $aPrototype->name() ;
+			foreach($keyValues as $sKey=>$sValue)
+			{
+				$aCriteria->add($sTableAlias.'.'.$sKey,$sValue) ;
+			}
 		}
 		
 		// 设置查询条件
@@ -41,31 +55,50 @@ class Selecter extends OperationStrategy
 		}
 		
 		// 加载 sql
-		$aModel->loadData($aRecordSet,$aPrototype->name().'.') ;
-		
-		
-		
-		// 分别处理1对多关系
-		// ---------------------------
-		
-		
+		$this->loadModel($aModel, $aRecordSet, $aPrototype->name().'.') ;
 		
 		return true ;
 	}
+
 	
-	/**
-	 * @return jc\mvc\model\db\Model
-	 */
-	public function createModelByPrototype(ModelPrototype $aPrototype)
+	
+	protected function makeAssociationQuerySql($sTableName,ModelPrototype $aPrototype,Select $aStatement)
 	{
-		$aModel = new Model() ;
-		$aModel->setPrototype($aPrototype) ;
+		$aTables = $aStatement->tables() ;
+		$aJoin = $aTables->sqlStatementJoin() ;
+
+		foreach($aPrototype->columnIterator() as $sClmName)
+		{
+			$aStatement->addColumn($sTableName.'.'.$sClmName,$sTableName.'.'.$sClmName) ;
+		}
 		
-		return $aModel ;
+		// 处理关联表
+		foreach($aPrototype->associations() as $aAssoPrototype)
+		{
+			// 联合sql查询
+			if( in_array($aAssoPrototype->type(), array(
+					AssociationPrototype::hasOne
+					, AssociationPrototype::belongsTo
+			)) )
+			{
+				$sAssoTableAlias = $aAssoPrototype->modelProperty() ;
+				$aTables->join( $aAssoPrototype->toPrototype()->tableName(), null, $sAssoTableAlias ) ;
+				
+				$arrToKeys = $aAssoPrototype->toKeys() ;
+				foreach($aAssoPrototype->fromKeys() as $nIdx=>$sFromKey)
+				{
+					$aJoin->criteria()->add( "{$sTableName}.{$sFromKey} = {$sAssoTableAlias}.{$arrToKeys[$nIdx]}" ) ;
+				}
+				
+				$this->makeAssociationQuerySql($sAssoTableAlias,$aAssoPrototype->toPrototype(),$aStatement) ;
+			}
+		}
 	}
 	
 	protected function loadModel( IModel $aModel, IRecordSet $aRecordSet, $sClmPrefix )
 	{
+		$aPrototype = $aModel->prototype() ;
+		
 		if(!$sClmPrefix)
 		{
 			$sClmPrefix = $aPrototype->name() ;
@@ -74,8 +107,7 @@ class Selecter extends OperationStrategy
 		// load 自己
 		$aModel->loadData($aRecordSet,$sClmPrefix) ;
 		
-		// load association modal
-		$aPrototype = $aModel->prototype() ;
+		// 加载关联model
 		foreach($aPrototype->associations() as $aAssoPrototype)
 		{
 			// 一对一关联
@@ -91,13 +123,24 @@ class Selecter extends OperationStrategy
 					$aModel->addChild($aModel,$aAssoPrototype->modelProperty()) ;
 				}
 				
-				$this->loadModel($aChildModel,$aRecordSet,$aAssoPrototype->toPrototype(),$aAssoPrototype->modelProperty()) ;
+				$this->loadModel($aChildModel,$aRecordSet,$aAssoPrototype->modelProperty()) ;
 			}
 			
 			// 一对多关联
 			else if( $aAssoPrototype->type()==AssociationPrototype::hasMany )
 			{
 				
+				$aChidModel = $aToPrototype->createModel() ;
+				
+				$arrKeys = $aAssoPrototype->toKeys() ;
+				$arrKeyValues = array() ;
+				foreach($arrKeys as $sKey)
+				{
+					$arrKeyValues[$sKey] = $aModel->get($sKey) ;
+				}
+				$this->select($aDB, $aChidModel, null, null, $arrKeyValues, 30 ) ;
+				
+				$aModel->addChild($aChidModel,$aAssoPrototype->modelProperty()) ;
 			}
 		}
 	}

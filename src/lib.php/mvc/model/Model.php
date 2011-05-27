@@ -176,9 +176,6 @@ abstract class Model extends Object implements IModel
 		return reset($this->arrDatas) ;
 	}
 	
-	
-	private $aPrototype ;
-	
 	private $arrData = array() ;
 	
 	private $arrChildren = array() ;
