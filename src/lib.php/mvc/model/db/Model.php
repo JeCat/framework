@@ -25,7 +25,7 @@ class Model extends BaseModel implements IModel
 		}
 		
 		// Prototype
-		else if( $prototype instanceof Prototype )
+		else if( $prototype instanceof ModelPrototype )
 		{
 			$this->setPrototype( $prototype ) ;
 		}

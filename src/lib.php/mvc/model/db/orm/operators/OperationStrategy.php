@@ -23,7 +23,7 @@ abstract class OperationStrategy extends Object
 
 	protected function makeAssociationQuerySql(ModelPrototype $aPrototype,MultiTableStatement $aStatement)
 	{
-		$sTableName = $aPrototype->tableName() ;
+		$sTableName = $aStatement->realTableName($aPrototype->tableName()) ;
 		$aTables = $aStatement->tables() ;
 		$aJoin = $aTables->sqlStatementJoin() ;
 
@@ -35,14 +35,14 @@ abstract class OperationStrategy extends Object
 					, AssociationPrototype::belongsTo
 			)) )
 			{
-				$sAssoTableName = $aAssoPrototype->toPrototype()->tableName() ;
+				$sAssoTableName = $aStatement->realTableName($aAssoPrototype->toPrototype()->tableName()) ;
 				
 				$aTables->join( $sAssoTableName, null, $aAssoPrototype->modelProperty() ) ;
 				
 				$arrToKeys = $aAssoPrototype->toKeys() ;
 				foreach($aAssoPrototype->fromKeys() as $nIdx=>$sFromKey)
 				{
-					$aJoin->criteria()->addExpression( "%a.%c=%a.%c", $sTableName, $sFromKey, $sAssoTableName, $arrToKeys[$nIdx] ) ;
+					$aJoin->criteria()->add( "{$sTableName}.{$sFromKey} = {$sAssoTableName}.{$arrToKeys[$nIdx]}" ) ;
 				}
 				
 				// 
