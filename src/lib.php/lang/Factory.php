@@ -10,9 +10,16 @@ class Factory extends Object
 	 * 
 	 * @return void
 	 */
-	static public function createNewObject($sClassName,$sNamespace,array $arrArgvs=array())
+	static public function createNewObject($sClassName,$sNamespace=null,array $arrArgvs=array())
 	{
-		$sFullClassName = $sNamespace . (substr($sNamespace,strlen($sNamespace)-1,1)=='\\'? '': '\\') . $sClassName ;
+		if($sNamespace)
+		{
+			$sFullClassName = $sNamespace . (substr($sNamespace,strlen($sNamespace)-1,1)=='\\'? '': '\\') . $sClassName ;
+		}
+		else 
+		{
+			$sFullClassName = $sClassName ;
+		}
 		
 		if( !class_exists($sFullClassName) )
 		{

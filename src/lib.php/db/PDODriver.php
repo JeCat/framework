@@ -37,7 +37,12 @@ class PDODriver extends \PDO implements IDriver
 		$sSql = ($sql instanceof Statement)?
 					$sql->makeStatement(): strval($sql) ;
 
-		return new PDORecordSet( \PDO::query($sSql) ) ;
+		if( !$result = \PDO::query($sSql) )
+		{
+			return false ;
+		}
+		
+		return new PDORecordSet($result) ;
 	}
 	
 	public function execute($sql)

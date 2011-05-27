@@ -11,36 +11,46 @@ use jc\db\sql\Select;
 
 class Selecter extends OperationStrategy
 {
-	public function execute( DB $aDB, IModel $aModel=null, ModelPrototype $aPrototype=null, $primaryKeyValues=null, $sWhere=null )
+	
+	public function select( DB $aDB, IModel $aModel, ModelPrototype $aPrototype, $primaryKeyValues=null, $sWhere=null )
 	{
-		if(!$aPrototype)
-		{
-			if( !$aModel and !$aPrototype= $aModel->prototype() )
-			{
-				throw new Exception( "缺少有效的模型原型" ) ;
-			}
-		}
-
-		// 联合表查询 
+		// 对所有1对1关系，进行递归联合查询 
 		// ---------------------------
 		//  生成 sql
 		$aStatement = new Select( $aPrototype->tableName(), $aPrototype->name() ) ;
 		$this->makeAssociationQuerySql($aPrototype,$aStatement) ;
 		$aStatement->setLimit(1,0) ;
 		
+		// 设置主键查询条件
+		if($primaryKeyValues)
+		{
+			$this->setCondition($aStatement->criteria(),$aPrototype->primaryKeys(),$primaryKeyValues) ;
+		}
+		
+		// 设置查询条件
+		if( $sWhere )
+		{
+			$aStatement->criteria()->add($sWhere) ;
+		}
+
 		//  执行
-		$aRecordSet = $aDB->query($aStatement->makeStatement()) ;
+		$aRecordSet = $aDB->query($aStatement) ;
+		if(!$aRecordSet)
+		{
+			return false ;
+		}
 		
 		// 加载 sql
 		$aModel->loadData($aRecordSet,$aPrototype->name().'.') ;
 		
-		// 穿件
 		
-	}
-	
-	public function makeSelectSql($aPrototype,)
-	{
 		
+		// 分别处理1对多关系
+		// ---------------------------
+		
+		
+		
+		return true ;
 	}
 	
 	/**
@@ -77,7 +87,7 @@ class Selecter extends OperationStrategy
 				$aChildModel = $aModel->child( $aAssoPrototype->modelProperty() ) ;
 				if(!$aChildModel)
 				{
-					$aChildModel = $this->createModelByPrototype( $aAssoPrototype->toPrototype() ) ;
+					$aChildModel = $aAssoPrototype->toPrototype()->createModel() ;
 					$aModel->addChild($aModel,$aAssoPrototype->modelProperty()) ;
 				}
 				

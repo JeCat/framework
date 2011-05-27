@@ -89,22 +89,22 @@ abstract class MultiTableStatement extends Statement
 	{
 		if($nLen!==null)
 		{
-			$this->nLen = intval($this->nLen) ;
+			$this->nLimitLen = intval($nLen) ;
 		}
 		if($nFrom!==null)
 		{
-			$this->nFrom = intval($this->nFrom) ;
+			$this->nLimitFrom = intval($nFrom) ;
 		}
 	}
 	
 	public function limitLen()
 	{
-		return $this->nLen ;
+		return $this->nLimitLen ;
 	}
 	
 	public function limitFrom()
 	{
-		return $this->nFrom ;
+		return $this->nLimitFrom ;
 	}
 	
 	/**

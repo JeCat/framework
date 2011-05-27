@@ -15,8 +15,6 @@ interface IModel extends IModelBase
 	public function setPrototype(ModelPrototype $aPrototype) ;
 	
 	public function loadData( IRecordSet $aRecordSet, $sClmPrefix=null) ;
-
-	public function delete() ;
 	
 }
 

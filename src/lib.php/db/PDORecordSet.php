@@ -1,8 +1,9 @@
 <?php
 namespace jc\db ;
 
+use jc\lang\Object;
 
-class PDORecordSet extends RecordSet implements IRecordSet
+class PDORecordSet extends Object implements IRecordSet
 {
 	public function __construct(\PDOStatement $aPDOStatement)
 	{
@@ -22,7 +23,7 @@ class PDORecordSet extends RecordSet implements IRecordSet
 		return $this->aPDOStatement->fetch() ;
 	}
 	
-	public function row( $nRow ) 
+	public function row( $nRow=0 ) 
 	{
 		return isset($this->arrRecordSet[$nRow])? $this->arrRecordSet[$nRow]: null ;
 	}

@@ -7,11 +7,11 @@ interface IRecordSet
 	
 	public function fetch() ;
 	
-	public function row( $nRow=-1 ) ;
+	public function row( $nRow=0 ) ;
 	
 	public function allRows() ;
 
-	public function field($sFieldName) ;
+	public function field($nRow,$sFieldName) ;
 	
 	public function iterator() ;
 

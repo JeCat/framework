@@ -5,9 +5,7 @@ use jc\pattern\composite\IContainer;
 
 interface IModel extends \ArrayAccess, \Iterator
 {
-	public function name() ;
-	
-	public function setName($sName) ;
+	public function isAggregarion() ;
 	
 	public function hasSerialized() ;
 	
@@ -15,8 +13,10 @@ interface IModel extends \ArrayAccess, \Iterator
 	
 	public function save() ;
 	
+	public function delete() ;
+	
 	// for child model ///////////////////////////////
-	public function addChild(IModel $aModel) ;
+	public function addChild(IModel $aModel,$sName) ;
 	
 	public function removeChild(IModel $aModel) ;
 	

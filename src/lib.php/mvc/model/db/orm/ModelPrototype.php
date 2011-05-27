@@ -39,6 +39,7 @@ class ModelPrototype extends Object
 		}
 		
 		$aPrototype = new self($arrCnf['name'],$arrCnf['table'],$arrCnf['keys'],$arrCnf['clms']) ;
+		$aPrototype->sModelClass = $arrCnf['class'] ;
 		
 		// 为模型原型 创建关联原型
 		foreach(AssociationPrototype::allAssociationTypes() as $sAssoType)
@@ -80,6 +81,17 @@ class ModelPrototype extends Object
 	{
 		$this->sDatabaseName = $sDatabase ;
 	}
+	
+	public function modelClass() 
+	{
+		return $this->sModelClass ;
+	}
+	public function setModelClass($sModelClass) 
+	{
+		$this->sModelClass = $sModelClass ;
+	}
+	
+	
 	
 	public function primaryKeys()
 	{
@@ -132,6 +144,26 @@ class ModelPrototype extends Object
 		$aAssociations->set($aAssociation->modelProperty(), $aAssociation) ;
 	}
 
+	/**
+	 * @return jc\mvc\model\db\IModel
+	 */
+	public function createModel()
+	{
+		$sClassName = $this->modelClass() ;
+		if( !class_exists($sClassName,true) )
+		{
+			throw new Exception("Model类:%s 不存在",$sClassName) ;
+		}
+		if( !is_subclass_of($sClassName,jc\mvc\model\db\IModel) )
+		{
+			throw new Exception("%s 不是一个有效的Model类（必须实现 jc\mvc\model\db\IModel 接口）",$sClassName) ;
+		}
+		
+		$aModel = new $sClassName() ;
+		$aModel->setPrototype($this) ;
+		
+		return $aModel ;
+	}
 
 	/** 
 	 * array(
@@ -257,6 +289,8 @@ class ModelPrototype extends Object
 	private $sTableName ;
 	
 	private $sDatabaseName ;
+	
+	private $sModelClass = "jc\\mvc\\model\\db\\Model" ;
 	
 	private $arrPrimaryKeys = array() ;
 	

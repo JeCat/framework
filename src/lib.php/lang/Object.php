@@ -59,7 +59,51 @@ class Object implements IObject
 	{
 		$this->aApplication = $aApp ;
 	}
+	
+	/*static public function singleton ($bCreateNew=true,$createArgvs=null)
+	{
+		$sClass = get_called_class() ;
+		
+		if( !isset(self::$arrGlobalInstancs[$sClass]) )
+		{
+			if($bCreateNew)
+			{
+				if($createArgvs)
+				{
+					self::$arrGlobalInstancs[$sClass] = new $sClass() ;
+				}
+				
+				else 
+				{
+					self::$arrGlobalInstancs[$sClass] = Factory::createNewObject($sClass,null,(array)$createArgvs) ;
+				}
+			}
+			else 
+			{
+				return null ;
+			}
+		}
+		
+		return self::$arrGlobalInstancs[$sClass] ;
+	}
+	
+	static public function setSingleton (self $aInstance=null)
+	{
+		$sClass = get_called_class() ;
+		
+		// 移除全局实例
+		if(!$aInstance)
+		{
+			unset(self::$arrGlobalInstancs[$sClass]) ;
+		}
+		
+		if( !($aInstance instanceof static) )
+		{
+			throw new Exception('%s::setSingleton() 设置的单件实例必须为一个 %s 类型的对象',array($sClass,$sClass)) ;
+		}
 
+		self::$arrGlobalInstancs[$sClass] = $aInstance ;
+	}*/
 
 	static public function singleton ($bCreateNew=true)
 	{

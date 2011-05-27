@@ -12,13 +12,13 @@ use jc\lang\Object;
 
 abstract class OperationStrategy extends Object
 {
-	abstract public function execute(
+	/*abstract public function execute(
 				DB $aDB
 				, IModel $aModel=null
 				, ModelPrototype $aPrototype=null
 				, $primaryKeyValues=null
 				, $sWhere=null
-			) ;
+			) ;*/
 			
 
 	protected function makeAssociationQuerySql(ModelPrototype $aPrototype,MultiTableStatement $aStatement)
@@ -48,6 +48,17 @@ abstract class OperationStrategy extends Object
 				// 
 				$this->makeAssociationQuerySql($aAssoPrototype->toPrototype(),$aStatement) ;
 			}
+		}
+	}
+	
+	protected function setCondition(Criteria $aCriteria,$keys,$values)
+	{
+		$keys = array_values((array)$keys) ;
+		$values = array_values((array)$values) ;
+		
+		foreach($keys as $nIdx=>$sKey)
+		{
+			$aCriteria->add($sKey,$values[$nIdx]) ;
 		}
 	}
 }
