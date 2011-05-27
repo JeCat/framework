@@ -19,6 +19,9 @@ class DB extends Object
 		$this->aDriver = $aDriver ;
 	}
 	
+	/**
+	 * @return jc\db\recordset\IRecordSet
+	 */
 	public function query($sql)
 	{
 		return $this->driver()->query($sql) ;

@@ -21,7 +21,7 @@ abstract class OperationStrategy extends Object
 			) ;
 			
 
-	protected function makeStatementAssociationQuery(ModelPrototype $aPrototype,MultiTableStatement $aStatement)
+	protected function makeAssociationQuerySql(ModelPrototype $aPrototype,MultiTableStatement $aStatement)
 	{
 		$sTableName = $aPrototype->tableName() ;
 		$aTables = $aStatement->tables() ;
@@ -46,7 +46,7 @@ abstract class OperationStrategy extends Object
 				}
 				
 				// 
-				$this->makeStatementAssociationQuery($aAssoPrototype->toPrototype(),$aStatement) ;
+				$this->makeAssociationQuerySql($aAssoPrototype->toPrototype(),$aStatement) ;
 			}
 		}
 	}

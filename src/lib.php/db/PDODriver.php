@@ -4,7 +4,7 @@ namespace jc\db ;
 
 use jc\db\sql\Statement;
 
-class DriverPDO extends \PDO implements IDriver
+class PDODriver extends \PDO implements IDriver
 {
 	public function error()
 	{
@@ -39,9 +39,7 @@ class DriverPDO extends \PDO implements IDriver
 
 		return new PDORecordSet( \PDO::query($sSql) ) ;
 	}
-	/**
-	 * @return jc\db\recordset\IRecordSet
-	 */
+	
 	public function execute($sql)
 	{
 		$sSql = ($sql instanceof Statement)?

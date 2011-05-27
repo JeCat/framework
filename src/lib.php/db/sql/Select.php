@@ -20,6 +20,7 @@ class Select extends MultiTableStatement
 			. $this->makeStatementPredicate($bFormat)
 			. ($this->aColumns? $this->aColumns->makeStatement(): ' *')
 			. parent::makeStatement($bFormat)
+			. $this->makeStatementLimit()
 			. ' ;' ;
 	}
 

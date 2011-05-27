@@ -1,8 +1,51 @@
 <?php
 namespace jc\mvc\model ;
 
+use jc\pattern\composite\IContainer;
 
-interface IModel {
+interface IModel extends \ArrayAccess, \Iterator
+{
+	public function name() ;
+	
+	public function setName($sName) ;
+	
+	public function hasSerialized() ;
+	
+	public function load() ;
+	
+	public function save() ;
+	
+	// for child model ///////////////////////////////
+	public function addChild(IModel $aModel) ;
+	
+	public function removeChild(IModel $aModel) ;
+	
+	public function clearChildren() ;
+	
+	public function childrenCount() ;
+	
+	/**
+	 * @return IModel
+	 */
+	public function child($sName) ;
+	
+	public function childIterator() ;
+	
+	
+	// for data ///////////////////////////////
+	public function data($sName) ;
+	
+	public function setData($sName,$sValue) ;
+	
+	public function hasData($sName) ;
+	
+	public function removeData($sName) ;
+	
+	public function clearData() ;
+	
+	public function dataIterator() ;
+	
+		
 }
 
 ?>
