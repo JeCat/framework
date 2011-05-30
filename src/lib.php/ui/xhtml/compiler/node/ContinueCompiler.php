@@ -15,10 +15,10 @@ class ContinueCompiler extends NodeCompiler {
 	public function compile(IObject $aObject, IOutputStream $aDev, CompilerManager $aCompilerManager) {
 		Type::check ( "jc\\ui\\xhtml\\Node", $aObject );
 		
-		$aDev->write ( "<?php } ?>" );
-		
+		$aDev->write ( '<?php continue '
+						 . ExpressionCompiler::compileExpression ( $aObject->attributes ()->source () )
+						 . '; ?>' );
 	}
-
 }
 
 ?>

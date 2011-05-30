@@ -121,6 +121,12 @@ class NodeCompiler extends BaseCompiler
 		
 		return $this->arrCompilers[$sTagName] ;
 	}
+	
+	static public function assignVariableName($sPrefix='')
+	{
+		return $sPrefix.'var'.self::$nVariableAssigned++ ;
+	}
+	static private $nVariableAssigned = 0 ;
 }
 
 ?>
