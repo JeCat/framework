@@ -106,76 +106,87 @@ class Selecter extends OperationStrategy
 		// load 自己
 		$aModel->loadData($aRecordSet,$sClmPrefix) ;
 		
-		
-		////////////////////////////////////////////////////////////
-		// 加载关联model
-		foreach($aPrototype->associations() as $aAssoPrototype)
+		if( $aModel->isAggregarion() )
 		{
-			// 关联模型原型
-			$aToPrototype = $aAssoPrototype->toPrototype() ;
-			$sChildModelName = $aAssoPrototype->modelProperty() ;
-			
-			// 通过关联原型 创建子模型
-			$aChildModel = $aModel->child( $sChildModelName ) ;
-			if(!$aChildModel)
+			$models = $aModel->childIterator() ;
+		}
+		else 
+		{
+			$models = array($aModel) ;
+		}
+		
+		foreach($models as $aModel)
+		{
+			////////////////////////////////////////////////////////////
+			// 加载关联model
+			foreach($aPrototype->associations() as $aAssoPrototype)
 			{
-				$aChildModel = $aToPrototype->createModel() ;
-				$aModel->addChild($aChildModel,$sChildModelName) ;
-			}
-						
-			// -------------------------------------------------------------
-			// 一对一关联（从传入的recordset里加载数据）
-			if( in_array($aAssoPrototype->type(), array(
-					AssociationPrototype::hasOne
-					, AssociationPrototype::belongsTo
-			)) )
-			{
-				$this->loadModel($aDB,$aChildModel,$aRecordSet,$sChildModelName) ;
-			}
-			
-			// -------------------------------------------------------------
-			// 多项关系（独立查询）
-			else 
-			{
-					
-				// 一对多关联
-				if( $aAssoPrototype->type()==AssociationPrototype::hasMany )
+				// 关联模型原型
+				$aToPrototype = $aAssoPrototype->toPrototype() ;
+				$sChildModelName = $aAssoPrototype->modelProperty() ;
+				
+				// 通过关联原型 创建子模型
+				$aChildModel = $aModel->child( $sChildModelName ) ;
+				if(!$aChildModel)
 				{
-					$arrFromKeys = $aAssoPrototype->fromKeys() ;
-					$arrKeyValues = array() ;
-					foreach($aAssoPrototype->toKeys() as $nIdx=>$sKey)
-					{
-						$arrKeyValues[$sChildModelName.'.'.$sKey] = $aModel->data($arrFromKeys[$nIdx]) ;
-					}
-					
-					// 加载 child 类
-					$this->select($aDB, $aChildModel, null, null, $arrKeyValues, null, 30 ) ;
+					$aChildModel = $aToPrototype->createModel() ;
+					$aModel->addChild($aChildModel,$sChildModelName) ;
+				}
+							
+				// -------------------------------------------------------------
+				// 一对一关联（从传入的recordset里加载数据）
+				if( in_array($aAssoPrototype->type(), array(
+						AssociationPrototype::hasOne
+						, AssociationPrototype::belongsTo
+				)) )
+				{
+					$this->loadModel($aDB,$aChildModel,$aRecordSet,$sChildModelName) ;
 				}
 				
-				// 多对多关联
-				else if( $aAssoPrototype->type()==AssociationPrototype::hasAndBelongsMany )
+				// -------------------------------------------------------------
+				// 多项关系（独立查询）
+				else 
 				{
-					$aSelect = new Select( $aToPrototype->tableName(), $sChildModelName ) ;
-					
-					// bridge 表到 to表的关联条件
-					$sBridgeTable = $aAssoPrototype->bridgeTableName() ;
-					$aSelect->tables()->join($sBridgeTable) ;
-					$this->setAssociationCriteria(
-							$aSelect->tables()->sqlStatementJoin()->criteria()
-							, $sBridgeTable, $sChildModelName
-							, $aAssoPrototype->bridgeFromKeys(), $aAssoPrototype->toKeys()
-					) ;
-					
-					// from 表到 bridge 表的关联条件
-					$arrFromKeys = $aAssoPrototype->fromKeys() ;
-					$arrKeyValues = array() ;
-					foreach($aAssoPrototype->bridgeToKeys() as $nIdx=>$sKey)
+						
+					// 一对多关联
+					if( $aAssoPrototype->type()==AssociationPrototype::hasMany )
 					{
-						$arrKeyValues[$sBridgeTable.'.'.$sKey] = $aModel->data($arrFromKeys[$nIdx]) ;
+						$arrFromKeys = $aAssoPrototype->fromKeys() ;
+						$arrKeyValues = array() ;
+						foreach($aAssoPrototype->toKeys() as $nIdx=>$sKey)
+						{
+							$arrKeyValues[$sChildModelName.'.'.$sKey] = $aModel->data($arrFromKeys[$nIdx]) ;
+						}
+						
+						// 加载 child 类
+						$this->select($aDB, $aChildModel, null, null, $arrKeyValues, null, 30 ) ;
 					}
 					
-					// 加载 child 类
-					$this->select($aDB, $aChildModel, $aSelect, $sChildModelName, $arrKeyValues, null, 30 ) ;
+					// 多对多关联
+					else if( $aAssoPrototype->type()==AssociationPrototype::hasAndBelongsMany )
+					{
+						$aSelect = new Select( $aToPrototype->tableName(), $sChildModelName ) ;
+						
+						// bridge 表到 to表的关联条件
+						$sBridgeTable = $aAssoPrototype->bridgeTableName() ;
+						$aSelect->tables()->join($sBridgeTable) ;
+						$this->setAssociationCriteria(
+								$aSelect->tables()->sqlStatementJoin()->criteria()
+								, $sBridgeTable, $sChildModelName
+								, $aAssoPrototype->bridgeFromKeys(), $aAssoPrototype->toKeys()
+						) ;
+						
+						// from 表到 bridge 表的关联条件
+						$arrFromKeys = $aAssoPrototype->fromKeys() ;
+						$arrKeyValues = array() ;
+						foreach($aAssoPrototype->bridgeToKeys() as $nIdx=>$sKey)
+						{
+							$arrKeyValues[$sBridgeTable.'.'.$sKey] = $aModel->data($arrFromKeys[$nIdx]) ;
+						}
+						
+						// 加载 child 类
+						$this->select($aDB, $aChildModel, $aSelect, $sChildModelName, $arrKeyValues, null, 30 ) ;
+					}
 				}
 			}
 		}

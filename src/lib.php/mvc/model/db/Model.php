@@ -56,7 +56,7 @@ class Model extends BaseModel implements IModel
 		if( $this->isAggregarion() )
 		{
 			$aPrototype = $this->prototype() ;
-			foreach($aRecordSet as $arrRow)
+			foreach($aRecordSet->iterator() as $arrRow)
 			{
 				$aModel = $aPrototype->createModel() ;
 				$aModel->loadArrayData($arrRow,$sClmPrefix) ;
@@ -95,12 +95,34 @@ class Model extends BaseModel implements IModel
 	
 	public function load($values=null,$keys=null)
 	{
+		if($values)
+		{
+			$values = (array) $values ;
+			
+			if(!$keys)
+			{
+				$keys = $this->prototype()->primaryKeys() ;
+			}
+			
+			foreach($keys as &$sKey)
+			{
+				if(strstr($sKey,'.')==false)
+				{
+					$sKey = $this->prototype()->tableName().'.'.$sKey ;
+				}
+			}
+			
+			$values = array_combine($keys,$values) ;
+		}
+		
 		if( Selecter::singleton()->select(
 			DB::singleton()
 			, $this
 			, null
 			, null
 			, $values
+			, null
+			, $this->isAggregarion()? 30: 1
 		) )
 		{
 			$this->setSerialized(true) ;

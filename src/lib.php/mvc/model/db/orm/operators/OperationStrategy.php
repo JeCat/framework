@@ -12,16 +12,6 @@ use jc\lang\Object;
 
 abstract class OperationStrategy extends Object
 {
-	/*abstract public function execute(
-				DB $aDB
-				, IModel $aModel=null
-				, ModelPrototype $aPrototype=null
-				, $primaryKeyValues=null
-				, $sWhere=null
-			) ;*/
-			
-
-	
 	protected function setCondition(Criteria $aCriteria,$keys,$values)
 	{
 		$keys = array_values((array)$keys) ;
