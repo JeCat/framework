@@ -14,10 +14,6 @@ use jc\ui\xhtml\compiler\NodeCompiler;
 class WhileCompiler extends NodeCompiler {
 	public function compile(IObject $aObject, IOutputStream $aDev, CompilerManager $aCompilerManager) {
 		Type::check ( "jc\\ui\\xhtml\\Node", $aObject );
-		
-//		$aDev->write ( '<?php $__WHILE_EXE_' . $sObjId . '=' . ExpressionCompiler::compileExpression ( $aObject->attributes ()->source () ) . ';');
-//		$aDev->write ( 'while( ' );
-//		$aDev->write ( '$__WHILE_EXE_' . $sObjId  );
 
 		$aDev->write ( '<?php while(' );
 		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes ()->source () ) );

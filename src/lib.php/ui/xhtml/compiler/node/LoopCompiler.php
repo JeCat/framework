@@ -24,8 +24,15 @@ class LoopCompiler extends NodeCompiler
 		$sObjId = spl_object_hash($aObject);
 		
 		$sVarName =  $aAttrs->get("var") ;
-		if(!$sVarName){
+		if( empty($sVarName) ){
 			$sVarName = '__loop_idx_' . $sObjId;
+		}else{
+			//给出的var如果不带$就给加上
+			if(substr($sVarName,0,1) == '$'){
+				$aAttrs->set( substr($sVarName, 1) , $sStart );
+			}else{
+				$aAttrs->set( $sVarName , $sStart );
+			}
 		}
 		
 		$sVarName = '$' . $sVarName;

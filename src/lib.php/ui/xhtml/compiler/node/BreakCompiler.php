@@ -11,17 +11,14 @@ use jc\ui\CompilerManager;
 use jc\ui\IObject;
 use jc\ui\xhtml\compiler\NodeCompiler;
 
-class DoWhileCompiler extends NodeCompiler {
+class BreakCompiler extends NodeCompiler {
 	public function compile(IObject $aObject, IOutputStream $aDev, CompilerManager $aCompilerManager) {
 		Type::check ( "jc\\ui\\xhtml\\Node", $aObject );
 		
-		$aDev->write ( '<?php do{ ?>' );
-		$this->compileChildren ( $aObject, $aDev, $aCompilerManager );
-		$aDev->write ( "<?php }while(" );
-		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes ()->source () ) );
-		$aDev->write ( ");?>" );
+		$aDev->write ( '<?php break '
+						 . ExpressionCompiler::compileExpression ( $aObject->attributes ()->source () )
+						 . '; ?>' );
 	}
-
 }
 
 ?>
