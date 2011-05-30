@@ -38,7 +38,7 @@ abstract class MultiTableStatement extends Statement
 	{
 		if(!$this->aCriteria)
 		{
-			$this->aCriteria = new Criteria() ;
+			$this->aCriteria = new Criteria($this) ;
 		}
 		return $this->aCriteria ;
 	}
@@ -59,7 +59,7 @@ abstract class MultiTableStatement extends Statement
 	
 		if($this->aCriteria)
 		{
-			$sStatement.= " " . $this->aCriteria->makeStatement($bFormat) ;
+			$sStatement.= " WHERE " . $this->aCriteria->makeStatement($bFormat) ;
 		}
 				
 		return $sStatement ;

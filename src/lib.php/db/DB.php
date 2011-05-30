@@ -32,6 +32,11 @@ class DB extends Object
 		return $this->driver()->execute($sql) ;
 	}
 	
+	public function executeLog()
+	{
+		return $this->driver()->executeLog() ;
+	}
+	
 	private $aDriver ;
 }
 

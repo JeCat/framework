@@ -34,10 +34,16 @@ class PDODriver extends \PDO implements IDriver
 	 */
 	public function query($sql)
 	{
-		$sSql = ($sql instanceof Statement)?
+		$arrLog['sql'] = ($sql instanceof Statement)?
 					$sql->makeStatement(): strval($sql) ;
 
-		if( !$result = \PDO::query($sSql,\PDO::FETCH_ASSOC) )
+		$fBefore = microtime(true) ;
+		$result = \PDO::query($arrLog['sql'],\PDO::FETCH_ASSOC) ;
+		$arrLog['time'] = microtime(true) - $fBefore ;
+					
+		$this->arrExecuteLog[] = $arrLog ;
+		
+		if( !$result )
 		{
 			return false ;
 		}
@@ -46,12 +52,25 @@ class PDODriver extends \PDO implements IDriver
 	}
 	
 	public function execute($sql)
-	{
-		$sSql = ($sql instanceof Statement)?
+	{		
+		$arrLog['sql'] = ($sql instanceof Statement)?
 					$sql->makeStatement(): strval($sql) ;
 
-		return new PDORecordSet( \PDO::exec($sSql) ) ;
+		$fBefore = microtime(true) ;
+		$arrLog['affected'] = \PDO::exec($arrLog['sql']) ;
+		$arrLog['time'] = microtime(true) - $fBefore ;
+		
+		$this->arrExecuteLog[] = $arrLog ;
+		
+		return $arrLog['affected'] ;
 	}
+	
+	public function executeLog()
+	{
+		return $this->arrExecuteLog ;
+	}
+	
+	private $arrExecuteLog = array() ;
 }
 
 ?>

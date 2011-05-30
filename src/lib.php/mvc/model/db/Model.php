@@ -98,7 +98,8 @@ class Model extends BaseModel implements IModel
 		if( Selecter::singleton()->select(
 			DB::singleton()
 			, $this
-			, $this->prototype()
+			, null
+			, null
 			, $values
 		) )
 		{

@@ -86,7 +86,11 @@ class AssociationPrototype extends Object
 	{
 		return $this->arrToKeys ;
 	}
-	
+
+	public function bridgeTableName()
+	{
+		return $this->sBridgeTable ;
+	}
 	public function bridgeFromKeys()
 	{
 		return $this->arrBridgeFromKeys ;

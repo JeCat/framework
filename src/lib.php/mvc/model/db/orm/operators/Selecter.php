@@ -1,8 +1,9 @@
 <?php
 namespace jc\mvc\model\db\orm\operators ;
 
-use jc\db\IRecordSet;
+use jc\db\sql\Criteria;
 
+use jc\db\IRecordSet;
 use jc\mvc\model\db\Model;
 use jc\db\DB;
 use jc\mvc\model\db\orm\AssociationPrototype;
@@ -14,62 +15,63 @@ use jc\db\sql\Select;
 class Selecter extends OperationStrategy
 {
 	
-	public function select( DB $aDB, IModel $aModel, Select $aSelect=null, array $keyValues=null, $sWhere=null, $nLimitLen=1, $nLimitFrom=0 )
+	public function select( DB $aDB, IModel $aModel, Select $aSelect=null, $sTableAlias=null, array $keyValues=null, $sWhere=null, $nLimitLen=1, $nLimitFrom=0 )
 	{
 		$aPrototype = $aModel->prototype() ;
+		if(!$sTableAlias)
+		{
+			$sTableAlias = $aPrototype->name() ;
+		}
 		
 		// 对所有1对1关系，进行递归联合查询 
 		// ---------------------------
-		//  生成 sql select
+		// 组建一对一联合 sql select
 		if(!$aSelect)
 		{
-			$aStatement = new Select( $aPrototype->tableName(), $aPrototype->name() ) ;
+			$aSelect = new Select( $aPrototype->tableName(), $sTableAlias ) ;
 		}
-		
-		// 组建 sql select
-		$this->makeAssociationQuerySql($aPrototype->name(),$aPrototype,$aStatement) ;
-		$aStatement->setLimit($nLimitLen,$nLimitFrom) ;
-		
+		$this->makeAssociationQuerySql($sTableAlias,$aPrototype,$aSelect) ;
+		$aSelect->setLimit($nLimitLen,$nLimitFrom) ;
+
 		// 设置主键查询条件
 		if( $keyValues )
 		{
-			$aCriteria = $aStatement->criteria() ;
-			$sTableAlias = $aPrototype->name() ;
+			$aCriteria = $aSelect->criteria() ;
 			foreach($keyValues as $sKey=>$sValue)
 			{
-				$aCriteria->add($sTableAlias.'.'.$sKey,$sValue) ;
+				$aCriteria->add($sKey,$sValue) ;
 			}
 		}
-		
+
 		// 设置查询条件
 		if( $sWhere )
 		{
-			$aStatement->criteria()->add($sWhere) ;
+			$aSelect->criteria()->add($sWhere) ;
 		}
 
 		//  执行
-		$aRecordSet = $aDB->query($aStatement) ;
+		$aRecordSet = $aDB->query($aSelect) ;
 		if(!$aRecordSet)
 		{
 			return false ;
 		}
 		
 		// 加载 sql
-		$this->loadModel($aModel, $aRecordSet, $aPrototype->name().'.') ;
+		$this->loadModel($aDB, $aModel, $aRecordSet, $aPrototype->name().'.') ;
 		
 		return true ;
 	}
 
 	
 	
-	protected function makeAssociationQuerySql($sTableName,ModelPrototype $aPrototype,Select $aStatement)
+	protected function makeAssociationQuerySql($sTableName,ModelPrototype $aPrototype,Select $aSelect)
 	{
-		$aTables = $aStatement->tables() ;
+		$aTables = $aSelect->tables() ;
 		$aJoin = $aTables->sqlStatementJoin() ;
 
 		foreach($aPrototype->columnIterator() as $sClmName)
 		{
-			$aStatement->addColumn($sTableName.'.'.$sClmName,$sTableName.'.'.$sClmName) ;
+			$aSelect->addColumn($sTableName.'.'.$sClmName,$sTableName.'.'.$sClmName) ;
 		}
 		
 		// 处理关联表
@@ -84,18 +86,15 @@ class Selecter extends OperationStrategy
 				$sAssoTableAlias = $aAssoPrototype->modelProperty() ;
 				$aTables->join( $aAssoPrototype->toPrototype()->tableName(), null, $sAssoTableAlias ) ;
 				
-				$arrToKeys = $aAssoPrototype->toKeys() ;
-				foreach($aAssoPrototype->fromKeys() as $nIdx=>$sFromKey)
-				{
-					$aJoin->criteria()->add( "{$sTableName}.{$sFromKey} = {$sAssoTableAlias}.{$arrToKeys[$nIdx]}" ) ;
-				}
+				$this->setAssociationCriteria($aJoin->criteria(),$sTableName,$sAssoTableAlias, $aAssoPrototype->fromKeys(), $aAssoPrototype->toKeys() ) ;
 				
-				$this->makeAssociationQuerySql($sAssoTableAlias,$aAssoPrototype->toPrototype(),$aStatement) ;
+				// 递归关联
+				$this->makeAssociationQuerySql($sAssoTableAlias,$aAssoPrototype->toPrototype(),$aSelect) ;
 			}
 		}
 	}
 	
-	protected function loadModel( IModel $aModel, IRecordSet $aRecordSet, $sClmPrefix )
+	protected function loadModel( DB $aDB, IModel $aModel, IRecordSet $aRecordSet, $sClmPrefix )
 	{
 		$aPrototype = $aModel->prototype() ;
 		
@@ -107,41 +106,86 @@ class Selecter extends OperationStrategy
 		// load 自己
 		$aModel->loadData($aRecordSet,$sClmPrefix) ;
 		
+		
+		////////////////////////////////////////////////////////////
 		// 加载关联model
 		foreach($aPrototype->associations() as $aAssoPrototype)
 		{
-			// 一对一关联
+			// 关联模型原型
+			$aToPrototype = $aAssoPrototype->toPrototype() ;
+			$sChildModelName = $aAssoPrototype->modelProperty() ;
+			
+			// 通过关联原型 创建子模型
+			$aChildModel = $aModel->child( $sChildModelName ) ;
+			if(!$aChildModel)
+			{
+				$aChildModel = $aToPrototype->createModel() ;
+				$aModel->addChild($aChildModel,$sChildModelName) ;
+			}
+						
+			// -------------------------------------------------------------
+			// 一对一关联（从传入的recordset里加载数据）
 			if( in_array($aAssoPrototype->type(), array(
 					AssociationPrototype::hasOne
 					, AssociationPrototype::belongsTo
 			)) )
 			{
-				$aChildModel = $aModel->child( $aAssoPrototype->modelProperty() ) ;
-				if(!$aChildModel)
-				{
-					$aChildModel = $aAssoPrototype->toPrototype()->createModel() ;
-					$aModel->addChild($aModel,$aAssoPrototype->modelProperty()) ;
-				}
-				
-				$this->loadModel($aChildModel,$aRecordSet,$aAssoPrototype->modelProperty()) ;
+				$this->loadModel($aDB,$aChildModel,$aRecordSet,$sChildModelName) ;
 			}
 			
-			// 一对多关联
-			else if( $aAssoPrototype->type()==AssociationPrototype::hasMany )
+			// -------------------------------------------------------------
+			// 多项关系（独立查询）
+			else 
 			{
-				
-				$aChidModel = $aToPrototype->createModel() ;
-				
-				$arrKeys = $aAssoPrototype->toKeys() ;
-				$arrKeyValues = array() ;
-				foreach($arrKeys as $sKey)
+					
+				// 一对多关联
+				if( $aAssoPrototype->type()==AssociationPrototype::hasMany )
 				{
-					$arrKeyValues[$sKey] = $aModel->get($sKey) ;
+					$arrFromKeys = $aAssoPrototype->fromKeys() ;
+					$arrKeyValues = array() ;
+					foreach($aAssoPrototype->toKeys() as $nIdx=>$sKey)
+					{
+						$arrKeyValues[$sChildModelName.'.'.$sKey] = $aModel->data($arrFromKeys[$nIdx]) ;
+					}
+					
+					// 加载 child 类
+					$this->select($aDB, $aChildModel, null, null, $arrKeyValues, null, 30 ) ;
 				}
-				$this->select($aDB, $aChidModel, null, null, $arrKeyValues, 30 ) ;
 				
-				$aModel->addChild($aChidModel,$aAssoPrototype->modelProperty()) ;
+				// 多对多关联
+				else if( $aAssoPrototype->type()==AssociationPrototype::hasAndBelongsMany )
+				{
+					$aSelect = new Select( $aToPrototype->tableName(), $sChildModelName ) ;
+					
+					// bridge 表到 to表的关联条件
+					$sBridgeTable = $aAssoPrototype->bridgeTableName() ;
+					$aSelect->tables()->join($sBridgeTable) ;
+					$this->setAssociationCriteria(
+							$aSelect->tables()->sqlStatementJoin()->criteria()
+							, $sBridgeTable, $sChildModelName
+							, $aAssoPrototype->bridgeFromKeys(), $aAssoPrototype->toKeys()
+					) ;
+					
+					// from 表到 bridge 表的关联条件
+					$arrFromKeys = $aAssoPrototype->fromKeys() ;
+					$arrKeyValues = array() ;
+					foreach($aAssoPrototype->bridgeToKeys() as $nIdx=>$sKey)
+					{
+						$arrKeyValues[$sBridgeTable.'.'.$sKey] = $aModel->data($arrFromKeys[$nIdx]) ;
+					}
+					
+					// 加载 child 类
+					$this->select($aDB, $aChildModel, $aSelect, $sChildModelName, $arrKeyValues, null, 30 ) ;
+				}
 			}
+		}
+	}
+	
+	private function setAssociationCriteria(Criteria $aCriteria,$sFromTable,$sToTable,array $arrFromKeys,array $arrToKeys)
+	{
+		foreach($arrFromKeys as $nIdx=>$sFromKey)
+		{
+			$aCriteria->add( "{$sFromTable}.{$sFromKey} = {$sToTable}.{$arrToKeys[$nIdx]}" ) ;
 		}
 	}
 }
