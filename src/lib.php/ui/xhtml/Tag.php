@@ -11,7 +11,7 @@ class Tag extends ObjectBase
 	const TYPE_TAIL = 4 ;
 	const TYPE_SINGLE = 3 ;
 	
-	public function __construct($sName,Attributes $aAttrs,$nType,$nPosition,$nEndPosition,$nLine,$sSource)
+	public function __construct($sName,Attributes $aAttrs=null,$nType,$nPosition,$nEndPosition,$nLine,$sSource)
 	{
 		$this->sName = $sName ;
 		$this->nType = $nType ;
@@ -24,6 +24,11 @@ class Tag extends ObjectBase
 	{
 		return $this->sName ;
 	}
+	public function setName($sName)
+	{
+		$this->sName = $sName ;
+	}
+	
 	/**
 	 * @return Attributes
 	 */
@@ -31,9 +36,21 @@ class Tag extends ObjectBase
 	{
 		return $this->aAttrs ;
 	}
+	/**
+	 * @return Attributes
+	 */
+	public function setAttributes($aAttrs)
+	{
+		$this->aAttrs = $aAttrs ;
+	}
+	
 	public function tagType()
 	{
 		return $this->nType ;
+	}
+	public function setTagType($nType)
+	{
+		$this->nType = $nType ;
 	}
 	
 	public function isHead()

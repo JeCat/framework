@@ -115,6 +115,7 @@ class String extends Object
 	
 	private $sText = '' ;
 	
+		
 	/**
 	 * Description
 	 * 
@@ -199,6 +200,10 @@ class String extends Object
 			, 'ucfirst' => array( 'function'=>'ucfirst', 'pos'=>0, 'modify'=>1 ) 
 			, 'ucwords' => array( 'function'=>'ucwords', 'pos'=>0, 'modify'=>1 ) 
 			, 'wordwrap' => array( 'function'=>'wordwrap', 'pos'=>0, 'modify'=>1 ) 
+			
+			// 一些别名
+			, 'ireplace' => array( 'function'=>'str_ireplace', 'pos'=>3, 'modify'=>1 ) 
+			, 'replace' => array( 'function'=>'str_replace', 'pos'=>3, 'modify'=>1 ) 
 	 ) ;
 }
 ?>
