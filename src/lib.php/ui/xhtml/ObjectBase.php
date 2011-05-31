@@ -1,8 +1,6 @@
 <?php
 namespace jc\ui\xhtml ;
 
-use jc\util\String;
-
 use jc\ui\ICompiler;
 use jc\io\IOutputStream;
 use jc\lang\Exception;
@@ -176,16 +174,9 @@ class ObjectBase extends Object
 		) ;
 	}
 	
-	static public function getLine($source,$nObjectPos,$nFindStart=0)
+	static public function getLine($sSource,$nObjectPos,$nFindStart=0)
 	{
-		if( $source instanceof String )
-		{
-			return $source->substrCount("\n",$nFindStart,($nObjectPos+1)-$nFindStart+1) ;
-		}
-		else 
-		{
-			return substr_count($source,"\n",$nFindStart,($nObjectPos+1)-$nFindStart+1) ;
-		}
+		return substr_count($sSource,"\n",$nFindStart,($nObjectPos+1)-$nFindStart+1) ;
 	}
 	
 	private $nPosition = -1 ;

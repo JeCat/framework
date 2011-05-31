@@ -1,88 +1,43 @@
 <?php
-namespace jc\ui\xhtml\parsers\node ;
+namespace jc\ui\xhtml\parsers ;
 
+use jc\ui\xhtml\ObjectBase;
+
+use jc\util\match\Result;
+
+use jc\util\match\RegExp;
+
+use jc\ui\xhtml\Attributes;
 
 use jc\ui\xhtml\Text;
-use jc\util\String;
-use jc\ui\xhtml\ObjectBase;
+
+use jc\lang\Exception;
+use jc\ui\xhtml\Node;
+use jc\ui\xhtml\Tag;
 use jc\ui\IObject;
 use jc\ui\IInterpreter;
-use jc\lang\Object as JcObject;
+use jc\lang\Object;
+use jc\util\String;
 
-class Parser extends JcObject implements IInterpreter
+class NodeParser extends Object implements IInterpreter
 {
 	public function __construct()
 	{
-		/*$this->aTextState = new TextState() ;
-		$this->aTagState = new TagState() ;
-		$this->aAttributeState = new AttributeState() ;*/
-		
-		$this->aCurrentState = TextState::singleton(true) ;
-		$this->aCurrentObject = new Text(0, 0, 0, '') ;
-		
-		/*$sMark = md5(__CLASS__) ;
+		$sMark = md5(__CLASS__) ;
 		$this->aRegextFindQuote = new RegExp("/~\\*\\*{$sMark}\\{\\[(.*?)\\]\\}{$sMark}\\*\\*~/s") ;
 		
 		$this->aRegextFindHeadTags = new RegExp("|<([\\w:_\\-]+)([^>]*?)(/)?>|s") ;
 		$this->aRegextFindTailTags = new RegExp("|</([\\w:_\\-]+)>|s") ;
-		$this->aRegextParseTagAttributes = new RegExp("|([\\w_\\.\\-]+)\\s*=\\s*([\"'])([^\"']+)\\2|s") ;*/
+		$this->aRegextParseTagAttributes = new RegExp("|([\\w_\\.\\-]+)\\s*=\\s*([\"'])([^\"']+)\\2|s") ;
 	}
-	
-	/**
-	 * @return IParserState
-	 */
-	public function currentState()
-	{
-		return $this->aCurrentState ;
-	}
-	
-	public function switchState(IParserState $aState,String $aSource,$nPosition)
-	{
-		// 完成当前对象
-		if( $this->aCurrentObject->position() < $nPosition )
-		{
-			$this->aCurrentState->sleep($aSource,$nPosition,$this->aCurrentObject,$this->aObjectContainer) ;
-		}
-
-		// 创建新的当前对象
-		$aState->wakeup($this,$aSource,$nPosition) ;
-		
-		// 切换状态
-		$this->aCurrentState = $aState ;
-	}
-	
-	/**
-	 * @return IObject
-	 */
-	public function currentObject()
-	{
-		return $this->aCurrentObject ;
-	}
-	public function setCurrentObject(IObject $aObject)
-	{
-		$this->aCurrentObject = $aObject ;
-	}
-	
-	private $aObjectContainer ;
-	private $aCurrentObject ;
-	private $aCurrentState ;
 	
 	/**
 	 * return IObject
 	 */
 	public function parse(String $aSource,IObject $aObjectContainer,$sSourcePath)
-	{		
-		$this->aObjectContainer = new ObjectBase(0,$aSource->length()-1,0,'') ;
-		$nProcIndex = 0 ;
-		
-		while( $nProcIndex < $aSource->length() )
-		{
-			$nProcIndex = $this->aCurrentState->process($aSource,$nProcIndex,$this,$aObjectContainer) ;
-		}
-		
-		
+	{
 		// 前处理
-		/*$this->preprocessor($aSource) ;
+		$this->preprocessor($aSource) ;
 		
 		// parse tags
 		$arrTags = $this->parseTags($aSource) ;
@@ -103,7 +58,7 @@ class Parser extends JcObject implements IInterpreter
 		foreach($aRoot->iterator() as $aObject)
 		{
 			$aObjectContainer->add($aObject) ;
-		}*/
+		}
 	}
 	
 	public function preprocessor(String $aSource)

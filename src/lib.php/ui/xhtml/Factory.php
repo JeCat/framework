@@ -17,7 +17,7 @@ class Factory extends FactoryBase
 		$aInterpreters = parent::newInterpreterManager() ;
 		
 		// 注册  parser
-		$aInterpreters->add(parsers\node\Parser::singleton()) ;
+		$aInterpreters->add(parsers\NodeParser::singleton()) ;
 		$aInterpreters->add(parsers\MarkParser::singleton()) ;
 
 		

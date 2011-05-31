@@ -22,10 +22,10 @@ class ForeachCompiler extends NodeCompiler
 		$sFor = $aAttrs->expression('for');
 		$bHasKey = $aAttrs->has('key');
 		$bHasItem = $aAttrs->has('item');
-		$sKey = $bHasKey? $aAttrs->get('key') : '$__foreach_key_' . $sObjId;
-		$sItem = $bHasItem? $aAttrs->get('item') : '$__foreach_item_' . $sObjId;
+		$sKey = $bHasKey? $aAttrs->get('key') : NodeCompiler::assignVariableName('$__foreach_key_');
+		$sItem = $bHasItem? $aAttrs->get('item') : NodeCompiler::assignVariableName('$__foreach_item_');
 		$sDesc = $aAttrs->has('desc')? $aAttrs->get('desc') : 'false';    //是否反序
-		$sArrName = '$__foreach_Arr_' . $sObjId;
+		$sArrName = NodeCompiler::assignVariableName('$__foreach_Arr_');
 		
 		$aDev->write("<?php
 				$sArrName = $sFor;

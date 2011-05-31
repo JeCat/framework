@@ -18,16 +18,11 @@ class LoopCompiler extends NodeCompiler {
 		$sEndValue = $aAttrs->expression ( "end" );
 		$sStepValue = $aAttrs->has ( "step" ) ? $aAttrs->expression ( "step" ) : '1';
 		
-		//为变量名准备唯一的标示,防止loop嵌套后出现冲突
-		$sObjId = spl_object_hash ( $aObject );
-		
-		NodeCompiler::assignVariableName('__loop_idx_') ;
-		
 		$sVarName = $aAttrs->get ( "var" );
 		
 		$needMarkKey = false;
 		if (empty ( $sVarName )) {
-			$sVarName = '$__loop_idx_' . $sObjId;
+			$sVarName = NodeCompiler::assignVariableName('$__loop_idx_');
 		} else {
 			$needMarkKey = true;
 			//给出的var如果不带$就给加上
@@ -36,8 +31,8 @@ class LoopCompiler extends NodeCompiler {
 			}
 		}
 		
-		$sEndName = '$__loop_end_' . $sObjId;
-		$sStepName = '$__loop_step_' . $sObjId;
+		$sEndName = NodeCompiler::assignVariableName('$__loop_end_');
+		$sStepName = NodeCompiler::assignVariableName('$__loop_step_');
 		
 		$aDev->write ( "<?php
 								$sEndName  = $sEndValue ; 
