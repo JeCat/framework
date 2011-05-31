@@ -1,4 +1,11 @@
 <?php
+/**
+ *	continue
+ *
+ * <continue exp/>
+ * @author anubis
+ *
+ */
 namespace jc\ui\xhtml\compiler\node;
 
 use jc\ui\xhtml\compiler\ExpressionCompiler;

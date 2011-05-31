@@ -1,4 +1,17 @@
 <?php
+/**
+ * 
+ * else
+ * 
+ * <if exp>
+ * 	[ifbody]
+ * 	<else/>
+ * 	[elsebody]
+ * </if>
+ * 
+ * @author anubis
+ *
+ */
 namespace jc\ui\xhtml\compiler\node ;
 
 use jc\ui\xhtml\Node;

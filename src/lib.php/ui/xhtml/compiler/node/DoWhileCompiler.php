@@ -1,4 +1,15 @@
 <?php
+/**
+ *
+ * do-while
+ * 
+ * <dowhile exp>
+ * 	[dobody]
+ * </dowhile>
+ * 
+ * @author anubis
+ *
+ */
 namespace jc\ui\xhtml\compiler\node;
 
 use jc\ui\xhtml\compiler\ExpressionCompiler;

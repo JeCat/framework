@@ -1,4 +1,11 @@
 <?php
+/**
+ * while循环
+ * <while *exe* >  *loopbody*  </while>
+ * 
+ * @author anubis
+ *
+ */
 namespace jc\ui\xhtml\compiler\node;
 
 use jc\ui\xhtml\compiler\ExpressionCompiler;
@@ -23,7 +30,6 @@ class WhileCompiler extends NodeCompiler {
 		
 		$aDev->write ( "<?php } ?>" );
 	}
-
 }
 
 ?>

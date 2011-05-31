@@ -1,4 +1,22 @@
 <?php
+/**
+ * for循环
+ * else标签以下为exe为假时执行的语句
+ * 
+ * start int/exp 开始值 ,默认 0
+ * end   int/exp 结束值 
+ * step  int/exp 步长   ,默认 1
+ * var   text/exp 当前循环次数,相当于"key"
+ * 
+ * <loop [start] end [step var]> 
+ * 	[loopbody]
+ * 	[<else/>]
+ * 	[elsebody] 
+ * </loop> 
+ * 
+ * @author anubis
+ *
+ */
 namespace jc\ui\xhtml\compiler\node;
 
 use jc\ui\xhtml\Node;

@@ -1,4 +1,12 @@
 <?php
+/**
+ * elseif
+ * 
+ * <if exp>
+ * 
+ * @author anubis
+ *
+ */
 namespace jc\ui\xhtml\compiler\node;
 
 use jc\ui\xhtml\compiler\ExpressionCompiler;

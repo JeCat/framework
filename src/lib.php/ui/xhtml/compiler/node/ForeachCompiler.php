@@ -1,4 +1,14 @@
 <?php
+/**
+ * foreach
+ * 
+ * <foreach exp>
+ * 	[<foreach:else/>]
+ * </foreach>
+ * 
+ * @author anubis
+ *
+ */
 namespace jc\ui\xhtml\compiler\node ;
 
 use jc\ui\xhtml\Node;

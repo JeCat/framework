@@ -1,4 +1,14 @@
 <?php
+/**
+ * 当exe为假时执行的语句
+ * 
+ * <foreach exe>
+ * 	<foreach:else/>
+ * </foreach>
+ * 
+ * @author anubis
+ *
+ */
 namespace jc\ui\xhtml\compiler\node ;
 
 use jc\ui\xhtml\Node;
