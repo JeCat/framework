@@ -34,8 +34,6 @@ class Parser extends JcObject implements IInterpreter
 				// 切换状态
 				if( $aNewState!=$aState )
 				{
-					echo "切换状态\r\n" ;
-					
 					// 
 					$aCurrentObject = $aState->sleep($aCurrentObject,$aSource,$nProcIndex-1) ;
 					

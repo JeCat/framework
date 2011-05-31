@@ -61,11 +61,12 @@ class ObjectBase extends Object implements IObject
 	{
 		$this->sSource = $sSource ;
 	}
+	
 
 	public function add($aChild,$bAdoptRelative=true)
 	{
-		Type::assert(__NAMESPACE__."\\IObject",$aChild) ;
-
+		Type::assert(__NAMESPACE__.'\\IObject', $aChild) ;
+		
 		parent::add($aChild) ;
 		
 		if($bAdoptRelative)
@@ -73,43 +74,16 @@ class ObjectBase extends Object implements IObject
 			$aChild->setParent($this) ;
 		}
 	}
-
-	
-	/**
-	 * 从相对parent的位置，转换到全局位置
-	 */
-	static public function globalLocate(ObjectBase $aParent,ObjectBase $aChild)
-	{
-		$aChild->setPosition(
-			$aParent->position() + $aChild->position()
-		) ;
-		
-		$aChild->setEndPosition(
-			$aParent->position() + $aChild->endPosition()
-		) ;
-		
-		$aChild->setLine(
-			$aParent->line() + $aChild->line()
-		) ;
-	}
 	
 	static public function getLine($source,$nObjectPos,$nFindStart=0)
 	{
-		$nFindLen = $nObjectPos-$nFindStart+1 ;
-
-		$sTextLen = ( $source instanceof String )? $source->length(): strlen($source) ;
-		if( $sTextLen<$nFindStart+$nFindLen )
-		{
-			throw new Exception("计算对象所在行数时遇到了错误的参数：全文长度：%d,开始位置：%d,有效长度：%d",array($sTextLen,$nFindStart,$nFindLen)) ; 
-		}
-		
 		if( $source instanceof String )
 		{
-			return $source->substrCount("\n",$nFindStart,$nFindLen) ;
+			return $source->substrCount("\n",$nFindStart,($nObjectPos+1)-$nFindStart+1) ;
 		}
 		else 
 		{
-			return substr_count($source,"\n",$nFindStart,$nFindLen) ;
+			return substr_count($source,"\n",$nFindStart,($nObjectPos+1)-$nFindStart+1) ;
 		}
 	}
 	

@@ -19,7 +19,7 @@ class Stack extends Object
 	
 	public function put($element) 
 	{
-		$this->arrDataStack[] = $element
+		$this->arrDataStack[] = $element ;
 	}
 	
 	public function get() 
