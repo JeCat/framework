@@ -1,6 +1,7 @@
 <?php
 namespace jc\ui\xhtml ;
 
+use jc\util\String;
 use jc\ui\ICompiler;
 use jc\io\IOutputStream;
 use jc\lang\Exception;
@@ -8,7 +9,7 @@ use jc\lang\Type;
 use jc\pattern\composite\IContainedable;
 use jc\ui\Object ;
 
-class ObjectBase extends Object
+class ObjectBase extends Object implements IObject
 {
 	const LOCATE_IN = 1 ;
 	const LOCATE_OUT = 2 ;
@@ -60,98 +61,16 @@ class ObjectBase extends Object
 	{
 		$this->sSource = $sSource ;
 	}
-	
-	/**
-	 * 比较UI对象的位置
-	 *
-	 * @access	public
-	 * @param	$aUIObject	JCAT_UIObject	用于比较的另外一个对象
-	 * @return	self::LOCATE_IN, self::LOCATE_OUT, self::LOCATE_FRONT, self::LOCATE_BEHIND
-	 */
-	public function locate(ObjectBase $aUIObject)
-	{
-		// 前
-		if( $aUIObject->endPosition() <= $this->position() )
-		{
-			return self::LOCATE_FRONT ;
-		}
-			
-		// 后
-		if( $aUIObject->position() >= $this->endPosition() )
-		{
-			return self::LOCATE_BEHIND ;
-		}
-		
-		
-		// 内
-		if( $aUIObject->position() >= $this->position() )
-		{
-			return self::LOCATE_IN ;
-		}
-			
-		// 外
-		if( $aUIObject->position() <= $this->position() )
-		{
-			return self::LOCATE_OUT ;
-		}
-		
-		// 不支持
-		throw new Exception('不支持交叉UI对象。') ;
-	}
 
 	public function add($aChild,$bAdoptRelative=true)
 	{
-		Type::assert(__NAMESPACE__."\\ObjectBase",$aChild,'aChild') ;
+		Type::assert(__NAMESPACE__."\\IObject",$aChild) ;
+
+		parent::add($aChild) ;
 		
-		$arrNewList = array() ;
-		$aUIObject = $aChild ;
-
-		foreach(parent::iterator() as $aMyUIObject)
+		if($bAdoptRelative)
 		{
-			if($aUIObject)
-			{				
-				switch( $aMyUIObject->locate($aUIObject) )
-				{
-					// 对象在目标对象前
-					case self::LOCATE_FRONT :
-						$arrNewList[] = $aUIObject ;				// 插入到当前位置
-						$arrNewList[] = $aMyUIObject ;
-						$aUIObject = null ;
-						break ;
-					
-					case self::LOCATE_BEHIND :
-						$arrNewList[] = $aMyUIObject ;
-						break ;
-						
-					case self::LOCATE_IN :
-						$aMyUIObject->add($aUIObject) ;
-						$arrNewList[] = $aMyUIObject ;
-						$aUIObject = null ;
-						break ;
-						
-					case self::LOCATE_OUT :
-
-						$aUIObject->add($aMyUIObject) ;
-						break ;
-				}
-			}
-			else
-			{
-				$arrNewList[] = $aMyUIObject ;
-			}
-		}
-		
-		// 加入到最后
-		if( $aUIObject )
-		{
-			$arrNewList[] = $aUIObject ;
-		}
-
-		// 设置新的清单
-		$this->clear() ;
-		foreach($arrNewList as $aObject)
-		{
-			parent::add($aObject) ;
+			$aChild->setParent($this) ;
 		}
 	}
 
@@ -174,9 +93,24 @@ class ObjectBase extends Object
 		) ;
 	}
 	
-	static public function getLine($sSource,$nObjectPos,$nFindStart=0)
+	static public function getLine($source,$nObjectPos,$nFindStart=0)
 	{
-		return substr_count($sSource,"\n",$nFindStart,($nObjectPos+1)-$nFindStart+1) ;
+		$nFindLen = $nObjectPos-$nFindStart+1 ;
+
+		$sTextLen = ( $source instanceof String )? $source->length(): strlen($source) ;
+		if( $sTextLen<$nFindStart+$nFindLen )
+		{
+			throw new Exception("计算对象所在行数时遇到了错误的参数：全文长度：%d,开始位置：%d,有效长度：%d",array($sTextLen,$nFindStart,$nFindLen)) ; 
+		}
+		
+		if( $source instanceof String )
+		{
+			return $source->substrCount("\n",$nFindStart,$nFindLen) ;
+		}
+		else 
+		{
+			return substr_count($source,"\n",$nFindStart,$nFindLen) ;
+		}
 	}
 	
 	private $nPosition = -1 ;

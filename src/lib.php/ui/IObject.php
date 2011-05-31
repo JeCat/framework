@@ -3,9 +3,9 @@
 namespace jc\ui ;
 
 use jc\pattern\composite\IContainer;
-use jc\io\IOutputStream;
+use jc\pattern\composite\IContainedable;
 
-interface IObject extends IContainer
+interface IObject extends IContainer, IContainedable
 {
 }
 

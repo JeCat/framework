@@ -3,7 +3,6 @@
 namespace jc\ui\xhtml ;
 
 use jc\ui\xhtml\compiler\NodeCompiler;
-
 use jc\ui\xhtml\nodes\TagLibrary;
 use jc\ui\FactoryBase;
 
@@ -17,10 +16,8 @@ class Factory extends FactoryBase
 		$aInterpreters = parent::newInterpreterManager() ;
 		
 		// 注册  parser
-		$aInterpreters->add(parsers\NodeParser::singleton()) ;
-		$aInterpreters->add(parsers\MarkParser::singleton()) ;
+		$aInterpreters->add(parsers\Parser::singleton()) ;
 
-		
 		return $aInterpreters ;
 	}
 	

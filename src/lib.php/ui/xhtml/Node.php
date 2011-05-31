@@ -3,10 +3,8 @@
 namespace jc\ui\xhtml ;
 
 use jc\util\CombinedIterator;
-
 use jc\lang\Type;
 use jc\ui\xhtml\nodes\TagLibrary;
-use jc\ui\IObject;
 use jc\ui\ICompiler;
 use jc\io\IOutputStream;
 use jc\util\IDataSrc;
@@ -20,8 +18,8 @@ class Node extends ObjectBase
 	
 	public function __construct(Tag $aHeadTag, Tag $aTailTag=null)
 	{
-		$this->aHeadTag = $aHeadTag ;
-		$this->aTailTag = $aTailTag ;
+		$this->setHeadTag($aHeadTag) ;
+		$this->setTailTag($aTailTag) ;
 		
 		$this->setPosition(
 			$this->aHeadTag->position()
@@ -64,6 +62,16 @@ class Node extends ObjectBase
 	{
 		return $this->aHeadTag ;
 	}
+	public function setHeadTag(Tag $aTag)
+	{
+		if($this->aHeadTag)
+		{
+			$this->aHeadTag->setParent(null) ;
+		}
+		
+		$this->aHeadTag = $aTag ;
+		$this->aHeadTag->setParent($this) ;
+	}
 	/**
 	 * @return Tag
 	 */
@@ -71,6 +79,21 @@ class Node extends ObjectBase
 	{
 		return $this->aTailTag ;
 	}
+	public function setTailTag(Tag $aTag=null)
+	{
+		if($this->aTailTag)
+		{
+			$this->aTailTag->setParent(null) ;
+		}
+		
+		$this->aTailTag = $aTag ;
+		
+		if($this->aTailTag)
+		{
+			$this->aTailTag->setParent($this) ;
+		}
+	}
+	
 	/**
 	 * @return Attributes
 	 */

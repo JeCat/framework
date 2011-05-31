@@ -41,6 +41,7 @@ class Type
 
 	static public function assert($Types,& $Variable,$sVarName=null)
 	{
+		$Types = (array) $Types ;
 		if( !self::check($Types,$Variable) )
 		{
 			throw new TypeException($Variable,$Types,$sVarName) ;

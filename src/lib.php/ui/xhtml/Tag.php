@@ -15,7 +15,7 @@ class Tag extends ObjectBase
 	{
 		$this->sName = $sName ;
 		$this->nType = $nType ;
-		$this->aAttrs = $aAttrs ;
+		$this->aAttrs = $aAttrs? $aAttrs: new Attributes() ;
 		
 		parent::__construct($nPosition, $nEndPosition, $nLine, $sSource) ;
 	}

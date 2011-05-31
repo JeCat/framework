@@ -24,6 +24,11 @@ class String extends Object
 		$this->sText = $sText ;
 	}
 	
+	public function byte($nIdx)
+	{
+		return strlen($this->sText)>$nIdx? substr($this->sText,$nIdx,1): null ;
+	}
+	
 	public function append($sText,$bTail=true)
 	{
 		if($bTail)
