@@ -21,6 +21,8 @@ class LoopCompiler extends NodeCompiler {
 		//为变量名准备唯一的标示,防止loop嵌套后出现冲突
 		$sObjId = spl_object_hash ( $aObject );
 		
+		NodeCompiler::assignVariableName('__loop_idx_') ;
+		
 		$sVarName = $aAttrs->get ( "var" );
 		
 		$needMarkKey = false;
