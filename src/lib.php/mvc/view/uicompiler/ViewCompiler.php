@@ -1,7 +1,7 @@
 <?php
 namespace jc\mvc\view\uicompiler ;
 
-use jc\lang\Type;
+use jc\lang\Assert;
 use jc\ui\IObject;
 use jc\ui\CompilerManager;
 use jc\io\IOutputStream;
@@ -11,7 +11,7 @@ class ViewCompiler extends NodeCompiler
 {
 	public function compile(IObject $aObject,IOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		Type::assert("jc\\ui\\xhtml\\Node",$aObject,'aObject') ;
+		Assert::type("jc\\ui\\xhtml\\Node",$aObject,'aObject') ;
 
 		$aAttrs = $aObject->attributes() ;
 		

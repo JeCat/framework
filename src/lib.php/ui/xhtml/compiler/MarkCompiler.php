@@ -1,7 +1,7 @@
 <?php
 namespace jc\ui\xhtml\compiler ;
 
-use jc\lang\Type;
+use jc\lang\Assert;
 use jc\io\IOutputStream;
 use jc\ui\CompilerManager;
 use jc\ui\IObject;
@@ -10,7 +10,7 @@ class MarkCompiler extends BaseCompiler
 {
 	public function compile(IObject $aObject,IOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		Type::assert("jc\\ui\\xhtml\\Mark",$aObject,'aObject') ;
+		Assert::type("jc\\ui\\xhtml\\Mark",$aObject,'aObject') ;
 		
 		switch ( $aObject->markType() )
 		{

@@ -8,7 +8,7 @@ use jc\system\Application ;
 class Object implements IObject
 {
 	public function __construct()
-	{
+	{return ;
 		// 从调用堆栈上设置 application
 		if( $aApp = self::findApplicationOnCallStack(debug_backtrace()) )
 		{

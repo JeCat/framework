@@ -5,7 +5,7 @@ use jc\util\String;
 use jc\ui\ICompiler;
 use jc\io\IOutputStream;
 use jc\lang\Exception;
-use jc\lang\Type;
+use jc\lang\Assert;
 use jc\pattern\composite\IContainedable;
 use jc\ui\Object ;
 
@@ -65,7 +65,7 @@ class ObjectBase extends Object implements IObject
 
 	public function add($aChild,$bAdoptRelative=true)
 	{
-		Type::assert(__NAMESPACE__.'\\IObject', $aChild) ;
+		Assert::type(__NAMESPACE__.'\\IObject', $aChild) ;
 		
 		parent::add($aChild) ;
 		

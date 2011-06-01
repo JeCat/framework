@@ -20,7 +20,7 @@
 namespace jc\ui\xhtml\compiler\node;
 
 use jc\ui\xhtml\Node;
-use jc\lang\Type;
+use jc\lang\Assert;
 use jc\ui\ICompiler;
 use jc\io\IOutputStream;
 use jc\ui\CompilerManager;
@@ -29,7 +29,7 @@ use jc\ui\xhtml\compiler\NodeCompiler;
 
 class LoopCompiler extends NodeCompiler {
 	public function compile(IObject $aObject, IOutputStream $aDev, CompilerManager $aCompilerManager) {
-		Type::assert ( "jc\\ui\\xhtml\\Node", $aObject, 'aObject' );
+		Assert::type ( "jc\\ui\\xhtml\\Node", $aObject, 'aObject' );
 		
 		$aAttrs = $aObject->attributes ();
 		$sStart = $aAttrs->has ( "start" ) ? $aAttrs->expression ( "start" ) : '0';

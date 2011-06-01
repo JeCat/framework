@@ -3,9 +3,7 @@
 namespace jc\ui\xhtml ;
 
 use jc\lang\Exception;
-
-use jc\lang\Type;
-
+use jc\lang\Assert;
 use jc\pattern\composite\IContainedable;
 
 class Text extends ObjectBase
@@ -31,7 +29,7 @@ class Text extends ObjectBase
 	
 	public function add($aChild,$bAdoptRelative=true)
 	{
-		Type::assert(__NAMESPACE__.'\\ObjectBase', $aChild, 'aChild') ;
+		Assert::type(__NAMESPACE__.'\\ObjectBase', $aChild, 'aChild') ;
 		
 		if( $this->count() )
 		{

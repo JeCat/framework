@@ -4,7 +4,7 @@ namespace jc\ui\xhtml\parsers ;
 use jc\ui\xhtml\AttributeValue;
 use jc\ui\xhtml\IObject;
 use jc\util\String;
-use jc\lang\Type;
+use jc\lang\Assert;
 use jc\ui\xhtml\ObjectBase;
 use jc\ui\xhtml\Tag;
 
@@ -19,7 +19,7 @@ class ParserStateAttribute extends ParserState
 	
 	public function active(IObject $aParent,String $aSource,$nPosition)
 	{
-		Type::assert("jc\\ui\\xhtml\\Tag", $aParent, 'aParent') ;
+		Assert::type("jc\\ui\\xhtml\\Tag", $aParent, 'aParent') ;
 		
 		$aAttriVal = new AttributeValue( $aSource->substr($nPosition,1), $nPosition+1, ObjectBase::getLine($aSource, $nPosition) ) ;
 		$aParent->attributes()->set($nPosition+1,$aAttriVal) ;
@@ -30,7 +30,7 @@ class ParserStateAttribute extends ParserState
 
 	public function complete(IObject $aObject,String $aSource,$nPosition)
 	{
-		Type::assert("jc\\ui\\xhtml\\AttributeValue", $aObject, 'aObject') ;
+		Assert::type("jc\\ui\\xhtml\\AttributeValue", $aObject, 'aObject') ;
 		
 		$sAttrTextPos = $aObject->position() ;
 		$sAttrTextLen = ($nPosition-1) - $sAttrTextPos + 1 ;
@@ -45,7 +45,7 @@ class ParserStateAttribute extends ParserState
 
 	public function examineEnd(String $aSource, &$nPosition,IObject $aObject)
 	{
-		Type::assert("jc\\ui\\xhtml\\AttributeValue", $aObject, 'aObject') ;
+		Assert::type("jc\\ui\\xhtml\\AttributeValue", $aObject, 'aObject') ;
 		
 		$sByte = $aSource->byte($nPosition) ;
 		

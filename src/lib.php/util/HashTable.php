@@ -3,9 +3,7 @@
 namespace jc\util ;
 
 use jc\lang\Exception;
-
-use jc\lang\Type;
-
+use jc\lang\Assert;
 use jc\lang\Object;
 
 class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator
@@ -30,7 +28,7 @@ class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator
 	{
 		if( $this->sClass )
 		{
-			Type::assert($this->sClass,$Value,'Value') ;
+			Assert::type($this->sClass,$Value,'Value') ;
 		}
 		
 		$this->arrDatas[ $sName ] = $Value ;

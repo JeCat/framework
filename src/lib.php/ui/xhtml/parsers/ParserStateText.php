@@ -1,7 +1,7 @@
 <?php
 namespace jc\ui\xhtml\parsers ;
 
-use jc\lang\Type;
+use jc\lang\Assert;
 use jc\ui\xhtml\IObject;
 use jc\ui\xhtml\Text;
 use jc\ui\xhtml\ObjectBase;
@@ -34,7 +34,7 @@ class ParserStateText extends ParserState
 
 	public function complete(IObject $aObject,String $aSource,$nPosition)
 	{
-		Type::assert("jc\\ui\\xhtml\\Text", $aObject, 'aObject') ;
+		Assert::type("jc\\ui\\xhtml\\Text", $aObject, 'aObject') ;
 		
 		$sTextPos = $aObject->position() ;
 		$sTextLen = $nPosition - $sTextPos + 1 ;

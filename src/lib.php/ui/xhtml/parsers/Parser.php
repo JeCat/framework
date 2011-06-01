@@ -27,7 +27,6 @@ class Parser extends JcObject implements IInterpreter
 		
 		while( $nProcIndex < $aSource->length() )
 		{
-			$aState = ParserState::queryState($aCurrentObject) ;
 			
 			$aNewState = $aState->examineStateChange($aSource,$nProcIndex,$aCurrentObject) ;
 			if( $aNewState )
@@ -39,6 +38,9 @@ class Parser extends JcObject implements IInterpreter
 					$aCurrentObject = $aState->sleep($aCurrentObject,$aSource,$nProcIndex-1) ;
 					
 					$aCurrentObject = $aNewState->active($aCurrentObject,$aSource,$nProcIndex) ;
+					
+					// 状态变化
+					$aState = ParserState::queryState($aCurrentObject) ;
 				}
 			}
 			
@@ -51,6 +53,9 @@ class Parser extends JcObject implements IInterpreter
 				}
 				
 				$aCurrentObject = ParserState::queryState($aCurrentObject)->wakeup($aCurrentObject,$aSource,$nProcIndex) ;
+				
+				// 状态变化
+				$aState = ParserState::queryState($aCurrentObject) ;
 			}
 			
 			$nProcIndex ++ ;
@@ -63,7 +68,6 @@ class Parser extends JcObject implements IInterpreter
 					get_class($aCurrentObject), $aCurrentObject->line()
 			)) ;
 		}
-		
 		
 		$aObjectContainer->clear() ;
 		foreach($aRootObject->iterator() as $aObject)

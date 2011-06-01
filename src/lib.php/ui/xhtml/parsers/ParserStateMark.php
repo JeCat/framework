@@ -2,9 +2,7 @@
 namespace jc\ui\xhtml\parsers ;
 
 use jc\lang\Exception;
-
-use jc\lang\Type;
-
+use jc\lang\Assert;
 use jc\ui\xhtml\ObjectBase;
 use jc\ui\xhtml\Mark;
 use jc\ui\xhtml\IObject;
@@ -41,7 +39,7 @@ class ParserStateMark extends ParserState
 	
 	public function complete(IObject $aObject,String $aSource,$nPosition)
 	{
-		Type::assert("jc\\ui\\xhtml\\Mark", $aObject, 'aObject') ;
+		Assert::type("jc\\ui\\xhtml\\Mark", $aObject, 'aObject') ;
 		
 		$sTextPos = $aObject->position() ;
 		$sTextLen = ($nPosition-1) - $sTextPos + 1 ;

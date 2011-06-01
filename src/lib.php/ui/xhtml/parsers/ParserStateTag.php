@@ -5,7 +5,7 @@ use jc\ui\xhtml\Node;
 use jc\ui\xhtml\Attributes;
 use jc\ui\xhtml\Text;
 use jc\lang\Exception;
-use jc\lang\Type;
+use jc\lang\Assert;
 use jc\util\match\RegExp;
 use jc\ui\xhtml\ObjectBase;
 use jc\ui\xhtml\IObject;
@@ -73,10 +73,10 @@ class ParserStateTag extends ParserState
 
 	public function complete(IObject $aObject,String $aSource,$nPosition)
 	{
-		Type::assert("jc\\ui\\xhtml\\Tag", $aObject, 'aObject') ;
+		Assert::type("jc\\ui\\xhtml\\Tag", $aObject, 'aObject') ;
 
 		$aNode = $aObject->parent() ;
-		Type::assert("jc\\ui\\xhtml\\Node", $aNode) ;
+		Assert::type("jc\\ui\\xhtml\\Node", $aNode) ;
 	
 		$sTagLen = $nPosition - $aObject->position() + 1 ;
 		$sTagSource = $aSource->substr($aObject->position(),$sTagLen) ;

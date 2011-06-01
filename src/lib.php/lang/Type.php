@@ -38,16 +38,6 @@ class Type
 			self::OBJECT ,
 	) ;
 	
-
-	static public function assert($Types,& $Variable,$sVarName=null)
-	{
-		$Types = (array) $Types ;
-		if( !self::check($Types,$Variable) )
-		{
-			throw new TypeException($Variable,$Types,$sVarName) ;
-		}
-	}
-	
 	static public function check($Types,& $Variable)
 	{
 		if( is_string($Types) )
@@ -139,6 +129,7 @@ class Type
 		$aRefClass = new ReflectionClass($sClassName) ;
 		return $aRefClass->implementsInterface($sInterfaceName) ;
 	}
+	
 }
 
 ?>
