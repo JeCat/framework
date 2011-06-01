@@ -115,7 +115,7 @@ class ExpressionCompiler extends BaseCompiler
 			$sCompiled = addcslashes($sCompiled,'"') ;		
 		}
 		
-		if( !preg_match("/;\s*$/",$sCompiled) )
+		if( !preg_match("/;\\s*$/",$sCompiled) )
 		{
 			$sCompiled.= ';' ;
 		}
