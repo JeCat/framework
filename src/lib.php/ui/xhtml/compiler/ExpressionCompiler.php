@@ -103,7 +103,7 @@ class ExpressionCompiler extends BaseCompiler
 		// 合并 变量声明行, 执行行 和 变量保存行
 		$arrLines = array_merge(array_values($arrVarDefineLines),$arrLines,$arrVarResaveLines) ;
 		
-		if(!empty($sLastLine))
+		if( $bReturn )
 		{
 			$arrLines[] = 'return ' . $sLastLine ;
 		}
