@@ -13,13 +13,15 @@ class ParserStateAttribute extends ParserState
 	public function __construct()
 	{
 		parent::__construct() ;
+		
+		$this->arrChangeToStates[] = ParserStateMark::singleton() ;
 	}
 	
 	public function active(IObject $aParent,String $aSource,$nPosition)
 	{
 		Type::assert("jc\\ui\\xhtml\\Tag", $aParent, 'aParent') ;
 		
-		$aAttriVal = new AttributeValue( $aSource->substr($nPosition,1), $nPosition+1, ObjectBase::getLine($aSource, $nPosition+1) ) ;
+		$aAttriVal = new AttributeValue( $aSource->substr($nPosition,1), $nPosition+1, ObjectBase::getLine($aSource, $nPosition) ) ;
 		$aParent->attributes()->set($nPosition+1,$aAttriVal) ;
 		$aAttriVal->setParent($aParent) ;
 		

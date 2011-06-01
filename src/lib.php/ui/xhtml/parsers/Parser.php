@@ -12,7 +12,7 @@ use jc\lang\Object as JcObject ;
  * @author alee
  */
 class Parser extends JcObject implements IInterpreter
-{		
+{
 	/**
 	 * return IObject
 	 */
@@ -22,7 +22,6 @@ class Parser extends JcObject implements IInterpreter
 		
 		$aState = ParserStateDefault::singleton() ;
 		$aCurrentObject = $aRootObject = new ObjectBase(0,$aSource->length()-1,0,'') ;
-		
 		
 		while( $nProcIndex < $aSource->length() )
 		{
