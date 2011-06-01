@@ -36,6 +36,7 @@ class ExpressionCompiler extends BaseCompiler
 		
 		$sLineCode = '' ;
 		$arrVarDefineLines = array() ;
+		$arrVarResaveLines = array() ;
 		$arrLines = array() ;
 		foreach($arrTokens as $arrOneTkn)
 		{
@@ -46,17 +47,19 @@ class ExpressionCompiler extends BaseCompiler
 				{
 					// 变量名
 					$sVarName = substr($arrOneTkn[1],1) ;
-					$sVarNameNew = '_stack'.$nStackId.'_var_'.$sVarName ;
+					$sVarNameNew = NodeCompiler::assignVariableName('_stack').'_var_'.$sVarName ;
 					
 					//
 					if($bEval)
 					{
 						$arrVarDefineLines[$sVarName] = '\\$'.$sVarNameNew."=\\\$aVariables->get('{$sVarName}')" ;
+						$arrVarResaveLines[$sVarName] = "\\\$aVariables->set('{$sVarName}',\\\${$sVarNameNew})" ;
 						$sLineCode.= '\\$'.$sVarNameNew ;
 					}
 					else 
 					{
 						$arrVarDefineLines[$sVarName] = '$'.$sVarNameNew."=\$aVariables->get('{$sVarName}')" ;
+						$arrVarResaveLines[$sVarName] = "\$aVariables->set('{$sVarName}',\${$sVarNameNew})" ;
 						$sLineCode.= '$'.$sVarNameNew ;
 					}
 				}
@@ -95,17 +98,26 @@ class ExpressionCompiler extends BaseCompiler
 		if( $bReturn )
 		{
 			$sLastLine = array_pop($arrLines) ;
+		}
+		
+		// 合并 变量声明行, 执行行 和 变量保存行
+		$arrLines = array_merge(array_values($arrVarDefineLines),$arrLines,$arrVarResaveLines) ;
+		
+		if(!empty($sLastLine))
+		{
 			$arrLines[] = 'return ' . $sLastLine ;
 		}
 		
-		// 合并 变量声明行 和 执行行
-		$arrLines = array_merge(array_values($arrVarDefineLines),$arrLines) ;
-		
 		// 
-		$sCompiled = implode(";\r\n", $arrLines).";" ;
+		$sCompiled = implode(";\r\n", $arrLines) ;
 		if( $bEval )
 		{
 			$sCompiled = addcslashes($sCompiled,'"') ;		
+		}
+		
+		if( !preg_match("/;\s*$/",$sCompiled) )
+		{
+			$sCompiled.= ';' ;
 		}
 		
 		return $bEval? ("eval(\"" . $sCompiled . "\")"): $sCompiled ;
