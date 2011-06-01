@@ -32,7 +32,7 @@ class ParserStateAttribute extends ParserState
 	{
 		Type::assert("jc\\ui\\xhtml\\AttributeValue", $aObject, 'aObject') ;
 		
-		$sAttrTextPos = $aObject->position()+1 ;
+		$sAttrTextPos = $aObject->position() ;
 		$sAttrTextLen = ($nPosition-1) - $sAttrTextPos + 1 ;
 		$sAttrText = $aSource->substr( $sAttrTextPos, $sAttrTextLen ) ;
 		
