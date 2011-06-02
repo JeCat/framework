@@ -4,11 +4,22 @@ namespace jc\ui\xhtml ;
 
 class AttributeValue extends Text
 {
-	public function __construct($sQuoteType,$nPosition,$nLine)
+	public function __construct($sName,$sQuoteType,$nPosition,$nLine)
 	{
 		parent::__construct($nPosition,0,$nLine,'') ;
 		
 		$this->sQuoteType = $sQuoteType ;
+		$this->sName = $sName ;
+	}
+	
+	public function name()
+	{
+		return $this->sName ;
+	}
+	
+	public function setName($sName)
+	{
+		$this->sName = $sName ;
 	}
 	
 	public function quoteType()
@@ -17,6 +28,8 @@ class AttributeValue extends Text
 	} 
 	
 	private $sQuoteType ;
+	
+	private $sName ;
 }
 
 ?>

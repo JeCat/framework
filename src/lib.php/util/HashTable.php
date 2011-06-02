@@ -171,6 +171,15 @@ class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator
 		$this->sClass = $sClass ;
 	} 
 	
+	public function removeByValue($val)
+	{
+		$key=array_search($val,$this->arrDatas,!is_object($val)) ;
+		if( $key!==false )
+		{
+			unset($this->arrDatas[$key]) ;
+		}
+	}
+	
 	protected $arrDatas = array() ;
 	
 	private $sClass = array() ;

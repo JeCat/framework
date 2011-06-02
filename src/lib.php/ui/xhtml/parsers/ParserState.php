@@ -14,7 +14,10 @@ use jc\util\String;
 
 abstract class ParserState extends JcObject
 {
-	abstract public function active(IObject $aParent,String $aSource,$nPosition) ;
+	public function active(IObject $aParent,String $aSource,$nPosition)
+	{
+		return $aParent ;
+	}
 	
 	public function sleep(IObject $aObject,String $aSource,$nPosition)
 	{

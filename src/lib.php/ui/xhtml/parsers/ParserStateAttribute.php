@@ -1,6 +1,8 @@
 <?php
 namespace jc\ui\xhtml\parsers ;
 
+use jc\lang\Exception;
+
 use jc\ui\xhtml\AttributeValue;
 use jc\ui\xhtml\IObject;
 use jc\util\String;
@@ -21,23 +23,62 @@ class ParserStateAttribute extends ParserState
 	{
 		Assert::type("jc\\ui\\xhtml\\Tag", $aParent, 'aParent') ;
 		
-		$aAttriVal = new AttributeValue( $aSource->substr($nPosition,1), $nPosition+1, ObjectBase::getLine($aSource, $nPosition) ) ;
-		$aParent->attributes()->set($nPosition+1,$aAttriVal) ;
+		$sByte = $aSource->byte($nPosition) ;
+				
+		if( in_array($sByte,array('"',"'")) )
+		{
+			$nStartPos = $nPosition+1 ;
+			$sBorder = $sByte ;
+		}
+		else 
+		{
+			$nStartPos = $nPosition ;
+			$sBorder = null ;
+		}
+
+		$aAttriVal = new AttributeValue( null, $sBorder, $nStartPos, ObjectBase::getLine($aSource, $nStartPos) ) ;
+		$aParent->attributes()->add($aAttriVal) ;
 		$aAttriVal->setParent($aParent) ;
-		
-		return $aAttriVal ;
+	
+		if( $sByte=='=' )
+		{
+			$aAttriVal->setEndPosition($nPosition) ;
+			$aAttriVal->setSource($sByte) ;
+			
+			return $aParent ;
+		}
+		else 
+		{			
+			// 只有一个字节的属性值
+			$nNextPos = $nPosition+1 ;
+			if( ParserStateTag::singleton()->examineEnd($aSource,$nNextPos,$aAttriVal) )
+			{
+				return $this->complete($aAttriVal, $aSource, $nPosition) ;
+			}
+			
+			return $aAttriVal ;
+		}
 	}
 
 	public function complete(IObject $aObject,String $aSource,$nPosition)
 	{
 		Assert::type("jc\\ui\\xhtml\\AttributeValue", $aObject, 'aObject') ;
+
+		$sByte = $aSource->byte($nPosition) ;
+		
+		if( $aObject->quoteType() and $aObject->quoteType()!=$sByte )
+		{
+			throw new Exception("属性前后边界类型不符，位置：%d行",$aObject->line()) ;
+		}
 		
 		$sAttrTextPos = $aObject->position() ;
-		$sAttrTextLen = ($nPosition-1) - $sAttrTextPos + 1 ;
+		$sAttrTextEndPos = $aObject->quoteType()? $nPosition-1: $nPosition ;
+		
+		$sAttrTextLen = $sAttrTextEndPos - $sAttrTextPos + 1 ;
 		$sAttrText = $aSource->substr( $sAttrTextPos, $sAttrTextLen ) ;
 		
 		$aObject->setPosition($sAttrTextPos) ;
-		$aObject->setEndPosition($nPosition-1) ;
+		$aObject->setEndPosition($sAttrTextPos) ;
 		$aObject->setSource($sAttrText) ;
 		
 		return $aObject->parent() ;
@@ -48,25 +89,47 @@ class ParserStateAttribute extends ParserState
 		Assert::type("jc\\ui\\xhtml\\AttributeValue", $aObject, 'aObject') ;
 		
 		$sByte = $aSource->byte($nPosition) ;
+		$sQuote = $aObject->quoteType() ;
 		
-		if($aObject->quoteType()==$sByte)
+		// 有引号的
+		if($sQuote)
 		{
-			return true ;
+			if($aObject->quoteType()==$sByte)
+			{
+				return true ;
+			}
+			else 
+			{
+				if($sByte=='\\')
+				{
+					$nPosition ++ ;
+				}
+
+				return false ;
+			}
 		}
+		
+		// 无引号的
 		else 
 		{
-			if($sByte=='\\')
+			$sNextByte = $aSource->byte($nPosition+1) ;
+			if( in_array($sNextByte,array('=','>')) )
 			{
-				$nPosition ++ ;
+				return true ;
 			}
 			
+			// 空白字符
+			if( preg_match('/\\s/',$sNextByte) )
+			{
+				return true ;
+			}
+
 			return false ;
 		}
 	}
 	public function examineStart(String $aSource, &$nPosition,IObject $aCurrentObject)
-	{
-		$sByte = $aSource->byte($nPosition) ;
-		return $sByte=='"' or $sByte=="'" ;
+	{		
+		return preg_match("|^[^\\s/]$|", $aSource->byte($nPosition)) ;
 	}
 	
 }
