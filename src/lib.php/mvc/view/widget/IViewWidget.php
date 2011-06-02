@@ -2,6 +2,8 @@
 
 namespace jc\mvc\view\widget ;
 
+use jc\io\IOutputStream;
+use jc\util\IHashTable;
 use jc\mvc\view\IView;
 use jc\ui\UI;
 
@@ -16,9 +18,9 @@ interface IViewWidget
 
 	public function id() ;
 
-	public function setId() ;
+	public function setId($sId) ;
 
-	public function display(UI $aUI) ;
+	public function display(UI $aUI,IHashTable $aVariables=null,IOutputStream $aDevice=null) ;
 
 }
 

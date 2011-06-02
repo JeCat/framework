@@ -4,7 +4,6 @@ namespace jc\mvc\view ;
 use jc\mvc\view\widget\IViewWidget;
 
 use jc\pattern\composite\Container;
-use jc\pattern\Container;
 use jc\util\HashTable;
 use jc\io\OutputStreamBuffer;
 use jc\pattern\composite\NamableComposite;
@@ -112,9 +111,9 @@ class View extends NamableComposite implements IView
 	 */
 	protected function widgits()
 	{
-		if( $this->aWidgets )
+		if( !$this->aWidgets )
 		{
-			$this->aWidgets = new Container(__NAMESPACE__.'\\IViewWidget') ;
+			$this->aWidgets = new Container(__NAMESPACE__.'\\widget\\IViewWidget') ;
 		}
 		
 		return $this->aWidgets ;

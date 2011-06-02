@@ -27,9 +27,15 @@ class Controller extends NamableComposite implements IController
     protected function init()
     {}
     
+    /**
+     * @return IView
+     */
     public function createView($sName,$sSourceFile)
     {
-    	$this->registerView($sName,new View($sSourceFile)) ;
+    	$aView = new View($sSourceFile) ;
+    	$this->registerView($sName,$aView) ;
+    	
+    	return $aView ;
     }
     
     public function registerView($sName,IView $aView)

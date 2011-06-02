@@ -115,7 +115,13 @@ class UI extends JcObject
 	public function compile($sSourcePath,$sCompiledPath)
 	{
 		// 解析
-		$aObjectContainer = $this->interpreters()->parse($sSourcePath) ;
+		try{
+			$aObjectContainer = $this->interpreters()->parse($sSourcePath) ;
+		}
+		catch (Exception $e)
+		{
+			throw new Exception("UI引擎在解析模板文件时遇到了错误: %s",$sSourcePath,$e) ;
+		}
 		
 		// 编译
 		$this->compilers()->compile($aObjectContainer,$sCompiledPath) ;

@@ -1,20 +1,21 @@
 <?php
 namespace jc\mvc\view\widget ;
 
+use jc\ui\UI;
+use jc\io\IOutputStream;
+use jc\mvc\view\IView;
 use jc\lang\Exception;
-
 use jc\util\IHashTable;
-
 use jc\lang\Object ;
 
 class Widget extends Object implements IViewWidget
 {
-	public function __construct($sId,$sTemplateFile,IView $aView=null)
+	public function __construct($sId,$sTemplateName,IView $aView=null)
 	{
 		parent::__construct() ;
 		
 		$this->setId($sId) ;
-		$this->setTemplateFile($sTemplateFile) ;
+		$this->setTemplateName($sTemplateName) ;
 		
 		if($aView)
 		{

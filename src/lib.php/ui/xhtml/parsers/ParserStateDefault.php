@@ -12,7 +12,7 @@ class ParserStateDefault extends ParserState
 	{
 		parent::__construct() ;
 		
-		$this->arrChangeToStates[] = ParserStateNode::singleton() ;
+		$this->arrChangeToStates[] = ParserStateTag::singleton() ;
 		$this->arrChangeToStates[] = ParserStateMark::singleton() ;
 		$this->arrChangeToStates[] = ParserStateText::singleton() ;
 	}

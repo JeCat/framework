@@ -26,11 +26,7 @@ interface IView extends IContainer
 	public function display() ;
 	
 	public function show() ;
-	
-	public function formName() ;
-	
-	public function setFormName($sFormName) ;
-	
+		
 	public function addWidget(IViewWidget $aWidget) ;
 	
 	public function removeWidget(IViewWidget $aWidget) ;

@@ -75,16 +75,21 @@ class ObjectBase extends Object implements IObject
 		}
 	}
 	
-	static public function getLine($source,$nObjectPos,$nFindStart=0)
+	static public function getLine(String $aSource,$nObjectPos,$nFindStart=0)
 	{
-		if( $source instanceof String )
+		$nFindLen = $nObjectPos-$nFindStart+1 ;
+		
+		if( $aSource->length() < $nFindStart+$nFindLen )
 		{
-			return $source->substrCount("\n",$nFindStart,($nObjectPos+1)-$nFindStart+1) ;
+			throw new Exception(__METHOD__."() 超过字符范围(源数据长度:%d, 对象位置: %d,find from:%d,find %d)",array(
+					$aSource->length()
+					, $nObjectPos
+					, $nFindStart
+					, $nFindLen
+			)) ;
 		}
-		else 
-		{
-			return substr_count($source,"\n",$nFindStart,($nObjectPos+1)-$nFindStart+1) ;
-		}
+		
+		return $aSource->substrCount("\n",$nFindStart,$nFindLen) + 1;
 	}
 	
 	private $nPosition = -1 ;

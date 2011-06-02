@@ -44,20 +44,31 @@ class NodeCompiler extends BaseCompiler
 		
 		// 属性
 		$aAttrs = $aTag->attributes() ;
-		foreach ($aAttrs->nameIterator() as $sName)
+		foreach ($aAttrs->valueIterator() as $aAttrVal)
 		{
 			$aDev->write(" ") ;
-			$aDev->write($sName) ;
-			$aDev->write('="') ;
 			
-			$aValue = $aAttrs->object($sName) ;
-			if( $aAttrCompiler = $aCompilerManager->compiler($aValue) )
+			if($sName=$aAttrVal->name())
 			{
-				$aAttrCompiler->compile($aValue,$aDev,$aCompilerManager) ;
+				$aDev->write($sName) ;
+				$aDev->write('=') ;
+			}
+			
+			$aDev->write('"') ;
+			if( $aAttrCompiler = $aCompilerManager->compiler($aAttrVal) )
+			{
+				$aAttrCompiler->compile($aAttrVal,$aDev,$aCompilerManager) ;
 			}
 			else 
 			{
-				$aDev->write(addslashes($aAttrs->get($sName))) ;
+				if($sName)
+				{
+					$aDev->write(addslashes($aAttrs->get($sName))) ;
+				}
+				else 
+				{
+					$aDev->write(addslashes($aAttrVal->source())) ;
+				}
 			}
 		
 			$aDev->write('"') ;

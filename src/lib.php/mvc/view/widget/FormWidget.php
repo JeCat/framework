@@ -2,6 +2,8 @@
 namespace jc\mvc\view\widget ;
 
 
+use jc\system\Request;
+
 use jc\pattern\composite\Container;
 
 class FormWidget extends Widget implements IViewFormWidget
