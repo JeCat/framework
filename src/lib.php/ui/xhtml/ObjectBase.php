@@ -78,7 +78,7 @@ class ObjectBase extends Object implements IObject
 	static public function getLine(String $aSource,$nObjectPos,$nFindStart=0)
 	{
 		$nFindLen = $nObjectPos-$nFindStart+1 ;
-		
+
 		if( $aSource->length() < $nFindStart+$nFindLen )
 		{
 			throw new Exception(__METHOD__."() 超过字符范围(源数据长度:%d, 对象位置: %d,find from:%d,find %d)",array(

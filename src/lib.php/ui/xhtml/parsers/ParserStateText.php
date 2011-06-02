@@ -48,7 +48,7 @@ class ParserStateText extends ParserState
 		
 	public function examineEnd(String $aSource, &$nPosition,IObject $aObject)
 	{
-		return false ;
+		return $aSource->length()-1==$nPosition ;
 	}
 	public function examineStart(String $aSource, &$nPosition,IObject $aObject)
 	{

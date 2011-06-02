@@ -124,7 +124,13 @@ class UI extends JcObject
 		}
 		
 		// 编译
-		$this->compilers()->compile($aObjectContainer,$sCompiledPath) ;
+		try{
+			$this->compilers()->compile($aObjectContainer,$sCompiledPath) ;
+		}
+		catch (Exception $e)
+		{
+			throw new Exception("UI引擎在编译模板文件时遇到了错误: %s",$sSourcePath,$e) ;
+		}
 	}
 	
 	public function render($sCompiledPath,IHashTable $aVariables=null,IOutputStream $aDevice=null)
