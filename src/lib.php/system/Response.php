@@ -34,7 +34,7 @@ class Response extends Object
 			list($sBytes) = $aFilters->handle($sBytes) ;
 		}
 		
-		$this->aPrinter->write($sBytes) ;
+		$this->aPrinter->println($sBytes) ;
 	}
 	
 	/**

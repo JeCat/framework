@@ -57,7 +57,7 @@ class Selecter extends OperationStrategy
 		}
 		
 		// 加载 sql
-		$this->loadModel($aDB, $aModel, $aRecordSet, $aPrototype->name().'.') ;
+		$this->loadModel($aDB, $aModel, $aRecordSet, $sTableAlias.'.') ;
 		
 		return true ;
 	}
@@ -100,7 +100,7 @@ class Selecter extends OperationStrategy
 		
 		if(!$sClmPrefix)
 		{
-			$sClmPrefix = $aPrototype->name() ;
+			$sClmPrefix = $aPrototype->name().'.' ;
 		}
 		
 		// load 自己
@@ -140,7 +140,7 @@ class Selecter extends OperationStrategy
 						, AssociationPrototype::belongsTo
 				)) )
 				{
-					$this->loadModel($aDB,$aChildModel,$aRecordSet,$sChildModelName) ;
+					$this->loadModel($aDB,$aChildModel,$aRecordSet,$sChildModelName.'.') ;
 				}
 				
 				// -------------------------------------------------------------

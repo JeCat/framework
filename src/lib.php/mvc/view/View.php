@@ -1,6 +1,9 @@
 <?php
 namespace jc\mvc\view ;
 
+use jc\mvc\view\widget\IViewWidget;
+
+use jc\pattern\composite\Container;
 use jc\pattern\Container;
 use jc\util\HashTable;
 use jc\io\OutputStreamBuffer;
@@ -11,10 +14,10 @@ class View extends NamableComposite implements IView
 {
 	public function __construct($sSourceFilename=null,UI $aUI=null)
 	{
+		parent::__construct("jc\\mvc\\view\\IView") ;
+		
 		$this->setSourceFilename($sSourceFilename) ;
 		$this->setUi( $aUI? $aUI: UIFactory::singleton()->create() ) ;
-		
-		parent::__construct("jc\\mvc\\view\\IView") ;
 	}
 
 	/**
@@ -102,20 +105,50 @@ class View extends NamableComposite implements IView
 		
 		$this->display() ;
 	}
-	
+
+
 	/**
 	 * @return Container
 	 */
-	/*public function viewContainers()
+	protected function widgits()
 	{
-		if( !$this->aViewContainer )
+		if( $this->aWidgets )
 		{
-			$this->aViewContainer = new Container('jc\\mvc\\IViewContainer') ;
+			$this->aWidgets = new Container(__NAMESPACE__.'\\IViewWidget') ;
 		}
 		
-		return $this->aViewContainer ;
-	}*/
+		return $this->aWidgets ;
+	}
 	
+	public function addWidget(IViewWidget $aWidget)
+	{
+		$this->widgits()->add($aWidget) ;
+		$aWidget->setView($this) ;
+	}
+	
+	public function removeWidget(IViewWidget $aWidget)
+	{
+		$this->widgits()->remove($aWidget) ;
+		$aWidget->setView(null) ;
+	}
+	
+	public function clearWidgets()
+	{
+		foreach($this->widgitIterator() as $aWidget)
+		{
+			$this->removeWidget($aWidget) ;
+		}
+	}
+	
+	/**
+	 * @return \Iterator
+	 */
+	public function widgitIterator()
+	{
+		return $this->widgits()->iterator() ;
+	}
+	
+	private $aWidgets ;
 	private $sSourceFile ;
 	private $aUI ;
 	private $aOutputStream ;

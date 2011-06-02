@@ -1,7 +1,9 @@
 <?php
 namespace jc\mvc\view ;
 
+use jc\mvc\view\widget\IViewWidget;
 use jc\pattern\composite\IContainer;
+use jc\pattern\composite\Container;
 
 interface IView extends IContainer
 {
@@ -25,10 +27,20 @@ interface IView extends IContainer
 	
 	public function show() ;
 	
+	public function formName() ;
+	
+	public function setFormName($sFormName) ;
+	
+	public function addWidget(IViewWidget $aWidget) ;
+	
+	public function removeWidget(IViewWidget $aWidget) ;
+	
+	public function clearWidgets() ;
+	
 	/**
-	 * @return Container
+	 * @return \Iterator
 	 */
-	// public function viewContainers() ;
+	public function widgitIterator() ;
 	
 }
 

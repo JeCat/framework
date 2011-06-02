@@ -125,7 +125,7 @@ class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator
 		//
 		// $arr = array(null=>1,2,3) ;
 		// key($arr)===''
-		 
+		$k = key($this->arrDatas) ;
 		return key($this->arrDatas)!==null ;
 	}
 

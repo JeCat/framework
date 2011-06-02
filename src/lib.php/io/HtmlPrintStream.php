@@ -5,6 +5,11 @@ use jc\lang\Object;
 
 class HtmlPrintStream extends PrintStream implements IOutputStream
 {
+	public function println($sBytes)
+	{
+		$this->write($sBytes) ;
+	}
+	
 	public function write($sBytes,$nLen=null,$bFlush=false)
 	{		
 		PrintStream::write(

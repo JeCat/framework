@@ -50,17 +50,17 @@ class Model extends BaseModel implements IModel
 		$this->aPrototype = $aPrototype ;
 	}
 
-	public function loadData( IRecordSet $aRecordSet, $sClmPrefix=null)
+	public function loadData( IRecordSet $aRecordSet, $nRowIdx=0, $sClmPrefix=null)
 	{
 		// 聚合模型
 		if( $this->isAggregarion() )
 		{
 			$aPrototype = $this->prototype() ;
-			foreach($aRecordSet->iterator() as $arrRow)
+			for($nIdx=0; $nIdx<$aRecordSet->rowCount(); $nIdx++)
 			{
 				$aModel = $aPrototype->createModel() ;
-				$aModel->loadArrayData($arrRow,$sClmPrefix) ;
-				
+				$aModel->loadData($aRecordSet,$nIdx,$sClmPrefix) ;
+
 				$this->addChild($aModel) ;
 			}
 		}
@@ -68,30 +68,13 @@ class Model extends BaseModel implements IModel
 		// 常规模型
 		else 
 		{
-			$arrRow = $aRecordSet->row() ;
-			if(!$arrRow)
+			foreach( $this->prototype()->columns() as $sClm )
 			{
-				return ;
+				$this->setData( $sClm, $aRecordSet->field($nRowIdx,$sClmPrefix.$sClm) ) ;
 			}
-			
-			$this->loadArrayData($arrRow,$sClmPrefix) ;
 		}
 	}
-	public function loadArrayData( array $arrRow, $sClmPrefix=null)
-	{
-		$nPreLen = $sClmPrefix? strlen($sClmPrefix): 0 ;
-		foreach($arrRow as $sClm=>&$sValue)
-		{
-			if( $sClmPrefix and substr($sClm,0,$nPreLen)!=$sClmPrefix )
-			{
-				continue ;
-			}
-			
-			$this->setData(
-				substr($sClm,$nPreLen), $sValue
-			) ;
-		}
-	}
+	
 	
 	public function load($values=null,$keys=null)
 	{

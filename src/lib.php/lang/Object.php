@@ -60,7 +60,7 @@ class Object implements IObject
 		$this->aApplication = $aApp ;
 	}
 	
-	/*static public function singleton ($bCreateNew=true,$createArgvs=null)
+	static public function singleton ($bCreateNew=true,$createArgvs=null)
 	{
 		$sClass = get_called_class() ;
 		
@@ -103,9 +103,9 @@ class Object implements IObject
 		}
 
 		self::$arrGlobalInstancs[$sClass] = $aInstance ;
-	}*/
+	}
 
-	static public function singleton ($bCreateNew=true)
+	/*static public function singleton ($bCreateNew=true)
 	{
 		// 从调用堆栈上找到 application
 		if( !$aApp = self::findApplicationOnCallStack(debug_backtrace()) )
@@ -134,7 +134,7 @@ class Object implements IObject
 		}
 
 		$aApp->setSingletonInstance($sClass,$aInstance) ;
-	}
+	}*/
 	
 	static public function findApplicationOnCallStack(array $arrCallStack)
 	{
@@ -152,7 +152,28 @@ class Object implements IObject
 		}
 	}
 	
+	static public function flyweight($sKey/* ... */)
+	{		
+		$sClass = get_called_class() ;
+		
+		if( !isset(self::$arrFlyweightInstancs[$sClass]) )
+		{
+			self::$arrFlyweightInstancs[$sClass] = array() ;
+		}
+		
+		$arrArgs = func_get_args() ;
+		$sKey = implode(',', $arrArgs) ;
+		
+		if( empty(self::$arrFlyweightInstancs[$sClass][$sKey]) )
+		{
+			self::$arrFlyweightInstancs[$sClass][$sKey] = Factory::createNewObject($sClass,null,$arrArgs) ;
+		}
+		
+		return self::$arrFlyweightInstancs[$sClass][$sKey] ;
+	}
+		
 	static private $arrGlobalInstancs = array() ;
+	static private $arrFlyweightInstancs = array() ;
 	
 	private $aApplication ;
 }

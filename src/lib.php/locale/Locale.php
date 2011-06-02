@@ -46,6 +46,11 @@ class Locale implements ILocale
 	
 	public function findSentence($sKey)
 	{
+		if(!$this->arrSentencePackages)
+		{
+			return null ;
+		}
+		
 		for(end($this->arrSentencePackages);$arrPackages=current($this->arrSentencePackages);prev($this->arrSentencePackages))
 		{
 			for(end($arrPackages);$aPackage=current($arrPackages);prev($arrPackages))
