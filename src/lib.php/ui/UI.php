@@ -3,9 +3,7 @@
 namespace jc\ui ;
 
 use jc\lang\Exception;
-
 use jc\util\HashTable;
-
 use jc\io\IOutputStream;
 use jc\util\DataSrc;
 use jc\lang\Object as JcObject;
@@ -118,7 +116,7 @@ class UI extends JcObject
 		try{
 			$aObjectContainer = $this->interpreters()->parse($sSourcePath) ;
 		}
-		catch (Exception $e)
+		catch (\Exception $e)
 		{
 			throw new Exception("UI引擎在解析模板文件时遇到了错误: %s",$sSourcePath,$e) ;
 		}
@@ -127,7 +125,7 @@ class UI extends JcObject
 		try{
 			$this->compilers()->compile($aObjectContainer,$sCompiledPath) ;
 		}
-		catch (Exception $e)
+		catch (\Exception $e)
 		{
 			throw new Exception("UI引擎在编译模板文件时遇到了错误: %s",$sSourcePath,$e) ;
 		}
@@ -152,7 +150,16 @@ class UI extends JcObject
 			$aOutputFilters->add( array($aDevice,'write') ) ;
 		}
 		
-		include $sCompiledPath ;
+		try{
+			include $sCompiledPath ;
+		
+		// 处理异常
+		} catch (\Exception $e) {
+			
+			// 解除拦截 然后再抛出异常
+			$aOutputFilters->remove( array($aDevice,'write') ) ;
+			throw $e ;
+		}
 		
 		// 解除拦截
 		if($aDevice)

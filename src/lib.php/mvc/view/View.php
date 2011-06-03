@@ -1,8 +1,8 @@
 <?php
 namespace jc\mvc\view ;
 
+use jc\mvc\model\IModel;
 use jc\mvc\view\widget\IViewWidget;
-
 use jc\pattern\composite\Container;
 use jc\util\HashTable;
 use jc\io\OutputStreamBuffer;
@@ -19,6 +19,19 @@ class View extends NamableComposite implements IView
 		$this->setUi( $aUI? $aUI: UIFactory::singleton()->create() ) ;
 	}
 
+	/**
+	 * @return IModel
+	 */
+	public function model()
+	{
+		return $this->aModel ;
+	}
+	
+	public function setModel(IModel $aModel)
+	{
+		$this->aModel = $aModel ;
+	}
+	
 	/**
 	 * @return jc\ui\UI
 	 */
@@ -107,13 +120,13 @@ class View extends NamableComposite implements IView
 
 
 	/**
-	 * @return Container
+	 * @return HashTable
 	 */
 	protected function widgits()
 	{
 		if( !$this->aWidgets )
 		{
-			$this->aWidgets = new Container(__NAMESPACE__.'\\widget\\IViewWidget') ;
+			$this->aWidgets = new HashTable() ;
 		}
 		
 		return $this->aWidgets ;
@@ -121,13 +134,13 @@ class View extends NamableComposite implements IView
 	
 	public function addWidget(IViewWidget $aWidget)
 	{
-		$this->widgits()->add($aWidget) ;
+		$this->widgits()->set($aWidget->id(),$aWidget) ;
 		$aWidget->setView($this) ;
 	}
 	
 	public function removeWidget(IViewWidget $aWidget)
 	{
-		$this->widgits()->remove($aWidget) ;
+		$this->widgits()->remove($aWidget->id()) ;
 		$aWidget->setView(null) ;
 	}
 	
@@ -140,6 +153,14 @@ class View extends NamableComposite implements IView
 	}
 	
 	/**
+	 * @return IViewWidget
+	 */
+	public function widget($sId)
+	{
+		return $this->widgits()->get($sId) ;
+	}
+	
+	/**
 	 * @return \Iterator
 	 */
 	public function widgitIterator()
@@ -147,6 +168,7 @@ class View extends NamableComposite implements IView
 		return $this->widgits()->iterator() ;
 	}
 	
+	private $aModel ;
 	private $aWidgets ;
 	private $sSourceFile ;
 	private $aUI ;

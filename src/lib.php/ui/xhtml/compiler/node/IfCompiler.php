@@ -14,7 +14,7 @@ use jc\ui\xhtml\compiler\NodeCompiler;
 class IfCompiler extends NodeCompiler {
 	public function compile(IObject $aObject, IOutputStream $aDev, CompilerManager $aCompilerManager) {
 		Type::check ( "jc\\ui\\xhtml\\Node", $aObject );
-		
+
 		$aDev->write ( '<?php if(' );
 		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes ()->source () ) );
 		$aDev->write ( "){ ?>" );

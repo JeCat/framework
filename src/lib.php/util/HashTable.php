@@ -31,7 +31,9 @@ class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator
 			Assert::type($this->sClass,$Value,'Value') ;
 		}
 		
+		$oldVal = isset($this->arrDatas[ $sName ])? $this->arrDatas[ $sName ]: null ;
 		$this->arrDatas[ $sName ] = $Value ;
+		return $oldVal ;
 	}
 	public function setRef($sName,&$Value)
 	{

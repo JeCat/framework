@@ -67,7 +67,7 @@ class Attributes extends HashTable
 	{
 		return $this->bool($sName.'.express')?
 			$this->expression($sName) :
-			(($aText=parent::get($sName))?$aText->source():null) ;
+			(($aText=parent::get($sName))?'"'.$aText->source().'"':null) ;
 	}
 	
 	public function bool($sName)

@@ -27,11 +27,11 @@ class FilterMangeger extends Object implements IFilterMangeger
 	
 	public function handle()
 	{
-		$arrArgvs = func_get_args() ;
+		$arrOriArgvs = $arrArgvs = func_get_args() ;
 		
 		if( !$this->bWorking or empty($this->arrFilters) )
 		{
-			return $arrArgvs ;
+			return $arrOriArgvs ;
 		}
 		
 		foreach($this->arrFilters as &$arrFilter)
@@ -40,13 +40,21 @@ class FilterMangeger extends Object implements IFilterMangeger
 			
 			try{
 				$arrArgvs = (array)call_user_func_array($arrFilter[0],$arrFilterFuncArgvs) ;
+				
+				if( ($miss=count($arrOriArgvs)-count($arrArgvs)) > 0 )
+				{
+					while($miss--)
+					{
+						$arrArgvs[] = null ;
+					}
+				}
 			}
 			catch (StopFilterSignal $e)
 			{
 				return $e->returnVariables() ;
 			}
 		}
-		
+				
 		return $arrArgvs ;
 	}
 	

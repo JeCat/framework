@@ -28,6 +28,8 @@ class ForeachCompiler extends NodeCompiler
 		//为变量名准备唯一的标示,防止foreach嵌套后出现冲突
 		$sObjId = spl_object_hash($aObject);
 		
+		
+		
 		$aAttrs = $aObject->attributes() ;
 		$sFor = $aAttrs->expression('for');
 		$bHasKey = $aAttrs->has('key');
@@ -58,7 +60,7 @@ class ForeachCompiler extends NodeCompiler
 				$sItem = '$' . $sItem;
 			}
 			$aDev->write("
-					foreach($sArrName as $sKey => $sItem){
+					foreach({$sArrName}as ($sKey => )$sItem){
 						\$aVariables->set('$sKeyName',$sKey);
 						\$aVariables->set('$sItemName',$sItem);
 						");
@@ -67,7 +69,7 @@ class ForeachCompiler extends NodeCompiler
 				$sItemName = substr($sItem,1);
 			}
 			$aDev->write("
-					foreach($sArrName as $sItem){
+					foreach($sArrName as \${$sItem}){
 						\$aUI->variables()->set('$sItemName',$sItem);
 						");
 		}elseif(!$bHasKey && !$bHasItem){
@@ -75,7 +77,8 @@ class ForeachCompiler extends NodeCompiler
 					foreach($sArrName as $sKey => $sItem){
 						");
 		}
-		$aDev->write("?>");					
+		$aDev->write("?>");			
+				
 		//循环体，可能会包含foreach:else标签
 		$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
 		

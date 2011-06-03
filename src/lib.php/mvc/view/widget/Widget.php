@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\view\widget ;
 
+use jc\util\HashTable;
+
 use jc\ui\UI;
 use jc\io\IOutputStream;
 use jc\mvc\view\IView;
@@ -63,8 +65,20 @@ class Widget extends Object implements IViewWidget
 		{
 			throw new Exception("显示UI控件时遇到错误，UI控件尚未设置模板文件",$this->id()) ;
 		}
+		
+		if(!$aVariables)
+		{
+			$aVariables = new HashTable() ;
+			$aVariables->set("theWidget", $this) ;			
+			$aUI->display($sTemplateName,$aVariables,$aDevice) ;
+		}
 
-		$aUI->display($sTemplateName,$aVariables,$aDevice) ;
+		else 
+		{
+			$aOldVal = $aVariables->set("theWidget", $this) ;			
+			$aUI->display($sTemplateName,$aVariables,$aDevice) ;			
+			$aVariables->set("theWidget", $aOldVal) ;
+		}
 	}
 	
 	private $aView ;

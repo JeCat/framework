@@ -5,10 +5,10 @@ class Text extends FormWidget
 {
 	public function __construct($sId,$bMultiLine=false,$aView=null)
 	{
-		$sTemplate = $bMultiLine? 'ViewWidgetMultiLineText.template.html': 'ViewWidgetSingleLineText.template.html' ;
+		//$sTemplate = $bMultiLine? 'ViewWidgetText.template.html': 'ViewWidgetSingleLineText.template.html' ;
 		$this->bMultiLine = $bMultiLine ;
 			
-		parent::__construct($sId,$sTemplate,$aView) ;
+		parent::__construct($sId,'ViewWidgetText.template.html',$aView) ;
 	}
 	
 	public function isMultiLine()

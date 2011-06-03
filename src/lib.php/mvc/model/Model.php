@@ -79,23 +79,66 @@ abstract class Model extends Object implements IModel
 	// for data ///////////////////////////////
 	public function data($sName)
 	{
-		return isset($this->arrData[$sName])?
-					$this->arrData[$sName]: null ;
+		if( array_key_exists($sName, $this->arrData) )
+		{
+			return $this->arrData[$sName] ;
+		}
+		
+		list($aModel,$sName) = $this->findDataByPath($sName) ;
+		if($aModel)
+		{
+			return $aModel->data($sName) ;
+		}
+		
+		return null ;
 	}
 	
 	public function setData($sName,$sValue)
 	{
-		$this->arrData[$sName] = $sValue ;
+		if( array_key_exists($sName, $this->arrData) )
+		{
+			$this->arrData[$sName] = $sValue ;
+		}
+		
+		else 
+		{
+			list($aModel,$sName) = $this->findDataByPath($sName) ;
+			if($aModel)
+			{
+				$aModel->set($sName,$sValue) ;
+			}
+		}
 	}
 	
 	public function hasData($sName)
 	{
-		return isset($this->arrData[$sName]) ;
+		if(array_key_exists($sName,$this->arrData))
+		{
+			return true ;
+		}
+		
+		else 
+		{
+			list($aModel) = $this->findDataByPath($sName) ;
+			return $aModel? true: false ;
+		}
 	}
 	
 	public function removeData($sName)
 	{
-		unset($this->arrData[$sName]) ;
+		if(array_key_exists($sName,$this->arrData))
+		{
+			unset($this->arrData[$sName]) ;
+		}
+		
+		else 
+		{
+			list($aModel) = $this->findDataByPath($sName) ;
+			if($aModel)
+			{
+				$aModel->removeData($sName) ;
+			}
+		}
 	}
 	
 	public function clearData()
@@ -107,7 +150,6 @@ abstract class Model extends Object implements IModel
 	{
 		return new \ArrayIterator($this->arrData) ;
 	}
-	
 	
 	///////////////////////////////////////////
 	public function offsetExists($offset)
@@ -174,6 +216,29 @@ abstract class Model extends Object implements IModel
 	public function rewind ()
 	{
 		return reset($this->arrDatas) ;
+	}
+	
+	protected function findDataByPath($sDataPath)
+	{
+	
+		$arrSlices = explode('.', $sName) ;
+		if( count($arrSlices)>1 )
+		{
+			$sName = array_pop($arrSlices) ;
+			$aModel = $this ;
+			do{
+				
+				$sModelName = array_shift($arrSlices) ;
+				
+			}while( !empty($arrSlices) and $aModel=$aModel->child($sModelName) ) ;
+			
+			if( $aModel and $aModel->hasData($sName) )
+			{
+				return array($aModel,$sName) ;
+			}
+		}
+		
+		return array(null,null) ;
 	}
 	
 	private $arrData = array() ;

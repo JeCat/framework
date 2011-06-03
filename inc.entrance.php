@@ -36,15 +36,15 @@ UIFactory::singleton()->sourceFileManager()->addFolder(PATH.'src/template/') ;
 set_exception_handler(function(\Exception $aException)
 {
 	$aRspn = Application::singleton()->response() ;
-	
-	$aRspn->output($aException->message()) ;
-	$aRspn->output($aException->getTraceAsString()) ;
+
+	do{
+		
+		$aRspn->output("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------") ;
+		$aRspn->output($aException->message()) ;
+		$aRspn->output($aException->getTraceAsString()) ;
 	
 	// 递归 cause
-	if( $aException->getPrevious() )
-	{
-		// todo ...
-	}
+	} while( $aException = $aException->getPrevious() ) ;
 }) ;
 
 return $aApp ;
