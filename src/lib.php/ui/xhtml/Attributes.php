@@ -70,6 +70,10 @@ class Attributes extends HashTable
 			(($aText=parent::get($sName))?'"'.$aText->source().'"':null) ;
 	}
 	
+	public function string($sName)
+	{
+		return $aText=parent::get($sName)? $aText->source() :null ;
+	}
 	public function bool($sName)
 	{
 		return !in_array( strtolower(
