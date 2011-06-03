@@ -34,52 +34,49 @@ class ForeachCompiler extends NodeCompiler {
 		$aAttrs = $aObject->attributes();
 		
 		if( $aAttrs->has ( 'for' ) ){
-			$sFor = $aAttrs->expression ( 'for' );
-			if( substr($sFor, 0 , 1) == '$' ){
-				$sFor = substr($sFor, 1);
-			}
-//			var_dump($sFor);
-//			exit();
+			$sForUserExp = $aAttrs->expression ( 'for' );
 		}else{
 			throw new Exception("foreach tag can not run without 'for' attribute");
 		}
 		
 		$bIsSingle = $aObject->headTag()->isSingle() ? true : false ;
+		$sKeyUserName = $aAttrs->has ( 'key' ) ? $aAttrs->get ( 'key' ) : '' ;
+		$sItemUserName = $aAttrs->has ( 'item' ) ? $aAttrs->get ( 'item' ) : '' ;
 		
-		$sKey = $aAttrs->has ( 'key' ) ? $aAttrs->get ( 'key' ) : '' ;//: NodeCompiler::assignVariableName ( '__foreach_key_' );
-		$sItem = $aAttrs->has ( 'item' ) ? $aAttrs->get ( 'item' ) : NodeCompiler::assignVariableName ( '__foreach_item_' );
-//		$sArrName = NodeCompiler::assignVariableName ( '__foreach_Arr_' );
-		//\${$sArrName} = {$sFor};
+		
+		$sForAutoName = NodeCompiler::assignVariableName ( '$__foreach_Arr_' );
+		$sItemAutoName = NodeCompiler::assignVariableName ( '$__foreach_item_' ) ;
+		$sKeyAutoName = NodeCompiler::assignVariableName ( '$__foreach_key_' ) ;
+		
 		$aDev->write ( "<?php
-				if(!empty(\${$sFor})){
+				{$sForAutoName} = {$sForUserExp};
+				if(!empty({$sForAutoName})){
+					foreach({$sForAutoName} as {$sKeyAutoName}=>{$sItemAutoName}){
 					" );
-		$aDev->write ( "
-					foreach($sFor as ");
-		if($sKey){
-			$aDev->write ( " \${$sKey} => " ) ;
+		
+		if( !empty($sKeyUserName) ){
+			$aDev->write ( " \$aVariables->set({$sKeyUserName},{$sKeyAutoName}); ");
 		}
 		
-		$aDev->write ( " \${$sItem} ){ 
-						");
-		if($sKey){
-			$aDev->write ( " \$aVariables->set('{$sKey}',\${$sKey}); ");
+		if( !empty($sItemUserName) ){
+			$aDev->write ( " \$aVariables->set({$sItemUserName},{$sItemAutoName} ); ");	
 		}
-		
-		$aDev->write ( " \$aVariables->set('{$sItem}',\${$sItem} ); ");				
-						
-		
+					
 		$aDev->write("?>");
 		
 		//是否是单行标签?
-		if(!$aObject->headTag()->isSingle()){
+		if($aObject->headTag()->isSingle()){
+			$aDev->write("<?php 
+					}
+			 		?>") ;
+		}else{
 			//循环体，可能会包含foreach:else标签
 			$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
-		}
-		
-		$aDev->write("<?php 
+			$aDev->write("<?php 
 					}
 				}
 			 		?>") ; // end if   (如果foreach的内容包含foreach:else标签,则此处为foreach:else的end)
+		}
 	}
 }
 
