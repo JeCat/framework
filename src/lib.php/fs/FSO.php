@@ -187,47 +187,35 @@ class FSO extends Object
 		// 统一、合并斜线
 		$sPath = preg_replace('|[/\\\\]+|', '/', $sPath) ;
 		
-		$arrFoldersStack = explode('/', $sPath) ;
-		$arrFoldersStack = array_reverse($arrFoldersStack) ;
+		$arrFolders = explode('/', $sPath) ;
 		
-		// 第一次遍历先处理 "."
-		$nLen = count($arrFoldersStack) ;
-		for($i=0;$i<$nLen;$i++)
+		
+		$arrFoldersStack = array() ;
+		foreach($arrFolders as $nIdx=>$sFolderName)
 		{
-			if($arrFoldersStack[$i]=='.')
+			if( $sFolderName=='.' )
 			{
-				unset($arrFoldersStack[$i]) ; 
+				continue ;
 			}
-		}
-		$arrFoldersStack = array_values($arrFoldersStack) ;
-	
-		// 第二次遍历处理 ".."
-		$nLen = count($arrFoldersStack) ;
-		for($i=0;$i<$nLen;$i++)
-		{
-			if($arrFoldersStack[$i]=='..')
-			{				
-				unset($arrFoldersStack[$i]) ;
+			
+			if($sFolderName=='..')
+			{
+				$sParentFoldre = array_pop($arrFoldersStack) ;
 				
-				// 移除上一级目录，但是以下情况例外：
-				// windows 路径风格  c:\..\xxx
-				// 或 unix 路径风格  /../xxx	
-				if( $i<$nLen-2 )
+				// windows 盘符
+				if( preg_match("|^[a-z]:$|i",$sParentFoldre) )
 				{
-					unset($arrFoldersStack[$i+1]) ;
-					$i ++ ;
+					// 放回去
+					array_push($arrFoldersStack,$sFolderName) ;
 				}
+				
+				continue ;
 			}
+			
+			array_push($arrFoldersStack,$sFolderName) ;
 		}
 		
-		// 
-		$arrFoldersStack = array_reverse($arrFoldersStack) ;
-		$sNewPath = implode($sPathSeparator, $arrFoldersStack) ;
-		
-		// 转换 windows下  c:\xxx 这种情况
-		$sNewPath = preg_replace("|^([a-z]):/|i","\\1:\\",$sNewPath) ;
-		
-		return $sNewPath ;
+		return implode($sPathSeparator, $arrFoldersStack) ;
 	}
 	
 	/**

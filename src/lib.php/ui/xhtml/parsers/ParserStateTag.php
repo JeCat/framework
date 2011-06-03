@@ -40,7 +40,7 @@ class ParserStateTag extends ParserState
 			}
 			$sByte = $aSource->byte($nPosition) ;
 			
-			if( preg_match('/[\'"\\s>]/',$sByte) )
+			if( ($sTagName and $sByte=='/') or preg_match('|[\'"\\s>]|',$sByte) )
 			{
 				break ;
 			}

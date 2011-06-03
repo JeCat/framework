@@ -21,15 +21,15 @@ class FSOIterator extends \FilterIterator
 	public function __construct($sFolderPath,$nFlags=self::FLAG_DEFAULT)
 	{
 		$this->nFlags = $nFlags ;
-		$this->sFolderPath = Dir::formatPath($sFolderPath) ;
+		$this->sFolderPath = $sFolderPath = Dir::formatPath($sFolderPath) ;
 		
 		if( ($nFlags&self::RECURSIVE)==self::RECURSIVE )
 		{
-			parent::__construct(new \DirectoryIterator($sFolderPath)) ;
+			parent::__construct(new \RecursiveDirectoryIterator($sFolderPath)) ;
 		}
 		else
 		{
-			parent::__construct(new \RecursiveDirectoryIterator($sFolderPath)) ;
+			parent::__construct(new \DirectoryIterator($sFolderPath)) ;
 		}
 	}
 
@@ -44,7 +44,7 @@ class FSOIterator extends \FilterIterator
 	
 	public function accept() 
 	{
-		$sPath = parent::current() ;
+		$sPath = $this->getInnerIterator()->getPath() ;
 		
 		if( is_file($sPath) )
 		{
@@ -68,9 +68,10 @@ class FSOIterator extends \FilterIterator
 	
 	public function current()
 	{
+		$sPath = parent::current() ;
+			
 		if(($this->nFlags&self::RETURN_PATH)==self::RETURN_PATH)
 		{
-			$sPath = $this->sFolderPath . parent::current() ;
 			if( is_dir($sPath) )
 			{
 				$sPath.= DIRECTORY_SEPARATOR ;
@@ -81,23 +82,23 @@ class FSOIterator extends \FilterIterator
 		
 		else if(($this->nFlags&self::RETURN_NAME)==self::RETURN_NAME)
 		{
-			return parent::current() ;
+			return basename($sPath) ;
 		}
 		
 		else if(($this->nFlags&self::RETURN_DIR)==self::RETURN_DIR)
 		{
-			$sSubDir = dirname(parent::current()) ;
-			if($sSubDir)
+			$sDir = dirname($sPath) ;
+			if($sDir)
 			{
-				$sSubDir.= DIRECTORY_SEPARATOR ;
+				$sDir.= DIRECTORY_SEPARATOR ;
 			}
 			
-			return $this->sFolderPath . $sSubDir ;
+			return $sDir ;
 		}
 		
 		else if($this->nFlags&self::RETURN_FSO)
 		{
-			return FSO::create(parent::current()) ;
+			return FSO::create($sPath) ;
 		}
 		
 		else
