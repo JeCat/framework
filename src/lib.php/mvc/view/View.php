@@ -168,12 +168,22 @@ class View extends NamableComposite implements IView
 		return $this->widgits()->iterator() ;
 	}
 	
+	public function dataExchanger()
+	{
+		if(!$this->aDataExchanger)
+		{
+			$this->aDataExchanger = new DataExchanger() ;
+		}
+		return $this->aDataExchanger ;
+	}
+	
 	private $aModel ;
 	private $aWidgets ;
 	private $sSourceFile ;
 	private $aUI ;
 	private $aOutputStream ;
 	private $aVariables ;
+	private $aDataExchanger ;
 }
 
 ?>

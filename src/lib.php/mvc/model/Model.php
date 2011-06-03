@@ -220,8 +220,7 @@ abstract class Model extends Object implements IModel
 	
 	protected function findDataByPath($sDataPath)
 	{
-	
-		$arrSlices = explode('.', $sName) ;
+		$arrSlices = explode('.', $sDataPath) ;
 		if( count($arrSlices)>1 )
 		{
 			$sName = array_pop($arrSlices) ;

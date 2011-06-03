@@ -5,48 +5,17 @@ namespace jc\pattern\composite ;
 
 class NamableComposite extends Composite implements INamable
 {
-	// implement for IContainedable //////////////////
-	public function addName($Names)
+	public function name($sName)
 	{
-		$Names = (array) $Names ;
-		foreach ($Names as $sName)
-		{
-			if( !in_array($sName, $this->arrNames) )
-			{
-				return $this->arrNames[] = (string)$sName ;
-			}
-		}
+		return $this->sName ;
 	}
 	
-	public function hasName($sName)
+	public function setName($sName)
 	{
-		return in_array($sName, $this->arrNames) ;
+		$this->sName = $sName ;
 	}
 	
-	public function removeName($sName)
-	{
-		$nIdx = array_search($sName, $this->arrNames) ;
-		if($nIdx!==null)
-		{
-			unset($this->arrNames[$nIdx]) ;
-		}
-		
-		return $nIdx ;
-	}
-	
-	public function clearNames()
-	{
-		$this->arrNames = array() ;
-	}
-	
-	public function namesIterator()
-	{
-		return $this->arrNames ;
-	}
-	
-	
-	
-	private $arrNames = array() ;
+	private $sName ;
 	
 }
 

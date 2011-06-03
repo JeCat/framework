@@ -19,10 +19,6 @@ class ParserStateTag extends ParserState
 	{
 		parent::__construct() ;
 		
-		$this->aRegextFindHeadTags = new RegExp("|^<([\\w:_\\-]+)([^>]*?)(/)?>$|s") ;
-		$this->aRegextFindTailTags = new RegExp("|^</([\\w:_\\-]+)>$|s") ;
-		$this->aRegextParseTagAttributes = new RegExp("|([\\w_\\.\\-]+)\\s*=\\s*([\"'])([^\"']+)\\2|s") ;
-		
 		$this->arrChangeToStates[] = ParserStateAttribute::singleton() ;
 	}
 
@@ -93,17 +89,14 @@ class ParserStateTag extends ParserState
 	public function examineStart(String $aSource, &$nPosition,IObject $aObject)
 	{
 		$sByte = $aSource->byte($nPosition) ;
+		$sNextByte = $aSource->byte($nPosition+1) ;
 		
-		if( $sByte=='<' and preg_match('|[/\w:_\-\.\!]|',$nPosition+1) )
-		{
-			// 排除html注释
-			if( $aSource->substr($nPosition,4)=='<!--' )
-			{
-				return false ;
-			}
-			
+		if( $sByte=='<' and preg_match('|[/\w:_\-\.]|',$sNextByte) )
+		{			
 			return true ;
 		}
+		
+		return false ;
 	}
 
 	public function complete(IObject $aObject,String $aSource,$nPosition)
@@ -214,20 +207,12 @@ class ParserStateTag extends ParserState
 			return $aNode->parent() ;
 		}
 		
+		// 意外
 		else 
 		{
 			throw new Exception("遇到无效的xhtml标签。源文：%s",$sTagSource) ;
 		}
-		
-		
 	}
-	
-	
-	private $aRegextFindHeadTags ;
-	
-	private $aRegextFindTailTags ;
-	
-	private $aRegextParseTagAttributes ;
 }
 
 ?>

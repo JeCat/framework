@@ -29,17 +29,9 @@ namespace jc\pattern\composite ;
 
 interface INamable
 {
+	public function name($sName) ;
 	
-	public function addName($Names) ;
-	
-	public function hasName($sName) ;
-	
-	public function removeName($sName) ;
-	
-	public function clearNames() ;
-	
-	public function namesIterator() ;
-	
+	public function setName($sName) ;
 }
 
 ?>
