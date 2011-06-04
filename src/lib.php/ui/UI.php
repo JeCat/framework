@@ -146,6 +146,7 @@ class UI extends JcObject
 		// 拦截 output
 		if($aDevice)
 		{
+			ob_flush() ;
 			$aOutputFilters = $this->application(true)->response()->filters() ;
 			$aOutputFilters->add( array($aDevice,'write') ) ;
 		}
