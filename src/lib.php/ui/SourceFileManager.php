@@ -20,8 +20,18 @@ class SourceFileManager extends ResourceManager
 	{
 		return dirname($sSourcePath).'/compileds/'.basename($sSourcePath).'.php' ;
 	}
+
+	public function isForceCompile()
+	{
+		return $this->bForceCompile ;
+	}
 	
-	private $bForceCompile = true ;
+	public function setForceCompile($bForceCompile)
+	{
+		$this->bForceCompile = $bForceCompile ;
+	}
+	
+	private $bForceCompile = false ;
 }
 
 ?>

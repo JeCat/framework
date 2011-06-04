@@ -9,18 +9,6 @@ class CoreApplication extends Object
 	public function __construct()
 	{
 		$this->setApplication($this) ;
-		
-		// 初始化 class loader		
-		$aClassLoader = new ClassLoader() ;
-		$aClassLoader->setApplication($this) ;
-		$aClassLoader->addPackage( realpath(__DIR__.'/..').'/', "jc" ) ; // 将 jcat 加入到 class loader 中
-		$this->setClassLoader($aClassLoader) ;
-
-		// 创建 AccessRouter 对象
-		$this->setAccessRouter( $this->create('AccessRouter',__NAMESPACE__) ) ;
-		
-		// 创建 LocaleManager 对象
-		$this->setLocaleManager( $this->create('LocaleManager','jc\locale',array('cn')) ) ;
 	}
 	
 	/**

@@ -1,14 +1,20 @@
 <?php
 namespace jc\system ;
 
-class ClassLoader extends \jc\lang\Factory
+class ClassLoader extends \jc\lang\Object
 {
 	public function __construct()
 	{
-		spl_autoload_register( array($this,"Autoload") ) ;
+		spl_autoload_register( array($this,"autoload") ) ;
 		
 		// OOXX.php
-		$this->addClassFilenameWrapper(array(__CLASS__,'classFilenameWrapper')) ;
+		$this->addClassFilenameWrapper(function ($sClassName){ return "{$sClassName}.php" ; }) ;		
+		
+		// OOXX.class.php
+		$this->addClassFilenameWrapper(function ($sClassName){ return "{$sClassName}.class.php" ; }) ;
+		
+		// class.OOXX.php
+		$this->addClassFilenameWrapper(function ($sClassName){ return "class.{$sClassName}.php" ; }) ;
 	}
 
 	public function addPackage($sFolder,$sNamespace='') 
@@ -21,48 +27,34 @@ class ClassLoader extends \jc\lang\Factory
 		$this->arrClassFilenameWraps[] = $func ;
 	}
 	
-	static public function classFilenameWrapper($sClassName)
-	{
-		return "{$sClassName}.php" ;
-	}
-	
 	public function autoload($sClassFullName)
 	{
 		$nNamespaceEnd = strrpos($sClassFullName,"\\") ;
 		$sFullNamespace = substr($sClassFullName,0,$nNamespaceEnd) ;
 		$sClassName = substr($sClassFullName,$nNamespaceEnd+1) ;
 		
-		$sNamespace = "" ;
-		$arrNamespaces = $sFullNamespace? explode("\\", $sFullNamespace): array() ;
-		while( $sNamespacePart=array_shift($arrNamespaces) )
+		// 逆向遍历所有注册过的包目录
+		for( end($this->arrPackages); $sPackageName=key($this->arrPackages); prev($this->arrPackages) )
 		{
-			$sNamespaceTemp = $sNamespace.($sNamespace?"\\":'').$sNamespacePart ;
-			if( !isset($this->arrPackages[$sNamespaceTemp]) )
+			$nPackageNameLen = strlen($sPackageName) ;
+			if( substr($sFullNamespace,0,$nPackageNameLen) == $sPackageName )
 			{
-				array_unshift($arrNamespaces, $sNamespacePart) ;
-				break ;	
-			}
-			$sNamespace = $sNamespaceTemp ;
-		}
-				
-		if(!isset($this->arrPackages[$sNamespace]))
-		{
-			return ;
-		}
-		
-		$sSubNamespace = implode("/", $arrNamespaces)."/" ;
-		
-		foreach($this->arrClassFilenameWraps as $func)
-		{
-			$sClassFilePath = $this->arrPackages[$sNamespace]."/".$sSubNamespace
-								. call_user_func_array($func, array($sClassName)) ;
+				$sPackageFolder = current($this->arrPackages) . str_replace("\\","/",substr($sFullNamespace,$nPackageNameLen)) ;
 			
-			if( is_file($sClassFilePath) )
-			{
-				include $sClassFilePath ;
-				return ;
+				foreach($this->arrClassFilenameWraps as $func)
+				{
+					$sClassFilePath = $sPackageFolder . '/' . call_user_func_array($func, array($sClassName)) ;
+					
+					if( is_file($sClassFilePath) )
+					{
+						include $sClassFilePath ;
+						return ;
+					}
+				}
 			}
 		}
+		
+		return ;
 	}
 	
 	
