@@ -40,15 +40,26 @@ class Factory extends FactoryBase
 	{
 		// Node Compiler
 		$aNodeCompiler = NodeCompiler::singleton() ;
-		
+		//if
 		$aNodeCompiler->addSubCompiler('if',__NAMESPACE__."\\compiler\\node\\IfCompiler") ;
 		$aNodeCompiler->addSubCompiler('else',__NAMESPACE__."\\compiler\\node\\ElseCompiler") ;
 		$aNodeCompiler->addSubCompiler('elseif',__NAMESPACE__."\\compiler\\node\\ElseIfCompiler") ;
+		//for
+		$aNodeCompiler->addSubCompiler('loop',__NAMESPACE__."\\compiler\\node\\LoopCompiler") ;
+		//foreach
 		$aNodeCompiler->addSubCompiler('foreach',__NAMESPACE__."\\compiler\\node\\ForeachCompiler") ;
 		$aNodeCompiler->addSubCompiler('foreach:else',__NAMESPACE__."\\compiler\\node\\ForeachelseCompiler") ;
-		$aNodeCompiler->addSubCompiler('loop',__NAMESPACE__."\\compiler\\node\\LoopCompiler") ;
+		//while
 		$aNodeCompiler->addSubCompiler('while',__NAMESPACE__."\\compiler\\node\\WhileCompiler") ;
 		$aNodeCompiler->addSubCompiler('dowhile',__NAMESPACE__."\\compiler\\node\\DoWhileCompiler") ;
+		//ends
+		$aNodeCompiler->addSubCompiler('end',__NAMESPACE__."\\compiler\\node\\EndCompiler") ;
+		$aNodeCompiler->addSubCompiler('if:end',__NAMESPACE__."\\compiler\\node\\EndCompiler") ;
+		$aNodeCompiler->addSubCompiler('foreach:end',__NAMESPACE__."\\compiler\\node\\EndCompiler") ;
+		$aNodeCompiler->addSubCompiler('loop:end',__NAMESPACE__."\\compiler\\node\\EndCompiler") ;
+		$aNodeCompiler->addSubCompiler('while:end',__NAMESPACE__."\\compiler\\node\\EndCompiler") ;
+		$aNodeCompiler->addSubCompiler('dowhile:end',__NAMESPACE__."\\compiler\\node\\EndCompiler") ;
+		//others
 		$aNodeCompiler->addSubCompiler('include',__NAMESPACE__."\\compiler\\node\\IncludeCompiler") ;
 		$aNodeCompiler->addSubCompiler('function',__NAMESPACE__."\\compiler\\node\\FunctionCompiler") ;
 		$aNodeCompiler->addSubCompiler('continue',__NAMESPACE__."\\compiler\\node\\ContinueCompiler") ;

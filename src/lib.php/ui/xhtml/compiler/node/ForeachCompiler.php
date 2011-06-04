@@ -43,7 +43,6 @@ class ForeachCompiler extends NodeCompiler {
 		$sKeyUserName = $aAttrs->has ( 'key' ) ? $aAttrs->get ( 'key' ) : '' ;
 		$sItemUserName = $aAttrs->has ( 'item' ) ? $aAttrs->get ( 'item' ) : '' ;
 		
-		
 		$sForAutoName = NodeCompiler::assignVariableName ( '$__foreach_Arr_' );
 		$sItemAutoName = NodeCompiler::assignVariableName ( '$__foreach_item_' ) ;
 		$sKeyAutoName = NodeCompiler::assignVariableName ( '$__foreach_key_' ) ;
@@ -65,11 +64,7 @@ class ForeachCompiler extends NodeCompiler {
 		$aDev->write("?>");
 		
 		//是否是单行标签?
-		if($aObject->headTag()->isSingle()){
-			$aDev->write("<?php 
-					}
-			 		?>") ;
-		}else{
+		if(!$aObject->headTag()->isSingle()){
 			//循环体，可能会包含foreach:else标签
 			$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
 			$aDev->write("<?php 
