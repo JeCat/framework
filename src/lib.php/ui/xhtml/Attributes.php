@@ -65,14 +65,31 @@ class Attributes extends HashTable
 	
 	public function get($sName)
 	{
-		return $this->bool($sName.'.express')?
-			$this->expression($sName) :
-			(($aText=parent::get($sName))?'"'.$aText->source().'"':null) ;
+		$sType = $this->has($sName.'.type')? $this->string($sName.'.type'): 'string' ;
+		if( !in_array($sType,self::$arrAttributeTypes) )
+		{
+			throw new Exception(
+					"ui node 属性 %s.type 值无效：%s; 必须为以下值："
+					, array($sName,$sType,implode(',', self::$arrAttributeTypes))
+			) ; 
+		}
+		
+		switch($sType)
+		{
+			case 'string' :
+				return '"'.$this->string($sName).'"' ;
+				
+			case 'expression' :
+				return $this->expression($sName) ;
+				
+			default :
+				return $this->$sType($sName) ;
+		}
 	}
 	
 	public function string($sName)
 	{
-		return $aText=parent::get($sName)? $aText->source() :null ;
+		return ($aText=parent::get($sName))? $aText->source() :null ;
 	}
 	public function bool($sName)
 	{
@@ -110,6 +127,8 @@ class Attributes extends HashTable
 	static public $arrFalseValues = array(
 		'false', '0', 'off', '',
 	) ;
+	
+	static private $arrAttributeTypes = array('string','int','float','bool','expression') ; 
 	
 	private $sSource ;
 	private $arrAnonymous = array() ;
