@@ -5,6 +5,7 @@ namespace jc\util ;
 interface IHashTable
 {
 	public function get($sName) ;
+	public function &getRef($sName) ;
 	public function set($sName,$Value) ;
 	public function setRef($sName,&$Value) ;
 	public function has($sName) ;	

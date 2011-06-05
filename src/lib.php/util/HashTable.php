@@ -23,6 +23,15 @@ class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator
 	{
 		return isset($this->arrDatas[$sName])? $this->arrDatas[$sName]: null ;
 	}
+	public function &getRef($sName)
+	{
+		if( !array_key_exists($sName, $this->arrDatas) )
+		{
+			$this->arrDatas[$sName] = null ;
+		}
+		
+		return $this->arrDatas[$sName] ;
+	}
 
 	public function set($sName,$Value)
 	{

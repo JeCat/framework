@@ -20,14 +20,7 @@ class ExpressionCompiler extends BaseCompiler
 			$bReturn = false ;
 		}
 		
-		$nStackId = self::$nStackVarId++ ;
-				
-		// 补行尾的';'
 		$sSource = trim($sSource) ;
-		if( substr($sSource,-1)!=';' )
-		{
-			$sSource.= ';' ;
-		}
 		
 		// 分解
 		$arrTokens = token_get_all('<?php '.$sSource.'?>') ;
@@ -36,7 +29,6 @@ class ExpressionCompiler extends BaseCompiler
 		
 		$sLineCode = '' ;
 		$arrVarDefineLines = array() ;
-		$arrVarResaveLines = array() ;
 		$arrLines = array() ;
 		foreach($arrTokens as $arrOneTkn)
 		{
@@ -47,35 +39,14 @@ class ExpressionCompiler extends BaseCompiler
 				{
 					// 变量名
 					$sVarName = substr($arrOneTkn[1],1) ;
-					$sVarNameNew = NodeCompiler::assignVariableName('_stack').'_var_'.$sVarName ;
+					$sVarNameNew = NodeCompiler::assignVariableName('var').'_'.$sVarName ;
 					
-					//
-					if($bEval)
-					{
-						$arrVarDefineLines[$sVarName] = '\\$'.$sVarNameNew."=\\\$aVariables->get('{$sVarName}')" ;
-						$arrVarResaveLines[$sVarName] = "\\\$aVariables->set('{$sVarName}',\\\${$sVarNameNew})" ;
-						$sLineCode.= '\\$'.$sVarNameNew ;
-					}
-					else 
-					{
-						$arrVarDefineLines[$sVarName] = '$'.$sVarNameNew."=\$aVariables->get('{$sVarName}')" ;
-						$arrVarResaveLines[$sVarName] = "\$aVariables->set('{$sVarName}',\${$sVarNameNew})" ;
-						$sLineCode.= '$'.$sVarNameNew ;
-					}
+					$arrVarDefineLines[$sVarName] = '$'.$sVarNameNew."=&\$aVariables->getRef('{$sVarName}')" ;
+					$sLineCode.= '$'.$sVarNameNew ;
 				}
 				else 
 				{
-					// 转义作为字符的$ （将 \$ 替换为 \\\$）
-					if($bEval)
-					{
-						$sLine = str_replace("\\\$","\\\\\\\$",$arrOneTkn[1]) ;
-					}
-					else 
-					{
-						$sLine = $arrOneTkn[1] ;
-					}
-					
-					$sLineCode.= $sLine ;
+					$sLineCode.= $arrOneTkn[1] ;
 				}
 			}
 			// 行尾
@@ -94,25 +65,21 @@ class ExpressionCompiler extends BaseCompiler
 			}
 		}
 		
+		// 合并 变量声明行, 执行行 和 变量保
+		$arrLines = array_merge(array_values($arrVarDefineLines),$arrLines) ;
+		
 		// return 最末行的结果
 		if( $bReturn )
 		{
-			$sLastLine = array_pop($arrLines) ;
-		}
-		
-		// 合并 变量声明行, 执行行 和 变量保存行
-		$arrLines = array_merge(array_values($arrVarDefineLines),$arrLines,$arrVarResaveLines) ;
-		
-		if( $bReturn )
-		{
-			$arrLines[] = 'return ' . $sLastLine ;
+			$arrLines[] = 'return ' . array_pop($arrLines) ;
 		}
 		
 		// 
 		$sCompiled = implode(";\r\n", $arrLines) ;
 		if( $bEval )
 		{
-			$sCompiled = addcslashes($sCompiled,'"') ;		
+			$sCompiled = addcslashes($sCompiled,'"\\') ;	
+			$sCompiled = str_replace('$','\\$',$sCompiled) ;		
 		}
 		
 		if( !preg_match("/;\\s*$/",$sCompiled) )
@@ -122,8 +89,6 @@ class ExpressionCompiler extends BaseCompiler
 		
 		return $bEval? ("eval(\"" . $sCompiled . "\")"): $sCompiled ;
 	}
-	
-	static private $nStackVarId = 0 ;
 }
 
 ?>
