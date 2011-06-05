@@ -14,7 +14,7 @@ class Text extends ObjectBase
 		if( $this->count() )
 		{
 			$sSource = '' ;
-			foreach($this->childrenIterator() as $aChild)
+			foreach($this->iterator() as $aChild)
 			{
 				$sSource.= $aChild->source() ;
 			}
@@ -27,46 +27,51 @@ class Text extends ObjectBase
 		}
 	}
 	
-	public function add($aChild,$bAdoptRelative=true)
+	public function separateChildren()
 	{
-		Assert::type(__NAMESPACE__.'\\ObjectBase', $aChild, 'aChild') ;
-		
-		if( $this->count() )
+		if( !$sSource=parent::source() or !$this->count() )
 		{
-			parent::add($aChild,$bAdoptRelative) ;
+			return ;
 		}
 		
-		// 切割文本
-		else 
-		{
-			/*if( $this->locate($aChild)!=parent::LOCATE_IN )
-			{
-				throw new Exception(__METHOD__."()传入的参数，无法满足UI对象的层属关系。") ;
-			}*/
-			
-			$sSource = $this->source() ;
-			
-			// 之前的文本
-			$sBeforeText = substr( $sSource, 0, $aChild->position()-$this->position() ) ;
-			if( $sBeforeText )
-			{
-				parent::add( new Text($this->position(), $aChild->position()-1, $this->line(), $sBeforeText) ) ;
-			}
-			
-			// UI对象
-			parent::add( $aChild ) ;
+		$arrNewChildren = array() ;
 		
-			// 之后的文本
-			$sAfterText = substr( $sSource, $aChild->endPosition()-$this->position()+1 ) ;
-			if( $sAfterText )
+		$nIdx = $this->position() ;
+		foreach($this->iterator() as $aChild)
+		{
+			$nLen = $aChild->position() - $nIdx ;
+			if($nLen)
 			{
-				$nAfterTextLine = $aChild->line()+substr_count($aChild->source(),"\n") ; // $aChild所在行数 + $aChild内的换行符出现次数
-				parent::add( new Text($aChild->endPosition()+1, $this->endPosition(), $nAfterTextLine, $sAfterText) ) ;
+				$arrNewChildren[] = new Text(
+						$nIdx
+						, $nIdx+$nLen-1
+						, $this->line()
+						, substr($sSource, $nIdx-$this->position(), $nLen)
+				) ;
 			}
 			
-			// 清空自己的source ，仅仅作为一个聚合对象
-			$this->setSource('') ;
+			$arrNewChildren[] = $aChild ;
+			$nIdx = $aChild->endPosition() + 1 ;
+			
+			$this->remove($aChild) ;
 		}
+		
+		if( $this->endPosition()>=$nIdx )
+		{
+			$arrNewChildren[] = new Text(
+					$nIdx
+					, $this->endPosition()
+					, $this->line()
+					, substr($sSource, $nIdx-$this->position())
+			) ;
+		}
+		
+		foreach($arrNewChildren as $aChild)
+		{
+			$this->add($aChild) ;
+		}
+		
+		$this->setSource('') ;
 	}
 }
 

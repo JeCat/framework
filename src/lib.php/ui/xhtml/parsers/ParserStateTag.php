@@ -18,6 +18,7 @@ class ParserStateTag extends ParserState
 	public function __construct()
 	{
 		parent::__construct() ;
+		self::setSingleton($this) ;
 		
 		$this->arrChangeToStates[] = ParserStateAttribute::singleton() ;
 	}

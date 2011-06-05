@@ -21,6 +21,10 @@ class ExpressionCompiler extends BaseCompiler
 		}
 		
 		$sSource = trim($sSource) ;
+		if( !preg_match("/;\\s*/", $sSource) )
+		{
+			$sSource.= ';' ;
+		}
 		
 		// 分解
 		$arrTokens = token_get_all('<?php '.$sSource.'?>') ;
@@ -39,7 +43,7 @@ class ExpressionCompiler extends BaseCompiler
 				{
 					// 变量名
 					$sVarName = substr($arrOneTkn[1],1) ;
-					$sVarNameNew = NodeCompiler::assignVariableName('var').'_'.$sVarName ;
+					$sVarNameNew = NodeCompiler::assignVariableName().'_'.$sVarName ;
 					
 					$arrVarDefineLines[$sVarName] = '$'.$sVarNameNew."=&\$aVariables->getRef('{$sVarName}')" ;
 					$sLineCode.= '$'.$sVarNameNew ;

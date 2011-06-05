@@ -12,6 +12,7 @@ class ParserStateNode extends ParserState
 	public function __construct()
 	{
 		parent::__construct() ;
+		self::setSingleton($this) ;
 		
 		$this->arrChangeToStates[] = ParserStateTag::singleton() ;
 		$this->arrChangeToStates[] = ParserStateMark::singleton() ;

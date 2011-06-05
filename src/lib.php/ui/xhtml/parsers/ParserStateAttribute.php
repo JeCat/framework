@@ -1,8 +1,9 @@
 <?php
 namespace jc\ui\xhtml\parsers ;
 
-use jc\lang\Exception;
+use jc\ui\xhtml\Text;
 
+use jc\lang\Exception;
 use jc\ui\xhtml\AttributeValue;
 use jc\ui\xhtml\IObject;
 use jc\util\String;
@@ -15,6 +16,7 @@ class ParserStateAttribute extends ParserState
 	public function __construct()
 	{
 		parent::__construct() ;
+		self::setSingleton($this) ;
 		
 		$this->arrChangeToStates[] = ParserStateMark::singleton() ;
 	}
@@ -78,8 +80,11 @@ class ParserStateAttribute extends ParserState
 		$sAttrText = $aSource->substr( $sAttrTextPos, $sAttrTextLen ) ;
 		
 		$aObject->setPosition($sAttrTextPos) ;
-		$aObject->setEndPosition($sAttrTextPos) ;
+		$aObject->setEndPosition($sAttrTextEndPos) ;
 		$aObject->setSource($sAttrText) ;
+		
+		// 子对象 分离
+		$aObject->separateChildren() ;
 		
 		return $aObject->parent() ;
 	}

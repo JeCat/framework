@@ -10,9 +10,15 @@ use jc\util\String;
 
 class ParserStateMark extends ParserState
 {
+	public function __construct()
+	{
+		parent::__construct() ;
+		self::setSingleton($this) ;
+	}
+	
 	public function active(IObject $aParent,String $aSource,$nPosition)
 	{
-		$aMark = new Mark($aSource->byte($nPosition+1),$nPosition+2, 0, ObjectBase::getLine($aSource,$nPosition), '') ;
+		$aMark = new Mark($aSource->byte($nPosition+1),$nPosition, 0, ObjectBase::getLine($aSource,$nPosition), '') ;
 		$aParent->add($aMark) ;
 		
 		return $aMark ;
@@ -41,11 +47,11 @@ class ParserStateMark extends ParserState
 	{
 		Assert::type("jc\\ui\\xhtml\\Mark", $aObject, 'aObject') ;
 		
-		$sTextPos = $aObject->position() ;
+		$sTextPos = $aObject->position() + 2 ;
 		$sTextLen = ($nPosition-1) - $sTextPos + 1 ;
 		$sText = $aSource->substr( $sTextPos, $sTextLen ) ;
 		
-		$aObject->setEndPosition($nPosition-1) ;
+		$aObject->setEndPosition($nPosition) ;
 		$aObject->setSource($sText) ;
 		
 		return $aObject->parent() ;
