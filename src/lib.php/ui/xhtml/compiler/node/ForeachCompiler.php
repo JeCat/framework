@@ -42,6 +42,8 @@ class ForeachCompiler extends NodeCompiler {
 		$bIsSingle = $aObject->headTag()->isSingle() ? true : false ;
 		$sKeyUserName = $aAttrs->has ( 'key' ) ? $aAttrs->get ( 'key' ) : '' ;
 		$sItemUserName = $aAttrs->has ( 'item' ) ? $aAttrs->get ( 'item' ) : '' ;
+		$sItemRef = $aAttrs->has ( 'item.ref' ) ? $aAttrs->get ( 'item.ref' ) : '' ;
+		$bItemRef = ($sItemRef == '"false"' || $sItemRef == '"0"' || $sItemRef == '""') ? false : true;
 		
 		$sForAutoName = NodeCompiler::assignVariableName ( '$__foreach_Arr_' );
 		$sItemAutoName = NodeCompiler::assignVariableName ( '$__foreach_item_' ) ;
@@ -49,16 +51,21 @@ class ForeachCompiler extends NodeCompiler {
 		
 		$aDev->write ( "<?php
 				{$sForAutoName} = {$sForUserExp};
-				if(!empty({$sForAutoName})){
-					foreach({$sForAutoName} as {$sKeyAutoName}=>{$sItemAutoName}){
-					" );
+				if(!empty({$sForAutoName})){ 
+					foreach({$sForAutoName} as {$sKeyAutoName} => " );
+		if($bItemRef){ 
+			$aDev->write ( "&{$sItemAutoName}){
+						" );
+		}else{
+			$aDev->write ( "{$sItemAutoName}){
+						" );
+		}
 		
 		if( !empty($sKeyUserName) ){
 			$aDev->write ( " \$aVariables->set({$sKeyUserName},{$sKeyAutoName}); ");
 		}
-		
 		if( !empty($sItemUserName) ){
-			$aDev->write ( " \$aVariables->set({$sItemUserName},{$sItemAutoName} ); ");	
+			$aDev->write ( " \$aVariables->set({$sItemUserName},{$sItemAutoName} ); ");	;
 		}
 					
 		$aDev->write("?>");
