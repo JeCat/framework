@@ -53,12 +53,13 @@ class Factory extends FactoryBase
 		$aNodeCompiler->addSubCompiler('while',__NAMESPACE__."\\compiler\\node\\WhileCompiler") ;
 		$aNodeCompiler->addSubCompiler('dowhile',__NAMESPACE__."\\compiler\\node\\DoWhileCompiler") ;
 		//ends
-		$aNodeCompiler->addSubCompiler('end',__NAMESPACE__."\\compiler\\node\\EndCompiler") ;
-		$aNodeCompiler->addSubCompiler('if:end',__NAMESPACE__."\\compiler\\node\\EndCompiler") ;
-		$aNodeCompiler->addSubCompiler('foreach:end',__NAMESPACE__."\\compiler\\node\\EndCompiler") ;
-		$aNodeCompiler->addSubCompiler('loop:end',__NAMESPACE__."\\compiler\\node\\EndCompiler") ;
-		$aNodeCompiler->addSubCompiler('while:end',__NAMESPACE__."\\compiler\\node\\EndCompiler") ;
-		$aNodeCompiler->addSubCompiler('dowhile:end',__NAMESPACE__."\\compiler\\node\\EndCompiler") ;
+		$aNodeCompiler->addSubCompiler('signle:end',__NAMESPACE__."\\compiler\\node\\SingleEndCompiler") ;
+		$aNodeCompiler->addSubCompiler('if:end',__NAMESPACE__."\\compiler\\node\\SingleEndCompiler") ;
+		$aNodeCompiler->addSubCompiler('double:end',__NAMESPACE__."\\compiler\\node\\DoubleEndCompiler") ;
+		$aNodeCompiler->addSubCompiler('foreach:end',__NAMESPACE__."\\compiler\\node\\DoubleEndCompiler") ;
+		$aNodeCompiler->addSubCompiler('loop:end',__NAMESPACE__."\\compiler\\node\\DoubleEndCompiler") ;
+		$aNodeCompiler->addSubCompiler('while:end',__NAMESPACE__."\\compiler\\node\\DoubleEndCompiler") ;
+		$aNodeCompiler->addSubCompiler('dowhile:end',__NAMESPACE__."\\compiler\\node\\DoubleEndCompiler") ;
 		//others
 		$aNodeCompiler->addSubCompiler('include',__NAMESPACE__."\\compiler\\node\\IncludeCompiler") ;
 		$aNodeCompiler->addSubCompiler('function',__NAMESPACE__."\\compiler\\node\\FunctionCompiler") ;

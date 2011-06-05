@@ -2,7 +2,6 @@
 namespace jc\ui\xhtml\compiler\node;
 
 use jc\ui\xhtml\compiler\ExpressionCompiler;
-
 use jc\ui\xhtml\Node;
 use jc\lang\Type;
 use jc\ui\ICompiler;
@@ -14,16 +13,18 @@ use jc\ui\xhtml\compiler\NodeCompiler;
 class IfCompiler extends NodeCompiler {
 	public function compile(IObject $aObject, IOutputStream $aDev, CompilerManager $aCompilerManager) {
 		Type::check ( "jc\\ui\\xhtml\\Node", $aObject );
+		
+		$bIsSingle = $aObject->headTag()->isSingle();
 
 		$aDev->write ( '<?php if(' );
 		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes ()->source () ) );
 		$aDev->write ( "){ ?>" );
 		
-		$this->compileChildren ( $aObject, $aDev, $aCompilerManager );
-		
-		$aDev->write ( "<?php } ?>" );
+		if (!$bIsSingle) {
+			$this->compileChildren ( $aObject, $aDev, $aCompilerManager );
+			$aDev->write ( "<?php } ?>" );
+		}
 	}
-
 }
 
 ?>
