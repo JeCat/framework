@@ -41,6 +41,7 @@ set_exception_handler(function(\Exception $aException)
 		
 		$aRspn->output("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------") ;
 		$aRspn->output($aException->message()) ;
+		$aRspn->output('Line '.$aException->getLine().' in '.$aException->getFile()) ;
 		$aRspn->output($aException->getTraceAsString()) ;
 	
 	// 递归 cause

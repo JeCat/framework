@@ -1,6 +1,8 @@
 <?php
 namespace jc\ui\xhtml\compiler\node ;
 
+use jc\lang\Exception;
+
 use jc\ui\xhtml\compiler\ExpressionCompiler;
 use jc\ui\xhtml\Node;
 use jc\lang\Type;
@@ -16,10 +18,20 @@ class IncludeCompiler extends NodeCompiler
 	{
 		Type::check("jc\\ui\\xhtml\\Node",$aObject) ;
 
-		$aDev->write( "<?php include(") ;
-		$aDev->write ( '"../' . $aObject->attributes ()->get("file")  . '"' );
-		$aDev->write(") ?>") ;	
+		if( $aObject->headTag()->attributes()->has("file") )
+		{
+			$sFileName = $aObject->attributes()->get("file") ;		
+		}
+		else 
+		{
+			if( !$aFileVal = $aObject->attributes()->anonymous() )
+			{
+				throw new Exception("include 节点缺少file属性(line:%d)",$aObject->line()) ;
+			}
+			$sFileName = '"' . addslashes($aFileVal->source()) . '"' ;
+		}
 		
+		$aDev->write( "<?php \$this->display({$sFileName},\$aVariables,\$aDevice) ; ?>") ;		
 	}
 }
 

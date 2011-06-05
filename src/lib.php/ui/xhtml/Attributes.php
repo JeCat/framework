@@ -47,13 +47,10 @@ class Attributes extends HashTable
 			$this->removeByValue($req) ;
 			
 			// anonymous attribute
-			if(!$req->name())
+			$key = array_search($req, $this->arrAnonymous) ;
+			if($key!==false)
 			{
-				$key = array_search($req, $this->arrAnonymous) ;
-				if($key!==false)
-				{
-					unset($this->arrAnonymous[$key]) ;
-				}
+				unset($this->arrAnonymous[$key]) ;
 			}
 		}
 		
