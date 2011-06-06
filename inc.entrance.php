@@ -41,6 +41,8 @@ set_exception_handler(function(\Exception $aException)
 		
 		$aRspn->output("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------") ;
 		
+		$aRspn->output("无法处理的异常：".get_class($aException)) ;
+			
 		if($aException instanceof \jc\lang\Exception)
 		{
 			$aRspn->output($aException->message()) ;

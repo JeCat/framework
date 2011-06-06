@@ -29,7 +29,7 @@ class DoWhileCompiler extends NodeCompiler {
 		$aDev->write ( '<?php do{ ?>' );
 		$this->compileChildren ( $aObject, $aDev, $aCompilerManager );
 		$aDev->write ( "<?php }while(" );
-		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes ()->source () ) );
+		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes()->anonymous()->source() ) );
 		$aDev->write ( ");?>" );
 	}
 
