@@ -43,9 +43,9 @@ class ExpressionCompiler extends BaseCompiler
 				{
 					// 变量名
 					$sVarName = substr($arrOneTkn[1],1) ;
-					$sVarNameNew = NodeCompiler::assignVariableName().'_'.$sVarName ;
+					$sVarNameNew = '__uivar_'.$sVarName ;
 					
-					$arrVarDefineLines[$sVarName] = '$'.$sVarNameNew."=&\$aVariables->getRef('{$sVarName}')" ;
+					$arrVarDefineLines[$sVarName] = "if(!isset(\${$sVarNameNew})){ \${$sVarNameNew}=&\$aVariables->getRef('{$sVarName}') ;}" ;
 					$sLineCode.= '$'.$sVarNameNew ;
 				}
 				else 

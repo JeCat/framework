@@ -125,7 +125,7 @@ class AccessRouter extends \jc\lang\Factory
      * 
      * @return void
      */
-    public function createRequestController(IRequest $aRequest)
+    public function createRequestController(Request $aRequest)
     {
     	$sControllerName = $aRequest->string($this->sControllerParam) ;
     	return $this->createController($sControllerName) ;

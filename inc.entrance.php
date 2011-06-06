@@ -40,7 +40,16 @@ set_exception_handler(function(\Exception $aException)
 	do{
 		
 		$aRspn->output("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------") ;
-		$aRspn->output($aException->message()) ;
+		
+		if($aException instanceof \jc\lang\Exception)
+		{
+			$aRspn->output($aException->message()) ;
+		}
+		else
+		{
+			$aRspn->output($aException->getMessage()) ;
+		}
+		
 		$aRspn->output('Line '.$aException->getLine().' in '.$aException->getFile()) ;
 		$aRspn->output($aException->getTraceAsString()) ;
 	

@@ -1,10 +1,12 @@
 <?php
 namespace jc\mvc\view ;
 
+use jc\io\IOutputStream;
 use jc\mvc\model\IModel;
 use jc\mvc\view\widget\IViewWidget;
 use jc\pattern\composite\Container;
 use jc\util\HashTable;
+use jc\util\IHashTable;
 use jc\io\OutputStreamBuffer;
 use jc\pattern\composite\NamableComposite;
 use jc\ui\UI;

@@ -90,8 +90,8 @@ class Attributes extends HashTable
 	}
 	public function bool($sName)
 	{
-		return !in_array( strtolower(
-				$aText=parent::get($sName))?$aText->source():''
+		return !in_array( 
+				strtolower( ($aText=parent::get($sName))?$aText->source():'' )
 				, self::$arrFalseValues
 				, true ) ;
 	}

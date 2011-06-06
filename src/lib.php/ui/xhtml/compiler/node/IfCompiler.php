@@ -17,7 +17,7 @@ class IfCompiler extends NodeCompiler {
 		$bIsSingle = $aObject->headTag()->isSingle();
 
 		$aDev->write ( '<?php if(' );
-		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes ()->source () ) );
+		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes ()->anonymous()->source () ) );
 		$aDev->write ( "){ ?>" );
 		
 		if (!$bIsSingle) {

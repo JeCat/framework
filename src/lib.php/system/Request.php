@@ -1,6 +1,7 @@
 <?php
 namespace jc\system ;
 
+use jc\util\IFilterMangeger;
 use jc\util\DataSrc ;
 
 class Request extends DataSrc

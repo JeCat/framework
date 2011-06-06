@@ -47,10 +47,10 @@ class StatementFactory extends Factory implements IStatementFactory
 	}
 	
 	/**
-	 * @param ISQLStatement $aStatement
-	 * @return ISQLStatement
+	 * @param IStatement $aStatement
+	 * @return IStatement
 	 */
-	protected function initializeStatement(ISQLStatement $aStatement)
+	protected function initializeStatement(IStatement $aStatement)
 	{
 		$aStatement->setTableNameFactory( $this->tableNameFactory() ) ;
 		return $aStatement ;
