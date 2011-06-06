@@ -37,7 +37,7 @@ class ScriptCompiler extends NodeCompiler
 		// 按照普通 html 节点处理
 		else 
 		{
-			parent::NodeCompiler($aObject,$aDev,$aCompilerManager) ;
+			parent::compile($aObject,$aDev,$aCompilerManager) ;
 		}
 	}
 
