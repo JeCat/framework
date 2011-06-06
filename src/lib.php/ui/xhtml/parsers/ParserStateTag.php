@@ -198,9 +198,9 @@ class ParserStateTag extends ParserState
 			{
 				throw new Exception("遇到不匹配的XHTML节点，头标签:%s(line:%d), 尾标签:%s(line:%d)", array(
 						$aNode->tagName() ,
-						$aNode->position() ,
+						$aNode->line() ,
 						$aObject->name() ,
-						$aObject->position() ,
+						$aObject->line() ,
 				)) ;
 			}
 			

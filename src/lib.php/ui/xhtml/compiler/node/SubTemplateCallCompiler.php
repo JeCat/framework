@@ -41,6 +41,10 @@ class SubTemplateCallCompiler extends NodeCompiler
 		if(!$bExtendParentVars)
 		{
 			$aDev->write("\$__subtemplate_aVariables = new \\jc\\util\\HashTable() ; \r\n");
+			
+			// 设置子模版用于递归
+			$aDev->write("\$__subtemplate_aVariables->set('__subtemplate_'.{$sSubTemplateName},\$aVariables->get('__subtemplate_'.{$sSubTemplateName})) ; \r\n");
+			
 		}
 		else
 		{
