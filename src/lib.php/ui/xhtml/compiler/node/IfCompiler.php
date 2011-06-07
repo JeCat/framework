@@ -14,13 +14,11 @@ class IfCompiler extends NodeCompiler {
 	public function compile(IObject $aObject, IOutputStream $aDev, CompilerManager $aCompilerManager) {
 		Type::check ( "jc\\ui\\xhtml\\Node", $aObject );
 		
-		$bIsSingle = $aObject->headTag()->isSingle();
-
 		$aDev->write ( '<?php if(' );
 		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes ()->anonymous()->source () ) );
 		$aDev->write ( "){ ?>" );
 		
-		if (!$bIsSingle) {
+		if (!$aObject->headTag()->isSingle()) {
 			$this->compileChildren ( $aObject, $aDev, $aCompilerManager );
 			$aDev->write ( "<?php } ?>" );
 		}

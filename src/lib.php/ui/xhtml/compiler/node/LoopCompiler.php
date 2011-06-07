@@ -36,36 +36,25 @@ class LoopCompiler extends NodeCompiler {
 		$sEndValue = $aAttrs->expression ( "end" );
 		$sStepValue = $aAttrs->has ( "step" ) ? $aAttrs->expression ( "step" ) : '1';
 		
-		$sVarName = $aAttrs->get ( "var" );
-		
-		$needMarkKey = false;
-		if (empty ( $sVarName )) {
-			$sVarName = NodeCompiler::assignVariableName('$__loop_idx_');
-		} else {
-			$needMarkKey = true;
-			//给出的var如果不带$就给加上
-			if (substr ( $sVarName, 0, 1 ) != '$') {
-				$sVarName = '$' . $sVarName;
-			}
-		}
-		
+		$sVarAutoName = NodeCompiler::assignVariableName('$__loop_idx_');
 		$sEndName = NodeCompiler::assignVariableName('$__loop_end_');
 		$sStepName = NodeCompiler::assignVariableName('$__loop_step_');
 		
 		$aDev->write ( "<?php
-								$sEndName  = $sEndValue ; 
-								$sStepName  = $sStepValue  ;
-								for( $sVarName = $sStart ; $sVarName <= $sEndName ; $sVarName += $sStepName ){  
+								{$sEndName}  = {$sEndValue} ; 
+								{$sStepName}  = {$sStepValue}  ;
+								for( {$sVarAutoName} = {$sStart} ; {$sVarAutoName} <= {$sEndName} ; {$sVarAutoName} += {$sStepName} ){  
 						" );
-		if ($needMarkKey) {
-			$aDev->write ( "			\$aVariables->set('" . substr( $sVarName, 1 ) . "', $sVarName) ;	?>" );
-		}else{
-			$aDev->write ( '?>' );
+		if ($aAttrs->has ( "var" )){
+			$sVarUserName = $aAttrs->get ( "var" );
+			$aDev->write ( "			\$aVariables->set( {$sVarUserName}, {$sVarAutoName} ) ;" );
 		}
+		$aDev->write ( '?>' );
 		
-		$this->compileChildren ( $aObject, $aDev, $aCompilerManager );
-		
-		$aDev->write ( '<?php } ?>' );
+		if(!$aObject->headTag()->isSingle()){
+			$this->compileChildren ( $aObject, $aDev, $aCompilerManager );
+			$aDev->write ( '<?php } ?>' );
+		}
 	}
 }
 

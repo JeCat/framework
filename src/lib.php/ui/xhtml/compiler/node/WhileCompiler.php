@@ -23,12 +23,13 @@ class WhileCompiler extends NodeCompiler {
 		Type::check ( "jc\\ui\\xhtml\\Node", $aObject );
 
 		$aDev->write ( '<?php while(' );
-		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes ()->source () ) );
+		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes ()->anonymous()->source () ) );
 		$aDev->write ( "){ ?>" );
 		
-		$this->compileChildren ( $aObject, $aDev, $aCompilerManager );
-		
-		$aDev->write ( "<?php } ?>" );
+		if(!$aObject->headTag()->isSingle()){
+			$this->compileChildren ( $aObject, $aDev, $aCompilerManager );
+			$aDev->write ( "<?php } ?>" );
+		}
 	}
 }
 

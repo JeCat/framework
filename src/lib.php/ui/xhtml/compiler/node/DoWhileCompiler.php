@@ -32,7 +32,6 @@ class DoWhileCompiler extends NodeCompiler {
 		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes()->anonymous()->source() ) );
 		$aDev->write ( ");?>" );
 	}
-
 }
 
 ?>

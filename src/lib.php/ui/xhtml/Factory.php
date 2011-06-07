@@ -43,6 +43,7 @@ class Factory extends FactoryBase
 		//if
 		$aNodeCompiler->addSubCompiler('if',__NAMESPACE__."\\compiler\\node\\IfCompiler") ;
 		$aNodeCompiler->addSubCompiler('else',__NAMESPACE__."\\compiler\\node\\ElseCompiler") ;
+		$aNodeCompiler->addSubCompiler('if:else',__NAMESPACE__."\\compiler\\node\\ElseCompiler") ;
 		$aNodeCompiler->addSubCompiler('elseif',__NAMESPACE__."\\compiler\\node\\ElseIfCompiler") ;
 		//for
 		$aNodeCompiler->addSubCompiler('loop',__NAMESPACE__."\\compiler\\node\\LoopCompiler") ;
@@ -52,14 +53,15 @@ class Factory extends FactoryBase
 		//while
 		$aNodeCompiler->addSubCompiler('while',__NAMESPACE__."\\compiler\\node\\WhileCompiler") ;
 		$aNodeCompiler->addSubCompiler('dowhile',__NAMESPACE__."\\compiler\\node\\DoWhileCompiler") ;
+		$aNodeCompiler->addSubCompiler('do',__NAMESPACE__."\\compiler\\node\\DoWhileCompiler") ;
 		//ends
 		$aNodeCompiler->addSubCompiler('signle:end',__NAMESPACE__."\\compiler\\node\\SingleEndCompiler") ;
 		$aNodeCompiler->addSubCompiler('if:end',__NAMESPACE__."\\compiler\\node\\SingleEndCompiler") ;
+		$aNodeCompiler->addSubCompiler('loop:end',__NAMESPACE__."\\compiler\\node\\SingleEndCompiler") ;
+		$aNodeCompiler->addSubCompiler('while:end',__NAMESPACE__."\\compiler\\node\\SingleEndCompiler") ;
+		$aNodeCompiler->addSubCompiler('dowhile:end',__NAMESPACE__."\\compiler\\node\\SingleEndCompiler") ;
 		$aNodeCompiler->addSubCompiler('double:end',__NAMESPACE__."\\compiler\\node\\DoubleEndCompiler") ;
 		$aNodeCompiler->addSubCompiler('foreach:end',__NAMESPACE__."\\compiler\\node\\DoubleEndCompiler") ;
-		$aNodeCompiler->addSubCompiler('loop:end',__NAMESPACE__."\\compiler\\node\\DoubleEndCompiler") ;
-		$aNodeCompiler->addSubCompiler('while:end',__NAMESPACE__."\\compiler\\node\\DoubleEndCompiler") ;
-		$aNodeCompiler->addSubCompiler('dowhile:end',__NAMESPACE__."\\compiler\\node\\DoubleEndCompiler") ;
 		//others
 		$aNodeCompiler->addSubCompiler('include',__NAMESPACE__."\\compiler\\node\\IncludeCompiler") ;
 		$aNodeCompiler->addSubCompiler('function',__NAMESPACE__."\\compiler\\node\\FunctionCompiler") ;

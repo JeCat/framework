@@ -39,19 +39,20 @@ class ForeachCompiler extends NodeCompiler {
 			throw new Exception("foreach tag can not run without 'for' attribute");
 		}
 		
-		$bIsSingle = $aObject->headTag()->isSingle() ? true : false ;
 		$sKeyUserName = $aAttrs->has ( 'key' ) ? $aAttrs->get ( 'key' ) : '' ;
 		$sItemUserName = $aAttrs->has ( 'item' ) ? $aAttrs->get ( 'item' ) : '' ;
-		$sItemRef = $aAttrs->has ( 'item.ref' ) ? $aAttrs->get ( 'item.ref' ) : '' ;
-		$bItemRef = ($sItemRef == '"false"' || $sItemRef == '"0"' || $sItemRef == '""') ? false : true;
+		$bItemRef = $aAttrs->has ( 'item.ref' ) ? $aAttrs->bool('item.ref') : true;
+		$sIdxUserName = $aAttrs->has ( 'idx' ) ? $aAttrs->get ( 'idx' ) : '' ;
 		
 		$sForAutoName = NodeCompiler::assignVariableName ( '$__foreach_Arr_' );
 		$sItemAutoName = NodeCompiler::assignVariableName ( '$__foreach_item_' ) ;
 		$sKeyAutoName = NodeCompiler::assignVariableName ( '$__foreach_key_' ) ;
+		$sIdxAutoName = NodeCompiler::assignVariableName ( '$__foreach_idx_' ) ;
 		
 		$aDev->write ( "<?php
 				{$sForAutoName} = {$sForUserExp};
 				if(!empty({$sForAutoName})){ 
+					{$sIdxAutoName} = -1;
 					foreach({$sForAutoName} as {$sKeyAutoName} => " );
 		if($bItemRef){ 
 			$aDev->write ( "&{$sItemAutoName}){
@@ -60,12 +61,17 @@ class ForeachCompiler extends NodeCompiler {
 			$aDev->write ( "{$sItemAutoName}){
 						" );
 		}
+		$aDev->write ( "{$sIdxAutoName}++;
+						" );
 		
 		if( !empty($sKeyUserName) ){
 			$aDev->write ( " \$aVariables->set({$sKeyUserName},{$sKeyAutoName}); ");
 		}
 		if( !empty($sItemUserName) ){
-			$aDev->write ( " \$aVariables->set({$sItemUserName},{$sItemAutoName} ); ");	;
+			$aDev->write ( " \$aVariables->set({$sItemUserName},{$sItemAutoName} ); ");
+		}
+		if( !empty($sIdxUserName) ){
+			$aDev->write ( " \$aVariables->set({$sIdxUserName},{$sIdxAutoName} ); ");
 		}
 					
 		$aDev->write("?>");
