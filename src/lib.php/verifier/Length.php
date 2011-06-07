@@ -1,5 +1,5 @@
 <?php
-namespace jc\mvc\view\widget ;
+namespace jc\verifier ;
 
 use jc\lang\Exception;
 use jc\lang\Object;

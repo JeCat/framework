@@ -2,7 +2,8 @@
 
 namespace jc\mvc\view\widget ;
 
-use jc\system\Request;
+
+use jc\util\IDataSrc;
 
 interface IViewFormWidget extends IViewWidget
 {
@@ -14,7 +15,7 @@ interface IViewFormWidget extends IViewWidget
 	
 	public function setValueFromString($data) ;
 	
-	public function setDataFromSubmit(Request $aRequest) ;
+	public function setDataFromSubmit(IDataSrc $aDataSrc) ;
 	
 	public function dataVerifiers() ;
 

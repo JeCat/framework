@@ -1,6 +1,7 @@
 <?php
 namespace jc\mvc\view\uicompiler ;
 
+use jc\lang\Assert;
 use jc\lang\Exception;
 use jc\ui\IObject;
 use jc\ui\CompilerManager;
@@ -19,7 +20,7 @@ class FormCompiler extends NodeCompiler
 
 			$this->compileChildren($aObject, $aDev, $aCompilerManager) ;
 
-			$aDev->write('<input type="hidden" name="<?php echo $aVariables->get(\'theView\')->makeInputName()?>" value="1" />') ;
+			$aDev->write('<input type="hidden" name="<?php echo $aVariables->get(\'theView\')->htmlFormSignature()?>" value="1" />') ;
 			$this->compileTag($aTailTag, $aDev, $aCompilerManager) ;
 		}
 		

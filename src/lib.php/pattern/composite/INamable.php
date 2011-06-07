@@ -29,7 +29,7 @@ namespace jc\pattern\composite ;
 
 interface INamable
 {
-	public function name($sName) ;
+	public function name() ;
 	
 	public function setName($sName) ;
 }

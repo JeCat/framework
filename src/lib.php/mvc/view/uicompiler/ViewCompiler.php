@@ -26,8 +26,7 @@ class ViewCompiler extends NodeCompiler
 		
 		$aDev->write("<?php ob_flush() ;\r\n") ;
 		$aDev->write("\$theView = \$aVariables->get('theView') ;\r\n") ;
-		$aDev->write("\$__aViewContainer = new \\jc\\mvc\\view\\View() ;\r\n") ;
-		$aDev->write("\$__aViewContainer->addName('ViewContainer') ;\r\n") ;
+		$aDev->write("\$__aViewContainer = new \\jc\\mvc\\view\\View('ViewContainer') ;\r\n") ;
 		$aDev->write("\$theView->outputStream()->write(\$__aViewContainer->outputStream());\r\n") ;
 		$aDev->write("\$__aSearchFor = {$sFor};\r\n") ;
 		$aDev->write("if(\$__aSearchFor){\r\n") ;

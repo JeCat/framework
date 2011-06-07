@@ -1,9 +1,7 @@
 <?php
 namespace jc\mvc\view\widget ;
 
-
-use jc\system\Request;
-
+use jc\util\IDataSrc;
 use jc\pattern\composite\Container;
 
 class FormWidget extends Widget implements IViewFormWidget
@@ -29,9 +27,11 @@ class FormWidget extends Widget implements IViewFormWidget
 	}
 	
 	
-	public function setDataFromSubmit(Request $aRequest)
+	public function setDataFromSubmit(IDataSrc $aDataSrc)
 	{
-		
+		$this->setValueFromString(
+			$aDataSrc->get($this->formName()) 
+		) ;
 	}
 	
 	public function dataVerifiers()
@@ -45,7 +45,7 @@ class FormWidget extends Widget implements IViewFormWidget
 
 	public function verifyData()
 	{
-		if( !$this->aVerifiers )
+		if( $this->aVerifiers )
 		{
 			foreach($this->aVerifiers->iterator() as $aVerifier)
 			{

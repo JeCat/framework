@@ -8,7 +8,9 @@ use jc\ui\xhtml\Factory;
 use jc\system\Application;
 use jc\ui\xhtml\Factory as UIFactory ;
 
-error_reporting(E_ALL) ;							// 报告所有错误	
+// 报告所有错误
+error_reporting(E_ALL) ;	
+ini_set('display_errors', 1);
 
 
 // 预加载类(Before Class Loader)

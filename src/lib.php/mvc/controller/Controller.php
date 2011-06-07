@@ -2,6 +2,9 @@
 
 namespace jc\mvc\controller ;
 
+use jc\message\MessageQueue;
+
+use jc\message\IMessageQueueHolder;
 use jc\util\DataSrc;
 use jc\util\IDataSrc;
 use jc\util\HashTable ;
@@ -15,7 +18,7 @@ use jc\pattern\composite\NamableComposite ;
  * 
  * 
  */
-class Controller extends NamableComposite implements IController
+class Controller extends NamableComposite implements IController, IMessageQueueHolder
 {
     function __construct ()
     {
@@ -30,17 +33,21 @@ class Controller extends NamableComposite implements IController
     /**
      * @return IView
      */
-    public function createView($sName,$sSourceFile)
+    public function createView($sName,$sSourceFile,$sClass=null)
     {
-    	$aView = new View($sSourceFile) ;
-    	$this->registerView($sName,$aView) ;
+    	if(!$sClass)
+    	{
+    		$sClass = 'jc\\\mvc\\view\\View' ;
+    	}
+    	$aView = new $sClass($sName,$sSourceFile) ;
+    	$this->registerView($aView) ;
     	
     	return $aView ;
     }
     
-    public function registerView($sName,IView $aView)
+    public function registerView(IView $aView)
     {
-    	$aView->addName($sName) ;
+    	$sName = $aView->name() ;
     	$this->$sName = $aView ;
     	$this->mainView()->add( $aView, false ) ;
     	$aView->variables()->set("theController", $this) ;
@@ -58,8 +65,7 @@ class Controller extends NamableComposite implements IController
     {
     	if( !$this->aMainView )
     	{
-    		$this->aMainView = new View() ;
-    		$this->aMainView->addName("controllerMainView") ;
+    		$this->aMainView = new View('controllerMainView') ;
     	}
     	
     	return $this->aMainView ;
@@ -89,7 +95,7 @@ class Controller extends NamableComposite implements IController
     {
     	if(empty($Params))
     	{
-    		$this->aParams = new HashTable() ;
+    		$this->aParams = new DataSrc() ;
     	}
     	else if( $Params instanceof IDataSrc )
     	{
@@ -141,6 +147,34 @@ class Controller extends NamableComposite implements IController
 		}
 	}
 	
+	/**
+	 * @return IMessageQueue
+	 */
+	public function messageQueue()
+	{
+		if( !$this->aMsgQueue )
+		{
+			return $this->aMsgQueue ;
+		}
+		
+		else 
+		{
+			if( $aParent=$this->parent() and ( $aParent instanceof IMessageQueueHolder ) )
+			{
+				return $aParent->messageQueue() ;
+			}
+			else 
+			{
+				return MessageQueue::singleton(true) ;				
+			}
+		}
+	}
+	
+	public function setMessageQueue(IMessageQueue $aMsgQueue)
+	{
+		$this->aMsgQueue = $aMsgQueue ;
+	}
+	
     /**
      * Enter description here ...
      * 
@@ -149,5 +183,7 @@ class Controller extends NamableComposite implements IController
     protected $aParams = null ;
     
     private $aMainView = null ;
+    
+    private $aMsgQueue = null ;
 }
 ?>

@@ -13,10 +13,11 @@ use jc\ui\UI;
 
 class View extends NamableComposite implements IView
 {
-	public function __construct($sSourceFilename=null,UI $aUI=null)
+	public function __construct($sName,$sSourceFilename=null,UI $aUI=null)
 	{
 		parent::__construct("jc\\mvc\\view\\IView") ;
 		
+		$this->setName($sName) ;
 		$this->setSourceFilename($sSourceFilename) ;
 		$this->setUi( $aUI? $aUI: UIFactory::singleton()->create() ) ;
 	}
@@ -134,10 +135,15 @@ class View extends NamableComposite implements IView
 		return $this->aWidgets ;
 	}
 	
+	/**
+	 * @return IViewWidget
+	 */
 	public function addWidget(IViewWidget $aWidget)
 	{
 		$this->widgits()->set($aWidget->id(),$aWidget) ;
 		$aWidget->setView($this) ;
+		
+		return $aWidget ;
 	}
 	
 	public function removeWidget(IViewWidget $aWidget)

@@ -1,5 +1,5 @@
 <?php
-namespace jc\mvc\view\widget ;
+namespace jc\verifier ;
 
 interface IVerifier
 {

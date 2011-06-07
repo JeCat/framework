@@ -12,7 +12,7 @@ class OutputStreamBuffer extends OutputStream
 		
 		if( $nIdx>0 and is_string($this->arrBuffer[$nIdx]) and !($Content instanceof IOutputStream) )
 		{
-			$this->arrBuffer[$nIdx]+= strval($Content) ;
+			$this->arrBuffer[$nIdx].= strval($Content) ;
 		}
 		
 		else 

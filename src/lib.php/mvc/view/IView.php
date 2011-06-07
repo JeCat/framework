@@ -37,6 +37,9 @@ interface IView extends IContainer
 	
 	public function show() ;
 		
+	/**
+	 * @return IViewWidget
+	 */
 	public function addWidget(IViewWidget $aWidget) ;
 	
 	public function removeWidget(IViewWidget $aWidget) ;

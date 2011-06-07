@@ -24,11 +24,13 @@ class HttpRequest extends Request
 	
 	public function __construct()
 	{
+		parent::__construct() ;
+		
 		foreach(self::$arrDataSources as $sVarName)
 		{
-			if( isset($$sVarName) )
+			if( isset($GLOBALS[$sVarName]) )
 			{
-				$this->addChild( new DataSrc($$sVarName,true) ) ;
+				$this->addChild( new DataSrc($GLOBALS[$sVarName],true) ) ;
 			}
 		}
 	}
