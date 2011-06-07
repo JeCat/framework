@@ -1,6 +1,7 @@
 <?php
 namespace jc\mvc\view ;
 
+use jc\ui\UI;
 use jc\mvc\view\widget\IViewFormWidget;
 use jc\util\IDataSrc;
 use jc\system\Request;
