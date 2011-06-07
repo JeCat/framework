@@ -1,11 +1,10 @@
 <?php
 namespace jc\message ;
 
+use jc\lang\Object;
 use jc\pattern\composite\Container;
 
-use jc\util\HashTable;
-
-class MessageQueue extends Container implements IMessageQueue
+class MessageQueue extends Object implements IMessageQueue
 {
 	public function add(Message $aMsg)
 	{

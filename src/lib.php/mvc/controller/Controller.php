@@ -2,6 +2,8 @@
 
 namespace jc\mvc\controller ;
 
+use jc\message\IMessageQueue;
+
 use jc\message\MessageQueue;
 
 use jc\message\IMessageQueueHolder;
