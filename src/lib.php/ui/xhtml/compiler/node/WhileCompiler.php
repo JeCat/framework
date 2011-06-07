@@ -21,10 +21,19 @@ use jc\ui\xhtml\compiler\NodeCompiler;
 class WhileCompiler extends NodeCompiler {
 	public function compile(IObject $aObject, IOutputStream $aDev, CompilerManager $aCompilerManager) {
 		Type::check ( "jc\\ui\\xhtml\\Node", $aObject );
-
-		$aDev->write ( '<?php while(' );
+		
+		$sIdxUserName = $aObject->attributes()->has ( 'idx' ) ? $aObject->attributes()->get ( 'idx' ) : '' ;
+		$sIdxAutoName = NodeCompiler::assignVariableName ( '$__while_idx_' ) ;
+		if( !empty($sIdxUserName) ){
+			$aDev->write ( "<?php {$sIdxAutoName} = -1; ?>" );
+		}
+		$aDev->write ( "<?php while(" );
 		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes ()->anonymous()->source () ) );
-		$aDev->write ( "){ ?>" );
+		$aDev->write ( "){?>" );
+		if( !empty($sIdxUserName) ){
+			$aDev->write ( "<?php {$sIdxAutoName}++; 
+							\$aVariables->set({$sIdxUserName},{$sIdxAutoName} ); ?>");
+		}
 		
 		if(!$aObject->headTag()->isSingle()){
 			$this->compileChildren ( $aObject, $aDev, $aCompilerManager );
@@ -32,5 +41,4 @@ class WhileCompiler extends NodeCompiler {
 		}
 	}
 }
-
 ?>

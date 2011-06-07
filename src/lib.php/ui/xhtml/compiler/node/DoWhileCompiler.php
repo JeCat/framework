@@ -26,12 +26,20 @@ class DoWhileCompiler extends NodeCompiler {
 	public function compile(IObject $aObject, IOutputStream $aDev, CompilerManager $aCompilerManager) {
 		Type::check ( "jc\\ui\\xhtml\\Node", $aObject );
 		
+		$sIdxUserName = $aObject->attributes()->has ( 'idx' ) ? $aObject->attributes()->get ( 'idx' ) : '' ;
+		$sIdxAutoName = NodeCompiler::assignVariableName ( '$__dowhile_idx_' ) ;
+		if( !empty($sIdxUserName) ){
+			$aDev->write ( "<?php {$sIdxAutoName} = -1; ?>" );
+		}
 		$aDev->write ( '<?php do{ ?>' );
+		if( !empty($sIdxUserName) ){
+			$aDev->write ( "<?php {$sIdxAutoName}++; 
+							\$aVariables->set({$sIdxUserName},{$sIdxAutoName} ); ?>");
+		}
 		$this->compileChildren ( $aObject, $aDev, $aCompilerManager );
 		$aDev->write ( "<?php }while(" );
 		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes()->anonymous()->source() ) );
 		$aDev->write ( ");?>" );
 	}
 }
-
 ?>
