@@ -12,6 +12,16 @@ use jc\ui\xhtml\compiler\ExpressionCompiler ;
 
 class Attributes extends HashTable
 {
+	public function count() 
+	{
+		return parent::count() + $this->anonymousCount() ;
+	}
+	
+	public function anonymousCount() 
+	{
+		return count($this->arrAnonymous) ;
+	}
+	
 	public function add(AttributeValue $aVal)
 	{
 		if( $aVal->name() )
