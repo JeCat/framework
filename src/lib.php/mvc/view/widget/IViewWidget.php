@@ -2,13 +2,18 @@
 
 namespace jc\mvc\view\widget ;
 
+use jc\message\IMessageQueueHolder;
 use jc\io\IOutputStream;
 use jc\util\IHashTable;
 use jc\mvc\view\IView;
 use jc\ui\UI;
 
-interface IViewWidget
+interface IViewWidget extends IMessageQueueHolder
 {
+	public function title() ;
+	
+	public function setTitle($sTitle) ;
+	
 	/**
 	 * @return IView
 	 */

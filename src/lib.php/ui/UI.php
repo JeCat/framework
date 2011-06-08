@@ -2,6 +2,8 @@
 
 namespace jc\ui ;
 
+use jc\lang\Assert;
+
 use jc\lang\Exception;
 use jc\util\HashTable;
 use jc\io\IOutputStream;
@@ -170,8 +172,15 @@ class UI extends JcObject
 		}
 	}
 	
-	public function display($sSourceFile,IHashTable $aVariables=null,IOutputStream $aDevice=null)
+	public function display($sSourceFile,$aVariables=null,IOutputStream $aDevice=null)
 	{
+		Assert::type( array('\\jc\\util\\IHashTable','array','null'), $aVariables ) ;
+		
+		if( is_array($aVariables) )
+		{
+			$aVariables = new HashTable($aVariables) ;
+		}
+		
 		// 编译
 		$sSourcePath = $this->sourceFileManager()->find($sSourceFile) ;
 		if(!$sSourcePath)

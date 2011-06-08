@@ -1,6 +1,11 @@
 <?php
 namespace jc\mvc\view ;
 
+use jc\util\StopFilterSignal;
+
+use jc\message\Message;
+use jc\message\MessageQueue;
+use jc\message\IMessageQueue;
 use jc\io\IOutputStream;
 use jc\mvc\model\IModel;
 use jc\mvc\view\widget\IViewWidget;
@@ -20,6 +25,26 @@ class View extends NamableComposite implements IView
 		$this->setName($sName) ;
 		$this->setSourceFilename($sSourceFilename) ;
 		$this->setUi( $aUI? $aUI: UIFactory::singleton()->create() ) ;
+		
+		// 消息队列过滤器
+		$this->messageQueue()->filters()->add(function (Message $aMsg,$aView){
+			
+			$aPoster = $aMsg->poster() ;
+			
+			// 来自视图自身的消息
+			if($aPoster==$aView)
+			{
+				return array($aMsg) ;
+			}
+			
+			// 来自视图所拥有的窗体的消息
+			if( ($aPoster instanceof IViewWidget) and $aView->hasWidget($aPoster) )
+			{
+				return array($aMsg) ;
+			}
+			
+			StopFilterSignal::stop() ;
+		},$this) ;
 	}
 
 	/**
@@ -160,6 +185,11 @@ class View extends NamableComposite implements IView
 		}
 	}
 	
+	public function hasWidget(IViewWidget $aWidget)
+	{
+		return $this->widgits()->hasValue($aWidget) ;
+	}
+	
 	/**
 	 * @return IViewWidget
 	 */
@@ -184,6 +214,23 @@ class View extends NamableComposite implements IView
 		}
 		return $this->aDataExchanger ;
 	}
+
+	/**
+	 * @return IMessageQueue
+	 */
+	public function messageQueue()
+	{
+		if( !$this->aMsgQueue )
+		{
+			$this->aMsgQueue = new MessageQueue() ;
+		}
+		return $this->aMsgQueue ;
+	}
+	
+	public function setMessageQueue(IMessageQueue $aMsgQueue)
+	{
+		$this->aMsgQueue = $aMsgQueue ;
+	}
 	
 	private $aModel ;
 	private $aWidgets ;
@@ -192,6 +239,7 @@ class View extends NamableComposite implements IView
 	private $aOutputStream ;
 	private $aVariables ;
 	private $aDataExchanger ;
+	private $aMsgQueue ;
 }
 
 ?>

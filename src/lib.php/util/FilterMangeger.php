@@ -65,6 +65,10 @@ class FilterMangeger extends Object implements IFilterMangeger
 			throw new Exception(__METHOD__."()的参数\$callback必须为回调函数类型，传入的类型为：%s",Type::reflectType($callback)) ;
 		}
 		
+		if( !is_array($arrArgvs) )
+		{
+			$arrArgvs = array($arrArgvs) ;
+		}
 		array_unshift($this->arrFilters,array($callback,$arrArgvs)) ;
 	}
 	

@@ -15,6 +15,11 @@ class StopFilterSignal extends Exception
 		return $this->ReturnVariables ;
 	}
 	
+	static public function stop($return=null)
+	{
+		throw new StopFilterSignal($return) ;  
+	} 
+	
 	private $ReturnVariables ;
 }
 

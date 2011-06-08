@@ -1,12 +1,16 @@
 <?php
 namespace jc\mvc\view\widget;
 
+use jc\verifier\VerifyFailed;
+use jc\message\Message;
 use jc\util\IDataSrc;
 use jc\pattern\composite\Container;
 
-class FormWidget extends Widget implements IViewFormWidget {
-	public function value() {
-		return $this->value;
+class FormWidget extends Widget implements IViewFormWidget
+{	
+	public function value()
+	{
+		return $this->value ;
 	}
 	
 	public function setValue($data = null) {
@@ -31,12 +35,26 @@ class FormWidget extends Widget implements IViewFormWidget {
 		}
 		return $this->aVerifiers;
 	}
-	
-	public function verifyData() {
-		if ($this->aVerifiers) {
-			foreach ( $this->aVerifiers->iterator () as $aVerifier ) {
-				if (! $aVerifier->verify ( $this->value () )) {
-					return false;
+
+	public function verifyData()
+	{
+		if( $this->aVerifiers )
+		{
+			foreach($this->aVerifiers->iterator() as $aVerifier)
+			{
+				try{
+					
+					$aVerifier->verify( $this->value(), true ) ;
+					
+				} catch (VerifyFailed $e) {
+					
+					new Message(
+						Message::error
+						, "栏位%s输入的内容无效：".$e->getMessage()
+						, array_merge(array($this->title()),$e->getMessageArgvs())
+					) ;
+					
+					return false ;
 				}
 			}
 		}

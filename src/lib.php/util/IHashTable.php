@@ -8,7 +8,8 @@ interface IHashTable
 	public function &getRef($sName) ;
 	public function set($sName,$Value) ;
 	public function setRef($sName,&$Value) ;
-	public function has($sName) ;	
+	public function has($sName) ;
+	public function hasValue($value) ;	
 	public function remove($sName) ;	
 	public function clear() ;	
 	public function count() ;

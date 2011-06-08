@@ -1,6 +1,7 @@
 <?php
 namespace jc\mvc\view ;
 
+use jc\message\IMessageQueueHolder;
 use jc\io\IOutputStream;
 use jc\util\IHashTable;
 use jc\mvc\model\IModel;
@@ -8,7 +9,7 @@ use jc\mvc\view\widget\IViewWidget;
 use jc\pattern\composite\IContainer;
 use jc\pattern\composite\Container;
 
-interface IView extends IContainer
+interface IView extends IContainer, IMessageQueueHolder
 {
 	/**
 	 * @return IModel
@@ -45,6 +46,8 @@ interface IView extends IContainer
 	public function removeWidget(IViewWidget $aWidget) ;
 	
 	public function clearWidgets() ;
+	
+	public function hasWidget(IViewWidget $aWidget) ;
 	
 	/**
 	 * @return IViewWidget

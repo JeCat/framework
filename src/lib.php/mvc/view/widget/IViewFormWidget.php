@@ -6,7 +6,7 @@ namespace jc\mvc\view\widget ;
 use jc\util\IDataSrc;
 
 interface IViewFormWidget extends IViewWidget
-{
+{	
 	public function value() ;
 	
 	public function setValue($data=null) ;

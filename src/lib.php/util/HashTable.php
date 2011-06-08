@@ -53,6 +53,11 @@ class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator
 	{
 		return array_key_exists($sName,$this->arrDatas) ;
 	}
+	
+	public function hasValue($value)
+	{
+		return in_array($value,$this->arrDatas,true) ;
+	}
 
 	public function remove($sName)
 	{

@@ -1,7 +1,10 @@
 <?php
 namespace jc\mvc\controller ;
 
-interface IController
+
+use jc\message\IMessageQueueHolder;
+
+interface IController extends IMessageQueueHolder
 {
 	public function mainRun($Params=null) ;
 	

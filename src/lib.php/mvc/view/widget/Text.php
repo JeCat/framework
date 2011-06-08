@@ -12,13 +12,13 @@ class Text extends FormWidget {
 	private static $nTypeMin = 0;
 	private static $nTypeMax = 2;
 	
-	public function __construct($sId, $type = self::TEXT, $aView = null) {
+	public function __construct($sId, $sTitle=null, $type = self::TEXT, $aView = null) {
 		if (! is_int ( $type ) || $type < self::$nTypeMin || $type > self::$nTypeMax) {
-			throw new Exception ( "æž„å»ºTextå¯¹è±¡æ—¶ä½¿ç”¨äº†éžæ³•çš„typeå‚æ•°(å¾—åˆ°çš„typeæ˜¯:%s)", array ($type ) );
+			throw new Exception ( "¹¹½¨Text¶ÔÏóÊ±Ê¹ÓÃÁË·Ç·¨µÄtype²ÎÊý(µÃµ½µÄtypeÊÇ:%s)", array ($type ) );
 		}
 		
 		$this->nType = $type;
-		parent::__construct ( $sId, 'ViewWidgetText.template.html', $aView );
+		parent::__construct ( $sId, 'ViewWidgetText.template.html', $sTitle, $aView );
 	}
 	
 	public function isTextarea() {

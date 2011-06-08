@@ -3,7 +3,7 @@ namespace jc\verifier ;
 
 interface IVerifier
 {
-	public function verifier($data) ;
+	public function verify($data,$bThrowException) ;
 }
 
 ?>

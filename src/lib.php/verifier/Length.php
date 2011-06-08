@@ -1,6 +1,8 @@
 <?php
 namespace jc\verifier ;
 
+use jc\message\Message;
+
 use jc\lang\Exception;
 use jc\lang\Object;
 
@@ -12,7 +14,7 @@ class Length extends Object implements IVerifier
 		$this->nMaxLen = $nMaxLen ;
 	}
 
-	public function verifier($data)
+	public function verify($data,$bThrowException)
 	{
 		if( is_array($data) )
 		{
@@ -26,15 +28,27 @@ class Length extends Object implements IVerifier
 		
 		if( $this->nMinLen>=0 and $this->nMinLen>$nLen )
 		{
-			throw new Exception("不能小于%d",array($this->nMinLen)) ;
+			if($bThrowException)
+			{
+				throw new VerifyFailed("不能小于%d",array($this->nMinLen)) ;
+			}
+			return false ;
 		}
 		if( $this->nMaxLen>=0 and $this->nMaxLen<$nLen )
 		{
-			throw new Exception("不能大于%d",array($this->nMaxLen)) ;
+			if($bThrowException)
+			{
+				throw new VerifyFailed("不能大于%d",array($this->nMaxLen)) ;
+			}
+			return false ;
 		}
 		if( !$this->bAllowEmpty and $nLen<=0 )
 		{
-			throw new Exception("不能为空") ;
+			if($bThrowException)
+			{
+				throw new VerifyFailed("不能为空") ;
+			}
+			return false ;
 		}
 		
 		return true ;

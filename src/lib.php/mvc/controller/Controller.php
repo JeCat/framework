@@ -3,10 +3,7 @@
 namespace jc\mvc\controller ;
 
 use jc\message\IMessageQueue;
-
 use jc\message\MessageQueue;
-
-use jc\message\IMessageQueueHolder;
 use jc\util\DataSrc;
 use jc\util\IDataSrc;
 use jc\util\HashTable ;
@@ -20,7 +17,7 @@ use jc\pattern\composite\NamableComposite ;
  * 
  * 
  */
-class Controller extends NamableComposite implements IController, IMessageQueueHolder
+class Controller extends NamableComposite implements IController
 {
     function __construct ()
     {
@@ -69,7 +66,7 @@ class Controller extends NamableComposite implements IController, IMessageQueueH
     	{
     		$this->aMainView = new View('controllerMainView') ;
     	}
-    	
+
     	return $this->aMainView ;
     }
     
@@ -154,7 +151,7 @@ class Controller extends NamableComposite implements IController, IMessageQueueH
 	 */
 	public function messageQueue()
 	{
-		if( !$this->aMsgQueue )
+		if( $this->aMsgQueue )
 		{
 			return $this->aMsgQueue ;
 		}

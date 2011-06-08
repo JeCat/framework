@@ -1,0 +1,7 @@
+<if "$aMsgQueue->count()">
+<foreach for="$aMsgQueue->iterator()" item="aMessage" >
+<div class="{=$aMessage->type()}">
+	{=$aMessage->message()}
+</div>
+</foreach>
+</if>

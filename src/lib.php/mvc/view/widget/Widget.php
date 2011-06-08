@@ -1,8 +1,12 @@
 <?php
 namespace jc\mvc\view\widget ;
 
-use jc\util\HashTable;
+use jc\util\StopFilterSignal;
 
+use jc\message\Message;
+use jc\message\IMessageQueue;
+use jc\message\MessageQueue;
+use jc\util\HashTable;
 use jc\ui\UI;
 use jc\io\IOutputStream;
 use jc\mvc\view\IView;
@@ -11,13 +15,37 @@ use jc\util\IHashTable;
 use jc\lang\Object ;
 
 class Widget extends Object implements IViewWidget
-{
-	public function __construct($sId,$sTemplateName,IView $aView=null)
+{	
+	public function __construct($sId,$sTemplateName,$sTitle=null,IView $aView=null)
 	{
 		parent::__construct() ;
 		
 		$this->setId($sId) ;
+		$this->setTitle($sTitle?$sTitle:$sId) ;
 		$this->setTemplateName($sTemplateName) ;
+		
+		// 消息队列过滤器
+		$this->messageQueue()->filters()->add(function ($aMsg,$aWidget){
+			if($aMsg->poster()!=$aWidget)
+			{
+				StopFilterSignal::stop() ;
+			}
+			
+			return array($aMsg) ;
+		},$this) ;
+				
+		// “恐龙妈妈”模式
+		if(!$aView)
+		{
+			foreach(debug_backtrace() as $arrCall)
+			{
+				if( !empty($arrCall['object']) and $arrCall['object'] instanceof IView )
+				{
+					$aView = $arrCall['object'] ;
+					break ;
+				}
+			}
+		}
 		
 		if($aView)
 		{
@@ -25,6 +53,16 @@ class Widget extends Object implements IViewWidget
 		}
 	}
 
+	public function title()
+	{
+		return $this->sTitle ;
+	}
+	
+	public function setTitle($sTitle)
+	{
+		$this->sTitle = $sTitle ;
+	}
+	
 	/**
 	 * @return IView
 	 */
@@ -80,13 +118,34 @@ class Widget extends Object implements IViewWidget
 			$aVariables->set("theWidget", $aOldVal) ;
 		}
 	}
+
+	/**
+	 * @return IMessageQueue
+	 */
+	public function messageQueue()
+	{
+		if( !$this->aMsgQueue )
+		{
+			$this->aMsgQueue = new MessageQueue() ;
+		}
+		
+		return $this->aMsgQueue ;
+	}
+	
+	public function setMessageQueue(IMessageQueue $aMsgQueue)
+	{
+		$this->aMsgQueue = $aMsgQueue ;
+	}
 	
 	private $aView ;
 
 	private $sId ;
 	
 	private $sTemplateName ;
+	
+	private $aMsgQueue ;
 
+	private $sTitle ;
 }
 
 ?>

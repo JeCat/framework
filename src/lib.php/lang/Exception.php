@@ -29,7 +29,7 @@ class Exception extends \Exception implements IException, IObject
 	
 	public function code() 
 	{
-		return $this->getMessage() ;
+		return $this->getCode() ;
 	}
 	
 	public function file()
@@ -47,6 +47,10 @@ class Exception extends \Exception implements IException, IObject
 		return $this->getTrace() ;
 	}
 	
+	public function getMessageArgvs()
+	{
+		return $this->arrArgvs ;
+	}
 	
 	// for IJeCatObject //////////////////////////////////
 	public function create($sClassName,$sNamespace='\\',array $arrArgvs=array())
