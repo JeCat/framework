@@ -30,7 +30,9 @@ abstract class ParserState extends JcObject
 	}
 
 	public function complete(IObject $aObject,String $aSource,$nPosition)
-	{}
+	{
+		return $aObject ;
+	}
 	
 	abstract public function examineEnd(String $aSource, &$nPosition,IObject $aObject) ;
 	

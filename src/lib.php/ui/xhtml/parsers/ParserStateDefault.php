@@ -23,14 +23,9 @@ class ParserStateDefault extends ParserState
 		return null ;
 	}
 	
-	public function complete()
-	{
-		return null ;
-	}
-	
 	public function examineEnd(String $aSource, &$nPosition,IObject $aObject)
 	{
-		return $aSource->length()<=$nPosition ;
+		return $aSource->length()-1<=$nPosition ;
 	}
 	public function examineStart(String $aSource, &$nPosition,IObject $aObject)
 	{

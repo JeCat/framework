@@ -9,9 +9,7 @@ use jc\system\Application;
 use jc\ui\xhtml\Factory as UIFactory ;
 
 // 报告所有错误
-error_reporting(E_ALL) ;	
-ini_set('display_errors', 1);
-
+error_reporting(E_ALL & ~E_DEPRECATED) ;
 
 // 预加载类(Before Class Loader)
 require_once __DIR__."/src/lib.php/lang/IObject.php" ;
