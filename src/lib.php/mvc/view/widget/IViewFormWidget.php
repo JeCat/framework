@@ -20,6 +20,14 @@ interface IViewFormWidget extends IViewWidget
 	public function dataVerifiers() ;
 
 	public function verifyData() ;
+	
+	public function readOnly();
+	
+	public function setReadOnly($bReadOnly);
+	
+	public function enable();
+	
+	public function setEnable($bEnable);
 
 }
 

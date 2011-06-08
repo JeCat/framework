@@ -1,1 +1,1 @@
-<input id="{=$theWidget->id()}" name="{=$theWidget->formName()}" value="{=$theWidget->valueToString()}" />
+	<input id="{=$theWidget->id()}" name="{=$theWidget->formName()}" value="{=$theWidget->valueToString()}" type="{? echo $theWidget->isPassword() ? 'password' : 'text'}" />

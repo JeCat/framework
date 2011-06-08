@@ -1,79 +1,82 @@
 <?php
-namespace jc\mvc\view\widget ;
+namespace jc\mvc\view\widget;
 
 use jc\util\IDataSrc;
 use jc\pattern\composite\Container;
 
-class FormWidget extends Widget implements IViewFormWidget
-{
-	public function value()
-	{
-		return $this->value ;
-	}
-
-	public function setValue($data=null)
-	{
-		$this->value = $data ;
-	}
-
-	public function valueToString()
-	{
-		return strval($this->value()) ;
-	}
-
-	public function setValueFromString($data)
-	{
-		return $this->setValue($data) ;
+class FormWidget extends Widget implements IViewFormWidget {
+	public function value() {
+		return $this->value;
 	}
 	
-	
-	public function setDataFromSubmit(IDataSrc $aDataSrc)
-	{
-		$this->setValueFromString(
-			$aDataSrc->get($this->formName()) 
-		) ;
+	public function setValue($data = null) {
+		$this->value = $data;
 	}
 	
-	public function dataVerifiers()
-	{
-		if( !$this->aVerifiers )
-		{
-			$this->aVerifiers = new Container() ;
+	public function valueToString() {
+		return strval ( $this->value () );
+	}
+	
+	public function setValueFromString($data) {
+		return $this->setValue ( $data );
+	}
+	
+	public function setDataFromSubmit(IDataSrc $aDataSrc) {
+		$this->setValueFromString ( $aDataSrc->get ( $this->formName () ) );
+	}
+	
+	public function dataVerifiers() {
+		if (! $this->aVerifiers) {
+			$this->aVerifiers = new Container ();
 		}
-		return $this->aVerifiers ;
+		return $this->aVerifiers;
 	}
-
-	public function verifyData()
-	{
-		if( $this->aVerifiers )
-		{
-			foreach($this->aVerifiers->iterator() as $aVerifier)
-			{
-				if( !$aVerifier->verify( $this->value() ) )
-				{
-					return false ;
+	
+	public function verifyData() {
+		if ($this->aVerifiers) {
+			foreach ( $this->aVerifiers->iterator () as $aVerifier ) {
+				if (! $aVerifier->verify ( $this->value () )) {
+					return false;
 				}
 			}
 		}
 		
-		return true ;
-	}
-
-	public function formName()
-	{
-		return $this->sFormName===null? $this->id(): $this->sFormName ;
+		return true;
 	}
 	
-	public function setFormName($sFormName)
-	{
-		$this->sFormName = $sFormName ;
+	public function formName() {
+		return $this->sFormName === null ? $this->id () : $this->sFormName;
 	}
 	
-	private $sFormName ;
+	public function setFormName($sFormName) {
+		$this->sFormName = $sFormName;
+	}
 	
-	private $value ;
+	public function readOnly() {
+		return $this->bReadOnly ;
+	}
 	
-	private $aVerifiers ;
+	public function setReadOnly($bReadOnly) {
+		$this->bReadOnly = $bReadOnly;
+	}
+	
+	public function enable() {
+		return $this->bEnable ;
+	}
+	
+	public function setEnable($bEnable) {
+		$this->bEnable = $bEnable;
+	}
+	
+	private $sFormName;
+	
+	private $value;
+	
+	private $aVerifiers;
+	
+	private $bReadOnly = false;
+	
+	private $bEnable = true;
 }
 
 ?>
