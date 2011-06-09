@@ -19,11 +19,11 @@ class CheckBtn extends FormWidget {
 	
 	public function __construct($sId, $sTitle=null, $nType = self::CHECKBOX , $nChecked = self::UNCHEACKED, $aView = null) {
 		if (! is_int ( $nType ) || $nType < self::$nTypeMin || $nType > self::$nTypeMax) {
-			throw new Exception ( "构建checkbtn对象时使用了非法的type参数(得到的type是:%s)", array ( $nType ) );
+			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的type参数(得到的type是:%s)", array ( $nType ) );
 		}
 		
 		if (! is_int ( $nChecked ) || $nChecked < self::$nStateMin || $nChecked > self::$nStateMax) {
-			throw new Exception ( "构建checkbtn对象时使用了非法的checked参数(得到的checked是:%s)", array ( $nChecked ) );
+			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的checked参数(得到的checked是:%s)", array ( $nChecked ) );
 		}
 		
 		$this->nType = $nType;
