@@ -10,6 +10,11 @@ class MessageQueue extends Object implements IMessageQueue
 {
 	public function add(Message $aMsg)
 	{
+		if( in_array($aMsg, $this->arrMsgQueue) )
+		{
+			return ;
+		}
+		
 		if( $this->aFilterManager )
 		{
 			list($aMsg)=$this->aFilterManager->handle($aMsg) ;

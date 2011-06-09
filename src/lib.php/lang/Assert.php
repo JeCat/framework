@@ -24,7 +24,7 @@ class Assert
 	}
 	
 	
-	static private $bEnableAssert = false ;
+	static private $bEnableAssert = true ;
 }
 
 ?>

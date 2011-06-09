@@ -15,12 +15,16 @@ class TypeException extends Exception
 	
 	public function message(ILocale $aLocale=null)
 	{
-		return array(
-			"变量%s类型为：%s，不满足要求的类型: %s" ,
+		if( !$aLocale )
+		{
+			$aLocale = $this->application(true)->localeManager()->locale() ;
+		}
+		
+		return $aLocale->trans("变量%s类型为：%s，不满足要求的类型: %s",array(
 			($this->sVarName?:'') ,
 			Type::reflectType($this->Variable) ,
 			implode(",", $this->arrRequireTypes) ,
-		) ;
+		)) ;
 	}
 
 	private $Variable ;

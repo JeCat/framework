@@ -214,6 +214,14 @@ class View extends NamableComposite implements IView
 		}
 		return $this->aDataExchanger ;
 	}
+	
+	public function exchangeData($nWay=DataExchanger::MODEL_TO_WIDGET)
+	{
+		if($this->aDataExchanger)
+		{
+			$this->aDataExchanger->exchange($this,$nWay) ;
+		}
+	}
 
 	/**
 	 * @return IMessageQueue

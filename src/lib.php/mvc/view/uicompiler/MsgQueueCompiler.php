@@ -26,7 +26,9 @@ class MsgQueueCompiler extends NodeCompiler
 			$sMsgQueue = "\$aVariables->get('theView')->messageQueue()" ;
 		}
 		
-		$aDev->write( "\$this->display('MsgQueue.template.html',array('aMsgQueue'=>{$sMsgQueue}),\$aDevice) ; ?>\r\n" ) ;
+		$aDev->write("\$__ui_msgqueue = {$sMsgQueue} ;\r\n") ;		
+		$aDev->write("\\jc\\lang\\Assert::type('\\\\jc\\\\message\\\\IMessageQueue',\$__ui_msgqueue);\r\n") ;		
+		$aDev->write("\$this->display('MsgQueue.template.html',array('aMsgQueue'=>\$__ui_msgqueue),\$aDevice) ; ?>\r\n") ;
 		
 	}
 }
