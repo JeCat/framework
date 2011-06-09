@@ -1,1 +1,5 @@
-	<input id="{=$theWidget->id()}" name="{=$theWidget->formName()}" value="{=$theWidget->valueToString()}" type="{? echo $theWidget->isPassword() ? 'password' : 'text'}" />
+<if "{=$theWidget->isTextarea()}">
+	<textarea id="{=$theWidget->id()}" name="{=$theWidget->formName()}" >{=$theWidget->valueToString()}</textarea>
+	<if:else/>
+	<input id="{=$theWidget->id()}" name="{=$theWidget->formName()}" value="{=$theWidget->valueToString()}" type="{? echo $theWidget->isPassword() ? 'password' : 'text'}"/>
+</if>
