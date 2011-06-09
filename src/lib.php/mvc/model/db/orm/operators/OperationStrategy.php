@@ -12,14 +12,91 @@ use jc\lang\Object;
 
 abstract class OperationStrategy extends Object
 {
-	protected function setCondition(Criteria $aCriteria,$keys,$values)
+	protected function setCondition(Criteria $aCriteria,$keys,$names=null,IModel $aDataSource,$sTableName='')
 	{
 		$keys = array_values((array)$keys) ;
-		$values = array_values((array)$values) ;
-		
-		foreach($keys as $nIdx=>$sKey)
+		if($names)
 		{
-			$aCriteria->add($sKey,$values[$nIdx]) ;
+			$names = array_values((array)$names) ;
+		}
+		else 
+		{
+			$names = $keys ;
+		}
+		
+		if($sTableName)
+		{
+			$sTableName.= '.' ;
+		}
+		
+		foreach($keys as $idx=>$sKey)
+		{
+			$aCriteria->add(
+				$sTableName . $sKey
+				, $aDataSource->get($names[$idx])
+			) ;
+		}
+	}
+	
+	protected function setValue(IDataSettableStatement $aStatement,$keys,$names=null,IModel $aDataSource,$sTableName='')
+	{
+		$keys = array_values((array)$keys) ;
+		if($names)
+		{
+			$names = array_values((array)$names) ;
+		}
+		else 
+		{
+			$names = $keys ;
+		}
+		
+		if($sTableName)
+		{
+			$sTableName.= '.' ;
+		}
+		
+		foreach($keys as $idx=>$sKey)
+		{
+			$aStatement->setData(
+				$sTableName . $sKey
+				, $aDataSource->get($names[$idx])
+			) ;
+		}
+	}
+	
+	protected function setAssociationCriteria(Criteria $aCriteria,$sFromTable,$sToTable,array $arrFromKeys,array $arrToKeys)
+	{
+		foreach($arrFromKeys as $nIdx=>$sFromKey)
+		{
+			$aCriteria->add( "{$sFromTable}.{$sFromKey} = {$sToTable}.{$arrToKeys[$nIdx]}" ) ;
+		}
+	}
+	
+	protected function makeAssociation(MultiTableStatement $aStatement,ModelPrototype $aPrototype,$arrAssoTypes=array(AssociationPrototype::hasOne, AssociationPrototype::belongsTo))
+	{
+		$aTables = $aStatement->tables() ;
+		$aJoin = $aTables->sqlStatementJoin() ;
+		
+		// 处理关联表
+		foreach($aPrototype->associations() as $aAssoPrototype)
+		{
+			// 联合sql查询
+			if( in_array($aAssoPrototype->type(), $arrAssoTypes) )
+			{
+				$sAssoTableAlias = $aAssoPrototype->modelProperty() ;
+				$aTables->join( $aAssoPrototype->toPrototype()->tableName(), null, $sAssoTableAlias ) ;
+				
+				$this->setAssociationCriteria(
+						$aJoin->criteria()
+						, $aAssoPrototype->fromPrototype()->name()
+						, $sAssoTableAlias
+						, $aAssoPrototype->fromKeys()
+						, $aAssoPrototype->toKeys()
+				) ;
+				
+				// 递归关联
+				$this->makeAssociation($aStatement,$aAssoPrototype->toPrototype(),$arrAssoTypes) ;
+			}
 		}
 	}
 }

@@ -10,8 +10,8 @@ class Delete extends MultiTableStatement
 		
 		$aCriteria = $this->criteria() ;
 		
-		$sStatement = "DELETE" . $this->tables()->makeStatement($bFormat) 
-				. ($aCriteria? $aCriteria->makeStatement($bFormat): '') ;
+		$sStatement = "DELETE " . $this->tables()->makeStatement($bFormat) 
+				. ($aCriteria? (' WHERE '.$aCriteria->makeStatement($bFormat)): '') ;
 		
 		return $sStatement ;
 	}

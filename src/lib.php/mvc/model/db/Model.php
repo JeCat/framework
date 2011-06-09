@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\model\db ;
 
+use jc\mvc\model\db\orm\operators\Deleter;
+
 use jc\db\DB;
 use jc\mvc\model\db\orm\operators\Selecter;
 use jc\db\IRecordSet;
@@ -129,13 +131,20 @@ class Model extends BaseModel implements IModel
 		// update
 		if( $this->hasSerialized() )
 		{
-			
+			return Updater::singleton() ;
 		}
 		
 		// insert
 		else 
 		{
+			if( Inserter::singleton() )
+			{
+				$this->setSerialized(true) ;
+				
+				return true ;
+			}
 			
+			return false ;
 		}
 	}
 	
@@ -143,9 +152,24 @@ class Model extends BaseModel implements IModel
 	{
 		if( !$this->hasSerialized() )
 		{
-			return ;
+			$aDB = DB::singleton() ;
+			
+			if( Deleter::singleton()->delete($aDB, $this) )
+			{
+				$this->setSerialized(false) ;
+								
+				return true ;
+			}	
+			else 
+			{
+				return false ;
+			}	
 		}
 		
+		else 
+		{
+			return true ;
+		}
 	}
 	
 	

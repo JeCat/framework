@@ -76,7 +76,7 @@ class Criteria extends SubStatement
 			} 
 			else
 			{
-				$this->arrExpressions[] = strval($column) ;
+				$this->arrExpressions[] = array(strval($column),$sValue,$sOperator,$sTernary) ;
 			}
 		}
 		

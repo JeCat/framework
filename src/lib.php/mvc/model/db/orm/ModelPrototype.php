@@ -59,7 +59,7 @@ class ModelPrototype extends Object
 		}
 		
 		// 通过反射设置model prototype
-		if( empty($aPrototype->arrClms) or empty($aPrototype->arrPrimaryKeys) )
+		if( empty($aPrototype->arrClms) or empty($aPrototype->arrPrimaryKeys) or empty($aPrototype->sDevicePrimaryKey) )
 		{
 			$aPrototype->reflectTableInfo(DB::singleton()) ;
 		}
@@ -100,6 +100,16 @@ class ModelPrototype extends Object
 	}
 	
 	
+	
+	public function devicePrimaryKey()
+	{
+		return $this->sDevicePrimaryKey ;
+	}
+	
+	public function setDevicePrimaryKey($sDevicePrimaryKey)
+	{
+		$this->sDevicePrimaryKey = $sDevicePrimaryKey ;
+	}
 	
 	public function primaryKeys()
 	{
@@ -275,9 +285,14 @@ class ModelPrototype extends Object
 		{
 			$arrClms[] = $arrRow['Field'] ;
 			
-			if( $arrRow['Key']=='PRI' and empty($this->arrPrimaryKeys) )
+			if( $arrRow['Key']=='PRI' )
 			{
-				$this->arrPrimaryKeys = array($arrRow['Field']) ;
+				if(empty($this->arrPrimaryKeys))
+				{
+					$this->arrPrimaryKeys = array($arrRow['Field']) ;
+				}
+				
+				$this->sDevicePrimaryKey = $arrRow['Field'] ;
 			}
 		}
 		
@@ -296,6 +311,8 @@ class ModelPrototype extends Object
 	private $sModelClass = "jc\\mvc\\model\\db\\Model" ;
 	
 	private $arrPrimaryKeys = array() ;
+	
+	private $sDevicePrimaryKey ;
 	
 	private $arrClms = array() ;
 	

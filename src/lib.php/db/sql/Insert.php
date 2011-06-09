@@ -3,7 +3,7 @@ namespace jc\db\sql ;
 
 use jc\lang\Exception ;
 
-class Insert extends Statement
+class Insert extends Statement implements IDataSettableStatement
 {
 	public function __construct($sTableName="")
 	{
@@ -25,6 +25,11 @@ class Insert extends Statement
 		$this->mapData[$sColumnName] = $sData ;
 	}
 	
+	public function clearData()
+	{
+		$this->mapData = array() ;
+	}
+	
 	public function removeData($sColumnName)
 	{
 		unset($this->mapData[$sColumnName]) ;
@@ -38,6 +43,11 @@ class Insert extends Statement
 	public function dataIterator()
 	{
 		return new \ArrayIterator($this->mapData) ;
+	}
+
+	public function dataNameIterator()
+	{
+		return new \ArrayIterator( array_keys($this->mapData) ) ;
 	}
 
 	public function makeStatement($bFormat=false)

@@ -2,7 +2,6 @@
 namespace jc\mvc\model\db\orm\operators ;
 
 use jc\db\sql\Criteria;
-
 use jc\db\IRecordSet;
 use jc\mvc\model\db\Model;
 use jc\db\DB;
@@ -191,14 +190,7 @@ class Selecter extends OperationStrategy
 			}
 		}
 	}
-	
-	private function setAssociationCriteria(Criteria $aCriteria,$sFromTable,$sToTable,array $arrFromKeys,array $arrToKeys)
-	{
-		foreach($arrFromKeys as $nIdx=>$sFromKey)
-		{
-			$aCriteria->add( "{$sFromTable}.{$sFromKey} = {$sToTable}.{$arrToKeys[$nIdx]}" ) ;
-		}
-	}
+
 }
 
 ?>

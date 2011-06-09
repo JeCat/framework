@@ -2,7 +2,7 @@
 
 namespace jc\db\sql ;
 
-class Update extends MultiTableStatement
+class Update extends MultiTableStatement implements IDataSettableStatement
 {
 	public function setReplace($bReplace=true)
 	{
@@ -53,6 +53,26 @@ class Update extends MultiTableStatement
 	public function removeData($sColumnName)
 	{
 		unset($this->mapData[$sColumnName]) ;
+	}
+
+	public function clearData()
+	{
+		$this->mapData = array() ;
+	}
+
+	public function data($sColumnName)
+	{
+		return isset($this->mapData[$sColumnName])? $this->mapData[$sColumnName]: null ;
+	}
+
+	public function dataIterator()
+	{
+		return new \ArrayIterator($this->mapData) ;
+	}
+
+	public function dataNameIterator()
+	{
+		return new \ArrayIterator( array_keys($this->mapData) ) ;
 	}
 	
 	private $mapData = array() ;

@@ -43,6 +43,8 @@ interface IModel extends \ArrayAccess, \Iterator
 	
 	public function clearData() ;
 	
+	public function dataNameIterator() ;
+	
 	public function dataIterator() ;
 	
 		

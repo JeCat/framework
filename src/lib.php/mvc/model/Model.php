@@ -2,7 +2,6 @@
 namespace jc\mvc\model ;
 
 use jc\lang\Object;
-use jc\util\HashTable;
 
 abstract class Model extends Object implements IModel
 {
@@ -11,7 +10,6 @@ abstract class Model extends Object implements IModel
 		parent::__construct() ;
 		
 		$this->bAggregarion = $bAggregarion ;
-		$this->aData = new HashTable() ;
 	}
 
 	
@@ -95,18 +93,14 @@ abstract class Model extends Object implements IModel
 	
 	public function setData($sName,$sValue)
 	{
-		if( array_key_exists($sName, $this->arrData) )
+		list($aModel,$sChildName) = $this->findDataByPath($sName) ;
+		if($aModel)
 		{
-			$this->arrData[$sName] = $sValue ;
+			$aModel->set($sChildName,$sValue) ;
 		}
-		
 		else 
 		{
-			list($aModel,$sName) = $this->findDataByPath($sName) ;
-			if($aModel)
-			{
-				$aModel->set($sName,$sValue) ;
-			}
+			$this->arrData[$sName]=$sValue ;
 		}
 	}
 	
@@ -149,6 +143,12 @@ abstract class Model extends Object implements IModel
 	public function dataIterator()
 	{
 		return new \ArrayIterator($this->arrData) ;
+	}
+	}
+	
+	public function dataNameIterator()
+	{
+		return new \ArrayIterator( array_keys($this->arrData) ) ;
 	}
 	
 	///////////////////////////////////////////
