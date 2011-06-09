@@ -48,13 +48,14 @@ class NodeCompiler extends BaseCompiler
 		{
 			$aDev->write(" ") ;
 			
+			// 具名属性
 			if($sName=$aAttrVal->name())
 			{
 				$aDev->write($sName) ;
 				$aDev->write('=') ;
 			}
 			
-			$aDev->write('"') ;
+			$aDev->write($aAttrVal->quoteType()) ;
 			if( $aAttrCompiler = $aCompilerManager->compiler($aAttrVal) )
 			{
 				$aAttrCompiler->compile($aAttrVal,$aDev,$aCompilerManager) ;
@@ -71,7 +72,7 @@ class NodeCompiler extends BaseCompiler
 				}
 			}
 		
-			$aDev->write('"') ;
+			$aDev->write($aAttrVal->quoteType()) ;
 		}
 		
 		if( $aTag->isSingle() )

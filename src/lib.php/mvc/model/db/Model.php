@@ -2,9 +2,10 @@
 namespace jc\mvc\model\db ;
 
 use jc\mvc\model\db\orm\operators\Deleter;
-
-use jc\db\DB;
 use jc\mvc\model\db\orm\operators\Selecter;
+use jc\mvc\model\db\orm\operators\Inserter;
+use jc\mvc\model\db\orm\operators\Updater;
+use jc\db\DB;
 use jc\db\IRecordSet;
 use jc\db\sql\MultiTableStatement;
 use jc\mvc\model\db\orm\AssociationPrototype;

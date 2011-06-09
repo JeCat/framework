@@ -20,6 +20,7 @@ class ParserStateTag extends ParserState
 		parent::__construct() ;
 		self::setSingleton($this) ;
 		
+		$this->arrChangeToStates[] = ParserStateMark::singleton() ;
 		$this->arrChangeToStates[] = ParserStateAttribute::singleton() ;
 	}
 

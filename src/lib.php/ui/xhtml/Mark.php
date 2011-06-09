@@ -10,12 +10,31 @@ class Mark extends ObjectBase
 		$this->sMarkType = $sMarkType ;
 	}
 	
+	public function setBorder($sStartMark,$sEndMark)
+	{
+		$this->sStartMark = $sStartMark ;
+		$this->sEndMark = $sEndMark ;
+	}
+	
+	public function borderStartMark()
+	{
+		return $this->sStartMark ;
+	}
+	
+	public function borderEndMark()
+	{
+		return $this->sEndMark ;
+	}
+	
 	public function markType()
 	{
 		return $this->sMarkType ;
 	}
 	
 	private $sMarkType ;
+	private $sStartMark ;
+	private $sEndMark ;	
+	
 }
 
 ?>

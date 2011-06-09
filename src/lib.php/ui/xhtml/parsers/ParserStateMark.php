@@ -18,7 +18,10 @@ class ParserStateMark extends ParserState
 	
 	public function active(IObject $aParent,String $aSource,$nPosition)
 	{
-		$aMark = new Mark($aSource->byte($nPosition+1),$nPosition, 0, ObjectBase::getLine($aSource,$nPosition), '') ;
+		$sStartMark = $this->determineMarkBorder($aSource, $nPosition) ;
+		
+		$aMark = new Mark($aSource->byte($nPosition+strlen($sStartMark)),$nPosition, 0, ObjectBase::getLine($aSource,$nPosition), '') ;
+		$aMark->setBorder($sStartMark,$this->arrMarkBorder[$sStartMark]) ;
 		$aParent->add($aMark) ;
 		
 		return $aMark ;
@@ -26,29 +29,28 @@ class ParserStateMark extends ParserState
 	
 	public function examineEnd(String $aSource, &$nPosition,IObject $aObject) 
 	{
-		$sByte = $aSource->byte($nPosition) ;
+		Assert::type("jc\\ui\\xhtml\\Mark", $aObject) ;
 		
-		if( in_array($sByte,array('{')) )
+		$sEndMark = $aObject->borderEndMark() ;
+		$nBorderWidth = strlen($sEndMark) ;
+		
+		if($aSource->substr($nPosition,$nBorderWidth)==$sEndMark)
 		{
-			throw new Exception('分析UI模板Mark对象时遇到无效的字符：%s(位置：%d行)',array(
-						$sByte, $aObject->line()
-			)) ;
+			$nPosition+= $nBorderWidth-1 ;
+			return true ;
 		}
-		
-		if( in_array($sByte,array("\r","\n")) )
+		else 
 		{
-			throw new Exception('分析UI模板Mark对象时遇到换行，Mark对象只能在单行内书写(位置：%d行)',$aObject->line()) ;
+			return false ;
 		}
-		
-		return $sByte=='}' ;
 	}
 	
 	public function complete(IObject $aObject,String $aSource,$nPosition)
 	{
 		Assert::type("jc\\ui\\xhtml\\Mark", $aObject, 'aObject') ;
-		
-		$sTextPos = $aObject->position() + 2 ;
-		$sTextLen = ($nPosition-1) - $sTextPos + 1 ;
+				
+		$sTextPos = $aObject->position() + strlen($aObject->borderStartMark()) + 1 ;
+		$sTextLen = ($nPosition-strlen($aObject->borderEndMark())) - $sTextPos + 1 ;
 		$sText = $aSource->substr( $sTextPos, $sTextLen ) ;
 		
 		$aObject->setEndPosition($nPosition) ;
@@ -59,8 +61,34 @@ class ParserStateMark extends ParserState
 	
 	public function examineStart(String $aSource, &$nPosition,IObject $aObject)
 	{
-		return $aSource->byte($nPosition)=='{' and in_array($aSource->byte($nPosition+1),array('?','=','*')) ;
+		return $this->determineMarkBorder($aSource,$nPosition)? true: false ;
 	}
+	
+	private function determineMarkBorder(String $aSource, $nPosition)
+	{
+		foreach($this->arrMarkBorder as $sStartMark=>$sEndMark)
+		{
+			$nBorderWidth = strlen($sStartMark) ;
+			
+			if( $aSource->substr($nPosition,$nBorderWidth)==$sStartMark 
+					and in_array($aSource->byte($nPosition+$nBorderWidth),array('?','=','*')) )
+			{
+				return $sStartMark ;
+			}
+		}
+		
+		return null ;
+	}
+	
+	public function addMarkBorder($sStartMark,$sEndMark)
+	{
+		$this->arrMarkBorder[$sStartMark] = $sEndMark ;
+	}
+	
+	private $arrMarkBorder = array(
+		'{'=>'}' ,
+		'{#'=>'#}' ,
+	) ;
 }
 
 ?>

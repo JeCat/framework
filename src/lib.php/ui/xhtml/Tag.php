@@ -65,7 +65,22 @@ class Tag extends ObjectBase
 	{
 		return ($this->nType&self::TYPE_SINGLE)==self::TYPE_SINGLE ;
 	}
-		
+	
+	public function add($aChild,$bAdoptRelative=true)
+	{
+		if( $aChild instanceof Mark )
+		{
+			$aAttrVal = new AttributeValue(null, '', $aChild->position(), $aChild->line()) ;
+			$aAttrVal->setEndPosition($aChild->endPosition()) ;
+			$aAttrVal->add($aChild) ;
+			
+			$this->attributes()->add($aAttrVal) ;
+			
+			$aAttrVal->setParent($this) ;
+			$aChild->setParent($this) ;
+		}
+	}
+	
 	private $sName ;
 	private $aAttrs ;
 	private $nType ;
