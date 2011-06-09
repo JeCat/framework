@@ -144,7 +144,6 @@ abstract class Model extends Object implements IModel
 	{
 		return new \ArrayIterator($this->arrData) ;
 	}
-	}
 	
 	public function dataNameIterator()
 	{

@@ -90,21 +90,26 @@ class Inserter extends OperationStrategy
 					
 					// -----------------------
 					// insert bridge table
-					$aInsertForBridge = new Insert( $aAssoPrototype->bridgeTableName() ) ;
-					
-					// from table key vale
-					$this->setValue($aInsertForBridge,$aAssoPrototype->bridgeToKeys(),$aAssoPrototype->fromKeys(),$aModel) ;
-					
-					// to table key vale
-					$this->setValue($aInsertForBridge,$aAssoPrototype->bridgeFromKeys(),$aAssoPrototype->toKeys(),$aChildModel) ;
-					
-					if( $aDB->execute($aInsertForBridge)===false )
+					foreach($aChildModel->childIterator() as $aOneChildModel)
 					{
-						return false ;
+						$aInsertForBridge = new Insert( $aAssoPrototype->bridgeTableName() ) ;
+						
+						// from table key vale
+						$this->setValue($aInsertForBridge,$aAssoPrototype->bridgeToKeys(),$aAssoPrototype->fromKeys(),$aModel) ;
+						
+						// to table key vale
+						$this->setValue($aInsertForBridge,$aAssoPrototype->bridgeFromKeys(),$aAssoPrototype->toKeys(),$aOneChildModel) ;
+						
+						if( $aDB->execute($aInsertForBridge)===false )
+						{
+							return false ;
+						}
 					}
 				}
 			}
 		}
+		
+		return true ;
 	} 
 	
 	private public function insertDirectAssocModel(IModel $aModel,IModel $aChildModel,AssociationPrototype $aAssoPrototype)
