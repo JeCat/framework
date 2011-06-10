@@ -1,1 +1,1 @@
-<input id="{=$theWidget->id()}" name="{=$theWidget->formName()}" type="{? echo $theWidget->isCheckBox() ? 'checkbox' : 'radio'}" value="{=$theWidget->valueToString()}"/>
+<input id="{=$theWidget->id()}" name="{=$theWidget->formName()}" type="{? echo $theWidget->isCheckBox() ? 'checkbox' : 'radio'}" value="{=$theWidget->valueToString()}"  {? echo $theWidget->isReadOnly() ? 'readonly="readonly"' : ''}  {? echo $theWidget->isDisabled() ? 'disabled="disabled"' : ''} />

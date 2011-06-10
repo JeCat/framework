@@ -17,7 +17,7 @@ class CheckBtn extends FormWidget {
 	private static $nTypeMin = 0;
 	private static $nTypeMax = 1;
 	
-	public function __construct($sId, $sTitle=null, $nType = self::CHECKBOX , $nChecked = self::UNCHEACKED, $aView = null) {
+	public function __construct($sId, $sTitle=null, $nType = self::CHECKBOX , $nChecked = self::UNCHEACKED,IViewWidget $aView = null) {
 		if (! is_int ( $nType ) || $nType < self::$nTypeMin || $nType > self::$nTypeMax) {
 			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的type参数(得到的type是:%s)", array ( $nType ) );
 		}

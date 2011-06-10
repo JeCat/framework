@@ -70,7 +70,8 @@ class FormWidget extends Widget implements IViewFormWidget
 		$this->sFormName = $sFormName;
 	}
 	
-	public function readOnly() {
+	//如果要求有readonly属性则返回true
+	public function isReadOnly() {
 		return $this->bReadOnly ;
 	}
 	
@@ -78,12 +79,13 @@ class FormWidget extends Widget implements IViewFormWidget
 		$this->bReadOnly = $bReadOnly;
 	}
 	
-	public function enable() {
-		return $this->bEnable ;
+	//如果要求有disable属性则返回true
+	public function isDisabled() {
+		return $this->bDisabled ;
 	}
 	
-	public function setEnable($bEnable) {
-		$this->bEnable = $bEnable;
+	public function setDisabled($bDisabled) {
+		$this->bDisabled = $bDisabled;
 	}
 	
 	private $sFormName;
@@ -94,7 +96,7 @@ class FormWidget extends Widget implements IViewFormWidget
 	
 	private $bReadOnly = false;
 	
-	private $bEnable = true;
+	private $bDisabled = false;
 }
 
 ?>

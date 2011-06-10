@@ -21,13 +21,13 @@ interface IViewFormWidget extends IViewWidget
 
 	public function verifyData() ;
 	
-	public function readOnly();
+	public function isReadOnly();
 	
 	public function setReadOnly($bReadOnly);
 	
-	public function enable();
+	public function isDisabled();
 	
-	public function setEnable($bEnable);
+	public function setDisabled($bDisabled);
 
 }
 
