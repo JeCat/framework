@@ -96,7 +96,16 @@ class ModelAssociationMap extends Object
 		return $this->aModelPrototypes ;
 	}
 	
-	
+	public function fragment($sPrototypeName,array $arrAssocFragment=array())
+	{
+		$aPrototype = $this->modelPrototype($sPrototypeName) ;
+		if(!$aPrototype)
+		{
+			return null ;
+		}
+		
+		return $aPrototype->cloneObject($arrAssocFragment) ;
+	}
 	
 	private $arrOrms = array() ;
 	

@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\model\db\orm ;
 
+use jc\lang\Assert;
+
 use jc\db\DB;
 
 use jc\lang\Type;
@@ -300,6 +302,43 @@ class ModelPrototype extends Object
 		{
 			$this->arrClms = $arrClms ;
 		}
+	}
+	
+	public function cloneObject(array $arrAssocs=array())
+	{
+		$aNewIns = clone $this ;
+		
+		foreach($arrAssocs as $sAssocName=>$assoc)
+		{
+			if( is_string($assoc) )
+			{
+				$sAssocName = $assoc ;
+				$assoc = array() ;
+			}
+			
+			Assert::type('array',$assoc) ;
+			
+			$aAssoc = $this->associations()->get($sAssocName) ;
+			if( !$aAssoc )
+			{
+				throw new Exception("模型原型(%s)中缺少指定的关系：%s",array($this->name(),$sAssocName)) ;
+			}
+			$aNewAssoc = clone $aAssoc ;
+			
+			$aNewAssoc->setFromPrototype($aNewIns) ;
+			$aNewAssoc->setToPrototype(
+				$aAssoc->toPrototype()->cloneObject($assoc)		// 递归 clone 一个 model prototype
+			) ;
+			
+			$aNewIns->addAssociation($aNewAssoc) ;
+		}
+		
+		return $aNewIns ;
+	}
+	
+	public function __clone()
+	{
+		$this->aAssociations = null ;
 	}
 
 	private $sName ;

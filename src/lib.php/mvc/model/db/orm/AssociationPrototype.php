@@ -169,6 +169,15 @@ class AssociationPrototype extends Object
 		
 		return $arrAsso ;
 	}
+
+	public function setFromPrototype($aFromPrototype)
+	{
+		$this->aFromPrototype = $aFromPrototype ;
+	}
+	public function setToPrototype($aToPrototype)
+	{
+		$this->aToPrototype = $aToPrototype ;
+	}
 	
 	private $sType ;
 	private $sModelProperty ;

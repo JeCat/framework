@@ -1,6 +1,7 @@
 <?php
 namespace jc\mvc\model\db\orm\operators ;
 
+use jc\db\DB;
 use jc\mvc\model\db\IModel;
 use jc\mvc\model\db\orm\AssociationPrototype;
 use jc\db\sql\Update;
@@ -60,17 +61,6 @@ class Updater extends OperationStrategy
 		}
 		
 		return true ;
-	} 
-	
-	private public function insertDirectAssocModel(IModel $aModel,IModel $aChildModel,AssociationPrototype $aAssoPrototype)
-	{
-		$arrFromKeys = $aAssoPrototype->fromKeys() ;
-		foreach($aAssoPrototype->toKeys() as $nIdx=>$sKey)
-		{
-			$aChildModel->setData( $sKey, $aModel->data($arrFromKeys[$nIdx]) ) ;
-		}
-		
-		return $aChildModel->save() ;
 	}
 }
 

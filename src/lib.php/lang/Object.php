@@ -18,8 +18,10 @@ class Object implements IObject
 	}
 
 	/**
-	 * Enter description here ...
+	 * 创建一个对象，并设置该对象的 application 属性
 	 * 
+	 * @param	string	$sClassName		类名称（可以是包含完整路径的类名，也可以只是类名通过后面的 $sNamespace 参数指定所属的包名）
+	 * @param	array	$arrArgvs		传递给构造函数的参数
 	 * @return stdClass
 	 */
 	public function create($sClassName,$sNamespace='\\',array $arrArgvs=array())

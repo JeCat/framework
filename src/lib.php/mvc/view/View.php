@@ -2,7 +2,6 @@
 namespace jc\mvc\view ;
 
 use jc\util\StopFilterSignal;
-
 use jc\message\Message;
 use jc\message\MessageQueue;
 use jc\message\IMessageQueue;

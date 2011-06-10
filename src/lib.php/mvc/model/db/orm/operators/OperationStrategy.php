@@ -1,8 +1,8 @@
 <?php
 namespace jc\mvc\model\db\orm\operators ;
 
+use jc\db\sql\IDataSettableStatement;
 use jc\mvc\model\db\orm\AssociationPrototype;
-
 use jc\db\sql\Criteria;
 use jc\db\sql\MultiTableStatement;
 use jc\mvc\model\db\IModel;
