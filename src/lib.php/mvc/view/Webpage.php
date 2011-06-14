@@ -18,10 +18,21 @@ class Webpage extends View
 	public function title()
 	{}
 	
-	public function setTitle()
+	public function setTitle($sTitle)
+	{}
+	
+	public function keywords()
+	{}
+	
+	public function setKeywords($sKeywords)
+	{}
+	
+	public function description()
+	{}
+	
+	public function setDescription($sDescription)
 	{}
 	
 	
 }
-
 ?>

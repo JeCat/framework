@@ -2,6 +2,7 @@
 
 namespace jc\mvc\view\widget ;
 
+use jc\mvc\view\htmlresrc\HtmlResourcePool;
 use jc\message\IMessageQueueHolder;
 use jc\io\IOutputStream;
 use jc\util\IHashTable;
@@ -27,6 +28,7 @@ interface IViewWidget extends IMessageQueueHolder
 
 	public function display(UI $aUI,IHashTable $aVariables=null,IOutputStream $aDevice=null) ;
 
+	public function requireResources(HtmlResourcePool $aResourcePool) ;
 }
 
 ?>

@@ -5,6 +5,16 @@ use jc\system\AppFactory;
 
 use jc\system\Application ;
 
+/**
+ * Object 是所有 JeCat 类的基类，它有以下作用：
+ * 	1、为 JeCat框架本身 和 基于JeCat框架构建的应用项目 提供了统一的类型。（然而，有时候出于性能的考虑，或其他技术方面的原因，并没有让所有的JeCat框架类从Object派生）；
+ *  2、自动设置 Application 对象，记录对象所属的 Application 对象；
+ *  3、提供了单件(singleton)模式的实现。 Object 的派生类可以通过 YourClass::singleton() 取得一个该类的单件对象；
+ *  4、提供了享员(flyweight)模式的实现。 Object 的派生类可以通过 YourClass::flyweight($arg1,$arg2,...) 取得一个该类的享员对象; flyweight() 方法的参数表，既是创建享员对象的参数，也是用于区分不同享员对象的值；
+ *  
+ * @author alee
+ *
+ */
 class Object implements IObject
 {
 	public function __construct()

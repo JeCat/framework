@@ -1,6 +1,8 @@
 <?php
 namespace jc\system ;
 
+use jc\fs\Dir;
+
 class Application extends CoreApplication
 {
 	public function singletonInstance($sClass,$bCreateNew=true)
@@ -26,6 +28,16 @@ class Application extends CoreApplication
 	{
 		$this->arrGlobalSingeltonInstance[$sClass] = $aInstance ;
 	}
+	
+	public function applicationDir()
+	{
+		$this->sApplicationDir ;
+	}
+	
+	public function setApplicationDir($sFolder)
+	{
+		$this->sApplicationDir = Dir::formatPath($sFolder) ;
+	}
 
 	/**
 	 * @return Application
@@ -43,7 +55,21 @@ class Application extends CoreApplication
 		self::$aGlobalSingeltonInstance = $aInstance ;
 	}
 	
-	private $arrGlobalSingeltonInstance ; 
+	public function setEntrance($sEntrance)
+	{
+		$this->sEntrance = $sEntrance ;
+	}
+	
+	public function entrance()
+	{
+		return $this->sEntrance ;
+	}
+	
+	private $arrGlobalSingeltonInstance ;
+	 
+	private $sApplicationFolder ; 
+	
+	private $sEntrance = '' ; 
 	
 	static private $aGlobalSingeltonInstance ; 
 }

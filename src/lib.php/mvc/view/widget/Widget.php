@@ -1,8 +1,8 @@
 <?php
 namespace jc\mvc\view\widget ;
 
+use jc\mvc\view\htmlresrc\HtmlResourcePool;
 use jc\util\StopFilterSignal;
-
 use jc\message\Message;
 use jc\message\IMessageQueue;
 use jc\message\MessageQueue;
@@ -136,6 +136,18 @@ class Widget extends Object implements IViewWidget
 	{
 		$this->aMsgQueue = $aMsgQueue ;
 	}
+
+	public function requireResources(HtmlResourcePool $aResourcePool)
+	{
+		foreach($this->arrRequiredJsFilenames as $sFilename)
+		{
+			$aResourcePool->addRequire($sFilename, HtmlResourcePool::RESRC_JS) ;
+		}
+		foreach($this->arrRequiredCssFilename as $sFilename)
+		{
+			$aResourcePool->addRequire($sFilename, HtmlResourcePool::RESRC_CSS) ;
+		}
+	}
 	
 	private $aView ;
 
@@ -146,6 +158,10 @@ class Widget extends Object implements IViewWidget
 	private $aMsgQueue ;
 
 	private $sTitle ;
+	
+	protected $arrRequiredJsFilenames = array() ;
+	
+	protected $arrRequiredCssFilename = array() ;
 }
 
 ?>

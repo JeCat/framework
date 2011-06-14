@@ -5,20 +5,30 @@ use jc\lang\Object;
 use jc\fs\Dir ;
 use jc\fs\FSO ;
 
-class ResourceManager extends Object
-{	
+class ResourceManager extends Object implements IResourceManager
+{
 	public function addFolder($sPath)
 	{
 		$sPath = Dir::formatPath($sPath) ;
+		$this->addFormatFolder($sPath) ;
+	}
+	
+	public function removeFolder($sPath)
+	{
+		$sPath = Dir::formatPath($sPath) ;
+		$this->removeFormatFolder($sPath) ;
+	}
+
+	protected function addFormatFolder($sPath)
+	{
 		if( !in_array($sPath,$this->arrFolders) )
 		{
 			array_unshift($this->arrFolders,$sPath) ;
 		}
 	}
 	
-	public function removeFolder($sPath)
+	protected function removeFormatFolder($sPath)
 	{
-		$sPath = Dir::formatPath($sPath) ;
 		$nIdx = array_search($sPath, $this->arrFolders) ;
 		if($nIdx!==false)
 		{
@@ -31,7 +41,7 @@ class ResourceManager extends Object
 		$this->arrFolders = array() ;
 	}
 	
-	public function find($sFilename)
+	public function findFolderAndFile($sFilename)
 	{
 		foreach($this->arrFolders as $sFolderPath)
 		{
@@ -39,7 +49,7 @@ class ResourceManager extends Object
 			{
 				if( is_file($sFolderPath.$sFilename) )
 				{
-					return $sFolderPath.$sFilename ;
+					return array($sFolderPath,$sFilename) ;
 				}
 			}
 			else 
@@ -50,13 +60,26 @@ class ResourceManager extends Object
 				
 					if( is_file($sFolderPath.$sWrapedFilename) )
 					{
-						return $sFolderPath.$sWrapedFilename ;
+						return array($sFolderPath,$sWrapedFilename) ;
 					}
 				}
 			}
 		}
 		
-		return null ;
+		return array(null,null) ;
+	}
+	
+	public function find($sFilename)
+	{
+		list($sFolderPath,$sWrapedFilename) = $this->findFolderAndFile($sFilename) ;
+		if( $sFolderPath and $sWrapedFilename )
+		{
+			return $sFolderPath.$sWrapedFilename ;
+		}
+		else 
+		{
+			return null ;
+		}
 	}
 
 	public function addFilenameWrapper($func)

@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\view ;
 
+use jc\mvc\view\htmlresrc\HtmlResourcePool;
+
 use jc\message\IMessageQueueHolder;
 use jc\io\IOutputStream;
 use jc\util\IHashTable;
@@ -58,6 +60,8 @@ interface IView extends IContainer, IMessageQueueHolder
 	 * @return \Iterator
 	 */
 	public function widgitIterator() ;
+	
+	public function requireResources(HtmlResourcePool $aResourcePool) ;
 	
 }
 

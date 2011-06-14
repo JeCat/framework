@@ -1,6 +1,10 @@
 <?php
 namespace jc\mvc\view ;
 
+use jc\mvc\view\htmlresrc\HtmlResourcePool;
+
+use jc\util\CombinedIterator;
+
 use jc\util\StopFilterSignal;
 use jc\message\Message;
 use jc\message\MessageQueue;
@@ -238,6 +242,25 @@ class View extends NamableComposite implements IView
 	{
 		$this->aMsgQueue = $aMsgQueue ;
 	}
+		
+	public function requireResources(HtmlResourcePool $aResourcePool)
+	{
+		foreach($this->arrRequiredJsFilenames as $sFilename)
+		{
+			$aResourcePool->addRequire($sFilename, HtmlResourcePool::RESRC_JS) ;
+		}
+		foreach($this->arrRequiredCssFilename as $sFilename)
+		{
+			$aResourcePool->addRequire($sFilename, HtmlResourcePool::RESRC_CSS) ;
+		}
+		
+		// for widget
+		foreach($this->widgitIterator() as $aWidget)
+		{
+			$aWidget->requireResources($aResourcePool) ;
+		}
+	}
+	
 	
 	private $aModel ;
 	private $aWidgets ;
@@ -247,6 +270,9 @@ class View extends NamableComposite implements IView
 	private $aVariables ;
 	private $aDataExchanger ;
 	private $aMsgQueue ;
+	
+	protected $arrRequiredJsFilenames = array() ;
+	protected $arrRequiredCssFilename = array() ;
 }
 
 ?>
