@@ -10,8 +10,8 @@ use jc\ui\UI;
 
 class Group extends FormWidget {
 	public function __construct($sId, $sTitle = null, IViewWidget $aView = null) {
-		$this->setSerializMethod ( array (__CLASS__, 'escape' ), array (',' , '=' ) );
-		$this->setUnSerializMethod ( array (__CLASS__, 'unescape' ), array (',' , '=' ) );
+		$this->setSerializMethod ( array (__CLASS__, 'serialize' ), array (',', '=' ) );
+		$this->setUnSerializMethod ( array (__CLASS__, 'unserialize' ), array (',', '=' ) );
 		parent::__construct ( $sId, null, $sTitle, $aView );
 	}
 	
@@ -76,12 +76,13 @@ class Group extends FormWidget {
 	public function valueToString() {
 		$arrValuesOfWidgets = Array ();
 		foreach ( $this->widgetIterator () as $widget ) {
-			if ($widget->value() !== null) {
-				$arrValuesOfWidgets [$widget->id()] = $widget->valueToString ();
+			if ($widget->value () !== null) {
+				$arrValuesOfWidgets [$widget->id ()] = $widget->valueToString ();
 			}
 		}
-		array_unshift ( $this->arrSerializMethodArgs, $arrValuesOfWidgets );
-		return call_user_func_array ( $this->arrSerializMethodName, $this->arrSerializMethodArgs );
+		$arrArgs = $this->arrSerializMethodArgs ;
+		array_unshift ( $arrArgs, $arrValuesOfWidgets );
+		return call_user_func_array ( $this->arrSerializMethodName, $arrArgs );
 	}
 	
 	public function setValueFromString($data) {
@@ -97,15 +98,12 @@ class Group extends FormWidget {
 				if ($sSubWidgetId === $sWidgetId) {
 					$groupSubWidget->setValueFromString ( $sWidgetValue );
 					break;
-				} 
-//				else {
-//					throw new Exception ( "调用" . __CLASS__ . "类的" . __METHOD__ . "方法不能根据data参数找到对应的widget(得到的data为:%s)", array ($data ) );
-//				}
+				}
 			}
 		}
 	}
 	
-	public static function escape($arrWidgetValues, $sSeparator = "," , $sIdMark = "=") {
+	public static function serialize( $arrWidgetValues, $sSeparator = ",", $sIdMark = "=") {
 		if (! is_array ( $arrWidgetValues )) {
 			throw new Exception ( '调用' . __CLASS__ . '的' . __METHOD__ . "方法时得到了非法的sStringToEscape参数(得到的sStringToEscape是:%s)", array ($arrWidgetValues ) );
 		}
@@ -136,7 +134,7 @@ class Group extends FormWidget {
 		return $sValues;
 	}
 	
-	public static function unescape($sEscapeString, $sSeparator = ',', $sIdMark = '=') {
+	public static function unserialize( $sEscapeString, $sSeparator = ',', $sIdMark = '=') {
 		if (! is_string ( $sEscapeString )) {
 			throw new Exception ( '调用' . __CLASS__ . '的' . __METHOD__ . "方法时得到了非法的sEscapeString参数(得到的sEscapeString是:%s)", array ($sEscapeString ) );
 		}
@@ -165,7 +163,6 @@ class Group extends FormWidget {
 		}
 		return $arrWidgetValues;
 	}
-	
 	
 	public function setSerializMethod($callback, $args) {
 		if (! is_callable ( $callback )) {

@@ -19,7 +19,7 @@ class RadioGroup extends Group {
 			throw new Exception("调用" . __CLASS__ . "类的" . __METHOD__ . "方法时使用了非法的aWidget参数(得到的aWidget为:%s)", array ( $aWidget ) );
 		}
 		$aWidget->setFormName($this->formName());
-		$this->arrWidgets [] = $aWidget;
+		parent::addWidget($aWidget) ;
 	}
 	
 	//删除一个子控件
@@ -36,21 +36,35 @@ class RadioGroup extends Group {
 		if(! is_string( $sCheckedId )){
 			throw new Exception("调用" . __CLASS__ . "类的" . __METHOD__ . "方法时使用了非法的sCheckedId参数(得到的sCheckedId为:%s)", array ( $sCheckedId ) );
 		}
-		foreach($this->arrWidgets as $widget){  // TODO 迭代器为什么不好用了呢?
+		foreach($this->widgetIterator() as $widget){
 			if($sCheckedId == $widget->id()){
-				$widget->setChecked(CheckBtn::CHEACKED);
+				$widget->setChecked();
 			}else{
-				$widget->setChecked(CheckBtn::UNCHEACKED);
+				$widget->setNotChecked();
 			}
 		}
 	}
 	
-	public function checkedValue(){
-		foreach($this->arrWidgets as $widget){ // TODO 迭代器为什么不好用了呢?
+	public function value()
+	{
+		foreach($this->widgetIterator() as $widget){
 			if($widget->isChecked()){
-				 return $widget->value();
+				 return (string)$widget->value();
 			}
 		}
 	}
+	
+	public function setValue($data = null) {
+		$this->value = $data;
+	}
+	
+	public function setValueFromString($data){
+		$this->setValue($data);
+	}
+	
+	public function valueToString(){
+		$this->value();
+	}
+	
 }
 ?>
