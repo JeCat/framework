@@ -105,7 +105,7 @@ class Group extends FormWidget {
 		}
 	}
 	
-	public static function escape($arrWidgetValues, $sSeparator = ',' , $sIdMark = '=') {
+	public static function escape($arrWidgetValues, $sSeparator = "," , $sIdMark = "=") {
 		if (! is_array ( $arrWidgetValues )) {
 			throw new Exception ( '调用' . __CLASS__ . '的' . __METHOD__ . "方法时得到了非法的sStringToEscape参数(得到的sStringToEscape是:%s)", array ($arrWidgetValues ) );
 		}
