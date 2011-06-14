@@ -46,7 +46,7 @@ class CheckBtn extends FormWidget {
 		return $this->nType == self::RADIO ;
 	}
 	
-	public function setCheckBox($nChecked) {
+	public function setChecked($nChecked) {
 		if (! is_int ( $nChecked ) || $nChecked < self::$nStateMin || $nChecked > self::$nStateMax) {
 			throw new Exception ( "调用" . __CLASS__ . "的".__METHOD__."方法时使用了非法的checked参数(得到的checked是:%s)", array ( $nChecked ) );
 		}
