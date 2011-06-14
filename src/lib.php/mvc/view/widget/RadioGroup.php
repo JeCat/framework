@@ -55,11 +55,11 @@ class RadioGroup extends Group {
 	}
 	
 	public function setValue($data = null) {
-		$this->value = $data;
+		parent::setValue($data);
 	}
 	
 	public function setValueFromString($data){
-		$this->setValue($data);
+		parent::setValueFromString($data);
 	}
 	
 	public function valueToString(){
