@@ -26,12 +26,6 @@ require_once __DIR__."/src/lib.php/system/AppFactory.php" ;
 define( __NAMESPACE__."\\VERSION", '0.6.1' ) ;
 define( __NAMESPACE__."\\PATH", __DIR__.'/' ) ;
 
-// 创建 Application 对象
-$aApp = Application::singleton(true) ;
-
-// 模板目录
-UIFactory::singleton()->sourceFileManager()->addFolder(PATH.'src/template/') ;
-
 // 处理未捕获的异常
 set_exception_handler(function(\Exception $aException)
 {
@@ -58,6 +52,4 @@ set_exception_handler(function(\Exception $aException)
 	// 递归 cause
 	} while( $aException = $aException->getPrevious() ) ;
 }) ;
-
-return $aApp ;
 ?>

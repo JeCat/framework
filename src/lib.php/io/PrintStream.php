@@ -10,6 +10,11 @@ class PrintStream extends OutputStream
 	public function __destruct()
 	{}
 	
+	public function printstr($sBytes)
+	{
+		$this->write($sBytes) ;
+	}
+	
 	public function printvar($Variable)
 	{
 		$this->write(print_r($Variable,true)) ;

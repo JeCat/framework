@@ -7,15 +7,34 @@ class HtmlPrintStream extends PrintStream implements IOutputStream
 {
 	public function println($sBytes)
 	{
-		$this->write($sBytes) ;
+		$this->printstr($sBytes) ;
 	}
 	
-	public function write($sBytes,$nLen=null,$bFlush=false)
-	{		
-		PrintStream::write(
-				'<pre>'.($nLen===null?$sBytes:substr($sBytes, 0, $nLen)).'</pre>'
-				, null, $bFlush
-		) ;
+	public function printstr($sBytes,$nLen=null,$bFlush=false)
+	{
+		if(!$sBytes)
+		{
+			return  ;
+		}
+		
+		if($nLen===null)
+		{
+			$this->write('<pre>',null,$bFlush) ;
+			$this->write($sBytes,null,$bFlush) ;
+			$this->write('</pre>',null,$bFlush) ;
+		}
+		
+		else 
+		{
+			if(!$nLen)
+			{
+				return ;
+			}
+			
+			$this->write('<pre>',null,$bFlush) ;
+			$this->write($sBytes, $nLen, $bFlush) ;
+			$this->write('</pre>',null,$bFlush) ;
+		}
 	}
 }
 ?>

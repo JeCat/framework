@@ -19,15 +19,18 @@ abstract class AppFactory extends Object
 
 	public function create()
 	{
-		$aApp = new Application() ;
-		
+		return $this->build(new Application()) ;
+	}
+	
+	public function build(CoreApplication $aApp)
+	{
 		// 初始化 class loader
 		$aApp->setClassLoader(
 			$this->createClassLoader($aApp)
 		) ;
 		
 		// 创建 AccessRouter 对象
-		$aApp->AccessRouter(
+		$aApp->setAccessRouter(
 			$this->createAccessRouter($aApp)
 		) ;
 		

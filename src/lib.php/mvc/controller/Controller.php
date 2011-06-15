@@ -36,7 +36,7 @@ class Controller extends NamableComposite implements IController
     {
     	if(!$sClass)
     	{
-    		$sClass = 'jc\\\mvc\\view\\View' ;
+    		$sClass = 'jc\\mvc\\view\\View' ;
     	}
     	$aView = new $sClass($sName,$sSourceFile) ;
     	$this->registerView($aView) ;
@@ -48,7 +48,7 @@ class Controller extends NamableComposite implements IController
     {
     	$sName = $aView->name() ;
     	$this->$sName = $aView ;
-    	$this->mainView()->add( $aView, false ) ;
+    	$this->mainView()->add( $aView, false ) ;				// controller的视图不属于 controller的 mainView ，以便被 VagrantViewSearcher 收容
     	$aView->variables()->set("theController", $this) ;
     }
     
@@ -72,6 +72,14 @@ class Controller extends NamableComposite implements IController
     
     public function setMainView(IView $aView)
     {
+    	if( $this->aMainView )
+    	{
+    		foreach($this->aMainView->iterator() as $aChildView)
+    		{
+    			$aView->add( $aChildView, false ) ;			// controller的视图不属于 controller的 mainView ，以便被 VagrantViewSearcher 收容
+    		}
+    	}
+    	
     	$this->aMainView = $aView ;
     }
     
@@ -123,6 +131,8 @@ class Controller extends NamableComposite implements IController
 
     protected function displayViews()
     {
+    	$this->mainView()->render() ;
+    	
 		foreach($this->iterator() as $aChild)
 		{
 			$aChild->displayViews() ;

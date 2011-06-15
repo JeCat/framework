@@ -1,6 +1,8 @@
 <?php
 namespace jc\system ;
 
+use jc\mvc\view\WebpageFactory ;
+
 class AccessRouter extends \jc\lang\Factory
 {
     /**
@@ -128,7 +130,21 @@ class AccessRouter extends \jc\lang\Factory
     public function createRequestController(Request $aRequest)
     {
     	$sControllerName = $aRequest->string($this->sControllerParam) ;
-    	return $this->createController($sControllerName) ;
+    	$aController = $this->createController($sControllerName) ;
+    	
+    	// 	请求类型
+    	$sRspnType = $aRequest->string( $this->sResponseTypeParam ) ;
+    	if(!$sRspnType)
+    	{
+    		$sRspnType = $this->sResponseDefaultType ;
+    	}
+    	
+    	if($sRspnType=='html')
+    	{
+    		$aController->setMainView( WebpageFactory::singleton()->create() ) ;
+    	}
+    	
+    	return $aController ;
     }
 
     /**
@@ -142,24 +158,8 @@ class AccessRouter extends \jc\lang\Factory
     	if($sControllerClass)
     	{
     		return new $sControllerClass() ;
-    		//return $this->controllerFactory()->createController($sControllerClass) ;
     	}
     }
-    
-    /**
-     * Enter description here ...
-     * 
-     * @return jc\\mvc\\ControllerFactory
-     *//*
-    public function controllerFactory()
-    {
-    	if( !$this->aControllerFactory )
-    	{
-    		$this->aControllerFactory = $this->factory()->create("ControllerFactory",'jc\\mvc') ;
-    	}
-    	
-    	return $this->aControllerFactory ;
-    }*/
     
     /**
      * Enter description here ...
@@ -205,6 +205,10 @@ class AccessRouter extends \jc\lang\Factory
     private $sDefaultControllerName = null ;
     
 	private $sControllerParam = 'c' ;
+	
+	private $sResponseTypeParam = 'rspn' ;
+	
+	private $sResponseDefaultType = 'html' ;
 	
 	private $sControllerDefaultNamespace ;
 	

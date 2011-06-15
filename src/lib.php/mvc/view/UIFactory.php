@@ -20,6 +20,18 @@ class UIFactory extends Factory
 		
 		return $aNodeCompilers ;
 	}
+	
+	/**
+	 * @return SourceFileManager
+	 */
+	public function newSourceFileManager()
+	{
+		$aSrcMgr = parent::newSourceFileManager() ;
+		$aSrcMgr->addFolder(\jc\PATH.'src/template/') ;
+		
+		return $aSrcMgr ;
+	}
+	
 }
 
 ?>

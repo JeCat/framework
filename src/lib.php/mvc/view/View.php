@@ -136,7 +136,7 @@ class View extends NamableComposite implements IView
 		
 		else 
 		{
-			$this->application()->response()->output(
+			$this->application()->response()->printer()->write(
 				$this->outputStream()->bufferBytes() 
 			) ;
 		}
