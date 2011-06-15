@@ -19,7 +19,7 @@ class UrlResourceManager extends ResourceManager
 				throw new Exception("没有为系统设置应用目录，无法自动定位资源的访问URL") ;
 			}
 			
-			if( strstr($sPath,$sAppFolder)!==0 )
+			if( strstr($sPath,$sAppFolder)===false )
 			{
 				throw new Exception(
 					"资源目录(%s)不在系统目录内，无法自动定位资源的访问URL，必须为该资源目录显式地指定一个URL访问路径。"

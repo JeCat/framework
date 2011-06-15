@@ -31,7 +31,7 @@ class Application extends CoreApplication
 	
 	public function applicationDir()
 	{
-		$this->sApplicationDir ;
+		return $this->sApplicationDir ;
 	}
 	
 	public function setApplicationDir($sFolder)
@@ -67,7 +67,7 @@ class Application extends CoreApplication
 	
 	private $arrGlobalSingeltonInstance ;
 	 
-	private $sApplicationFolder ; 
+	private $sApplicationDir ; 
 	
 	private $sEntrance = '' ; 
 	
