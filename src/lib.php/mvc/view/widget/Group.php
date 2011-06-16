@@ -4,6 +4,7 @@ namespace jc\mvc\view\widget;
 use jc\lang\Assert;
 use jc\lang\Type;
 use jc\lang\Exception;
+use jc\util\IDataSrc;
 use jc\io\IOutputStream;
 use jc\util\IHashTable;
 use jc\ui\UI;
@@ -178,6 +179,10 @@ class Group extends FormWidget {
 		}
 		$this->arrUnSerializMethodName = $callback;
 		$this->arrUnSerializMethodArgs = $args;
+	}
+	
+	public function setDataFromSubmit(IDataSrc $aDataSrc){
+		return ;
 	}
 	
 	private $arrWidgets = Array ();
