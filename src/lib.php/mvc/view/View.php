@@ -120,10 +120,15 @@ class View extends NamableComposite implements IView
 	
 	public function render()
 	{
+		if(!$sSourceFilename=$this->sourceFilename())
+		{
+			return ;
+		}
+		
 		$aVars = $this->variables() ;
 		$aVars->set('theView',$this) ;
 		
-		$this->ui()->display($this->sourceFilename(),$aVars,$this->OutputStream()) ;
+		$this->ui()->display($sSourceFilename,$aVars,$this->OutputStream()) ;
 	}
 	
 	public function display()
