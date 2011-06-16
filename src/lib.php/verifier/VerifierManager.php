@@ -52,7 +52,7 @@ class VerifierManager extends Object
 		return new \ArrayIterator($this->arrVerifiers) ;
 	}
 	
-	public function verifyData(&$value,$bThrowExcetion=false)
+	public function verifyData($value,$bThrowExcetion=false)
 	{		
 		foreach($this->arrVerifiers as $nIdx=>$aVerifier)
 		{
@@ -63,13 +63,13 @@ class VerifierManager extends Object
 			} catch (VerifyFailed $e) {
 				
 				// 通过回调函数报告错误
-				if( $this->arrVerifierOthers[$value][1] )
+				if( $this->arrVerifierOthers[$nIdx][1] )
 				{
 					call_user_func_array(
-							$this->arrVerifierOthers[$value][1]
+							$this->arrVerifierOthers[$nIdx][1]
 							, array_merge(
-									array( $value, $aVerifier, $e, $this->arrVerifierOthers[$value][0] )
-									, (array)$this->arrVerifierOthers[$value][2]
+									array( $value, $aVerifier, $e, $this->arrVerifierOthers[$nIdx][0] )
+									, (array)$this->arrVerifierOthers[$nIdx][2]
 							)
 					) ;
 				}
@@ -77,13 +77,13 @@ class VerifierManager extends Object
 				// 抛出异常
 				else if($bThrowExcetion)
 				{
-					if( $this->arrVerifierOthers[$value][0] )
+					if( $this->arrVerifierOthers[$nIdx][0] )
 					{
-						throw new VerifyFailed($this->arrVerifierOthers[$value][0],null,$e) ;
+						throw new VerifyFailed($this->arrVerifierOthers[$nIdx][0],null,$e) ;
 					}
 					else 
 					{
-						throw new $e ;
+						throw $e ;
 					}
 				}
 				
