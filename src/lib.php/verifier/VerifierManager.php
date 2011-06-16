@@ -20,7 +20,7 @@ class VerifierManager extends Object
 					$sExceptionWords, $callback, $arrCallbackArgvs
 		) ;
 		
-		// 串联操作
+		// 连续操作
 		return $this ;
 	}
 	
@@ -71,7 +71,7 @@ class VerifierManager extends Object
 									array( $value, $aVerifier, $e, $this->arrVerifierOthers[$value][0] )
 									, (array)$this->arrVerifierOthers[$value][2]
 							)
-					)
+					) ;
 				}
 				
 				// 抛出异常
