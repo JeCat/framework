@@ -8,9 +8,9 @@ class VerifierManager extends Object
 {
 	public function add(IVerifier $aVerifier, $sExceptionWords=null, $callback=null, $arrCallbackArgvs=array()) 
 	{
-		if( !in_array($aVerifier,$this->arrVerifiers) )
+		if( in_array($aVerifier,$this->arrVerifiers) )
 		{
-			return ;
+			return $this ;
 		}
 		
 		$this->arrVerifiers[] = $aVerifier ;
