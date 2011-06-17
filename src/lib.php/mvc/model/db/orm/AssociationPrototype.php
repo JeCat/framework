@@ -122,7 +122,7 @@ class AssociationPrototype extends Object
 		// 必须属性
 		if( empty($arrAsso['model']) )
 		{
-			throw new Exception("orm %s 关联缺少 name 属性",$sType) ;
+			throw new Exception("orm %s 关联缺少 model 属性",$sType) ;
 		}
 		
 		// 递归检查  model 值
