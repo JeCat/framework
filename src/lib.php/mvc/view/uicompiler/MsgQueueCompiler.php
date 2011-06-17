@@ -27,9 +27,13 @@ class MsgQueueCompiler extends NodeCompiler
 		}
 		
 		$aDev->write("\$__ui_msgqueue = {$sMsgQueue} ;\r\n") ;		
-		$aDev->write("\\jc\\lang\\Assert::type('\\\\jc\\\\message\\\\IMessageQueue',\$__ui_msgqueue);\r\n") ;		
-		$aDev->write("\$this->display('MsgQueue.template.html',array('aMsgQueue'=>\$__ui_msgqueue),\$aDevice) ; ?>\r\n") ;
+		$aDev->write("if( \$__ui_msgqueue instanceof \\jc\\message\\IMessageQueueHolder )\r\n") ;	
+		$aDev->write("{ \$__ui_msgqueue = \$__ui_msgqueue->messageQueue() ; }\r\n") ;			
+		$aDev->write("\\jc\\lang\\Assert::type( '\\\\jc\\\\message\\\\IMessageQueue',\$__ui_msgqueue);\r\n") ;		
 		
+		$aDev->write("if( \$__ui_msgqueue->count() ){ \r\n") ;
+		$aDev->write("\$this->display('MsgQueue.template.html',array('aMsgQueue'=>\$__ui_msgqueue),\$aDevice) ;\r\n") ;
+		$aDev->write("} ?>\r\n") ;		
 	}
 }
 
