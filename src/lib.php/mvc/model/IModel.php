@@ -7,6 +7,8 @@ interface IModel extends \ArrayAccess, \Iterator
 {
 	public function isAggregarion() ;
 	
+	public function setAggregarion($bAggregarion=true) ;
+	
 	public function hasSerialized() ;
 	
 	public function load() ;

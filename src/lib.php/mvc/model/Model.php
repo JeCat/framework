@@ -12,10 +12,14 @@ abstract class Model extends Object implements IModel
 		$this->bAggregarion = $bAggregarion ;
 	}
 
-	
+
 	public function isAggregarion()
 	{
 		return $this->bAggregarion ;
+	}
+	public function setAggregarion($bAggregarion=true)
+	{
+		$this->bAggregarion = $bAggregarion ;
 	}
 		
 	public function hasSerialized()
@@ -96,7 +100,7 @@ abstract class Model extends Object implements IModel
 		list($aModel,$sChildName) = $this->findDataByPath($sName) ;
 		if($aModel)
 		{
-			$aModel->set($sChildName,$sValue) ;
+			$aModel->setData($sChildName,$sValue) ;
 		}
 		else 
 		{
@@ -228,15 +232,25 @@ abstract class Model extends Object implements IModel
 				
 				$sModelName = array_shift($arrSlices) ;
 				
-			}while( !empty($arrSlices) and $aModel=$aModel->child($sModelName) ) ;
+			}while( $aModel=$aModel->child($sModelName) and !empty($arrSlices) ) ;
 			
-			if( $aModel and $aModel->hasData($sName) )
+			if( $aModel )
 			{
 				return array($aModel,$sName) ;
 			}
 		}
 		
 		return array(null,null) ;
+	}
+
+	public function __get($sName)
+	{
+		return $this->data($sName) ;
+	}
+	
+	public function __set($sName,$value)
+	{
+		$this->setData($sName, $value) ;
 	}
 	
 	private $arrData = array() ;

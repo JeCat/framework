@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\model\db ;
 
+use jc\lang\Exception;
+
 use jc\mvc\model\db\orm\operators\Deleter;
 use jc\mvc\model\db\orm\operators\Selecter;
 use jc\mvc\model\db\orm\operators\Inserter;
@@ -22,22 +24,57 @@ class Model extends BaseModel implements IModel
 		// orm config
 		if( is_array($prototype) )
 		{
-			$this->setPrototype(
-				ModelPrototype::createFromCnf($prototype)
-			) ;
+			$aPrototype = ModelPrototype::createFromCnf($prototype) ;
 		}
 		
 		// Prototype
 		else if( $prototype instanceof ModelPrototype )
 		{
-			$this->setPrototype( $prototype ) ;
+			$aPrototype = $prototype ;
 		}
 		
 		// db table name
-		else if( is_string($prototype) )
+		/*else if( is_string($prototype) )
 		{
 			
+		}*/
+		
+		else if( $prototype===null )
+		{
+			$aPrototype = null ;
 		}
+		
+		else 
+		{
+			throw new Exception("创建模型时传入的模型原型无效") ;
+		}
+		
+		$this->setPrototype($aPrototype) ;
+	}
+
+	/**
+	 * @return IModel
+	 */
+	public function child($sName)
+	{
+		$aChild = parent::child($sName) ;
+		if(!$aChild)
+		{
+			// 根据 原型 自动创建子模型
+			if( $aAssocs=$this->prototype()->associations(false) and $aAssocPrototype=$aAssocs->get($sName) )
+			{
+				$aChild = $aAssocPrototype->toPrototype()->createModel() ;
+				$this->addChild($aChild,$aAssocPrototype->modelProperty()) ;
+				
+				// 多属关系
+				if( in_array( $aAssocPrototype->type(), array(AssociationPrototype::hasMany,AssociationPrototype::hasAndBelongsToMany) ) )
+				{
+					$aChild->setAggregarion(true) ;
+				}
+			}
+		}
+		
+		return $aChild ;
 	}
 	
 	/**
@@ -52,6 +89,23 @@ class Model extends BaseModel implements IModel
 	{
 		$this->aPrototype = $aPrototype ;
 	}
+	
+	public function createChild()
+	{
+		if( !$this->aPrototype )
+		{
+			throw new Exception("模型没有缺少对应的原型，无法为其创建子模型") ;
+		}
+		if( !$this->isAggregarion() )
+		{
+			throw new Exception("模型(%s)不是一个聚合模型，无法为其创建子模型",$this->aPrototype->name()) ;
+		}
+		
+		$aChild = $this->aPrototype->createModel() ;
+		$this->addChild($aChild) ;
+		
+		return $aChild ;
+	} 
 
 	public function loadData( IRecordSet $aRecordSet, $nRowIdx=0, $sClmPrefix=null)
 	{
@@ -173,7 +227,10 @@ class Model extends BaseModel implements IModel
 		}
 	}
 	
-	
+	/**
+	 * @var jc\mvc\model\db\orm\ModelPrototype
+	 */
+	private $aPrototype ;
 }
 
 ?>

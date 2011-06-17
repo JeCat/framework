@@ -27,7 +27,7 @@ class ModelAssociationMap extends Object
 	{
 		if($bCheck)
 		{
-			$arrOrm = self::assertOrmValid($arrOrm) ;
+			$arrOrm = ModelPrototype::assertCnfValid($arrOrm) ;
 		}
 
 		$this->arrOrms[$arrOrm['name']] = $arrOrm ;
@@ -47,12 +47,12 @@ class ModelAssociationMap extends Object
 		{
 			if(empty($this->arrOrms[$sName]))
 			{
-				throw new Exception("正在请求一个无效的orm 模型原型：%s",$sName) ;
+				throw new Exception("正在请求一个无效的orm 模型原型(name：%s)",$sName) ;
 			}
 			$arrOrm = $this->arrOrms[$sName] ;
 
 			// 创建/保存 模型原型
-			$aPrototype = ModelPrototype::createFromCnf($arrOrm,true) ;
+			$aPrototype = ModelPrototype::createFromCnf($arrOrm,false,false) ;
 			$this->aModelPrototypes->set($sName,$aPrototype) ;
 			
 			// 为模型原型 创建关联原型
@@ -62,7 +62,7 @@ class ModelAssociationMap extends Object
 				{
 					foreach($arrOrm[$sAssoType] as $arrAsso)
 					{
-						$aAssociation = AssociationPrototype::createFromCnf($arrOrm,true) ;
+						$aAssociation = AssociationPrototype::createFromCnf($arrAsso,$aPrototype,$sAssoType,false) ;
 						$aAssociation = new AssociationPrototype(
 								$sAssoType
 								, $arrAsso['prop']
@@ -96,15 +96,77 @@ class ModelAssociationMap extends Object
 		return $this->aModelPrototypes ;
 	}
 	
-	public function fragment($sPrototypeName,array $arrAssocFragment=array())
+	public function fragment($sPrototypeName,array $arrAssocFragment=array(),$bRetPrototype=true)
 	{
-		$aPrototype = $this->modelPrototype($sPrototypeName) ;
-		if(!$aPrototype)
+		if( !isset($this->arrOrms[$sPrototypeName]) )
 		{
-			return null ;
+			throw new Exception("正在请求不存在的模型原型：%s",$sPrototypeName) ;
 		}
 		
-		return $aPrototype->cloneObject($arrAssocFragment) ;
+		// 将 $arrAssocFragment 整理成易于访问的架构
+		foreach( $arrAssocFragment as $key=>$item )
+		{
+			if( is_string($item) )
+			{
+				unset( $arrAssocFragment[$key] ) ;
+				$key = $item ;
+				$arrAssocFragment[$key] = array() ;
+			}
+			
+			if( !is_array($arrAssocFragment[$key]) )
+			{
+				throw new Exception('从原型%s中截取关系片段时，遇到无效的原型关系片段设定：%s',array($sPrototypeName,$key)) ;
+			}
+		}
+		
+		$arrCnf = $this->arrOrms[$sPrototypeName] ;
+		
+		foreach(AssociationPrototype::allAssociationTypes() as $sAssoType)
+		{
+			if( empty($arrCnf[$sAssoType]) )
+			{
+				continue ;
+			}
+			
+			foreach($arrCnf[$sAssoType] as $nAssocIdx=>$arrAssocCnf)
+			{
+				if( array_key_exists($arrAssocCnf['prop'],$arrAssocFragment) )
+				{
+					// 递归关联
+					$arrCnf[$sAssoType][$nAssocIdx]['model']
+							 = $this->fragment($arrAssocCnf['model'],$arrAssocFragment[$arrAssocCnf['prop']],false) ;
+
+					unset($arrAssocFragment[$arrAssocCnf['prop']]) ;
+				}
+
+				else 
+				{
+					unset($arrCnf[$sAssoType][$nAssocIdx]) ;
+				}
+			}
+			
+			if( empty($arrCnf[$sAssoType]) )
+			{
+				unset($arrCnf[$sAssoType]) ;
+			}
+		}
+		
+		if(!empty($arrAssocFragment))
+		{
+			throw new Exception(
+					'从无法从原型%s中截取指定的关系片段：%s'
+					, array( $sPrototypeName, implode(',',array_keys($arrAssocFragment)) )
+			) ;
+		}
+		
+		if($bRetPrototype)
+		{
+			return ModelPrototype::createFromCnf($arrCnf,false) ;
+		}
+		else 
+		{
+			return $arrCnf ;
+		}
 	}
 	
 	private $arrOrms = array() ;

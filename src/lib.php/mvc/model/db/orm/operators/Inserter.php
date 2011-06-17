@@ -82,7 +82,7 @@ class Inserter extends OperationStrategy
 				}
 				
 				// has and belongs many
-				else if($aAssoPrototype->type()==AssociationPrototype::hasAndBelongsMany)
+				else if($aAssoPrototype->type()==AssociationPrototype::hasAndBelongsToMany)
 				{
 					if( !$aChildModel->save() )
 					{

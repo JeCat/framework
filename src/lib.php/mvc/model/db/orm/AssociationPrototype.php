@@ -9,13 +9,13 @@ class AssociationPrototype extends Object
 	const hasOne = 'hasOne' ;
 	const belongsTo = 'belongsTo' ;
 	const hasMany = 'hasMany' ;
-	const hasAndBelongsMany = 'hasAndBelongsMany' ;
+	const hasAndBelongsToMany = 'hasAndBelongsToMany' ;
 
 	public function __construct($sType,$sModelProperty,ModelPrototype $aFromPrototype,ModelPrototype $aToPrototype,$fromKeys,$toKeys)
 	{
 		if( !in_array($sType,self::$arrAssociationTypes) )
 		{
-			throw new Exception(__METHOD__."()参数\$sType只能接受以下值：hasOne, belongsTo, hasMany, hasAndBelongsMany; 传入值为：%s",$sType) ;
+			throw new Exception(__METHOD__."()参数\$sType只能接受以下值：hasOne, belongsTo, hasMany, hasAndBelongsToMany; 传入值为：%s",$sType) ;
 		}
 		
 		$this->sType = $sType ;
@@ -45,7 +45,7 @@ class AssociationPrototype extends Object
 			// , $arrCnf['bfromk']?:null, $arrCnf['btok']?:null
 		) ;
 		
-		if( $sType==self::hasAndBelongsMany )
+		if( $sType==self::hasAndBelongsToMany )
 		{
 			$aAsso->setBridge($arrCnf['bridge'],$arrCnf['bfromk'],$arrCnf['btok']) ;			
 		}
@@ -109,7 +109,7 @@ class AssociationPrototype extends Object
 			self::hasOne
 			, self::belongsTo
 			, self::hasMany
-			, self::hasAndBelongsMany
+			, self::hasAndBelongsToMany
 	) ;
 
 	static public function assertCnfValid(array $arrAsso,$sType,$bNestingModel)
@@ -136,7 +136,7 @@ class AssociationPrototype extends Object
 			ModelPrototype::assertCnfValid($arrAsso['model']) ;
 		}
 		
-		if($sType==AssociationPrototype::hasAndBelongsMany)
+		if($sType==AssociationPrototype::hasAndBelongsToMany)
 		{
 			if( empty($arrAsso['bridge']) )
 			{

@@ -13,7 +13,7 @@ use jc\lang\Object;
 
 class ModelPrototype extends Object
 {
-	public function __construct($sName,$sTable,$primaryKeys,array $arrClms=array())
+	public function __construct($sName,$sTable,$primaryKeys=null,array $arrClms=null)
 	{
 		$this->sName = $sName ;
 		
@@ -27,7 +27,7 @@ class ModelPrototype extends Object
 		
 		$this->arrPrimaryKeys = (array)$primaryKeys ;
 		
-		$this->arrClms = $arrClms ;
+		$this->arrClms = (array)$arrClms ;
 
 		parent::__construct() ;
 	}
@@ -35,7 +35,7 @@ class ModelPrototype extends Object
 	/**
 	 * @return ModelPrototype
 	 */
-	static function createFromCnf(array $arrCnf,$bCheckValid=true)
+	static function createFromCnf(array $arrCnf,$bCheckValid=true,$bCreateAssoc=true)
 	{
 		if( $bCheckValid )
 		{
@@ -45,25 +45,28 @@ class ModelPrototype extends Object
 		$aPrototype = new self($arrCnf['name'],$arrCnf['table'],$arrCnf['keys'],$arrCnf['clms']) ;
 		$aPrototype->sModelClass = $arrCnf['class'] ;
 		
-		// 为模型原型 创建关联原型
-		foreach(AssociationPrototype::allAssociationTypes() as $sAssoType)
-		{
-			if( !empty($arrCnf[$sAssoType]) )
-			{
-				foreach($arrCnf[$sAssoType] as $arrAsso)
-				{
-					$aAssociation = AssociationPrototype::createFromCnf(
-							$arrAsso, $aPrototype, $sAssoType, $bCheckValid
-					) ;
-					$aPrototype->addAssociation($aAssociation) ;
-				}
-			}
-		}
-		
 		// 通过反射设置model prototype
 		if( empty($aPrototype->arrClms) or empty($aPrototype->arrPrimaryKeys) or empty($aPrototype->sDevicePrimaryKey) )
 		{
 			$aPrototype->reflectTableInfo(DB::singleton()) ;
+		}
+	
+		// 为模型原型 创建关联原型
+		if($bCreateAssoc)
+		{
+			foreach(AssociationPrototype::allAssociationTypes() as $sAssoType)
+			{
+				if( !empty($arrCnf[$sAssoType]) )
+				{
+					foreach($arrCnf[$sAssoType] as $arrAsso)
+					{
+						$aAssociation = AssociationPrototype::createFromCnf(
+								$arrAsso, $aPrototype, $sAssoType, $bCheckValid
+						) ;
+						$aPrototype->addAssociation($aAssociation) ;
+					}
+				}
+			}
 		}
 		
 		return $aPrototype ;
@@ -199,7 +202,7 @@ class ModelPrototype extends Object
 	 * 			'tok' => array('xxx') ,
 	 * 		) ,
 	 * 	) ,
-	 * 	'hasAndBelongsMany' => array(
+	 * 	'hasAndBelongsToMany' => array(
 	 * 		array(
 	 * 			'model' => 'oooo',
 	 * 			'fromk' => array('xxx') ,
@@ -216,18 +219,31 @@ class ModelPrototype extends Object
 	static public function assertCnfValid(array $arrOrm,$bNestingModel=false)
 	{
 		// 必须属性
-		if( empty($arrOrm['name']) )
-		{
-			throw new Exception("orm 缺少 name 属性") ;
-		}
 		if( empty($arrOrm['table']) )
 		{
 			throw new Exception("orm(%s) 缺少 table 属性",$arrOrm['name']) ;
 		}
+		
+		// 可选属性
+		if( empty($arrOrm['name']) )
+		{
+			$arrOrm['name'] = $arrOrm['table'] ;
+		}
 		if( empty($arrOrm['keys']) )
 		{
-			throw new Exception("orm(%s) 缺少 keys 属性",$arrOrm['name']) ;
+			$arrOrm['keys'] = array() ;
 		}
+		if( empty($arrOrm['clms']) )
+		{
+			$arrOrm['clms'] = array() ;
+		}
+		if( empty($arrOrm['class']) )
+		{
+			$arrOrm['class'] = 'jc\\mvc\\model\\db\\Model' ;
+		}
+	
+		// 统一格式
+		$arrOrm['columns'] = (array) $arrOrm['clms'] ;
 		
 		// 关联
 		foreach(AssociationPrototype::allAssociationTypes() as $sAssoType)
@@ -249,26 +265,8 @@ class ModelPrototype extends Object
 				}				
 				
 				$arrAsso = AssociationPrototype::assertCnfValid($arrAsso,$sAssoType,$bNestingModel) ;
-				
-				if( $arrAsso['model'] == $arrOrm['name'] )
-				{
-					throw new Exception("遇到orm 配置错误：关联的两端不能是相同的模型原型(%s)。",$arrOrm['name']) ;
-				}
 			}
 		}
-		
-		// 可选属性
-		if( empty($arrOrm['clms']) )
-		{
-			$arrOrm['clms'] = array() ;
-		}
-		if( empty($arrOrm['class']) )
-		{
-			$arrOrm['class'] = 'jc\\mvc\\model\\db\\Model' ;
-		}
-		
-		// 统一格式
-		$arrOrm['columns'] = (array) $arrOrm['clms'] ;
 		
 		return $arrOrm ;
 	}

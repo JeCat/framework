@@ -162,7 +162,7 @@ class Selecter extends OperationStrategy
 					}
 					
 					// 多对多关联
-					else if( $aAssoPrototype->type()==AssociationPrototype::hasAndBelongsMany )
+					else if( $aAssoPrototype->type()==AssociationPrototype::hasAndBelongsToMany )
 					{
 						$aSelect = new Select( $aToPrototype->tableName(), $sChildModelName ) ;
 						

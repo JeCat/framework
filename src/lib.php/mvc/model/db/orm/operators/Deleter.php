@@ -39,12 +39,12 @@ class Deleter extends OperationStrategy
 			foreach($aPrototype->associations() as $aAssoPrototype)
 			{
 				// 多属关系
-				if( in_array($aAssoPrototype->type(),array(AssociationPrototype::hasMany,AssociationPrototype::hasAndBelongsMany)) )
+				if( in_array($aAssoPrototype->type(),array(AssociationPrototype::hasMany,AssociationPrototype::hasAndBelongsToMany)) )
 				{
 					$aChildModel = $aModel->child($aAssoPrototype->modelProperty()) ;
 				
 					// 多对多，删除桥接表记录
-					if( $aAssoPrototype->type()==AssociationPrototype::hasAndBelongsMany )
+					if( $aAssoPrototype->type()==AssociationPrototype::hasAndBelongsToMany )
 					{
 						$sBridgeTable = $aAssoPrototype->bridgeTableName() ;
 						$aDeleteForBridge = new Delete($sBridgeTable) ;
