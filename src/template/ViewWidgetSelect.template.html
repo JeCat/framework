@@ -1,5 +1,5 @@
-<select id="{=$theWidget->id()}" name="{=$theWidget->formName()}" value="{=$theWidget->valueToString()}" size="{=$theWidget->size()}"  {? echo $theWidget->isMultiple() ? 'multiple="multiple"' : ''}  {? echo $theWidget->isReadOnly() ? 'readonly="readonly"' : ''}  {? echo $theWidget->isDisabled() ? 'disabled="disabled"' : ''} >
+<select id="{=$theWidget->id()}" name="{=$theWidget->formName()}" size="{=$theWidget->size()}"  {? echo get_class($theWidget) == "jc\\mvc\\view\\widget\\SelectList" ? 'multiple="multiple"' : ''}  {? echo $theWidget->isReadOnly() ? 'readonly="readonly"' : ''}  {? echo $theWidget->isDisabled() ? 'disabled="disabled"' : ''} >
 	<foreach for="{=$theWidget->optionIterator()}" item="item_name_for_select">
-		<option value ="{=$item_name_for_select[0]}">{=$item_name_for_select[1]}</option>
+		<option value ="{=$item_name_for_select[0]}" {? echo $item_name_for_select[2]? "selected=\"selected\"" : ''}>{=$item_name_for_select[1]}</option>
 	</foreach>
 </select>
