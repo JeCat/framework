@@ -90,8 +90,9 @@ class Group extends FormWidget {
 		if (! is_string ( $data )) {
 			throw new Exception ( '调用' . __CLASS__ . '的' . __METHOD__ . "方法时得到了非法的data参数(得到的data是:%s)", array ($data ) );
 		}
-		array_unshift ( $this->arrUnSerializMethodArgs, $data );
-		$arrWidgetValues = call_user_func_array ( $this->arrUnSerializMethodName, $this->arrUnSerializMethodArgs );
+		$arrArgs = $this->arrSerializMethodArgs ;
+		array_unshift ( $arrArgs, $data );
+		$arrWidgetValues = call_user_func_array ( $this->arrUnSerializMethodName, $arrArgs );
 		
 		foreach ( $this->widgetIterator () as $groupSubWidget ) {
 			foreach ( $arrWidgetValues as $sWidgetId => $sWidgetValue ) {

@@ -22,7 +22,7 @@ class FormWidget extends Widget implements IViewFormWidget
 	}
 	
 	public function setValueFromString($data) {
-		return $this->setValue ( $data );
+		$this->setValue ( $data );
 	}
 	
 	public function setDataFromSubmit(IDataSrc $aDataSrc) {

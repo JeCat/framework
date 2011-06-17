@@ -5,7 +5,7 @@ use jc\message\Message;
 use jc\lang\Exception;
 use jc\lang\Object;
 
-class Same extends Object implements IVerifier {
+class NotNull extends Object implements IVerifier {
 	public function __construct() {
 	}
 	
@@ -14,9 +14,9 @@ class Same extends Object implements IVerifier {
 			throw new Exception ( __CLASS__ . "的" . __METHOD__ . "传入了错误的data参数(得到的参数是:%s)", array ($data ) );
 		}
 		
-		if( count(array_unique($data)) != 1){
+		if( $data === null or $data === '' ){
 			if ( $bThrowException ) {
-				throw new VerifyFailed ( "输入内容必须一致" );
+				throw new VerifyFailed ( "输入的内容为空" );
 			}
 			return false;
 		}
