@@ -10,24 +10,38 @@ class SelectList extends Select {
 		parent::__construct ( $sId, $sTitle, $nSize, $aView );
 	}
 	
+	public function getSelected(){
+		$arrSelected = array();
+		foreach(parent::optionIterator() as $value){
+			if($value[2] == true){
+				$arrSelected[] = $value;
+			}
+		}
+		return $arrSelected;
+	}
+	
 	public function value() {
-		$arrValue = '';
-		foreach ( $this->arrOptions as $key => $option ) {
+		$arrValue = array();
+		foreach ( parent::optionIterator() as $key => $option ) {
 			if ($option [2] == true) {
-				$arrValue [] = $option [0]; //option[0]是option 的value
+				$arrValue[] = $option [0]; //option[0]是option 的value
 			}
 		}
 		return $arrValue;
 	}
 	
 	public function setValue($data = null) {
-		if (! is_array ( $data )) {
+		if(! is_array($data)){
 			throw new Exception ( __CLASS__ . "的" . __METHOD__ . "传入了错误的data参数(得到的参数是:%s)", array ($data ) );
 		}
-		foreach ( $this->arrOptions as $key => $option ) {
-			$option [2] = false;
-			if ($option [0] == $data) {
-				$option [2] = true;
+		$arrOptionIterator = parent::optionIterator();
+		
+		foreach ($data as $sSelectValue){
+			foreach($arrOptionIterator as $key => $option){
+				$arrOptionIterator[$key][2] = false;
+				if((string)$option[0] == $sSelectValue){
+					$arrOptionIterator[$key][2] = true;
+				}
 			}
 		}
 	}
