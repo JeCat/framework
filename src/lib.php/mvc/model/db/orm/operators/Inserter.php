@@ -28,6 +28,23 @@ class Inserter extends OperationStrategy
 			$aPrototype = $aModel->prototype() ;
 			$aInsert = new Insert($aPrototype->tableName()) ;
 			
+			// 从 belongs to model 中设置外键值
+			foreach($aPrototype->associations() as $aAssoPrototype)
+			{				
+				if( $aAssoPrototype->type()==AssociationPrototype::belongsTo )
+				{
+					$aAssocModel = $aModel->child( $aAssoPrototype->modelProperty() ) ;
+					if(!$aAssocModel)
+					{
+						continue ;
+					}
+					
+					$aAssocModel->save() ;
+					
+					$this->setAssocModelData($aAssocModel,$aModel,$aAssoPrototype) ;
+				}
+			}
+			
 			// -----------------------------------
 			// insert 当前model
 			foreach($aPrototype->columnIterator() as $sClmName)
@@ -35,10 +52,7 @@ class Inserter extends OperationStrategy
 				$aInsert->setData($sClmName,$aModel->data($sClmName)) ;
 			}
 			
-			if( $aDB->execute( $aInsert->makeStatement() )===false )
-			{
-				return false ;
-			}
+			$aDB->execute( $aInsert->makeStatement() ) ;
 			
 			// 自增形主键
 			if( $aModel->data( $aPrototype->devicePrimaryKey() )===null )
@@ -49,49 +63,51 @@ class Inserter extends OperationStrategy
 				) ;
 			}
 			
+			$aModel->setSerialized(true) ;
 			
 			// -----------------------------------
 			// insert 关联model
 			foreach($aPrototype->associations() as $aAssoPrototype)
 			{
-				// has one 
-				if($aAssoPrototype->type()==AssociationPrototype::hasOne)
+				$aAssocModel = $aModel->child( $aAssoPrototype->modelProperty() ) ;
+				if(!$aAssocModel)
 				{
-					$aChildModel = $aModel->child( $aAssoPrototype->propertyName() ) ;
-					if(!$aChildModel)
-					{
-						continue ;
-					}
-		
-					if( !$this->insertDirectAssocModel($aModel,$aChildModel,$aAssoPrototype) )
+					continue ;
+				}
+				
+				switch ( $aAssoPrototype->type() )
+				{
+				case AssociationPrototype::hasOne :
+				case AssociationPrototype::belongsTo :
+			
+					$this->setAssocModelData($aModel,$aAssocModel,$aAssoPrototype) ;
+					if( !$aAssocModel->save() )
 					{
 						return false ;
 					}
-				}
-				
-				// has many
-				else if($aAssoPrototype->type()==AssociationPrototype::hasMany)
-				{
-					foreach($aModel->childIterator() as $aChildModel)
+					
+					break ;
+					
+				case AssociationPrototype::hasMany :
+			
+					$this->setAssocModelData($aModel,$aAssocModel,$aAssoPrototype) ;
+					if( !$aAssocModel->save() )
 					{
-						if( !$this->insertDirectAssocModel($aModel,$aChildModel,$aAssoPrototype) )
-						{
-							return false ;
-						}
+						return false ;
 					}
-				}
 				
-				// has and belongs many
-				else if($aAssoPrototype->type()==AssociationPrototype::hasAndBelongsToMany)
-				{
-					if( !$aChildModel->save() )
+					break ;
+					
+				case AssociationPrototype::hasAndBelongsToMany :
+					
+					if( !$aAssocModel->save() )
 					{
 						return false ;
 					}
 					
 					// -----------------------
 					// insert bridge table
-					foreach($aChildModel->childIterator() as $aOneChildModel)
+					foreach($aAssocModel->childIterator() as $aOneChildModel)
 					{
 						$aInsertForBridge = new Insert( $aAssoPrototype->bridgeTableName() ) ;
 						
@@ -101,27 +117,24 @@ class Inserter extends OperationStrategy
 						// to table key vale
 						$this->setValue($aInsertForBridge,$aAssoPrototype->bridgeFromKeys(),$aAssoPrototype->toKeys(),$aOneChildModel) ;
 						
-						if( $aDB->execute($aInsertForBridge)===false )
-						{
-							return false ;
-						}
+						$aDB->execute($aInsertForBridge) ;
 					}
+					
+					break ;
 				}
 			}
 		}
 		
 		return true ;
-	} 
+	}
 	
-	private function insertDirectAssocModel(IModel $aModel,IModel $aChildModel,AssociationPrototype $aAssoPrototype)
+	private function setAssocModelData(IModel $aModel,IModel $aChildModel,AssociationPrototype $aAssoPrototype)
 	{
 		$arrFromKeys = $aAssoPrototype->fromKeys() ;
 		foreach($aAssoPrototype->toKeys() as $nIdx=>$sKey)
 		{
 			$aChildModel->setData( $sKey, $aModel->data($arrFromKeys[$nIdx]) ) ;
 		}
-		
-		return $aChildModel->save() ;
 	}
 }
 

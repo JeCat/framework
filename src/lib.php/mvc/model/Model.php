@@ -27,7 +27,7 @@ abstract class Model extends Object implements IModel
 		return $this->bSerialized ;
 	}
 	
-	protected function setSerialized($bSerialized)
+	public function setSerialized($bSerialized=true)
 	{
 		$this->bSerialized = $bSerialized ;
 	}

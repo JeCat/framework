@@ -33,12 +33,6 @@ class Model extends BaseModel implements IModel
 			$aPrototype = $prototype ;
 		}
 		
-		// db table name
-		/*else if( is_string($prototype) )
-		{
-			
-		}*/
-		
 		else if( $prototype===null )
 		{
 			$aPrototype = null ;
@@ -135,6 +129,8 @@ class Model extends BaseModel implements IModel
 	
 	public function load($values=null,$keys=null)
 	{
+		$keys = (array) $keys ;
+		
 		if($values)
 		{
 			$values = (array) $values ;
@@ -155,7 +151,7 @@ class Model extends BaseModel implements IModel
 			$values = array_combine($keys,$values) ;
 		}
 		
-		if( Selecter::singleton()->select(
+		return Selecter::singleton()->select(
 			DB::singleton()
 			, $this
 			, null
@@ -163,17 +159,7 @@ class Model extends BaseModel implements IModel
 			, $values
 			, null
 			, $this->isAggregarion()? 30: 1
-		) )
-		{
-			$this->setSerialized(true) ;
-			
-			return true ;
-		}
-		
-		else 
-		{
-			return false ;
-		}
+		) ;
 	}
 	
 	public function totalCount()
@@ -186,39 +172,21 @@ class Model extends BaseModel implements IModel
 		// update
 		if( $this->hasSerialized() )
 		{
-			return Updater::singleton() ;
+			return Updater::singleton()->update(DB::singleton(), $this) ;
 		}
 		
 		// insert
 		else 
 		{
-			if( Inserter::singleton() )
-			{
-				$this->setSerialized(true) ;
-				
-				return true ;
-			}
-			
-			return false ;
+			return Inserter::singleton()->insert(DB::singleton(), $this) ;
 		}
 	}
 	
 	public function delete()
 	{
-		if( !$this->hasSerialized() )
+		if( $this->hasSerialized() )
 		{
-			$aDB = DB::singleton() ;
-			
-			if( Deleter::singleton()->delete($aDB, $this) )
-			{
-				$this->setSerialized(false) ;
-								
-				return true ;
-			}	
-			else 
-			{
-				return false ;
-			}	
+			return Deleter::singleton()->delete(DB::singleton(), $this) ;	
 		}
 		
 		else 

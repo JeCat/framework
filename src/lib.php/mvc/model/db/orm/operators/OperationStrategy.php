@@ -33,7 +33,7 @@ abstract class OperationStrategy extends Object
 		{
 			$aCriteria->add(
 				$sTableName . $sKey
-				, $aDataSource->get($names[$idx])
+				, $aDataSource->data($names[$idx])
 			) ;
 		}
 	}
@@ -59,7 +59,7 @@ abstract class OperationStrategy extends Object
 		{
 			$aStatement->setData(
 				$sTableName . $sKey
-				, $aDataSource->get($names[$idx])
+				, $aDataSource->data($names[$idx])
 			) ;
 		}
 	}
@@ -68,7 +68,7 @@ abstract class OperationStrategy extends Object
 	{
 		foreach($arrFromKeys as $nIdx=>$sFromKey)
 		{
-			$aCriteria->add( "{$sFromTable}.{$sFromKey} = {$sToTable}.{$arrToKeys[$nIdx]}" ) ;
+			$aCriteria->addExpression( "{$sFromTable}.{$sFromKey} = {$sToTable}.{$arrToKeys[$nIdx]}" ) ;
 		}
 	}
 	

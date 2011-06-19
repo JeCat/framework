@@ -26,50 +26,49 @@ class Deleter extends OperationStrategy
 		else 
 		{
 			$aPrototype = $aModel->prototype() ;
-			$aDelete = new Delete($aPrototype->tableName(),$aPrototype->name()) ;
+			$aDelete = new Delete($aPrototype->tableName()) ;
 			
 			// -----------------
 			// 联合表 删除
 			$this->makeAssociation($aDelete,$aPrototype,array(AssociationPrototype::hasOne)) ;
 			
 			// 主键条件
-			$this->setCondition($aDelete->criteria(),$aPrototype->primaryKeys(),null,$aModel,$aPrototype->name()) ;
+			$this->setCondition($aDelete->criteria(),$aPrototype->primaryKeys(),null,$aModel,$aPrototype->tableName()) ;
 			
 			// -----------------
 			foreach($aPrototype->associations() as $aAssoPrototype)
 			{
-				// 多属关系
-				if( in_array($aAssoPrototype->type(),array(AssociationPrototype::hasMany,AssociationPrototype::hasAndBelongsToMany)) )
-				{
-					$aChildModel = $aModel->child($aAssoPrototype->modelProperty()) ;
-				
-					// 多对多，删除桥接表记录
-					if( $aAssoPrototype->type()==AssociationPrototype::hasAndBelongsToMany )
-					{
-						$sBridgeTable = $aAssoPrototype->bridgeTableName() ;
-						$aDeleteForBridge = new Delete($sBridgeTable) ;
-						
-						// from表 条件
-						$this->setCondition($aDeleteForBridge->criteria(),$aPrototype->fromKeys(),$aPrototype->bridgeToKeys(),$aModel,$sBridgeTable) ;
-						
-						// to表 条件
-						$this->setCondition($aDeleteForBridge->criteria(),$aPrototype->bridgeFromKeys(),$aPrototype->toKeys(),$aModel,$sBridgeTable) ;
-						
-						if( $aDB->execute($aDelete->makeStatement())===false )
-						{
-							return false ;
-						}
-					}
+				$aChildModel = $aModel->child($aAssoPrototype->modelProperty()) ;
 					
+				// 多对多，删除桥接表记录
+				if( $aAssoPrototype->type()==AssociationPrototype::hasAndBelongsToMany )
+				{
+					$sBridgeTable = $aAssoPrototype->bridgeTableName() ;
+					$aDeleteForBridge = new Delete($sBridgeTable) ;
+					
+					// from表 条件
+					$this->setCondition($aDeleteForBridge->criteria(),$aAssoPrototype->fromKeys(),$aAssoPrototype->bridgeToKeys(),$aModel,$sBridgeTable) ;
+					
+					$aDB->execute($aDeleteForBridge->makeStatement()) ;
+				}
+				
+				// 删除 hasOne, hasMany 关联模型 
+				if( in_array($aAssoPrototype->type(),array(AssociationPrototype::hasOne,AssociationPrototype::hasMany)) )
+				{
 					// 删除子model
 					if( !$aChildModel->delete() )
 					{
 						return false ;
 					}
+					$aChildModel->setSerialized(false) ;
 				}
 			}
 			
-			return $aDB->execute($aDelete->makeStatement())!==false ;
+			$aDB->execute($aDelete->makeStatement()) ;
+			
+			$aModel->setSerialized(false) ;
+			
+			return true ;
 		}
 	}
 }

@@ -11,6 +11,8 @@ interface IModel extends \ArrayAccess, \Iterator
 	
 	public function hasSerialized() ;
 	
+	public function setSerialized($bSerialized=true) ;
+	
 	public function load() ;
 	
 	public function save() ;

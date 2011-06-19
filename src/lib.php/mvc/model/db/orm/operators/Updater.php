@@ -35,18 +35,15 @@ class Updater extends OperationStrategy
 				$aUpdate->setData($sClmName,$aModel->data($sClmName)) ;
 			}
 			
-			$this->setCondition($aUpdate->criteria(), $aPrototype->primeryKeys(), null, $aModel) ;
+			$this->setCondition($aUpdate->criteria(), $aPrototype->primaryKeys(), null, $aModel) ;
 			
-			if( $aDB->execute( $aUpdate )===false )
-			{
-				return false ;
-			}
+			$aDB->execute( $aUpdate ) ;
 			
 			// -----------------------------------
 			// update 关联model
 			foreach($aPrototype->associations() as $aAssoPrototype)
 			{
-				$aChildModel = $aModel->child( $aAssoPrototype->propertyName() ) ;
+				$aChildModel = $aModel->child( $aAssoPrototype->modelProperty() ) ;
 				if(!$aChildModel)
 				{
 					continue ;

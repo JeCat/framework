@@ -58,6 +58,8 @@ class Selecter extends OperationStrategy
 		// 加载 sql
 		$this->loadModel($aDB, $aModel, $aRecordSet, $sTableAlias.'.') ;
 		
+		$aModel->setSerialized(true) ;
+			
 		return true ;
 	}
 
@@ -103,7 +105,7 @@ class Selecter extends OperationStrategy
 		}
 		
 		// load 自己
-		$aModel->loadData($aRecordSet,$sClmPrefix) ;
+		$aModel->loadData($aRecordSet,0,$sClmPrefix) ;
 		
 		if( $aModel->isAggregarion() )
 		{
@@ -140,6 +142,7 @@ class Selecter extends OperationStrategy
 				)) )
 				{
 					$this->loadModel($aDB,$aChildModel,$aRecordSet,$sChildModelName.'.') ;
+					$aChildModel->setSerialized(true) ;
 				}
 				
 				// -------------------------------------------------------------
@@ -159,6 +162,7 @@ class Selecter extends OperationStrategy
 						
 						// 加载 child 类
 						$this->select($aDB, $aChildModel, null, null, $arrKeyValues, null, 30 ) ;
+						$aChildModel->setSerialized(true) ;
 					}
 					
 					// 多对多关联
@@ -185,6 +189,7 @@ class Selecter extends OperationStrategy
 						
 						// 加载 child 类
 						$this->select($aDB, $aChildModel, $aSelect, $sChildModelName, $arrKeyValues, null, 30 ) ;
+						$aChildModel->setSerialized(true) ;
 					}
 				}
 			}
