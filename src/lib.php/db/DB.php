@@ -37,6 +37,11 @@ class DB extends Object
 		return $this->driver()->executeLog() ;
 	}
 	
+	public function lastInsertId()
+	{
+		return $this->driver()->lastInsertId() ;
+	}
+	
 	private $aDriver ;
 }
 

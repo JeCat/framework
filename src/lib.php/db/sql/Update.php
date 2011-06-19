@@ -20,23 +20,26 @@ class Update extends MultiTableStatement implements IDataSettableStatement
 		
 		$aCriteria = $this->criteria() ;
 		
-		$sStatement = ($this->isReplace()? "REPLACE": "UPDATE")
+		$sStatement = ($this->isReplace()? "REPLACE ": "UPDATE ")
 				. $this->tables()->makeStatement($bFormat) 
 				. " SET " ;
 
 		$arrValues = array() ;
 		foreach($this->mapData as $sClm=>$Data)
 		{
-			$arrValues[] = $sClm."=".addslashes($Data) ;
+			$arrValues[] = $sClm."='".addslashes($Data)."'" ;
 		}
 		
 		$sStatement.= implode(", ", $arrValues) ;
 		
 		if( $aCriteria )
 		{
-			$sStatement.= $aCriteria->makeStatement($bFormat) ;
+			$sStatement.= ' WHERE ' . $aCriteria->makeStatement($bFormat) ;
 		}
 		
+		// limit
+		$sStatement.= $this->makeStatementLimit($bFormat) ;
+			
 		return $sStatement ;
 	}
 	

@@ -54,7 +54,7 @@ class Insert extends Statement implements IDataSettableStatement
 	{
 		$this->checkValid(true) ;
 		
-		$sStatement = 'INSERT INTO ' . $this->createTableName($this->sTableName) ;
+		$sStatement = 'INSERT INTO ' . $this->sTableName ;
 		
 		$arrClms = array() ;
 		$arrValues = array() ;

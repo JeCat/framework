@@ -16,6 +16,8 @@ class Select extends MultiTableStatement
 	{
 		$this->checkValid(true) ;
 		
+		parent::setLimit(30) ;
+		
 		return "SELECT"
 			. $this->makeStatementPredicate($bFormat)
 			. ' ' . ($this->arrColumns? implode(',', $this->arrColumns): '*')
@@ -33,6 +35,18 @@ class Select extends MultiTableStatement
 								' PERCENT': ''
 					): ''
 		) ;
+	}
+
+	public function makeStatementLimit($bFormat=false)
+	{
+		if( $this->limitLen()!==null )
+		{
+			return " LIMIT " . $this->limitFrom() . ", " . $this->limitLen() ;
+		}
+		else
+		{
+			return '' ;
+		}
 	}
 	
 	public function checkValid($bThrowException=true)
@@ -62,6 +76,21 @@ class Select extends MultiTableStatement
 		}
 		$this->arrColumns[] = $sClmName ;
 	}
+
+	public function setLimit($nLen=null,$nFrom=null)
+	{
+		parent::setLimit($nLen) ;
+		
+		if($nFrom!==null)
+		{
+			$this->nLimitFrom = intval($nFrom) ;
+		}
+	}
+	
+	public function limitFrom()
+	{
+		return $this->nLimitFrom ;
+	}
 	
 	private $arrColumns = array() ;
 	
@@ -86,6 +115,9 @@ class Select extends MultiTableStatement
 	 * @var int
 	 */
 	private $nPredicateTopLen = 30 ;
+	
+	
+	private $nLimitFrom = 0 ;
 }
 
 ?>

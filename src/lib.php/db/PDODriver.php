@@ -45,7 +45,12 @@ class PDODriver extends \PDO implements IDriver
 		
 		if( !$result )
 		{
-			return false ;
+			throw new ExecuteException(
+					$this
+					, $arrLog['sql']
+					, $this->error()
+					, $this->errorMessage()
+			) ;
 		}
 		
 		return new PDORecordSet($result) ;
@@ -57,9 +62,22 @@ class PDODriver extends \PDO implements IDriver
 					$sql->makeStatement(): strval($sql) ;
 
 		$fBefore = microtime(true) ;
-		$arrLog['affected'] = \PDO::exec($arrLog['sql']) ;
+		$ret = \PDO::exec($arrLog['sql']) ;
 		$arrLog['time'] = microtime(true) - $fBefore ;
 		
+		if( $ret===false )
+		{
+			$this->arrExecuteLog[] = $arrLog ;
+			
+			throw new ExecuteException(
+					$this
+					, $arrLog['sql']
+					, $this->error()
+					, $this->errorMessage()
+			) ;
+		}
+		
+		$arrLog['affected'] = $ret ;
 		$this->arrExecuteLog[] = $arrLog ;
 		
 		return $arrLog['affected'] ;

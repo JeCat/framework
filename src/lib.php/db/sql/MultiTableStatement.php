@@ -54,7 +54,7 @@ abstract class MultiTableStatement extends Statement
 		
 		if($this->aTables)
 		{
-			$sStatement.= " " . $this->aTables->makeStatement($bFormat) ;
+			$sStatement.= " FROM " . $this->aTables->makeStatement($bFormat) ;
 		}
 	
 		if($this->aCriteria)
@@ -67,7 +67,14 @@ abstract class MultiTableStatement extends Statement
 	
 	public function makeStatementLimit($bFormat=false)
 	{
-		return " LIMIT " . $this->nLimitFrom . ", " . $this->nLimitLen ;
+		if($this->nLimitLen!==null)
+		{
+			return " LIMIT " . $this->nLimitLen ;
+		}
+		else
+		{
+			return '' ;
+		}
 	}
 	
 	public function checkValid($bThrowException=true)
@@ -85,26 +92,17 @@ abstract class MultiTableStatement extends Statement
 		return $this->aTables->checkValid($bThrowException) ;
 	}
 	
-	public function setLimit($nLen=null,$nFrom=null)
+	public function setLimit($nLen=null)
 	{
 		if($nLen!==null)
 		{
 			$this->nLimitLen = intval($nLen) ;
-		}
-		if($nFrom!==null)
-		{
-			$this->nLimitFrom = intval($nFrom) ;
 		}
 	}
 	
 	public function limitLen()
 	{
 		return $this->nLimitLen ;
-	}
-	
-	public function limitFrom()
-	{
-		return $this->nLimitFrom ;
 	}
 	
 	/**
@@ -119,9 +117,7 @@ abstract class MultiTableStatement extends Statement
 	 */
 	private $aCriteria = null ;
 	
-	private $nLimitFrom = 0 ;
-	
-	private $nLimitLen = 30 ;
+	private $nLimitLen = null ;
 	
 }
 

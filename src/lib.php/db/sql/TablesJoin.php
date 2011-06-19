@@ -68,13 +68,13 @@ class TablesJoin extends SubStatement
 		}
 	}
 	
-	public function makeStatement($bFormat=false)
+	public function makeStatement($bFormat=false,$bEnableAlias=true)
 	{
 		$aStatement = $this->statement() ;
 		$arrTables = array() ;
 		foreach( $this->arrTables as $sAlias=>$sTable )
 		{
-			if($sAlias!=$sTable)
+			if( $bEnableAlias and $sAlias!=$sTable )
 			{
 				$sTable.= " AS ".$sAlias ;
 			}

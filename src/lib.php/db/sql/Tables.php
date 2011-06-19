@@ -61,17 +61,31 @@ class Tables extends SubStatement
 		call_user_func_array(array($aJoin,'addExpression'), $arrExpression) ;
 	}
 	
-	public function makeStatement($bFormat=false)
-	{		
+	public function makeStatement($bFormat=false,$bEnableAlias=true)
+	{
+		$sRet = $this->sTableName ;
+		
+		// alias
+		if( $bEnableAlias and $this->sTableAlias and $this->sTableAlias!=$this->sTableName )
+		{
+			$sRet.= " AS " . $this->sTableAlias ;
+		}
+	
+		// join 
 		$arrJoins = array() ;
 		foreach ($this->mapJoinTables as $aJoin)
 		{
 			if( $aJoin->checkValid(false) )
 			{
-				$arrJoins[] = $aJoin->makeStatement($bFormat) ;
+				$arrJoins[] = $aJoin->makeStatement($bFormat,$bEnableAlias) ;
 			}
 		}
-		return "FROM " . $this->sTableName .($this->sTableAlias?" AS {$this->sTableAlias}":''). (empty($arrJoins)?"":(" ".implode(", ", $arrJoins))) ;
+		if( !empty($arrJoins) )
+		{
+			$sRet.= ' ' . implode(", ", $arrJoins) ;
+		}
+		
+		return $sRet ;
 	}
 	
 	public function checkValid($bThrowException=true)
@@ -86,7 +100,6 @@ class Tables extends SubStatement
 		}
 		return true ;		
 	}
-
 
 	/**
 	 * Enter description here ...
