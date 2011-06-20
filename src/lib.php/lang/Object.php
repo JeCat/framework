@@ -116,6 +116,8 @@ class Object implements IObject
 		}
 
 		self::$arrGlobalInstancs[$sClass] = $aInstance ;
+		
+		return $aInstance ;
 	}
 
 	/*static public function singleton ($bCreateNew=true)
@@ -184,9 +186,78 @@ class Object implements IObject
 		
 		return self::$arrFlyweightInstancs[$sClass][$sKey] ;
 	}
+	
+	public function __sleep()
+	{
+		return $this->arrSerializeProperties ;
+	}
+	
+	public function addPropertyForSerialize($sProperty,$sAccess='public',$sClass=null)
+	{
+		switch($sAccess)
+		{
+		case 'private' :
+			if(!$sClass)
+			{
+				throw new Exception(
+							"%s::addPropertyForSerialize() 的参数 \$sAccess 为 \"private\"时，\$sClass参数不能省略"
+							, array(get_class($this))
+				) ;
+			}
+			$sPropertyName = self::privatePropNameForSerialize($sProperty,$sClass) ;
+			break ;
+			
+		case 'protected' :
+			$sPropertyName = self::protectedPropNameForSerialize($sProperty) ;
+			break ;
+			
+		case 'public' :
+			$sPropertyName = $sProperty ;
+			break ;
+			
+		default :
+			throw new Exception(
+						"%s::addPropertyForSerialize() 的参数 \$sAccess 无效（%s）"
+						, array(get_class($this),$sAccess)
+			) ;
+		}
+		
+		$this->arrSerializeProperties[] = $sPropertyName ;
+	}
+
+	/**
+	 * 在 __sleep() 魔术函数中，如果直接返回一个 private 属性的名称，则对 子类对象 serialize 操作时 无效。
+	 * 此函数 返回一个 任何时候 都有效的  属性名称。
+	 * 
+	 * @access	public
+	 * @param	$sPropertyName		string	属性名称
+	 * @param	$sClassName			string	正在载入的 类名 或 接口名
+	 * @static
+	 * @return	void
+	 */
+	static public function privatePropNameForSerialize($sPropertyName,$sClassName) 
+	{
+		return "\0{$sClassName}\0{$sPropertyName}" ;
+	}
+	
+	/**
+	 * 在 __sleep() 魔术函数中，如果直接返回一个 protected 属性的名称，则对 子类对象 serialize 操作时 无效。
+	 * 此函数 返回一个 任何时候 都有效的  属性名称。
+	 *
+	 * @access	public
+	 * @param	$sPropertyName		string	属性名称
+	 * @static
+	 * @return	string
+	 */
+	static public function protectedPropNameForSerialize($sPropertyName) 
+	{
+		return "\0*\0{$sPropertyName}" ;
+	}
 		
 	static private $arrGlobalInstancs = array() ;
 	static private $arrFlyweightInstancs = array() ;
+	
+	private $arrSerializeProperties = array() ;
 	
 	private $aApplication ;
 }
