@@ -19,6 +19,7 @@ class UIFactory extends Factory
 		$aNodeCompilers->addSubCompiler('msgqueue',__NAMESPACE__."\\uicompiler\\MsgQueueCompiler") ;
 		$aNodeCompilers->addSubCompiler('view:msgqueue',__NAMESPACE__."\\uicompiler\\ViewMsgQueueCompiler") ;
 		$aNodeCompilers->addSubCompiler('widget:msgqueue',__NAMESPACE__."\\uicompiler\\WidgetMsgQueueCompiler") ;
+		$aNodeCompilers->addSubCompiler('resrc',__NAMESPACE__."\\uicompiler\\LoadResourceCompiler") ;
 		
 		return $aNodeCompilers ;
 	}
