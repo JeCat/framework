@@ -2,6 +2,7 @@
 namespace jc\mvc\view\widget;
 
 use jc\lang\Exception;
+use jc\util\IDataSrc;
 
 class SelectList extends Select {
 	public function __construct($sId, $sTitle = null, $nSize = 1, IViewWidget $aView = null) {
@@ -12,7 +13,7 @@ class SelectList extends Select {
 	
 	public function getSelected(){
 		$arrSelected = array();
-		foreach(parent::optionIterator() as $value){
+		foreach($this->optionIterator() as $value){
 			if($value[2] == true){
 				$arrSelected[] = $value;
 			}
@@ -22,7 +23,7 @@ class SelectList extends Select {
 	
 	public function value() {
 		$arrValue = array();
-		foreach ( parent::optionIterator() as $key => $option ) {
+		foreach ( $this->optionIterator() as $key => $option ) {
 			if ($option [2] == true) {
 				$arrValue[] = $option [0]; //option[0]是option 的value
 			}
@@ -34,13 +35,12 @@ class SelectList extends Select {
 		if(! is_array($data)){
 			throw new Exception ( __CLASS__ . "的" . __METHOD__ . "传入了错误的data参数(得到的参数是:%s)", array ($data ) );
 		}
-		$arrOptionIterator = parent::optionIterator();
-		
+		$this->unsetSelected();
+		$arrOptionIterator = $this->optionIterator();
 		foreach ($data as $sSelectValue){
 			foreach($arrOptionIterator as $key => $option){
-				$arrOptionIterator[$key][2] = false;
 				if((string)$option[0] == $sSelectValue){
-					$arrOptionIterator[$key][2] = true;
+					$this->setSelected($key);
 				}
 			}
 		}
@@ -57,6 +57,15 @@ class SelectList extends Select {
 		array_unshift ( $arrArgs, $data );
 		$arrValues = call_user_func_array ( $this->arrUnSerializMethodName, $arrArgs );
 		$this->setValue ( $arrValues );
+	}
+	
+	public function setDataFromSubmit(IDataSrc $aDataSrc) {
+		$data = $aDataSrc->get ( $this->formName () );
+		if( $data == null ){
+			return;
+		}else{
+			$this->setValue ( $data );
+		}
 	}
 	
 	public static function serialize($arrValues, $sSeparator = ',') {

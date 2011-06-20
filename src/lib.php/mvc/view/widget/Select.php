@@ -19,15 +19,18 @@ class Select extends FormWidget {
 		return count($this->arrOptions);
 	}
 	
-	public function setSelect($nIndex){
+	public function setSelected($nIndex){
 		if (! is_int ( $nIndex )) {
 			new Exception ( "调用" . __CLASS__ . "的" . __METHOD__ . "方法时使用了非法的nIndex参数(得到的nIndex参数是:%s)", array ($nIndex ) );
 		}
-		//因为select是单选,所以清空其他所有选择
+		$this->unsetSelected();
+		$this->arrOptions[$nIndex][2] = true;
+	}
+	
+	public function unsetSelected(){
 		foreach($this->arrOptions as $value){
 			$value[2] = false;
 		}
-		$this->arrOptions[$nIndex][2] = true;
 	}
 	
 	public function getSelected(){
