@@ -94,6 +94,8 @@ class UploadManager extends Object implements IUploadManager
 		return true ;
 	}
 	
+	
+	## --  检验   -- ##
 	public function setMaxByte($nByte){
 		if(! is_int($nByte) and $nByte > 0){
 			throw new Exception ( "调用" . __CLASS__ . "的" . __METHOD__ . "方法时使用了非法的nByte参数(得到的nByte参数是:%s)", array ($nByte ) );
@@ -113,33 +115,25 @@ class UploadManager extends Object implements IUploadManager
 		return $this->sStoreFileName;
 	}
 	
+	public function getByte($sInputName=null,Request $aRequest)
+	{
+		$arrFileInfo = $aRequest->getParam(
+			($sInputName==null)?$this->sLastInput:$sInputName
+		) ;
+		
+		return $arrFileInfo['size'] ;
+	}
+	
 	//得到已上传的文件的文件扩展名
 	public function getFileType(){
 		// TODO 如何得到上次上传的文件?
 		return mime_content_type( $this->sStorePath . $this->sStoreSubPath . $this->getFileName() );
 	}
 	
+	##  -- 路径  文件名   -- ##
+	
 	public function getTmpDir(){
 		return ini_get(upload_tmp_dir);
-	}
-	
-	public function cancelUpload($sInputName=null)
-	{
-		if($sInputName===null)
-		{
-			$sInputName = $this->sLastInput ;
-		}
-
-		if( is_file($this->GetStorePath()) )
-		{
-			unlink($this->GetStorePath()) ;
-		}
-
-		unset($this->arrStoreFileName[$sInputName]) ;
-		unset($this->arrStorePath[$sInputName]) ;
-		unset($this->arrStoreSubPath[$sInputName]) ;
-
-		$this->_PutErrorInfo($sInputName,"文件上传被取消",self::ERR_CANCEL) ;
 	}
 	
 	public function getStorePath($sInputName=null)
@@ -151,11 +145,8 @@ class UploadManager extends Object implements IUploadManager
 	public function getStoreFileName($sInputName=null)
 	{ return $this->arrStoreFileName[($sInputName==null)?$this->sLastInput:$sInputName] ; }
 	
-	
-	## -- 新文件名 -- ##
 	public function makeStoreName($sInputName=null)
 	{
-		
 		if($sInputName==null)
 		{
 			$sInputName = $this->sLastInput ;
@@ -170,7 +161,7 @@ class UploadManager extends Object implements IUploadManager
 		// 保持 原有文件名
 		if($this->bKeepOriginalName)
 		{
-			return $this->sStoreSubDir.$this->GetOriginalName($sInputName) ;
+			return $this->sStoreSubDir.$this->getOriginalName($sInputName) ;
 		}
 		
 		// 产生随机文件名
@@ -184,7 +175,7 @@ class UploadManager extends Object implements IUploadManager
 		}
 		
 		// 原名
-		$sOriginalName = $this->GetOriginalName($sInputName) ;
+		$sOriginalName = $this->getOriginalName($sInputName) ;
 		
 		// 扩展名
 		$arrNameParts = explode('.',$sOriginalName);
@@ -194,17 +185,25 @@ class UploadManager extends Object implements IUploadManager
 		return $this->sStoreSubDir.$this->arrStoreFileName[$sInputName] ;
 	}
 	
-	public function setNewNameGenerater($sFunctionName=null,$mixedClassOrOb=null)
+	public function setStoreDir($sStoreDir)
 	{
-		if($mixedClassOrOb===null)
-		{
-			$this->callbackGenerateNewName = $sFunctionName ;
-		}
-		else
-		{
-			$this->callbackGenerateNewName = array($mixedClassOrOb,$sFunctionName) ;
-		}
+		//  检验文件夹是否有足够权限 ? 
+//		if( @opendir($sStoreDir) != false){
+//			
+//		}
+		$this->sStoreDir = DIR::formatPath($sStoreDir) ;
 	}
+	
+	public function setStoreSubDir($sStoreSubDir)
+	{
+		$this->sStoreSubDir = DIR::formatPath($sStoreSubDir) ;
+	}
+	
+	public function getStoreDir()
+	{ return $this->sStoreDir ; }
+	
+	public function getStoreSubDir()
+	{ return $this->sStoreSubDir ; }
 	
 	/**
 	 * 从默认的存储文件名中 取得原始文件名
@@ -228,6 +227,48 @@ class UploadManager extends Object implements IUploadManager
 		}
 	}
 	
+	##  -- 行为  --  ##
+	
+	public function cancelUpload($sInputName=null)
+	{
+		if($sInputName===null)
+		{
+			$sInputName = $this->sLastInput ;
+		}
+
+		if( is_file($this->GetStorePath()) )
+		{
+			unlink($this->GetStorePath()) ;
+		}
+
+		unset($this->arrStoreFileName[$sInputName]) ;
+		unset($this->arrStorePath[$sInputName]) ;
+		unset($this->arrStoreSubPath[$sInputName]) ;
+
+		$this->_PutErrorInfo($sInputName,"文件上传被取消",self::ERR_CANCEL) ;
+	}
+	
+	public function keepOriginalName($bKeepOriginalName=true,$bOverlayIfExisted=false)
+	{
+		$this->bKeepOriginalName = $bKeepOriginalName ;
+		$this->bOverlayIfExisted = $bOverlayIfExisted ;
+	}
+	
+	public function setOverlayIfExisted($bOverlayIfExisted=false)
+	{
+		$old = $this->bOverlayIfExisted ;
+		$this->bOverlayIfExisted = $bOverlayIfExisted ;
+		return $old ;		
+	}
+	
+	public function setAutoCreateStoreDir($bAutoCreateStoreDir=true)
+	{
+		$old = $this->bAutoCreateStoreDir ;
+		$this->bAutoCreateStoreDir = $bAutoCreateStoreDir ;
+		return $old ;
+	}
+	
+	
 	/**
 	 * 检查是否上传
 	 *
@@ -240,25 +281,6 @@ class UploadManager extends Object implements IUploadManager
 		$arrFileInfo = $aRequest->get($sInputName) ;
 		return !empty($arrFileInfo['tmp_name']) ;
 	}
-	
-	## -- 存储目录 -- ##
-	public function setStoreDir($sStoreDir)
-	{
-		// TODO 检验文件夹是否有足够权限
-		$this->sStoreDir = DIR::formatPath($sStoreDir) ;
-	}
-	
-	public function setStoreSubDir($sStoreSubDir)
-	{
-		$this->sStoreSubDir = DIR::formatPath($sStoreSubDir) ;
-	}
-	
-	public function getStoreDir()
-	{ return $this->sStoreDir ; }
-	
-	public function getStoreSubDir()
-	{ return $this->sStoreSubDir ; }
-	
 	
 	## -- 原始文件信息 -- ##
 	
@@ -292,16 +314,7 @@ class UploadManager extends Object implements IUploadManager
 		return $arrFileInfo['tmp_name'] ;
 	}
 	
-	public function getByte($sInputName=null,Request $aRequest)
-	{
-		$arrFileInfo = $aRequest->getParam(
-			($sInputName==null)?$this->sLastInput:$sInputName
-		) ;
-		
-		return $arrFileInfo['size'] ;
-	}
-	
-	## --- 扩展名/文件类型 --- ##
+	## -- 扩展名 -- ##
 	
 	public function setAllowExts($arrTypes){
 		$arrTypes = array_unique($arrTypes);
@@ -369,29 +382,8 @@ class UploadManager extends Object implements IUploadManager
 		}
 		return isset($this->arrAllowExt[$sExt]) ;
 	}
-	
-	## --- 行为 --- ##
-	public function keepOriginalName($bKeepOriginalName=true,$bOverlayIfExisted=false)
-	{
-		$this->bKeepOriginalName = $bKeepOriginalName ;
-		$this->bOverlayIfExisted = $bOverlayIfExisted ;
-	}
-	
-	public function setOverlayIfExisted($bOverlayIfExisted=false)
-	{
-		$old = $this->bOverlayIfExisted ;
-		$this->bOverlayIfExisted = $bOverlayIfExisted ;
-		return $old ;		
-	}
-	
-	public function setAutoCreateStoreDir($bAutoCreateStoreDir=true)
-	{
-		$old = $this->bAutoCreateStoreDir ;
-		$this->bAutoCreateStoreDir = $bAutoCreateStoreDir ;
-		return $old ;
-	}
-	
-	## --- ... --- ##
+
+	## --- 工具  --- ##
 	static function getReadableFileSize($nByte,$nPrecision=2)
 	{
 		$unit = 'Byte' ;
@@ -413,6 +405,20 @@ class UploadManager extends Object implements IUploadManager
 		
 		return round($nByte,$nPrecision).' '.$unit ;
 	}
+	
+	
+//	public function setNewNameGenerater($sFunctionName=null,$mixedClassOrOb=null)
+//	{
+//		if($mixedClassOrOb===null)
+//		{
+//			$this->callbackGenerateNewName = $sFunctionName ;
+//		}
+//		else
+//		{
+//			$this->callbackGenerateNewName = array($mixedClassOrOb,$sFunctionName) ;
+//		}
+//	}
+
 	
 	//错误信息
 	const ERR_NOupload = 1 ;								// 文件未上传
