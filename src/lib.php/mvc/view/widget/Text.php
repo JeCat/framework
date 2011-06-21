@@ -14,7 +14,7 @@ class Text extends FormWidget {
 	
 	public function __construct($sId, $sTitle = null, $type = self::TEXT, IViewWidget $aView = null) {
 		if (! is_int ( $type ) || $type < self::$nTypeMin || $type > self::$nTypeMax) {
-			throw new Exception ( "构建Text对象时使用了非法的type参数(得到的type是:%s)", array ($type ) );
+			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的type参数(得到的type是:%s)", array ($type ) );
 		}
 		
 		$this->nType = $type;
