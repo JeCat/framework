@@ -2,7 +2,6 @@
 namespace jc\auth ;
 
 use jc\session\ISession;
-
 use jc\lang\Object;
 use jc\lang\Exception;
 

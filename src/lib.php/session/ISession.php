@@ -19,7 +19,7 @@ interface ISession
 	
 	public function cookieParam() ;
 	
-	public function setCookieParam() ;
+	public function setCookieParam($sParamName) ;
 	
 	/**
 	 * @return bool

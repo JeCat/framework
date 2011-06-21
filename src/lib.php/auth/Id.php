@@ -1,25 +1,21 @@
 <?php
 namespace jc\auth ;
 
+use jc\mvc\model\IModel;
+
 use jc\lang\Object;
 
 class Id extends Object implements IIdentity
 {
-	public function __construct()
+	public function __construct( IModel $aModel, array $arrPropConf )
 	{
 		parent::__construct() ;
 		
 		$this->addPropertyForSerialize('arrPurviews','private',__CLASS__) ;
 		$this->addPropertyForSerialize('arrProps','private',__CLASS__) ;
 		$this->addPropertyForSerialize('aModeal','private',__CLASS__) ;
-	}
+		
 	
-	static private $arrPropNames = array(
-			'id', 'username', 'nickname', 'lastlogintime', 'lastloginip', 'activetime', 'activeip'
-	) ; 
-	
-	public function __construct( IModel $aModel, array $arrPropConf )
-	{
 		$this->aModeal = $aModel ;
 		
 		foreach( $arrPropConf as $sPropName=>$sProp )
@@ -33,6 +29,10 @@ class Id extends Object implements IIdentity
 		}
 	}
 	
+	static private $arrPropNames = array(
+			'id', 'username', 'nickname', 'lastlogintime', 'lastloginip', 'activetime', 'activeip'
+	) ; 
+		
 	public function userId()
 	{
 		return $this->getDataFromModel('id') ;

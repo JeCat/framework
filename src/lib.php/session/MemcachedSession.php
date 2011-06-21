@@ -1,7 +1,7 @@
 <?php
 namespace jc\session ;
 
-class MemcachedSession extends Session
+abstract class MemcachedSession extends Session
 {
 
 }

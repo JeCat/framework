@@ -3,7 +3,7 @@ namespace jc\mvc\model ;
 
 use jc\lang\Object;
 
-class Model extends Object implements IModel
+abstract class Model extends Object implements IModel
 {
 	public function __construct($bAggregarion=false)
 	{
