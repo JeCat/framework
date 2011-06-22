@@ -7,10 +7,26 @@ use jc\lang\Exception;
 use jc\io\IOutputStream;
 use jc\util\IHashTable;
 use jc\ui\UI;
+use jc\mvc\view\widget\CheckBtn;
 
 class RadioGroup extends Group {
 	public function __construct($sId, $sTitle = null, IViewWidget $aView = null) {
 		parent::__construct ( $sId, $sTitle, $aView );
+	}
+	
+	public function createRadio($sId, $sTitle, $sValue, $nType = CheckBtn::radio, $bChecked = false, IViewWidget $aView = null) {
+		$sId = ( string ) $sId;
+		if (empty ( $sId )) {
+			$sId = $this->id () . ':' . $sValue;
+		}
+		
+		$sTitle = ( string ) $sTitle;
+		if (empty ( $sTitle )) {
+			throw new Exception ( "调用" . __CLASS__ . "类的" . __METHOD__ . "方法时使用了非法的sTitle参数(得到的sTitle为:%s)", array ($sTitle ) );
+		}
+		
+		$this->addWidget ( new CheckBtn ( $sId, $sTitle, $sValue, $nType, $bChecked, $aView ) );
+		return $this;
 	}
 	
 	//添加控件
@@ -51,7 +67,7 @@ class RadioGroup extends Group {
 				return ( string ) $widget->value ();
 			}
 		}
-		throw new Exception ( __CLASS__ . "类的" . __METHOD__ . "方法无法获取radiogroup的值,有可能这个radiogroup中没有任何radio被选中");
+		throw new Exception ( __CLASS__ . "类的" . __METHOD__ . "方法无法获取radiogroup的值,有可能这个radiogroup中没有任何radio被选中" );
 	}
 	
 	public function setValue($data = null) {
@@ -62,13 +78,13 @@ class RadioGroup extends Group {
 		}
 	}
 	
-	public function setValueFromString($data){
-		$this->setValue($data);
+	public function setValueFromString($data) {
+		$this->setValue ( $data );
 	}
 	
-	public function valueToString(){
-		return $this->value();
+	public function valueToString() {
+		return $this->value ();
 	}
-	
+
 }
 ?>

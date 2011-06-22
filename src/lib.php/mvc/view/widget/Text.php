@@ -5,44 +5,52 @@ use jc\lang\Exception;
 
 class Text extends FormWidget {
 	
-	const TEXT = 0;
-	const PASSWORD = 1;
-	const TEXTAREA = 2;
+	const single = 0;
+	const password = 1;
+	const multiple = 2;
 	
 	private static $nTypeMin = 0;
 	private static $nTypeMax = 2;
 	
-	public function __construct($sId, $sTitle = null, $type = self::TEXT, IViewWidget $aView = null) {
-		if (! is_int ( $type ) || $type < self::$nTypeMin || $type > self::$nTypeMax) {
-			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的type参数(得到的type是:%s)", array ($type ) );
-		}
-		
-		$this->nType = $type;
+	public function __construct($sId, $sValue=null, $sTitle = null, $nType = self::single, IViewWidget $aView = null) {
+		$this->setType ( $nType );
+		$this->setValue ( $sValue );
 		parent::__construct ( $sId, 'ViewWidgetText.template.html', $sTitle, $aView );
 	}
 	
-	public function isText() {
-		return $this->nType == self::TEXT;
+	public function type() {
+		return $this->nType;
 	}
 	
-	public function isTextarea() {
-		return $this->nType == self::TEXTAREA;
+	public function setType($nType) {
+		if (! is_int ( $nType ) || $nType < self::$nTypeMin || $nType > self::$nTypeMax) {
+			throw new Exception ( "调用" . __CLASS__ . "对象的" . __METHOD__ . "方法时使用了非法的nType参数(得到的nType是:%s)", array ($nType ) );
+		}
+		$this->nType == $nType;
+	}
+	
+	public function setSingle($bSingle = true) {
+		$this->nType = $bSingle ? self::single : self::multiple;
+	}
+	
+	public function isSingle() {
+		return $this->nType == self::single;
+	}
+	
+	public function isMultiple() {
+		return $this->nType == self::multiple;
+	}
+	
+	public function setMultiple($bMul = true) {
+		$this->nType = $bMul ? self::multiple : self::single;
 	}
 	
 	public function isPassword() {
-		return $this->nType == self::PASSWORD;
-	}
-	
-	public function setText() {
-		$this->nType = self::TEXT;
-	}
-	
-	public function setTextarea() {
-		$this->nType == self::TEXTAREA;
+		return $this->nType == self::password;
 	}
 	
 	public function setPassword() {
-		$this->nType = self::PASSWORD;
+		$this->nType = self::password;
 	}
 	
 	private $nType;

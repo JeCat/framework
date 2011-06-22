@@ -6,6 +6,11 @@ use jc\lang\Object;
 
 class VerifierManager extends Object
 {
+	
+	public function __construct($bLogic = true){
+		$this->setLogic($bLogic);
+	}
+	
 	public function add(IVerifier $aVerifier, $sExceptionWords=null, $callback=null, $arrCallbackArgvs=array()) 
 	{
 		if( in_array($aVerifier,$this->arrVerifiers) )
@@ -22,6 +27,15 @@ class VerifierManager extends Object
 		
 		// 连续操作
 		return $this ;
+	}
+	
+	public function setLogic($bLogic){
+		$this->bLogic = (bool)$bLogic;
+		return $this ;
+	}
+	
+	public function logic(){
+		return $this->bLogic;
 	}
 	
 	public function remove(IVerifier $aVerifier)
@@ -54,6 +68,7 @@ class VerifierManager extends Object
 	
 	public function verifyData($value,$bThrowExcetion=false)
 	{		
+		$aVerifyFailed = new VerifyFailed(''); 
 		foreach($this->arrVerifiers as $nIdx=>$aVerifier)
 		{
 			try{
@@ -86,9 +101,7 @@ class VerifierManager extends Object
 						throw $e ;
 					}
 				}
-				
 				return false ;
-				
 			}
 		}
 		
@@ -97,6 +110,7 @@ class VerifierManager extends Object
 	
 	private $arrVerifiers = array() ; 
 	private $arrVerifierOthers = array() ; 
+	private $bLogic = true; //true校验器之间为and关系, false校验器之间为or关系
 }
 
 ?>

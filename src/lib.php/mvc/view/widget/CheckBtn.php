@@ -4,22 +4,31 @@ namespace jc\mvc\view\widget;
 use jc\lang\Exception;
 
 class CheckBtn extends FormWidget {
-	const RADIO = 0;
-	const CHECKBOX = 1;
+	const radio = 0;
+	const checkbox = 1;
 	
 	private static $nTypeMin = 0;
 	private static $nTypeMax = 1;
 	
-	public function __construct($sId, $sTitle = null, $nType = self::CHECKBOX, $checkedValue, IViewWidget $aView = null) {
+	public function __construct($sId, $sTitle, $sValue, $nType = self::checkbox, $bChecked = false, IViewWidget $aView = null) {
 		if (! is_int ( $nType ) || $nType < self::$nTypeMin || $nType > self::$nTypeMax) {
 			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的type参数(得到的type是:%s)", array ($nType ) );
 		}
-		
-		$checkedValue = ( string ) $checkedValue;
-		if (empty ( $checkedValue )) {
-			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的checked参数(得到的checked是:%s)", array ($checkedValue ) );
+		$sValue = ( string ) $sValue;
+		if (empty ( $sValue )) {
+			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的checked参数(得到的checked是:%s)", array ($sValue ) );
 		}
-		$this->checkedValue = $checkedValue;
+		
+		$sTitle = ( string ) $sTitle;
+		if (empty ( $sTitle )) {
+			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的sTitle参数(得到的sTitle是:%s)", array ($sTitle ) );
+		}
+		
+		if ($bChecked) {
+			$this->setChecked ();
+		}
+		
+		$this->checkedValue = $sValue;
 		$this->nType = $nType;
 		parent::__construct ( $sId, 'ViewWidgetCheckBtn.template.html', $sTitle, $aView );
 	}
@@ -35,12 +44,12 @@ class CheckBtn extends FormWidget {
 		return $this->nType;
 	}
 	
-	public function setChecked() {
-		$this->setValue ( $this->checkedValue );
-	}
-	
-	public function setNotChecked() {
-		$this->setValue ( null );
+	public function setChecked($bChecked) {
+		if ($bChecked) {
+			$this->setValue ( $this->checkedValue );
+		} else {
+			$this->setValue ( '' );
+		}
 	}
 	
 	public function checkedValue() {
@@ -60,11 +69,11 @@ class CheckBtn extends FormWidget {
 	}
 	
 	public function isRadio() {
-		return $this->nType == self::RADIO;
+		return $this->nType == self::radio;
 	}
 	
 	public function isCheckBox() {
-		return $this->nType == self::CHECKBOX;
+		return $this->nType == self::checkbox;
 	}
 	
 	private $nType;
