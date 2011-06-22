@@ -14,10 +14,14 @@ class RadioGroup extends Group {
 		parent::__construct ( $sId, $sTitle, $aView );
 	}
 	
-	public function createRadio($sId, $sTitle, $sValue, $bChecked = false, IViewWidget $aView = null) {
-		$sId = ( string ) $sId;
-		if (empty ( $sId )) {
+	public function createRadio( $sTitle, $sValue, $bChecked = false, $sId = null ,IViewWidget $aView = null) {
+		if ( $sId === null) {
 			$sId = $this->id () . ':' . $sValue;
+		}
+		
+		if(!$aView)
+		{
+			$aView = $this->view() ;
 		}
 		
 		$sTitle = ( string ) $sTitle;
@@ -27,6 +31,13 @@ class RadioGroup extends Group {
 		
 		$this->addWidget ( new CheckBtn ( $sId, $sTitle, $sValue, CheckBtn::radio , $bChecked, $aView ) );
 		return $this;
+	}
+
+	public function setView(IView $aView)
+	{
+		$this->aView = $aView ;
+		
+		
 	}
 	
 	//添加控件
