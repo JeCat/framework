@@ -144,7 +144,7 @@ class Model extends BaseModel implements IModel
 			{
 				if(strstr($sKey,'.')==false)
 				{
-					$sKey = $this->prototype()->tableName().'.'.$sKey ;
+					$sKey = $this->prototype()->name().'.'.$sKey ;
 				}
 			}
 			
