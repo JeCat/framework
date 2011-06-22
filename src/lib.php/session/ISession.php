@@ -27,6 +27,11 @@ interface ISession
 	public function start() ;
 	
 	/**
+	 * @return bool
+	 */
+	public function hasStarted() ;
+	
+	/**
 	 * 将session中的数据保存到实际设备中
 	 */
 	public function commit() ;

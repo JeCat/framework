@@ -60,14 +60,6 @@ class OriginalSession extends Session
 	}
 	
 	/**
-	 * @return bool
-	 */
-	public function start()
-	{
-		return session_start() ;
-	}
-	
-	/**
 	 * 将session中的数据保存到实际设备中
 	 */
 	public function commit()
