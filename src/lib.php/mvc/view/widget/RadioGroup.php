@@ -14,7 +14,7 @@ class RadioGroup extends Group {
 		parent::__construct ( $sId, $sTitle, $aView );
 	}
 	
-	public function createRadio($sId, $sTitle, $sValue, $nType = CheckBtn::radio, $bChecked = false, IViewWidget $aView = null) {
+	public function createRadio($sId, $sTitle, $sValue, $bChecked = false, IViewWidget $aView = null) {
 		$sId = ( string ) $sId;
 		if (empty ( $sId )) {
 			$sId = $this->id () . ':' . $sValue;
@@ -25,7 +25,7 @@ class RadioGroup extends Group {
 			throw new Exception ( "调用" . __CLASS__ . "类的" . __METHOD__ . "方法时使用了非法的sTitle参数(得到的sTitle为:%s)", array ($sTitle ) );
 		}
 		
-		$this->addWidget ( new CheckBtn ( $sId, $sTitle, $sValue, $nType, $bChecked, $aView ) );
+		$this->addWidget ( new CheckBtn ( $sId, $sTitle, $sValue, CheckBtn::radio , $bChecked, $aView ) );
 		return $this;
 	}
 	
