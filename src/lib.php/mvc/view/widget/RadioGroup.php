@@ -11,11 +11,11 @@ use jc\ui\UI;
 use jc\mvc\view\widget\CheckBtn;
 
 class RadioGroup extends Group {
-	public function __construct($sId, $sTitle = null, IViewWidget $aView = null) {
+	public function __construct($sId, $sTitle = null, IView $aView = null) {
 		parent::__construct ( $sId, $sTitle, $aView );
 	}
 	
-	public function createRadio( $sTitle, $sValue, $bChecked = false, $sId = null ,IViewWidget $aView = null) {
+	public function createRadio( $sTitle, $sValue, $bChecked = false, $sId = null ,IView $aView = null) {
 		if ( $sId === null) {
 			$sId = $this->id () . ':' . $sValue;
 		}

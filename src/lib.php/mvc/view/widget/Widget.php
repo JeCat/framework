@@ -137,6 +137,11 @@ class Widget extends Object implements IViewWidget
 		$this->aMsgQueue = $aMsgQueue ;
 	}
 
+	public function createMessage($sType,$sMessage,$arrMessageArgs=null,$aPoster=null)
+	{
+		return $this->messageQueue()->create($sType,$sMessage,$arrMessageArgs,$aPoster) ;
+	}
+	
 	public function requireResources(HtmlResourcePool $aResourcePool)
 	{
 		foreach($this->arrRequiredJsFilenames as $sFilename)

@@ -51,7 +51,7 @@ class CoreApplication extends Object
     }
 
 	/**
-     * @return Response
+     * @return jc\system\Response
      */
     public function response ()
     {
@@ -59,14 +59,14 @@ class CoreApplication extends Object
     }
 
 	/**
-     * @return AccessRouter
+     * @return jc\system\AccessRouter
      */
     public function accessRouter ()
     {
         return $this->aAccessRouter;
     }
 	/**
-     * @param AccessRouter $aAccessRouter
+     * @param jc\system\AccessRouter $aAccessRouter
      */
     public function setAccessRouter (AccessRouter $aAccessRouter)
     {

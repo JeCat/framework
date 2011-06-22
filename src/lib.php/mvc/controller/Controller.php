@@ -30,14 +30,21 @@ class Controller extends NamableComposite implements IController
     {}
     
     /**
+     * @param $formview		该参数可以为：true 则创建一个 FormView 类型的视图; false 则创建一个 View 普通视图; 或是其他视图的类名 
      * @return IView
      */
-    public function createView($sName,$sSourceFile,$sClass=null)
+    public function createView($sName,$sSourceFile,$formview='jc\\mvc\\view\\View')
     {
-    	if(!$sClass)
-    	{
-    		$sClass = 'jc\\mvc\\view\\View' ;
-    	}
+		if( is_string($formview) and class_exists($formview) )
+	    {
+	    	$sClass = $formview ;
+	    }
+	    else
+	    {
+	    	$sClass = $formview? 'jc\\mvc\\view\\FormView': 'jc\\mvc\\view\\View' ;
+	    }
+    	
+    	
     	$aView = new $sClass($sName,$sSourceFile) ;
     	$this->registerView($aView) ;
     	
@@ -182,6 +189,11 @@ class Controller extends NamableComposite implements IController
 	public function setMessageQueue(IMessageQueue $aMsgQueue)
 	{
 		$this->aMsgQueue = $aMsgQueue ;
+	}
+	
+	public function createMessage($sType,$sMessage,$arrMessageArgs=null,$aPoster=null)
+	{
+		return $this->messageQueue()->create($sType,$sMessage,$arrMessageArgs,$aPoster) ;
 	}
 	
     /**

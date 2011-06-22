@@ -81,6 +81,7 @@ abstract class Model extends Object implements IModel
 	// for data ///////////////////////////////
 	public function data($sName)
 	{
+		$arrKeys = array_keys($this->arrData) ;
 		if( array_key_exists($sName, $this->arrData) )
 		{
 			return $this->arrData[$sName] ;

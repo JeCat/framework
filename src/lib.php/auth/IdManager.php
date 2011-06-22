@@ -1,14 +1,20 @@
 <?php
 namespace jc\auth ;
 
+use jc\session\Session;
 use jc\session\ISession;
 use jc\lang\Object;
 use jc\lang\Exception;
 
 class IdManager extends Object
 {
-	static public function fromSession(ISession $aSession,$sSessionName=null)
+	static public function fromSession(ISession $aSession=null,$sSessionName=null)
 	{
+		if(!$aSession)
+		{
+			$aSession = Session::singleton() ;
+		}
+		
 		if( !$sSessionName )
 		{
 			$sSessionName = '__\\' . __CLASS__ ;
@@ -22,6 +28,8 @@ class IdManager extends Object
 		
 		return $aIdMgr ;
 	}
+	
+	
 	
 	public function __construct()
 	{
@@ -61,6 +69,11 @@ class IdManager extends Object
 		if( in_array($aId,$this->arrIds) )
 		{
 			return ;
+		}
+		
+		if( empty($this->arrIds) )
+		{
+			$this->aCurrentId = $aId ;
 		}
 		
 		$this->arrIds[] = $aId ;

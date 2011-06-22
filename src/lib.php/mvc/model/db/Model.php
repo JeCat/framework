@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\model\db ;
 
+use jc\mvc\model\db\orm\ModelAssociationMap;
+
 use jc\lang\Exception;
 
 use jc\mvc\model\db\orm\operators\Deleter;
@@ -17,6 +19,22 @@ use jc\db\sql\IDriver ;
 
 class Model extends BaseModel implements IModel
 {
+	static public function fromFragment($sPrototypeName,array $arrAssocFragment=array(),$bAggregarion=false,ModelAssociationMap $aAssocMap=null)
+	{
+		if( !$aAssocMap )
+		{
+			$aAssocMap = ModelAssociationMap::singleton() ;
+		}
+		
+		$aPrototype = $aAssocMap->fragment($sPrototypeName,$arrAssocFragment) ;
+		if(!$aPrototype)
+		{
+			throw new Exception("制定的原型：%s 不存在",$sPrototypeName) ;
+		}
+		
+		return new Model($aPrototype,$bAggregarion) ;
+	}
+	
 	public function __construct($prototype=null,$bAggregarion=false)
 	{
 		parent::__construct($bAggregarion) ;

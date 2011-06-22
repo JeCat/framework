@@ -41,14 +41,14 @@ abstract class Session extends Object implements ISession
 	 */
 	public function hasStarted()
 	{
-		return $this->bSessionStarted
+		return $this->bSessionStarted ;
 	}
 	
 	static public function singleton ($bCreateNew=true,$createArgvs=null,$bAutoStart=true)
 	{
 		$aInstance = parent::singleton ($bCreateNew,$createArgvs) ;
 		
-		if( $bAutoStart and !$aInstance->hasStarted() )
+		if( $bAutoStart and $aInstance and !$aInstance->hasStarted() )
 		{
 			$aInstance->start() ;
 		}

@@ -171,10 +171,15 @@ class View extends NamableComposite implements IView
 	/**
 	 * @return IViewWidget
 	 */
-	public function addWidget(IViewWidget $aWidget)
+	public function addWidget(IViewWidget $aWidget,$sExchangeName=null)
 	{
 		$this->widgits()->set($aWidget->id(),$aWidget) ;
 		$aWidget->setView($this) ;
+		
+		if( $sExchangeName )
+		{
+			$this->dataExchanger()->link($aWidget->id(), $sExchangeName) ;
+		}
 		
 		return $aWidget ;
 	}
@@ -247,7 +252,12 @@ class View extends NamableComposite implements IView
 	{
 		$this->aMsgQueue = $aMsgQueue ;
 	}
-		
+
+	public function createMessage($sType,$sMessage,$arrMessageArgs=null,$aPoster=null)
+	{
+		return $this->messageQueue()->create($sType,$sMessage,$arrMessageArgs,$aPoster) ;
+	}
+	
 	public function requireResources(HtmlResourcePool $aResourcePool)
 	{
 		foreach($this->arrRequiredJsFilenames as $sFilename)

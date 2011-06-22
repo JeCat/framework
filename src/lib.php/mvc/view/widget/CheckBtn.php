@@ -1,6 +1,7 @@
 <?php
 namespace jc\mvc\view\widget;
 
+use jc\mvc\view\IView;
 use jc\lang\Exception;
 
 class CheckBtn extends FormWidget {
@@ -10,22 +11,13 @@ class CheckBtn extends FormWidget {
 	private static $nTypeMin = 0;
 	private static $nTypeMax = 1;
 	
-	public function __construct($sId, $sTitle, $sValue, $nType = self::checkbox, $bChecked = false, IViewWidget $aView = null) {
+	public function __construct($sId, $sTitle, $sValue, $nType = self::checkbox, $bChecked = false, IView $aView = null) {
 		if (! is_int ( $nType ) || $nType < self::$nTypeMin || $nType > self::$nTypeMax) {
 			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的type参数(得到的type是:%s)", array ($nType ) );
 		}
-		$sValue = ( string ) $sValue;
-		if (empty ( $sValue )) {
-			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的checked参数(得到的checked是:%s)", array ($sValue ) );
-		}
-		
-		$sTitle = ( string ) $sTitle;
-		if (empty ( $sTitle )) {
-			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的sTitle参数(得到的sTitle是:%s)", array ($sTitle ) );
-		}
 		
 		if ($bChecked) {
-			$this->setChecked ();
+			$this->setChecked (true) ;
 		}
 		
 		$this->checkedValue = $sValue;
@@ -44,7 +36,7 @@ class CheckBtn extends FormWidget {
 		return $this->nType;
 	}
 	
-	public function setChecked($bChecked) {
+	public function setChecked($bChecked=true) {
 		if ($bChecked) {
 			$this->setValue ( $this->checkedValue );
 		} else {

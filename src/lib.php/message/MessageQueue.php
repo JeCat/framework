@@ -25,6 +25,28 @@ class MessageQueue extends Object implements IMessageQueue
 		}
 		
 		$this->arrMsgQueue[] = $aMsg ;
+		
+		return $aMsg ;
+	}
+	
+	public function create($sType,$sMessage,$arrMessageArgs=null,$aPoster=null)
+	{
+		if($aPoster)
+		{
+			$aPoster = $aPoster ;
+		}
+		else 
+		{
+			$arrStack = debug_backtrace() ;
+			$arrCall = array_shift($arrStack) ;
+			$arrCall = array_shift($arrStack) ;
+			if( !empty($arrCall['object']) )
+			{
+				$aPoster = $arrCall['object'] ;
+			}
+		}
+		
+		return $this->add(new Message($sType,$sMessage,$arrMessageArgs,$aPoster,false)) ;
 	}
 	
 	public function iterator()

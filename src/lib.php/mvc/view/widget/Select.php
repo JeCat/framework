@@ -14,9 +14,9 @@ class Select extends FormWidget {
 	
 	//增加option条目 
 	//selected 该选项是否默认选中	
-	public function addOption($sValue, $sText, $bSelected = false) {
+	public function addOption($sText, $sValue, $bSelected = false) {
 		$this->arrOptions [] = Array ($sValue, $sText, $bSelected );
-		return count($this->arrOptions);
+		return $this ;
 	}
 	
 	public function setSelected($nIndex){
