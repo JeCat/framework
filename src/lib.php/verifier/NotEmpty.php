@@ -5,7 +5,7 @@ use jc\message\Message;
 use jc\lang\Exception;
 use jc\lang\Object;
 
-class NotNull extends Object implements IVerifier {
+class NotEmpty extends Object implements IVerifier {
 	public function __construct() {
 	}
 	
