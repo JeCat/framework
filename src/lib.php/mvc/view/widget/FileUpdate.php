@@ -7,7 +7,7 @@ use jc\mvc\view\widget\UploadManager;
 
 class FileUpdate extends FormWidget{
 	
-	public function __construct($sId, $sTitle = null , $nMaxByte = null , $sStoreDir = null , $sAccept = null , IViewWidget $aView = null) {
+	public function __construct($sId, $sTitle = null , $nMaxByte = null , $sStoreDir = null , $sAccept = null , IView $aView = null) {
 		if (! is_int ( $nMaxByte ) or $nMaxByte <= 0) {
 			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的nMaxByte参数(得到的nMaxByte是:%s)", array ($nMaxByte ) );
 		}

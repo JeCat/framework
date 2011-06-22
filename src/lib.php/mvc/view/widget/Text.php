@@ -12,7 +12,7 @@ class Text extends FormWidget {
 	private static $nTypeMin = 0;
 	private static $nTypeMax = 2;
 	
-	public function __construct($sId, $sValue=null, $sTitle = null, $nType = self::single, IViewWidget $aView = null) {
+	public function __construct($sId, $sTitle = null, $sValue=null, $nType = self::single, IView $aView = null) {
 		$this->setType ( $nType );
 		$this->setValue ( $sValue );
 		parent::__construct ( $sId, 'ViewWidgetText.template.html', $sTitle, $aView );

@@ -10,7 +10,7 @@ use jc\util\IHashTable;
 use jc\ui\UI;
 
 class Group extends FormWidget {
-	public function __construct($sId, $sTitle = null, IViewWidget $aView = null) {
+	public function __construct($sId, $sTitle = null, IView $aView = null) {
 		$this->setSerializMethod ( array (__CLASS__, 'serialize' ), array (',', '=' ) );
 		$this->setUnSerializMethod ( array (__CLASS__, 'unserialize' ), array (',', '=' ) );
 		parent::__construct ( $sId, null, $sTitle, $aView );
@@ -22,7 +22,7 @@ class Group extends FormWidget {
 	}
 	
 	//删除一个子控件
-	public function removeWidget(IViewWidget $aWidget) {
+	public function removeWidget(IView $aWidget) {
 		if (($nKey = array_search ( $aWidget, $this->arrWidgets, true )) !== false) {
 			unset ( $this->arrWidgets [$nKey] );
 		}
