@@ -6,6 +6,7 @@ use jc\lang\Type;
 use jc\lang\Exception;
 use jc\io\IOutputStream;
 use jc\util\IHashTable;
+use jc\mvc\view\IView;
 use jc\ui\UI;
 use jc\mvc\view\widget\CheckBtn;
 
@@ -35,9 +36,11 @@ class RadioGroup extends Group {
 
 	public function setView(IView $aView)
 	{
-		$this->aView = $aView ;
-		
-		
+		foreach($this->widgetIterator() as $aRadio){
+//			$aRadio->setView($aView);
+			$aView->addWidget($aRadio);
+		}
+		parent::setView($aView) ;
 	}
 	
 	//添加控件
