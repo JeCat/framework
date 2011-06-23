@@ -24,21 +24,34 @@ class ExecuteException extends JcException
 	}
 	public function sql()
 	{
-		return $this->$sSql ;
+		return $this->sSql ;
 	}
 	public function deviceErrorNo()
 	{
-		return $this->$nDeviceErrorNo ;
+		return $this->nDeviceErrorNo ;
 	}
 	public function deviceErrorMsg()
 	{
-		return $this->$sDeviceErrorMsg ;
+		return $this->sDeviceErrorMsg ;
 	}
-	
+
 	public function isDuplicate()
 	{
 		// just for mysql
 		return $this->deviceErrorNo()==1062 and strpos($this->deviceErrorMsg(),'Duplicate entry')===0 ;
+	}
+	
+	public function duplicateKey()
+	{
+		// just for mysql
+		if( preg_match("/Duplicate entry '.+?' for key '(.+?)'/i", $this->deviceErrorMsg(),$arrRes) )
+		{
+			return $arrRes[1] ;
+		}
+		else 
+		{
+			return null ;
+		}
 	}
 	
 	private $aDevice ;

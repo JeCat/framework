@@ -55,7 +55,19 @@ class FormView extends View
 		return $this->sHtmlFormSignature ;
 	}
 	
+	public function isShowForm()
+	{
+		return $this->bShowForm ;
+	}
+	
+	public function hideForm($bHide=true)
+	{
+		$this->bShowForm = $bHide? false: true ;
+	}
+	
 	private $sHtmlFormSignature ;
+	
+	private $bShowForm = true ;
 }
 
 ?>
