@@ -62,15 +62,6 @@ class Model extends BaseModel implements IModel
 		
 		$this->setPrototype($aPrototype) ;
 	}
-/*
-	public function __sleep()
-	{
-		$arrPropertyNames = parent::__sleep() ;
-		
-		$arrPropertyNames[] = Object::privatePropNameForSerialize('aPrototype',__CLASS__) ;
-		
-		return $arrPropertyNames ;
-	}*/
 
 	public function serialize ()
 	{
@@ -154,7 +145,7 @@ class Model extends BaseModel implements IModel
 			$aPrototype = $this->prototype() ;
 			for($nIdx=0; $nIdx<$aRecordSet->rowCount(); $nIdx++)
 			{
-				$aModel = $aPrototype->createModel() ;
+				$aModel = $aPrototype? $aPrototype->createModel(): new self() ;
 				$aModel->loadData($aRecordSet,$nIdx,$sClmPrefix) ;
 
 				$this->addChild($aModel) ;
@@ -164,9 +155,23 @@ class Model extends BaseModel implements IModel
 		// 常规模型
 		else 
 		{
-			foreach( $this->prototype()->columns() as $sClm )
+			if( $aPrototype=$this->prototype() )
 			{
-				$this->setData( $sClm, $aRecordSet->field($nRowIdx,$sClmPrefix.$sClm) ) ;
+				foreach( $this->prototype()->columns() as $sClm )
+				{
+					$this->setData( $sClm, $aRecordSet->field($nRowIdx,$sClmPrefix.$sClm) ) ;
+				}
+			}
+			else 
+			{
+				$arrRow = $aRecordSet->row($nRowIdx) ;
+				if($arrRow)
+				{
+					foreach ($arrRow as $sClmName=>&$sValue)
+					{
+						$this->setData($sClmName,$sValue) ;
+					}
+				}
 			}
 		}
 	}

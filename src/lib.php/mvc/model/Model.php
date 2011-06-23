@@ -31,18 +31,6 @@ abstract class Model extends Object implements IModel, \Serializable
 		$this->bAggregarion =& $arrData['bAggregarion'] ;
 		$this->bSerialized =& $arrData['bSerialized'] ;
 	}
-	
-	public function __sleep()
-	{
-		$arrPropertyNames = parent::__sleep() ;
-		
-		/*$arrPropertyNames[] = Object::privatePropNameForSerialize('arrData',__CLASS__) ;
-		$arrPropertyNames[] = Object::privatePropNameForSerialize('arrChildren',__CLASS__) ;
-		$arrPropertyNames[] = Object::privatePropNameForSerialize('bAggregarion',__CLASS__) ;
-		$arrPropertyNames[] = Object::privatePropNameForSerialize('bSerialized',__CLASS__) ;*/
-		
-		return $arrPropertyNames ;
-	}
 
 	public function isAggregarion()
 	{
