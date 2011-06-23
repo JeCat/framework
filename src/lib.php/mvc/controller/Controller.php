@@ -195,6 +195,32 @@ class Controller extends NamableComposite implements IController
 	{
 		return $this->messageQueue()->create($sType,$sMessage,$arrMessageArgs,$aPoster) ;
 	}
+
+	/**
+	 * 在自己的 mainView 中显示一段字符串类型的内容
+	 */
+	public function renderString(& $sContent)
+	{
+		$aView = new View("anonymous",$this->mainView()->ui) ;
+		$this->mainView()->add($aView) ;
+		$aView->outputStream()->write($sContent) ;
+	}
+	
+	/**
+	 * 在自己的 mainView 中渲染自己的消息队列
+	 */
+	public function renderMessageQueue($sTemplateFilename=null)
+	{
+		if( !$this->messageQueue()->count() )
+		{
+			return ;
+		}
+		
+		$aView = new View("anonymous",$this->mainView()->ui()) ;
+		$this->mainView()->add($aView) ;
+		
+		$this->messageQueue()->display($this->mainView()->ui(),$aView->outputStream(),$sTemplateFilename) ;		
+	}
 	
     /**
      * Enter description here ...

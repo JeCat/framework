@@ -2,9 +2,7 @@
 namespace jc\mvc\model\db ;
 
 use jc\mvc\model\db\orm\ModelAssociationMap;
-
 use jc\lang\Exception;
-
 use jc\mvc\model\db\orm\operators\Deleter;
 use jc\mvc\model\db\orm\operators\Selecter;
 use jc\mvc\model\db\orm\operators\Inserter;
@@ -16,6 +14,7 @@ use jc\mvc\model\db\orm\AssociationPrototype;
 use jc\mvc\model\db\orm\ModelPrototype ;
 use jc\mvc\model\Model as BaseModel ;
 use jc\db\sql\IDriver ;
+use jc\lang\Object;
 
 class Model extends BaseModel implements IModel
 {
@@ -63,7 +62,35 @@ class Model extends BaseModel implements IModel
 		
 		$this->setPrototype($aPrototype) ;
 	}
+/*
+	public function __sleep()
+	{
+		$arrPropertyNames = parent::__sleep() ;
+		
+		$arrPropertyNames[] = Object::privatePropNameForSerialize('aPrototype',__CLASS__) ;
+		
+		return $arrPropertyNames ;
+	}*/
 
+	public function serialize ()
+	{
+		return serialize( array(
+		
+				'__parent' => parent::serialize() ,
+		
+				'aPrototype' => &$this->aPrototype ,
+		) ) ;
+	}
+
+	public function unserialize ($sSerialized)
+	{
+		$arrData = unserialize($sSerialized) ;
+		
+		parent::unserialize($arrData['__parent']) ;
+		
+		$this->aPrototype =& $arrData['aPrototype'] ;
+	}
+	
 	/**
 	 * @return IModel
 	 */

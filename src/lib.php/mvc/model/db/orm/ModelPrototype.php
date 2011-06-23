@@ -2,16 +2,14 @@
 namespace jc\mvc\model\db\orm ;
 
 use jc\lang\Assert;
-
 use jc\db\DB;
-
 use jc\lang\Type;
 use jc\lang\Exception;
 use jc\util\HashTable;
 use jc\pattern\composite\Container;
 use jc\lang\Object;
 
-class ModelPrototype extends Object
+class ModelPrototype extends Object implements \Serializable
 {
 	public function __construct($sName,$sTable,$primaryKeys=null,array $arrClms=null)
 	{
@@ -72,6 +70,46 @@ class ModelPrototype extends Object
 		return $aPrototype ;
 	}
 
+	public function serialize ()
+	{
+		foreach(array(
+				'sName',
+				'sTableName',
+				'sDatabaseName',
+				'sModelClass',
+				'arrPrimaryKeys',
+				'sDevicePrimaryKey',
+				'arrClms',
+				'aAssociations'
+		) as $sPropName)
+		{
+			$arrData[$sPropName] =& $this->$sPropName ;
+		}
+		return serialize( $arrData ) ;
+	}
+
+	public function unserialize ($sSerialized)
+	{
+		$arrData = unserialize($sSerialized) ;
+				
+		foreach(array(
+				'sName',
+				'sTableName',
+				'sDatabaseName',
+				'sModelClass',
+				'arrPrimaryKeys',
+				'sDevicePrimaryKey',
+				'arrClms',
+				'aAssociations'
+		) as $sPropName)
+		{
+			if( array_key_exists($sPropName, $arrData) )
+			{
+				$this->$sPropName =& $arrData[$sPropName] ;
+			}
+		}
+	}
+	
 	public function name()
 	{
 		return $this->sName ;
@@ -103,8 +141,6 @@ class ModelPrototype extends Object
 	{
 		$this->sModelClass = $sModelClass ;
 	}
-	
-	
 	
 	public function devicePrimaryKey()
 	{

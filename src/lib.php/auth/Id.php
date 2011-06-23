@@ -5,18 +5,13 @@ use jc\mvc\model\IModel;
 
 use jc\lang\Object;
 
-class Id extends Object implements IIdentity
+class Id extends Object implements IIdentity, \Serializable
 {
 	public function __construct( IModel $aModel, array $arrPropConf )
 	{
 		parent::__construct() ;
 		
-		$this->addPropertyForSerialize('arrPurviews','private',__CLASS__) ;
-		$this->addPropertyForSerialize('arrProps','private',__CLASS__) ;
-		$this->addPropertyForSerialize('aModeal','private',__CLASS__) ;
-		
-	
-		$this->aModeal = $aModel ;
+		$this->aModel = $aModel ;
 		
 		foreach( $arrPropConf as $sPropName=>$sProp )
 		{
@@ -32,10 +27,41 @@ class Id extends Object implements IIdentity
 	static private $arrPropNames = array(
 			'id', 'username', 'nickname', 'lastlogintime', 'lastloginip', 'activetime', 'activeip'
 	) ; 
-		
+
+
+	public function serialize ()
+	{
+		foreach(array(
+				'arrPurviews',
+				'arrProps',
+				'aModel',
+		) as $sPropName)
+		{
+			$arrData[$sPropName] =& $this->$sPropName ;
+		}
+		return serialize( $arrData ) ;
+	}
+
+	public function unserialize ($sSerialized)
+	{
+		$arrData = unserialize($sSerialized) ;
+				
+		foreach(array(
+				'arrPurviews',
+				'arrProps',
+				'aModel',
+		) as $sPropName)
+		{
+			if( array_key_exists($sPropName, $arrData) )
+			{
+				$this->$sPropName =& $arrData[$sPropName] ;
+			}
+		}
+	}
+	
 	public function userId()
 	{
-		return $this->getDataFromModel('id') ;
+		return (string)$this->getDataFromModel('id') ;
 	}
 	public function setUserId($id)
 	{
@@ -44,7 +70,7 @@ class Id extends Object implements IIdentity
 	
 	public function username()
 	{
-		return $this->getDataFromModel('username') ;
+		return (string)$this->getDataFromModel('username') ;
 	}
 	public function setUsername($sUsername)
 	{
@@ -53,7 +79,7 @@ class Id extends Object implements IIdentity
 	
 	public function nickname()
 	{
-		return $this->getDataFromModel('nickname') ;
+		return (string)$this->getDataFromModel('nickname') ;
 	}
 	public function setNickname($sNickname)
 	{
@@ -62,7 +88,7 @@ class Id extends Object implements IIdentity
 	
 	public function lastLoginTime()
 	{
-		return intval($this->getDataFromModel('lastlogintime')) ;
+		return (int)intval($this->getDataFromModel('lastlogintime')) ;
 	}
 	public function setLastLoginTime($nUnixTimestamp)
 	{
@@ -71,7 +97,7 @@ class Id extends Object implements IIdentity
 	
 	public function lastLoginIp()
 	{
-		return $this->getDataFromModel('lastloginip') ;
+		return (string)$this->getDataFromModel('lastloginip') ;
 	}
 	public function setLastLoginIp($sIp)
 	{
@@ -80,7 +106,7 @@ class Id extends Object implements IIdentity
 	
 	public function activeTime()
 	{
-		return intval($this->getDataFromModel('activetime')) ;
+		return (int)intval($this->getDataFromModel('activetime')) ;
 	}
 	public function setActiveTime($nUnixTimestamp)
 	{
@@ -89,7 +115,7 @@ class Id extends Object implements IIdentity
 	
 	public function activeIp()
 	{
-		return $this->getDataFromModel('activeip') ;
+		return (string)$this->getDataFromModel('activeip') ;
 	}
 	public function setActiveIp($sIp)
 	{
@@ -132,41 +158,41 @@ class Id extends Object implements IIdentity
 	 */
 	public function userDataModel()
 	{
-		return $this->aModeal ;
+		return $this->aModel ;
 	}
 	
 	public function setUserDataModel(IModel $aModel)
 	{
-		$this->aModeal = $aModel ;
+		$this->aModel = $aModel ;
 	}
 	
 
 	
 	private function getDataFromModel($sProp)
 	{
-		if(!$this->aModeal)
+		if(!$this->aModel)
 		{
 			return null ;
 		}
 		
-		return $this->$sProp? $this->aModeal->data($this->$sProp): null ;
+		return isset($this->arrProps[$sProp])? $this->aModel->data($this->arrProps[$sProp]): null ;
 	}
 	
 	private function setDataFromModel($sProp,&$data)
 	{
-		if( $this->aModeal and $this->$sProp )
+		if( $this->aModel and $this->$sProp )
 		{
-			$this->aModeal->setData($this->$sProp,$data) ;
+			$this->aModel->setData($this->$sProp,$data) ;
 		}
 		
-		return $this->$sProp? $this->aModeal->data($this->$sProp): null ;
+		return $this->$sProp? $this->aModel->data($this->$sProp): null ;
 	}
 	
 	private $arrProps = array() ;
 	
 	private $arrPurviews = array() ;
 	
-	private $aModeal ;
+	private $aModel ;
 }
 
 ?>

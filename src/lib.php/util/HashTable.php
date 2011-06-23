@@ -6,7 +6,7 @@ use jc\lang\Exception;
 use jc\lang\Assert;
 use jc\lang\Object;
 
-class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator
+class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator, \Serializable 
 {
 	public function __construct(array $arrDatas=array(),$sClass=null)
 	{
@@ -195,6 +195,23 @@ class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator
 			unset($this->arrDatas[$key]) ;
 		}
 	}
+	
+	public function serialize ()
+	{
+		return serialize( array(
+				'arrDatas' => &$this->arrDatas ,
+				'sClass' => &$this->sClass ,
+		) ) ;
+	}
+
+	public function unserialize ($sSerialized)
+	{
+		$arrData = unserialize($sSerialized) ;
+		
+		$this->arrDatas =& $arrData['arrDatas'] ;
+		$this->sClass =& $arrData['sClass'] ;
+	}
+	
 	
 	protected $arrDatas = array() ;
 	

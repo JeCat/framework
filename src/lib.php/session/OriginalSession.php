@@ -43,7 +43,7 @@ class OriginalSession extends Session
 
 	public function removeVariable($sName)
 	{
-		remove($_SESSION[$sName]) ;
+		unset($_SESSION[$sName]) ;
 	}
 	
 	public function clear()

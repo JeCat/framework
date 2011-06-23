@@ -131,6 +131,10 @@ class AccessRouter extends \jc\lang\Factory
     {
     	$sControllerName = $aRequest->string($this->sControllerParam) ;
     	$aController = $this->createController($sControllerName) ;
+    	if(!$aController)
+    	{
+    		return null ;
+    	}
     	
     	// 	请求类型
     	$sRspnType = $aRequest->string( $this->sResponseTypeParam ) ;

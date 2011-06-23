@@ -37,7 +37,7 @@ class Message extends Object
 		
 		$this->sType = $sType ;
 		$this->sMessage = $sMessage ;
-		$this->arrMessageArgs = $arrMessageArgs===null? array(): $arrMessageArgs ;
+		$this->arrMessageArgs = $arrMessageArgs===null? array(): (array)$arrMessageArgs ;
 
 		// 自动 post 到 message queue
 		if($bPost)

@@ -32,7 +32,7 @@ class MsgQueueCompiler extends NodeCompiler
 		$aDev->write("\\jc\\lang\\Assert::type( '\\\\jc\\\\message\\\\IMessageQueue',\$__ui_msgqueue);\r\n") ;		
 		
 		$aDev->write("if( \$__ui_msgqueue->count() ){ \r\n") ;
-		$aDev->write("\$this->display('MsgQueue.template.html',array('aMsgQueue'=>\$__ui_msgqueue),\$aDevice) ;\r\n") ;
+		$aDev->write("	\$__ui_msgqueue->display(\$this,\$aDevice) ;\r\n") ;
 		$aDev->write("} ?>\r\n") ;		
 	}
 }

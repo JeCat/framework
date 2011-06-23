@@ -4,7 +4,7 @@ namespace jc\mvc\model\db\orm ;
 use jc\lang\Exception;
 use jc\lang\Object;
 
-class AssociationPrototype extends Object
+class AssociationPrototype extends Object implements \Serializable
 {
 	const hasOne = 'hasOne' ;
 	const belongsTo = 'belongsTo' ;
@@ -177,6 +177,48 @@ class AssociationPrototype extends Object
 	public function setToPrototype($aToPrototype)
 	{
 		$this->aToPrototype = $aToPrototype ;
+	}
+
+	public function serialize ()
+	{
+		foreach(array(
+				'sType',
+				'sModelProperty',
+				'aFromPrototype',
+				'aToPrototype',
+				'arrFromKeys',
+				'arrToKeys',
+				'sBridgeTable',
+				'arrBridgeFromKeys',
+				'arrBridgeToKeys',
+		) as $sPropName)
+		{
+			$arrData[$sPropName] =& $this->$sPropName ;
+		}
+		return serialize( $arrData ) ;
+	}
+
+	public function unserialize ($sSerialized)
+	{
+		$arrData = unserialize($sSerialized) ;
+				
+		foreach(array(
+				'sType',
+				'sModelProperty',
+				'aFromPrototype',
+				'aToPrototype',
+				'arrFromKeys',
+				'arrToKeys',
+				'sBridgeTable',
+				'arrBridgeFromKeys',
+				'arrBridgeToKeys',
+		) as $sPropName)
+		{
+			if( array_key_exists($sPropName, $arrData) )
+			{
+				$this->$sPropName =& $arrData[$sPropName] ;
+			}
+		}
 	}
 	
 	private $sType ;

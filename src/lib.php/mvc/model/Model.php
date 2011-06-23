@@ -3,7 +3,7 @@ namespace jc\mvc\model ;
 
 use jc\lang\Object;
 
-abstract class Model extends Object implements IModel
+abstract class Model extends Object implements IModel, \Serializable
 {
 	public function __construct($bAggregarion=false)
 	{
@@ -12,6 +12,37 @@ abstract class Model extends Object implements IModel
 		$this->bAggregarion = $bAggregarion ;
 	}
 
+	public function serialize ()
+	{
+		return serialize( array(
+				'arrData' => &$this->arrData ,
+				'arrChildren' => &$this->arrChildren ,
+				'bAggregarion' => &$this->bAggregarion ,
+				'bSerialized' => &$this->bSerialized ,
+		) ) ;
+	}
+
+	public function unserialize ($sSerialized)
+	{
+		$arrData = unserialize($sSerialized) ;
+		
+		$this->arrData =& $arrData['arrData'] ;
+		$this->arrChildren =& $arrData['arrChildren'] ;
+		$this->bAggregarion =& $arrData['bAggregarion'] ;
+		$this->bSerialized =& $arrData['bSerialized'] ;
+	}
+	
+	public function __sleep()
+	{
+		$arrPropertyNames = parent::__sleep() ;
+		
+		/*$arrPropertyNames[] = Object::privatePropNameForSerialize('arrData',__CLASS__) ;
+		$arrPropertyNames[] = Object::privatePropNameForSerialize('arrChildren',__CLASS__) ;
+		$arrPropertyNames[] = Object::privatePropNameForSerialize('bAggregarion',__CLASS__) ;
+		$arrPropertyNames[] = Object::privatePropNameForSerialize('bSerialized',__CLASS__) ;*/
+		
+		return $arrPropertyNames ;
+	}
 
 	public function isAggregarion()
 	{

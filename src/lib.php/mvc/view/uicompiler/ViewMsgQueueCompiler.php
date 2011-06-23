@@ -15,7 +15,7 @@ class ViewMsgQueueCompiler extends NodeCompiler
 		Assert::type("jc\\ui\\xhtml\\Node",$aObject,'aObject') ;
 		
 		$aDev->write("<?php if( \$aVariables->get('theView')->messageQueue()->count() ){ \r\n") ;
-		$aDev->write("	\$this->display('MsgQueue.template.html',array('aMsgQueue'=>\$aVariables->get('theView')->messageQueue()),\$aDevice) ; ?>\r\n") ;
+		$aDev->write("	\$aVariables->get('theView')->messageQueue()->display(\$this,\$aDevice) ;\r\n") ;
 		$aDev->write("} ?>\r\n") ;
 	}
 }

@@ -50,7 +50,7 @@ class Selecter extends OperationStrategy
 
 		//  执行
 		$aRecordSet = $aDB->query($aSelect) ;
-		if(!$aRecordSet)
+		if( !$aRecordSet or !$aRecordSet->rowCount() )
 		{
 			return false ;
 		}

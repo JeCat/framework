@@ -1,6 +1,10 @@
 <?php
 namespace jc\message ;
 
+use jc\io\IOutputStream;
+use jc\ui\xhtml\Factory;
+use jc\io\OutputStream;
+use jc\ui\UI;
 use jc\util\FilterMangeger;
 use jc\util\IFilterMangeger;
 use jc\lang\Object;
@@ -75,6 +79,21 @@ class MessageQueue extends Object implements IMessageQueue
 	public function setFilters(IFilterMangeger $aFilterManager)
 	{
 		$this->aFilterManager = $aFilterManager ;
+	}
+	
+	public function display(UI $aUI=null,IOutputStream $aDevice=null,$sTemplateFilename=null)
+	{
+		if( !$sTemplateFilename )
+		{
+			$sTemplateFilename = 'MsgQueue.template.html' ;
+		}
+		
+		if( !$aUI )
+		{
+			$aUI = Factory::singleton()->create() ;
+		}
+		
+		$aUI->display($sTemplateFilename,array('aMsgQueue'=>$this),$aDevice) ;
 	}
 	
 	private $arrMsgQueue = array() ;
