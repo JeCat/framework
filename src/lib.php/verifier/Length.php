@@ -8,7 +8,7 @@ use jc\lang\Object;
 
 class Length extends Object implements IVerifier
 {
-	public function __construct($nMinLen,$nMaxLen)
+	public function __construct($nMinLen=-1,$nMaxLen=-1)
 	{
 		$this->nMinLen = $nMinLen ;
 		$this->nMaxLen = $nMaxLen ;

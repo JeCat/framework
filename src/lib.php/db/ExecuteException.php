@@ -5,15 +5,15 @@ use jc\lang\Exception as JcException ;
 
 class ExecuteException extends JcException
 {
-	public function __construct( IDriver $aDevice, $sSql, $nDeviceErrorNo, $nDeviceErrorMsg, \Exception $aCause=null )
+	public function __construct( IDriver $aDevice, $sSql, $nDeviceErrorNo, $sDeviceErrorMsg, \Exception $aCause=null )
 	{
 		$this->aDevice = $aDevice ;
 		$this->sSql = $sSql ;
 		$this->nDeviceErrorNo = $nDeviceErrorNo ;
-		$this->nDeviceErrorMsg = $nDeviceErrorMsg ;
+		$this->sDeviceErrorMsg = $sDeviceErrorMsg ;
 		
 		$sMessage = "数据库在执行SQL语句时发生了错误(code %d): %s ; 正在执行的 sql 是: %s" ;
-		$Argvs = array($nDeviceErrorNo,$nDeviceErrorMsg,$sSql) ;
+		$Argvs = array($nDeviceErrorNo,$sDeviceErrorMsg,$sSql) ;
 		
 		parent::__construct($sMessage,$Argvs,$aCause) ;
 	}
@@ -32,14 +32,19 @@ class ExecuteException extends JcException
 	}
 	public function deviceErrorMsg()
 	{
-		return $this->$nDeviceErrorMsg ;
+		return $this->$sDeviceErrorMsg ;
 	}
 	
+	public function isDuplicate()
+	{
+		// just for mysql
+		return $this->deviceErrorNo()==1062 and strpos($this->deviceErrorMsg(),'Duplicate entry')===0 ;
+	}
 	
 	private $aDevice ;
 	private $sSql ;
 	private $nDeviceErrorNo ;
-	private $nDeviceErrorMsg ;
+	private $sDeviceErrorMsg ;
 }
 
 ?>
