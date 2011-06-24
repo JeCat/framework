@@ -86,7 +86,7 @@ class RadioGroup extends Group {
 	
 	public function setValue($data = null) {
 		foreach ( $this->widgetIterator () as $widget ) {
-			if ($widget->value () == $data) {
+			if ($widget->checkedValue () == $data) {
 				$widget->setChecked ();
 			}
 		}
