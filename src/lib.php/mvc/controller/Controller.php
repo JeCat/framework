@@ -2,6 +2,8 @@
 
 namespace jc\mvc\controller ;
 
+use jc\mvc\view\VagrantViewSearcher;
+
 use jc\message\IMessageQueue;
 use jc\message\MessageQueue;
 use jc\util\DataSrc;
@@ -55,7 +57,9 @@ class Controller extends NamableComposite implements IController
     {
     	$sName = $aView->name() ;
     	$this->$sName = $aView ;
-    	$this->mainView()->add( $aView, false ) ;				// controller的视图不属于 controller的 mainView ，以便被 VagrantViewSearcher 收容
+    	
+    	$this->viewContainer()->add( $aView, false ) ;				// controller的视图不属于 controller的 viewContainer ，以便被 VagrantViewSearcher 收容
+    	
     	$aView->variables()->set("theController", $this) ;
     }
     
@@ -71,23 +75,49 @@ class Controller extends NamableComposite implements IController
     {
     	if( !$this->aMainView )
     	{
-    		$this->aMainView = new View('controllerMainView') ;
+    		$this->setMainView( new View('controllerMainView') ) ;
     	}
 
     	return $this->aMainView ;
     }
     
-    public function setMainView(IView $aView)
+    public function setMainView(IView $aView,IView $aViewContainer=null)
     {
-    	if( $this->aMainView )
+    	if( !$aViewContainer )
     	{
-    		foreach($this->aMainView->iterator() as $aChildView)
+    		$aViewContainer = $aView ;
+    	}
+    	
+    	$this->setViewContainer($aViewContainer) ;
+    	
+    	$this->aMainView = $aView ;
+    }
+    
+    public function viewContainer()
+    {
+    	if( !$this->aViewContainer )
+    	{
+    		$this->aViewContainer = $this->mainView() ;
+    	}
+    		
+    	return $this->aViewContainer ;
+    }
+    
+    public function setViewContainer(IView $aViewContainer)
+    {
+    	if( $this->aViewContainer and $this->aViewContainer!=$aViewContainer )
+    	{
+    		foreach($this->aViewContainer->iterator() as $aChildView)
     		{
-    			$aView->add( $aChildView, false ) ;			// controller的视图不属于 controller的 mainView ，以便被 VagrantViewSearcher 收容
+    			if( $aViewContainer!=$aChildView )						// 新的视图容器 可能是当前容器的子视图
+    			{
+	    			$aViewContainer->add( $aChildView, false ) ;		// controller的视图不属于 controller的 viewContainer ，以便被 VagrantViewSearcher 收容
+	    			$this->aViewContainer->remove($aChildView) ;
+    			}
     		}
     	}
     	
-    	$this->aMainView = $aView ;
+    	$this->aViewContainer = $aViewContainer ;
     }
     
     /**
@@ -123,6 +153,12 @@ class Controller extends NamableComposite implements IController
     	{
     		throw new Exception(__CLASS__."对象传入的 params 参数必须为 array 或 jc\\util\\IDataSrc 对象") ;
     	}
+    
+    	// 为子控制器设置执行参数
+		foreach($this->iterator() as $aChild)
+		{
+			$aChild->buildParams($this->aParams) ;
+		}
     }
 
     public function process ()
@@ -138,7 +174,10 @@ class Controller extends NamableComposite implements IController
 
     protected function displayViews()
     {
-    	$this->mainView()->render() ;
+    	if( !$this->aParams->bool('noframe') )
+    	{
+    		$this->mainView()->render() ;
+    	}
     	
 		foreach($this->iterator() as $aChild)
 		{
@@ -150,7 +189,10 @@ class Controller extends NamableComposite implements IController
     		$aView->display() ;
     	}
     	
-    	$this->mainView()->display() ;
+    	if( !$this->aParams->bool('noframe') )
+    	{
+    		$this->mainView()->display() ;
+    	}
     }
     
 	public function add($object,$bAdoptRelative=true)
@@ -230,6 +272,8 @@ class Controller extends NamableComposite implements IController
     protected $aParams = null ;
     
     private $aMainView = null ;
+    
+    private $aViewContainer = null ;
     
     private $aMsgQueue = null ;
 }

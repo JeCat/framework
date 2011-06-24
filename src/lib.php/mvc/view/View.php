@@ -131,20 +131,22 @@ class View extends NamableComposite implements IView
 		$this->ui()->display($sSourceFilename,$aVars,$this->OutputStream()) ;
 	}
 	
-	public function display()
+	public function display(IOutputStream $aDevice=null)
 	{
-		// 找到可收容当前视图
-		if( $aParent=$this->parent() )
+		if(!$aDevice)
 		{
-			$aParent->outputStream()->write( $this->outputStream() ) ;
+			if( $aParent=$this->parent() )
+			{
+				$aDevice = $aParent->outputStream() ;
+			}
+			
+			else 
+			{
+				$aDevice = $this->application()->response()->printer() ;
+			}
 		}
 		
-		else 
-		{
-			$this->application()->response()->printer()->write(
-				$this->outputStream()->bufferBytes() 
-			) ;
-		}
+		$aDevice->write($this->outputStream()) ;
 	}
 	
 	public function show()

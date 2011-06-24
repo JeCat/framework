@@ -64,6 +64,11 @@ class Container extends Object implements IContainer
 
 	public function add($object,$bAdoptRelative=false)
 	{
+		if( $object==$this )
+		{
+			return ;
+		}
+		
 		if( !$this->accept($object) )
 		{
 			throw new Exception(__METHOD__."() 方法无法接受 %s 类型的参数",Type::reflectType($object)) ;
