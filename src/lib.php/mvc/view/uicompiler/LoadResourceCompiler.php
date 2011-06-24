@@ -12,13 +12,12 @@ class LoadResourceCompiler extends NodeCompiler
 	{
 		$aDev->write("<?php \r\n") ;
 		$aDev->write("\$__aHtmlResrcPool = \\jc\\mvc\\view\\htmlresrc\\HtmlResourcePoolFactory::singleton() ;\r\n") ;
-		$aDev->write("\$aVariables->requireResources(\$__aHtmlResrcPool) ;\r\n") ;
 		$aDev->write("// output js\r\n") ;
-		$aDev->write("foreach(\$__aHtmlResrcPool->iterator(\\jc\\mvc\\view\\htmlresrc\\HtmlResourcePoolFactory::RESRC_JS) as \$sJsUrl) {\r\n") ;
+		$aDev->write("foreach(\$__aHtmlResrcPool->iterator(\\jc\\mvc\\view\\htmlresrc\\HtmlResourcePool::RESRC_JS) as \$sJsUrl) {\r\n") ;
 		$aDev->write("	echo \"<script type=\\\"text/javascript\\\" src=\\\"{\\\$sJsUrl}\\\"></script>\\r\\n\" ;") ;
 		$aDev->write("}\r\n") ;
 		$aDev->write("// output css\r\n") ;
-		$aDev->write("foreach(\$__aHtmlResrcPool->iterator(\\jc\\mvc\\view\\htmlresrc\\HtmlResourcePoolFactory::RESRC_CSS) as \$sJsUrl) {\r\n") ;
+		$aDev->write("foreach(\$__aHtmlResrcPool->iterator(\\jc\\mvc\\view\\htmlresrc\\HtmlResourcePool::RESRC_CSS) as \$sJsUrl) {\r\n") ;
 		$aDev->write("	echo \"<link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" href=\\\"my.css\\\" />\\r\\n\" ;") ;
 		$aDev->write("}\r\n") ;
 		$aDev->write("?>") ;
