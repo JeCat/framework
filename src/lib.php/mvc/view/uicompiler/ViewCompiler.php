@@ -21,20 +21,13 @@ class ViewCompiler extends NodeCompiler
 		}
 		else 
 		{
-			$sFor = "(\$__aController=\$aVariables->get('theController'))? \$__aController->mainView(): \$theView" ;
+			$sFor = "\$theView" ;
 		}
 		
 		$aDev->write("<?php ob_flush() ;\r\n") ;
 		$aDev->write("\$theView = \$aVariables->get('theView') ;\r\n") ;
-		$aDev->write("\$__aViewContainer = new \\jc\\mvc\\view\\View('ViewContainer') ;\r\n") ;
-		$aDev->write("\$theView->outputStream()->write(\$__aViewContainer->outputStream());\r\n") ;
-		$aDev->write("\$__aSearchFor = {$sFor};\r\n") ;
-		$aDev->write("if(\$__aSearchFor){\r\n") ;
-		$aDev->write("\tforeach(new \\jc\\mvc\\view\\VagrantViewSearcher(\$__aSearchFor) as \$__aVagrantView){\r\n") ;
-		$aDev->write("\t\tif(\$__aVagrantView!=\$theView){\r\n") ;
-		$aDev->write("\t\t\t\$__aViewContainer->add(\$__aVagrantView,true) ;\r\n") ;
-		$aDev->write("\t\t}\r\n") ;
-		$aDev->write("\t}\r\n") ;
+		$aDev->write("foreach({$sFor}->iterator() as \$aChildView){\r\n") ;
+		$aDev->write("\t\$theView->outputStream()->write(\$aChildView->outputStream()) ;\r\n") ;
 		$aDev->write("}?>") ;
 	}
 	

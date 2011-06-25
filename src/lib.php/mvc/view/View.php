@@ -49,7 +49,12 @@ class View extends NamableComposite implements IView
 			StopFilterSignal::stop() ;
 		},$this) ;
 	}
-
+	
+	public function add($object,$bAdoptRelative=true)
+	{
+		parent::add($object,$bAdoptRelative) ;
+	}
+	
 	/**
 	 * @return IModel
 	 */
@@ -118,35 +123,48 @@ class View extends NamableComposite implements IView
 		$this->aOutputStream = $aDev ;
 	}
 	
+	public function isOutputStreamEmpty()
+	{
+		return !$this->aOutputStream or $this->aOutputStream->isEmpty() ;
+	}
+	
 	public function render()
 	{
-		if(!$sSourceFilename=$this->sourceFilename())
+		// render myself
+		if( $sSourceFilename=$this->sourceFilename() )
 		{
-			return ;
+			$aVars = $this->variables() ;
+			$aVars->set('theView',$this) ;
+			
+			$this->ui()->display($sSourceFilename,$aVars,$this->OutputStream()) ;
 		}
 		
-		$aVars = $this->variables() ;
-		$aVars->set('theView',$this) ;
 		
-		$this->ui()->display($sSourceFilename,$aVars,$this->OutputStream()) ;
+		// render child view
+		foreach($this->iterator() as $aChildView)
+		{
+			$aChildView->render() ;
+		}
 	}
 	
 	public function display(IOutputStream $aDevice=null)
 	{
 		if(!$aDevice)
 		{
-			if( $aParent=$this->parent() )
-			{
-				$aDevice = $aParent->outputStream() ;
-			}
-			
-			else 
-			{
-				$aDevice = $this->application()->response()->printer() ;
-			}
+			$aDevice = $this->application()->response()->printer() ;
 		}
 		
-		$aDevice->write($this->outputStream()) ;
+		// display myself
+		if( !$this->isOutputStreamEmpty() )
+		{
+			$aDevice->write( $this->outputStream()->bufferBytes(true) ) ;
+		}
+		
+		// display children view
+		foreach($this->iterator() as $aChildView)
+		{
+			$aChildView->display($aDevice) ;
+		}
 	}
 	
 	public function show()

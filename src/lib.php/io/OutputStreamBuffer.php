@@ -31,13 +31,18 @@ class OutputStreamBuffer extends OutputStream
 		return $this->bufferBytes() ;
 	}
 	
-	public function bufferBytes()
+	public function bufferBytes($bClear=true)
 	{
 		$sBytes = '' ;
 		
 		foreach ($this->arrBuffer as $Contents)
 		{
 			$sBytes.= strval($Contents) ;
+		}
+		
+		if($bClear)
+		{
+			$this->arrBuffer = array() ;
 		}
 		
 		return $sBytes ;
@@ -53,6 +58,10 @@ class OutputStreamBuffer extends OutputStream
 		$this->clean() ;
 	}
 	
+	public function isEmpty()
+	{
+		return empty($this->arrBuffer) ;
+	}
 	
 	private $arrBuffer = array() ;
 }

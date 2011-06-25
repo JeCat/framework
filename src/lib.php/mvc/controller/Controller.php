@@ -58,7 +58,7 @@ class Controller extends NamableComposite implements IController
     	$sName = $aView->name() ;
     	$this->$sName = $aView ;
     	
-    	$this->viewContainer()->add( $aView, false ) ;				// controller的视图不属于 controller的 viewContainer ，以便被 VagrantViewSearcher 收容
+    	$this->viewContainer()->add( $aView, true ) ;
     	
     	$aView->variables()->set("theController", $this) ;
     }
@@ -81,15 +81,8 @@ class Controller extends NamableComposite implements IController
     	return $this->aMainView ;
     }
     
-    public function setMainView(IView $aView,IView $aViewContainer=null)
-    {
-    	if( !$aViewContainer )
-    	{
-    		$aViewContainer = $aView ;
-    	}
-    	
-    	$this->setViewContainer($aViewContainer) ;
-    	
+    public function setMainView(IView $aView)
+    {    	
     	$this->aMainView = $aView ;
     }
     
@@ -104,19 +97,7 @@ class Controller extends NamableComposite implements IController
     }
     
     public function setViewContainer(IView $aViewContainer)
-    {
-    	if( $this->aViewContainer and $this->aViewContainer!=$aViewContainer )
-    	{
-    		foreach($this->aViewContainer->iterator() as $aChildView)
-    		{
-    			if( $aViewContainer!=$aChildView )						// 新的视图容器 可能是当前容器的子视图
-    			{
-	    			$aViewContainer->add( $aChildView, false ) ;		// controller的视图不属于 controller的 viewContainer ，以便被 VagrantViewSearcher 收容
-	    			$this->aViewContainer->remove($aChildView) ;
-    			}
-    		}
-    	}
-    	
+    {    	
     	$this->aViewContainer = $aViewContainer ;
     }
     
@@ -176,22 +157,15 @@ class Controller extends NamableComposite implements IController
     {
     	if( !$this->aParams->bool('noframe') )
     	{
-    		$this->mainView()->render() ;
+			$this->mainView()->show() ;
     	}
     	
-		foreach($this->iterator() as $aChild)
-		{
-			$aChild->displayViews() ;
-		}
-    	
-    	foreach( $this->mainView()->iterator() as $aView )
+    	else 
     	{
-    		$aView->display() ;
-    	}
-    	
-    	if( !$this->aParams->bool('noframe') )
-    	{
-    		$this->mainView()->display() ;
+	    	foreach( $this->viewContainer()->iterator() as $aView )
+	    	{
+				$aView->show() ;
+	    	}
     	}
     }
     
@@ -243,8 +217,8 @@ class Controller extends NamableComposite implements IController
 	 */
 	public function renderString(& $sContent)
 	{
-		$aView = new View("anonymous",$this->mainView()->ui) ;
-		$this->mainView()->add($aView) ;
+		$aView = new View("anonymous",null,$this->mainView()->ui) ;
+		$this->viewContainer()->add($aView,true) ;
 		$aView->outputStream()->write($sContent) ;
 	}
 	
@@ -258,8 +232,8 @@ class Controller extends NamableComposite implements IController
 			return ;
 		}
 		
-		$aView = new View("anonymous",$this->mainView()->ui()) ;
-		$this->mainView()->add($aView) ;
+		$aView = new View("anonymous",null,$this->mainView()->ui()) ;
+		$this->viewContainer()->add($aView,true) ;
 		
 		$this->messageQueue()->display($this->mainView()->ui(),$aView->outputStream(),$sTemplateFilename) ;		
 	}

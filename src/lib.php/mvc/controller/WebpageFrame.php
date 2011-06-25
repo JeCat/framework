@@ -25,14 +25,19 @@ class WebpageFrame extends Controller
 		parent::setParent($aParent) ;
 		
 		// 添加替换父控制器的 视图容器
-		$aParent->setMainView($this->mainView(),$this->viewContainer()) ;
+		$aParent->setViewContainer( $this->viewContainer() ) ;
 	}
 	
 	public function addFrameView(IView $aFrameView)
 	{
-		$aOriContainer = $this->viewContainer() ;
-		$aOriContainer->add($aFrameView,false) ;
-		$this->setViewContainer($aFrameView) ;		
+		$this->registerView($aFrameView) ;
+		
+		$this->setViewContainer($aFrameView) ;	
+
+		if( $aParent=$this->parent() )
+		{
+			$aParent->setViewContainer($aFrameView) ;
+		}
 	}
 }
 
