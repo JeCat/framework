@@ -2,9 +2,7 @@
 namespace jc\mvc\view ;
 
 use jc\mvc\view\htmlresrc\HtmlResourcePool;
-
 use jc\util\CombinedIterator;
-
 use jc\util\StopFilterSignal;
 use jc\message\Message;
 use jc\message\MessageQueue;
@@ -236,7 +234,7 @@ class View extends NamableComposite implements IView
 	 */
 	public function widgitIterator()
 	{
-		return $this->widgits()->iterator() ;
+		return $this->widgits()->valueIterator() ;
 	}
 	
 	public function dataExchanger()
@@ -284,7 +282,7 @@ class View extends NamableComposite implements IView
 		{
 			$aResourcePool->addRequire($sFilename, HtmlResourcePool::RESRC_JS) ;
 		}
-		foreach($this->arrRequiredCssFilename as $sFilename)
+		foreach($this->arrRequiredCssFilenames as $sFilename)
 		{
 			$aResourcePool->addRequire($sFilename, HtmlResourcePool::RESRC_CSS) ;
 		}
@@ -293,6 +291,12 @@ class View extends NamableComposite implements IView
 		foreach($this->widgitIterator() as $aWidget)
 		{
 			$aWidget->requireResources($aResourcePool) ;
+		}
+		
+		// for child view
+		foreach($this->iterator() as $aChildView)
+		{
+			$aChildView->requireResources($aResourcePool) ;
 		}
 	}
 	
@@ -307,7 +311,7 @@ class View extends NamableComposite implements IView
 	private $aMsgQueue ;
 	
 	protected $arrRequiredJsFilenames = array() ;
-	protected $arrRequiredCssFilename = array() ;
+	protected $arrRequiredCssFilenames = array() ;
 }
 
 ?>

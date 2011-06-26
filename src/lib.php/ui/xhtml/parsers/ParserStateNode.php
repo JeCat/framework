@@ -15,7 +15,7 @@ class ParserStateNode extends ParserState
 		self::setSingleton($this) ;
 		
 		$this->arrChangeToStates[] = ParserStateTag::singleton() ;
-		$this->arrChangeToStates[] = ParserStateMark::singleton() ;
+		$this->arrChangeToStates[] = ParserStateMacro::singleton() ;
 		$this->arrChangeToStates[] = ParserStateText::singleton() ;
 	}
 	public function active(IObject $aParent,String $aSource,$nPosition)

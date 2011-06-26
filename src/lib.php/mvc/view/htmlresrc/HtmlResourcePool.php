@@ -1,6 +1,7 @@
 <?php
 namespace jc\mvc\view\htmlresrc ;
 
+use jc\util\UrlResourceManager;
 use jc\lang\Exception;
 use jc\lang\Object;
 
@@ -9,7 +10,7 @@ class HtmlResourcePool extends Object
 	const 	RESRC_JS = 1 ;
 	const 	RESRC_CSS = 2 ;
 	
-	public function __construct(HtmlResourcePoolFactory $aJsManager, HtmlResourcePoolFactory $aCssManager)
+	public function __construct(UrlResourceManager $aJsManager, UrlResourceManager $aCssManager)
 	{
 		parent::__construct() ;
 		
@@ -72,7 +73,7 @@ class HtmlResourcePool extends Object
 		}
 		
 		$arrResrcUrls = array() ;
-		foreach( $this->arrResrcs[$nType] as $sFileName )
+		foreach( $this->arrResrcs[$nType] as $sFileName=>$nBeRequiredCount )
 		{
 			$sResrcUrl = $aResrcMgr->find($sFileName) ;
 			if(!$sResrcUrl)

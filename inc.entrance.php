@@ -6,7 +6,6 @@ namespace jc ;
 // 错误处理
 use jc\ui\xhtml\Factory;
 use jc\system\Application;
-use jc\ui\xhtml\Factory as UIFactory ;
 
 // 报告所有错误
 error_reporting(E_ALL & ~E_DEPRECATED) ;

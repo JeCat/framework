@@ -1,0 +1,41 @@
+.jc_message_queue{
+	background-color : #FFF4F0;
+	border-color : #FF3510;
+	border-width : 1px;
+	border-style : solid;
+	text-align : left;
+	padding-left : 15px;
+	padding-right : 15px;
+	padding-top : 8px;
+	padding-bottom : 8px;
+}
+
+.jc_message_queue li{
+	list-style-type: none;
+}
+
+
+
+.jc_message_type_forbid{
+	
+}
+
+.jc_message_type_success{
+	color : #289000;	
+}
+
+.jc_message_type_failed{
+	color : #E41500;	
+}
+
+.jc_message_type_error{
+	
+}
+
+.jc_message_type_warning{
+	
+}
+
+.jc_message_type_notice{
+	
+}

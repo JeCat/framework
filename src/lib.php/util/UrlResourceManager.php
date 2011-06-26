@@ -34,7 +34,7 @@ class UrlResourceManager extends ResourceManager
 			}
 			else 
 			{
-				$sUrlPrefix = substr($sUrlPrefix,$sAppFolderPathLen) ;
+				$sUrlPrefix = substr($sPath,$sAppFolderPathLen) ;
 			}
 		}
 		

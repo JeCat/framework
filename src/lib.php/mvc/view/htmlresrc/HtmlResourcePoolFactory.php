@@ -48,6 +48,7 @@ class HtmlResourcePoolFactory extends Object
 		if( !$this->aCssManager )
 		{
 			$this->aCssManager = new UrlResourceManager() ;
+			$this->aCssManager->addFolder(\jc\PATH.'src/style/') ;
 		}
 		return $this->aCssManager ;
 	}

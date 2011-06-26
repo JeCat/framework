@@ -14,7 +14,7 @@ class ParserStateDefault extends ParserState
 		self::setSingleton($this) ;
 		
 		$this->arrChangeToStates[] = ParserStateTag::singleton() ;
-		$this->arrChangeToStates[] = ParserStateMark::singleton() ;
+		$this->arrChangeToStates[] = ParserStateMacro::singleton() ;
 		$this->arrChangeToStates[] = ParserStateText::singleton() ;
 	}
 	

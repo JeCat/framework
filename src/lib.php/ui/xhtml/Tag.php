@@ -68,7 +68,7 @@ class Tag extends ObjectBase
 	
 	public function add($aChild,$bAdoptRelative=true)
 	{
-		if( $aChild instanceof Mark )
+		if( $aChild instanceof Macro )
 		{
 			$aAttrVal = new AttributeValue(null, '', $aChild->position(), $aChild->line()) ;
 			$aAttrVal->setEndPosition($aChild->endPosition()) ;

@@ -1,9 +1,9 @@
 <?php
 namespace jc\mvc\view ;
 
-use jc\ui\xhtml\Factory;
+use jc\ui\xhtml\UIFactory as UIFactoryBase;
 
-class UIFactory extends Factory
+class UIFactory extends UIFactoryBase
 {
 	/**
 	 * return SourceFileManager

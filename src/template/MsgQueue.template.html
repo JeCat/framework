@@ -1,7 +1,9 @@
 <if "$aMsgQueue->count()">
+<ul class="jc_message_queue">
 <foreach for="$aMsgQueue->iterator()" item="aMessage" >
-<div class="{=$aMessage->type()}">
-	{=$aMessage->message()}
-</div>
+	<li class="{=$aMessage->type()}">
+		{=$aMessage->message()}
+	</li>
 </foreach>
+</ul>
 </if>

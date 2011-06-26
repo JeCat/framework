@@ -4,7 +4,7 @@ namespace jc\ui\xhtml\parsers ;
 use jc\lang\Exception;
 use jc\ui\xhtml\ObjectBase;
 use jc\ui\xhtml\Node;
-use jc\ui\xhtml\Mark;
+use jc\ui\xhtml\Macro;
 use jc\ui\xhtml\AttributeValue;
 use jc\ui\xhtml\Tag;
 use jc\ui\xhtml\Text;
@@ -76,9 +76,9 @@ abstract class ParserState extends JcObject
 			return ParserStateNode::singleton() ;
 		}
 		
-		else if( $aObject instanceof Mark )
+		else if( $aObject instanceof Macro )
 		{
-			return ParserStateMark::singleton() ;
+			return ParserStateMacro::singleton() ;
 		}
 	
 		else if( $aObject instanceof Text )
