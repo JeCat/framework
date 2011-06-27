@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\model\db\orm\operators ;
 
+use jc\db\sql\Select;
+
 use jc\db\sql\IDataSettableStatement;
 use jc\mvc\model\db\orm\AssociationPrototype;
 use jc\db\sql\Criteria;
@@ -9,6 +11,7 @@ use jc\mvc\model\db\IModel;
 use jc\mvc\model\db\orm\ModelPrototype;
 use jc\db\DB;
 use jc\lang\Object;
+use jc\db\sql\Insert;
 
 abstract class OperationStrategy extends Object
 {
@@ -99,6 +102,34 @@ abstract class OperationStrategy extends Object
 			}
 		}
 	}
+	
+	protected function buildBridge(DB $aDB,AssociationPrototype $aAssoPrototype,IModel $aFromModel,IModel $aToModel)
+	{
+		$aSelect = new Select($aAssoPrototype->bridgeTableName()) ;
+		$this->setCondition($aSelect->criteria(),$aAssoPrototype->bridgeToKeys(),$aAssoPrototype->fromKeys(),$aFromModel) ;
+		$this->setCondition($aSelect->criteria(),$aAssoPrototype->bridgeFromKeys(),$aAssoPrototype->toKeys(),$aFromModel) ;
+		
+		// 检查对应的桥接表记录是否存在
+		if( !$aDB->queryCount($aSelect) )
+		{
+			$aInsertForBridge = new Insert( $aAssoPrototype->bridgeTableName() ) ;
+			
+			// from table key vale
+			$this->setValue($aInsertForBridge,$aAssoPrototype->bridgeToKeys(),$aAssoPrototype->fromKeys(),$aFromModel) ;
+			
+			// to table key vale
+			$this->setValue($aInsertForBridge,$aAssoPrototype->bridgeFromKeys(),$aAssoPrototype->toKeys(),$aToModel) ;
+			
+			$aDB->execute($aInsertForBridge) ;
+		}
+		
+	}
+	
+	protected function destroyBridge()
+	{
+		
+	}
+	
 }
 
 ?>

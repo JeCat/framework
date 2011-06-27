@@ -94,15 +94,7 @@ class Inserter extends OperationStrategy
 				// insert bridge table
 				foreach($aAssocModel->childIterator() as $aOneChildModel)
 				{
-					$aInsertForBridge = new Insert( $aAssoPrototype->bridgeTableName() ) ;
-					
-					// from table key vale
-					$this->setValue($aInsertForBridge,$aAssoPrototype->bridgeToKeys(),$aAssoPrototype->fromKeys(),$aModel) ;
-					
-					// to table key vale
-					$this->setValue($aInsertForBridge,$aAssoPrototype->bridgeFromKeys(),$aAssoPrototype->toKeys(),$aOneChildModel) ;
-					
-					$aDB->execute($aInsertForBridge) ;
+					$this->buildBridge($aDB,$aAssoPrototype,$aModel,$aOneChildModel) ;
 				}
 				
 				break ;

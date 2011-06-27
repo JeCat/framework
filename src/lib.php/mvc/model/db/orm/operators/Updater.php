@@ -39,6 +39,15 @@ class Updater extends OperationStrategy
 			{
 				return false ;
 			}
+			
+			// 
+			if( $aAssoPrototype->type()==AssociationPrototype::hasAndBelongsToMany )
+			{
+				foreach($aChildModel->childIterator() as $aOneChildModel)
+				{
+					$this->buildBridge($aDB,$aAssoPrototype,$aModel,$aOneChildModel) ;
+				}
+			}
 		}
 		
 		return true ;

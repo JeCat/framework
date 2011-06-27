@@ -11,12 +11,29 @@ class Select extends MultiTableStatement
 	const PREDICATE_DISTINCT = 'DISTINCT' ;
 	const PREDICATE_DISTINCTROW = 'DISTINCTROW' ;
 	const PREDICATE_TOP = 'TOP' ;
+
+	public function __construct($sTableName=null,$sTableAlias=null)
+	{
+		parent::__construct($sTableName,$sTableAlias) ;
+		
+		parent::setLimit(30) ;
+	}
+	
+	public function makeStatementForCount($sCntClmName='rowCount',$bFormat=false)
+	{
+		$this->checkValid(true) ;
+		
+		return "SELECT"
+			. $this->makeStatementPredicate($bFormat)
+			. " count(*) AS {$sCntClmName} "
+			. parent::makeStatement($bFormat)
+			. $this->makeStatementLimit()
+			. ' ;' ;
+	}
 	
 	public function makeStatement($bFormat=false)
 	{
 		$this->checkValid(true) ;
-		
-		parent::setLimit(30) ;
 		
 		return "SELECT"
 			. $this->makeStatementPredicate($bFormat)

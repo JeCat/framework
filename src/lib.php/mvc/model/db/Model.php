@@ -119,23 +119,6 @@ class Model extends BaseModel implements IModel
 	{
 		$this->aPrototype = $aPrototype ;
 	}
-	
-	public function createChild()
-	{
-		if( !$this->aPrototype )
-		{
-			throw new Exception("模型没有缺少对应的原型，无法为其创建子模型") ;
-		}
-		if( !$this->isAggregarion() )
-		{
-			throw new Exception("模型(%s)不是一个聚合模型，无法为其创建子模型",$this->aPrototype->name()) ;
-		}
-		
-		$aChild = $this->aPrototype->createModel() ;
-		$this->addChild($aChild) ;
-		
-		return $aChild ;
-	} 
 
 	public function loadData( IRecordSet $aRecordSet, $nRowIdx=0, $sClmPrefix=null)
 	{
@@ -275,6 +258,70 @@ class Model extends BaseModel implements IModel
 				return true ;
 			}
 		}
+	}
+	
+	
+	
+	public function createChild()
+	{
+		if( !$this->aPrototype )
+		{
+			throw new Exception("模型没有缺少对应的原型，无法为其创建子模型") ;
+		}
+		if( !$this->isAggregarion() )
+		{
+			throw new Exception("模型(%s)不是一个聚合模型，无法为其创建子模型",$this->aPrototype->name()) ;
+		}
+		
+		$aChild = $this->aPrototype->createModel() ;
+		$this->addChild($aChild) ;
+		
+		return $aChild ;
+	}
+	
+	public function loadChild($values=null,$keys=null)
+	{
+		if( !$this->aPrototype )
+		{
+			throw new Exception("模型没有缺少对应的原型，无法为其创建子模型") ;
+		}
+		if( !$this->isAggregarion() )
+		{
+			throw new Exception("模型(%s)不是一个聚合模型，无法为其创建子模型",$this->aPrototype->name()) ;
+		}
+		
+		$aChild = $this->aPrototype->createModel() ;
+		$this->addChild($aChild) ;
+		
+		$arrArgvs = func_get_args() ;
+		call_user_func_array( array($aChild,'load'), $arrArgvs ) ;
+		
+		return $aChild ;
+	}
+	
+	public function findChildBy($values,$keys=null)
+	{
+		if(!$keys)
+		{
+			$keys = $this->prototype()->primaryKeys() ;
+		}
+		$values = (array)$values ;
+		
+		$keys = array_values($keys) ;
+		$values = array_values($values) ;
+		
+		foreach( $this->childIterator() as $aChild )
+		{
+			foreach($values as $nIdx=>$sValue)
+			{
+				if( isset($keys[$nIdx]) and $aChild->data($keys[$nIdx])==$sValue )
+				{
+					return $aChild ;
+				}
+			}
+		}
+		
+		return null ;
 	}
 	
 	/**
