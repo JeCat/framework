@@ -219,29 +219,61 @@ class Model extends BaseModel implements IModel
 	
 	public function save()
 	{
-		// update
-		if( $this->hasSerialized() )
+		if($this->isAggregarion())
 		{
-			return Updater::singleton()->update(DB::singleton(), $this) ;
+			foreach($this->childIterator() as $aChildModel)
+			{
+				if( !$aChildModel->save() )
+				{
+					return false ;
+				}
+			}
+			
+			return true ;
 		}
 		
-		// insert
 		else 
 		{
-			return Inserter::singleton()->insert(DB::singleton(), $this) ;
+			// update
+			if( $this->hasSerialized() )
+			{
+				return Updater::singleton()->update(DB::singleton(), $this) ;
+			}
+			
+			// insert
+			else 
+			{
+				return Inserter::singleton()->insert(DB::singleton(), $this) ;
+			}
 		}
 	}
 	
 	public function delete()
 	{
-		if( $this->hasSerialized() )
+		if($this->isAggregarion())
 		{
-			return Deleter::singleton()->delete(DB::singleton(), $this) ;	
+			foreach($this->childIterator() as $aChildModel)
+			{
+				if( !$aChildModel->delete() )
+				{
+					return false ;
+				}
+			}
+			
+			return true ;
 		}
 		
 		else 
 		{
-			return true ;
+			if( $this->hasSerialized() )
+			{
+				return Deleter::singleton()->delete(DB::singleton(), $this) ;	
+			}
+			
+			else 
+			{
+				return true ;
+			}
 		}
 	}
 	

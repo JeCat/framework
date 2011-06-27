@@ -10,50 +10,34 @@ class Updater extends OperationStrategy
 {
 	public function update(DB $aDB, IModel $aModel) 
 	{
-		if( $aModel->isAggregarion() )
+		$aPrototype = $aModel->prototype() ;
+		$aUpdate = new Update($aPrototype->tableName()) ;
+		
+		// -----------------------------------
+		// insert 当前model
+		foreach($aPrototype->columnIterator() as $sClmName)
 		{
-			foreach($aModel->childIterator() as $aChildModel)
-			{
-				if( !$this->update($aDB, $aChildModel) )
-				{
-					return false ;
-				}
-			}
-			
-			return true ;
+			$aUpdate->setData($sClmName,$aModel->data($sClmName)) ;
 		}
 		
-		else 
+		$this->setCondition($aUpdate->criteria(), $aPrototype->primaryKeys(), null, $aModel) ;
+		
+		$aDB->execute( $aUpdate ) ;
+		
+		// -----------------------------------
+		// update 关联model
+		foreach($aPrototype->associations() as $aAssoPrototype)
 		{
-			$aPrototype = $aModel->prototype() ;
-			$aUpdate = new Update($aPrototype->tableName()) ;
-			
-			// -----------------------------------
-			// insert 当前model
-			foreach($aPrototype->columnIterator() as $sClmName)
+			$aChildModel = $aModel->child( $aAssoPrototype->modelProperty() ) ;
+			if(!$aChildModel)
 			{
-				$aUpdate->setData($sClmName,$aModel->data($sClmName)) ;
+				continue ;
 			}
 			
-			$this->setCondition($aUpdate->criteria(), $aPrototype->primaryKeys(), null, $aModel) ;
-			
-			$aDB->execute( $aUpdate ) ;
-			
-			// -----------------------------------
-			// update 关联model
-			foreach($aPrototype->associations() as $aAssoPrototype)
+			// 
+			if( !$aChildModel->save() )
 			{
-				$aChildModel = $aModel->child( $aAssoPrototype->modelProperty() ) ;
-				if(!$aChildModel)
-				{
-					continue ;
-				}
-				
-				// 
-				if( !$aChildModel->save() )
-				{
-					return false ;
-				}
+				return false ;
 			}
 		}
 		
