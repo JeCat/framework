@@ -133,6 +133,7 @@ class View extends NamableComposite implements IView
 		{
 			$aVars = $this->variables() ;
 			$aVars->set('theView',$this) ;
+			$aVars->set('theModel',$this->model()) ;
 			
 			$this->ui()->display($sSourceFilename,$aVars,$this->OutputStream()) ;
 		}
