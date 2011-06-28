@@ -84,6 +84,11 @@ class Controller extends NamableComposite implements IController
     public function setMainView(IView $aView)
     {    	
     	$this->aMainView = $aView ;
+    
+    	if( !$this->aViewContainer )
+    	{
+    		$this->aViewContainer = $aView ;
+    	}
     }
     
     public function viewContainer()
@@ -99,6 +104,11 @@ class Controller extends NamableComposite implements IController
     public function setViewContainer(IView $aViewContainer)
     {    	
     	$this->aViewContainer = $aViewContainer ;
+    
+    	if( !$this->aMainView )
+    	{
+    		$this->aMainView = $aViewContainer ;
+    	}
     }
     
     /**
@@ -171,12 +181,12 @@ class Controller extends NamableComposite implements IController
     
 	public function add($object,$bAdoptRelative=true)
 	{
-		parent::add($object,$bAdoptRelative) ;
-		
 		if( $bAdoptRelative and ($object instanceof IController) )
 		{
-			$this->mainView()->add( $object->mainView(), true ) ;
+			$this->viewContainer()->add( $object->mainView(), true ) ;
 		}
+		
+		parent::add($object,$bAdoptRelative) ;
 	}
 	
 	/**

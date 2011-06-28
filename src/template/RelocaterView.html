@@ -1,0 +1,17 @@
+<div>
+
+	<div>
+		{=$theController->title()}
+	</div>
+	
+	<a href="{=$theController->url()}">
+		正在重定向当前网页 ... ...
+	</a>
+	
+	<script>
+	setTimeout(function(){
+		location = "{=$theController->url()}" ;
+	},1000*{=$theController->waitSec()});
+	</script>
+
+</div>

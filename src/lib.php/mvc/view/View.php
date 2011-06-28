@@ -128,6 +128,11 @@ class View extends NamableComposite implements IView
 	
 	public function render()
 	{
+		if(!$this->bEnable)
+		{
+			return ;
+		}
+		
 		// render myself
 		if( $sSourceFilename=$this->sourceFilename() )
 		{
@@ -143,11 +148,18 @@ class View extends NamableComposite implements IView
 		foreach($this->iterator() as $aChildView)
 		{
 			$aChildView->render() ;
+			
+			$this->OutputStream()->write( $aChildView->OutputStream() ) ;
 		}
 	}
 	
 	public function display(IOutputStream $aDevice=null)
 	{
+		if(!$this->bEnable)
+		{
+			return ;
+		}
+		
 		if(!$aDevice)
 		{
 			$aDevice = $this->application()->response()->printer() ;
@@ -300,6 +312,21 @@ class View extends NamableComposite implements IView
 			$aChildView->requireResources($aResourcePool) ;
 		}
 	}
+
+	public function disable()
+	{
+		$this->bEnable = false ;
+	}
+	
+	public function enable($bEnalbe=true)
+	{
+		$this->bEnable = $bEnalbe? true: false ;
+	}
+	
+	public function isEnable()
+	{
+		return $this->bEnable ;
+	}
 	
 	
 	private $aModel ;
@@ -310,6 +337,7 @@ class View extends NamableComposite implements IView
 	private $aVariables ;
 	private $aDataExchanger ;
 	private $aMsgQueue ;
+	private $bEnable = true ;
 	
 	protected $arrRequiredJsFilenames = array() ;
 	protected $arrRequiredCssFilenames = array() ;
