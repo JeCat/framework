@@ -26,7 +26,7 @@ class Text extends FormWidget {
 		if (! is_int ( $nType ) || $nType < self::$nTypeMin || $nType > self::$nTypeMax) {
 			throw new Exception ( "调用" . __CLASS__ . "对象的" . __METHOD__ . "方法时使用了非法的nType参数(得到的nType是:%s)", array ($nType ) );
 		}
-		$this->nType == $nType;
+		$this->nType = $nType;
 	}
 	
 	public function setSingle($bSingle = true) {
