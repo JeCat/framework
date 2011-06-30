@@ -298,6 +298,25 @@ class Model extends BaseModel implements IModel
 					$aChild: null ;
 	}
 	
+	public function buildModel($values=null,$keys=null)
+	{
+		if( !$aChildModel=$this->loadChild($values,$keys) )
+		{
+			$aChildModel = $this->createChild() ;
+			
+			if( $keys )
+			{
+				$values = (array) $values ;
+				foreach((array) $keys as $i=>$sKey)
+				{
+					$aChildModel->setData($sKey,$values[$i]) ;
+				}
+			}
+		}
+		
+		return $aChildModel ;
+	}
+	
 	public function findChildBy($values,$keys=null)
 	{
 		if(!$keys)
