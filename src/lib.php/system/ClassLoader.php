@@ -57,6 +57,19 @@ class ClassLoader extends \jc\lang\Object
 		return ;
 	}
 	
+	public function namespaceFolder($sNamespace)
+	{
+		return isset($this->arrPackages[$sNamespace])? $this->arrPackages[$sNamespace]: null ;
+	}
+	
+	/**
+	 * @return \IIterator
+	 */
+	public function namespaceIterator()
+	{
+		return new \ArrayIterator( array_keys($this->arrPackages) ) ;
+	}
+	
 	
 	private $arrPackages = array() ;
 	
