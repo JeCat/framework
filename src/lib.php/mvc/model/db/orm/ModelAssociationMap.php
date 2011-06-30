@@ -41,6 +41,10 @@ class ModelAssociationMap extends Object
 		return new \ArrayIterator(array_keys($this->arrOrms)) ;
 	}
 	
+	/**
+	 * @return ModelPrototype
+	 * @throws Exception
+	 */
 	public function modelPrototype($sName)
 	{
 		if( !$this->aModelPrototypes->has($sName) )
@@ -62,14 +66,14 @@ class ModelAssociationMap extends Object
 				{
 					foreach($arrOrm[$sAssoType] as $arrAsso)
 					{
-						$aAssociation = AssociationPrototype::createFromCnf($arrAsso,$aPrototype,$sAssoType,false) ;
+						//$aAssociation = AssociationPrototype::createFromCnf($arrAsso,$aPrototype,$sAssoType,false) ;
 						$aAssociation = new AssociationPrototype(
 								$sAssoType
 								, $arrAsso['prop']
 								, $aPrototype
 								, $this->modelPrototype($arrAsso['model'])
 								, $arrAsso['fromk'], $arrAsso['tok']
-								, $arrAsso['bfromk'], $arrAsso['btok']
+								, isset($arrAsso['bfromk'])?$arrAsso['bfromk']:null, isset($arrAsso['btok'])?$arrAsso['btok']:null
 						) ;
 						
 						$aPrototype->addAssociation($aAssociation) ;
@@ -103,7 +107,7 @@ class ModelAssociationMap extends Object
 			throw new Exception("正在请求不存在的模型原型：%s",$sPrototypeName) ;
 		}
 		
-		// 将 $arrAssocFragment 整理成易于访问的架构
+		// 将 $arrAssocFragment 整理成易于访问的结构
 		foreach( $arrAssocFragment as $key=>$item )
 		{
 			if( is_string($item) )
