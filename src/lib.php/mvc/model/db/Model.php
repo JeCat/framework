@@ -294,9 +294,8 @@ class Model extends BaseModel implements IModel
 		$this->addChild($aChild) ;
 		
 		$arrArgvs = func_get_args() ;
-		call_user_func_array( array($aChild,'load'), $arrArgvs ) ;
-		
-		return $aChild ;
+		return call_user_func_array( array($aChild,'load'), $arrArgvs )?
+					$aChild: null ;
 	}
 	
 	public function findChildBy($values,$keys=null)
