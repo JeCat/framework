@@ -304,7 +304,7 @@ class Model extends BaseModel implements IModel
 		}
 	}
 	
-	public function buildModel($values=null,$keys=null)
+	public function buildChild($values=null,$keys=null)
 	{
 		if( !$aChildModel=$this->loadChild($values,$keys) )
 		{
