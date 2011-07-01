@@ -291,11 +291,17 @@ class Model extends BaseModel implements IModel
 		}
 		
 		$aChild = $this->aPrototype->createModel() ;
-		$this->addChild($aChild) ;
 		
 		$arrArgvs = func_get_args() ;
-		return call_user_func_array( array($aChild,'load'), $arrArgvs )?
-					$aChild: null ;
+		if( call_user_func_array( array($aChild,'load'), $arrArgvs ) )
+		{
+			$this->addChild($aChild) ;
+			return $aChild ;
+		}
+		else
+		{
+			return null ;
+		}
 	}
 	
 	public function buildModel($values=null,$keys=null)
