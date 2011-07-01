@@ -95,7 +95,7 @@ class Selecter extends OperationStrategy
 		}
 	}
 	
-	protected function loadModel( DB $aDB, IModel $aModel, IRecordSet $aRecordSet, $sClmPrefix )
+	protected function loadModel( DB $aDB, IModel $aModel, IRecordSet $aRecordSet, $sClmPrefix, $nIdx=0 )
 	{
 		$aPrototype = $aModel->prototype() ;
 		
@@ -105,8 +105,9 @@ class Selecter extends OperationStrategy
 		}
 		
 		// load 自己
-		$aModel->loadData($aRecordSet,0,$sClmPrefix) ;
+		$aModel->loadData($aRecordSet,$nIdx,$sClmPrefix) ;
 		
+		// load children
 		if( $aModel->isAggregarion() )
 		{
 			$models = $aModel->childIterator() ;
@@ -116,7 +117,7 @@ class Selecter extends OperationStrategy
 			$models = array($aModel) ;
 		}
 		
-		foreach($models as $aModel)
+		foreach($models as $nRowIdx=>$aModel)
 		{
 			////////////////////////////////////////////////////////////
 			// 加载关联model
@@ -141,7 +142,7 @@ class Selecter extends OperationStrategy
 						, AssociationPrototype::belongsTo
 				)) )
 				{
-					$this->loadModel($aDB,$aChildModel,$aRecordSet,$sChildModelName.'.') ;
+					$this->loadModel($aDB,$aChildModel,$aRecordSet,$sChildModelName.'.',$nRowIdx) ;
 					$aChildModel->setSerialized(true) ;
 				}
 				
