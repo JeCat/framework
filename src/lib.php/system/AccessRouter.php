@@ -47,43 +47,6 @@ class AccessRouter extends \jc\lang\Factory
     {
     	return $this->sControllerParam ;
     }
-    
-    /**
-     * Enter description here ...
-     * 
-     * @return string
-     */
-    public function setControllerDefaultNamespace($sNamespace)
-    {
-    	if(!$sNamespace)
-    	{
-    		$this->sControllerDefaultNamespace = null ;
-    	}
-    	
-    	else 
-    	{
-	    	$sNamespace = preg_replace("/\\\\{2,}/", "\\", $sNamespace) ;  // 连续符号
-	    	$sNamespace = preg_replace("/\\\\$/", "", $sNamespace) ;  	// 结尾符号
-	   	  	// 开头符号
-	    	if( !preg_match("/^\\\\/",$sNamespace) )
-	    	{
-	    		$sNamespace = '\\'.$sNamespace ;
-	    	}
-	    	
-	    	$this->sControllerDefaultNamespace = $sNamespace ;
-    	}
-    }
-    
-    /**
-     * Enter description here ...
-     * 
-     * @return string
-     */
-    public function controllerDefaultNamespace()
-    {
-    	return $this->sControllerDefaultNamespace ;
-    }
-    
 
     /**
      * Enter description here ...
@@ -176,12 +139,6 @@ class AccessRouter extends \jc\lang\Factory
     		return $sControllerClass ;
     	}
     	
-    	// 默认包下
-    	if($this->sControllerDefaultNamespace)
-    	{
-    		return $this->sControllerDefaultNamespace . $sControllerClass ;
-    	}
-    	
     	return ;
     }
     
@@ -189,15 +146,7 @@ class AccessRouter extends \jc\lang\Factory
     
 	private $sControllerParam = 'c' ;
 	
-	private $sResponseTypeParam = 'rspn' ;
-	
-	private $sResponseDefaultType = 'html' ;
-	
-	private $sControllerDefaultNamespace ;
-	
 	private $arrControllers = array() ;
-	
-	private $aControllerFactory ;
 }
 
 ?>

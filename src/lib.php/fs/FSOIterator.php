@@ -1,6 +1,4 @@
 <?php
-
-use jc\fs\FSOIterator;
 namespace jc\fs ;
 
 use jc\util\FilterMangeger;
