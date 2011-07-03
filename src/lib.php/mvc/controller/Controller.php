@@ -2,8 +2,10 @@
 
 namespace jc\mvc\controller ;
 
+use jc\util\match\RegExp;
+use jc\mvc\model\db\orm\ModelPrototype;
+use jc\mvc\model\db\orm\ModelAssociationMap;
 use jc\mvc\view\VagrantViewSearcher;
-
 use jc\message\IMessageQueue;
 use jc\message\MessageQueue;
 use jc\util\DataSrc;
@@ -30,6 +32,37 @@ class Controller extends NamableComposite implements IController
     
     protected function init()
     {}
+    
+    public function createModel($prototype,array $arrProperties=array(),$bAgg=false,$sName=null,$sClass='jc\\mvc\\model\\db\\Model')
+    {
+    	if( $prototype instanceof ModelPrototype )
+    	{
+    		$aPrototype = $prototype ;
+    	}
+    	else
+    	{
+    		$aPrototype = ModelAssociationMap::singleton()->fragment($prototype,$arrProperties) ;
+    	}
+    	
+    	if(!$sName)
+    	{
+	    	$sName = $aPrototype->name() ;
+	    	
+	    	$aResSet=self::regexpModelName()->match($sName) ;
+	    	
+	    	for( $aResSet->end(); $aRes=$aResSet->current(); $aResSet->prev() )
+	    	{
+	    		// 大写
+	    		$sChar = substr($sName,$aRes->position()+1,1) ;
+	    		$sName = substr_replace($sName, strtoupper($sChar), $aRes->position()+1,1) ;
+	    		
+	    		// 删除单词分隔符
+	    		$sName = substr_replace($sName,'',$aRes->position(),1) ;
+	    	}
+    	}
+    	
+    	return $this->$sName = new $sClass($aPrototype,$bAgg) ;    	
+    }
     
     /**
      * @param $formview		该参数可以为：true 则创建一个 FormView 类型的视图; false 则创建一个 View 普通视图; 或是其他视图的类名 
@@ -248,6 +281,19 @@ class Controller extends NamableComposite implements IController
 		$this->messageQueue()->display($this->mainView()->ui(),$aView->outputStream(),$sTemplateFilename) ;		
 	}
 	
+    
+    
+   	static private function regexpModelName()
+   	{
+   		if( !self::$aRegexpModelName )
+   		{
+   			self::$aRegexpModelName = new RegExp("/[^\da-zA-Z]/i");
+   		}
+   		return self::$aRegexpModelName ;
+   	}
+   
+    static private $aRegexpModelName = null ;
+    
     /**
      * Enter description here ...
      * 
