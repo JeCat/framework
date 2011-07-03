@@ -26,16 +26,16 @@ abstract class OperationStrategy extends Object
 		{
 			$names = $keys ;
 		}
-		
+	
 		if($sTableName)
 		{
-			$sTableName.= '.' ;
+			$sTableName = "`{$sTableName}`." ;
 		}
 		
 		foreach($keys as $idx=>$sKey)
 		{
 			$aCriteria->add(
-				$sTableName . $sKey
+				"{$sTableName}`{$sKey}`"
 				, $aDataSource->data($names[$idx])
 			) ;
 		}
@@ -55,13 +55,13 @@ abstract class OperationStrategy extends Object
 		
 		if($sTableName)
 		{
-			$sTableName.= '.' ;
+			$sTableName = "`{$sTableName}`." ;
 		}
 		
 		foreach($keys as $idx=>$sKey)
 		{
 			$aStatement->setData(
-				$sTableName . $sKey
+				"{$sTableName}`{$sKey}`"
 				, $aDataSource->data($names[$idx])
 			) ;
 		}
@@ -71,7 +71,7 @@ abstract class OperationStrategy extends Object
 	{
 		foreach($arrFromKeys as $nIdx=>$sFromKey)
 		{
-			$aCriteria->addExpression( "{$sFromTable}.{$sFromKey} = {$sToTable}.{$arrToKeys[$nIdx]}" ) ;
+			$aCriteria->addExpression( "`{$sFromTable}`.`{$sFromKey}` = `{$sToTable}`.`{$arrToKeys[$nIdx]}`" ) ;
 		}
 	}
 	

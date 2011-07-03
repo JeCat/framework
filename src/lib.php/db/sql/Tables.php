@@ -68,7 +68,7 @@ class Tables extends SubStatement
 		// alias
 		if( $bEnableAlias and $this->sTableAlias and $this->sTableAlias!=$this->sTableName )
 		{
-			$sRet.= " AS " . $this->sTableAlias ;
+			$sRet.= " AS `{$this->sTableAlias}`" ;
 		}
 	
 		// join 

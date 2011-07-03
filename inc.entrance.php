@@ -4,6 +4,7 @@ namespace jc ;
 
 //////////////////////////////
 // 错误处理
+use jc\mvc\view\Webpage;
 use jc\ui\xhtml\Factory;
 use jc\system\Application;
 
@@ -28,27 +29,33 @@ define( __NAMESPACE__."\\PATH", __DIR__.'/' ) ;
 // 处理未捕获的异常
 set_exception_handler(function(\Exception $aException)
 {
-	$aRspn = Application::singleton()->response() ;
+	$sContents = "<pre>" ;
 
 	do{
 		
-		$aRspn->output("------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------") ;
+		$sContents.= "------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\r\n" ;
 		
-		$aRspn->output("无法处理的异常：".get_class($aException)) ;
+		$sContents.= "无法处理的异常：".get_class($aException)."\r\n" ;
 			
 		if($aException instanceof \jc\lang\Exception)
 		{
-			$aRspn->output($aException->message()) ;
+			$sContents.= $aException->message()."\r\n" ;
 		}
 		else
 		{
-			$aRspn->output($aException->getMessage()) ;
+			$sContents.= $aException->getMessage()."\r\n" ;
 		}
 		
-		$aRspn->output('Line '.$aException->getLine().' in '.$aException->getFile()) ;
-		$aRspn->output($aException->getTraceAsString()) ;
+		$sContents.= 'Line '.$aException->getLine().' in file: '.$aException->getFile()."\r\n" ;
+		$sContents.= $aException->getTraceAsString()."\r\n" ;
 	
 	// 递归 cause
 	} while( $aException = $aException->getPrevious() ) ;
+	
+	$sContents.= "</pre>\r\n" ;
+	
+	$aWebpage = new Webpage() ;
+	$aWebpage->setContents($sContents) ;
+	$aWebpage->show() ;
 }) ;
 ?>

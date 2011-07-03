@@ -31,7 +31,9 @@ class Model extends BaseModel implements IModel
 			throw new Exception("制定的原型：%s 不存在",$sPrototypeName) ;
 		}
 		
-		return new Model($aPrototype,$bAggregarion) ;
+		$sClass = get_called_class() ;
+		
+		return new $sClass($aPrototype,$bAggregarion) ;
 	}
 	
 	public function __construct($prototype=null,$bAggregarion=false)
@@ -177,7 +179,7 @@ class Model extends BaseModel implements IModel
 			{
 				if(strstr($sKey,'.')==false)
 				{
-					$sKey = $this->prototype()->name().'.'.$sKey ;
+					$sKey = '`'.$this->prototype()->name().'`.`'.$sKey.'`' ;
 				}
 			}
 			

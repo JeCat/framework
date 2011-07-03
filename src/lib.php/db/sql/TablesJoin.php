@@ -76,7 +76,7 @@ class TablesJoin extends SubStatement
 		{
 			if( $bEnableAlias and $sAlias!=$sTable )
 			{
-				$sTable.= " AS ".$sAlias ;
+				$sTable.= " AS `{$sAlias}`" ;
 			}
 			
 			$arrTables[] = $sTable ;

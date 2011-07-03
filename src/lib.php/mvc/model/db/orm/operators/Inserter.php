@@ -34,7 +34,7 @@ class Inserter extends OperationStrategy
 		// insert 当前model
 		foreach($aPrototype->columnIterator() as $sClmName)
 		{
-			$aInsert->setData($sClmName,$aModel->data($sClmName)) ;
+			$aInsert->setData('`'.$sClmName.'`',$aModel->data($sClmName)) ;
 		}
 		
 		$aDB->execute( $aInsert->makeStatement() ) ;

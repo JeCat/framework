@@ -126,7 +126,7 @@ class Type
 	
 	static public function hasImplements($sClassName,$sInterfaceName)
 	{
-		$aRefClass = new ReflectionClass($sClassName) ;
+		$aRefClass = new \ReflectionClass($sClassName) ;
 		return $aRefClass->implementsInterface($sInterfaceName) ;
 	}
 	

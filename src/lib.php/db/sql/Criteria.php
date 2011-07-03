@@ -14,7 +14,7 @@ class Criteria extends SubStatement
 		{
 			if( is_array($express) )
 			{
-				$arrExpressions[] = $this->tancTableName($express[0])
+				$arrExpressions[] = $this->transTableName($express[0])
 							." {$express[2]} '".addslashes($express[1])."'" ;
 			}
 			else if( $express instanceof Criteria )
@@ -90,14 +90,14 @@ class Criteria extends SubStatement
 		$arrArgs = func_get_args() ;
 		array_shift($arrArgs) ;
 		
-		$this->arrExpressions[] = $this->tancExpression($sExpression,$arrArgs) ;
+		$this->arrExpressions[] = $this->transExpression($sExpression,$arrArgs) ;
 	}
 	public function clear()
 	{
 		$this->arrExpressions = array() ;
 	}
 	
-	public function tancTableName($sColumn)
+	public function transTableName($sColumn)
 	{
 		if( strstr($sColumn,'.')!==false )
 		{
@@ -107,7 +107,7 @@ class Criteria extends SubStatement
 		return $sColumn ;
 	}
 	
-	public function tancExpression($sExpression,$arrArgvs)
+	public function transExpression($sExpression,$arrArgvs)
 	{
 		// find mark
 		$aReses = self::expressionRegexp()->match($sExpression) ;

@@ -72,7 +72,7 @@ class Selecter extends OperationStrategy
 
 		foreach($aPrototype->columnIterator() as $sClmName)
 		{
-			$aSelect->addColumn($sTableName.'.'.$sClmName,$sTableName.'.'.$sClmName) ;
+			$aSelect->addColumn("`{$sTableName}`.`{$sClmName}`","{$sTableName}.{$sClmName}") ;
 		}
 		
 		// 处理关联表
@@ -158,7 +158,7 @@ class Selecter extends OperationStrategy
 						$arrKeyValues = array() ;
 						foreach($aAssoPrototype->toKeys() as $nIdx=>$sKey)
 						{
-							$arrKeyValues[$sChildModelName.'.'.$sKey] = $aModel->data($arrFromKeys[$nIdx]) ;
+							$arrKeyValues["`{$sChildModelName}`.`{$sKey}`"] = $aModel->data($arrFromKeys[$nIdx]) ;
 						}
 						
 						// 加载 child 类
@@ -185,7 +185,7 @@ class Selecter extends OperationStrategy
 						$arrKeyValues = array() ;
 						foreach($aAssoPrototype->bridgeToKeys() as $nIdx=>$sKey)
 						{
-							$arrKeyValues[$sBridgeTable.'.'.$sKey] = $aModel->data($arrFromKeys[$nIdx]) ;
+							$arrKeyValues["`{$sBridgeTable}`.`{$sKey}`"] = $aModel->data($arrFromKeys[$nIdx]) ;
 						}
 						
 						// 加载 child 类
