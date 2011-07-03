@@ -5,7 +5,7 @@ class AccessRouter extends \jc\lang\Factory
 {
 	public function __construct()
 	{
-		$this->addController('ajax', 'jc\\mvc\\controller\\AjaxAction') ;
+		$this->addController('jc\\mvc\\controller\\AjaxAction','ajax') ;
 	}
 	
     /**
@@ -90,8 +90,13 @@ class AccessRouter extends \jc\lang\Factory
      * 
      * @return string
      */
-    public function addController($sControllerName,$sControllerClass)
+    public function addController($sControllerClass,$sControllerName=null)
     {
+    	if(!$sControllerName)
+    	{
+    		$sControllerName = basename($sControllerClass) ;
+    	}
+    	
     	$this->arrControllers[$sControllerName] = $sControllerClass ;
     }
     
@@ -133,21 +138,10 @@ class AccessRouter extends \jc\lang\Factory
     public function createRequestController(Request $aRequest)
     {
     	$sControllerName = $aRequest->string($this->sControllerParam) ;
-    	return $this->createController($sControllerName) ;
-    }
-
-    /**
-     * Enter description here ...
-     * 
-     * @return void
-     */
-    public function createController($sName)
-    {
-    	$sControllerClass = $this->transControllerClass($sName) ;
-    	if($sControllerClass)
-    	{
-    		return new $sControllerClass() ;
-    	}
+    	
+    	$sControllerClass = $this->transControllerClass($sControllerName) ;
+    	
+    	return new $sControllerName() ;
     }
     
     /**

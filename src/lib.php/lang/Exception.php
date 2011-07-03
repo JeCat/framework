@@ -21,10 +21,15 @@ class Exception extends \Exception implements IException, IObject
 	{
 		if( !$aLocale )
 		{
-			$aLocale = $this->application(true)->localeManager()->locale() ;
+			if( $aLocaleMgr=$this->application(true)->localeManager() )
+			{
+				$aLocale = $aLocaleMgr->locale() ;
+			}
 		}
 		
-		return $aLocale->trans($this->getMessage(),$this->arrArgvs) ;
+		return $aLocale?
+				$aLocale->trans($this->getMessage(),$this->arrArgvs):
+				sprintf($this->getMessage(),$this->arrArgvs) ;
 	}
 	
 	public function code() 
