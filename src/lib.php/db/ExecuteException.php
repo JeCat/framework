@@ -12,7 +12,11 @@ class ExecuteException extends JcException
 		$this->nDeviceErrorNo = $nDeviceErrorNo ;
 		$this->sDeviceErrorMsg = $sDeviceErrorMsg ;
 		
-		$sMessage = "数据库在执行SQL语句时发生了错误(code %d): %s ; 正在执行的 sql 是: %s" ;
+		$sMessage = "数据库在执行SQL语句时发生了错误(code %d): \r\n" ;
+		$sMessage.= "\t%s ;\r\n" ;
+		$sMessage.= "正在执行的 SQL 是: \r\n" ;
+		$sMessage.= "\t%s" ;
+		
 		$Argvs = array($nDeviceErrorNo,$sDeviceErrorMsg,$sSql) ;
 		
 		parent::__construct($sMessage,$Argvs,$aCause) ;

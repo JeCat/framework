@@ -35,6 +35,23 @@ class Webpage extends View
 	public function setDescription($sDescription)
 	{}
 	
+	public function contents()
+	{
+		return strval($this->sContents) ;
+	}
 	
+	public function setContents($contents)
+	{
+		if( $contents instanceof IView )
+		{
+			$this->add($contents) ;
+		}
+		else
+		{
+			$this->sContents = $contents ;
+		}
+	}
+	
+	private $sContents = null ;
 }
 ?>

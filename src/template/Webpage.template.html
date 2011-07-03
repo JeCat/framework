@@ -14,7 +14,11 @@
 </head>
 
 <body>
-<views />
+<if "$sContents=$theView->contents()">
+	{=$sContents}
+<if:else />
+	<views />
+</if>
 </body>
 
 </html>
