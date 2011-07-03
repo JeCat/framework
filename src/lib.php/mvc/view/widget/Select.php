@@ -19,6 +19,13 @@ class Select extends FormWidget {
 		return $this ;
 	}
 	
+	public function addOptionByArray($arrOptions) {
+		foreach($arrOptions  as $key => $option){
+			addOption($option[0],$option[1],$option[2]);
+		}
+		return $this ;
+	}
+	
 	public function setSelected($nIndex){
 		if (! is_int ( $nIndex )) {
 			new Exception ( "调用" . __CLASS__ . "的" . __METHOD__ . "方法时使用了非法的nIndex参数(得到的nIndex参数是:%s)", array ($nIndex ) );
