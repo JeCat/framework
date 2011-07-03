@@ -3,6 +3,11 @@ namespace jc\system ;
 
 class AccessRouter extends \jc\lang\Factory
 {
+	public function __construct()
+	{
+		$this->addController('ajax', 'jc\\mvc\\controller\\AjaxAction') ;
+	}
+	
     /**
      * Enter description here ...
      * 
