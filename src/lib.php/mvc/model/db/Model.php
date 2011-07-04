@@ -222,15 +222,25 @@ class Model extends BaseModel implements IModel
 			// update
 			if( $this->hasSerialized() )
 			{
-				return Updater::singleton()->update(DB::singleton(), $this) ;
+				return $this->update() ;
 			}
 			
 			// insert
 			else 
 			{
-				return Inserter::singleton()->insert(DB::singleton(), $this) ;
+				return $this->insert() ;
 			}
 		}
+	}
+
+	public function insert()
+	{
+		return Updater::singleton()->update(DB::singleton(), $this) ;
+	}
+	
+	public function update()
+	{
+		return Updater::singleton()->update(DB::singleton(), $this) ;
 	}
 	
 	public function delete()
