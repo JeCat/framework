@@ -321,9 +321,36 @@ class Model extends BaseModel implements IModel
 		}
 	}
 	
+	public function findChildBy($values,$keys=null)
+	{
+		if(!$keys)
+		{
+			$keys = $this->prototype()->primaryKeys() ;
+		}
+		$keys = (array)$keys ;
+		$values = (array)$values ;
+		
+		$keys = array_values($keys) ;
+		$values = array_values($values) ;
+		
+		foreach( $this->childIterator() as $aChild )
+		{
+			foreach($values as $nIdx=>$sValue)
+			{
+				if( isset($keys[$nIdx]) and $aChild->data($keys[$nIdx])!=$sValue )
+				{
+					break(2) ;
+				}
+			}
+			return $aChild ;
+		}
+		
+		return null ;
+	}
+	
 	public function buildChild($values=null,$keys=null)
 	{
-		if( !$aChildModel=$this->loadChild($values,$keys) )
+		if( !$aChildModel=$this->findChildBy($values,$keys) and !$aChildModel=$this->loadChild($values,$keys) )
 		{
 			$aChildModel = $this->createChild() ;
 			
@@ -338,31 +365,6 @@ class Model extends BaseModel implements IModel
 		}
 		
 		return $aChildModel ;
-	}
-	
-	public function findChildBy($values,$keys=null)
-	{
-		if(!$keys)
-		{
-			$keys = $this->prototype()->primaryKeys() ;
-		}
-		$values = (array)$values ;
-		
-		$keys = array_values($keys) ;
-		$values = array_values($values) ;
-		
-		foreach( $this->childIterator() as $aChild )
-		{
-			foreach($values as $nIdx=>$sValue)
-			{
-				if( isset($keys[$nIdx]) and $aChild->data($keys[$nIdx])==$sValue )
-				{
-					return $aChild ;
-				}
-			}
-		}
-		
-		return null ;
 	}
 	
 	/**
