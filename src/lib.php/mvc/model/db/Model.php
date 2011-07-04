@@ -235,7 +235,7 @@ class Model extends BaseModel implements IModel
 
 	public function insert()
 	{
-		return Updater::singleton()->update(DB::singleton(), $this) ;
+		return Inserter::singleton()->insert(DB::singleton(), $this) ;
 	}
 	
 	public function update()
