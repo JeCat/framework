@@ -9,7 +9,7 @@ class Select extends FormWidget {
 			new Exception ( "调用" . __CLASS__ . "的" . __METHOD__ . "方法时使用了非法的size参数(得到的size参数是:%s)", array ($nSize ) );
 		}
 		$this->nSize = $nSize;
-		parent::__construct ( $sId, 'ViewWidgetSelect.template.html', $sTitle, $aView );
+		parent::__construct ( $sId, 'jc:ViewWidgetSelect.template.html', $sTitle, $aView );
 	}
 	
 	//增加option条目 

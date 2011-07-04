@@ -85,7 +85,7 @@ class MessageQueue extends Object implements IMessageQueue
 	{
 		if( !$sTemplateFilename )
 		{
-			$sTemplateFilename = 'MsgQueue.template.html' ;
+			$sTemplateFilename = 'jc:MsgQueue.template.html' ;
 		}
 		
 		if( !$aUI )

@@ -122,7 +122,7 @@ class Model extends BaseModel implements IModel
 		$this->aPrototype = $aPrototype ;
 	}
 
-	public function loadData( IRecordSet $aRecordSet, $nRowIdx=0, $sClmPrefix=null)
+	public function loadData( IRecordSet $aRecordSet, $nRowIdx=0, $sClmPrefix=null, $bSetSerialized=false )
 	{
 		// 聚合模型
 		if( $this->isAggregarion() )
@@ -131,7 +131,7 @@ class Model extends BaseModel implements IModel
 			for($nIdx=0; $nIdx<$aRecordSet->rowCount(); $nIdx++)
 			{
 				$aModel = $aPrototype? $aPrototype->createModel(): new self() ;
-				$aModel->loadData($aRecordSet,$nIdx,$sClmPrefix) ;
+				$aModel->loadData($aRecordSet,$nIdx,$sClmPrefix,$bSetSerialized) ;
 
 				$this->addChild($aModel) ;
 			}
@@ -157,6 +157,11 @@ class Model extends BaseModel implements IModel
 						$this->setData($sClmName,$sValue) ;
 					}
 				}
+			}
+			
+			if($bSetSerialized)
+			{
+				$this->setSerialized(true) ;
 			}
 		}
 	}

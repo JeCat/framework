@@ -16,7 +16,7 @@ class FileUpdate extends FormWidget{
 		$this->setStoreDir((string)$sStoreDir);
 		$this->setAccept((string)$sAccept);
 		
-		parent::__construct ( $sId, 'ViewWidgetFileUpdate.template.html', $sTitle, $aView );
+		parent::__construct ( $sId, 'jc:ViewWidgetFileUpdate.template.html', $sTitle, $aView );
 	}
 	
 	public function setMaxByte($nMaxByte) {

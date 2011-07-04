@@ -7,43 +7,58 @@ use jc\fs\FSO ;
 
 class ResourceManager extends Object implements IResourceManager
 {
-	public function addFolder($sPath)
+	public function addFolder($sPath,$sNamespace='*')
 	{
 		$sPath = Dir::formatPath($sPath) ;
-		$this->addFormatFolder($sPath) ;
+		$this->addFormatFolder($sPath,$sNamespace) ;
 	}
 	
-	public function removeFolder($sPath)
+	public function removeFolder($sPath,$sNamespace='*')
 	{
 		$sPath = Dir::formatPath($sPath) ;
-		$this->removeFormatFolder($sPath) ;
+		$this->removeFormatFolder($sPath,$sNamespace) ;
 	}
 
-	protected function addFormatFolder($sPath)
+	protected function addFormatFolder($sPath,$sNamespace)
 	{
-		if( !in_array($sPath,$this->arrFolders) )
+		if(!isset($this->arrFolders[$sNamespace]))
 		{
-			array_unshift($this->arrFolders,$sPath) ;
+			$this->arrFolders[$sNamespace] = array() ;
+		}
+		
+		if( !in_array($sPath,$this->arrFolders[$sNamespace]) )
+		{
+			array_unshift($this->arrFolders[$sNamespace],$sPath) ;
 		}
 	}
 	
-	protected function removeFormatFolder($sPath)
+	protected function removeFormatFolder($sPath,$sNamespace)
 	{
-		$nIdx = array_search($sPath, $this->arrFolders) ;
+		if(!isset($this->arrFolders[$sNamespace]))
+		{
+			return ;
+		}
+		
+		$nIdx = array_search($sPath, $this->arrFolders[$sNamespace]) ;
 		if($nIdx!==false)
 		{
-			unset($this->arrFolders[$nIdx]) ;
+			unset($this->arrFolders[$sNamespace][$nIdx]) ;
 		}
 	}
 	
-	public function clearFolders()
+	public function clearFolders($sNamespace='*')
 	{
-		$this->arrFolders = array() ;
+		$this->arrFolders[$sNamespace] = array() ;
 	}
 	
-	public function findFolderAndFile($sFilename)
+	public function findFolderAndFile($sFilename,$sNamespace='*')
 	{
-		foreach($this->arrFolders as $sFolderPath)
+		if( empty($this->arrFolders[$sNamespace]) )
+		{
+			return ;
+		}
+		
+		foreach($this->arrFolders[$sNamespace] as $sFolderPath)
 		{
 			if( empty($this->arrFilenameWrappers) )
 			{
@@ -69,9 +84,15 @@ class ResourceManager extends Object implements IResourceManager
 		return array(null,null) ;
 	}
 	
-	public function find($sFilename)
+	public function find($sFilename,$sNamespace='*')
 	{
-		list($sFolderPath,$sWrapedFilename) = $this->findFolderAndFile($sFilename) ;
+		if( $sNamespace=='*' and ($nPos=strpos($sFilename,':'))!==false )
+		{
+			$sNamespace = substr($sFilename,0,$nPos) ;
+			$sFilename = substr($sFilename,$nPos+1) ;
+		}
+		
+		list($sFolderPath,$sWrapedFilename) = $this->findFolderAndFile($sFilename,$sNamespace) ;
 		if( $sFolderPath and $sWrapedFilename )
 		{
 			return $sFolderPath.$sWrapedFilename ;
@@ -102,7 +123,7 @@ class ResourceManager extends Object implements IResourceManager
 		$this->arrFilenameWrappers = array() ;
 	}
 	
-	private $arrFolders = array() ;
+	protected $arrFolders = array() ;
 	
 	private $arrFilenameWrappers = array() ;
 }

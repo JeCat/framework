@@ -22,7 +22,7 @@ class CheckBtn extends FormWidget {
 		
 		$this->checkedValue = $sValue;
 		$this->nType = $nType;
-		parent::__construct ( $sId, 'ViewWidgetCheckBtn.template.html', $sTitle, $aView );
+		parent::__construct ( $sId, 'jc:ViewWidgetCheckBtn.template.html', $sTitle, $aView );
 	}
 	
 	public function setType($nType) {

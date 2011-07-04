@@ -105,7 +105,7 @@ class Selecter extends OperationStrategy
 		}
 		
 		// load 自己
-		$aModel->loadData($aRecordSet,$nIdx,$sClmPrefix) ;
+		$aModel->loadData($aRecordSet,$nIdx,$sClmPrefix,true) ;
 		
 		// load children
 		if( $aModel->isAggregarion() )
@@ -118,7 +118,7 @@ class Selecter extends OperationStrategy
 		}
 		
 		foreach($models as $nRowIdx=>$aModel)
-		{
+		{			
 			////////////////////////////////////////////////////////////
 			// 加载关联model
 			foreach($aPrototype->associations() as $aAssoPrototype)

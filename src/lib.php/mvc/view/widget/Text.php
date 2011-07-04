@@ -15,7 +15,7 @@ class Text extends FormWidget {
 	public function __construct($sId, $sTitle = null, $sValue=null, $nType = self::single, IView $aView = null) {
 		$this->setType ( $nType );
 		$this->setValue ( $sValue );
-		parent::__construct ( $sId, 'ViewWidgetText.template.html', $sTitle, $aView );
+		parent::__construct ( $sId, 'jc:ViewWidgetText.template.html', $sTitle, $aView );
 	}
 	
 	public function type() {

@@ -20,14 +20,10 @@ class IdManager extends Object implements \Serializable
 			$sSessionName = '__\\' . __CLASS__ ;
 		}
 		
-		if( !$aSession->hasVariable($sSessionName) )
+		if( !$aSession->hasVariable($sSessionName) or !$aIdMgr=$aSession->variable($sSessionName) )
 		{
 			$aIdMgr = new self() ;
 			$aSession->addVariable($sSessionName, $aIdMgr) ;
-		}
-		else 
-		{
-			$aIdMgr = $aSession->variable($sSessionName) ;
 		}
 		
 		return $aIdMgr ;

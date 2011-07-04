@@ -30,7 +30,7 @@ class UIFactory extends UIFactoryBase
 	public function newSourceFileManager()
 	{
 		$aSrcMgr = parent::newSourceFileManager() ;
-		$aSrcMgr->addFolder(\jc\PATH.'src/template/') ;
+		$aSrcMgr->addFolder(\jc\PATH.'src/template/','jc') ;
 		
 		return $aSrcMgr ;
 	}

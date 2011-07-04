@@ -7,7 +7,7 @@ use jc\lang\Exception;
 
 class UrlResourceManager extends ResourceManager 
 {
-	public function addFolder($sPath,$sUrlPrefix=null)
+	public function addFolder($sPath,$sUrlPrefix=null,$sNamespace='*')
 	{
 		$sPath = Dir::formatPath($sPath) ;
 		
@@ -38,22 +38,22 @@ class UrlResourceManager extends ResourceManager
 			}
 		}
 		
-		parent::addFormatFolder($sPath) ;
+		parent::addFormatFolder($sPath,$sNamespace) ;
 		$this->arrFolderUrlPrefix [$sPath] = $sUrlPrefix ;
 	}
 	
-	public function removeFolder($sPath)
+	public function removeFolder($sPath,$sNamespace='*')
 	{
 		$sPath = Dir::formatPath($sPath) ;
 		
 		unset($this->arrFolderUrlPrefix [$sPath]) ;
 		
-		parent::removeFolder($sPath) ;
+		parent::removeFolder($sPath,$sNamespace) ;
 	}
 	
-	public function clearFolders()
+	public function clearFolders($sNamespace='*')
 	{
-		parent::clearFolders() ;
+		parent::clearFolders($sNamespace) ;
 		
 		$this->arrFolderUrlPrefix = array() ;
 	}
