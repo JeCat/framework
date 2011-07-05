@@ -108,7 +108,7 @@ class Selecter extends OperationStrategy
 		$aModel->loadData($aRecordSet,$nIdx,$sClmPrefix,true) ;
 		
 		// load children
-		if( $aModel->isAggregarion() )
+		if( $aModel->isAggregation() )
 		{
 			$models = $aModel->childIterator() ;
 		}

@@ -18,7 +18,7 @@ use jc\lang\Object;
 
 class Model extends BaseModel implements IModel
 {
-	static public function fromFragment($sPrototypeName,array $arrAssocFragment=array(),$bAggregarion=false,ModelAssociationMap $aAssocMap=null)
+	static public function fromFragment($sPrototypeName,array $arrAssocFragment=array(),$bAggregation=false,ModelAssociationMap $aAssocMap=null)
 	{
 		if( !$aAssocMap )
 		{
@@ -33,12 +33,12 @@ class Model extends BaseModel implements IModel
 		
 		$sClass = get_called_class() ;
 		
-		return new $sClass($aPrototype,$bAggregarion) ;
+		return new $sClass($aPrototype,$bAggregation) ;
 	}
 	
-	public function __construct($prototype=null,$bAggregarion=false)
+	public function __construct($prototype=null,$bAggregation=false)
 	{
-		parent::__construct($bAggregarion) ;
+		parent::__construct($bAggregation) ;
 		
 		// orm config
 		if( is_array($prototype) )
@@ -101,7 +101,7 @@ class Model extends BaseModel implements IModel
 				// 多属关系
 				if( in_array( $aAssocPrototype->type(), array(AssociationPrototype::hasMany,AssociationPrototype::hasAndBelongsToMany) ) )
 				{
-					$aChild->setAggregarion(true) ;
+					$aChild->setAggregation(true) ;
 				}
 			}
 		}
@@ -125,7 +125,7 @@ class Model extends BaseModel implements IModel
 	public function loadData( IRecordSet $aRecordSet, $nRowIdx=0, $sClmPrefix=null, $bSetSerialized=false )
 	{
 		// 聚合模型
-		if( $this->isAggregarion() )
+		if( $this->isAggregation() )
 		{
 			$aPrototype = $this->prototype() ;
 			for($nIdx=0; $nIdx<$aRecordSet->rowCount(); $nIdx++)
@@ -198,7 +198,7 @@ class Model extends BaseModel implements IModel
 			, null
 			, $values
 			, null
-			, $this->isAggregarion()? 30: 1
+			, $this->isAggregation()? 30: 1
 		) ;
 	}
 	
@@ -209,7 +209,7 @@ class Model extends BaseModel implements IModel
 	
 	public function save()
 	{
-		if($this->isAggregarion())
+		if($this->isAggregation())
 		{
 			foreach($this->childIterator() as $aChildModel)
 			{
@@ -250,7 +250,7 @@ class Model extends BaseModel implements IModel
 	
 	public function delete()
 	{
-		if($this->isAggregarion())
+		if($this->isAggregation())
 		{
 			foreach($this->childIterator() as $aChildModel)
 			{
@@ -285,7 +285,7 @@ class Model extends BaseModel implements IModel
 		{
 			throw new Exception("模型没有缺少对应的原型，无法为其创建子模型") ;
 		}
-		if( !$this->isAggregarion() )
+		if( !$this->isAggregation() )
 		{
 			throw new Exception("模型(%s)不是一个聚合模型，无法为其创建子模型",$this->aPrototype->name()) ;
 		}
@@ -302,7 +302,7 @@ class Model extends BaseModel implements IModel
 		{
 			throw new Exception("模型没有缺少对应的原型，无法为其创建子模型") ;
 		}
-		if( !$this->isAggregarion() )
+		if( !$this->isAggregation() )
 		{
 			throw new Exception("模型(%s)不是一个聚合模型，无法为其创建子模型",$this->aPrototype->name()) ;
 		}

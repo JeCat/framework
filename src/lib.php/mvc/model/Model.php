@@ -1,15 +1,17 @@
 <?php
 namespace jc\mvc\model ;
 
+use jc\io\IOutputStream;
+
 use jc\lang\Object;
 
 abstract class Model extends Object implements IModel, \Serializable
 {
-	public function __construct($bAggregarion=false)
+	public function __construct($bAggregation=false)
 	{
 		parent::__construct() ;
 		
-		$this->bAggregarion = $bAggregarion ;
+		$this->bAggregation = $bAggregation ;
 	}
 
 	public function serialize ()
@@ -17,7 +19,7 @@ abstract class Model extends Object implements IModel, \Serializable
 		return serialize( array(
 				'arrData' => &$this->arrData ,
 				'arrChildren' => &$this->arrChildren ,
-				'bAggregarion' => &$this->bAggregarion ,
+				'bAggregation' => &$this->bAggregation ,
 				'bSerialized' => &$this->bSerialized ,
 		) ) ;
 	}
@@ -28,17 +30,17 @@ abstract class Model extends Object implements IModel, \Serializable
 		
 		$this->arrData =& $arrData['arrData'] ;
 		$this->arrChildren =& $arrData['arrChildren'] ;
-		$this->bAggregarion =& $arrData['bAggregarion'] ;
+		$this->bAggregation =& $arrData['bAggregation'] ;
 		$this->bSerialized =& $arrData['bSerialized'] ;
 	}
 
-	public function isAggregarion()
+	public function isAggregation()
 	{
-		return $this->bAggregarion ;
+		return $this->bAggregation ;
 	}
-	public function setAggregarion($bAggregarion=true)
+	public function setAggregation($bAggregation=true)
 	{
-		$this->bAggregarion = $bAggregarion ;
+		$this->bAggregation = $bAggregation ;
 	}
 		
 	public function hasSerialized()
@@ -95,6 +97,14 @@ abstract class Model extends Object implements IModel, \Serializable
 	public function childIterator()
 	{
 		return new \ArrayIterator($this->arrChildren) ;
+	}
+
+	/**
+	 * @return IIterator
+	 */
+	public function childNameIterator()
+	{
+		return new \ArrayIterator( array_keys($this->arrChildren) ) ;
 	}
 
 	// for data ///////////////////////////////
@@ -273,11 +283,39 @@ abstract class Model extends Object implements IModel, \Serializable
 		$this->setData($sName, $value) ;
 	}
 	
+	// misc
+	public function printStruct(IOutputStream $aOutput=null,$nDepth=0)
+	{
+		if(!$aOutput)
+		{
+			$aOutput = $this->application()->response()->printer() ;
+		}
+		
+		$aOutput->write( "<pre>\r\n" ) ;
+		
+		$aOutput->write( str_repeat("\t", $nDepth) ) ;
+		$aOutput->write( ($this->isAggregation()? "[Aggregation Model]": "[Model]") ) ;
+		$aOutput->write( "\r\n" ) ;
+		
+		foreach($this->arrData as $sName=>$value)
+		{
+			$aOutput->write( str_repeat("\t", $nDepth)."{$sName}: ".strval($value)."\r\n" ) ;
+		}
+		
+		foreach($this->childNameIterator() as $sName) 
+		{
+			$aOutput->write( str_repeat("\t", $nDepth)."\"{$sName}\" =>\r\n" ) ;
+			$this->child($sName)->printStruct($aOutput,$nDepth+1) ;
+		}
+		
+		$aOutput->write( "</pre>" ) ;
+	}
+	
 	private $arrData = array() ;
 	
 	private $arrChildren = array() ;
 	
-	private $bAggregarion = false ;
+	private $bAggregation = false ;
 	
 	private $bSerialized = false ;
 }
