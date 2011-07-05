@@ -90,6 +90,16 @@ abstract class Model extends Object implements IModel, \Serializable
 		return isset($this->arrChildren[$sName])?
 				$this->arrChildren[$sName]: null ;
 	}
+	
+	/**
+	 * 这个方法仅返回聚合模式的child，他只是为了开发人员从函数名上就能判断返回模型的类型
+	 * @return IModel
+	 */
+	public function childAgg($sName)
+	{
+		$aChild = $this->child($sName) ;
+		return ($aChild and $aChild->isAggregation())? $aChild: null ;
+	}
 
 	/**
 	 * @return IIterator
