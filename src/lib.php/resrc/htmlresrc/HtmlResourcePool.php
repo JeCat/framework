@@ -1,7 +1,7 @@
 <?php
-namespace jc\mvc\view\htmlresrc ;
+namespace jc\resrc\htmlresrc ;
 
-use jc\util\UrlResourceManager;
+use jc\resrc\UrlResourceManager;
 use jc\lang\Exception;
 use jc\lang\Object;
 

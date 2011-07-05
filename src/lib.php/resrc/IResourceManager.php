@@ -1,5 +1,5 @@
 <?php
-namespace jc\util ;
+namespace jc\resrc ;
 
 interface IResourceManager
 {

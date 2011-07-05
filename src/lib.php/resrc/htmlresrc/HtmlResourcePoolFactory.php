@@ -1,8 +1,8 @@
 <?php
-namespace jc\mvc\view\htmlresrc ;
+namespace jc\resrc\htmlresrc ;
 
-use jc\util\IResourceManager;
-use jc\util\UrlResourceManager;
+use jc\resrc\IResourceManager;
+use jc\resrc\UrlResourceManager;
 use jc\ui\Object;
 
 class HtmlResourcePoolFactory extends Object

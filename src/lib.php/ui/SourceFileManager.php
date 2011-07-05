@@ -2,7 +2,7 @@
 
 namespace jc\ui ;
 
-use jc\util\ResourceManager;
+use jc\resrc\ResourceManager;
 
 class SourceFileManager extends ResourceManager
 {

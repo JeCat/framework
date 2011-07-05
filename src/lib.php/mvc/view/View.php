@@ -1,7 +1,7 @@
 <?php
 namespace jc\mvc\view ;
 
-use jc\mvc\view\htmlresrc\HtmlResourcePool;
+use jc\resrc\htmlresrc\HtmlResourcePool;
 use jc\util\CombinedIterator;
 use jc\util\StopFilterSignal;
 use jc\message\Message;

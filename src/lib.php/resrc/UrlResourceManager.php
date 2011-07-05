@@ -1,8 +1,7 @@
 <?php
-namespace jc\util ;
+namespace jc\resrc ;
 
 use jc\fs\Dir;
-
 use jc\lang\Exception;
 
 class UrlResourceManager extends ResourceManager 
