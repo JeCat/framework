@@ -1,7 +1,7 @@
 <?php
 namespace jc\mvc\view ;
 
-use jc\resrc\htmlresrc\HtmlResourcePool;
+use jc\resrc\HtmlResourcePool;
 use jc\message\IMessageQueueHolder;
 use jc\io\IOutputStream;
 use jc\util\IHashTable;

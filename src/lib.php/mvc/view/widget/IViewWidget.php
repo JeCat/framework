@@ -2,7 +2,7 @@
 
 namespace jc\mvc\view\widget ;
 
-use jc\resrc\htmlresrc\HtmlResourcePool;
+use jc\resrc\HtmlResourcePool;
 use jc\message\IMessageQueueHolder;
 use jc\io\IOutputStream;
 use jc\util\IHashTable;

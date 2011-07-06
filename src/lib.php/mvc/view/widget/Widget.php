@@ -1,7 +1,7 @@
 <?php
 namespace jc\mvc\view\widget ;
 
-use jc\resrc\htmlresrc\HtmlResourcePool;
+use jc\resrc\HtmlResourcePool;
 use jc\util\StopFilterSignal;
 use jc\message\Message;
 use jc\message\IMessageQueue;

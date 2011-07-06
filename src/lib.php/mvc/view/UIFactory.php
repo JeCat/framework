@@ -20,6 +20,10 @@ class UIFactory extends UIFactoryBase
 		$aNodeCompilers->addSubCompiler('view:msgqueue',__NAMESPACE__."\\uicompiler\\ViewMsgQueueCompiler") ;
 		$aNodeCompilers->addSubCompiler('widget:msgqueue',__NAMESPACE__."\\uicompiler\\WidgetMsgQueueCompiler") ;
 		$aNodeCompilers->addSubCompiler('resrc',__NAMESPACE__."\\uicompiler\\LoadResourceCompiler") ;
+		$aNodeCompilers->addSubCompiler('link',__NAMESPACE__."\\uicompiler\\CssCompiler") ;
+		$aNodeCompilers->addSubCompiler('css',__NAMESPACE__."\\uicompiler\\CssCompiler") ;
+		$aNodeCompilers->addSubCompiler('script',__NAMESPACE__."\\uicompiler\\ScriptCompiler") ;
+		$aNodeCompilers->addSubCompiler('js',__NAMESPACE__."\\uicompiler\\ScriptCompiler") ;
 		
 		return $aNodeCompilers ;
 	}

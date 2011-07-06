@@ -159,7 +159,7 @@ class Controller extends NamableComposite implements IController
 		$this->displayViews() ;
     }
     
-    protected function buildParams($Params)
+    public function buildParams($Params)
     {
     	if(empty($Params))
     	{

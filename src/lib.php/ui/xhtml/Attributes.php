@@ -26,7 +26,7 @@ class Attributes extends HashTable
 	{
 		if( $aVal->name() )
 		{
-			$this->set($aVal->name(),$aVal) ;
+			parent::set($aVal->name(),$aVal) ;
 		}
 		else 
 		{
@@ -92,6 +92,13 @@ class Attributes extends HashTable
 			default :
 				return $this->$sType($sName) ;
 		}
+	}
+	public function set($sName,$sValue,$sQuoteType='"',$nPosition=-1,$nLine=-1)
+	{
+		$aVal = new AttributeValue($sName, $sQuoteType, $nPosition, $nLine) ;
+		$aVal->setSource($sValue) ;
+		
+		$this->add($aVal) ;
 	}
 	
 	public function string($sName)
