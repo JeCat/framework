@@ -13,8 +13,8 @@ class NodeCompiler extends BaseCompiler
 	public function compile(IObject $aObject,IOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Assert::type("jc\\ui\\xhtml\\Node",$aObject,'aObject') ;
-		
-		if( $aCompiler=$this->subCompiler($aObject) )
+
+		if( $aCompiler=$this->subCompiler(strtolower($aObject->tagName())) )
 		{
 			$aCompiler->compile($aObject,$aDev,$aCompilerManager) ;
 		}
@@ -92,46 +92,6 @@ class NodeCompiler extends BaseCompiler
 				$aCompiler->compile($aObject,$aDev,$aCompilerManager) ;
 			}
 		}
-	}
-	
-	// sub compiler ---------------------------------------------------------------
-	public function addSubCompiler($sTagName,$sCompilerClass) 
-	{
-		$this->arrCompilers[ strtolower($sTagName) ] = $sCompilerClass ;
-	}
-	public function removeSubCompiler($sTagName)
-	{
-		unset($this->arrCompilers[ strtolower($sTagName) ]) ;
-	}
-	public function clearSubCompiler()
-	{
-		$this->arrCompilers = array() ;
-	}
-
-	/**
-	 * @return ICompiler
-	 */
-	public function subCompiler(Node $aNode)
-	{
-		$sTagName = strtolower($aNode->tagName()) ;
-		if( !isset($this->arrCompilers[$sTagName]) )
-		{
-			if( !isset($this->arrCompilers['*']) )
-			{
-				return null ;				
-			}
-			else 
-			{
-				$sTagName = '*' ;
-			}
-		}
-		
-		if( is_string($this->arrCompilers[$sTagName]) )
-		{
-			$this->arrCompilers[$sTagName] = new $this->arrCompilers[$sTagName]() ;
-		}
-		
-		return $this->arrCompilers[$sTagName] ;
 	}
 	
 	//

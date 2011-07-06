@@ -12,25 +12,16 @@ class MacroCompiler extends BaseCompiler
 	{
 		Assert::type("jc\\ui\\xhtml\\Macro",$aObject,'aObject') ;
 		
-		switch ( $aObject->macroType() )
+		if( $aCompiler=$this->subCompiler($aObject->macroType()) )
 		{
-		// 执行	
-		case '?' :
-			$sCompiled = "<?php " . ExpressionCompiler::compileExpression($aObject->source(),false,false) . " ;?>" ;
-			break ;
-			 
-		// 输出
-		case '=' :
-			$sCompiled = "<?php echo " . ExpressionCompiler::compileExpression($aObject->source()) . " ;?>" ;
-			break ;
-			
-		// 注释
-		case '*' :
-			$sCompiled = '' ;
-			break ;
+			$aCompiler->compile($aObject,$aDev,$aCompilerManager) ;
 		}
 		
-		$aDev->write($sCompiled) ;
+		else 
+		{
+			$aDev->write( $aObject->source() ) ;
+		}
+		
 	}
 }
 

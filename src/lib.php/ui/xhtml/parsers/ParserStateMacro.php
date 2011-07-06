@@ -64,6 +64,16 @@ class ParserStateMacro extends ParserState
 		return $this->determineMacroBorder($aSource,$nPosition)? true: false ;
 	}
 	
+	public function addMacroType($sType)
+	{
+		if(!in_array($sType,$this->arrMacroTypes))
+		{
+			$this->arrMacroTypes[] = $sType ;
+		}
+		
+		return $this ;
+	}
+	
 	private function determineMacroBorder(String $aSource, $nPosition)
 	{
 		foreach($this->arrMacroBorder as $sStartMacro=>$sEndMacro)
@@ -71,7 +81,7 @@ class ParserStateMacro extends ParserState
 			$nBorderWidth = strlen($sStartMacro) ;
 			
 			if( $aSource->substr($nPosition,$nBorderWidth)==$sStartMacro 
-					and in_array($aSource->byte($nPosition+$nBorderWidth),array('?','=','*')) )
+					and in_array($aSource->byte($nPosition+$nBorderWidth),$this->arrMacroTypes) )
 			{
 				return $sStartMacro ;
 			}
@@ -89,6 +99,8 @@ class ParserStateMacro extends ParserState
 		'{'=>'}' ,
 		'{#'=>'#}' ,
 	) ;
+	
+	private $arrMacroTypes = array() ;
 }
 
 ?>
