@@ -1,7 +1,7 @@
 <?php
 namespace jc\mvc\view ;
 
-use jc\resrc\htmlresrc\HtmlResourcePool;
+use jc\resrc\HtmlResourcePool;
 use jc\util\CombinedIterator;
 use jc\util\StopFilterSignal;
 use jc\message\Message;
@@ -139,7 +139,12 @@ class View extends NamableComposite implements IView
 			$aVars = $this->variables() ;
 			$aVars->set('theView',$this) ;
 			$aVars->set('theModel',$this->model()) ;
-			
+		
+			if( $aVars->has('theController') and $aParams=$aVars->get('theController')->executeParams() )
+			{
+				$aVars->set('theRequest',$aParams) ;
+			}
+		
 			$this->ui()->display($sSourceFilename,$aVars,$this->OutputStream()) ;
 		}
 		

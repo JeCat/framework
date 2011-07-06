@@ -184,7 +184,12 @@ class Controller extends NamableComposite implements IController
 			$aChild->buildParams($this->aParams) ;
 		}
     }
-
+    
+    public function executeParams()
+    {
+    	return $this->aParams ;
+    }
+    
     public function process ()
     {}
     

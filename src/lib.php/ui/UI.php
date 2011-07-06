@@ -140,6 +140,12 @@ class UI extends JcObject
 			$aVariables = $this->variables() ;
 		}
 		
+		// 模板变量
+		if( !$aVariables->has('theRequest') )
+		{
+			$aVariables->set('theRequest',$this->application()->request()) ;
+		}
+		
 		if(!$aDevice)
 		{
 			$aDevice = $this->OutputStream() ;
@@ -152,6 +158,7 @@ class UI extends JcObject
 			$aOutputFilters = $this->application(true)->response()->filters() ;
 			$aOutputFilters->add( array($aDevice,'write') ) ;
 		}
+		
 		
 		try{
 			include $sCompiledPath ;
