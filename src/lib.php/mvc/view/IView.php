@@ -44,8 +44,6 @@ interface IView extends IContainer, IMessageQueueHolder, IWidgetContainer
 	
 	public function isEnable() ;
 	
-	public function requireResources(HtmlResourcePool $aResourcePool) ;
-	
 }
 
 ?>

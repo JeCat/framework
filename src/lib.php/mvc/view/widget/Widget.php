@@ -142,18 +142,6 @@ class Widget extends Object implements IViewWidget
 		return $this->messageQueue()->create($sType,$sMessage,$arrMessageArgs,$aPoster) ;
 	}
 	
-	public function requireResources(HtmlResourcePool $aResourcePool)
-	{
-		foreach($this->arrRequiredJsFilenames as $sFilename)
-		{
-			$aResourcePool->addRequire($sFilename, HtmlResourcePool::RESRC_JS) ;
-		}
-		foreach($this->arrRequiredCssFilename as $sFilename)
-		{
-			$aResourcePool->addRequire($sFilename, HtmlResourcePool::RESRC_CSS) ;
-		}
-	}
-	
 	private $aView ;
 
 	private $sId ;
@@ -163,10 +151,6 @@ class Widget extends Object implements IViewWidget
 	private $aMsgQueue ;
 
 	private $sTitle ;
-	
-	protected $arrRequiredJsFilenames = array() ;
-	
-	protected $arrRequiredCssFilename = array() ;
 }
 
 ?>

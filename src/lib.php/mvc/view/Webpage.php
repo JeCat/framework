@@ -13,8 +13,6 @@ class Webpage extends View
 		}
 		
 		parent::__construct($sName,'jc:Webpage.template.html',$aUI) ;
-		
-		$this->arrRequiredCssFilenames[] = 'jc:style.css' ;
 	}
 
 	public function title()

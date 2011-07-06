@@ -13,7 +13,6 @@ class LoadResourceCompiler extends NodeCompiler
 		$aDev->write("<?php \r\n") ;
 		$aDev->write("ob_flush() ;\r\n") ;
 		$aDev->write("\$theView = \$aVariables->get('theView') ;\r\n") ;
-		$aDev->write("\$theView->requireResources(\\jc\\resrc\\HtmlResourcePool::singleton()) ;\r\n") ;
 		$aDev->write("\$theView->outputStream()->write(\\jc\\resrc\\HtmlResourcePool::singleton()) ;\r\n") ;
 		$aDev->write("?>") ;
 	}

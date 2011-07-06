@@ -294,30 +294,6 @@ class View extends NamableComposite implements IView
 		return $this->messageQueue()->create($sType,$sMessage,$arrMessageArgs,$aPoster) ;
 	}
 	
-	public function requireResources(HtmlResourcePool $aResourcePool)
-	{
-		foreach($this->arrRequiredJsFilenames as $sFilename)
-		{
-			$aResourcePool->addRequire($sFilename, HtmlResourcePool::RESRC_JS) ;
-		}
-		foreach($this->arrRequiredCssFilenames as $sFilename)
-		{
-			$aResourcePool->addRequire($sFilename, HtmlResourcePool::RESRC_CSS) ;
-		}
-		
-		// for widget
-		foreach($this->widgitIterator() as $aWidget)
-		{
-			$aWidget->requireResources($aResourcePool) ;
-		}
-		
-		// for child view
-		foreach($this->iterator() as $aChildView)
-		{
-			$aChildView->requireResources($aResourcePool) ;
-		}
-	}
-
 	public function disable()
 	{
 		$this->bEnable = false ;
@@ -343,9 +319,6 @@ class View extends NamableComposite implements IView
 	private $aDataExchanger ;
 	private $aMsgQueue ;
 	private $bEnable = true ;
-	
-	protected $arrRequiredJsFilenames = array() ;
-	protected $arrRequiredCssFilenames = array() ;
 }
 
 ?>

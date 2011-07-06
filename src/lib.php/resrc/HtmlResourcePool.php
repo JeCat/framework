@@ -16,6 +16,9 @@ class HtmlResourcePool extends Object
 		
 		$this->aJsManager = $aJsManager? $aJsManager: new UrlResourceManager() ;
 		$this->aCssManager = $aCssManager? $aCssManager: new UrlResourceManager() ;
+		
+		$this->addRequire('jc:style.css',self::RESRC_CSS) ;
+		
 	}
 
 	public function addRequire($sResrcFileName,$nType)
@@ -135,7 +138,7 @@ class HtmlResourcePool extends Object
 				}
 				else 
 				{
-					$sRet.= "<script type=\"text/javascript\" comment=\"正在请求一个未知的资源：{$sFilename}\"></script>\r\n" ;
+					$sRet.= "<script type=\"text/javascript\" comment=\"正在请求一个未知的CSS文件：{$sFilename}\"></script>\r\n" ;
 				}
 			}
 			foreach($this->iterator(self::RESRC_CSS,false) as $sFilename)
@@ -146,7 +149,7 @@ class HtmlResourcePool extends Object
 				}
 				else 
 				{
-					$sRet.= "<link rel=\"stylesheet\" type=\"text/css\" comment=\"正在请求一个未知的资源：{$sFilename}\" />\r\n" ;
+					$sRet.= "<link rel=\"stylesheet\" type=\"text/css\" comment=\"正在请求一个未知的JavaScript文件：{$sFilename}\" />\r\n" ;
 				}
 			}
 		}

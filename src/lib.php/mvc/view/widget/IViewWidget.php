@@ -27,8 +27,6 @@ interface IViewWidget extends IMessageQueueHolder
 	public function setId($sId) ;
 
 	public function display(UI $aUI,IHashTable $aVariables=null,IOutputStream $aDevice=null) ;
-
-	public function requireResources(HtmlResourcePool $aResourcePool) ;
 }
 
 ?>
