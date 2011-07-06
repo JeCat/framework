@@ -91,13 +91,23 @@ class HtmlResourcePool extends Object
 	{
 		$sRet = '' ;
 	
-		foreach($this->iterator(self::RESRC_JS) as $sUrl)
-		{
-			$sRet.= "<script type=\"text/javascript\" src=\"{$sUrl}\"></script>\r\n" ;
+		try {
+			foreach($this->iterator(self::RESRC_JS) as $sUrl)
+			{
+				$sRet.= "<script type=\"text/javascript\" src=\"{$sUrl}\"></script>\r\n" ;
+			}
+			foreach($this->iterator(self::RESRC_CSS) as $sUrl)
+			{
+				$sRet.= "<link rel=\"stylesheet\" type=\"text/css\" href=\"{$sUrl}\" />\r\n" ;
+			}
 		}
-		foreach($this->iterator(self::RESRC_CSS) as $sUrl)
+		catch (Exception $e)
 		{
-			$sRet.= "<link rel=\"stylesheet\" type=\"text/css\" href=\"{$sUrl}\" />\r\n" ;
+			$sRet.= $e->message() ;
+		}
+		catch (\Exception $e)
+		{
+			$sRet.= $e->getMessage() ;
 		}
 		
 		return $sRet ;

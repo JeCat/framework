@@ -12,9 +12,9 @@ class LoadResourceCompiler extends NodeCompiler
 	{
 		$aDev->write("<?php \r\n") ;
 		$aDev->write("ob_flush() ;\r\n") ;
+		$aDev->write("\$__aHtmlResrcPool = \\jc\\resrc\\htmlresrc\\HtmlResourcePoolFactory::singleton()->create() ;\r\n") ;
 		$aDev->write("\$theView = \$aVariables->get('theView') ;\r\n") ;
 		$aDev->write("\$theView->requireResources(\$__aHtmlResrcPool) ;\r\n") ;
-		$aDev->write("\$__aHtmlResrcPool = \\jc\\resrc\\htmlresrc\\HtmlResourcePoolFactory::singleton()->create() ;\r\n") ;
 		$aDev->write("\$theView->outputStream()->write(\$__aHtmlResrcPool) ;\r\n") ;
 		$aDev->write("?>") ;
 	}
