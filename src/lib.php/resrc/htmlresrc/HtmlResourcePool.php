@@ -87,6 +87,22 @@ class HtmlResourcePool extends Object
 		return new \ArrayIterator($arrResrcUrls) ;
 	}
 	
+	public function __toString()
+	{
+		$sRet = '' ;
+	
+		foreach($this->iterator(self::RESRC_JS) as $sUrl)
+		{
+			$sRet.= "<script type=\"text/javascript\" src=\"{$sUrl}\"></script>\r\n" ;
+		}
+		foreach($this->iterator(self::RESRC_CSS) as $sUrl)
+		{
+			$sRet.= "<link rel=\"stylesheet\" type=\"text/css\" href=\"{$sUrl}\" />\r\n" ;
+		}
+		
+		return $sRet ;
+	}
+	
 	private $arrResrcs = array(
 				self::RESRC_JS => array() ,
 				self::RESRC_CSS => array() ,

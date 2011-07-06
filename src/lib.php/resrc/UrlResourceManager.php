@@ -57,9 +57,15 @@ class UrlResourceManager extends ResourceManager
 		$this->arrFolderUrlPrefix = array() ;
 	}
 	
-	public function find($sFilename)
+	public function find($sFilename,$sNamespace='*')
 	{
-		list($sFolderPath,$sWrapedFilename) = $this->findFolderAndFile($sFilename) ;
+		if( $sNamespace=='*' and ($nPos=strpos($sFilename,':'))!==false )
+		{
+			$sNamespace = substr($sFilename,0,$nPos) ;
+			$sFilename = substr($sFilename,$nPos+1) ;
+		}
+		
+		list($sFolderPath,$sWrapedFilename) = $this->findFolderAndFile($sFilename,$sNamespace) ;
 		if( $sFolderPath and $sWrapedFilename )
 		{
 			return $this->arrFolderUrlPrefix[$sFolderPath] . $sWrapedFilename ;

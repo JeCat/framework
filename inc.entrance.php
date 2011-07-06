@@ -54,15 +54,6 @@ set_exception_handler(function(\Exception $aException)
 	
 	$sContents.= "</pre>\r\n" ;
 	
-	if( !class_exists("jc\\mvc\\view\\Webpage") )
-	{
-		echo $sContents ;
-	}
-	else 
-	{
-		$aWebpage = new Webpage() ;
-		$aWebpage->setContents($sContents) ;
-		$aWebpage->show() ;
-	}
+	echo $sContents ;
 }) ;
 ?>
