@@ -88,7 +88,6 @@ class Selecter extends OperationStrategy
 				$sAssoTableAlias = $sTableName.'.'.$aAssoPrototype->modelProperty() ;
 				$aTables->join( $aAssoPrototype->toPrototype()->tableName(), null, $sAssoTableAlias ) ;
 				
-				echo $sAssoTableAlias, "<br/>" ;
 				$this->setAssociationCriteria($aJoin->criteria(),$sTableName,$sAssoTableAlias, $aAssoPrototype->fromKeys(), $aAssoPrototype->toKeys() ) ;
 				
 				// 递归关联
