@@ -1,6 +1,7 @@
 <?php
 namespace jc\mvc\model\db\orm ;
 
+use jc\io\IOutputStream;
 use jc\lang\Assert;
 use jc\db\DB;
 use jc\lang\Type;
@@ -374,6 +375,32 @@ class ModelPrototype extends Object implements \Serializable
 	{
 		$this->aAssociations = null ;
 	}
+	
+	// misc
+	public function printStruct(IOutputStream $aOutput=null,$nDepth=0)
+	{
+		if(!$aOutput)
+		{
+			$aOutput = $this->application()->response()->printer() ;
+		}
+		
+		$aOutput->write( "<pre>\r\n" ) ;
+		
+		$aOutput->write( str_repeat("\t", $nDepth)."Prototype: " ) ;
+		$aOutput->write( $this->name() ) ;
+		$aOutput->write( ":\r\n" ) ;
+		
+		$aOutput->write( str_repeat("\t", $nDepth)."table: " ) ;
+		$aOutput->write( $this->tableName()."\r\n" ) ;
+						
+		foreach ($this->associations() as $aAssoc) 
+		{
+			$aAssoc->printStruct($aOutput,$nDepth+1) ;
+		}
+		
+		$aOutput->write( "</pre>" ) ;
+	}
+	
 
 	private $sName ;
 	

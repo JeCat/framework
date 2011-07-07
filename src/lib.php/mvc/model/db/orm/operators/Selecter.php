@@ -84,9 +84,11 @@ class Selecter extends OperationStrategy
 					, AssociationPrototype::belongsTo
 			)) )
 			{
-				$sAssoTableAlias = $aAssoPrototype->modelProperty() ;
+				
+				$sAssoTableAlias = $sTableName.'.'.$aAssoPrototype->modelProperty() ;
 				$aTables->join( $aAssoPrototype->toPrototype()->tableName(), null, $sAssoTableAlias ) ;
 				
+				echo $sAssoTableAlias, "<br/>" ;
 				$this->setAssociationCriteria($aJoin->criteria(),$sTableName,$sAssoTableAlias, $aAssoPrototype->fromKeys(), $aAssoPrototype->toKeys() ) ;
 				
 				// 递归关联
@@ -142,7 +144,7 @@ class Selecter extends OperationStrategy
 						, AssociationPrototype::belongsTo
 				)) )
 				{
-					$this->loadModel($aDB,$aChildModel,$aRecordSet,$sChildModelName.'.',$nRowIdx) ;
+					$this->loadModel($aDB,$aChildModel,$aRecordSet,$sClmPrefix.$sChildModelName.'.',$nRowIdx) ;
 					$aChildModel->setSerialized(true) ;
 				}
 				

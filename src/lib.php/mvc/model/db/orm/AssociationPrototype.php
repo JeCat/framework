@@ -1,6 +1,7 @@
 <?php
 namespace jc\mvc\model\db\orm ;
 
+use jc\io\IOutputStream;
 use jc\lang\Exception;
 use jc\lang\Object;
 
@@ -220,6 +221,26 @@ class AssociationPrototype extends Object implements \Serializable
 			}
 		}
 	}
+	
+	// misc
+	public function printStruct(IOutputStream $aOutput=null,$nDepth=0)
+	{
+		if(!$aOutput)
+		{
+			$aOutput = $this->application()->response()->printer() ;
+		}
+		
+		$aOutput->write( "<pre>\r\n" ) ;
+		
+		$aOutput->write( str_repeat("\t", $nDepth)."[" ) ;
+		$aOutput->write( $this->type()."] " ) ;
+		$aOutput->write( $this->modelProperty()."\r\n" ) ;
+		
+		$this->toPrototype()->printStruct($aOutput,$nDepth) ;
+		
+		$aOutput->write( "</pre>" ) ;
+	}
+	
 	
 	private $sType ;
 	private $sModelProperty ;
