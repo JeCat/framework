@@ -138,7 +138,7 @@ class HtmlResourcePool extends Object
 				}
 				else 
 				{
-					$sRet.= "<script type=\"text/javascript\" comment=\"正在请求一个未知的CSS文件：{$sFilename}\"></script>\r\n" ;
+					$sRet.= "<script type=\"text/javascript\" comment=\"正在请求一个未知的JavaScript文件：{$sFilename}\"></script>\r\n" ;
 				}
 			}
 			foreach($this->iterator(self::RESRC_CSS,false) as $sFilename)
@@ -149,7 +149,7 @@ class HtmlResourcePool extends Object
 				}
 				else 
 				{
-					$sRet.= "<link rel=\"stylesheet\" type=\"text/css\" comment=\"正在请求一个未知的JavaScript文件：{$sFilename}\" />\r\n" ;
+					$sRet.= "<link rel=\"stylesheet\" type=\"text/css\" comment=\"正在请求一个未知的CSS文件：{$sFilename}\" />\r\n" ;
 				}
 			}
 		}
