@@ -2,9 +2,10 @@
 namespace jc\mvc\view\widget;
 
 use jc\lang\Exception;
+use jc\mvc\view\IView;
 
 class Select extends FormWidget {
-	public function __construct($sId, $sTitle = null, $nSize = 1, IViewWidget $aView = null) {
+	public function __construct($sId, $sTitle = null, $nSize = 1, IView $aView = null) {
 		if (! is_int ( $nSize )) {
 			new Exception ( "调用" . __CLASS__ . "的" . __METHOD__ . "方法时使用了非法的size参数(得到的size参数是:%s)", array ($nSize ) );
 		}

@@ -33,15 +33,6 @@ class RadioGroup extends Group {
 		$this->addWidget ( new CheckBtn ( $sId, $sTitle, $sValue, CheckBtn::radio , $bChecked, $aView ) );
 		return $this;
 	}
-
-	public function setView(IView $aView)
-	{
-		foreach($this->widgetIterator() as $aRadio){
-//			$aRadio->setView($aView);
-			$aView->addWidget($aRadio);
-		}
-		parent::setView($aView) ;
-	}
 	
 	//添加控件
 	public function addWidget(IViewWidget $aWidget) {

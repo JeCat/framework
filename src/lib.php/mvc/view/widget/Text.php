@@ -8,9 +8,10 @@ class Text extends FormWidget {
 	const single = 0;
 	const password = 1;
 	const multiple = 2;
+	const hidden = 3;
 	
 	private static $nTypeMin = 0;
-	private static $nTypeMax = 2;
+	private static $nTypeMax = 3;
 	
 	public function __construct($sId, $sTitle = null, $sValue=null, $nType = self::single, IView $aView = null) {
 		$this->setType ( $nType );
@@ -19,6 +20,21 @@ class Text extends FormWidget {
 	}
 	
 	public function type() {
+		return $this->nType;
+	}
+	
+	public function typeForHtml() {
+		switch ($this->nType) {
+		    case self::single :
+		        return "text";
+		        break;
+		    case self::password :
+		        return "password";
+		        break;
+		    case self::hidden :
+		        return "hidden";
+		        break;
+		}
 		return $this->nType;
 	}
 	
@@ -51,6 +67,14 @@ class Text extends FormWidget {
 	
 	public function setPassword() {
 		$this->nType = self::password;
+	}
+	
+	public function isHidden() {
+		return $this->nType == self::hidden;
+	}
+	
+	public function setHidden() {
+		$this->nType = self::hidden;
 	}
 	
 	private $nType;

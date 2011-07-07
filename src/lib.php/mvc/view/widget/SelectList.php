@@ -3,9 +3,10 @@ namespace jc\mvc\view\widget;
 
 use jc\lang\Exception;
 use jc\util\IDataSrc;
+use jc\mvc\view\IView;
 
 class SelectList extends Select {
-	public function __construct($sId, $sTitle = null, $nSize = 1, IViewWidget $aView = null) {
+	public function __construct($sId, $sTitle = null, $nSize = 1, IView $aView = null) {
 		$this->setSerializMethod ( array (__CLASS__, 'serialize' ), array (',' ) );
 		$this->setUnSerializMethod ( array (__CLASS__, 'unserialize' ), array (',' ) );
 		parent::__construct ( $sId, $sTitle, $nSize, $aView );
