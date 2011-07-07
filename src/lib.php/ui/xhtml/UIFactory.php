@@ -22,6 +22,7 @@ class UIFactory extends UIFactoryBase
 		ParserStateMacro::singleton()
 				->addMacroType('?')
 				->addMacroType('=')
+				->addMacroType('/')
 				->addMacroType('*') ;
 
 		return $aInterpreters ;
@@ -97,6 +98,7 @@ class UIFactory extends UIFactoryBase
 			$aMacroCompiler->addSubCompiler('*',__NAMESPACE__."\\compiler\\macro\\CommentMacroCompiler") ;
 			$aMacroCompiler->addSubCompiler('?',__NAMESPACE__."\\compiler\\macro\\EvalMacroCompiler") ;
 			$aMacroCompiler->addSubCompiler('=',__NAMESPACE__."\\compiler\\macro\\PrintMacroCompiler") ;
+			$aMacroCompiler->addSubCompiler('/',__NAMESPACE__."\\compiler\\macro\\PathMacroCompiler") ;
 		}
 		
 		return $aMacroCompiler ;

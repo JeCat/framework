@@ -33,6 +33,77 @@ class HttpRequest extends Request
 				$this->addChild( new DataSrc($GLOBALS[$sVarName],true) ) ;
 			}
 		}
+		
+		// 
+		$this->set('REQUEST_URL',(empty($_SERVER['HTTPS'])?'http://':'https://').$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']) ;
+	}
+
+	public function referer()
+	{
+		return $this->get('HTTP_REFERER') ;
+	}
+	
+	public function urlInfo($sName=null)
+	{
+		if(!$this->arrUrlPathInfo)
+		{
+			$this->arrUrlPathInfo = parse_url($this->url()) ;
+		}
+		
+		if(!$sName)
+		{
+			return $this->arrUrlPathInfo ;
+		}
+		else 
+		{
+			return isset($this->arrUrlPathInfo[$sName])?
+				$this->arrUrlPathInfo[$sName]: null ;
+		}
+	}
+	
+	public function url()
+	{
+		return $this->get('REQUEST_URL') ;
+	}
+
+	public function urlScheme()
+	{
+		return $this->urlInfo('scheme') ;
+	}
+	public function urlHost()
+	{
+		return $this->urlInfo('host') ;
+	}
+	public function urlPath()
+	{
+		return $this->urlInfo('path') ;
+	}
+	public function urlQuery()
+	{
+		return $this->urlInfo('query') ;
+	}
+	public function urlAnchor()
+	{
+		return $this->urlInfo('fragment') ;
+	}
+	public function urlUsername()
+	{
+		return $this->urlInfo('user') ;
+	}
+	public function urlPassword()
+	{
+		return $this->urlInfo('pass') ;
+	}
+	
+	public function uri()
+	{
+		if(!$this->sUri)
+		{
+			$sQuery = $this->urlQuery() ;
+			$this->sUri = $this->urlPath() . ($sQuery?('?'.$sQuery):"") ;
+		}
+		
+		return $this->sUri ;
 	}
 
 	public function quoteString($sName)
@@ -71,5 +142,8 @@ class HttpRequest extends Request
 		
 		return 0 ;
 	}
+	
+	private $sUri ;
+	private $arrUrlPathInfo ;
 }
 ?>
