@@ -53,6 +53,14 @@ class RadioGroup extends Group {
 		}
 	}
 	
+	public function setView(IView $aView)
+	{
+		parent::setView($aView);
+		foreach ( $this->widgetIterator() as $aWidget ) {
+			$aView->addWidget($aWidget);
+		}
+	}
+	
 	public function setChecked($sCheckedId) {
 		if (! is_string ( $sCheckedId )) {
 			throw new Exception ( "调用" . __CLASS__ . "类的" . __METHOD__ . "方法时使用了非法的sCheckedId参数(得到的sCheckedId为:%s)", array ($sCheckedId ) );
