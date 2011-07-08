@@ -16,11 +16,12 @@ class CheckBtn extends FormWidget {
 			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的type参数(得到的type是:%s)", array ($nType ) );
 		}
 		
+		$this->checkedValue = $sValue;
+		
 		if ($bChecked) {
 			$this->setChecked (true) ;
 		}
 		
-		$this->checkedValue = $sValue;
 		$this->nType = $nType;
 		parent::__construct ( $sId, 'jc:ViewWidgetCheckBtn.template.html', $sTitle, $aView );
 	}
