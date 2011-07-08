@@ -32,6 +32,21 @@ class Object extends Composite implements IObject
 			$aObject->compile($aDev) ;
 		}
 	}
+
+	public function childAfter(self $aFind)
+	{
+		$aIter = $this->iterator() ;
+		foreach($aIter as $aChild)
+		{
+			if($aFind==$aChild)
+			{
+				$aIter->next() ;
+				return $aIter->current() ;
+			}
+		}
+		
+		return null ;
+	}
 	
 	private $aParent ;
 	
