@@ -139,17 +139,18 @@ class UI extends JcObject
 		{
 			$aVariables = $this->variables() ;
 		}
+		if(!$aDevice)
+		{
+			$aDevice = $this->OutputStream() ;
+		}
+		
 		
 		// 模板变量
 		if( !$aVariables->has('theRequest') )
 		{
 			$aVariables->set('theRequest',$this->application()->request()) ;
 		}
-		
-		if(!$aDevice)
-		{
-			$aDevice = $this->OutputStream() ;
-		}
+		$aVariables->set('theDevice',$aDevice) ;
 		
 		// 拦截 output
 		if($aDevice)

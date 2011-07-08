@@ -10,25 +10,28 @@ abstract class MultiTableStatement extends Statement
 {
 	public function __construct($sTableName=null,$sTableAlias=null)
 	{
-		$this->aTables = new Tables($this,$sTableName,$sTableAlias) ;
+		$this->aMainTable = $sTableAlias?
+			new Table($sTableName,$sTableAlias): $sTableName ;
+			
+		$this->arrTables[] = $this->aMainTable ;
 	}
 	
 	/** 
 	 * @return Tables
 	 */
-	public function tables()
+	public function table()
 	{
-		return $this->aTables ;
+		return $this->table ;
 	}
 
-	public function setTables(Tables $aTables)
+	public function setTable($table)
 	{
-		$this->aTables = $aTables ;
+		$this->table = $table ;
 	}
 	
-	public function realTableName($sInputName,$bAlias=false)
+	public function addTable($aTable)
 	{
-		return $this->tableNameFactory()->tableName($sInputName) ;
+		$this->arrTables[] = $aTable ;
 	}
 	
 	/**
@@ -52,17 +55,28 @@ abstract class MultiTableStatement extends Statement
 	{
 		$sStatement = '' ;
 		
-		if($this->aTables)
-		{
-			$sStatement.= " FROM " . $this->aTables->makeStatement($bFormat) ;
-		}
+		$sStatement.= " FROM" . $this->arrTables->makeStatementTableList($bFormat) ;
 	
 		if($this->aCriteria)
 		{
 			$sStatement.= " WHERE " . $this->aCriteria->makeStatement($bFormat) ;
 		}
-				
+		
 		return $sStatement ;
+	}
+	
+	public function makeStatementTableList($bFormat=false)
+	{
+		foreach($this->arrTables as $table)
+		{
+			$arrTables = array() ;
+			foreach( $this->arrTables as $table )
+			{
+				$arrTables[] = ($table instanceof Table)? $table->makeStatement($bFormat): "`{$table}`" ;
+			}
+			
+			return ' ' . implode(", ",$arrTables) ;
+		}
 	}
 	
 	public function makeStatementLimit($bFormat=false)
@@ -79,7 +93,7 @@ abstract class MultiTableStatement extends Statement
 	
 	public function checkValid($bThrowException=true)
 	{
-		if( !$this->aTables )
+		if( !$this->arrTables )
 		{
 			if($bThrowException)
 			{
@@ -89,7 +103,7 @@ abstract class MultiTableStatement extends Statement
 			return false ;
 		}
 		
-		return $this->aTables->checkValid($bThrowException) ;
+		return $this->arrTables->checkValid($bThrowException) ;
 	}
 	
 	public function setLimit($nLen=null)
@@ -105,10 +119,9 @@ abstract class MultiTableStatement extends Statement
 		return $this->nLimitLen ;
 	}
 	
-	/**
-	 * @var Tables
-	 */
-	private $aTables = null ;
+	private $arrTables = array() ;
+	
+	private $aMainTable = null ;
 	
 	/**
 	 * Enter description here ...

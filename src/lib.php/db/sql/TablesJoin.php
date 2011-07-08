@@ -1,9 +1,7 @@
 <?php 
-
 namespace jc\db\sql ;
 
 use jc\lang\Exception;
-use jc\niy\IIteratable ;
 
 class TablesJoin extends SubStatement
 {
@@ -11,7 +9,7 @@ class TablesJoin extends SubStatement
 	const JOIN_RIGHT = "RIGHT JOIN" ;
 	const JOIN_INNER = "INNER JOIN" ;
 	
-	public function __construct(IStatement $aStatement,$sType=self::JOIN_LEFT)
+	public function __construct($sType=self::JOIN_LEFT)
 	{
 		if( !in_array($sType,array(
 				self::JOIN_LEFT ,
@@ -23,9 +21,11 @@ class TablesJoin extends SubStatement
 		}
 		
 		$this->sType = $sType ;
-		$this->aCriteria = new Criteria($aStatement,$aStatement) ;
-		
-		parent::__construct($aStatement) ;
+	}
+	
+	public function setType($sType)
+	{
+		$this->sType = $sType ;
 	}
 	
 	public function type()
@@ -33,20 +33,13 @@ class TablesJoin extends SubStatement
 		return $this->sType ;
 	}
 	
-	public function addTable($sTableName,$criteria=null,$sAlias=null)
+	public function addTable($table,$criteria=null)
 	{
-		$sTableName = $this->statement()->realTableName($sTableName) ;
+		$this->arrTables[] = $table ;
 		
-		if(!$sAlias)
-		{
-			$sAlias = $sTableName ;
-		}
-		
-		$this->arrTables[$sAlias] = $sTableName ;
-			
 		if($criteria)
 		{
-			$this->aCriteria->add($criteria) ;
+			$this->criteria()->add($criteria) ;
 		}
 	}
 	
@@ -68,18 +61,12 @@ class TablesJoin extends SubStatement
 		}
 	}
 	
-	public function makeStatement($bFormat=false,$bEnableAlias=true)
+	public function makeStatement($bFormat=false)
 	{
-		$aStatement = $this->statement() ;
 		$arrTables = array() ;
-		foreach( $this->arrTables as $sAlias=>$sTable )
+		foreach( $this->arrTables as $table )
 		{
-			if( $bEnableAlias and $sAlias!=$sTable )
-			{
-				$sTable.= " AS `{$sAlias}`" ;
-			}
-			
-			$arrTables[] = $sTable ;
+			$arrTables[] = ($table instanceof Table)? $table->makeStatement($bFormat): "`{$table}`" ;
 		}
 		
 		return $this->sType . "( " . implode(", ",$arrTables)
@@ -88,6 +75,10 @@ class TablesJoin extends SubStatement
 	
 	public function criteria()
 	{
+		if(!$this->aCriteria)
+		{
+			$this->aCriteria = new Criteria() ;
+		}
 		return $this->aCriteria ;
 	}
 	

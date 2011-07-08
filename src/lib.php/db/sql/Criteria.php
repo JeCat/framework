@@ -6,7 +6,7 @@ use jc\lang\Exception;
 use jc\util\match\RegExp;
 
 class Criteria extends SubStatement
-{	
+{
 	public function makeStatement($bFormat=false)
 	{
 		$arrExpressions = array() ;
@@ -14,7 +14,7 @@ class Criteria extends SubStatement
 		{
 			if( is_array($express) )
 			{
-				$arrExpressions[] = $this->transTableName($express[0])
+				$arrExpressions[] = $express[0]
 							." {$express[2]} '".addslashes($express[1])."'" ;
 			}
 			else if( $express instanceof Criteria )
@@ -95,16 +95,6 @@ class Criteria extends SubStatement
 	public function clear()
 	{
 		$this->arrExpressions = array() ;
-	}
-	
-	public function transTableName($sColumn)
-	{
-		if( strstr($sColumn,'.')!==false )
-		{
-			list($sTable,$sColumn) = explode(".", $sColumn) ;
-			return $this->statement()->realTableName($sTable,true) . '.' . $sColumn ;
-		}
-		return $sColumn ;
 	}
 	
 	public function transExpression($sExpression,$arrArgvs)
