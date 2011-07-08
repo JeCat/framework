@@ -53,6 +53,7 @@ class RadioGroup extends Group {
 		}
 	}
 	
+	//当把当前的radiogroup对象添加到view中时,同时把radiogroup的子对象也添加到view中去,这样无论radiogroup什么时候creatradio,view对象都可以准确的添加radiogroup的子控件
 	public function setView(IView $aView)
 	{
 		parent::setView($aView);
