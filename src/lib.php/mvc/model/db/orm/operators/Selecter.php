@@ -36,7 +36,7 @@ class Selecter extends OperationStrategy
 				$aCriteria->add( $aSelect->transColumn($sKey), $sValue ) ;
 			}
 		}
-		echo "<p>".$aSelect->makeStatement(),"</p>" ;
+
 		//  执行
 		$aRecordSet = $aDB->query($aSelect) ;
 		if( !$aRecordSet or !$aRecordSet->rowCount() )
