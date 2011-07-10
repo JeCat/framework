@@ -70,7 +70,7 @@ class TablesJoin extends SubStatement
 		}
 		
 		return $this->sType . "( " . implode(", ",$arrTables)
-					. " ) ON ( " . $this->aCriteria->makeStatement($bFormat) ." )" ;
+					. " ) ON " . $this->aCriteria->makeStatement($bFormat) ;
 	}
 	
 	public function criteria()

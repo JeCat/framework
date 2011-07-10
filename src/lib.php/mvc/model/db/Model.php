@@ -1,28 +1,28 @@
 <?php
 namespace jc\mvc\model\db ;
 
-use jc\mvc\model\db\orm\ModelAssociationMap;
+use jc\mvc\model\db\orm\PrototypeAssociationMap;
 use jc\lang\Exception;
 use jc\mvc\model\db\orm\operators\Deleter;
 use jc\mvc\model\db\orm\operators\Selecter;
 use jc\mvc\model\db\orm\operators\Inserter;
 use jc\mvc\model\db\orm\operators\Updater;
 use jc\db\DB;
-use jc\db\IRecordSet;
+use jc\db\recordset\IRecordSet;
 use jc\db\sql\MultiTableStatement;
-use jc\mvc\model\db\orm\AssociationPrototype;
-use jc\mvc\model\db\orm\ModelPrototype ;
+use jc\mvc\model\db\orm\Association;
+use jc\mvc\model\db\orm\PrototypeInFragment ;
 use jc\mvc\model\Model as BaseModel ;
 use jc\db\sql\IDriver ;
 use jc\lang\Object;
 
 class Model extends BaseModel implements IModel
 {
-	static public function fromFragment($sPrototypeName,array $arrAssocFragment=array(),$bAggregation=false,ModelAssociationMap $aAssocMap=null)
+	static public function fromFragment($sPrototypeName,array $arrAssocFragment=array(),$bAggregation=false,PrototypeAssociationMap $aAssocMap=null)
 	{
 		if( !$aAssocMap )
 		{
-			$aAssocMap = ModelAssociationMap::singleton() ;
+			$aAssocMap = PrototypeAssociationMap::singleton() ;
 		}
 		
 		$aPrototype = $aAssocMap->fragment($sPrototypeName,$arrAssocFragment) ;
@@ -40,14 +40,16 @@ class Model extends BaseModel implements IModel
 	{
 		parent::__construct($bAggregation) ;
 		
+		$this->setLimit( $bAggregation? 30: 1 ) ;
+		
 		// orm config
 		if( is_array($prototype) )
 		{
-			$aPrototype = ModelPrototype::createFromCnf($prototype) ;
+			$aPrototype = PrototypeInFragment::createFromCnf($prototype) ;
 		}
 		
 		// Prototype
-		else if( $prototype instanceof ModelPrototype )
+		else if( $prototype instanceof PrototypeInFragment )
 		{
 			$aPrototype = $prototype ;
 		}
@@ -93,16 +95,18 @@ class Model extends BaseModel implements IModel
 		if(!$aChild)
 		{
 			// 根据 原型 自动创建子模型
-			if( $aAssocs=$this->prototype()->associations(false) and $aAssocPrototype=$aAssocs->get($sName) )
+			if( $aAssocs=$this->prototype()->associations(false) and $aAssociation=$aAssocs->get($sName) )
 			{
-				$aChild = $aAssocPrototype->toPrototype()->createModel() ;
-				$this->addChild($aChild,$aAssocPrototype->modelProperty()) ;
+				$aChild = $aAssociation->toPrototype()->createModel() ;
+				$this->addChild($aChild,$aAssociation->modelProperty()) ;
 				
 				// 多属关系
-				if( in_array( $aAssocPrototype->type(), array(AssociationPrototype::hasMany,AssociationPrototype::hasAndBelongsToMany) ) )
+				if( !$aAssociation->isOneToOne() )
 				{
 					$aChild->setAggregation(true) ;
 				}
+				
+				$aChild->setLimit( $aAssociation->count() ) ;
 			}
 		}
 		
@@ -110,52 +114,55 @@ class Model extends BaseModel implements IModel
 	}
 	
 	/**
-	 * @return jc\mvc\model\db\orm\ModelPrototype
+	 * @return jc\mvc\model\db\orm\PrototypeInFragment
 	 */
 	public function prototype()
 	{
 		return $this->aPrototype ;
 	}
 
-	public function setPrototype(ModelPrototype $aPrototype=null)
+	public function setPrototype(PrototypeInFragment $aPrototype=null)
 	{
 		$this->aPrototype = $aPrototype ;
 	}
 
-	public function loadData( IRecordSet $aRecordSet, $nRowIdx=0, $sClmPrefix=null, $bSetSerialized=false )
+	public function loadData( IRecordSet $aRecordSet, $bSetSerialized=false )
 	{
 		// 聚合模型
 		if( $this->isAggregation() )
 		{
 			$aPrototype = $this->prototype() ;
-			for($nIdx=0; $nIdx<$aRecordSet->rowCount(); $nIdx++)
+			
+			while( $aRecordSet->valid() )
 			{
 				$aModel = $aPrototype? $aPrototype->createModel(): new self() ;
-				$aModel->loadData($aRecordSet,$nIdx,$sClmPrefix,$bSetSerialized) ;
+				$aModel->loadData($aRecordSet,$bSetSerialized) ;
 
 				$this->addChild($aModel) ;
+				
+				$aRecordSet->next() ;
 			}
 		}
 		
 		// 常规模型
 		else 
 		{
+			// 通过 prototype 加载各字段数据
 			if( $aPrototype=$this->prototype() )
 			{
-				foreach( $this->prototype()->columns() as $sClm )
+				foreach( $aPrototype->columns() as $sClm )
 				{
-					$this->setData( $sClm, $aRecordSet->field($nRowIdx,$sClmPrefix.$sClm) ) ;
+					$this->setData( $sClm, $aRecordSet->field($aPrototype->columnAlias($sClm)) ) ;
 				}
 			}
+			
+			// 通过 数据集 加载各字段数据
 			else 
 			{
-				$arrRow = $aRecordSet->row($nRowIdx) ;
-				if($arrRow)
+				$arrRow = $aRecordSet->current() ;
+				foreach ($arrRow as $sClmName=>&$sValue)
 				{
-					foreach ($arrRow as $sClmName=>&$sValue)
-					{
-						$this->setData($sClmName,$sValue) ;
-					}
+					$this->setData($sClmName,$sValue) ;
 				}
 			}
 			
@@ -180,31 +187,10 @@ class Model extends BaseModel implements IModel
 				$keys = $this->prototype()->primaryKeys() ;
 			}
 			
-			foreach($keys as &$sKey)
-			{
-				if(strstr($sKey,'.')==false)
-				{
-					$sKey = '`'.$this->prototype()->name().'`.`'.$sKey.'`' ;
-				}
-			}
-			
 			$values = array_combine($keys,$values) ;
 		}
 		
-		return Selecter::singleton()->select(
-			DB::singleton()
-			, $this
-			, null
-			, null
-			, $values
-			, null
-			, $this->isAggregation()? 30: 1
-		) ;
-	}
-	
-	public function totalCount()
-	{
-		
+		return Selecter::singleton()->select( DB::singleton(), $this, $values ) ;
 	}
 	
 	public function save()
@@ -367,10 +353,44 @@ class Model extends BaseModel implements IModel
 		return $aChildModel ;
 	}
 	
+	
+	public function totalCount()
+	{
+		
+	}
+	
+	const ignore = -1 ;
+	
+	public function setLimit($nLength=1,$nFrom=self::ignore)
+	{
+		if( $nFrom!=self::ignore )
+		{
+			$this->nLimitFrom = $nFrom ;
+		}
+		if( $nLength!=self::ignore )
+		{
+			$this->nLimitLength = $nLength ;
+		}
+	}
+	
+	public function limitFrom()
+	{
+		return $this->nLimitFrom ;
+	}
+	
+	public function limitLength()
+	{
+		return $this->nLimitLength ;
+	}
+	
 	/**
-	 * @var jc\mvc\model\db\orm\ModelPrototype
+	 * @var jc\mvc\model\db\orm\PrototypeInFragment
 	 */
 	private $aPrototype ;
+	
+	private $nLimitFrom = 0 ;
+	
+	private $nLimitLength = 1 ;
 }
 
 ?>

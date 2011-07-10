@@ -21,7 +21,7 @@ class Update extends MultiTableStatement implements IDataSettableStatement
 		$aCriteria = $this->criteria() ;
 		
 		$sStatement = ($this->isReplace()? "REPLACE ": "UPDATE ")
-				. $this->tables()->makeStatement($bFormat) 
+				. $this->makeStatementTableList($bFormat)
 				. " SET " ;
 
 		$arrValues = array() ;

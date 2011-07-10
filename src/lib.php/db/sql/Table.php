@@ -14,7 +14,7 @@ class Table extends SubStatement
 		$sSql = "`$this->sTableName`" ;
 		if( $this->sAlias and $this->sAlias!=$this->sTableName )
 		{
-			$sSql.= ' AS `{$this->sAlias}`' ;
+			$sSql.= " AS `{$this->sAlias}`" ;
 		}
 		
 		foreach($this->arrJoinSubStatements as $aJoin)
@@ -23,6 +23,11 @@ class Table extends SubStatement
 		}
 		
 		return $sSql ;
+	}
+	
+	public function checkValid($bThrowException=true) 
+	{
+		return true ;
 	}
 	
 	public function name()

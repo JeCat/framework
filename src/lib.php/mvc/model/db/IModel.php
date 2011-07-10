@@ -1,21 +1,29 @@
 <?php
 namespace jc\mvc\model\db ;
 
-use jc\db\IRecordSet;
-use jc\mvc\model\db\orm\ModelPrototype;
+use jc\db\recordset\IRecordSet;
+use jc\mvc\model\db\orm\PrototypeInFragment;
 use jc\mvc\model\IModel as IModelBase ;
 
 interface IModel extends IModelBase
 {
 	/**
-	 * @return jc\mvc\model\db\orm\ModelPrototype
+	 * @return jc\mvc\model\db\orm\PrototypeInFragment
 	 */
 	public function prototype() ;
 
-	public function setPrototype(ModelPrototype $aPrototype) ;
+	public function setPrototype(PrototypeInFragment $aPrototype) ;
 	
-	public function loadData( IRecordSet $aRecordSet, $nRowIdx=0, $sClmPrefix=null, $bSetSerialized=false ) ;
+	public function loadData( IRecordSet $aRecordSet, $bSetSerialized=false ) ;
+
 	
+	public function totalCount() ;
+	
+	public function setLimit($nLength=1,$nFrom=0) ;
+	
+	public function limitFrom() ;
+	
+	public function limitLength() ;
 }
 
 ?>

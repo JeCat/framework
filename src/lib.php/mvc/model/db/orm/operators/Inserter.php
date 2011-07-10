@@ -3,7 +3,7 @@ namespace jc\mvc\model\db\orm\operators ;
 
 use jc\db\DB;
 use jc\mvc\model\db\IModel;
-use jc\mvc\model\db\orm\AssociationPrototype;
+use jc\mvc\model\db\orm\Association;
 use jc\db\sql\Insert;
 
 class Inserter extends OperationStrategy
@@ -14,11 +14,11 @@ class Inserter extends OperationStrategy
 		$aInsert = new Insert($aPrototype->tableName()) ;
 		
 		// 从 belongs to model 中设置外键值
-		foreach($aPrototype->associations() as $aAssoPrototype)
+		foreach($aPrototype->associations() as $aAssociation)
 		{				
-			if( $aAssoPrototype->type()==AssociationPrototype::belongsTo )
+			if( $aAssociation->type()==Association::belongsTo )
 			{
-				$aAssocModel = $aModel->child( $aAssoPrototype->modelProperty() ) ;
+				$aAssocModel = $aModel->child( $aAssociation->modelProperty() ) ;
 				if(!$aAssocModel)
 				{
 					continue ;
@@ -26,7 +26,7 @@ class Inserter extends OperationStrategy
 				
 				$aAssocModel->save() ;
 				
-				$this->setAssocModelData($aAssocModel,$aModel,$aAssoPrototype) ;
+				$this->setAssocModelData($aAssocModel,$aModel,$aAssociation) ;
 			}
 		}
 		
@@ -52,20 +52,20 @@ class Inserter extends OperationStrategy
 		
 		// -----------------------------------
 		// insert 关联model
-		foreach($aPrototype->associations() as $aAssoPrototype)
+		foreach($aPrototype->associations() as $aAssociation)
 		{
-			$aAssocModel = $aModel->child( $aAssoPrototype->modelProperty() ) ;
+			$aAssocModel = $aModel->child( $aAssociation->modelProperty() ) ;
 			if(!$aAssocModel)
 			{
 				continue ;
 			}
 			
-			switch ( $aAssoPrototype->type() )
+			switch ( $aAssociation->type() )
 			{
-			case AssociationPrototype::hasOne :
-			case AssociationPrototype::belongsTo :
+			case Association::hasOne :
+			case Association::belongsTo :
 		
-				$this->setAssocModelData($aModel,$aAssocModel,$aAssoPrototype) ;
+				$this->setAssocModelData($aModel,$aAssocModel,$aAssociation) ;
 				if( !$aAssocModel->save() )
 				{
 					return false ;
@@ -73,9 +73,9 @@ class Inserter extends OperationStrategy
 				
 				break ;
 				
-			case AssociationPrototype::hasMany :
+			case Association::hasMany :
 		
-				$this->setAssocModelData($aModel,$aAssocModel,$aAssoPrototype) ;
+				$this->setAssocModelData($aModel,$aAssocModel,$aAssociation) ;
 				if( !$aAssocModel->save() )
 				{
 					return false ;
@@ -83,7 +83,7 @@ class Inserter extends OperationStrategy
 			
 				break ;
 				
-			case AssociationPrototype::hasAndBelongsToMany :
+			case Association::hasAndBelongsToMany :
 				
 				if( !$aAssocModel->save() )
 				{
@@ -94,7 +94,7 @@ class Inserter extends OperationStrategy
 				// insert bridge table
 				foreach($aAssocModel->childIterator() as $aOneChildModel)
 				{
-					$this->buildBridge($aDB,$aAssoPrototype,$aModel,$aOneChildModel) ;
+					$this->buildBridge($aDB,$aAssociation,$aModel,$aOneChildModel) ;
 				}
 				
 				break ;
@@ -104,10 +104,10 @@ class Inserter extends OperationStrategy
 		return true ;
 	}
 	
-	private function setAssocModelData(IModel $aModel,IModel $aChildModel,AssociationPrototype $aAssoPrototype)
+	private function setAssocModelData(IModel $aModel,IModel $aChildModel,Association $aAssociation)
 	{
-		$arrFromKeys = $aAssoPrototype->fromKeys() ;
-		foreach($aAssoPrototype->toKeys() as $nIdx=>$sKey)
+		$arrFromKeys = $aAssociation->fromKeys() ;
+		foreach($aAssociation->toKeys() as $nIdx=>$sKey)
 		{
 			$aChildModel->setData( $sKey, $aModel->data($arrFromKeys[$nIdx]) ) ;
 		}

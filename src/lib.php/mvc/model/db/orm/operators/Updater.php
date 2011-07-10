@@ -3,7 +3,7 @@ namespace jc\mvc\model\db\orm\operators ;
 
 use jc\db\DB;
 use jc\mvc\model\db\IModel;
-use jc\mvc\model\db\orm\AssociationPrototype;
+use jc\mvc\model\db\orm\Association;
 use jc\db\sql\Update;
 
 class Updater extends OperationStrategy
@@ -41,7 +41,7 @@ class Updater extends OperationStrategy
 			}
 			
 			// 
-			if( $aAssoPrototype->type()==AssociationPrototype::hasAndBelongsToMany )
+			if( $aAssoPrototype->type()==Association::hasAndBelongsToMany )
 			{
 				foreach($aChildModel->childIterator() as $aOneChildModel)
 				{

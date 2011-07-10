@@ -3,8 +3,8 @@
 namespace jc\mvc\controller ;
 
 use jc\util\match\RegExp;
-use jc\mvc\model\db\orm\ModelPrototype;
-use jc\mvc\model\db\orm\ModelAssociationMap;
+use jc\mvc\model\db\orm\Prototype;
+use jc\mvc\model\db\orm\PrototypeAssociationMap;
 use jc\mvc\view\VagrantViewSearcher;
 use jc\message\IMessageQueue;
 use jc\message\MessageQueue;
@@ -35,13 +35,13 @@ class Controller extends NamableComposite implements IController
     
     public function createModel($prototype,array $arrProperties=array(),$bAgg=false,$sName=null,$sClass='jc\\mvc\\model\\db\\Model')
     {
-    	if( $prototype instanceof ModelPrototype )
+    	if( $prototype instanceof Prototype )
     	{
     		$aPrototype = $prototype ;
     	}
     	else
     	{
-    		$aPrototype = ModelAssociationMap::singleton()->fragment($prototype,$arrProperties) ;
+    		$aPrototype = PrototypeAssociationMap::singleton()->fragment($prototype,$arrProperties) ;
     	}
     	
     	if(!$sName)

@@ -2,8 +2,8 @@
 
 namespace jc\db ;
 
+use jc\db\driver\IDriver;
 use jc\db\sql\Select;
-
 use jc\lang\Object;
 use jc\db\sql\Statement;
 
@@ -42,7 +42,7 @@ class DB extends Object
 		
 		if( $aRecords )
 		{
-			return intval($aRecords->field(0,'rowCount')) ;
+			return intval($aRecords->field('rowCount',0)) ;
 		}
 		
 		else 

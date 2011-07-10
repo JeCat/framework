@@ -10,23 +10,11 @@ abstract class MultiTableStatement extends Statement
 {
 	public function __construct($sTableName=null,$sTableAlias=null)
 	{
-		$this->aMainTable = $sTableAlias?
-			new Table($sTableName,$sTableAlias): $sTableName ;
-			
-		$this->arrTables[] = $this->aMainTable ;
-	}
-	
-	/** 
-	 * @return Tables
-	 */
-	public function table()
-	{
-		return $this->table ;
-	}
-
-	public function setTable($table)
-	{
-		$this->table = $table ;
+		if( $sTableName )
+		{
+			$this->arrTables[] = $sTableAlias?
+				new Table($sTableName,$sTableAlias): $sTableName ;
+		}
 	}
 	
 	public function addTable($aTable)
@@ -55,7 +43,7 @@ abstract class MultiTableStatement extends Statement
 	{
 		$sStatement = '' ;
 		
-		$sStatement.= " FROM" . $this->arrTables->makeStatementTableList($bFormat) ;
+		$sStatement.= " FROM" . $this->makeStatementTableList($bFormat) ;
 	
 		if($this->aCriteria)
 		{
@@ -103,7 +91,7 @@ abstract class MultiTableStatement extends Statement
 			return false ;
 		}
 		
-		return $this->arrTables->checkValid($bThrowException) ;
+		return true ;
 	}
 	
 	public function setLimit($nLen=null)
@@ -120,8 +108,6 @@ abstract class MultiTableStatement extends Statement
 	}
 	
 	private $arrTables = array() ;
-	
-	private $aMainTable = null ;
 	
 	/**
 	 * Enter description here ...

@@ -4,11 +4,11 @@ namespace jc\mvc\model\db\orm\operators ;
 use jc\db\sql\Select;
 
 use jc\db\sql\IDataSettableStatement;
-use jc\mvc\model\db\orm\AssociationPrototype;
+use jc\mvc\model\db\orm\Association;
 use jc\db\sql\Criteria;
 use jc\db\sql\MultiTableStatement;
 use jc\mvc\model\db\IModel;
-use jc\mvc\model\db\orm\ModelPrototype;
+use jc\mvc\model\db\orm\Prototype;
 use jc\db\DB;
 use jc\lang\Object;
 use jc\db\sql\Insert;
@@ -75,7 +75,7 @@ abstract class OperationStrategy extends Object
 		}
 	}
 	
-	protected function makeAssociation(MultiTableStatement $aStatement,ModelPrototype $aPrototype,$arrAssoTypes=array(AssociationPrototype::hasOne, AssociationPrototype::belongsTo))
+	protected function makeAssociation(MultiTableStatement $aStatement,Prototype $aPrototype,$arrAssoTypes=array(Association::hasOne, Association::belongsTo))
 	{
 		$aTables = $aStatement->tables() ;
 		$aJoin = $aTables->sqlStatementJoin() ;
@@ -103,7 +103,7 @@ abstract class OperationStrategy extends Object
 		}
 	}
 	
-	protected function buildBridge(DB $aDB,AssociationPrototype $aAssoPrototype,IModel $aFromModel,IModel $aToModel)
+	protected function buildBridge(DB $aDB,Association $aAssoPrototype,IModel $aFromModel,IModel $aToModel)
 	{
 		$aSelect = new Select($aAssoPrototype->bridgeTableName()) ;
 		$this->setCondition($aSelect->criteria(),$aAssoPrototype->bridgeToKeys(),$aAssoPrototype->fromKeys(),$aFromModel) ;

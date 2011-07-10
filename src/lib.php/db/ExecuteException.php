@@ -1,6 +1,7 @@
 <?php
 namespace jc\db ;
 
+use jc\db\driver\IDriver;
 use jc\lang\Exception as JcException ;
 
 class ExecuteException extends JcException

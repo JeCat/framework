@@ -15,7 +15,7 @@ class Delete extends MultiTableStatement
 		
 		$aCriteria = $this->criteria() ;
 		
-		$sStatement = "DELETE FROM " . $this->tables()->makeStatement($bFormat,false) 
+		$sStatement = "DELETE FROM " . $this->makeStatementTableList($bFormat)
 				. ($aCriteria? (' WHERE '.$aCriteria->makeStatement($bFormat)): '') ;
 		
 		// limit
