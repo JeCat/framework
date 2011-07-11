@@ -40,7 +40,7 @@ class File extends FSO implements IFile
 			return null ;
 		}
 		
-		return $this->create('InputStream','jc\\io',array($hHandle)) ;		
+		return InputStream::createInstance($hHandle,$this->application()) ;
 	}
 	
 	/**
@@ -56,7 +56,7 @@ class File extends FSO implements IFile
 			return null ;
 		}
 		
-		return $this->create('OutputStream','jc\\io',array($hHandle)) ;
+		return OutputStream::createInstance($hHandle,$this->application()) ;
 	}
 	
 }

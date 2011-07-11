@@ -91,15 +91,16 @@ class Object implements IObject
 			throw new Exception("class无效：".$sClassName) ;
 		}
 		
-		// 创建对象
-		$arrArgNameList = array() ;
-		foreach($argvs as $sKey=>&$Item)
+		// create object
+		if(empty($argvs))
 		{
-			$arrArgNameList[] = "\$argvs[$sKey]" ;
+			$aObject = new $sClassName() ;
 		}
-		$sArgList = implode(', ',$arrArgNameList) ;
-
-		$aObject = eval("return new {$sClassName}({$sArgList}) ;") ;
+		else 
+		{
+			$aRefClass = new \ReflectionClass($sClassName) ;
+			$aObject = $aRefClass->newInstanceArgs($argvs) ;
+		}
 		
 		// set application
 		if( $aApp and $aObject instanceof IObject )
@@ -121,15 +122,7 @@ class Object implements IObject
 		{
 			if($bCreateNew)
 			{
-				if($createArgvs)
-				{		
-					self::$arrGlobalInstancs[$sClass] = new $sClass() ;
-				}
-				
-				else 
-				{
-					self::$arrGlobalInstancs[$sClass] = $sClass::createInstance($createArgvs,null,$sClass) ;
-				}
+				self::$arrGlobalInstancs[$sClass] = self::createInstance($createArgvs,null,$sClass) ;
 			}
 			else 
 			{
