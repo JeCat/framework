@@ -12,12 +12,18 @@ class HttpAppFactory extends AppFactory
 		require_once __DIR__.'/Request.php' ;
 		require_once __DIR__.'/HttpRequest.php' ;
 		
-		return $aApp->create( 'HttpRequest', __NAMESPACE__ ) ;
+		$aReq = new HttpRequest() ;
+		$aReq->setApplication($aApp) ;
+		
+		return $aReq ;
 	}
 	
 	public function createResponse(CoreApplication $aApp)
 	{
-		$aRespn = parent::createResponse($aApp,$aApp->create('HtmlPrintStream','jc\\io')) ;
+		$aPrinter = new \jc\io\HtmlPrintStream() ;
+		$aPrinter->setApplication($aApp) ;
+		
+		$aRespn = parent::createResponse($aApp,$aPrinter) ;
 		return $aRespn ;
 	}
 }

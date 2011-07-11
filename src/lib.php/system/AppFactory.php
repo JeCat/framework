@@ -61,12 +61,16 @@ abstract class AppFactory extends Object
 
 	public function createAccessRouter(CoreApplication $aApp)
 	{
-		return $aApp->create('AccessRouter',__NAMESPACE__) ;
+		$aAccessRouter = new AccessRouter('cn') ;
+		$aAccessRouter->setApplication($aApp) ;
+		return $aAccessRouter ;
 	}
 	
 	public function createLocaleManager(CoreApplication $aApp)
 	{
-		return $aApp->create( 'LocaleManager','jc\locale',array('cn') ) ;
+		$aLocal = new \jc\locale\LocaleManager('cn') ;
+		$aLocal->setApplication($aApp) ;
+		return $aLocal ;
 	}
 	
 	abstract public function createRequest(CoreApplication $aApp) ;
@@ -74,9 +78,11 @@ abstract class AppFactory extends Object
 	
 	public function createResponse(CoreApplication $aApp,PrintStream $aPrinter)
 	{
-		$aRespn = $aApp->create( 'Response', __NAMESPACE__, array($aPrinter) ) ;
+		$aFilter = new \jc\io\StdOutputFilterMgr() ;
+		$aFilter->setApplication($aApp) ;
 		
-		$aFilter = $aApp->create('StdOutputFilterMgr','jc\io') ;
+		$aRespn = new Response($aPrinter) ;
+		$aRespn->setApplication($aApp) ;
 		$aRespn->setFilters($aFilter) ;
 		
 		return $aRespn ;

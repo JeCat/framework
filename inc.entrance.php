@@ -16,7 +16,6 @@ require_once __DIR__."/src/lib.php/lang/IObject.php" ;
 require_once __DIR__."/src/lib.php/lang/Object.php" ;
 require_once __DIR__."/src/lib.php/lang/IException.php" ;
 require_once __DIR__."/src/lib.php/lang/Exception.php" ;
-require_once __DIR__."/src/lib.php/lang/Factory.php" ;
 require_once __DIR__."/src/lib.php/system/ClassLoader.php" ;
 require_once __DIR__."/src/lib.php/system/CoreApplication.php" ;
 require_once __DIR__."/src/lib.php/system/Application.php" ;

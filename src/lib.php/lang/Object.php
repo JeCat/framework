@@ -26,25 +26,6 @@ class Object implements IObject
 			$this->setApplication($aApp) ;
 		}
 	}
-
-	/**
-	 * 创建一个对象，并设置该对象的 application 属性
-	 * 
-	 * @param	string	$sClassName		类名称（可以是包含完整路径的类名，也可以只是类名通过后面的 $sNamespace 参数指定所属的包名）
-	 * @param	array	$arrArgvs		传递给构造函数的参数
-	 * @return stdClass
-	 */
-	public function create($sClassName,$sNamespace='\\',array $arrArgvs=array())
-	{		
-		$aObject = Factory::createNewObject($sClassName,$sNamespace,$arrArgvs) ;
-		
-		if( $aObject instanceof IObject )
-		{
-			$aObject->setApplication($this->application(true)) ;
-		}
-		
-		return $aObject ;
-	}
 	
 	/**
 	 * Enter description here ...
@@ -73,22 +54,81 @@ class Object implements IObject
 		$this->aApplication = $aApp ;
 	}
 	
-	static public function singleton ($bCreateNew=true,$createArgvs=null)
+
+	/**
+	 * 创建一个对象，并设置该对象的 application 属性
+	 * 如果没有提供参数 $sClassName ， 则使用延迟静态绑定的类型
+	 * 这个静态方法有以下意义：
+	 * 	1、php 中使用 new 运算符的表达式，不是一个普通的表达式，例如以下情况会造成语法错误： (new xxx())->ooo() ;
+	 * 	可以使用类方法: xxx:create()->ooo() ;
+	 *  2、创建一个对象时，简化 application 对象的设置
+	 *  3、实现动态创建对象, 例如:
+	 *  	$sClassName = 'ooxx' ;
+	 *  	$aObject = $sClassName::create() ;
+	 * 	如果 $sClassName 不是从 jc\lang\Object 继承的类，则可以
+	 * 		\jc\lang\Object::create(null,null,'ooxx') ;
+	 * 
+	 * @return Object
+	 */
+	static public function createInstance($argvs=null,Application $aApp=null,$sClassName=null)
 	{
-		$sClass = get_called_class() ;
+		if($argvs===null)
+		{
+			$argvs = array() ;
+		}
+		else 
+		{
+			$argvs = (array) $argvs ;
+		}
 		
+		if(!$sClassName)
+		{
+			$sClassName = get_called_class() ;
+		}
+		
+		if( !class_exists($sClassName) )
+		{
+			throw new Exception("class无效：".$sClassName) ;
+		}
+		
+		// 创建对象
+		$arrArgNameList = array() ;
+		foreach($argvs as $sKey=>&$Item)
+		{
+			$arrArgNameList[] = "\$argvs[$sKey]" ;
+		}
+		$sArgList = implode(', ',$arrArgNameList) ;
+
+		$aObject = eval("return new {$sClassName}({$sArgList}) ;") ;
+		
+		// set application
+		if( $aApp and $aObject instanceof IObject )
+		{
+			$aObject->setApplication($aApp) ;
+		}
+		
+		return $aObject ;
+	}
+	
+	static public function singleton ($bCreateNew=true,$createArgvs=null,$sClass=null)
+	{
+		if(!$sClass)
+		{
+			$sClass = get_called_class() ;
+		}
+					
 		if( !isset(self::$arrGlobalInstancs[$sClass]) )
 		{
 			if($bCreateNew)
 			{
 				if($createArgvs)
-				{
+				{		
 					self::$arrGlobalInstancs[$sClass] = new $sClass() ;
 				}
 				
 				else 
 				{
-					self::$arrGlobalInstancs[$sClass] = Factory::createNewObject($sClass,null,(array)$createArgvs) ;
+					self::$arrGlobalInstancs[$sClass] = $sClass::createInstance($createArgvs,null,$sClass) ;
 				}
 			}
 			else 
@@ -100,9 +140,12 @@ class Object implements IObject
 		return self::$arrGlobalInstancs[$sClass] ;
 	}
 	
-	static public function setSingleton (self $aInstance=null)
+	static public function setSingleton (self $aInstance=null,$sClass=null)
 	{
-		$sClass = get_called_class() ;
+		if(!$sClass)
+		{
+			$sClass = get_called_class() ;
+		}
 		
 		// 移除全局实例
 		if(!$aInstance)
@@ -118,6 +161,8 @@ class Object implements IObject
 		return self::$arrGlobalInstancs[$sClass] = $aInstance ;
 	}
 
+	// 以下是将 单件 和 享员 对象保存在所属的 application 中的实现
+	// 这个方案由于要在自动判断对象所属的 application 对象，有明显的性能影响
 	/*static public function singleton ($bCreateNew=true)
 	{
 		// 从调用堆栈上找到 application
@@ -165,40 +210,45 @@ class Object implements IObject
 		}
 	}
 	
-	static public function setFlyweight($aInstance,$sKey/* ... */)
+	static public function setFlyweight($aInstance,$keys,$sClassName=null)
 	{		
-		$sClass = get_called_class() ;
-		
-		if( !isset(self::$arrFlyweightInstancs[$sClass]) )
+		if(!$sClassName)
 		{
-			self::$arrFlyweightInstancs[$sClass] = array() ;
+			$sClassName = get_called_class() ;
 		}
 		
-		$arrArgs = func_get_args() ;
-		array_shift($arrArgs) ;
-		$sKey = implode(',', $arrArgs) ;
+		$keys = (array)$keys ;
+		$sKey = implode(',', $keys) ;
 		
-		return self::$arrFlyweightInstancs[$sClass][$sKey] = $aInstance ;
+		if( !isset(self::$arrFlyweightInstancs[$sClassName]) )
+		{
+			self::$arrFlyweightInstancs[$sClassName] = array() ;
+		}
+		
+		return self::$arrFlyweightInstancs[$sClassName][$sKey] = $aInstance ;
 	}
 	
-	static public function flyweight($sKey/* ... */)
+	static public function flyweight($keys,$sClassName=null)
 	{		
-		$sClass = get_called_class() ;
-		
-		if( !isset(self::$arrFlyweightInstancs[$sClass]) )
+		if(!$sClassName)
 		{
-			self::$arrFlyweightInstancs[$sClass] = array() ;
+			$sClassName = get_called_class() ;
 		}
 		
-		$arrArgs = func_get_args() ;
-		$sKey = implode(',', $arrArgs) ;
+		$keys = (array)$keys ;
+		$sKey = implode(',', $keys) ;
 		
-		if( empty(self::$arrFlyweightInstancs[$sClass][$sKey]) )
+		if( !isset(self::$arrFlyweightInstancs[$sClassName]) )
 		{
-			self::$arrFlyweightInstancs[$sClass][$sKey] = Factory::createNewObject($sClass,null,$arrArgs) ;
+			self::$arrFlyweightInstancs[$sClassName] = array() ;
 		}
 		
-		return self::$arrFlyweightInstancs[$sClass][$sKey] ;
+		if( empty(self::$arrFlyweightInstancs[$sClassName][$sKey]) )
+		{
+			self::$arrFlyweightInstancs[$sClassName][$sKey] = self::createInstance($keys,null,$sClassName) ;
+		}
+		
+		return self::$arrFlyweightInstancs[$sClassName][$sKey] ;
 	}
 	
 		

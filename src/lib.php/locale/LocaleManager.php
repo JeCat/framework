@@ -2,10 +2,11 @@
 
 namespace jc\locale ;
 
+use jc\lang\Object;
 use jc\fs\FSO;
 use jc\fs\FSOIterator;
 
-class LocaleManager
+class LocaleManager extends Object
 {
 	public function __construct($sDefaultLocaleName)
 	{
