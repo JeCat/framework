@@ -140,9 +140,9 @@ class View extends NamableComposite implements IView
 			$aVars->set('theView',$this) ;
 			$aVars->set('theModel',$this->model()) ;
 		
-			if( $aVars->has('theController') and $aParams=$aVars->get('theController')->executeParams() )
+			if( $aVars->has('theController') and $aParams=$aVars->get('theController')->params() )
 			{
-				$aVars->set('theRequest',$aParams) ;
+				$aVars->set('theParams',$aParams) ;
 			}
 		
 			$this->ui()->display($sSourceFilename,$aVars,$this->OutputStream()) ;

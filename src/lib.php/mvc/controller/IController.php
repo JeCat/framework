@@ -6,12 +6,13 @@ use jc\message\IMessageQueueHolder;
 
 interface IController extends IMessageQueueHolder
 {
-	public function mainRun($Params=null) ;
+	public function mainRun() ;
 	
 	public function process() ;
     
-    public function executeParams() ;
-    
-    public function buildParams($Params) ;
+    /**
+     * @return jc\util\IDataSrc
+     */
+    public function params() ;
 }
 ?>

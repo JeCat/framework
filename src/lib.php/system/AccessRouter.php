@@ -104,7 +104,7 @@ class AccessRouter extends \jc\lang\Object
     	
     	$sControllerClass = $this->transControllerClass($sControllerName) ;
     	
-    	return new $sControllerName() ;
+    	return new $sControllerName($aRequest) ;
     }
     
     /**

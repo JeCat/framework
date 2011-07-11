@@ -23,9 +23,11 @@ use jc\pattern\composite\NamableComposite ;
  */
 class Controller extends NamableComposite implements IController
 {
-    function __construct ()
+    function __construct ($Params=null)
     {
 		parent::__construct("jc\\mvc\\controller\\IController") ;
+		
+		$this->buildParams($Params) ;
 		
 		$this->init() ;
     }
@@ -148,10 +150,8 @@ class Controller extends NamableComposite implements IController
      * 
      * @see IController::mainRun()
      */
-    public function mainRun ($Params=null)
+    public function mainRun ()
     {
-		$this->buildParams($Params) ;
-		
 		$this->processChildren() ;
 		
 		$this->process() ;
@@ -185,11 +185,6 @@ class Controller extends NamableComposite implements IController
 		}
     }
     
-    public function executeParams()
-    {
-    	return $this->aParams ;
-    }
-    
     public function process ()
     {}
     
@@ -219,12 +214,21 @@ class Controller extends NamableComposite implements IController
     
 	public function add($object,$bAdoptRelative=true)
 	{
-		if( $bAdoptRelative and ($object instanceof IController) )
+		if( $bAdoptRelative )
 		{
 			$this->viewContainer()->add( $object->mainView(), true ) ;
+			
+			$object->params()->addChild( $this->params() ) ;
 		}
 		
 		parent::add($object,$bAdoptRelative) ;
+	}
+	
+	public function remove($object)
+	{
+		parent::remove($object) ;
+		
+		$object->params()->removeChild( $this->params() ) ;
 	}
 	
 	/**
@@ -286,7 +290,13 @@ class Controller extends NamableComposite implements IController
 		$this->messageQueue()->display($this->mainView()->ui(),$aView->outputStream(),$sTemplateFilename) ;		
 	}
 	
-    
+    /**
+     * @return jc\util\IDataSrc
+     */
+    public function params()
+    {
+    	return $this->aParams ;
+    }
     
    	static private function regexpModelName()
    	{
