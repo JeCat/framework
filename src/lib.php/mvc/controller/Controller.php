@@ -23,11 +23,11 @@ use jc\pattern\composite\NamableComposite ;
  */
 class Controller extends NamableComposite implements IController
 {
-    function __construct ($Params=null)
+    function __construct ($params=null)
     {
 		parent::__construct("jc\\mvc\\controller\\IController") ;
 		
-		$this->buildParams($Params) ;
+		$this->buildParams($params) ;
 		
 		$this->init() ;
     }

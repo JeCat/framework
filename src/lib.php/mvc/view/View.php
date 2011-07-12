@@ -270,6 +270,12 @@ class View extends NamableComposite implements IView
 		{
 			$this->aDataExchanger->exchange($this,$nWay) ;
 		}
+	
+		// for children
+		foreach($this->iterator() as $aChild)
+		{
+			$aChild->exchangeData($nWay) ;
+		}
 	}
 
 	/**

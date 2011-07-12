@@ -6,7 +6,7 @@ use jc\mvc\view\widget\IViewFormWidget;
 use jc\util\IDataSrc;
 use jc\system\Request;
 
-class FormView extends View
+class FormView extends View implements IFormView
 {
 	public function __construct($sName,$sSourceFilename=null,UI $aUI=null)
 	{
@@ -28,6 +28,12 @@ class FormView extends View
 		{
 			$aWidget->setDataFromSubmit($aDataSrc) ;
 		}
+		
+		// for children
+		foreach($this->iterator() as $aChild)
+		{
+			$aChild->loadWidgets($aDataSrc) ;
+		}
 	}
 	
 	public function verifyWidgets()
@@ -37,6 +43,15 @@ class FormView extends View
 		foreach($this->widgits() as $aWidget)
 		{
 			if( ($aWidget instanceof IViewFormWidget) and !$aWidget->verifyData() )
+			{
+				$bRet = false ;
+			}
+		}
+	
+		// for children
+		foreach($this->iterator() as $aChild)
+		{
+			if( ($aChild instanceof IFormView) and !$aChild->verifyWidgets() )
 			{
 				$bRet = false ;
 			}

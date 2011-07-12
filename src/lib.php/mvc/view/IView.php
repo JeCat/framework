@@ -44,6 +44,7 @@ interface IView extends IContainer, IMessageQueueHolder, IWidgetContainer
 	
 	public function isEnable() ;
 	
+	public function exchangeData($nWay=DataExchanger::MODEL_TO_WIDGET) ;
 }
 
 ?>
