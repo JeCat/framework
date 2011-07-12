@@ -6,10 +6,14 @@ use jc\util\IDataSrc;
 use jc\mvc\view\IView;
 
 class SelectList extends Select {
-	public function __construct($sId, $sTitle = null, $nSize = 1, IView $aView = null) {
+	public function __construct($sId, $sTitle = null, $nSize = 4, IView $aView = null) {
+		if (! is_int ( $nSize )) {
+			new Exception ( "调用" . __CLASS__ . "的" . __METHOD__ . "方法时使用了非法的size参数(得到的size参数是:%s)", array ($nSize ) );
+		}
+		$this->nSize = $nSize;
 		$this->setSerializMethod ( array (__CLASS__, 'serialize' ), array (',' ) );
 		$this->setUnSerializMethod ( array (__CLASS__, 'unserialize' ), array (',' ) );
-		parent::__construct ( $sId, $sTitle, $nSize, $aView );
+		parent::__construct ( $sId, $sTitle , $aView );
 	}
 	
 	public function getSelected(){
@@ -20,6 +24,19 @@ class SelectList extends Select {
 			}
 		}
 		return $arrSelected;
+	}
+	
+	//返回可见条目数量
+	public function size() {
+		return $this->nSize;
+	}
+	
+	//设置可见条目数量
+	public function setSize($nSize) {
+		if (! is_int ( $nSize )) {
+			new Exception ( "调用" . __CLASS__ . "的" . __METHOD__ . "方法时使用了非法的size参数(得到的size参数是:%s)", array ($nSize ) );
+		}
+		$this->nSize = $nSize;
 	}
 	
 	public function value() {
@@ -138,7 +155,7 @@ class SelectList extends Select {
 	private $arrUnSerializMethodName;
 	private $arrSerializMethodArgs;
 	private $arrUnSerializMethodArgs;
-
+	private $nSize;
 }
 
 ?>

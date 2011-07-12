@@ -5,11 +5,7 @@ use jc\lang\Exception;
 use jc\mvc\view\IView;
 
 class Select extends FormWidget {
-	public function __construct($sId, $sTitle = null, $nSize = 1, IView $aView = null) {
-		if (! is_int ( $nSize )) {
-			new Exception ( "调用" . __CLASS__ . "的" . __METHOD__ . "方法时使用了非法的size参数(得到的size参数是:%s)", array ($nSize ) );
-		}
-		$this->nSize = $nSize;
+	public function __construct($sId, $sTitle = null, IView $aView = null) {
 		parent::__construct ( $sId, 'jc:ViewWidgetSelect.template.html', $sTitle, $aView );
 	}
 	
@@ -93,20 +89,6 @@ class Select extends FormWidget {
 		}
 		return $this->arrOptions[$nIndex][0];
 	}
-	
-	//返回可见条目数量
-	public function size() {
-		return $this->nSize;
-	}
-	
-	//设置可见条目数量
-	public function setSize($nSize) {
-		if (! is_int ( $nSize )) {
-			new Exception ( "调用" . __CLASS__ . "的" . __METHOD__ . "方法时使用了非法的size参数(得到的size参数是:%s)", array ($nSize ) );
-		}
-		$this->nSize = $nSize;
-	}
-	
 	//取得option列表
 	public function optionIterator() {
 		return new \ArrayIterator ( $this->arrOptions );
@@ -140,7 +122,6 @@ class Select extends FormWidget {
 	}
 	
 	private $arrOptions = Array ();
-	private $nSize;
 }
 
 ?>
