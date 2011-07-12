@@ -32,7 +32,10 @@ class FormView extends View implements IFormView
 		// for children
 		foreach($this->iterator() as $aChild)
 		{
-			$aChild->loadWidgets($aDataSrc) ;
+			if($aChild instanceof IFormView)
+			{
+				$aChild->loadWidgets($aDataSrc) ;
+			}
 		}
 	}
 	
