@@ -6,11 +6,15 @@ use jc\util\IDataSrc;
 use jc\mvc\view\IView;
 
 class SelectList extends Select {
-	public function __construct($sId, $sTitle = null, $nSize = 4, IView $aView = null) {
+	public function __construct($sId, $sTitle = null, $nSize = 4, $bMultiple = false, IView $aView = null) {
 		if (! is_int ( $nSize )) {
 			new Exception ( "调用" . __CLASS__ . "的" . __METHOD__ . "方法时使用了非法的size参数(得到的size参数是:%s)", array ($nSize ) );
 		}
 		$this->nSize = $nSize;
+		if (! is_bool ( $bMultiple )) {
+			new Exception ( "调用" . __CLASS__ . "的" . __METHOD__ . "方法时使用了非法的bMultiple参数(得到的bMultiple参数是:%s)", array ($bMultiple ) );
+		}
+		$this->bMultiple = $bMultiple;
 		$this->setSerializMethod ( array (__CLASS__, 'serialize' ), array (',' ) );
 		$this->setUnSerializMethod ( array (__CLASS__, 'unserialize' ), array (',' ) );
 		parent::__construct ( $sId, $sTitle , $aView );
@@ -24,6 +28,14 @@ class SelectList extends Select {
 			}
 		}
 		return $arrSelected;
+	}
+	//多行?
+	public function isMultiple(){
+		return $this->bMultiple;
+	}
+	//设置多行
+	public function setMultiple($bMultiple){
+		$this->bMultiple = $bMultiple;
 	}
 	
 	//返回可见条目数量
@@ -156,6 +168,7 @@ class SelectList extends Select {
 	private $arrSerializMethodArgs;
 	private $arrUnSerializMethodArgs;
 	private $nSize;
+	private $bMultiple;
 }
 
 ?>
