@@ -109,7 +109,18 @@ class Inserter extends OperationStrategy
 		$arrFromKeys = $aAssociation->fromKeys() ;
 		foreach($aAssociation->toKeys() as $nIdx=>$sKey)
 		{
-			$aChildModel->setData( $sKey, $aModel->data($arrFromKeys[$nIdx]) ) ;
+			if( $aChildModel->isAggregation() )
+			{
+				$value = $aModel->data($arrFromKeys[$nIdx]) ;
+				foreach ($aChildModel->childIterator() as $aChildChildModel)
+				{
+					$aChildChildModel->setData( $sKey, $value ) ;		
+				}
+			}
+			else 
+			{
+				$aChildModel->setData( $sKey, $aModel->data($arrFromKeys[$nIdx]) ) ;				
+			}
 		}
 	}
 }
