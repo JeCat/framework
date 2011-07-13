@@ -18,7 +18,7 @@ class Select extends FormWidget {
 	
 	public function addOptionByArray($arrOptions) {
 		foreach($arrOptions  as $key => $option){
-			addOption($option[0],$option[1],$option[2]);
+			$this->addOption($option[0],$option[1],$option[2]);
 		}
 		return $this ;
 	}

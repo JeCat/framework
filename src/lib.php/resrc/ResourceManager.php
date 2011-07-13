@@ -122,6 +122,19 @@ class ResourceManager extends Object implements IResourceManager
 	{
 		$this->arrFilenameWrappers = array() ;
 	}
+
+	public function folderNamespacesIterator()
+	{
+		return new \ArrayIterator(array_keys($this->arrFolders)) ;
+	}
+	
+	public function foldersIterator($sNamespace='*')
+	{
+		return new \ArrayIterator(
+			isset($this->arrFolders[$sNamespace])?
+				$this->arrFolders[$sNamespace]: array()
+		) ;
+	}
 	
 	protected $arrFolders = array() ;
 	
