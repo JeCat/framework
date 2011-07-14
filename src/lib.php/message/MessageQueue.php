@@ -2,7 +2,7 @@
 namespace jc\message ;
 
 use jc\io\IOutputStream;
-use jc\ui\xhtml\Factory;
+use jc\ui\xhtml\UIFactory;
 use jc\io\OutputStream;
 use jc\ui\UI;
 use jc\util\FilterMangeger;
@@ -90,7 +90,7 @@ class MessageQueue extends Object implements IMessageQueue
 		
 		if( !$aUI )
 		{
-			$aUI = Factory::singleton()->create() ;
+			$aUI = UIFactory::singleton()->create() ;
 		}
 		
 		$aUI->display($sTemplateFilename,array('aMsgQueue'=>$this),$aDevice) ;

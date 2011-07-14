@@ -167,6 +167,17 @@ class DataSrc extends HashTable implements IDataSrc, \ArrayAccess, \Iterator
 		return new \ArrayIterator($this->arrChildren) ;
 	}
 
+	
+	public function values(/*$sKey1,...$sKeyN*/)
+	{
+		$arrRet = array() ;
+		foreach(func_get_args() as $sName)
+		{
+			$arrRet[] = $this->get($sName) ;
+		}
+		
+		return $arrRet ;
+	}
 
 	protected $arrChildren = array() ;
 }

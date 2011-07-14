@@ -27,6 +27,14 @@ class CompilerManager extends JcObject
 	/**
 	 * @return ICompiler
 	 */
+	public function compilerByName($sName)
+	{
+		return isset($this->arrCompilers[$sName])? $this->arrCompilers[$sName]: null ;
+	}
+	
+	/**
+	 * @return ICompiler
+	 */
 	public function compiler(IObject $aObject)
 	{
 		for(end($this->arrCompilers);$Compiler=current($this->arrCompilers);prev($this->arrCompilers))
@@ -44,9 +52,11 @@ class CompilerManager extends JcObject
 	/**
 	 * @return ICompiled
 	 */
-	public function compile(IObject $aObjectContainer,$sCompiledPath)
+	public function compile(IObject $aObjectContainer,CompilingStatus $aCompilingStatus)
 	{
-		$aFile = $this->createCompiledFile($sCompiledPath) ;
+		$this->aCompilingStatus = $aCompilingStatus ;
+		
+		$aFile = $this->createCompiledFile($aCompilingStatus->compiledFilepath()) ;
 		if(!$aFile)
 		{
 			return false ;
@@ -55,7 +65,7 @@ class CompilerManager extends JcObject
 		$aWriter = $aFile->openWriter(false) ;
 		if(!$aWriter)
 		{
-			throw new Exception("保存XHTML模板的编译文件时无法打开文件:%s",$sCompiledPath) ;
+			throw new Exception("保存XHTML模板的编译文件时无法打开文件:%s",$aCompilingStatus->compiledFilepath()) ;
 		}
 		
 		foreach($aObjectContainer->iterator() as $aObject)
@@ -68,6 +78,8 @@ class CompilerManager extends JcObject
 		}
 		
 		$aWriter->close() ;
+		
+		$this->aCompilingStatus = null ;
 	}
 	
 	/**
@@ -88,8 +100,17 @@ class CompilerManager extends JcObject
 		return new File($sCompiledPath) ;
 	}
 	
+	/**
+	 * @return CompilingStatus
+	 */
+	public function compilingStatus()
+	{
+		return $this->aCompilingStatus ;
+	}
 	
 	private $arrCompilers = array() ;
+	
+	private $aCompilingStatus ;
 }
 
 ?>

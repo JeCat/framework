@@ -2,8 +2,9 @@
 
 namespace jc\ui ;
 
-use jc\lang\Assert;
+use jc\resrc\ResourceManager;
 
+use jc\lang\Assert;
 use jc\lang\Exception;
 use jc\util\HashTable;
 use jc\io\IOutputStream;
@@ -112,24 +113,24 @@ class UI extends JcObject
 		$this->aVariables = $aVariables ;
 	}
 	
-	public function compile($sSourcePath,$sCompiledPath)
+	public function compile(CompilingStatus $aCompilingStatus)
 	{
 		// 解析
 		try{
-			$aObjectContainer = $this->interpreters()->parse($sSourcePath) ;
+			$aObjectContainer = $this->interpreters()->parse($aCompilingStatus->sourceFilepath()) ;
 		}
 		catch (\Exception $e)
 		{
-			throw new Exception("UI引擎在解析模板文件时遇到了错误: %s",$sSourcePath,$e) ;
+			throw new Exception("UI引擎在解析模板文件时遇到了错误: %s",$aCompilingStatus->sourceFilepath(),$e) ;
 		}
 		
 		// 编译
 		try{
-			$this->compilers()->compile($aObjectContainer,$sCompiledPath) ;
+			$this->compilers()->compile($aObjectContainer,$aCompilingStatus) ;
 		}
 		catch (\Exception $e)
 		{
-			throw new Exception("UI引擎在编译模板文件时遇到了错误: %s",$sSourcePath,$e) ;
+			throw new Exception("UI引擎在编译模板文件时遇到了错误: %s",$aCompilingStatus->sourceFilepath(),$e) ;
 		}
 	}
 	
@@ -189,16 +190,28 @@ class UI extends JcObject
 			$aVariables = new HashTable($aVariables) ;
 		}
 		
-		// 编译
-		$sSourcePath = $this->sourceFileManager()->find($sSourceFile) ;
+		// 定位文件
+		$aSrcMgr = $this->sourceFileManager() ;
+		list($sNamespace,$sSourceFile) = $aSrcMgr->detectNamespace($sSourceFile) ;
+		$sSourcePath = $aSrcMgr->find($sSourceFile,$sNamespace) ;
 		if(!$sSourcePath)
 		{
-			throw new Exception("无法找到指定的源文件：%s",$sSourceFile) ;
+			throw new Exception("无法找到指定的源文件：%s:%s",array($sNamespace,$sSourceFile)) ;
 		}
 		$sCompiledPath = $this->sourceFileManager()->compiledPath($sSourcePath) ;
+		
+		// 检查编译文件是否有效
 		if( !$this->sourceFileManager()->isCompiledValid($sSourcePath,$sCompiledPath) )
 		{
-			$this->compile($sSourcePath,$sCompiledPath) ;
+			// 编译
+			$aCompilingStatus = new CompilingStatus( array(
+				'sourceNamespace' => $sNamespace,
+				'sourceFilename' => $sSourceFile,
+				'sourceFilepath' => $sSourcePath,
+				'compiledFilepath' => $sCompiledPath,
+			) ) ;
+		
+			$this->compile($aCompilingStatus) ;
 		}
 		
 		// render

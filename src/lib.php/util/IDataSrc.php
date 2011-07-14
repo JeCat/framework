@@ -14,6 +14,8 @@ interface IDataSrc extends IHashTable
 	public function clearChild() ;
 	
 	public function childIterator() ;
+	
+	public function values(/*$sKey1,...$sKeyN*/) ;
 }
 
 ?>

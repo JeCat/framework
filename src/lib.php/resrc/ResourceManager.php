@@ -86,10 +86,9 @@ class ResourceManager extends Object implements IResourceManager
 	
 	public function find($sFilename,$sNamespace='*')
 	{
-		if( $sNamespace=='*' and ($nPos=strpos($sFilename,':'))!==false )
+		if( $sNamespace=='*' )
 		{
-			$sNamespace = substr($sFilename,0,$nPos) ;
-			$sFilename = substr($sFilename,$nPos+1) ;
+			list($sNamespace,$sFilename) = self::detectNamespace($sFilename) ;
 		}
 		
 		list($sFolderPath,$sWrapedFilename) = $this->findFolderAndFile($sFilename,$sNamespace) ;
@@ -134,6 +133,18 @@ class ResourceManager extends Object implements IResourceManager
 			isset($this->arrFolders[$sNamespace])?
 				$this->arrFolders[$sNamespace]: array()
 		) ;
+	}
+
+	public function detectNamespace($sFilename)
+	{
+		if( ($nPos=strpos($sFilename,':'))!==false )
+		{
+			return array(substr($sFilename,0,$nPos),substr($sFilename,$nPos+1)) ;
+		}
+		else 
+		{
+			return array('*', $sFilename) ;
+		}
 	}
 	
 	protected $arrFolders = array() ;

@@ -38,6 +38,14 @@ class BaseCompiler extends JcObject implements ICompiler
 	// sub compiler ---------------------------------------------------------------
 	public function addSubCompiler($sName,$sCompilerClass) 
 	{
+		$sName = strtolower($sName) ;
+		if( !isset($this->arrCompilers[ $sName ]) )
+		{
+			$this->arrCompilers[ $sName ] = $sCompilerClass ;
+		}
+	}
+	public function setSubCompiler($sName,$sCompilerClass) 
+	{
 		$this->arrCompilers[ strtolower($sName) ] = $sCompilerClass ;
 	}
 	public function removeSubCompiler($sName)
