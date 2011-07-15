@@ -25,6 +25,11 @@ class UIFactory extends UIFactoryBase
 		$aNodeCompilers->addSubCompiler('script',__NAMESPACE__."\\uicompiler\\ScriptCompiler") ;
 		$aNodeCompilers->addSubCompiler('js',__NAMESPACE__."\\uicompiler\\ScriptCompiler") ;
 		
+		$aNodeCompilers->addSubCompiler('model:foreach',__NAMESPACE__."\\uicompiler\\ModelForeachCompiler") ;
+		$aNodeCompilers->addSubCompiler('model:foreach:end',"jc\\ui\\xhtml\\compiler\\node\\DoubleEndCompiler") ;
+		$aNodeCompilers->addSubCompiler('model:data',__NAMESPACE__."\\uicompiler\\ModelDataCompiler") ;
+		$aNodeCompilers->addSubCompiler('data',__NAMESPACE__."\\uicompiler\\ModelDataCompiler") ;
+		
 		return $aNodeCompilers ;
 	}
 	

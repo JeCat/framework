@@ -20,19 +20,6 @@ class Object extends Composite implements IObject
 		return $aParent? $aParent->depth()+1: 0 ;
 	}
 	
-	public function compile(IOutputStream $aDev)
-	{
-		$this->compileChildren($aDev) ;
-	}
-
-	protected function compileChildren(IOutputStream $aDev)
-	{
-		foreach($this->childrenIterator() as $aObject)
-		{
-			$aObject->compile($aDev) ;
-		}
-	}
-
 	public function childAfter(self $aFind)
 	{
 		$aIter = $this->iterator() ;
