@@ -313,7 +313,7 @@ class Controller extends NamableComposite implements IController
     public function preprocessForm(IFormView $aView)
     {
     	// 检查是否提交表单
-    	if( !$aView->isSubmit() )
+    	if( !$aView->isSubmit($this->aParams) )
     	{
     		return false ;
     	}
