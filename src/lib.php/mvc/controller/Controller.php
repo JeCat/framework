@@ -204,8 +204,8 @@ class Controller extends NamableComposite implements IController
     	{
 			$this->mainView()->show() ;
     	}
-    	
-    	else 
+
+    	else
     	{
 	    	foreach( $this->viewContainer()->iterator() as $aView )
 	    	{
@@ -213,14 +213,17 @@ class Controller extends NamableComposite implements IController
 	    	}
     	}
     }
-    
+
 	public function add($object,$bAdoptRelative=true)
 	{
 		if( $bAdoptRelative )
 		{
 			$this->viewContainer()->add( $object->mainView(), true ) ;
-			
-			$object->params()->addChild( $this->params() ) ;
+
+			if( $object->params()!=$this->params())
+			{
+				$object->params()->addChild($this->params()) ;
+			}
 		}
 		
 		parent::add($object,$bAdoptRelative) ;
@@ -302,22 +305,15 @@ class Controller extends NamableComposite implements IController
     
     /**
      * 当此方法负责常规的表单操作：
-     * 	1、检查是否提交表单；
-     * 	2、加载控件数据；
-     * 	3、校验控件数据；
-     * 	4、将数据交换到文档；
+     * 	1、加载控件数据；
+     * 	2、校验控件数据；
+     * 	3、将数据交换到文档；
      * 
      * 返回 true 的时候，传入的表单已经准备就绪。
 	 * @return bool
      */
     public function preprocessForm(IFormView $aView)
-    {
-    	// 检查是否提交表单
-    	if( !$aView->isSubmit($this->aParams) )
-    	{
-    		return false ;
-    	}
-    	
+    {    	
     	// 加载视图控件数据
     	$aView->loadWidgets($this->aParams) ;
     	
@@ -330,6 +326,42 @@ class Controller extends NamableComposite implements IController
     	$aView->exchangeData(DataExchanger::WIDGET_TO_MODEL) ;
     	
     	return true ;
+    }
+    
+    public function doAction($sActParamName=null)
+    {
+    	if(!$sActParamName)
+    	{
+    		$sActParamName = 'act' ;
+    	}
+    	
+    	if( !$this->aParams->has($sActParamName) )
+    	{
+    		return false ;
+    	}
+    	
+    	$sAct = $this->aParams[$sActParamName] ;
+    	$sMethod = 'action' . $sAct ;
+    	
+    	if( !method_exists($this,$sMethod) )
+    	{
+    		return false ;
+    	}
+    	
+    	$this->actionReturn = null ;
+    	
+    	call_user_func(array($this,$sMethod)) ;
+    	
+    	return true ;
+    }
+
+    public function setActionReturn(&$val)
+    {
+    	$this->actionReturn =& $val ;
+    }
+    public function & actionReturn()
+    {
+    	return $this->actionReturn ;
     }
     
    	static private function regexpModelName()
@@ -355,5 +387,7 @@ class Controller extends NamableComposite implements IController
     private $aViewContainer = null ;
     
     private $aMsgQueue = null ;
+    
+    private $actionReturn = null ;
 }
 ?>
