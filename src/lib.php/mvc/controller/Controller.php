@@ -2,8 +2,8 @@
 
 namespace jc\mvc\controller ;
 
+use jc\mvc\view\DataExchanger;
 use jc\mvc\view\IFormView;
-
 use jc\util\match\RegExp;
 use jc\mvc\model\db\orm\Prototype;
 use jc\mvc\model\db\orm\PrototypeAssociationMap;
@@ -327,7 +327,7 @@ class Controller extends NamableComposite implements IController
     		return false ;
     	}
     	
-    	$aView->exchangeData() ;
+    	$aView->exchangeData(DataExchanger::WIDGET_TO_MODEL) ;
     	
     	return true ;
     }
