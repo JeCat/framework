@@ -2,6 +2,8 @@
 
 namespace jc\mvc\controller ;
 
+use jc\mvc\view\IFormView;
+
 use jc\util\match\RegExp;
 use jc\mvc\model\db\orm\Prototype;
 use jc\mvc\model\db\orm\PrototypeAssociationMap;
@@ -296,6 +298,38 @@ class Controller extends NamableComposite implements IController
     public function params()
     {
     	return $this->aParams ;
+    }
+    
+    /**
+     * 当此方法负责常规的表单操作：
+     * 	1、检查是否提交表单；
+     * 	2、加载控件数据；
+     * 	3、校验控件数据；
+     * 	4、将数据交换到文档；
+     * 
+     * 返回 true 的时候，传入的表单已经准备就绪。
+	 * @return bool
+     */
+    public function preprocessForm(IFormView $aView)
+    {
+    	// 检查是否提交表单
+    	if( !$aView->isSubmit() )
+    	{
+    		return false ;
+    	}
+    	
+    	// 加载视图控件数据
+    	$aView->loadWidgets($this->aParams) ;
+    	
+    	// 校验数据
+    	if( !$aView->verifyWidgets() )
+    	{
+    		return false ;
+    	}
+    	
+    	$aView->exchangeData() ;
+    	
+    	return true ;
     }
     
    	static private function regexpModelName()
