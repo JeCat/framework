@@ -22,7 +22,7 @@ class FormCompiler extends NodeCompiler
 
 			$this->compileChildren($aObject, $aDev, $aCompilerManager) ;
 
-			$aDev->write('<?php if(\$aVariables->get(\'theView\') instanceof \\jc\\mvc\\view\\IFormView){ ?><input type="hidden" name="<?php echo $aVariables->get(\'theView\')->htmlFormSignature()?>" value="1" /><?php } ?>') ;
+			$aDev->write('<?php if($aVariables->get(\'theView\') instanceof \\jc\\mvc\\view\\IFormView){ ?><input type="hidden" name="<?php echo $aVariables->get(\'theView\')->htmlFormSignature()?>" value="1" /><?php } ?>') ;
 			$this->compileTag($aTailTag, $aDev, $aCompilerManager) ;
 			
 			$aDev->write("<?php } ?>\r\n") ;
