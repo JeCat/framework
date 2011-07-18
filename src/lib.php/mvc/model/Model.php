@@ -321,6 +321,14 @@ abstract class Model extends Object implements IModel, \Serializable
 		$aOutput->write( "</pre>" ) ;
 	}
 	
+	public function setChildrenData($sName,$value)
+	{
+		foreach( $this->childIterator() as $aChild )
+		{
+			$aChild->setData($sName,$aChild) ;
+		}
+	}
+	
 	private $arrData = array() ;
 	
 	private $arrChildren = array() ;
