@@ -15,20 +15,29 @@ class ViewCompiler extends NodeCompiler
 
 		$aAttrs = $aObject->attributes() ;
 		
+		$aDev->write("<?php ob_flush() ;\r\n") ;
+		$aDev->write("\$theView = \$aVariables->get('theView') ;\r\n") ;
+		
 		if( $aAttrs->has('for') )
 		{
 			$sFor = $aAttrs->expression('for') ;
+			$sForSrc = addslashes($aAttrs->string('for')) ;
+			
+			$aDev->write("\$aView = {$sFor} ;\r\n") ;
+			$aDev->write("if(\$aView){\r\n") ;
+			$aDev->write("\t\$theView->outputStream()->write(\$aView->outputStream()) ;\r\n") ;
+			$aDev->write("}else{\r\n") ;
+			$aDev->write("\techo '指定的视图不存在：\"{$sForSrc}\"' ;\r\n") ;
+			$aDev->write("}\r\n") ;
 		}
 		else 
 		{
-			$sFor = "\$theView" ;
+			$aDev->write("foreach(\$theView->iterator() as \$aChildView){\r\n") ;
+			$aDev->write("\t\$theView->outputStream()->write(\$aChildView->outputStream()) ;\r\n") ;
+			$aDev->write("}\r\n") ;
 		}
-		
-		$aDev->write("<?php ob_flush() ;\r\n") ;
-		$aDev->write("\$theView = \$aVariables->get('theView') ;\r\n") ;
-		$aDev->write("foreach({$sFor}->iterator() as \$aChildView){\r\n") ;
-		$aDev->write("\t\$theView->outputStream()->write(\$aChildView->outputStream()) ;\r\n") ;
-		$aDev->write("}?>") ;
+
+		$aDev->write("?>") ;
 	}
 	
 	static public function FindVagrantView()

@@ -25,8 +25,19 @@ use jc\pattern\composite\NamableComposite ;
  */
 class Controller extends NamableComposite implements IController
 {
-    function __construct ($params=null)
+    function __construct ($params=null,$sName=null)
     {
+    	if($sName===null)
+    	{
+    		$sName = get_class($this) ;
+    		if( ($nLastSlashPos=strrpos($sName,"\\"))!==false )
+    		{
+    			$sName = substr($sName,$nLastSlashPos+1) ;
+    		}
+    	}
+    	
+    	$this->setName($sName) ;
+    	
 		parent::__construct("jc\\mvc\\controller\\IController") ;
 		
 		$this->buildParams($params) ;
@@ -85,13 +96,7 @@ class Controller extends NamableComposite implements IController
 	    
 	    if( !$sName )
 	    {
-	    	$sMyClass = get_class($this) ;
-	    	if( ($idx=strrpos($sMyClass, '\\'))!==false and strlen($sMyClass)>$idx+1 )
-	    	{
-	    		$sMyClass = substr($sMyClass,$idx+1) ;
-	    	}
-	    	
-	    	$sName = lcfirst($sMyClass) ;
+	    	$sName = $this->name() ;
 	    }
 	    
 	    if( !$sSourceFile )
@@ -101,18 +106,20 @@ class Controller extends NamableComposite implements IController
     	
     	
     	$aView = new $sClass($sName,$sSourceFile) ;
-    	$this->registerView($aView) ;
+    	$this->registerView($aView,$sName) ;
     	
     	return $aView ;
     }
     
-    public function registerView(IView $aView)
+    
+    
+    public function registerView(IView $aView,$sName=null)
     {
-    	$sName = $aView->name() ;
-    	$this->$sName = $aView ;
-    	
-    	$this->viewContainer()->add( $aView, true ) ;
-    	
+    	if(!$sName)
+    	{
+    		$sName = $aView->name() ;
+    	}
+    	$this->viewContainer()->add( $aView, $sName, true ) ;
     	$aView->variables()->set("theController", $this) ;
     }
     
@@ -230,11 +237,21 @@ class Controller extends NamableComposite implements IController
     	}
     }
 
-	public function add($object,$bAdoptRelative=true)
+	public function add($object,$sName=null,$bAdoptRelative=true)
 	{
+		if($sName===null)
+		{
+			$sName = $object->name() ;
+		}
+		
+		if( $this->hasName($sName) )
+		{
+			throw new Exception("名称为：%s 的子控制器在控制器 %s 中已经存在，无法添加同名的子控制器",array($sName,$this->name())) ;
+		}
+		
 		if( $bAdoptRelative )
 		{
-			$this->viewContainer()->add( $object->mainView(), true ) ;
+			$this->viewContainer()->add( $object->mainView(), null, true ) ;
 
 			if( $object->params()!=$this->params())
 			{
@@ -242,7 +259,7 @@ class Controller extends NamableComposite implements IController
 			}
 		}
 		
-		parent::add($object,$bAdoptRelative) ;
+		parent::add($object,$sName,$bAdoptRelative) ;
 	}
 	
 	public function remove($object)
@@ -291,7 +308,7 @@ class Controller extends NamableComposite implements IController
 	public function renderString(& $sContent)
 	{
 		$aView = new View("anonymous",null,$this->mainView()->ui) ;
-		$this->viewContainer()->add($aView,true) ;
+		$this->viewContainer()->add($aView,null,true) ;
 		$aView->outputStream()->write($sContent) ;
 	}
 	
@@ -306,7 +323,7 @@ class Controller extends NamableComposite implements IController
 		}
 		
 		$aView = new View("anonymous",null,$this->mainView()->ui()) ;
-		$this->viewContainer()->add($aView,true) ;
+		$this->viewContainer()->add($aView,null,true) ;
 		
 		$this->messageQueue()->display($this->mainView()->ui(),$aView->outputStream(),$sTemplateFilename) ;		
 	}
@@ -378,6 +395,25 @@ class Controller extends NamableComposite implements IController
     public function & actionReturn()
     {
     	return $this->actionReturn ;
+    }
+    
+    public function __get($sName)
+    {
+    	$nNameLen = strlen($sName) ;
+    	
+    	if( $nNameLen>4 and substr($sName,0,4)=='view' )
+    	{
+    		$sViewName = substr($sName,4) ;
+    		return $this->viewContainer()->getByName($sViewName) ;
+    	}
+    	
+    	else if( $nNameLen>10 and substr($sName,0,10)=='controller' )
+    	{
+    		$sViewName = substr($sName,10) ;
+    		return $this->getByName($sViewName) ;
+    	}
+    	
+		throw new Exception("正在访问控制器 %s 中不存在的属性",array($sName,$this->name())) ;
     }
     
    	static private function regexpModelName()

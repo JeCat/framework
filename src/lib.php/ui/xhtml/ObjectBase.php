@@ -63,7 +63,7 @@ class ObjectBase extends Object implements IObject
 	}
 	
 
-	public function add($aChild,$bAdoptRelative=true)
+	public function add($aChild,$sName=null,$bAdoptRelative=true)
 	{
 		Assert::type(__NAMESPACE__.'\\IObject', $aChild) ;
 		

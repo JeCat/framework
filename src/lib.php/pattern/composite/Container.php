@@ -61,8 +61,8 @@ class Container extends Object implements IContainer
 		}
 		return false ;
 	}
-
-	public function add($object,$bAdoptRelative=false)
+	
+	public function add($object,$sName=null,$bAdoptRelative=false)
 	{
 		if( $object==$this )
 		{
@@ -73,15 +73,30 @@ class Container extends Object implements IContainer
 		{
 			throw new Exception(__METHOD__."() 方法无法接受 %s 类型的参数",Type::reflectType($object)) ;
 		}
-		if( !in_array($object,$this->arrObjects) )
+		
+		if( $sName===null and $object instanceof INamable )
 		{
-			$this->arrObjects[] = $object ;
-			
-			if( $bAdoptRelative and ($object instanceof IContainedable) )
+			$sName = $object->name() ;
+		}
+		
+		if( $sName===null )
+		{
+			if( !in_array($object,$this->arrObjects) )
 			{
-				$object->setParent($this) ;
+				$this->arrObjects[] = $object ;
 			}
 		}
+		else 
+		{
+			$this->arrObjects[$sName] = $object ;
+		}
+	
+		if( $bAdoptRelative and ($object instanceof IContainedable) )
+		{
+			$object->setParent($this) ;
+		}
+		
+		return $object ;
 	}
 	public function remove($object)
 	{
@@ -109,6 +124,13 @@ class Container extends Object implements IContainer
 	/**
 	 * @return \Iterate
 	 */
+	public function nameIterator()
+	{
+		return new \ArrayIterator( array_keys($this->arrObjects) ) ;
+	}
+	/**
+	 * @return \Iterate
+	 */
 	public function acceptClassIterator()
 	{
 		return new \ArrayIterator($this->arrAcceptClasses) ;
@@ -122,6 +144,21 @@ class Container extends Object implements IContainer
 		}
 		
 		return $this->aAddFilters ;
+	}
+
+	public function getByName($sName)
+	{
+		return isset($this->arrObjects[$sName])? $this->arrObjects[$sName]: null ;
+	}
+	
+	public function hasName($sName)
+	{
+		return array_key_exists($sName,$this->arrObjects) ;
+	}
+	
+	public function has($object)
+	{
+		return in_array($object,$this->arrObjects) ;
 	}
 	
 	private $arrObjects = array() ;
