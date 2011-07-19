@@ -17,16 +17,27 @@ class WebpageFrame extends Controller
 		
 		$this->setMainView(WebpageFactory::singleton()->create()) ;
 	}
+
+    public function mainRun ()
+    {
+		$this->processChildren() ;
+		
+		$this->process() ;
+		
+		$this->mainView()->show() ;
+    }
 	
-	public function setParent(IContainer $aParent)
+	/**
+	 * 接管子控制器的视图
+	 */
+	protected function takeOverView(IController $aChild,$sChildName=null)
 	{
-		Assert::type('jc\\mvc\\controller\\Controller',$aParent) ;
-		
-		parent::setParent($aParent) ;
-		
-		// 添加替换父控制器的 视图容器
-		$aParent->setViewContainer( $this->viewContainer() ) ;
-	}
+		if($sChildName===null)
+		{
+			$sChildName = $aChild->name() ;
+		}
+		$this->viewContainer()->add( $aChild->mainView(), "childrenMainViewFor".$sChildName, true )  ;
+	} 
 	
 	public function addFrameView(IView $aFrameView)
 	{
@@ -39,6 +50,40 @@ class WebpageFrame extends Controller
 			$aParent->setViewContainer($aFrameView) ;
 		}
 	}
+    
+	
+	
+    public function setMainView(IView $aView)
+    {    	
+    	parent::setMainView($aView) ;
+    
+    	if( !$this->aViewContainer )
+    	{
+    		$this->aViewContainer = $aView ;
+    	}
+    }
+    
+    public function viewContainer()
+    {
+    	if( !$this->aViewContainer )
+    	{
+    		$this->aViewContainer = $this->mainView() ;
+    	}
+
+    	return $this->aViewContainer ;
+    }
+    
+    public function setViewContainer(IView $aViewContainer)
+    {    	
+    	$this->aViewContainer = $aViewContainer ;
+    
+    	if( !$this->mainView() )
+    	{
+    		$this->setMainView($aViewContainer) ;
+    	}
+    }
+    
+    private $aViewContainer = null ;
 }
 
 ?>

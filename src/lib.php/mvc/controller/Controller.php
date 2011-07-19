@@ -119,7 +119,7 @@ class Controller extends NamableComposite implements IController
     	{
     		$sName = $aView->name() ;
     	}
-    	$this->viewContainer()->add( $aView, $sName, true ) ;
+    	$this->mainView()->add( $aView, $sName, true ) ;
     	$aView->variables()->set("theController", $this) ;
     }
     
@@ -144,44 +144,31 @@ class Controller extends NamableComposite implements IController
     public function setMainView(IView $aView)
     {    	
     	$this->aMainView = $aView ;
-    
-    	if( !$this->aViewContainer )
-    	{
-    		$this->aViewContainer = $aView ;
-    	}
     }
-    
-    public function viewContainer()
-    {
-    	if( !$this->aViewContainer )
-    	{
-    		$this->aViewContainer = $this->mainView() ;
-    	}
-    		
-    	return $this->aViewContainer ;
-    }
-    
-    public function setViewContainer(IView $aViewContainer)
-    {    	
-    	$this->aViewContainer = $aViewContainer ;
-    
-    	if( !$this->aMainView )
-    	{
-    		$this->aMainView = $aViewContainer ;
-    	}
-    }
-    
+        
     /**
      * 
      * @see IController::mainRun()
      */
     public function mainRun ()
     {
-		$this->processChildren() ;
-		
-		$this->process() ;
-		
-		$this->displayViews() ;
+    	if( !$this->aParams->bool('noframe') )
+    	{
+    		$aFrame = $this->frame() ;
+			
+    		$aFrame->add($this) ;
+			
+    		$aFrame->mainRun() ;
+    	}
+
+    	else
+    	{
+			$this->processChildren() ;
+			
+			$this->process() ;
+			
+			$this->mainView()->show() ;
+    	}
     }
     
     public function buildParams($Params)
@@ -221,22 +208,6 @@ class Controller extends NamableComposite implements IController
 		}
     }
 
-    protected function displayViews()
-    {
-    	if( !$this->aParams->bool('noframe') )
-    	{
-			$this->mainView()->show() ;
-    	}
-
-    	else
-    	{
-	    	foreach( $this->viewContainer()->iterator() as $aView )
-	    	{
-				$aView->show() ;
-	    	}
-    	}
-    }
-
 	public function add($object,$sName=null,$bAdoptRelative=true)
 	{
 		if($sName===null)
@@ -251,7 +222,7 @@ class Controller extends NamableComposite implements IController
 		
 		if( $bAdoptRelative )
 		{
-			$this->viewContainer()->add( $object->mainView(), null, true ) ;
+			$this->takeOverView($object,$sName) ;
 
 			if( $object->params()!=$this->params())
 			{
@@ -261,6 +232,18 @@ class Controller extends NamableComposite implements IController
 		
 		parent::add($object,$sName,$bAdoptRelative) ;
 	}
+	
+	/**
+	 * 接管子控制器的视图
+	 */
+	protected function takeOverView(IController $aChild,$sChildName=null)
+	{
+		if($sChildName===null)
+		{
+			$sChildName = $aChild->name() ;
+		}
+		$this->mainView()->add( $aChild->mainView(), "childrenMainViewFor".$sChildName, true )  ;
+	} 
 	
 	public function remove($object)
 	{
@@ -308,7 +291,7 @@ class Controller extends NamableComposite implements IController
 	public function renderString(& $sContent)
 	{
 		$aView = new View("anonymous",null,$this->mainView()->ui) ;
-		$this->viewContainer()->add($aView,null,true) ;
+		$this->mainView()->add($aView,null,true) ;
 		$aView->outputStream()->write($sContent) ;
 	}
 	
@@ -323,7 +306,7 @@ class Controller extends NamableComposite implements IController
 		}
 		
 		$aView = new View("anonymous",null,$this->mainView()->ui()) ;
-		$this->viewContainer()->add($aView,null,true) ;
+		$this->mainView()->add($aView,null,true) ;
 		
 		$this->messageQueue()->display($this->mainView()->ui(),$aView->outputStream(),$sTemplateFilename) ;		
 	}
@@ -404,7 +387,7 @@ class Controller extends NamableComposite implements IController
     	if( $nNameLen>4 and substr($sName,0,4)=='view' )
     	{
     		$sViewName = substr($sName,4) ;
-    		return $this->viewContainer()->getByName($sViewName) ;
+    		return $this->mainView()->getByName($sViewName) ;
     	}
     	
     	else if( $nNameLen>10 and substr($sName,0,10)=='controller' )
@@ -414,6 +397,21 @@ class Controller extends NamableComposite implements IController
     	}
     	
 		throw new Exception("正在访问控制器 %s 中不存在的属性",array($sName,$this->name())) ;
+    }
+    
+    public function createFrame()
+    {
+    	return new WebpageFrame() ;
+    }
+    
+    public function frame()
+    {
+    	if( !$this->aFrame )
+    	{
+    		$this->aFrame = $this->createFrame() ;
+    	}
+    	
+    	return $this->aFrame ;
     }
     
    	static private function regexpModelName()
@@ -436,10 +434,10 @@ class Controller extends NamableComposite implements IController
     
     private $aMainView = null ;
     
-    private $aViewContainer = null ;
-    
     private $aMsgQueue = null ;
     
     private $actionReturn = null ;
+    
+    private $aFrame = null ;
 }
 ?>
