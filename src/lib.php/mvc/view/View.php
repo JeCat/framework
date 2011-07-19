@@ -324,7 +324,19 @@ class View extends NamableComposite implements IView
 	{
 		return $this->bEnable ;
 	}
-	
+
+    public function __get($sName)
+    {
+    	$nNameLen = strlen($sName) ;
+    	
+    	if( $nNameLen>4 and substr($sName,0,4)=='view' )
+    	{
+    		$sViewName = substr($sName,4) ;
+    		return $this->getByName($sViewName) ;
+    	}
+    	
+		throw new Exception("正在访问视图 %s 中不存在的属性: %s",array($this->name(),$sName)) ;
+    }
 	
 	private $aModel ;
 	private $aWidgets ;

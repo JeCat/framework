@@ -2,6 +2,8 @@
 
 namespace jc\mvc\controller ;
 
+use jc\mvc\model\IModel;
+use jc\pattern\composite\Container;
 use jc\mvc\view\DataExchanger;
 use jc\mvc\view\IFormView;
 use jc\util\match\RegExp;
@@ -76,7 +78,7 @@ class Controller extends NamableComposite implements IController
 	    	}
     	}
     	
-    	return $this->$sName = new $sClass($aPrototype,$bAgg) ;    	
+    	return $this->addModel(new $sClass($aPrototype,$bAgg),$sName) ;    	
     }
     
     /**
@@ -106,28 +108,11 @@ class Controller extends NamableComposite implements IController
     	
     	
     	$aView = new $sClass($sName,$sSourceFile) ;
-    	$this->registerView($aView,$sName) ;
+    	$this->addView($aView,$sName) ;
     	
     	return $aView ;
     }
-    
-    
-    
-    public function registerView(IView $aView,$sName=null)
-    {
-    	if(!$sName)
-    	{
-    		$sName = $aView->name() ;
-    	}
-    	$this->mainView()->add( $aView, $sName, true ) ;
-    	$aView->variables()->set("theController", $this) ;
-    }
-    
-    public function unregisterView(IView $aView)
-    {
-    	$this->mainView()->remove($aView) ;
-    }
-    
+        
     /**
      * @return IView
      */
@@ -167,7 +152,10 @@ class Controller extends NamableComposite implements IController
 			
 			$this->process() ;
 			
-			$this->mainView()->show() ;
+			if( !$this->aParams->bool('noview') )
+			{
+				$this->mainView()->show() ;
+			}
     	}
     }
     
@@ -389,14 +377,20 @@ class Controller extends NamableComposite implements IController
     		$sViewName = substr($sName,4) ;
     		return $this->mainView()->getByName($sViewName) ;
     	}
+
+    	else if( $nNameLen>5 and substr($sName,0,5)=='model' )
+    	{
+    		$sModelName = substr($sName,5) ;
+    		return $this->modelContainer()->getByName($sModelName) ;
+    	}
     	
     	else if( $nNameLen>10 and substr($sName,0,10)=='controller' )
     	{
-    		$sViewName = substr($sName,10) ;
-    		return $this->getByName($sViewName) ;
+    		$sControllerName = substr($sName,10) ;
+    		return $this->getByName($sControllerName) ;
     	}
     	
-		throw new Exception("正在访问控制器 %s 中不存在的属性",array($sName,$this->name())) ;
+		throw new Exception("正在访问控制器 %s 中不存在的属性:%s",array($this->name(),$sName)) ;
     }
     
     public function createFrame()
@@ -412,6 +406,67 @@ class Controller extends NamableComposite implements IController
     	}
     	
     	return $this->aFrame ;
+    }
+    
+    public function addModel(IModel $aModel,$sName=null)
+    {
+    	return $this->modelContainer()->add($aModel,$sName) ;
+    }
+    public function removeModel(IModel $aModel)
+    {
+    	$this->modelContainer()->remove($aModel) ;
+    }
+    /**
+	 * @return jc\mvc\model\IModel
+     */
+    public function modelByName($sName)
+    {
+    	$this->modelContainer()->getByName($sName) ;
+    }
+    public function modelIterator()
+    {
+    	$this->modelContainer()->iterator() ;
+    }
+    public function clearModels()
+    {
+    	$this->modelContainer()->clear() ;
+    }
+    
+    
+    public function addView(IView $aView,$sName=null)
+    {
+    	$aView->variables()->set("theController", $this) ;
+    	return $this->mainView()->add( $aView, $sName, true ) ;
+    }
+    public function removeView(IView $aView)
+    {
+    	$aView->variables()->set("theController",null) ;
+    	$this->mainView()->remove($aView) ;
+    }
+    /**
+	 * @return jc\mvc\view\IView
+     */
+    public function viewByName($sName)
+    {
+    	$this->mainView()->getByName($sName) ;
+    }
+    public function viewIterator()
+    {
+    	$this->mainView()->iterator() ;
+    }
+    public function clearViews()
+    {
+    	$this->mainView()->clear() ;
+    }
+    
+    protected function modelContainer()
+    {
+    	if(!$this->aModelContainer)
+    	{
+    		$this->aModelContainer = new Container("jc\\mvc\\model\\IModel") ;
+    	}
+    	
+    	return $this->aModelContainer ;
     }
     
    	static private function regexpModelName()
@@ -437,6 +492,8 @@ class Controller extends NamableComposite implements IController
     private $aMsgQueue = null ;
     
     private $actionReturn = null ;
+    
+    private $aModelContainer = null ;
     
     private $aFrame = null ;
 }

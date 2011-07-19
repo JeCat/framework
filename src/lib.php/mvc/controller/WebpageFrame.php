@@ -41,7 +41,7 @@ class WebpageFrame extends Controller
 	
 	public function addFrameView(IView $aFrameView)
 	{
-		$this->registerView($aFrameView) ;
+		$this->addView($aFrameView) ;
 		
 		$this->setViewContainer($aFrameView) ;	
 
