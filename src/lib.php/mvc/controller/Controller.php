@@ -72,7 +72,7 @@ class Controller extends NamableComposite implements IController
      * @param $formview		该参数可以为：true 则创建一个 FormView 类型的视图; false 则创建一个 View 普通视图; 或是其他视图的类名 
      * @return IView
      */
-    public function createView($sName,$sSourceFile,$formview='jc\\mvc\\view\\View')
+    public function createView($sName=null,$sSourceFile=null,$formview='jc\\mvc\\view\\View')
     {
 		if( is_string($formview) and class_exists($formview) )
 	    {
@@ -81,6 +81,22 @@ class Controller extends NamableComposite implements IController
 	    else
 	    {
 	    	$sClass = $formview? 'jc\\mvc\\view\\FormView': 'jc\\mvc\\view\\View' ;
+	    }
+	    
+	    if( !$sName )
+	    {
+	    	$sMyClass = get_class($this) ;
+	    	if( ($idx=strrpos($sMyClass, '\\'))!==false and strlen($sMyClass)>$idx+1 )
+	    	{
+	    		$sMyClass = substr($sMyClass,$idx+1) ;
+	    	}
+	    	
+	    	$sName = lcfirst($sMyClass) ;
+	    }
+	    
+	    if( !$sSourceFile )
+	    {
+	    	$sSourceFile = $sName . '.html' ;
 	    }
     	
     	

@@ -142,6 +142,29 @@ class Widget extends Object implements IViewWidget
 		return $this->messageQueue()->create($sType,$sMessage,$arrMessageArgs,$aPoster) ;
 	}
 	
+	public function setAttribute($sName,$sValue)
+	{
+		$this->arrAttributes[$sName] = $sValue ;
+	}
+	public function attribute($sName,$sValue)
+	{
+		return isset($this->arrAttributes[$sName])? $this->arrAttributes[$sName]: null ;
+	}
+	public function attributeNameIterator()
+	{
+		return new \ArrayIterator(array_keys($this->arrAttributes)) ;
+	}
+	
+	public function displayInputAttributes()
+	{
+		$sRet = '' ;
+		foreach($this->arrAttributes as $sName=>$sValue)
+		{
+			$sRet.= ' ' . $sName . '="' . addslashes($sValue) . '"' ;
+		}
+		return $sRet ;
+	}
+	
 	private $aView ;
 
 	private $sId ;
@@ -151,6 +174,8 @@ class Widget extends Object implements IViewWidget
 	private $aMsgQueue ;
 
 	private $sTitle ;
+	
+	private $arrAttributes = array() ;
 }
 
 ?>

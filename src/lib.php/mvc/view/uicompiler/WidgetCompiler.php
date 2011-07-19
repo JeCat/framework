@@ -1,6 +1,7 @@
 <?php
 namespace jc\mvc\view\uicompiler ;
 
+use jc\ui\xhtml\compiler\ExpressionCompiler;
 use jc\ui\xhtml\compiler\NodeCompiler;
 use jc\lang\Exception;
 use jc\lang\Assert;
@@ -23,9 +24,36 @@ class WidgetCompiler extends NodeCompiler
 		}
 		
 		$sId = $aAttrs->get('id') ;
-		
+			
 		$aDev->write("<?php \$_aWidget = \$aVariables->get('theView')->widget({$sId}) ;\r\n") ;
 		$aDev->write("if(\$_aWidget){\r\n") ;
+		
+		// 常规 html attr
+		foreach(array('class','name','title') as $sName)
+		{
+			if( !$aAttrs->has($sName) )
+			{
+				continue ;
+			}
+
+			$sVarName = '"'. addslashes($sName) . '"' ;
+			$sValue = $aAttrs->get($sName) ;
+			$aDev->write("	\$_aWidget->setAttribute({$sVarName},{$sValue}) ;\r\n") ;
+		}
+		
+		// html attribute
+		$arrInputAttrs = array() ; 
+		foreach($aAttrs as $sName=>$aValue)
+		{
+			if( substr($sName,0,5)=='attr.' and $sVarName=substr($sName,5) )
+			{
+				$sVarName = '"'. addslashes($sVarName) . '"' ;
+				$sValue = $aAttrs->get($sName) ;
+				$aDev->write("	\$_aWidget->setAttribute({$sVarName},{$sValue}) ;\r\n") ;
+			}
+		}
+		
+		
 		$aDev->write("	\$_aWidget->display(\$this,null,\$aDevice) ;\r\n") ;
 		$aDev->write("}else{\r\n") ;
 		$aDev->write("	echo '缺少 widget (id:'.{$sId}.')' ;\r\n") ;
