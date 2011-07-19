@@ -29,7 +29,7 @@ class WidgetCompiler extends NodeCompiler
 		$aDev->write("if(\$_aWidget){\r\n") ;
 		
 		// 常规 html attr
-		foreach(array('class','name','title') as $sName)
+		foreach(array('class','name','title','style') as $sName)
 		{
 			if( !$aAttrs->has($sName) )
 			{
