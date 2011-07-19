@@ -154,6 +154,10 @@ class Widget extends Object implements IViewWidget
 	{
 		return new \ArrayIterator(array_keys($this->arrAttributes)) ;
 	}
+	public function removeAttribute($sName)
+	{
+		unset($this->arrAttributes[$sName]) ;
+	}
 	
 	public function displayInputAttributes()
 	{
