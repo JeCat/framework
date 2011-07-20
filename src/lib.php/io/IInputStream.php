@@ -17,7 +17,7 @@ interface IInputStream
 	 * 
 	 * @return string
 	 */
-	function readInString(String $aString,$nBytes) ;
+	function readInString(String $aString,$nBytes=-1) ;
 	
 	/**
 	 * Enter description here ...
