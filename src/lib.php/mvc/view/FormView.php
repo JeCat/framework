@@ -11,15 +11,6 @@ class FormView extends View implements IFormView
 	public function __construct($sName,$sSourceFilename=null,UI $aUI=null)
 	{
 		parent::__construct($sName,$sSourceFilename,$aUI) ;
-		
-		// html form signature
-		$arrStack = debug_backtrace() ;
-		$sHtmlFormSignature = '' ;
-		foreach($arrStack as $arrCall)
-		{
-			$sHtmlFormSignature.= md5_file($arrCall['file']).':'.$arrCall['line'] ;
-		}
-		$this->sHtmlFormSignature = md5($sHtmlFormSignature) ;
 	}
 	
 	public function loadWidgets(IDataSrc $aDataSrc)
@@ -68,9 +59,30 @@ class FormView extends View implements IFormView
 		return $aDataSrc->get( $this->htmlFormSignature() ) == '1' ;
 	}
 	
-	public function htmlFormSignature()
+	public function htmlFormSignature($bCreate=true)
 	{
+		if(!$this->sHtmlFormSignature)
+		{
+			$this->calculateHtmlFormFignature() ;			
+		}
+		
 		return $this->sHtmlFormSignature ;
+	}
+	
+	protected function calculateHtmlFormFignature()
+	{
+		if( !$sSourceFilename=$this->sourceFilename() )
+		{
+			return null ;
+		}
+		
+		$sFilepath = $this->ui()->sourceFileManager()->find($sSourceFilename) ;
+		if( !$sFilepath or !is_file($sFilepath) )
+		{
+			return ;
+		}
+		
+		$this->sHtmlFormSignature = $this->name().':'.md5_file($sFilepath) ;
 	}
 	
 	public function isShowForm()

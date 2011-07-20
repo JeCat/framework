@@ -25,7 +25,7 @@ class View extends NamableComposite implements IView
 		
 		$this->setName($sName) ;
 		$this->setSourceFilename($sSourceFilename) ;
-		$this->setUi( $aUI? $aUI: UIFactory::singleton()->create() ) ;
+		$this->setUi( $aUI ) ;
 		
 		// 消息队列过滤器
 		$this->messageQueue()->filters()->add(function (Message $aMsg,$aView){
@@ -85,9 +85,13 @@ class View extends NamableComposite implements IView
 	 */
 	public function ui()
 	{
+		if( !$this->aUI )
+		{
+			$this->aUI = UIFactory::singleton()->create() ;
+		} 
 		return $this->aUI ;
 	}
-	public function setUi(UI $aUI)
+	public function setUi(UI $aUI=null)
 	{
 		$this->aUI = $aUI ;
 	}
