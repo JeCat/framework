@@ -71,9 +71,13 @@ class View extends NamableComposite implements IView
 		return $this->aModel ;
 	}
 	
+	/**
+	 * @return IView
+	 */
 	public function setModel(IModel $aModel)
 	{
 		$this->aModel = $aModel ;
+		return $this ;
 	}
 	
 	/**
@@ -92,9 +96,13 @@ class View extends NamableComposite implements IView
 	{
 		return $this->sSourceFile ;
 	}
+	/**
+	 * @return IView
+	 */
 	public function setSourceFilename($sSourceFilename)
 	{
 		$this->sSourceFile = $sSourceFilename ;
+		return $this ;
 	}
 
 	/**
@@ -109,9 +117,13 @@ class View extends NamableComposite implements IView
 		return $this->aVariables ;
 	}
 	
+	/**
+	 * @return IView
+	 */
 	public function setVariables(IHashTable $aVariables)
 	{
 		$this->aVariables = $aVariables ;
+		return $this ;
 	}
 	
 	/**
