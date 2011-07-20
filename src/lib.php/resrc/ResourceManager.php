@@ -88,7 +88,7 @@ class ResourceManager extends Object implements IResourceManager
 	{
 		if( $sNamespace=='*' )
 		{
-			list($sNamespace,$sFilename) = self::detectNamespace($sFilename) ;
+			list($sNamespace,$sFilename) = $this->detectNamespace($sFilename) ;
 		}
 		
 		list($sFolderPath,$sWrapedFilename) = $this->findFolderAndFile($sFilename,$sNamespace) ;

@@ -68,15 +68,13 @@ class Controller extends NamableComposite implements IController
 	    	$aResSet=self::regexpModelName()->match($sName) ;
 	    	
 	    	for( $aResSet->end(); $aRes=$aResSet->current(); $aResSet->prev() )
-	    	{
-	    		// 大写
-	    		$sChar = substr($sName,$aRes->position()+1,1) ;
-	    		$sName = substr_replace($sName, strtoupper($sChar), $aRes->position()+1,1) ;
-	    		
+	    	{	    		
 	    		// 删除单词分隔符
 	    		$sName = substr_replace($sName,'',$aRes->position(),1) ;
 	    	}
     	}
+    	
+    	$sName = strtolower($sName) ;
     	
     	return $this->addModel(new $sClass($aPrototype,$bAgg),$sName) ;    	
     }
@@ -381,6 +379,7 @@ class Controller extends NamableComposite implements IController
     	else if( $nNameLen>5 and substr($sName,0,5)=='model' )
     	{
     		$sModelName = substr($sName,5) ;
+    		$sModelName = strtolower($sModelName) ;
     		return $this->modelContainer()->getByName($sModelName) ;
     	}
     	
