@@ -53,12 +53,12 @@ class Relocater extends Controller
 	
 	protected function init()
 	{
-		$this->createView("relocaterView", "jc:RelocaterView.html")->disable() ;					
+		$this->createView("Relocater", "jc:Relocater.html")->disable() ;					
 	}
 	
 	public function process()
 	{
-		$this->relocaterView->enable() ;
+		$this->viewRelocater->enable() ;
 	}
 	
 	public function setTitle($sTitle)
