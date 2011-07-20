@@ -29,7 +29,6 @@ class Relocater extends Controller
 		if($aParentController)
 		{	
 			// 禁用父控制器的所有视图
-			
 			foreach( $aParentController->mainView()->iterator() as $aView )
 			{
 				$aView->disable() ;
