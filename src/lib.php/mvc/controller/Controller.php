@@ -457,6 +457,11 @@ class Controller extends NamableComposite implements IController
     {
     	$this->mainView()->clear() ;
     }
+
+    protected function response()
+    {
+    	return $this->application()->response() ;
+    }
     
     protected function modelContainer()
     {
