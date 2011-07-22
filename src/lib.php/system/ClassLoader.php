@@ -136,7 +136,7 @@ class ClassLoader extends \jc\lang\Object
 		{
 			if( !mkdir($sClassCompiledFolder,0775,true) )
 			{
-				throw new Exception("无法编译class，创建目录失败：",$sClassCompiledFolder) ;
+				throw new Exception("无法编译class，创建编译目录失败：%s",$sClassCompiledFolder) ;
 			}
 		}
 		
