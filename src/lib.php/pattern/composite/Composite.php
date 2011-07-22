@@ -29,7 +29,7 @@ namespace jc\pattern\composite ;
 
 class Composite extends Container implements IContainedable
 {
-	public function setParent(IContainer $aParent)
+	public function setParent(IContainer $aParent=null)
 	{
 		$this->aParent = $aParent ;
 	}

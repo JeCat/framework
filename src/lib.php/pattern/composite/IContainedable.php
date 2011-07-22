@@ -30,7 +30,7 @@ namespace jc\pattern\composite ;
 
 interface IContainedable
 {
-	public function setParent(IContainer $aParent) ;
+	public function setParent(IContainer $aParent=null) ;
 	
 	public function parent() ;
 	

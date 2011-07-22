@@ -53,6 +53,8 @@ interface IContainer
 	public function hasName($sName) ;
 	
 	public function has($object) ;
+	
+	public function replace($newObject,$object) ;
 }
 
 ?>

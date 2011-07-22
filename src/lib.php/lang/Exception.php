@@ -28,8 +28,8 @@ class Exception extends \Exception implements IException, IObject
 		}
 		
 		return $aLocale?
-				$aLocale->trans($this->getMessage(),$this->arrArgvs):
-				sprintf($this->getMessage(),$this->arrArgvs) ;
+				$aLocale->trans($this->getMessage(),$this->arrArgvs) :
+				call_user_func_array('sprintf', array_merge(array($this->getMessage()),$this->arrArgvs)) ;
 	}
 	
 	public function code() 

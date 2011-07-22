@@ -21,6 +21,9 @@ require_once __DIR__."/src/lib.php/system/CoreApplication.php" ;
 require_once __DIR__."/src/lib.php/system/Application.php" ;
 require_once __DIR__."/src/lib.php/system/AppFactory.php" ;
 
+require_once __DIR__."/src/lib.php/compile/Compiler.php" ;
+require_once __DIR__."/src/lib.php/compile/CompilerFactory.php" ;
+
 
 define( __NAMESPACE__."\\VERSION", '0.6.1' ) ;
 define( __NAMESPACE__."\\PATH", __DIR__.'/' ) ;

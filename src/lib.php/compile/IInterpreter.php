@@ -6,7 +6,7 @@ use jc\pattern\composite\IContainer;
 
 interface IInterpreter
 {
-	public function generateTargetCode(IContainer $aObjectContainer) ;
+	public function analyze(IContainer $aObjectContainer) ;
 }
 
 ?>

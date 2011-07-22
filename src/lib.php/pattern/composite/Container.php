@@ -81,7 +81,7 @@ class Container extends Object implements IContainer
 		
 		if( $sName===null )
 		{
-			if( !in_array($object,$this->arrObjects) )
+			if( !in_array($object,$this->arrObjects,is_object($object)) )
 			{
 				$this->arrObjects[] = $object ;
 			}
@@ -104,6 +104,11 @@ class Container extends Object implements IContainer
 		if($nIdx!==false)
 		{
 			unset($this->arrObjects[$nIdx]) ;
+		
+			if( $object instanceof IContainedable and $object->parent()==$this )
+			{
+				$object->setParent(null) ;
+			}
 		}
 	}
 	public function clear()
@@ -159,6 +164,28 @@ class Container extends Object implements IContainer
 	public function has($object)
 	{
 		return in_array($object,$this->arrObjects) ;
+	}
+	
+	public function replace($newObject,$object)
+	{
+		$nKey = array_search( $object, $this->arrObjects, is_object($object) ) ;
+		
+		if($nKey===false)
+		{
+			return ;
+		}
+		
+		$this->arrObjects[$nKey] = $newObject ;
+	
+		if( $object instanceof IContainedable and $object->parent()==$this )
+		{
+			$object->setParent(null) ;
+			
+			if( $newObject instanceof IContainedable )
+			{
+				$newObject->setParent($this) ;
+			}
+		}
 	}
 	
 	private $arrObjects = array() ;

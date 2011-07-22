@@ -1,13 +1,19 @@
 <?php
 namespace jc\compile\object ;
 
+use jc\pattern\composite\Composite;
 
-class AbstractObject extends Object
+class AbstractObject extends Composite
 {
 	public function __construct($sSource,$nPostion)
 	{
 		$this->sSource = $this->sTarget = $sSource ;
 		$this->nPostion = $nPostion ;
+	}
+	
+	public function __toString()
+	{
+		return $this->sourceCode() ;
 	}
 
 	public function sourceCode()
@@ -31,6 +37,10 @@ class AbstractObject extends Object
 	public function position()
 	{
 		return $this->nPostion ;
+	}
+	public function setPosition($nPostion)
+	{
+		$this->nPostion = $nPostion ;
 	}
 	public function length()
 	{
