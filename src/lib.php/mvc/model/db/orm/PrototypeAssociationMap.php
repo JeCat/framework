@@ -73,8 +73,12 @@ class PrototypeAssociationMap extends Object
 								, $aPrototype
 								, $this->modelPrototype($arrAsso['model'])
 								, $arrAsso['fromk'], $arrAsso['tok']
-								, isset($arrAsso['bfromk'])?$arrAsso['bfromk']:null, isset($arrAsso['btok'])?$arrAsso['btok']:null
 						) ;
+						
+						if($sAssoType==Association::hasAndBelongsToMany)
+						{
+							$aAssociation->setBridge($arrAsso['bridge'],$arrAsso['bfromk'],$arrAsso['btok']) ;	
+						}
 						
 						$aPrototype->addAssociation($aAssociation) ;
 					}
