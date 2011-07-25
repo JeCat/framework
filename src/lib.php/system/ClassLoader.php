@@ -87,26 +87,41 @@ class ClassLoader extends \jc\lang\Object
 					}
 				}
 			
-				// 在编译目录内搜索类
-				$sClassCompiledFolder = $this->arrPackages[$sPackageName][1].'/'.$this->compiler()->strategySignature().$sClassSubNamespace ;
-				$sClassCompiled = $this->detectClassInFolder($sClassCompiledFolder,$sClassName) ;
-				
-				// 找到了源文件
-				if( $sClassSource )
+				// 使用编译文件
+				// --------------
+				if( $this->isEnableClassCompile() )
 				{
-					// 存在编译目录但没有的编译文件，或编译文件过期，需要重新编译
-					if( !$sClassCompiled or filemtime($sClassSource)>filemtime($sClassCompiled) )
+					// 在编译目录内搜索类
+					$sClassCompiledFolder = $this->arrPackages[$sPackageName][1].'/'.$this->compiler()->strategySignature().$sClassSubNamespace ;
+					$sClassCompiled = $this->detectClassInFolder($sClassCompiledFolder,$sClassName) ;
+					
+					// 找到了源文件
+					if( $sClassSource )
 					{
-						$this->compileClass($sClassSource,$sClassCompiledFolder,$sClassSourceFile) ;
+						// 存在编译目录但没有的编译文件，或编译文件过期，需要重新编译
+						if( !$sClassCompiled or filemtime($sClassSource)>filemtime($sClassCompiled) )
+						{
+							$this->compileClass($sClassSource,$sClassCompiledFolder,$sClassSourceFile) ;
+						}
+						
+						return $sClassCompiled? $sClassCompiled: $sClassCompiledFolder.'/'.$sClassSourceFile ;					
 					}
 					
-					return $sClassCompiled? $sClassCompiled: $sClassCompiledFolder.'/'.$sClassSourceFile ;					
+					// 没有找到源文件，但是找到了编译文件， 直接使用编译文件
+					else if( $sClassCompiled ) 
+					{
+						return $sClassCompiled ;
+					}
 				}
 				
-				// 没有找到源文件，但是找到了编译文件， 直接使用编译文件
-				else if( $sClassCompiled ) 
+				// 跳过编译文件
+				// --------------
+				else 
 				{
-					return $sClassCompiled ;
+					if($sClassSource)
+					{
+						return $sClassSource ;
+					}
 				}
 			}
 		}
@@ -157,7 +172,10 @@ class ClassLoader extends \jc\lang\Object
 			$aSourceFile = new File($sClassSource) ;
 			$aCompiledFile = new File($sClassCompiledFolder.'/'.$sClassFilename) ;
 			
-			$this->compiler()->compile( $aSourceFile->openReader(), $aCompiledFile->openWriter() ) ;
+			$aSrcInstream = $aSourceFile->openReader() ;
+			$aCompiledOutstream = $aCompiledFile->openWriter() ;
+			
+			$this->compiler()->compile( $aSrcInstream, $aCompiledOutstream ) ;
 			
 			$aCompiler->setCompiling(false) ;
 		}
@@ -186,9 +204,13 @@ class ClassLoader extends \jc\lang\Object
 		return $this->aCompiler ;
 	}
 	
-	public function disableCompile($bDisable=true)
+	public function isEnableClassCompile()
 	{
-		$this->bDisableCompile = $bDisable ;
+		return $this->bEnableClassCompile ; 
+	}
+	public function enableClassCompile($bEnble=true)
+	{
+		$this->bEnableClassCompile = $bEnble? true: false ;
 	}
 	
 	private $arrPackages = array() ;
@@ -197,7 +219,7 @@ class ClassLoader extends \jc\lang\Object
 
 	private $aCompiler = null ;
 	
-	private $bDisableCompile = false ;
+	private $bEnableClassCompile = false ;
 }
 
 ?>
