@@ -76,6 +76,11 @@ class UrlResourceManager extends ResourceManager
 		}
 	}
 	
+	public function findByPath()
+	{
+		
+	}
+	
 	private $arrFolderUrlPrefix = array() ;
 }
 
