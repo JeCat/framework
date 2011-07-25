@@ -25,7 +25,7 @@ class InterpreterManager extends Container
 	
 	public function iterate()
 	{
-		return new \ArrayIterator($this->arrInterpreters) ;
+		return new \jc\pattern\iterate\ArrayIterator($this->arrInterpreters) ;
 	}
 	
 	/**

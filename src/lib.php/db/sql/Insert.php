@@ -42,12 +42,12 @@ class Insert extends Statement implements IDataSettableStatement
 
 	public function dataIterator()
 	{
-		return new \ArrayIterator($this->mapData) ;
+		return new \jc\pattern\iterate\ArrayIterator($this->mapData) ;
 	}
 
 	public function dataNameIterator()
 	{
-		return new \ArrayIterator( array_keys($this->mapData) ) ;
+		return new \jc\pattern\iterate\ArrayIterator( array_keys($this->mapData) ) ;
 	}
 
 	public function makeStatement($bFormat=false)

@@ -152,7 +152,7 @@ class Widget extends Object implements IViewWidget
 	}
 	public function attributeNameIterator()
 	{
-		return new \ArrayIterator(array_keys($this->arrAttributes)) ;
+		return new \jc\pattern\iterate\ArrayIterator(array_keys($this->arrAttributes)) ;
 	}
 	public function removeAttribute($sName)
 	{

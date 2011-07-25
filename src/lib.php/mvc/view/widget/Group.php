@@ -30,7 +30,7 @@ class Group extends FormWidget {
 	
 	//返回组件列表
 	public function widgetIterator() {
-		return new \ArrayIterator ( $this->arrWidgets );
+		return new \jc\pattern\iterate\ArrayIterator ( $this->arrWidgets );
 	}
 	
 	//清除所有子控件

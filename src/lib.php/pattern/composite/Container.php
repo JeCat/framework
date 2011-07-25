@@ -124,21 +124,21 @@ class Container extends Object implements IContainer
 	 */
 	public function iterator()
 	{
-		return new \ArrayIterator($this->arrObjects) ;
+		return new \jc\pattern\iterate\ArrayIterator($this->arrObjects) ;
 	}
 	/**
 	 * @return \Iterate
 	 */
 	public function nameIterator()
 	{
-		return new \ArrayIterator( array_keys($this->arrObjects) ) ;
+		return new \jc\pattern\iterate\ArrayIterator( array_keys($this->arrObjects) ) ;
 	}
 	/**
 	 * @return \Iterate
 	 */
 	public function acceptClassIterator()
 	{
-		return new \ArrayIterator($this->arrAcceptClasses) ;
+		return new \jc\pattern\iterate\ArrayIterator($this->arrAcceptClasses) ;
 	}
 	
 	public function addFilters()

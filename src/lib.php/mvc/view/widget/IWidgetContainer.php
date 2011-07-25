@@ -20,7 +20,7 @@ interface IWidgetContainer {
 	public function widget($sId) ;
 	
 	/**
-	 * @return \Iterator
+	 * @return jc\pattern\iterate\INonlinearIterator
 	 */
 	public function widgitIterator() ;
 	

@@ -52,11 +52,11 @@ class OriginalSession extends Session
 	}
 	
 	/**
-	 * @return \Iterator
+	 * @return jc\pattern\iterate\INonlinearIterator
 	 */
 	public function variableNameIterator()
 	{
-		return new \ArrayIterator( array_keys($_SESSION) ) ;
+		return new \jc\pattern\iterate\ArrayIterator( array_keys($_SESSION) ) ;
 	}
 	
 	/**

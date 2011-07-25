@@ -76,7 +76,7 @@ class AccessRouter extends \jc\lang\Object
     /**
      * Enter description here ...
      * 
-     * @return \Iterator
+     * @return jc\pattern\iterate\INonlinearIterator
      */
     public function iterateController()
     {

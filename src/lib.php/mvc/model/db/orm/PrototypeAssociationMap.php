@@ -34,11 +34,11 @@ class PrototypeAssociationMap extends Object
 	}
 	
 	/**
-	 * @return \Iterator
+	 * @return jc\pattern\iterate\INonlinearIterator
 	 */
 	public function modelNameIterator()
 	{
-		return new \ArrayIterator(array_keys($this->arrOrms)) ;
+		return new \jc\pattern\iterate\ArrayIterator(array_keys($this->arrOrms)) ;
 	}
 	
 	/**

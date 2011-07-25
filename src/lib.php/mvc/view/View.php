@@ -274,7 +274,7 @@ class View extends NamableComposite implements IView
 	}
 	
 	/**
-	 * @return \Iterator
+	 * @return jc\pattern\iterate\INonlinearIterator
 	 */
 	public function widgitIterator()
 	{

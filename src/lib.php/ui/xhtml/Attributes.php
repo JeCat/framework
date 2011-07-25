@@ -42,7 +42,7 @@ class Attributes extends HashTable
 	
 	public function anonymousIterator()
 	{
-		return new \ArrayIterator($this->arrAnonymous) ;
+		return new \jc\pattern\iterate\ArrayIterator($this->arrAnonymous) ;
 	}
 	
 	public function remove($req)

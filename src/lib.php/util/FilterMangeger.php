@@ -101,11 +101,11 @@ class FilterMangeger extends Object implements IFilterMangeger
 		
 	/**
 	 * 
-	 * @return \Iterator
+	 * @return jc\pattern\iterate\INonlinearIterator
 	 */
 	public function iterator()
 	{
-		return new \ArrayIterator($this->arrFilters) ;
+		return new \jc\pattern\iterate\ArrayIterator($this->arrFilters) ;
 	}
 	
 	private $arrFilters = array() ;

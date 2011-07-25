@@ -91,7 +91,7 @@ class Select extends FormWidget {
 	}
 	//取得option列表
 	public function optionIterator() {
-		return new \ArrayIterator ( $this->arrOptions );
+		return new \jc\pattern\iterate\ArrayIterator ( $this->arrOptions );
 	}
 	
 	public function value() {

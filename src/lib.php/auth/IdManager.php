@@ -135,7 +135,7 @@ class IdManager extends Object implements \Serializable
 	 */
 	public function iterator() 
 	{
-		return new \ArrayIterator($this->arrIds) ;
+		return new \jc\pattern\iterate\ArrayIterator($this->arrIds) ;
 	}
 
 	private $arrIds = array() ;

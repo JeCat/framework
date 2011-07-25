@@ -14,7 +14,7 @@ class VerifyFailed extends Exception
 	}
 	
 	public function verifyFaildIterator(){
-		return new \ArrayIterator ( $this->arrVerify );
+		return new \jc\pattern\iterate\ArrayIterator ( $this->arrVerify );
 	}
 	
 	private $arrVerify = array(); 

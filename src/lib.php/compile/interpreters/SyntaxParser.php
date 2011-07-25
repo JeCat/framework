@@ -2,6 +2,7 @@
 
 namespace jc\compile\interpreters ;
 
+use jc\iterate\INonlinearIterator;
 use jc\compile\object\NamespaceDeclare;
 use jc\compile\object\ClassDefine;
 use jc\compile\object\Token;
@@ -75,7 +76,7 @@ class SyntaxParser extends Object implements IInterpreter
 	}
 	
 	
-	private function analyzeNamespaceDeclare(\Iterator $aObjectPoolIter,Token $aObject)
+	private function analyzeNamespaceDeclare(INonlinearIterator $aObjectPoolIter,Token $aObject)
 	{
 		$aNewToken = new NamespaceDeclare($aObject) ;
 		$this->aNamespace = $aNewToken ;
@@ -90,7 +91,7 @@ class SyntaxParser extends Object implements IInterpreter
 		
 	}
 	
-	private function analyzeFunctionDefine(\Iterator $aObjectPoolIter,Token $aObject)
+	private function analyzeFunctionDefine(INonlinearIterator $aObjectPoolIter,Token $aObject)
 	{
 		$aNewToken = new FunctionDefine( $aObject ) ;
 		$this->aFunction = $aNewToken ;
@@ -107,7 +108,7 @@ class SyntaxParser extends Object implements IInterpreter
 		$aObject->objectPool()->replace($aObject,$aNewToken) ;
 	}
 	
-	private function analyzeClassDefine(\Iterator $aObjectPoolIter,Token $aObject)
+	private function analyzeClassDefine(INonlinearIterator $aObjectPoolIter,Token $aObject)
 	{
 		$aNewToken = new ClassDefine( $aObject ) ;
 		$this->aClass = $aNewToken ;
@@ -119,7 +120,7 @@ class SyntaxParser extends Object implements IInterpreter
 	}
 	
 	
-	private function findToken(\Iterator $aObjectPoolIter,$types,$bReturnAllTokens=false)
+	private function findToken(INonlinearIterator $aObjectPoolIter,$types,$bReturnAllTokens=false)
 	{
 		if($bReturnAllTokens)
 		{

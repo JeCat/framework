@@ -63,7 +63,7 @@ class VerifierManager extends Object
 	
 	public function iterator()
 	{
-		return new \ArrayIterator($this->arrVerifiers) ;
+		return new \jc\pattern\iterate\ArrayIterator($this->arrVerifiers) ;
 	}
 	
 	public function verifyData($value,$bThrowExcetion=false)

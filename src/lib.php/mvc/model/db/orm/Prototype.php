@@ -181,11 +181,11 @@ class Prototype extends Object implements \Serializable
 		return $this->arrClms ;
 	}
 	/**
-	 * @return \Iterator
+	 * @return jc\pattern\iterate\INonlinearIterator
 	 */
 	public function columnIterator()
 	{
-		return new \ArrayIterator($this->arrClms) ;
+		return new \jc\pattern\iterate\ArrayIterator($this->arrClms) ;
 	}
 	
 	/**

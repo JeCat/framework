@@ -42,11 +42,11 @@ class Stack extends Object
 	}
 	
 	/**
-	 * @return \Iterator
+	 * @return jc\pattern\iterate\INonlinearIterator
 	 */
 	public function iterator()
 	{
-		return new \ArrayIterator($this->arrDataStack) ;
+		return new \jc\pattern\iterate\ArrayIterator($this->arrDataStack) ;
 	}
 
 	private $arrDataStack ;

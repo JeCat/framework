@@ -55,7 +55,7 @@ class MessageQueue extends Object implements IMessageQueue
 	
 	public function iterator()
 	{
-		return new \ArrayIterator($this->arrMsgQueue) ;
+		return new \jc\pattern\iterate\ArrayIterator($this->arrMsgQueue) ;
 	}
 	
 	public function count()

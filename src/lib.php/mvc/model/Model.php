@@ -106,7 +106,7 @@ abstract class Model extends Object implements IModel, \Serializable
 	 */
 	public function childIterator()
 	{
-		return new \ArrayIterator($this->arrChildren) ;
+		return new \jc\pattern\iterate\ArrayIterator($this->arrChildren) ;
 	}
 
 	/**
@@ -114,7 +114,7 @@ abstract class Model extends Object implements IModel, \Serializable
 	 */
 	public function childNameIterator()
 	{
-		return new \ArrayIterator( array_keys($this->arrChildren) ) ;
+		return new \jc\pattern\iterate\ArrayIterator( array_keys($this->arrChildren) ) ;
 	}
 
 	// for data ///////////////////////////////
@@ -186,12 +186,12 @@ abstract class Model extends Object implements IModel, \Serializable
 	
 	public function dataIterator()
 	{
-		return new \ArrayIterator($this->arrData) ;
+		return new \jc\pattern\iterate\ArrayIterator($this->arrData) ;
 	}
 	
 	public function dataNameIterator()
 	{
-		return new \ArrayIterator( array_keys($this->arrData) ) ;
+		return new \jc\pattern\iterate\ArrayIterator( array_keys($this->arrData) ) ;
 	}
 	
 	///////////////////////////////////////////

@@ -153,19 +153,19 @@ class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator, \
 	
 	/**
 	 * 
-	 * @return \Iterator
+	 * @return jc\pattern\iterate\INonlinearIterator
 	 */
 	public function nameIterator() {
-		return new \ArrayIterator(array_keys($this->arrDatas)) ;
+		return new \jc\pattern\iterate\ArrayIterator(array_keys($this->arrDatas)) ;
 	}
 
 	/**
 	 * 
-	 * @return \Iterator
+	 * @return jc\pattern\iterate\INonlinearIterator
 	 */
 	public function valueIterator()
 	{
-		return new \ArrayIterator(array_values($this->arrDatas)) ;
+		return new \jc\pattern\iterate\ArrayIterator(array_values($this->arrDatas)) ;
 	}
 	
 	public function add($Value)

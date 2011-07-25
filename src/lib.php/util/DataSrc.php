@@ -160,11 +160,11 @@ class DataSrc extends HashTable implements IDataSrc, \ArrayAccess, \Iterator
 	
 	/**
 	 * 
-	 * @return \Iterator
+	 * @return jc\pattern\iterate\INonlinearIterator
 	 */
 	public function childIterator()
 	{
-		return new \ArrayIterator($this->arrChildren) ;
+		return new \jc\pattern\iterate\ArrayIterator($this->arrChildren) ;
 	}
 
 	

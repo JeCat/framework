@@ -37,7 +37,7 @@ interface ISession
 	public function commit() ;
 	
 	/**
-	 * @return \Iterator
+	 * @return jc\pattern\iterate\INonlinearIterator
 	 */
 	public function variableNameIterator() ;
 	

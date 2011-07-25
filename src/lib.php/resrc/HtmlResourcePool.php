@@ -80,7 +80,7 @@ class HtmlResourcePool extends Object
 	}
 	
 	/**
-	 * @return \Iterator
+	 * @return jc\pattern\iterate\INonlinearIterator
 	 */
 	public function iterator($nType,$bUrl=true)
 	{		
@@ -122,7 +122,7 @@ class HtmlResourcePool extends Object
 			}
 		}
 		
-		return new \ArrayIterator($arrResrcUrls) ;
+		return new \jc\pattern\iterate\ArrayIterator($arrResrcUrls) ;
 	}
 	
 	public function __toString()

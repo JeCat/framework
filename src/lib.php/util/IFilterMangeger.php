@@ -25,7 +25,7 @@ interface IFilterMangeger
 	
 	/**
 	 * 
-	 * @return \Iterator
+	 * @return jc\pattern\iterate\INonlinearIterator
 	 */
 	public function iterator() ;
 	

@@ -1,8 +1,8 @@
 <?php
 namespace jc\auth ;
 
+use jc\pattern\iterate\ArrayIterator;
 use jc\mvc\model\IModel;
-
 use jc\lang\Object;
 
 class Id extends Object implements IIdentity, \Serializable
@@ -150,7 +150,7 @@ class Id extends Object implements IIdentity, \Serializable
 	 */
 	public function purviewIterator()
 	{
-		return new \ArrayIterator($this->arrPurviews) ;
+		return new ArrayIterator($this->arrPurviews) ;
 	}
 	
 	/**

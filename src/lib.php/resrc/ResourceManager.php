@@ -124,12 +124,12 @@ class ResourceManager extends Object implements IResourceManager
 
 	public function folderNamespacesIterator()
 	{
-		return new \ArrayIterator(array_keys($this->arrFolders)) ;
+		return new \jc\pattern\iterate\ArrayIterator(array_keys($this->arrFolders)) ;
 	}
 	
 	public function foldersIterator($sNamespace='*')
 	{
-		return new \ArrayIterator(
+		return new \jc\pattern\iterate\ArrayIterator(
 			isset($this->arrFolders[$sNamespace])?
 				$this->arrFolders[$sNamespace]: array()
 		) ;

@@ -93,13 +93,13 @@ class PDORecordSet extends Object implements IRecordSet
 	
 	public function iterator() 
 	{
-		return new \ArrayIterator($this->arrRecordSet) ;
+		return new \jc\pattern\iterate\ArrayIterator($this->arrRecordSet) ;
 	}
 
 	public function fieldIterator()
 	{
 		$arrRow = $this->current() ;
-		return new \ArrayIterator( $arrRow===null? array(): array_keys($arrRow) ) ;
+		return new \jc\pattern\iterate\ArrayIterator( $arrRow===null? array(): array_keys($arrRow) ) ;
 	}
 	
 	public function key ()
