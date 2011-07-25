@@ -89,7 +89,7 @@ class ClassLoader extends \jc\lang\Object
 			
 				// 使用编译文件
 				// --------------
-				if( $this->isEnableClassCompile() )
+				if( $this->isEnableClassCompile() and !preg_match($this->sSkipClassesForCompile,$sClassFullName) )
 				{
 					// 在编译目录内搜索类
 					$sClassCompiledFolder = $this->arrPackages[$sPackageName][1].'/'.$this->compiler()->strategySignature().$sClassSubNamespace ;
@@ -99,7 +99,7 @@ class ClassLoader extends \jc\lang\Object
 					if( $sClassSource )
 					{
 						// 存在编译目录但没有的编译文件，或编译文件过期，需要重新编译
-						if( !$sClassCompiled or filemtime($sClassSource)>filemtime($sClassCompiled) )
+						if( !$sClassCompiled or filemtime($sClassSource)>filemtime($sClassCompiled) or !filesize($sClassCompiled) )
 						{
 							$this->compileClass($sClassSource,$sClassCompiledFolder,$sClassSourceFile) ;
 						}
@@ -157,28 +157,17 @@ class ClassLoader extends \jc\lang\Object
 		
 		$aCompiler = $this->compiler() ; 
 		
-		if( $aCompiler->isCompiling() )
-		{
-			if( !copy($sClassSource,$sClassCompiledFolder.'/'.$sClassFilename) )
-			{
-				throw new Exception("无法创建class的编译文件：%s",$sClassCompiledFolder.'/'.$sClassFilename) ;
-			}
-		}
+		$aCompiler->setCompiling(true) ;
+					
+		$aSourceFile = new File($sClassSource) ;
+		$aCompiledFile = new File($sClassCompiledFolder.'/'.$sClassFilename) ;
 		
-		else 
-		{
-			$aCompiler->setCompiling(true) ;
-								
-			$aSourceFile = new File($sClassSource) ;
-			$aCompiledFile = new File($sClassCompiledFolder.'/'.$sClassFilename) ;
+		$aSrcInstream = $aSourceFile->openReader() ;
+		$aCompiledOutstream = $aCompiledFile->openWriter() ;
+		
+		$this->compiler()->compile( $aSrcInstream, $aCompiledOutstream ) ;
 			
-			$aSrcInstream = $aSourceFile->openReader() ;
-			$aCompiledOutstream = $aCompiledFile->openWriter() ;
-			
-			$this->compiler()->compile( $aSrcInstream, $aCompiledOutstream ) ;
-			
-			$aCompiler->setCompiling(false) ;
-		}
+		$aCompiler->setCompiling(false) ;
 	}
 	
 	public function namespaceFolder($sNamespace)
@@ -220,6 +209,8 @@ class ClassLoader extends \jc\lang\Object
 	private $aCompiler = null ;
 	
 	private $bEnableClassCompile = false ;
+	
+	private $sSkipClassesForCompile = '`^jc\\\\(system|compile|pattern\\\\iterate|pattern\\\\composite|)\\\\`' ;
 }
 
 ?>

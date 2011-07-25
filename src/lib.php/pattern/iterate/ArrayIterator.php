@@ -20,8 +20,15 @@ class ArrayIterator extends Object implements INonlinearIterator
 	
 	public function current ()
 	{
-		return isset($this->arrElements[$this->nPosition])?
-				$this->arrElements[$this->nPosition]: null ;
+		if( isset($this->arrElements[$this->nPosition]) )
+		{
+			return $this->arrElements[$this->nPosition] ;
+		}
+		
+		else 
+		{
+			return $ret=null ;
+		}
 	}
 
 	public function next ()

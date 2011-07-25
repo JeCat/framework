@@ -2,7 +2,7 @@
 
 namespace jc\compile\interpreters ;
 
-use jc\iterate\INonlinearIterator;
+use jc\pattern\iterate\INonlinearIterator;
 use jc\compile\object\NamespaceDeclare;
 use jc\compile\object\ClassDefine;
 use jc\compile\object\Token;

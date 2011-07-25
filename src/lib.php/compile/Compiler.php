@@ -2,8 +2,9 @@
 
 namespace jc\compile ;
 
-use jc\lang\Exception;
+use jc\system\ClassLoader;
 
+use jc\lang\Exception;
 use jc\lang\Type;
 use jc\compile\object\Token;
 use jc\util\String;
@@ -83,8 +84,7 @@ class Compiler extends JcObject
 		}
 		
 		return ;
-	}
-	
+	}	
 	
 	public function registerInterpreter($sInterpreterClass)
 	{
