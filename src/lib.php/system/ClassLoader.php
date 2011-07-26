@@ -172,7 +172,7 @@ class ClassLoader extends \jc\lang\Object
 	
 	public function namespaceFolder($sNamespace)
 	{
-		return isset($this->arrPackages[$sNamespace])? $this->arrPackages[$sNamespace]: null ;
+		return isset($this->arrPackages[$sNamespace][0])? $this->arrPackages[$sNamespace][0]: null ;
 	}
 	
 	/**

@@ -5,7 +5,7 @@ use jc\lang\Object;
 
 class ArrayIterator extends Object implements INonlinearIterator
 {
-	public function __construct(array &$array)
+	public function __construct(array $array)
 	{
 		$this->arrKeys = array_keys($array) ;
 		$this->arrElements = array_values($array) ;
