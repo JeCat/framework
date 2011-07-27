@@ -76,12 +76,12 @@ class FSO extends Object
 	
 	public function copy($sToPath)
 	{
-		return $this->fileSystem()->copy($this->path(),$sToPath) ;
+		return $this->fileSystem()->rootFileSystem()->copy($this->path(),$sToPath) ;
 	}
 	
 	public function move($sToPath)
 	{
-		return $this->fileSystem()->move($this->path(),$sToPath) ;
+		return $this->fileSystem()->rootFileSystem()->move($this->path(),$sToPath) ;
 	}
 	
 	/**

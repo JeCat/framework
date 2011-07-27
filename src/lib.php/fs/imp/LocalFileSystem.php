@@ -10,16 +10,6 @@ class LocalFileSystem extends FileSystem
 		$this->sLocalPath = self::formatPath($sLocalPath) ;
 	}
 	
-	public function copy($sFromPath,$sToPath)
-	{
-		
-	}
-	
-	public function move($sFromPath,$sToPath)
-	{
-		
-	}
-
 	public function iterator($sPath)
 	{
 		
@@ -88,6 +78,35 @@ class LocalFileSystem extends FileSystem
 		return LocalFolder::createInstance( array($this,$sPath,$this->sLocalPath.$sPath), $this->application() ) ;
 	}
 	
+	protected function copyOperation(&$sPath,FileSystem $aToFs,&$sToPath)
+	{
+		// 本地系统文件之间的操作
+		if( $aToFs instanceof self )
+		{
+			return copy( $this->localPath().$sPath, $aToFs->localPath().$sToPath ) ;
+		}
+		
+		// 不同类型文件系统之间的操作
+		else 
+		{
+			// todo
+		}
+	}
+	
+	protected function moveOperation(&$sPath,FileSystem $aToFs,&$sToPath)
+	{
+		// 本地系统文件之间的操作
+		if( $aToFs instanceof self )
+		{
+			return rename( $this->localPath().$sPath, $aToFs->localPath().$sToPath ) ;
+		}
+		
+		// 不同类型文件系统之间的操作
+		else 
+		{
+			// todo
+		}
+	}
 	
 	private $sLocalPath ;
 }

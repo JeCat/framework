@@ -9,8 +9,8 @@ abstract class FileSystem extends Object
 	 * 定位一个路径具体所属的文件系统
 	 * 返回所属的文件系统对象 和 在该文件系统对象内部的路径
 	 */
-	protected function localeFileSystem($sPath)
-	{
+	protected function localeFileSystem($sPath,$bRecurse=false)
+	{		
 		// 统一为绝对路径
 		if(substr($sPath,0,1)!='/')
 		{
@@ -22,7 +22,14 @@ abstract class FileSystem extends Object
 			$nMountPointLen = strlen($sMountPoint) ;
 			if( substr($sPath,0,$nMountPointLen)==$sMountPoint and (strlen($sPath)==$nMountPointLen or substr($sPath,$nMountPointLen,1)=='/') )
 			{
-				return array($aFileSystem,substr($sPath,$nMountPointLen)) ;
+				if($bRecurse)
+				{
+					return $this->localeFileSystem($aFileSystem,substr($sPath,$nMountPointLen)) ;
+				}
+				else 
+				{
+					return array($aFileSystem,substr($sPath,$nMountPointLen)) ;
+				}
 			}
 		}
 		
@@ -35,10 +42,10 @@ abstract class FileSystem extends Object
 	public function findFile($sPath)
 	{
 		// 是否在挂载的文件系统中
-		list($aMountFS,$sInnerPath) = $this->localeFileSystem($sPath) ;
-		if($aMountFS!==$this)
+		list($aFileSystem,$sInnerPath) = $this->localeFileSystem($sPath) ;
+		if($aFileSystem!==$this)
 		{
-			return $aMountFS->findFile($sInnerPath) ;
+			return $aFileSystem->findFile($sInnerPath) ;
 		}
 		
 		//////////////
@@ -131,11 +138,21 @@ abstract class FileSystem extends Object
 		return $this->isFolderOperation($sPath) ;
 	}
 	
-	abstract public function iterator($sPath) ;
+	public function copy($sFromPath,$sToPath)
+	{
+		list($aFromFS,$sFromInnerPath) = $this->localeFileSystem($sFromPath,true) ;
+		list($aTOFS,$sToInnerPath) = $this->localeFileSystem($sToPath,true) ;
+
+		return $aFromFS->copyOperation($aFromFS,$aTOFS,$sToInnerPath) ;
+	}
 	
-	abstract public function copy($sFromPath,$sToPath) ;
-	
-	abstract public function move($sFromPath,$sToPath) ;
+	public function move($sFromPath,$sToPath)
+	{
+		list($aFromFS,$sFromInnerPath) = $this->localeFileSystem($sFromPath,true) ;
+		list($aTOFS,$sToInnerPath) = $this->localeFileSystem($sToPath,true) ;
+
+		return $aFromFS->moveOperation($aFromFS,$aTOFS,$sToInnerPath) ;
+	}
 
 	public function createFile($sPath,$nMode=0644)
 	{
@@ -204,7 +221,11 @@ abstract class FileSystem extends Object
 		
 		return true ;
 	}
+		
+	abstract public function iterator($sPath) ;
 	
+	
+	////////////////////////////////////////////////////////////////////////////
 	abstract protected function deleteFileOperation(&$sPath) ;
 	
 	abstract protected function deleteDirOperation(&$sPath) ;
@@ -223,14 +244,36 @@ abstract class FileSystem extends Object
 	
 	abstract protected function isFolderOperation(&$sPath) ;
 	
+	abstract protected function copyOperation(&$sPath,FileSystem $aToFs,&$sToPath) ;
+	
+	abstract protected function moveOperation(&$sPath,FileSystem $aToFs,&$sToPath) ;
+	
 	public function mountPath()
 	{
 		return $this->sMountPath ;
 	}
 	
+	/**
+	 * @return FileSystem
+	 */
 	public function parentFileSystem()
 	{
 		return $this->aParentFileSystem ;
+	}
+
+	/**
+	 * @return FileSystem
+	 */
+	public function rootFileSystem()
+	{
+		$aFileSystem = $this ;
+		
+		while( $aParent=$aFileSystem->parentFileSystem() )
+		{
+			$aFileSystem = $aParent ;
+		}
+		
+		return $aFileSystem ;
 	}
 	
 	public function beMounted(self $aParentFileSystem=null,$sPath)
