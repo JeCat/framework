@@ -10,21 +10,6 @@ class LocalFileSystem extends FileSystem
 		$this->sLocalPath = self::formatPath($sLocalPath) ;
 	}
 	
-	public function exists($sPath)
-	{
-		file_exists($this->sLocalPath.$sPath) ;		
-	}
-	
-	public function isFile($sPath)
-	{
-		is_file($this->sLocalPath.$sPath) ;		
-	}
-	
-	public function isFolder($sPath)
-	{
-		is_dir($this->sLocalPath.$sPath) ;
-	}
-	
 	public function copy($sFromPath,$sToPath)
 	{
 		
@@ -35,45 +20,74 @@ class LocalFileSystem extends FileSystem
 		
 	}
 
-	public function createFile($sPath,$nMode=0755)
-	{
-		
-	}
-	
-	public function createFolder($sPath,$nMode=0755)
-	{
-		return mkdir($sPath) ;
-	}
-	
-	protected function deleteFile($sPath)
-	{
-		unlink($this->sLocalPath.'/'.$sPath) ;
-	}
-	
-	protected function deleteDir($sPath)
-	{
-		rmdir($this->sLocalPath.'/'.$sPath) ;
-	}
-	
 	public function iterator($sPath)
 	{
 		
-	}
-	
-	protected function createFileObject($sPath)
-	{
-		return LocalFile::createInstance( array($this,$sPath,$this->sLocalPath.$sPath), $this->application() ) ;
-	}
-	
-	protected function createFolderObject($sPath)
-	{
-		return LocalFolder::createInstance( array($this,$sPath,$this->sLocalPath.$sPath), $this->application() ) ;
 	}
 	
 	public function localPath()
 	{
 		return $this->sLocalPath ;
 	}
+	
+	/////////////////////////////////////////////////////////////////////////
+	
+	protected function existsOperation(&$sPath)
+	{
+		return file_exists($this->sLocalPath.$sPath) ;		
+	}
+	
+	protected function isFileOperation(&$sPath)
+	{
+		return is_file($this->sLocalPath.$sPath) ;		
+	}
+	
+	protected function isFolderOperation(&$sPath)
+	{
+		return is_dir($this->sLocalPath.$sPath) ;
+	}
+
+	protected function createFileOperation(&$sPath,&$nMode)
+	{
+		$sLocalPath = $this->localPath().$sPath ;
+		
+		if( !$hHandle=fopen($sLocalPath,'w') )
+		{
+			return false ;
+		}
+		
+		fclose($hHandle) ;
+		
+		chmod($sLocalPath, $nMode) ;
+		
+		return true ;
+	}
+	
+	protected function createFolderOperation(&$sPath,&$nMode,&$bRecursive)
+	{
+		return mkdir($this->localPath().$sPath,$nMode,$bRecursive) ;
+	}
+	
+	protected function deleteFileOperation(&$sPath)
+	{
+		return unlink($this->sLocalPath.$sPath) ;
+	}
+	
+	protected function deleteDirOperation(&$sPath)
+	{
+		return rmdir($this->sLocalPath.$sPath) ;
+	}
+	
+	protected function createFileObject(&$sPath)
+	{
+		return LocalFile::createInstance( array($this,$sPath,$this->sLocalPath.$sPath), $this->application() ) ;
+	}
+	
+	protected function createFolderObject(&$sPath)
+	{
+		return LocalFolder::createInstance( array($this,$sPath,$this->sLocalPath.$sPath), $this->application() ) ;
+	}
+	
 	
 	private $sLocalPath ;
 }

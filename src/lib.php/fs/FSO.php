@@ -29,9 +29,14 @@ class FSO extends Object
 	 */
 	public function path()
 	{
-		return $this->sPath ;
+		return $this->aFileSystem->mountPath() . $this->sPath ;
 	}
 
+	public function dirPath()
+	{
+		return dirname($this->path()) ;
+	}
+	
 	public function name()
 	{
 		if(!$this->sName)
@@ -69,7 +74,16 @@ class FSO extends Object
 		return $this->fileSystem()->delete($this->path()) ;
 	}
 	
-
+	public function copy($sToPath)
+	{
+		return $this->fileSystem()->copy($this->path(),$sToPath) ;
+	}
+	
+	public function move($sToPath)
+	{
+		return $this->fileSystem()->move($this->path(),$sToPath) ;
+	}
+	
 	/**
 	 * Enter description here ...
 	 * 

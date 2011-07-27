@@ -21,6 +21,16 @@ require_once __DIR__."/src/lib.php/system/CoreApplication.php" ;
 require_once __DIR__."/src/lib.php/system/Application.php" ;
 require_once __DIR__."/src/lib.php/system/AppFactory.php" ;
 
+require_once __DIR__."/src/lib.php/fs/FileSystem.php" ;
+require_once __DIR__."/src/lib.php/fs/IFSO.php" ;
+require_once __DIR__."/src/lib.php/fs/IFile.php" ;
+require_once __DIR__."/src/lib.php/fs/IFolder.php" ;
+require_once __DIR__."/src/lib.php/fs/FSO.php" ;
+require_once __DIR__."/src/lib.php/fs/imp/LocalFSO.php" ;
+require_once __DIR__."/src/lib.php/fs/imp/LocalFile.php" ;
+require_once __DIR__."/src/lib.php/fs/imp/LocalFolder.php" ;
+require_once __DIR__."/src/lib.php/fs/imp/LocalFileSystem.php" ;
+
 require_once __DIR__."/src/lib.php/compile/Compiler.php" ;
 require_once __DIR__."/src/lib.php/compile/CompilerFactory.php" ;
 

@@ -5,6 +5,8 @@ interface IFSO
 {
 
 	public function path() ;
+	
+	public function dirPath() ;
 
 	public function name() ;
 
@@ -41,8 +43,7 @@ interface IFSO
 	
 	public function isHidden() ;
 	
-	
-
+	public function exists() ;
 }
 
 ?>

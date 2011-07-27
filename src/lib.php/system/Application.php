@@ -1,10 +1,20 @@
 <?php
 namespace jc\system ;
 
+use jc\fs\imp\LocalFileSystem;
 use jc\fs\FileSystem;
 
 class Application extends CoreApplication
 {
+	public function __construct($sAppDirPath)
+	{
+		$this->setFileSystem(
+			LocalFileSystem::flyweight($sAppDirPath)
+		) ;
+		
+		parent::__construct() ;
+	}
+	
 	public function singletonInstance($sClass,$bCreateNew=true)
 	{		
 		if(!isset($this->arrGlobalSingeltonInstance[$sClass]))
@@ -27,6 +37,23 @@ class Application extends CoreApplication
 	public function setSingletonInstance($sClass,$aInstance)
 	{
 		$this->arrGlobalSingeltonInstance[$sClass] = $aInstance ;
+	}
+
+	/**
+	 * @return jc\fs\FileSystem
+	 */
+	public function fileSystem()
+	{
+		return $this->aFileSystem ;
+	}
+	public function setFileSystem(FileSystem $aFileSystem)
+	{
+		$this->aFileSystem = $aFileSystem ;
+		
+		// 将 jc framework 挂载到 /framework 目录下
+		$this->aFileSystem->mount(
+			'/framework', LocalFileSystem::flyweight(\jc\PATH)
+		) ;
 	}
 	
 	public function applicationDir()
@@ -70,6 +97,8 @@ class Application extends CoreApplication
 	private $sApplicationDir ; 
 	
 	private $sEntrance = '' ; 
+	
+	private $aFileSystem ;
 	
 	static private $aGlobalSingeltonInstance ; 
 }

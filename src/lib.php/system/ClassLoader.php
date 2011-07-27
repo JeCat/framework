@@ -1,6 +1,8 @@
 <?php
 namespace jc\system ;
 
+use jc\fs\FileSystem;
+
 use jc\io\OutputStream;
 
 use jc\io\InputStream;
@@ -26,10 +28,11 @@ class ClassLoader extends \jc\lang\Object
 	}
 
 	public function addPackage($sNamespace,$sCompiledFolder,$sFolder=null) 
-	{		
-		if( !is_dir($sCompiledFolder) )
+	{
+		$aFs = $this->application()->fileSystem() ;
+		if( !$aFs->exists($sCompiledFolder) )
 		{
-			if( !mkdir($sCompiledFolder,0755,true) )
+			if( !$aFs->createFolder($sCompiledFolder) )
 			{
 				throw new Exception(
 						"注册 class package (%s)时，提供的class编译目录不存在，且无法自动创建。"
@@ -39,8 +42,8 @@ class ClassLoader extends \jc\lang\Object
 		}
 		
 		$this->arrPackages[$sNamespace] = array(
-				$sFolder?realpath($sFolder):null
-				, realpath($sCompiledFolder)
+				FileSystem::formatPath($sFolder)
+				, FileSystem::formatPath($sCompiledFolder)
 		) ;
 	}
 	
@@ -57,9 +60,9 @@ class ClassLoader extends \jc\lang\Object
 		/**
 		 * 在系统维护的包中根据路径规则和命名规则搜索类文件
 		 */
-		if( $sClassPath=$this->searchClass($sClassFullName) )
+		if( $aClassPath=$this->searchClass($sClassFullName) )
 		{
-			require $sClassPath ;
+			$aClassPath->includeFile(false,true) ;
 		}
 	}
 	
@@ -68,6 +71,8 @@ class ClassLoader extends \jc\lang\Object
 		$nNamespaceEnd = strrpos($sClassFullName,"\\") ;
 		$sFullNamespace = substr($sClassFullName,0,$nNamespaceEnd) ;
 		$sClassName = substr($sClassFullName,$nNamespaceEnd+1) ;
+		
+		$aFs = $this->application()->fileSystem() ;
 		
 		// 逆向遍历所有注册过的包目录
 		$arrPackageNames = array_keys($this->arrPackages) ;
@@ -79,15 +84,12 @@ class ClassLoader extends \jc\lang\Object
 				$sClassSubNamespace = str_replace("\\","/",substr($sFullNamespace,$nPackageNameLen)) ;
 				
 				// 提供了源文件目录
-				$sClassSource = $sClassSourceFile = $sClassSourceFolder = null ;
+				$aClassSource = $sClassSourceFile = $sClassSourceFolder = null ;
 				if($this->arrPackages[$sPackageName][0])
 				{
 					// 在源文件目录内搜索类
 					$sClassSourceFolder = $this->arrPackages[$sPackageName][0].$sClassSubNamespace ;
-					if( $sClassSourceFile = $this->detectClassInFolder($sClassSourceFolder,$sClassName,true) )
-					{
-						$sClassSource = $sClassSourceFolder . '/' . $sClassSourceFile ;
-					}
+					$aClassSource = $this->detectClassInFolder($aFs,$sClassSourceFolder,$sClassName,true) ;
 				}
 			
 				// 使用编译文件
@@ -96,24 +98,38 @@ class ClassLoader extends \jc\lang\Object
 				{
 					// 在编译目录内搜索类
 					$sClassCompiledFolder = $this->arrPackages[$sPackageName][1].'/'.$this->compiler()->strategySignature().$sClassSubNamespace ;
-					$sClassCompiled = $this->detectClassInFolder($sClassCompiledFolder,$sClassName) ;
+					$aClassCompiled = $this->detectClassInFolder($aFs,$sClassCompiledFolder,$sClassName) ;
 					
 					// 找到了源文件
-					if( $sClassSource )
+					if( $aClassSource )
 					{
-						// 存在编译目录但没有的编译文件，或编译文件过期，需要重新编译
-						if( !$sClassCompiled or filemtime($sClassSource)>filemtime($sClassCompiled) or !filesize($sClassCompiled) )
+						if( !$aClassCompiled )
 						{
-							$this->compileClass($sClassSource,$sClassCompiledFolder,$sClassSourceFile) ;
+							$aClassCompiled = $aFs->findFile($sClassCompiledFolder.'/'.$sClassName) ;
 						}
 						
-						return $sClassCompiled? $sClassCompiled: $sClassCompiledFolder.'/'.$sClassSourceFile ;					
+						// 存在编译目录但没有的编译文件，或编译文件过期，需要重新编译
+						if( !$aClassCompiled->exists() or $aClassSource->modifyTime()>$aClassCompiled->modifyTime() or !$aClassCompiled->length() )
+						{
+							// 编译 class 文件
+							if( !$aFs->isFolder($aClassCompiled->dirPath()) )
+							{
+								if( !$aFs->createFolder($aClassCompiled->dirPath()) )
+								{
+									throw new Exception("无法编译class，创建编译目录失败：%s",$aClassCompiled->dirPath()) ;
+								}
+							}
+
+							$this->compiler()->compile( $aClassSource->openReader(), $aClassCompiled->openWriter() ) ;
+						}
+						
+						return $aClassCompiled ;					
 					}
 					
 					// 没有找到源文件，但是找到了编译文件， 直接使用编译文件
-					else if( $sClassCompiled ) 
+					else if( $aClassCompiled ) 
 					{
-						return $sClassCompiled ;
+						return $aClassCompiled ;
 					}
 				}
 				
@@ -121,9 +137,9 @@ class ClassLoader extends \jc\lang\Object
 				// --------------
 				else 
 				{
-					if($sClassSource)
+					if($aClassSource)
 					{
-						return $sClassSource ;
+						return $aClassSource ;
 					}
 				}
 			}
@@ -132,38 +148,23 @@ class ClassLoader extends \jc\lang\Object
 		return null ;
 	}
 	
-	private function detectClassInFolder($sPackageFolder,$sClassName,$bReturnClassFilename=false)
+	/**
+	 * @return jc\fs\IFile
+	 */
+	private function detectClassInFolder(FileSystem $aFs,$sPackageFolder,$sClassName)
 	{
 		foreach($this->arrClassFilenameWraps as $func)
 		{
 			$sClassFilename = call_user_func_array($func, array($sClassName)) ;
 			$sClassFilePath = $sPackageFolder . '/' . $sClassFilename ;
 			
-			if( is_file($sClassFilePath) )
+			if( $aClass = $aFs->findFile($sClassFilePath) )
 			{
-				return $bReturnClassFilename? $sClassFilename: $sClassFilePath ;
+				return $aClass ;
 			}
 		}
 		
 		return null ;
-	}
-	
-	private function compileClass($sClassSource,$sClassCompiledFolder,$sClassFilename)
-	{
-		if( !is_dir($sClassCompiledFolder) )
-		{
-			if( !mkdir($sClassCompiledFolder,0775,true) )
-			{
-				throw new Exception("无法编译class，创建编译目录失败：%s",$sClassCompiledFolder) ;
-			}
-		}
-		
-		$aCompiler = $this->compiler() ;
-
-		$aSrcInstream = new InputStream(fopen($sClassSource,'r')) ;
-		$aCompiledOutstream = new OutputStream(fopen($sClassCompiledFolder.'/'.$sClassFilename,'w')) ;
-		
-		$this->compiler()->compile( $aSrcInstream, $aCompiledOutstream ) ;
 	}
 	
 	public function namespaceFolder($sNamespace)

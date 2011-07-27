@@ -4,13 +4,24 @@ namespace jc\fs ;
 interface IFolder extends IFSO
 {
 	/**
-	 * @return \IFSO
+	 * @return IFile
 	 */
-	public function find($sPath) ;
+	public function findFile($sPath) ;
 	
-	public function createFile() ;
+	/**
+	 * @return IFolder
+	 */
+	public function findFolder($sPath) ;
 	
-	public function createFolder() ;
+	/**
+	 * @return IFile
+	 */
+	public function createFile($sPath) ;
+	
+	/**
+	 * @return IFolder
+	 */
+	public function createFolder($sPath) ;
 	
 	/**
 	 * @return \Iterator

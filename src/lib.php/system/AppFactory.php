@@ -54,9 +54,10 @@ abstract class AppFactory extends Object
 	{
 		$aClassLoader = new ClassLoader() ;
 		$aClassLoader->setApplication($aApp) ;
-		$aClassLoader->addPackage( 'jc', dirname(dirname(dirname(__DIR__))).'/bin/lib.php', dirname(__DIR__) ) ; // 将 jcat 加入到 class loader 中
+		//$aClassLoader->addPackage( 'jc', dirname(dirname(dirname(__DIR__))).'/bin/lib.php', dirname(__DIR__) ) ; // 将 jcat 加入到 class loader 中
+		$aClassLoader->addPackage( 'jc', '/framework/bin/lib.php', '/framework/src/lib.php' ) ; // 将 jcat 加入到 class loader 中
 		
-		return $aClassLoader ;		
+		return $aClassLoader ;
 	}
 
 	public function createAccessRouter(CoreApplication $aApp)

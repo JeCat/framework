@@ -12,7 +12,7 @@ class LocalFile extends LocalFSO implements IFile
 	 */
 	public function openReader()
 	{
-		$hHandle = fopen($this->path(),'r') ;
+		$hHandle = fopen($this->localPath(),'r') ;
 		if( !$hHandle )
 		{
 			return null ;
@@ -26,7 +26,7 @@ class LocalFile extends LocalFSO implements IFile
 	 */
 	public function openWriter($bAppend=false)
 	{
-		$hHandle = fopen($this->path(),$bAppend?'a':'w') ;
+		$hHandle = fopen($this->localPath(),$bAppend?'a':'w') ;
 		if( !$hHandle )
 		{
 			return null ;
@@ -45,14 +45,31 @@ class LocalFile extends LocalFSO implements IFile
 		return unlink($this->localPath()) ;
 	}
 	
-	public function copy($sToPath)
+	public function includeFile($bOnce=false,$bRequire=false)
 	{
-		return $this->fileSystem()->copy($this->path(),$sToPath) ;
-	}
-	
-	public function move($sToPath)
-	{
-		return $this->fileSystem()->move($this->path(),$sToPath) ;
+		if($bRequire)
+		{
+			if($bOnce)
+			{
+				return include_once $this->localPath() ;
+			}
+			else 
+			{
+				return include $this->localPath() ;
+			}
+		}
+		
+		else 
+		{
+			if($bOnce)
+			{
+				return require_once $this->localPath() ;
+			}
+			else 
+			{
+				return require $this->localPath() ;
+			}
+		}
 	}
 }
 ?>

@@ -18,6 +18,8 @@ interface IFile extends IFSO
 	public function openReader() ;
 	
 	public function length() ;
+	
+	public function includeFile() ;
 }
 
 ?>

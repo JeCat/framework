@@ -2,7 +2,6 @@
 namespace jc\fs ;
 
 use jc\io\OutputStream;
-
 use jc\io\InputStream;
 
 class File extends FSObject
