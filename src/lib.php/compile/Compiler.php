@@ -2,8 +2,8 @@
 
 namespace jc\compile ;
 
+use jc\compile\object\TokenPool;
 use jc\system\ClassLoader;
-
 use jc\lang\Exception;
 use jc\lang\Type;
 use jc\compile\object\Token;
@@ -19,9 +19,7 @@ class Compiler extends JcObject
 {
 	public function compile(IInputStream $aSourceStream,IOutputStream $aCompiledStream)
 	{
-		$this->bCompiling = true ;
-		
-		$aObjectContainer = new Container('jc\\compile\\object\\AbstractObject') ;
+		$aObjectContainer = new TokenPool('jc\\compile\\object\\AbstractObject') ;
 		
 		// 扫描 tokens
 		$this->scan($aSourceStream, $aObjectContainer) ;
@@ -56,8 +54,6 @@ class Compiler extends JcObject
 		{
 			$aCompiledStream->write($aObject->targetCode()) ;
 		}
-		
-		$this->bCompiling = false ;
 	}
 	
 	protected function scan(IInputStream $aSourceStream,IContainer $aObjectContainer)
@@ -166,18 +162,6 @@ class Compiler extends JcObject
 	}
 	
 	
-	
-	public function setCompiling($bCompiling=true)
-	{
-		$this->bCompiling = $bCompiling ;
-	} 
-	
-	public function isCompiling()
-	{
-		return $this->bCompiling ;
-	}
-	
-	private $bCompiling = false ;
 	
 	private $sStrategySignature ;
 

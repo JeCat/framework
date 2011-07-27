@@ -2,6 +2,7 @@
 
 namespace jc\compile\interpreters ;
 
+use jc\compile\object\TokenPool;
 use jc\lang\Exception;
 
 use jc\util\Stack;
@@ -15,7 +16,7 @@ use jc\lang\Object;
 
 class ClosureObjectParser extends Object implements IInterpreter
 {
-	public function analyze(IContainer $aObjectContainer)
+	public function analyze(TokenPool $aObjectContainer)
 	{
 		$arrStacks = array(
 			Token::T_BRACE_OPEN => new Stack() ,

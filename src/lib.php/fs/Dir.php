@@ -2,7 +2,7 @@
 namespace jc\fs ;
 
 
-class Dir extends FSO
+class Dir extends FSObject
 {
 	static public function formatPath($sPath,$sPathSeparator=DIRECTORY_SEPARATOR)
 	{

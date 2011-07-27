@@ -1,21 +1,20 @@
 <?php
 namespace jc\resrc ;
 
+use jc\fs\FileSystem;
 use jc\lang\Object;
-use jc\fs\Dir ;
-use jc\fs\FSO ;
 
 class ResourceManager extends Object implements IResourceManager
 {
 	public function addFolder($sPath,$sNamespace='*')
 	{
-		$sPath = Dir::formatPath($sPath) ;
+		$sPath = FileSystem::formatPath($sPath).'/' ;
 		$this->addFormatFolder($sPath,$sNamespace) ;
 	}
 	
 	public function removeFolder($sPath,$sNamespace='*')
 	{
-		$sPath = Dir::formatPath($sPath) ;
+		$sPath = FileSystem::formatPath($sPath).'/' ;
 		$this->removeFormatFolder($sPath,$sNamespace) ;
 	}
 

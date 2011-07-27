@@ -59,11 +59,49 @@ class FunctionDefine extends Token
 	{
 		return $this->aClass ;
 	}
+
+	public function setAccessToken($aAccessToken)
+	{
+		$this->aAccessToken = $aAccessToken ;
+	}
+	public function accessToken()
+	{
+		return $this->aAccessToken ;		
+	}
+	public function setStaticToken($aStaticToken)
+	{
+		$this->aStaticToken = $aStaticToken ;
+	}
+	public function staticToken()
+	{
+		return $this->aStaticToken ;		
+	}
+	public function setAbstractToken($aAbstractToken)
+	{
+		$this->aAbstractToken = $aAbstractToken ;
+	}
+	public function abstractToken()
+	{
+		return $this->aAbstractToken ;		
+	}
+	public function setDocToken($aDocToken)
+	{
+		$this->aDocToken = $aDocToken ;
+	}
+	public function docToken()
+	{
+		return $this->aDocToken ;		
+	}
 	
 	private $aTokenName ;
 	private $aTokenArgList ;
 	private $aTokenBody ;
 	private $aClass ;
+	
+	private $aAccessToken ;
+	private $aStaticToken ;
+	private $aAbstractToken ;
+	private $aDocToken ;
 }
 
 ?>

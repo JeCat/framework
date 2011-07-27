@@ -1,8 +1,11 @@
 <?php
 namespace jc\system ;
 
+use jc\io\OutputStream;
+
+use jc\io\InputStream;
+
 use jc\compile\CompilerFactory;
-use jc\fs\File;
 use jc\lang\Exception;
 use jc\lang\Assert;
 
@@ -89,7 +92,7 @@ class ClassLoader extends \jc\lang\Object
 			
 				// 使用编译文件
 				// --------------
-				if( $this->isEnableClassCompile() and !preg_match($this->sSkipClassesForCompile,$sClassFullName) )
+				if( $this->isEnableClassCompile() and !$this->skipForClassCompile($sClassFullName) )
 				{
 					// 在编译目录内搜索类
 					$sClassCompiledFolder = $this->arrPackages[$sPackageName][1].'/'.$this->compiler()->strategySignature().$sClassSubNamespace ;
@@ -155,19 +158,12 @@ class ClassLoader extends \jc\lang\Object
 			}
 		}
 		
-		$aCompiler = $this->compiler() ; 
-		
-		$aCompiler->setCompiling(true) ;
-					
-		$aSourceFile = new File($sClassSource) ;
-		$aCompiledFile = new File($sClassCompiledFolder.'/'.$sClassFilename) ;
-		
-		$aSrcInstream = $aSourceFile->openReader() ;
-		$aCompiledOutstream = $aCompiledFile->openWriter() ;
+		$aCompiler = $this->compiler() ;
+
+		$aSrcInstream = new InputStream(fopen($sClassSource,'r')) ;
+		$aCompiledOutstream = new OutputStream(fopen($sClassCompiledFolder.'/'.$sClassFilename,'w')) ;
 		
 		$this->compiler()->compile( $aSrcInstream, $aCompiledOutstream ) ;
-			
-		$aCompiler->setCompiling(false) ;
 	}
 	
 	public function namespaceFolder($sNamespace)
@@ -180,7 +176,7 @@ class ClassLoader extends \jc\lang\Object
 	 */
 	public function namespaceIterator()
 	{
-		return new \ArrayIterator( array_keys($this->arrPackages) ) ;
+		return new \jc\pattern\iterate\ArrayIterator( array_keys($this->arrPackages) ) ;
 	}
 	
 	public function compiler()
@@ -202,6 +198,11 @@ class ClassLoader extends \jc\lang\Object
 		$this->bEnableClassCompile = $bEnble? true: false ;
 	}
 	
+	public function skipForClassCompile($sClassFullName)
+	{
+		return preg_match($this->sSkipClassesForCompile,$sClassFullName) ;
+	}
+	
 	private $arrPackages = array() ;
 	
 	private $arrClassFilenameWraps = array() ;
@@ -210,7 +211,7 @@ class ClassLoader extends \jc\lang\Object
 	
 	private $bEnableClassCompile = false ;
 	
-	private $sSkipClassesForCompile = '`^jc\\\\(system|compile|pattern\\\\iterate|pattern\\\\composite|)\\\\`' ;
+	private $sSkipClassesForCompile = '`^jc\\\\(util|io|system|compile|pattern\\\\iterate|pattern\\\\composite|)\\\\`' ;
 }
 
 ?>

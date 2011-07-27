@@ -16,6 +16,19 @@ class ClassDefine extends Token
 		
 		$this->setBelongsClass($this) ;
 	}
+	
+	public function fullName()
+	{
+		$aNamespace = $this->belongsNamespace() ;
+		if($aNamespace)
+		{
+			return $aNamespace->name() . '\\' . $this->name() ;
+		}
+		else 
+		{
+			return $this->name() ;
+		}
+	}
 
 	public function name()
 	{

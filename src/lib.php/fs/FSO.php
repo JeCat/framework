@@ -6,34 +6,20 @@ use jc\lang\Object;
 
 class FSO extends Object
 {
-	const PATH_STYLE_WIN = '\\' ;
-	const PATH_STYLE_UNIX = '/' ;
-	
 	/**
 	 * Enter description here ...
 	 * 
 	 * @return void
 	 */
-	public function __construct($sPath='')
+	public function __construct(FileSystem $aFileSystem, $sPath='')
 	{
+		$this->aFileSystem = $aFileSystem ;
 		$this->sPath = $sPath ;
 	}
 	
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return FSO
-	 */
-	static public function createFSO($sPath)
+	public function fileSystem()
 	{
-		if(is_file($sPath))
-		{
-			return new File($sPath) ;
-		}
-		else if(is_dir($sPath))
-		{
-			return new Dir($sPath) ;
-		}
+		return $this->aFileSystem ;
 	}
 	
 	/**
@@ -45,96 +31,32 @@ class FSO extends Object
 	{
 		return $this->sPath ;
 	}
-	
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return string
-	 */
+
 	public function name()
 	{
-		return basename($this->path()) ;
-	}
-
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return string
-	 */
-	public function parentPath()
-	{
-		return dirname($this->path()).'/' ;
+		if(!$this->sName)
+		{
+			$this->sName = basename($this->path()) ;
+		}
+		return $this->sName ;
 	}
 	
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return bool
-	 */
-	public function exists()
+	public function title()
 	{
-		file_exists($this->path()) ;
+		if(!$this->sTitle)
+		{
+			$this->sTitle = self::getTitlename($this->name()) ;
+		}
+		return $this->sTitle ;
 	}
 	
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return int
-	 */
-	public function lastModified()
+	public function extname()
 	{
-		filemtime($this->path()) ;
-	}
-
-	
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return bool
-	 */
-	public function canRead()
-	{
-		return is_readable($this->path()) ;
-	}
-	
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return bool
-	 */
-	public function canWrite()
-	{
-		return is_writeable($this->path()) ;
-	}
-	
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return bool
-	 */
-	public function canExecute()
-	{
-		return is_executable($this->path()) ;
-	}
-
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return int
-	 */
-	public function perms()
-	{
-		return fileperms($this->path()) ;
-	}
-	
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return bool
-	 */
-	public function setPerms($nMode)
-	{
-		return chmod($this->path(),$nMode) ;
+		if(!$this->sExtname)
+		{
+			$this->sExtname = self::getExtname($this->name()) ;
+		}
+		return $this->sExtname ;
 	}
 	
 	/**
@@ -144,7 +66,7 @@ class FSO extends Object
 	 */
 	public function delete()
 	{
-		unlink($this->path()) ;
+		return $this->fileSystem()->delete($this->path()) ;
 	}
 	
 
@@ -169,60 +91,11 @@ class FSO extends Object
 		$nDotIdx = strrpos($sFilename,'.') ;
 		return ($nDotIdx===false)? $sFilename: substr($sFilename,0,$nDotIdx) ;
 	}
-
-	/**
-	 * 当前文件系统，是否对文件名的大小写敏感
-	 *
-	 * @access	public
-	 * @static
-	 * @return	bool
-	 */
-	static public function isFileSystemCaseSensitive()
-	{
-		return strtolower(substr(PHP_OS,0,3))!='win' ;
-	}
-
-	static public function formatPath($sPath,$sPathSeparator=DIRECTORY_SEPARATOR)
-	{
-		// 统一、合并斜线
-		$sPath = preg_replace('|[/\\\\]+|', '/', $sPath) ;
-		
-		$arrFolders = explode('/', $sPath) ;
-		
-		
-		$arrFoldersStack = array() ;
-		foreach($arrFolders as $nIdx=>$sFolderName)
-		{
-			if( $sFolderName=='.' )
-			{
-				continue ;
-			}
-			
-			if($sFolderName=='..')
-			{
-				$sParentFoldre = array_pop($arrFoldersStack) ;
-				
-				// windows 盘符
-				if( preg_match("|^[a-z]:$|i",$sParentFoldre) )
-				{
-					// 放回去
-					array_push($arrFoldersStack,$sFolderName) ;
-				}
-				
-				continue ;
-			}
-			
-			array_push($arrFoldersStack,$sFolderName) ;
-		}
-		
-		return implode($sPathSeparator, $arrFoldersStack) ;
-	}
 	
-	/**
-	 * Enter description here ...
-	 * 
-	 * @var string
-	 */
 	private $sPath = "" ;
+	private $aFileSystem ;
+	private $sName = "" ;
+	private $sTitle = "" ;
+	private $sExtname = "" ;
 }
 ?>

@@ -1,6 +1,8 @@
 <?php
 namespace jc\resrc ;
 
+use jc\fs\FileSystem;
+
 use jc\fs\Dir;
 use jc\lang\Exception;
 
@@ -8,7 +10,7 @@ class UrlResourceManager extends ResourceManager
 {
 	public function addFolder($sPath,$sUrlPrefix=null,$sNamespace='*')
 	{
-		$sPath = Dir::formatPath($sPath) ;
+		$sPath = FileSystem::formatPath($sPath).'/' ;
 		
 		if(!$sUrlPrefix)
 		{
@@ -43,7 +45,7 @@ class UrlResourceManager extends ResourceManager
 	
 	public function removeFolder($sPath,$sNamespace='*')
 	{
-		$sPath = Dir::formatPath($sPath) ;
+		$sPath = FileSystem::formatPath($sPath).'/' ;
 		
 		unset($this->arrFolderUrlPrefix [$sPath]) ;
 		

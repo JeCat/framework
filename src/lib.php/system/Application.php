@@ -1,7 +1,7 @@
 <?php
 namespace jc\system ;
 
-use jc\fs\Dir;
+use jc\fs\FileSystem;
 
 class Application extends CoreApplication
 {
@@ -36,7 +36,7 @@ class Application extends CoreApplication
 	
 	public function setApplicationDir($sFolder)
 	{
-		$this->sApplicationDir = Dir::formatPath($sFolder) ;
+		$this->sApplicationDir = FileSystem::formatPath($sFolder).'/' ;
 	}
 
 	/**

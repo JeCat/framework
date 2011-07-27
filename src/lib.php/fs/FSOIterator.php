@@ -26,7 +26,7 @@ class FSOIterator extends \FilterIterator
 	public function __construct($sFolderPath,$nFlags=self::FLAG_DEFAULT)
 	{
 		$this->nFlags = $nFlags ;
-		$this->sFolderPath = $sFolderPath = Dir::formatPath($sFolderPath) ;
+		$this->sFolderPath = $sFolderPath = FileSystem::formatPath($sFolderPath).'/' ;
 		
 		if( ($nFlags&self::RECURSIVE)==self::RECURSIVE )
 		{

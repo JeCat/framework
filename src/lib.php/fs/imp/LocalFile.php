@@ -1,36 +1,14 @@
 <?php
-namespace jc\fs ;
+namespace jc\fs\imp ;
 
+use jc\fs\IFile;
 use jc\io\OutputStream;
-
 use jc\io\InputStream;
 
-class File extends FSObject
-{
+class LocalFile extends LocalFSO implements IFile
+{	
 	/**
-	 * Enter description here ...
-	 * 
-	 * @return string
-	 */
-	public function extname()
-	{
-		return FSO::getExtname($this->name()) ;
-	}
-
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return string
-	 */
-	public function titlename()
-	{
-		return FSO::getTitlename($this->name()) ;
-	}
-	
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return InputStream
+	 * @return io\IInputStream
 	 */
 	public function openReader()
 	{
@@ -44,9 +22,7 @@ class File extends FSObject
 	}
 	
 	/**
-	 * Enter description here ...
-	 * 
-	 * @return OutputStream
+	 * @return io\IOutputStream
 	 */
 	public function openWriter($bAppend=false)
 	{
@@ -58,6 +34,25 @@ class File extends FSObject
 		
 		return OutputStream::createInstance($hHandle,$this->application()) ;
 	}
+
+	public function length()
+	{
+		return filesize($this->localPath()) ;
+	}
 	
+	public function delete()
+	{
+		return unlink($this->localPath()) ;
+	}
+	
+	public function copy($sToPath)
+	{
+		return $this->fileSystem()->copy($this->path(),$sToPath) ;
+	}
+	
+	public function move($sToPath)
+	{
+		return $this->fileSystem()->move($this->path(),$sToPath) ;
+	}
 }
 ?>

@@ -2,11 +2,11 @@
 
 namespace jc\compile ;
 
-use jc\pattern\composite\IContainer;
+use jc\compile\object\TokenPool;
 
 interface IInterpreter
 {
-	public function analyze(IContainer $aObjectContainer) ;
+	public function analyze(TokenPool $aObjectContainer) ;
 }
 
 ?>

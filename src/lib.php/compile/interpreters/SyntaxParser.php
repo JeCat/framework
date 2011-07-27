@@ -2,6 +2,7 @@
 
 namespace jc\compile\interpreters ;
 
+use jc\compile\object\TokenPool;
 use jc\pattern\iterate\INonlinearIterator;
 use jc\compile\object\NamespaceDeclare;
 use jc\compile\object\ClassDefine;
@@ -14,7 +15,7 @@ use jc\lang\Object;
 
 class SyntaxParser extends Object implements IInterpreter
 {
-	public function analyze(IContainer $aObjectContainer)
+	public function analyze(TokenPool $aObjectContainer)
 	{
 		$this->bIsPHPCode = false ;
 		$this->aClass = null ;
@@ -31,32 +32,53 @@ class SyntaxParser extends Object implements IInterpreter
 			{
 				continue ;
 			}
-
-			$this->setTokenBelongs($aObject) ;
 		
 			// namespace 声明
 			if( $aObject->tokenType()==T_NAMESPACE )
 			{
-				$this->analyzeNamespaceDeclare($aObjectPoolIter,$aObject) ;
+				$this->analyzeNamespaceDeclare(clone $aObjectPoolIter,$aObject) ;
 			}
 			
 			// 函数定义
 			else if( $aObject->tokenType()==T_FUNCTION )
 			{
-				$this->analyzeFunctionDefine($aObjectPoolIter,$aObject) ;
+				$aFunctionToken = $this->analyzeFunctionDefine(clone $aObjectPoolIter,$aObject) ;
+				
+				$aObjectContainer->addFunction($aFunctionToken) ;
+				
+				// 指针移动到函数体前
+				$aArgLstClose = $aFunctionToken->argListToken()->theOther() ;
+				$aObjectPoolIter->seek(
+					$aObjectPoolIter->search($aArgLstClose)
+				) ;
 			}
 			
 			// 类定义
 			else if( $aObject->tokenType()==T_CLASS )
 			{
-				$this->analyzeClassDefine($aObjectPoolIter,$aObject) ;
+				$aObjectContainer->addClass(
+					$this->analyzeClassDefine(clone $aObjectPoolIter,$aObject)
+				) ;
 			}
-			
+		
+			// 函数调用
+			else if( $aObject->tokenType()==Token::T_BRACE_ROUND_OPEN )
+			{
+				$this->analyzeFunctionCall(clone $aObjectPoolIter,$aObject) ;
+			}
+		
+
+			$this->setTokenBelongs($aObject) ;
 			
 			// class 定义结束
 			if( $this->aClass and $this->aClass->bodyToken()->theOther()===$aObject )
 			{
 				$this->aClass = null ;
+			}
+			// function 定义结束
+			if( $this->aFunction and $aFuncBody=$this->aFunction->bodyToken() and $aFuncBody->theOther()===$aObject )
+			{
+				$this->aFunction = null ;
 			}
 			
 			// php 结束标签
@@ -75,13 +97,12 @@ class SyntaxParser extends Object implements IInterpreter
 		}*/
 	}
 	
-	
 	private function analyzeNamespaceDeclare(INonlinearIterator $aObjectPoolIter,Token $aObject)
 	{
 		$aNewToken = new NamespaceDeclare($aObject) ;
 		$this->aNamespace = $aNewToken ;
-	
-		foreach($this->findToken($aObjectPoolIter, Token::T_SEMICOLON, true) as $aToken)
+
+		foreach( $this->findTokens($aObjectPoolIter,array(Token::T_SEMICOLON,T_WHITESPACE,T_NS_SEPARATOR,T_STRING)) as $aToken )
 		{
 			if( $aToken->tokenType()==T_STRING )
 			{
@@ -89,6 +110,7 @@ class SyntaxParser extends Object implements IInterpreter
 			}
 		}
 		
+		return $aNewToken ;
 	}
 	
 	private function analyzeFunctionDefine(INonlinearIterator $aObjectPoolIter,Token $aObject)
@@ -96,16 +118,55 @@ class SyntaxParser extends Object implements IInterpreter
 		$aNewToken = new FunctionDefine( $aObject ) ;
 		$this->aFunction = $aNewToken ;
 		
-		$aNewToken->setNameToken($this->findToken($aObjectPoolIter,T_STRING)) ;
-		$aNewToken->setArgListToken($this->findToken($aObjectPoolIter,Token::T_BRACE_ROUND_OPEN)) ;
+		// 函数修饰符
+		$arrModifies = $this->findTokens(clone $aObjectPoolIter,array(
+				T_PUBLIC ,
+				T_PROTECTED ,
+				T_PRIVATE ,
+				T_STATIC ,
+				T_ABSTRACT ,
+				T_DOC_COMMENT ,
+				T_WHITESPACE ,
+		),true) ;
+		foreach($arrModifies as $aToken)
+		{
+			switch ($aToken->tokenType())
+			{
+				case T_PUBLIC :
+					$aNewToken->setAccessToken($aToken) ;
+					break ;
+				case T_PROTECTED :
+					$aNewToken->setAccessToken($aToken) ;
+					break ;
+				case T_PRIVATE :
+					$aNewToken->setAccessToken($aToken) ;
+					break ;
+				case T_STATIC :
+					$aNewToken->setStaticToken($aToken) ;
+					break ;
+				case T_ABSTRACT :
+					$aNewToken->setAbstractToken($aToken) ;
+					break ;
+				case T_DOC_COMMENT :
+					$aNewToken->setDocToken($aToken) ;
+					break ;
+			}
+		}
 		
-		$aTokenBody = $this->findToken($aObjectPoolIter,array(Token::T_BRACE_OPEN,Token::T_SEMICOLON)) ;
-		if( $aTokenBody->tokenType()==Token::T_BRACE_OPEN )
+		// 参数列表
+		$aNewToken->setNameToken($this->findFirstToken($aObjectPoolIter,T_STRING)) ;
+		$aNewToken->setArgListToken($this->findFirstToken($aObjectPoolIter,Token::T_BRACE_ROUND_OPEN)) ;
+		
+		// 函数体
+		$aTokenBody = $this->findFirstToken($aObjectPoolIter,array(Token::T_BRACE_OPEN,Token::T_SEMICOLON)) ;
+		if( $aTokenBody and $aTokenBody->tokenType()==Token::T_BRACE_OPEN )
 		{
 			$aNewToken->setBodyToken($aTokenBody) ;
 		}
 		
 		$aObject->objectPool()->replace($aObject,$aNewToken) ;
+		
+		return $aNewToken ;
 	}
 	
 	private function analyzeClassDefine(INonlinearIterator $aObjectPoolIter,Token $aObject)
@@ -113,58 +174,72 @@ class SyntaxParser extends Object implements IInterpreter
 		$aNewToken = new ClassDefine( $aObject ) ;
 		$this->aClass = $aNewToken ;
 		
-		$aNewToken->setNameToken($this->findToken($aObjectPoolIter,T_STRING)) ;
-		$aNewToken->setBodyToken($this->findToken($aObjectPoolIter,Token::T_BRACE_OPEN)) ;
+		$aNewToken->setNameToken($this->findFirstToken($aObjectPoolIter,T_STRING)) ;
+		$aNewToken->setBodyToken($this->findFirstToken($aObjectPoolIter,Token::T_BRACE_OPEN)) ;
 		
 		$aObject->objectPool()->replace($aObject,$aNewToken) ;
+		
+		return $aNewToken ;
+	}
+	
+	private function analyzeFunctionCall(INonlinearIterator $aObjectPoolIter,Token $aObject)
+	{
+		$aObjectPoolIter = clone $aObjectPoolIter ;
+		
+		// $this->findToken($aObjectPoolIter, array(), true ) ;
 	}
 	
 	
-	private function findToken(INonlinearIterator $aObjectPoolIter,$types,$bReturnAllTokens=false)
+	private function findFirstToken(INonlinearIterator $aObjectPoolIter,$types,$bReverse=false)
+	{		
+		$types = (array)$types ;
+		
+		do{
+			
+			$bReverse?
+				$aObjectPoolIter->prev() :
+				$aObjectPoolIter->next() ;
+			
+			if( !$aToken=$aObjectPoolIter->current() )
+			{
+				return ;
+			}
+			
+			if( in_array($aToken->tokenType(),$types) )
+			{
+				return $aToken ;
+			}
+		
+		} while(1) ;
+	}
+
+	private function findTokens(INonlinearIterator $aObjectPoolIter,$types,$bReverse=false)
 	{
-		if($bReturnAllTokens)
-		{
-			$arrTokens = array() ;
-		}
+		$arrTokens = array() ;
 		
 		$types = (array)$types ;
 		
 		do{
 			
-			$aObjectPoolIter->next() ;
+			$bReverse?
+				$aObjectPoolIter->prev() :
+				$aObjectPoolIter->next() ;
 			
 			if( !$aToken=$aObjectPoolIter->current() )
 			{
-				foreach($types as &$t)
-				{
-					if(is_numeric($t))
-					{
-						$t = token_name($t) ;
-					}
-				}
-				throw new Exception("无法找到指定的 token ; type:%s",implode(",",$types)) ;
-			}
-						
-			$this->setTokenBelongs($aToken) ;
-			
-			if($bReturnAllTokens)
-			{
-				$arrTokens[] = $aToken ;
-			}
-			
-			if( in_array($aToken->tokenType(),$types) )
-			{
-				if($bReturnAllTokens)
-				{
-					return $arrTokens ;
-				}
-				else 
-				{
-					return $aToken ;
-				}
+				break ;
 			}
 		
+			if( !in_array($aToken->tokenType(),$types) )
+			{
+				break ;
+			}		
+			
+			$arrTokens[] = $aToken ;
+
 		} while(1) ;
+		
+		return $arrTokens ;
 	}
 	
 	private function setTokenBelongs(Token $aToken)
