@@ -84,14 +84,14 @@ class FSO extends Object
 		return $this->fileSystem()->delete($this->path()) ;
 	}
 	
-	public function copy($sToPath)
+	public function copy($to)
 	{
-		return $this->fileSystem()->rootFileSystem()->copy($this,$sToPath) ;
+		return $this->fileSystem()->rootFileSystem()->copy($this,$to) ;
 	}
 	
-	public function move($sToPath)
+	public function move($to)
 	{
-		return $this->fileSystem()->rootFileSystem()->move($this,$sToPath) ;
+		return $this->fileSystem()->rootFileSystem()->move($this,$to) ;
 	}
 	
 	/**

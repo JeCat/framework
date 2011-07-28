@@ -33,9 +33,9 @@ interface IFSO
 	
 	public function delete() ;
 	
-	public function copy($sToPath) ;
+	public function copy($to) ;
 	
-	public function move($sToPath) ;
+	public function move($to) ;
 	
 	public function createTime() ;
 	
