@@ -45,6 +45,11 @@ class LocalFile extends LocalFSO implements IFile
 		return unlink($this->localPath()) ;
 	}
 	
+	public function hash()
+	{
+		return md5($this->localPath()) ;
+	}
+	
 	public function includeFile($bOnce=false,$bRequire=false)
 	{
 		if($bRequire)

@@ -19,6 +19,8 @@ interface IFile extends IFSO
 	
 	public function length() ;
 	
+	public function hash() ;
+	
 	public function includeFile() ;
 }
 
