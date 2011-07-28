@@ -1,6 +1,10 @@
 <?php
 namespace jc\fs ;
 
+use jc\lang\Exception;
+
+use jc\lang\Type;
+
 use jc\lang\Object;
 
 abstract class FileSystem extends Object
@@ -165,16 +169,52 @@ abstract class FileSystem extends Object
 		return $this->isFolderOperation($sPath) ;
 	}
 	
-	public function copy($sFromPath,$sToPath)
+	/**
+	 * 在文件系统内复制文件对象
+	 * @param string,IFSO 		$from		被复制的源文件或目录，可以是表示路径的字符串或IFSO对象
+	 * @param string 			$sToPath	复制目标路径
+	 */
+	public function copy($from,$sToPath)
 	{
+		if( $from instanceof IFSO )
+		{
+			$sFromPath = $from->path() ;
+		}
+		else if( is_string($from) )
+		{
+			$sFromPath = $from ;
+		}
+		else 
+		{
+			throw new Exception('参数$from必须为 jc\\fs\\IFSO 或 表示路径的字符串格式，传入的参数格式为 %s',Type::detectType($from)) ;
+		}
+		
 		list($aFromFS,$sFromInnerPath) = $this->localeFileSystem($sFromPath,true) ;
 		list($aTOFS,$sToInnerPath) = $this->localeFileSystem($sToPath,true) ;
 
 		return $aFromFS->copyOperation($aFromFS,$aTOFS,$sToInnerPath) ;
 	}
 	
-	public function move($sFromPath,$sToPath)
+	/**
+	 * 在文件系统内移动文件对象
+	 * @param string,IFSO 		$from		被移动的文件或目录，可以是表示路径的字符串或IFSO对象
+	 * @param string 			$sToPath	移动目标路径
+	 */
+	public function move($from,$sToPath)
 	{
+		if( $from instanceof IFSO )
+		{
+			$sFromPath = $from->path() ;
+		}
+		else if( is_string($from) )
+		{
+			$sFromPath = $from ;
+		}
+		else 
+		{
+			throw new Exception('参数$from必须为 jc\\fs\\IFSO 或 表示路径的字符串格式，传入的参数格式为 %s',Type::detectType($from)) ;
+		}
+		
 		list($aFromFS,$sFromInnerPath) = $this->localeFileSystem($sFromPath,true) ;
 		list($aTOFS,$sToInnerPath) = $this->localeFileSystem($sToPath,true) ;
 
