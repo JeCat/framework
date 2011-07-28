@@ -12,12 +12,18 @@ class CLAppFactory extends AppFactory
 		require_once __DIR__.'/Request.php' ;
 		require_once __DIR__.'/CLRequest.php' ;
 		
-		return $aApp->create( 'CLRequest', __NAMESPACE__ ) ;
+		$aReq = new CLRequest() ;
+		$aReq->setApplication($aApp) ;
+		
+		return $aReq ;
 	}
 	
 	public function createResponse(CoreApplication $aApp)
 	{
-		$aRespn = parent::createResponse($aApp,$aApp->create('PrintStream','jc\\io')) ;
+		$aPrinter = new \jc\io\PrintStream() ;
+		$aPrinter->setApplication($aApp) ;
+		
+		$aRespn = parent::createResponse($aApp,$aPrinter) ;
 		return $aRespn ;
 	}
 }

@@ -3,9 +3,9 @@ namespace jc\ui ;
 
 use jc\util\HashTable;
 use jc\util\DataSrc;
-use jc\lang\Object;
+use jc\lang\Object as JcObject;
 
-abstract class FactoryBase extends Object implements IFactory 
+abstract class FactoryBase extends JcObject implements IFactory 
 {
 	/**
 	 * return UI

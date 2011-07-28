@@ -17,9 +17,18 @@ abstract class AppFactory extends Object
 		return new $sFactoryClassFullName() ;
 	}
 
-	public function create()
+	public function create($sAppDirPath)
 	{
-		return $this->build(new Application()) ;
+		$aApp = new Application($sAppDirPath) ;
+		
+		$this->build($aApp) ;
+		
+		if( !Application::singleton(false) )
+		{
+			Application::setSingleton($aApp) ;
+		}
+		
+		return $aApp ;
 	}
 	
 	public function build(CoreApplication $aApp)

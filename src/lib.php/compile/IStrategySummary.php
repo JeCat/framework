@@ -1,7 +1,7 @@
 <?php
 namespace jc\compile ;
 
-class IStrategySummary
+interface IStrategySummary
 {
 	public function strategySummary() ;
 }

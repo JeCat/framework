@@ -1,6 +1,7 @@
 <?php
 namespace jc\mvc\view\widget;
 
+use jc\mvc\view\IView;
 use jc\lang\Assert;
 use jc\lang\Type;
 use jc\lang\Exception;

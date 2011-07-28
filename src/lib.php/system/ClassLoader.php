@@ -158,9 +158,9 @@ class ClassLoader extends \jc\lang\Object
 			$sClassFilename = call_user_func_array($func, array($sClassName)) ;
 			$sClassFilePath = $sPackageFolder . '/' . $sClassFilename ;
 			
-			if( $aClass = $aFs->findFile($sClassFilePath) )
+			if( $aFs->exists($sClassFilePath) )
 			{
-				return $aClass ;
+				return $aFs->findFile($sClassFilePath) ;
 			}
 		}
 		

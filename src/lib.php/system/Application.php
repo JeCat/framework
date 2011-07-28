@@ -16,7 +16,7 @@ class Application extends CoreApplication
 	}
 	
 	public function singletonInstance($sClass,$bCreateNew=true)
-	{		
+	{
 		if(!isset($this->arrGlobalSingeltonInstance[$sClass]))
 		{
 			if($bCreateNew)
@@ -69,12 +69,8 @@ class Application extends CoreApplication
 	/**
 	 * @return Application
 	 */
-	static public function singleton($bCreateNew=true)
+	static public function singleton()
 	{
-		if( !self::$aGlobalSingeltonInstance and $bCreateNew )
-		{
-			self::$aGlobalSingeltonInstance = AppFactory::createFactory()->create() ;
-		}
 		return self::$aGlobalSingeltonInstance ;
 	}
 	static public function setSingleton(Application $aInstance=null)

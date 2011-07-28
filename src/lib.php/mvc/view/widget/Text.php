@@ -1,6 +1,7 @@
 <?php
 namespace jc\mvc\view\widget;
 
+use jc\mvc\view\IView;
 use jc\lang\Exception;
 
 class Text extends FormWidget {
