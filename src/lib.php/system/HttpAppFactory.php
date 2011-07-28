@@ -12,7 +12,7 @@ class HttpAppFactory extends AppFactory
 		require_once __DIR__.'/Request.php' ;
 		require_once __DIR__.'/HttpRequest.php' ;
 		
-		$aReq = new HttpRequest() ;
+		$aReq = new HttpRequest($aApp) ;
 		$aReq->setApplication($aApp) ;
 		
 		return $aReq ;

@@ -1,7 +1,10 @@
 <?php
 namespace jc\system ;
 
+use jc\fs\imp\UploadFile;
+use jc\fs\imp\LocalFileSystem;
 use jc\util\DataSrc ;
+use jc\fs\FileSystem ;
 
 class HttpRequest extends Request
 {
@@ -18,11 +21,11 @@ class HttpRequest extends Request
 		self::GET => '_GET' ,
 		self::POST => '_POST' ,
 		self::COOKIE => '_COOKIE' ,
-		self::FILE => '_FILES' ,
+		// self::FILE => '_FILES' ,
 		self::SERVER => '_SERVER' ,
 	) ;
 	
-	public function __construct()
+	public function __construct(Application $aApp)
 	{
 		parent::__construct() ;
 		
@@ -33,6 +36,9 @@ class HttpRequest extends Request
 				$this->addChild( new DataSrc($GLOBALS[$sVarName],true) ) ;
 			}
 		}
+		
+		// $_FILES 
+		$this->buildUploadFiles($aApp) ;
 		
 		// 
 		$this->set('REQUEST_URL',(empty($_SERVER['HTTPS'])?'http://':'https://').$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']) ;
@@ -143,7 +149,38 @@ class HttpRequest extends Request
 		return 0 ;
 	}
 	
+
+	
+	private function buildUploadFiles(Application $aApp)
+	{
+		// $_FILES 
+		if( empty($_FILES) or !is_array($_FILES) )
+		{
+			return ;
+		}
+		
+		$aFs = $aApp->fileSystem() ;
+		$this->mountUploadTmp($aFs) ;
+		
+		$aDataSrc = new DataSrc() ;
+		$this->addChild($aDataSrc) ;
+		
+		foreach($_FILES as $sName=>$arrFileInfo)
+		{
+			$aDataSrc->set($sName,UploadFile::createInstance(array($aFs,self::$sUploadTmpPath,$sName,$arrFileInfo))) ;
+		}
+	}
+	
+	private function mountUploadTmp(FileSystem $aFs)
+	{
+		if( !$aFs->exists(self::$sUploadTmpPath) )
+		{
+			$aFs->mount(self::$sUploadTmpPath,LocalFileSystem::createInstance(UploadFile::uploadTempDir())) ;
+		}
+	}
+	
 	private $sUri ;
 	private $arrUrlPathInfo ;
+	static private $sUploadTmpPath = '/tmp/upload' ;
 }
 ?>

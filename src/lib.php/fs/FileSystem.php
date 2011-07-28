@@ -81,6 +81,33 @@ abstract class FileSystem extends Object
 		
 		return $this->arrFSOFlyweights[$sFlyweightKey] ;
 	}
+
+	public function setFSOFlyweight($sPath,IFSO $aFSO=null)
+	{	
+		// 是否在挂载的文件系统中
+		list($aFileSystem,$sInnerPath) = $this->localeFileSystem($sPath) ;
+		if($aFileSystem!==$this)
+		{
+			return $aFileSystem->findFile($sInnerPath) ;
+		}
+		
+		else 
+		{
+			$sFlyweightKey = $this->fsoFlyweightKey($sPath) ;
+			
+			if(!$aFSO)
+			{
+				unset($this->arrFSOFlyweights[$sFlyweightKey]) ;
+			}
+			else 
+			{
+				$this->arrFSOFlyweights[$sFlyweightKey] = $aFSO ;
+				
+				$aFSO->setInnerPath($sPath) ;
+				$aFSO->setFileSystem($this) ;
+			}
+		}
+	}
 	
 	public function mount($sPath,self $aFileSystem)
 	{

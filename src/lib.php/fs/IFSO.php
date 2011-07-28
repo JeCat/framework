@@ -18,6 +18,8 @@ interface IFSO
 	 * @return FileSystem
 	 */
 	public function fileSystem() ;
+	
+	public function setFileSystem(FileSystem $aFileSystem) ;
 
 	public function canRead() ;
 	
@@ -44,6 +46,8 @@ interface IFSO
 	public function isHidden() ;
 	
 	public function exists() ;
+	
+	public function setInnerPath($sPath) ;
 }
 
 ?>

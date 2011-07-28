@@ -22,6 +22,11 @@ class FSO extends Object
 		return $this->aFileSystem ;
 	}
 	
+	public function setFileSystem(FileSystem $aFileSystem)
+	{
+		$this->aFileSystem = $aFileSystem ;
+	}
+	
 	/**
 	 * Enter description here ...
 	 * 
@@ -30,6 +35,11 @@ class FSO extends Object
 	public function path()
 	{
 		return $this->aFileSystem->mountPath() . $this->sPath ;
+	}
+	
+	public function setInnerPath($sPath)
+	{
+		$this->sPath = $sPath ;
 	}
 
 	public function dirPath()

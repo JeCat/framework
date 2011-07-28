@@ -130,7 +130,7 @@ class DataSrc extends HashTable implements IDataSrc, \ArrayAccess, \Iterator
 	 */
 	public function addChild(IDataSrc $aParams)
 	{
-		if( !in_array($aParams,$this->arrChildren) )
+		if( !in_array($aParams,$this->arrChildren,true) )
 		{
 			$this->arrChildren[] = $aParams ;
 		}

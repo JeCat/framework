@@ -16,6 +16,9 @@ class HtmlResourcePool extends Object
 		
 		$this->aJsManager = $aJsManager? $aJsManager: new UrlResourceManager() ;
 		$this->aCssManager = $aCssManager? $aCssManager: new UrlResourceManager() ;
+		
+		$this->addRequire('jc:style.css',self::RESRC_CSS) ;
+		
 	}
 
 	public function addRequire($sResrcFileName,$nType)
@@ -79,7 +82,7 @@ class HtmlResourcePool extends Object
 	/**
 	 * @return jc\pattern\iterate\INonlinearIterator
 	 */
-	public function iterator($nType)
+	public function iterator($nType,$bUrl=true)
 	{		
 		$sFilePath = '' ;
 		if( $nType==self::RESRC_JS )
@@ -98,13 +101,25 @@ class HtmlResourcePool extends Object
 		$arrResrcUrls = array() ;
 		foreach( $this->arrResrcs[$nType] as $sFileName=>$nBeRequiredCount )
 		{
-			$sResrcUrl = $aResrcMgr->find($sFileName) ;
-			if(!$sResrcUrl)
+			if(!$nBeRequiredCount)
 			{
-				throw new Exception("正在请求一个未知的资源：%s",$sFileName) ;
+				continue ;
 			}
 			
-			$arrResrcUrls[] = $sResrcUrl ; 
+			if( $bUrl )
+			{
+				$sResrcUrl = $aResrcMgr->find($sFileName) ;
+				if(!$sResrcUrl)
+				{
+					throw new Exception("正在请求一个未知的资源：%s",$sFileName) ;
+				}
+				
+				$arrResrcUrls[] = $sResrcUrl ; 
+			}
+			else 
+			{
+				$arrResrcUrls[] = $sFileName ; 
+			}
 		}
 		
 		return new \jc\pattern\iterate\ArrayIterator($arrResrcUrls) ;
@@ -115,13 +130,27 @@ class HtmlResourcePool extends Object
 		$sRet = '' ;
 	
 		try {
-			foreach($this->iterator(self::RESRC_JS) as $sUrl)
+			foreach($this->iterator(self::RESRC_JS,false) as $sFilename)
 			{
-				$sRet.= "<script type=\"text/javascript\" src=\"{$sUrl}\"></script>\r\n" ;
+				if( $sUrl = $this->aJsManager->find($sFilename) )
+				{
+					$sRet.= "<script type=\"text/javascript\" src=\"{$sUrl}\"></script>\r\n" ;
+				}
+				else 
+				{
+					$sRet.= "<script type=\"text/javascript\" comment=\"正在请求一个未知的JavaScript文件：{$sFilename}\"></script>\r\n" ;
+				}
 			}
-			foreach($this->iterator(self::RESRC_CSS) as $sUrl)
+			foreach($this->iterator(self::RESRC_CSS,false) as $sFilename)
 			{
-				$sRet.= "<link rel=\"stylesheet\" type=\"text/css\" href=\"{$sUrl}\" />\r\n" ;
+				if( $sUrl = $this->aCssManager->find($sFilename) )
+				{
+					$sRet.= "<link rel=\"stylesheet\" type=\"text/css\" href=\"{$sUrl}\" />\r\n" ;
+				}
+				else 
+				{
+					$sRet.= "<link rel=\"stylesheet\" type=\"text/css\" comment=\"正在请求一个未知的CSS文件：{$sFilename}\" />\r\n" ;
+				}
 			}
 		}
 		catch (Exception $e)
