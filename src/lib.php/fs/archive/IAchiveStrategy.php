@@ -3,14 +3,14 @@ namespace jc\fs\archive ;
 
 use jc\lang\Object;
 use jc\fs\IFolder;
-use jc\fs\IFSO;
+use jc\fs\IFile;
 
 abstract class IAchiveStrategy extends Object
 {
 	/**
-	 * 将 $aFSO 归档到 $aToDir 目录前，生成文件路径
+	 * 将 $aFile 归档到 $aToDir 目录前，生成文件路径
 	 */
-	abstract public function makePath(IFile $aFSO,IFolder $aToDir) ;
+	abstract public function makePath(IFile $aFile,IFolder $aToDir) ;
 
 	public function restoreOriginalFilename(IFile $aAchiveFile)
 	{

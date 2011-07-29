@@ -2,7 +2,7 @@
 namespace jc\fs\archive ;
 
 use jc\fs\IFolder;
-use jc\fs\IFSO;
+use jc\fs\IFile;
 
 /**
  * 按照当前日期生成归档路径
@@ -22,9 +22,9 @@ class DateAchiveStrategy extends IAchiveStrategy
 	}
 	
 	/**
-	 * 将 $aFSO 归档到 $aToDir 目录前，生成文件路径
+	 * 将 $aFile 归档到 $aToDir 目录前，生成文件路径
 	 */
-	public function makePath(IFile $aFSO,IFolder $aToDir)
+	public function makePath(IFile $aFile,IFolder $aToDir)
 	{
 		$sToPath = $aToDir->path() ;
 		
@@ -48,7 +48,7 @@ class DateAchiveStrategy extends IAchiveStrategy
 			$sToPath.= '/'.date('H') ;
 		}
 		
-		return $sToPath.'/'.$this->makeFilename($aFSO) ;
+		return $sToPath.'/'.$this->makeFilename($aFile) ;
 	}
 }
 

@@ -2,7 +2,7 @@
 namespace jc\fs\archive ;
 
 use jc\fs\IFolder;
-use jc\fs\IFSO;
+use jc\fs\IFile;
 
 /**
  * 按照文件内容的哈希值生成归档路径
@@ -19,11 +19,11 @@ class HashAchiveStrategy extends IAchiveStrategy
 	}
 	
 	/**
-	 * 将 $aFSO 归档到 $aToDir 目录前，生成文件路径
+	 * 将 $aFile 归档到 $aToDir 目录前，生成文件路径
 	 */
-	public function makePath(IFile $aFSO,IFolder $aToDir)
+	public function makePath(IFile $aFile,IFolder $aToDir)
 	{
-		$sFileHash = $aFSO->hash() ;
+		$sFileHash = $aFile->hash() ;
 		$sToPath = $aToDir->path() ;
 		
 		for($i=0;$i<$this->nDepth;$i++)
@@ -31,7 +31,7 @@ class HashAchiveStrategy extends IAchiveStrategy
 			$sToPath.= '/'.substr($sFileHash,$i,1) ;
 		}
 		
-		return $sToPath.'/'.$this->makeFilename($aFSO) ;
+		return $sToPath.'/'.$this->makeFilename($aFile) ;
 	}
 
 	private $nDepth ;
