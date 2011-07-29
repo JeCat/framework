@@ -65,7 +65,6 @@ class FileUpdate extends FormWidget{
 			}
 			$aFileSavePath = $this->aAchiveStrategy->makePath($this->aUploadedFile, $this->aFolder);
 			var_dump($aFileSavePath);
-			exit();
 			$this->aFile = $this->aUploadedFile->move($aFileSavePath);
 		}
 		return $this->aFile;
