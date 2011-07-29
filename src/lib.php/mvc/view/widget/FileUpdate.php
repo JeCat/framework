@@ -1,44 +1,32 @@
 <?php
 namespace jc\mvc\view\widget;
 
+use jc\mvc\view\DataExchanger;
+
 use jc\lang\Exception;
 use jc\system\Request;
 use jc\fs\UploadManager;
 use jc\mvc\view\IView;
 use jc\mvc\view\widgetIViewFormWidget;
 use jc\util\IDataSrc;
+use jc\fs\IFolder;
+use js\fs\archive\IAchiveStrategy;
+use js\fs\archive\DateAchiveStrategy;
 
 class FileUpdate extends FormWidget{
 	
-	public function __construct($sId, $sTitle = null , $nMaxByte = null , $sAccept = null , IView $aView = null) {
-		if (! is_int ( $nMaxByte ) or $nMaxByte <= 0) {
-			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的nMaxByte参数(得到的nMaxByte是:%s)", array ($nMaxByte ) );
+	public function __construct($sId, $sTitle = null , IFolder $aFolder , IAchiveStrategy $aAchiveStrategy = null ,  IView $aView = null) {
+		if (empty($aFolder)) {
+			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的aFolder参数(得到的aFolder是:%s)", array ($aFolder ) );
 		}
-		
-		$this->setMaxByte((int)$nMaxByte);
-//		$this->setStoreDir((string)$sStoreDir);
-		$this->setAccept((string)$sAccept);
-		
-		parent::__construct ( $sId, 'jc:ViewWidgetFileUpdate.template.html', $sTitle, $aView );
+		if($aAchiveStrategy == null){
+			$aAchiveStrategy = DateAchiveStrategy::flyweight(Array(true,true,true));
+		}
+		parent::__construct ( $sId, 'jc:WidgetFileUpdate.template.html', $sTitle, $aView );
 	}
-	
-	public function setMaxByte($nMaxByte) {
-		$this->nMaxByte = $nMaxByte;
-	}
-	public function getMaxByte() {
-		return $this->nMaxByte ;
-	}
-//	public function setStoreDir($sStoreDir) {
-//		$this->sStoreDir = $sStoreDir;
-//	}
-//	public function getStoreDir() {
-//		return $this->sStoreDir ;
-//	}
-	public function setAccept($sAccept) {
-		$this->sAccept = $sAccept;
-	}
-	public function getAccept() {
-		return $this->sAccept ;
+
+	public function getStoreDir(){
+		return '/home/anubis/tmp';
 	}
 	
 	public function hasUpdate(){
@@ -71,12 +59,14 @@ class FileUpdate extends FormWidget{
 	}
 	
 	public function setDataFromSubmit(IDataSrc $aDataSrc) {
-		$uploader = new UploadManager($this->getMaxByte());
+		//创建文件上传管理器
+		
+		$this->setValueFromString ( $aDataSrc->get ( $this->formName () ));
+//		var_dump($aDataSrc->get ( $this->formName ()));
 		//$this->setValueFromString ( $aDataSrc->get ( $this->formName () ) );
 	}
 	
 	private $sStoreDir;
-	private $nMaxByte;
 }
 
 ?>

@@ -1,0 +1,5 @@
+<if "{=$theWidget->isMultiple()}">
+	<textarea id="{=$theWidget->id()}" name="{=$theWidget->formName()}" {? echo $theWidget->isReadOnly() ? 'readonly="readonly"' : ''}  {? echo $theWidget->isDisabled() ? 'disabled="disabled"' : ''} {=$theWidget->displayInputAttributes()} >{=$theWidget->valueToString()}</textarea>
+<if:else/>
+	<input id="{=$theWidget->id()}" name="{=$theWidget->formName()}" value="{=$theWidget->valueToString()}" type="{=$theWidget->typeForHtml()}"  {? echo $theWidget->isReadOnly() ? 'readonly="readonly"' : ''}  {? echo $theWidget->isDisabled() ? 'disabled="disabled"' : ''} {=$theWidget->displayInputAttributes()} />
+</if>

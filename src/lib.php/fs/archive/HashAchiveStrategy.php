@@ -1,5 +1,5 @@
 <?php
-namespace js\archive ;
+namespace js\fs\archive ;
 
 use jc\fs\IFolder;
 use jc\fs\IFSO;

@@ -6,7 +6,7 @@ use jc\mvc\view\IView;
 
 class Select extends FormWidget {
 	public function __construct($sId, $sTitle = null, IView $aView = null) {
-		parent::__construct ( $sId, 'jc:ViewWidgetSelect.template.html', $sTitle, $aView );
+		parent::__construct ( $sId, 'jc:WidgetSelect.template.html', $sTitle, $aView );
 	}
 	
 	//增加option条目 
