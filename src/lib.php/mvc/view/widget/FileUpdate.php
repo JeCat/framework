@@ -5,13 +5,12 @@ use jc\mvc\view\DataExchanger;
 
 use jc\lang\Exception;
 use jc\system\Request;
-use jc\fs\UploadManager;
 use jc\mvc\view\IView;
 use jc\mvc\view\widgetIViewFormWidget;
 use jc\util\IDataSrc;
 use jc\fs\IFolder;
-use js\fs\archive\IAchiveStrategy;
-use js\fs\archive\DateAchiveStrategy;
+use jc\fs\archive\IAchiveStrategy;
+use jc\fs\archive\DateAchiveStrategy;
 
 class FileUpdate extends FormWidget{
 	
