@@ -8,9 +8,9 @@ use jc\fs\IFile;
 abstract class IAchiveStrategy extends Object
 {
 	/**
-	 * 将 $aFile 归档到 $aToDir 目录前，生成文件路径
+	 * @return jc\fs\IFile
 	 */
-	abstract public function makePath(IFile $aFile,IFolder $aToDir) ;
+	abstract public function makeFile(IFile $aOriginalFile,IFolder $aToDir) ;
 
 	public function restoreOriginalFilename(IFile $aAchiveFile)
 	{

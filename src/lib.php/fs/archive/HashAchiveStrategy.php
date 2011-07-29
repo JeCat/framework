@@ -19,9 +19,9 @@ class HashAchiveStrategy extends IAchiveStrategy
 	}
 	
 	/**
-	 * 将 $aFile 归档到 $aToDir 目录前，生成文件路径
+	 * @return jc\fs\IFile
 	 */
-	public function makePath(IFile $aFile,IFolder $aToDir)
+	public function makeFile(IFile $aOriginalFile,IFolder $aToDir) 
 	{
 		$sFileHash = $aFile->hash() ;
 		$sToPath = $aToDir->path() ;
@@ -31,7 +31,9 @@ class HashAchiveStrategy extends IAchiveStrategy
 			$sToPath.= '/'.substr($sFileHash,$i,1) ;
 		}
 		
-		return $sToPath.'/'.$this->makeFilename($aFile) ;
+		return $aToDir->fileSystem()->rootFileSystem()->findFile(
+			$sToPath.'/'.$this->makeFilename($aFile)
+		) ;
 	}
 
 	private $nDepth ;

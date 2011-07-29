@@ -22,9 +22,9 @@ class DateAchiveStrategy extends IAchiveStrategy
 	}
 	
 	/**
-	 * 将 $aFile 归档到 $aToDir 目录前，生成文件路径
+	 * @return jc\fs\IFile
 	 */
-	public function makePath(IFile $aFile,IFolder $aToDir)
+	public function makeFile(IFile $aOriginalFile,IFolder $aToDir) 
 	{
 		$sToPath = $aToDir->path() ;
 		
@@ -48,7 +48,9 @@ class DateAchiveStrategy extends IAchiveStrategy
 			$sToPath.= '/'.date('H') ;
 		}
 		
-		return $sToPath.'/'.$this->makeFilename($aFile) ;
+		return $aToDir->fileSystem()->rootFileSystem()->findFile(
+			$sToPath.'/'.$this->makeFilename($aFile)
+		) ;
 	}
 }
 
