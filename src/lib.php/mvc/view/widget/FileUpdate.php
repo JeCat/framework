@@ -59,13 +59,14 @@ class FileUpdate extends FormWidget{
 		if($this->aUploadedFile == null){
 			throw new Exception ( __CLASS__ . "的" . __METHOD__ . "方法没有找到上传来的文件" );
 		}
-		$aFileSavePath = $this->aAchiveStrategy->makePath($this->aUploadedFile, $this->aFolder);
-		if(!$this->aFolder->exists()){
-			if(!$this->aFolder->create()){
+		$aSavedFile = $this->aAchiveStrategy->makeFile($this->aUploadedFile, $this->aFolder);
+		$aFolderOfSavedFile = $aSavedFile->directory();
+		if(!$aFolderOfSavedFile->exists()){
+			if(!$aFolderOfSavedFile->create()){
 				throw new Exception ( __CLASS__ . "的" . __METHOD__ . "在创建路径\"%s\"时出错" ,array($this->aFolder->path()));
 			}
 		}
-		return $this->aUploadedFile->move($aFileSavePath);
+		return $this->aUploadedFile->move($aFolderOfSavedFile);
 	}
 	
 	public function setValueFromString($data) {
