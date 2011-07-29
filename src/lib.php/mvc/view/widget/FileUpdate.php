@@ -8,10 +8,10 @@ use jc\system\Request;
 use jc\mvc\view\IView;
 use jc\mvc\view\widgetIViewFormWidget;
 use jc\util\IDataSrc;
-use jc\fs\IFolder;
 use jc\fs\archive\IAchiveStrategy;
 use jc\fs\archive\DateAchiveStrategy;
 use jc\fs\IFile;
+use jc\fs\IFolder;
 
 class FileUpdate extends FormWidget{
 	
@@ -28,50 +28,49 @@ class FileUpdate extends FormWidget{
 		parent::__construct ( $sId, 'jc:WidgetFileUpdate.template.html', $sTitle, $aView );
 	}
 
-	public function getStoreDir(){
-		return '/home/anubis/tmp';
-	}
-	
-	public function hasUpdate(){
-		// TODO 推迟
-		return false;
+	public function hasUpdateFile(){
+		if(parent::value() != null){
+			return true;
+		}else{
+			return false;
+		}
 	}
 	public function getFileName(){
-		return 'fdsfds';
+		return parent::value()->fileName();
 	}
 	public function getFileSize(){
-		return '200m';
+		return parent::value()->length().'字节';
 	}
 
-	public function value()
-	{
-		return $this->value ;
-	}
-	
 	public function setValue($data = null) {
-		$this->value = $data;
+		Type::check("jc\\fs\\IFile", $data);
+		parent::setValue($data);
 	}
 	
 	public function valueToString() {
-		$this->file();
-		return strval ( $this->value () );
+		if(parent::value() == null){
+			parent::setValue($this->file());
+		}
+		return strval ( parent::value()->path() );
 	}
 	
+	//转存文件到网站的文件目录下
 	public function file(){
-		if($this->aFile == null){
-			//转存文件到网站的文件目录下
-			if($this->aUploadedFile == null){
-				throw new Exception ( __CLASS__ . "的" . __METHOD__ . "方法没有找到上传来的文件" );
-			}
-			$aFileSavePath = $this->aAchiveStrategy->makePath($this->aUploadedFile, $this->aFolder);
-			var_dump($aFileSavePath);
-			$this->aFile = $this->aUploadedFile->move($aFileSavePath);
+		if($this->aUploadedFile == null){
+			throw new Exception ( __CLASS__ . "的" . __METHOD__ . "方法没有找到上传来的文件" );
 		}
-		return $this->aFile;
+		$aFileSavePath = $this->aAchiveStrategy->makePath($this->aUploadedFile, $this->aFolder);
+		if(!$this->aFolder->exists()){
+			if(!$this->aFolder->create()){
+				throw new Exception ( __CLASS__ . "的" . __METHOD__ . "在创建路径\"%s\"时出错" ,array($this->aFolder->path()));
+			}
+		}
+		return $this->aUploadedFile->move($aFileSavePath);
 	}
 	
 	public function setValueFromString($data) {
-		$this->setValue ( $data );
+		parent::setValue($this->application()->fileSystem()->findFile($data));
+//		$this->setValue ( $data );
 	}
 	
 	public function setDataFromSubmit(IDataSrc $aDataSrc) {
@@ -80,7 +79,8 @@ class FileUpdate extends FormWidget{
 			throw new Exception ( __CLASS__ . "的" . __METHOD__ . "传入了错误的参数(得到的参数是%s类型)", array ( Type::detectType($uploadedFile) ) );
 		}
 		$this->aUploadedFile = $uploadedFile;
-		$this->setValueFromString ( $aDataSrc->get ( $this->formName () ));
+		
+		//$this->setValueFromString ( $aDataSrc->get ( $this->formName () ));
 	}
 	
 	private $sStoreDir;
@@ -91,8 +91,6 @@ class FileUpdate extends FormWidget{
 	 * @var	jc\fs\imp\UploadFile
 	 */
 	private $aUploadedFile = null;
-	
-	private $aFile = null;
 }
 
 ?>
