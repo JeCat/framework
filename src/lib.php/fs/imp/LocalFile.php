@@ -76,5 +76,21 @@ class LocalFile extends LocalFSO implements IFile
 			}
 		}
 	}
+	
+	public function create($nMode=0644)
+	{
+		$sLocalPath = $this->localPath() ;
+		
+		if( !$hHandle=fopen($sLocalPath,'w') )
+		{
+			return false ;
+		}
+		
+		fclose($hHandle) ;
+		
+		chmod($sLocalPath, $nMode) ;
+		
+		return true ;
+	}
 }
 ?>

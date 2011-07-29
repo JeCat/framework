@@ -36,27 +36,6 @@ class LocalFileSystem extends FileSystem
 	{
 		return is_dir($this->sLocalPath.$sPath) ;
 	}
-
-	protected function createFileOperation(&$sPath,&$nMode)
-	{
-		$sLocalPath = $this->localPath().$sPath ;
-		
-		if( !$hHandle=fopen($sLocalPath,'w') )
-		{
-			return false ;
-		}
-		
-		fclose($hHandle) ;
-		
-		chmod($sLocalPath, $nMode) ;
-		
-		return true ;
-	}
-	
-	protected function createFolderOperation(&$sPath,&$nMode,&$bRecursive)
-	{
-		return mkdir($this->localPath().$sPath,$nMode,$bRecursive) ;
-	}
 	
 	protected function deleteFileOperation(&$sPath)
 	{

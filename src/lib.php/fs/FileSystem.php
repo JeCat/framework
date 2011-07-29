@@ -218,33 +218,43 @@ abstract class FileSystem extends Object
 		list($aFromFS,$sFromInnerPath) = $this->localeFileSystem($sFromPath,true) ;
 		list($aTOFS,$sToInnerPath) = $this->localeFileSystem($sToPath,true) ;
 
-		return $aFromFS->moveOperation($aFromFS,$aTOFS,$sToInnerPath) ;
+		return $aFromFS->moveOperation($sFromPath,$aTOFS,$sToInnerPath) ;
 	}
 
+	/**
+	 * @return IFile
+	 */
 	public function createFile($sPath,$nMode=0644)
 	{
-		// 是否在挂载的文件系统中
-		list($aMountFS,$sInnerPath) = $this->localeFileSystem($sPath) ;
-		if($aMountFS!==$this)
+		//////////////
+		$aFile = $this->findFile($sPath) ;
+		if(!$aFile->exists())
 		{
-			return $aMountFS->createFile($sInnerPath,$nMode) ;
+			if( !$aFile->create($nMode) )
+			{
+				return null ;
+			}
 		}
 		
-		//////////////
-		return $this->createFileOperation($sPath,$nMode) ;
+		return $aFile ;
 	}
 	
+	/**
+	 * @return IFolder
+	 */
 	public function createFolder($sPath,$nMode=0755,$bRecursive=true)
 	{
-		// 是否在挂载的文件系统中
-		list($aMountFS,$sInnerPath) = $this->localeFileSystem($sPath) ;
-		if($aMountFS!==$this)
+		//////////////
+		$aFolder = $this->findFolder($sPath) ;
+		if(!$aFolder->exists())
 		{
-			return $aMountFS->createFolder($sInnerPath,$nMode,$bRecursive) ;
+			if( !$aFolder->create($nMode,$bRecursive) )
+			{
+				return null ;
+			}
 		}
 		
-		//////////////
-		return $this->createFolderOperation($sPath,$nMode,$bRecursive) ;
+		return $aFolder ;
 	}
 	
 	public function delete($sPath)
@@ -296,10 +306,6 @@ abstract class FileSystem extends Object
 	abstract protected function deleteFileOperation(&$sPath) ;
 	
 	abstract protected function deleteDirOperation(&$sPath) ;
-	
-	abstract protected function createFileOperation(&$sPath,&$nMode) ;
-	
-	abstract protected function createFolderOperation(&$sPath,&$nMode,&$bRecursive) ;
 	
 	abstract protected function createFileObject(&$sPath) ;
 	

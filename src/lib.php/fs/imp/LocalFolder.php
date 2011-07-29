@@ -24,6 +24,11 @@ class LocalFolder extends LocalFSO implements IFolder
 				(substr($sPath,0,1)=='/')? $sPath: ($this->path().'/'.$sPath)
 		) ;	
 	}
+
+	public function create($nMode=0755,$bRecursive=true)
+	{
+		return mkdir($this->localPath(),$nMode,$bRecursive) ;
+	}
 	
 	public function createFile($sPath)
 	{

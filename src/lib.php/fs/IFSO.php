@@ -47,6 +47,8 @@ interface IFSO
 	
 	public function exists() ;
 	
+	public function create() ;
+	
 	public function setInnerPath($sPath) ;
 }
 
