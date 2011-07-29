@@ -9,6 +9,10 @@ use jc\lang\Object;
 
 abstract class FileSystem extends Object
 {
+	const file = 'jc\\fs\\IFile' ;
+	const folder = 'jc\\fs\\IFolder' ;
+	const unknow = 0 ;
+	
 	/**
 	 * 定位一个路径具体所属的文件系统
 	 * 返回所属的文件系统对象 和 在该文件系统对象内部的路径
@@ -43,7 +47,7 @@ abstract class FileSystem extends Object
 	/**
 	 * @return IFSO
 	 */
-	public function find($sPath)
+	public function find($sPath,$type=self::unknow)
 	{
 		// 是否在挂载的文件系统中
 		list($aFileSystem,$sInnerPath) = $this->localeFileSystem($sPath) ;
@@ -57,68 +61,43 @@ abstract class FileSystem extends Object
 		
 		if( !isset($this->arrFSOFlyweights[$sFlyweightKey]) )
 		{
-			if( $this->isFile($sPath) )
+			if( $type==self::file or $this->isFile($sPath) )
 			{
 				$this->arrFSOFlyweights[$sFlyweightKey] = $this->createFileObject($sPath) ;
 			}
-			else if( $this->isFolder($sPath) )
+			else if( $type==self::folder or $this->isFolder($sPath) )
 			{
 				$this->arrFSOFlyweights[$sFlyweightKey] = $this->createFolderObject($sPath) ;
 			}
 			
 			else 
 			{
-				return null
+				return null ;
 			}
 		}
 		
+		if( $type!=0 and ($this->arrFSOFlyweights[$sFlyweightKey] instanceof $type) )
+		{
+			throw new Exception("路径：%s 返回的不是指定的类型文件对象类型：%s",array($sPath,$type)) ;
+		}
+		
 		return $this->arrFSOFlyweights[$sFlyweightKey] ;
 	}
 	
 	/**
-	 * @return IFSO
+	 * @return IFile
 	 */
 	public function findFile($sPath)
 	{
-		// 是否在挂载的文件系统中
-		list($aFileSystem,$sInnerPath) = $this->localeFileSystem($sPath) ;
-		if($aFileSystem!==$this)
-		{
-			return $aFileSystem->findFile($sInnerPath) ;
-		}
-		
-		//////////////
-		$sFlyweightKey = $this->fsoFlyweightKey($sPath) ;
-		
-		if( !isset($this->arrFSOFlyweights[$sFlyweightKey]) )
-		{
-			$this->arrFSOFlyweights[$sFlyweightKey] = $this->createFileObject($sPath) ;
-		}
-		
-		return $this->arrFSOFlyweights[$sFlyweightKey] ;
+		return $this->find($sPath,self::file) ;
 	}
 	
 	/**
-	 * @return IFSO
+	 * @return IFolder
 	 */
 	public function findFolder($sPath)
 	{
-		// 是否在挂载的文件系统中
-		list($aMountFS,$sInnerPath) = $this->localeFileSystem($sPath) ;
-		if($aMountFS!==$this)
-		{
-			return $aMountFS->findFolder($sInnerPath) ;
-		}
-		
-		//////////////
-		$sFlyweightKey = $this->fsoFlyweightKey($sPath) ;
-		
-		if( !isset($this->arrFSOFlyweights[$sFlyweightKey]) )
-		{
-			$this->arrFSOFlyweights[$sFlyweightKey] = $this->createFolderObject($sPath) ;
-		}
-		
-		return $this->arrFSOFlyweights[$sFlyweightKey] ;
+		return $this->find($sPath,self::folder) ;
 	}
 
 	public function setFSOFlyweight($sPath,IFSO $aFSO=null)
@@ -207,70 +186,47 @@ abstract class FileSystem extends Object
 	/**
 	 * 在文件系统内复制文件对象
 	 * @param string,IFSO 		$from		被复制的源文件或目录，可以是表示路径的字符串或IFSO对象
-	 * @param string 			$sToPath	复制目标路径
+	 * @param string 			$to			复制目标路径
 	 */
-	public function copy($from,$sToPath)
+	public function copy($from,$to)
 	{
 		if( $from instanceof IFSO )
 		{
-			$sFromPath = $from->path() ;
+			$aFromFSO = $from ;
 		}
 		else if( is_string($from) )
 		{
-			$sFromPath = $from ;
+			$aFromFSO = $this->find($from) ;
 		}
 		else 
 		{
 			throw new Exception('参数$from必须为 jc\\fs\\IFSO 或 表示路径的字符串格式，传入的参数格式为 %s',Type::detectType($from)) ;
 		}
 		
-		list($aFromFS,$sFromInnerPath) = $this->localeFileSystem($sFromPath,true) ;
-		list($aTOFS,$sToInnerPath) = $this->localeFileSystem($sToPath,true) ;
-
-		if($aFromFS->copyOperation($aFromFS,$aTOFS,$sToInnerPath))
-		{
-			return $this->find($sToPath) ;
-		}
-		else
-		{
-			return null ;
-		}
+		return $aFromFSO->copy($to) ;
 	}
 	
 	/**
 	 * 在文件系统内移动文件对象
 	 * @param string,IFSO 		$from		被移动的文件或目录，可以是表示路径的字符串或IFSO对象
-	 * @param string 			$sToPath	移动目标路径
+	 * @param string 			$to			移动目标路径
 	 */
-	public function move($from,$sToPath)
+	public function move($from,$to)
 	{
 		if( $from instanceof IFSO )
 		{
-			$sFromPath = $from->path() ;
+			$aFromFSO = $from ;
 		}
 		else if( is_string($from) )
 		{
-			$sFromPath = $from ;
+			$aFromFSO = $this->find($from) ;
 		}
 		else 
 		{
 			throw new Exception('参数$from必须为 jc\\fs\\IFSO 或 表示路径的字符串格式，传入的参数格式为 %s',Type::detectType($from)) ;
 		}
 		
-		list($aFromFS,$sFromInnerPath) = $this->localeFileSystem($sFromPath,true) ;
-		list($aTOFS,$sToInnerPath) = $this->localeFileSystem($sToPath,true) ;
-
-		if($aFromFS->moveOperation($sFromPath,$aTOFS,$sToInnerPath))
-		{
-			$this->setFSOFlyweight($sFromPath,null) ;
-			
-			return $this->find($sToPath) ;
-		}
-		
-		else
-		{
-			return null ;
-		}
+		return $aFromFSO->move($to) ;
 	}
 
 	/**
@@ -368,10 +324,6 @@ abstract class FileSystem extends Object
 	abstract protected function isFileOperation(&$sPath) ;
 	
 	abstract protected function isFolderOperation(&$sPath) ;
-	
-	abstract protected function copyOperation(&$sPath,FileSystem $aToFs,&$sToPath) ;
-	
-	abstract protected function moveOperation(&$sPath,FileSystem $aToFs,&$sToPath) ;
 	
 	public function mountPath()
 	{

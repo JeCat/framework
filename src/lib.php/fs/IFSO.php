@@ -14,6 +14,10 @@ interface IFSO
 	
 	public function extname() ;
 	
+	public function innerPath() ;
+	
+	public function setInnerPath($sInnerPath) ;
+	
 	/**
 	 * @return FileSystem
 	 */
@@ -33,8 +37,16 @@ interface IFSO
 	
 	public function delete() ;
 	
+	/**
+	 * 复制这个文件对象
+	 * @param string,IFolder 		$to	复制目标路径 或 目标目录
+	 */
 	public function copy($to) ;
 	
+	/**
+	 * 移动这个文件对象
+	 * @param string,IFolder 		$to	移动目标路径 或 目标目录
+	 */
 	public function move($to) ;
 	
 	public function createTime() ;

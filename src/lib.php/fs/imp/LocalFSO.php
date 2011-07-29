@@ -97,6 +97,79 @@ class LocalFSO extends FSO
 	{
 		return file_exists($this->sLocalPath) ;
 	}
+
+	public function copy($to)
+	{
+		if( $to instanceof IFolder )
+		{
+			$aToFSO = $to->folder( $this->name() ) ;
+		}
+		else if( is_string($to) )
+		{
+			$aToFSO = $this->fileSystem()->rootFileSystem()->find($to) ;
+		}
+		else 
+		{
+			throw new Exception('参数$from必须为 jc\\fs\\IFSO 或 表示路径的字符串格式，传入的参数格式为 %s',Type::detectType($to)) ;
+		}
+		
+		// 同为 LocalFileSystem ，可直接 copy
+		if( $aToFSO instanceof LocalFSO )
+		{
+			if( copy($this->localPath(),$aToFSO->localPath()) )
+			{
+				return $aToFSO ;
+			}
+			else 
+			{
+				return null ;
+			}
+		}
+	
+		// 不同类型文件系统之间的操作
+		else 
+		{
+			// todo
+		}
+	}
+	
+	public function move($to)
+	{
+		if( $to instanceof IFolder )
+		{
+			$aToFSO = $to->folder( $this->name() ) ;
+		}
+		else if( is_string($to) )
+		{
+			$aToFSO = $this->fileSystem()->rootFileSystem()->find($to) ;
+		}
+		else 
+		{
+			throw new Exception('参数$from必须为 jc\\fs\\IFSO 或 表示路径的字符串格式，传入的参数格式为 %s',Type::detectType($to)) ;
+		}
+		
+		// 同为 LocalFileSystem ，可直接 copy
+		if( $aToFSO instanceof LocalFSO )
+		{
+			if( rename($this->localPath(),$aToFSO->localPath()) )
+			{
+				// 从原来的文件系统中移除
+				$this->fileSystem()->setFSOFlyweight($this->innerPath(),null) ;
+				
+				return $aToFSO ;
+			}
+			else 
+			{
+				return null ;
+			}
+		}
+	
+		// 不同类型文件系统之间的操作
+		else 
+		{
+			// todo
+		}
+	}
 	
 	private $sLocalPath = "" ;
 }

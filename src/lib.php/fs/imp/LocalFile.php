@@ -1,6 +1,12 @@
 <?php
 namespace jc\fs\imp ;
 
+use jc\lang\Type;
+
+use jc\lang\Exception;
+
+use jc\fs\IFolder;
+
 use jc\fs\IFile;
 use jc\io\OutputStream;
 use jc\io\InputStream;
@@ -92,5 +98,6 @@ class LocalFile extends LocalFSO implements IFile
 		
 		return true ;
 	}
+
 }
 ?>

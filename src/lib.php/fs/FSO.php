@@ -1,22 +1,26 @@
 <?php
 
+use jc\fs\FileSystem;
 namespace jc\fs ;
 
 use jc\lang\Object;
 
-class FSO extends Object
+class FSO extends Object implements IFSO
 {
 	/**
 	 * Enter description here ...
 	 * 
 	 * @return void
 	 */
-	public function __construct(FileSystem $aFileSystem, $sPath='')
+	public function __construct(FileSystem $aFileSystem, $sInnerPath='')
 	{
 		$this->aFileSystem = $aFileSystem ;
-		$this->sPath = $sPath ;
+		$this->sInnerPath = $sInnerPath ;
 	}
 	
+	/**
+	 * @return FileSystem
+	 */
 	public function fileSystem()
 	{
 		return $this->aFileSystem ;
@@ -34,12 +38,17 @@ class FSO extends Object
 	 */
 	public function path()
 	{
-		return $this->aFileSystem->mountPath() . $this->sPath ;
+		return $this->aFileSystem->mountPath() . $this->sInnerPath ;
+	}
+
+	public function innerPath()
+	{
+		return $this->sInnerPath ;
 	}
 	
-	public function setInnerPath($sPath)
+	public function setInnerPath($sInnerPath)
 	{
-		$this->sPath = $sPath ;
+		$this->sInnerPath = $sInnerPath ;
 	}
 
 	public function dirPath()
@@ -84,16 +93,6 @@ class FSO extends Object
 		return $this->fileSystem()->delete($this->path()) ;
 	}
 	
-	public function copy($to)
-	{
-		return $this->fileSystem()->rootFileSystem()->copy($this,$to) ;
-	}
-	
-	public function move($to)
-	{
-		return $this->fileSystem()->rootFileSystem()->move($this,$to) ;
-	}
-	
 	/**
 	 * Enter description here ...
 	 * 
@@ -116,7 +115,7 @@ class FSO extends Object
 		return ($nDotIdx===false)? $sFilename: substr($sFilename,0,$nDotIdx) ;
 	}
 	
-	private $sPath = "" ;
+	private $sInnerPath = "" ;
 	private $aFileSystem ;
 	private $sName = "" ;
 	private $sTitle = "" ;
