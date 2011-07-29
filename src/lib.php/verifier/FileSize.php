@@ -24,7 +24,7 @@ class FileSize extends Object implements IVerifier {
 		$nDataSize = $data->length() ;
 		if ($nDataSize > $this->nMaxSize ) {
 			if ($bThrowException) {
-				throw new VerifyFailed ( "上传的文件大小大于网站限制" );
+				throw new VerifyFailed ( "上传的文件大小大于网站限制的".$this->nMaxSize."字节" );
 			}
 			return false;
 		}

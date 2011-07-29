@@ -1,5 +1,3 @@
 <input id="{=$theWidget->id()}" name="{=$theWidget->formName()}" type="file" {? echo $theWidget->isReadOnly() ? 'readonly="readonly"' : ''}  {? echo $theWidget->isDisabled() ? 'disabled="disabled"' : ''} /><br />
-<if "$theWidget->hasUpdateFile()" >
-<a href='#'>{=$theWidget->getFileName()}</a> <span>({=$theWidget->getFileSize()})</span> <input id='{=$theWidget->formName()}_delete' type='checkbox' name='{=$theWidget->formName()}_delete' value='{=$theWidget->getFileName()}'/><label for='{=$theWidget->formName()}_delete' >删除</label>
-</if>
+<a href='{=$theWidget->getFileUrl()}'>{=$theWidget->getFileName()}</a> <span>({=$theWidget->getFileSize()})</span> <input id='{=$theWidget->formName()}_delete' type='checkbox' name='{=$theWidget->formName()}_delete' value='{=$theWidget->getFileName()}'/><label for='{=$theWidget->formName()}_delete' >删除</label>
 <br />
