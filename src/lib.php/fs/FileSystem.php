@@ -43,6 +43,41 @@ abstract class FileSystem extends Object
 	/**
 	 * @return IFSO
 	 */
+	public function find($sPath)
+	{
+		// 是否在挂载的文件系统中
+		list($aFileSystem,$sInnerPath) = $this->localeFileSystem($sPath) ;
+		if($aFileSystem!==$this)
+		{
+			return $aFileSystem->find($sInnerPath) ;
+		}
+		
+		//////////////
+		$sFlyweightKey = $this->fsoFlyweightKey($sPath) ;
+		
+		if( !isset($this->arrFSOFlyweights[$sFlyweightKey]) )
+		{
+			if( $this->isFile($sPath) )
+			{
+				$this->arrFSOFlyweights[$sFlyweightKey] = $this->createFileObject($sPath) ;
+			}
+			else if( $this->isFolder($sPath) )
+			{
+				$this->arrFSOFlyweights[$sFlyweightKey] = $this->createFolderObject($sPath) ;
+			}
+			
+			else 
+			{
+				return null
+			}
+		}
+		
+		return $this->arrFSOFlyweights[$sFlyweightKey] ;
+	}
+	
+	/**
+	 * @return IFSO
+	 */
 	public function findFile($sPath)
 	{
 		// 是否在挂载的文件系统中
@@ -192,7 +227,14 @@ abstract class FileSystem extends Object
 		list($aFromFS,$sFromInnerPath) = $this->localeFileSystem($sFromPath,true) ;
 		list($aTOFS,$sToInnerPath) = $this->localeFileSystem($sToPath,true) ;
 
-		return $aFromFS->copyOperation($aFromFS,$aTOFS,$sToInnerPath) ;
+		if($aFromFS->copyOperation($aFromFS,$aTOFS,$sToInnerPath))
+		{
+			return $this->find($sToPath) ;
+		}
+		else
+		{
+			return null ;
+		}
 	}
 	
 	/**
@@ -218,7 +260,17 @@ abstract class FileSystem extends Object
 		list($aFromFS,$sFromInnerPath) = $this->localeFileSystem($sFromPath,true) ;
 		list($aTOFS,$sToInnerPath) = $this->localeFileSystem($sToPath,true) ;
 
-		return $aFromFS->moveOperation($sFromPath,$aTOFS,$sToInnerPath) ;
+		if($aFromFS->moveOperation($sFromPath,$aTOFS,$sToInnerPath))
+		{
+			$this->setFSOFlyweight($sFromPath,null) ;
+			
+			return $this->find($sToPath) ;
+		}
+		
+		else
+		{
+			return null ;
+		}
 	}
 
 	/**
