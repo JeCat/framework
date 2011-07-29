@@ -66,7 +66,7 @@ class FileUpdate extends FormWidget{
 				throw new Exception ( __CLASS__ . "的" . __METHOD__ . "在创建路径\"%s\"时出错" ,array($this->aFolder->path()));
 			}
 		}
-		return $this->aUploadedFile->move($aFolderOfSavedFile);
+		return $this->aUploadedFile->move($aSavedFile);
 	}
 	
 	public function setValueFromString($data) {

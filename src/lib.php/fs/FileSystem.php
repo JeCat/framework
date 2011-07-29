@@ -404,6 +404,14 @@ abstract class FileSystem extends Object
 		return implode($sPathSeparator, $arrFoldersStack) ;
 	}
 	
+	/**
+	 * 计算两个路径之间的相对路径
+	 */
+	static public function relativePath($sFromPath,$sToPath)
+	{
+		
+	}
+	
 	protected function fsoFlyweightKey($sPath)
 	{
 		return $this->isCaseSensitive()? strtolower($sPath): $sPath ;
