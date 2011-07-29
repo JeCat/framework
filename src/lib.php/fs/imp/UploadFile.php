@@ -31,6 +31,14 @@ class UploadFile extends LocalFile
 		$aFileSystem->setFSOFlyweight($sPath,$this) ;
 	}
 	
+	
+	public function name()
+	{
+		return $this->originalFilename() ;
+	}
+	
+	
+	
 	public function formName()
 	{
 		return $this->sFormName ;

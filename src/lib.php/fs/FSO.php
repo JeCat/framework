@@ -37,7 +37,8 @@ abstract class FSO extends Object implements IFSO
 	 */
 	public function path()
 	{
-		return $this->aFileSystem->mountPath() . $this->sInnerPath ;
+		$sFsMountPath = $this->aFileSystem->mountPath() ;
+		return $sFsMountPath=='/'? $this->sInnerPath: ($this->aFileSystem->mountPath().$this->sInnerPath) ;
 	}
 
 	public function innerPath()

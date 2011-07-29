@@ -156,7 +156,12 @@ abstract class LocalFSO extends FSO
 		// 同为 LocalFileSystem ，可直接 copy
 		if( $aToFSO instanceof LocalFSO )
 		{
-			if( rename($this->localPath(),$aToFSO->localPath()) )
+			$sLocalFile = $this->localPath() ;
+			
+			if( is_uploaded_file($sLocalFile)?								// 如果正在移动的文件是一个来自用户上传的文件，则使用 move_uploaded_file() 移动此文件
+					move_uploaded_file($sLocalFile,$aToFSO->localPath()):
+					rename($sLocalFile,$aToFSO->localPath())
+			)
 			{
 				// 从原来的文件系统中移除
 				$this->fileSystem()->setFSOFlyweight($this->innerPath(),null) ;

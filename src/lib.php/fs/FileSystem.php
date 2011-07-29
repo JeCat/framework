@@ -106,7 +106,7 @@ abstract class FileSystem extends Object
 		list($aFileSystem,$sInnerPath) = $this->localeFileSystem($sPath) ;
 		if($aFileSystem!==$this)
 		{
-			return $aFileSystem->findFile($sInnerPath) ;
+			return $aFileSystem->setFSOFlyweight($sInnerPath,$aFSO) ;
 		}
 		
 		else 
