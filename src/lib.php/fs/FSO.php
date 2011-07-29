@@ -93,6 +93,22 @@ abstract class FSO extends Object implements IFSO
 	}
 	
 	/**
+	 * @return IFolder
+	 */
+	public function directory()
+	{
+		$sPath = $this->path() ;
+		if($sPath=='/')
+		{
+			return null ;
+		}
+		
+		return $this->fileSystem()->rootFileSystem()->findFolder(
+			dirname($sPath)
+		) ;
+	}
+	
+	/**
 	 * Enter description here ...
 	 * 
 	 * @return string

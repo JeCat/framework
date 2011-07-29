@@ -60,6 +60,11 @@ interface IFSO
 	public function exists() ;
 	
 	public function create() ;
+	
+	/**
+	 * @return IFolder
+	 */
+	public function directory() ;
 }
 
 ?>
