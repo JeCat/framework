@@ -6,7 +6,9 @@ use jc\fs\IFSO;
 
 /**
  * 按照当前日期生成归档路径
- * @author alee
+ * 使用享元模式创建对象, 按照年、月、日分类目录归档文件：
+ * 	$aAchiveStrategy = DateAchiveStrategy::flyweight( array(true,true,true) ) ;
+ * 	$sPath = $aAchiveStrategy->makePath($aFile,$aFolder) ;
  *
  */
 class DateAchiveStrategy extends IAchiveStrategy
