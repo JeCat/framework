@@ -31,7 +31,7 @@ class HashAchiveStrategy extends IAchiveStrategy
 			$sToPath.= '/'.substr($sFileHash,$i,1) ;
 		}
 		
-		return $sToPath.'/'.$this->makeFilename($aFSO)' ;
+		return $sToPath.'/'.$this->makeFilename($aFSO) ;
 	}
 
 	private $nDepth ;

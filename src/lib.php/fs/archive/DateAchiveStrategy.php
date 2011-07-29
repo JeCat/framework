@@ -48,7 +48,7 @@ class DateAchiveStrategy extends IAchiveStrategy
 			$sToPath.= '/'.date('H') ;
 		}
 		
-		return $sToPath.'/'.$this->makeFilename($aFSO)' ;
+		return $sToPath.'/'.$this->makeFilename($aFSO) ;
 	}
 }
 
