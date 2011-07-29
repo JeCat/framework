@@ -1,11 +1,10 @@
 <?php
-
-use jc\fs\FileSystem;
 namespace jc\fs ;
 
+use jc\fs\FileSystem;
 use jc\lang\Object;
 
-class FSO extends Object implements IFSO
+abstract class FSO extends Object implements IFSO
 {
 	/**
 	 * Enter description here ...

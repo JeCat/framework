@@ -4,7 +4,7 @@ namespace jc\fs\imp ;
 
 use jc\fs\FSO;
 
-class LocalFSO extends FSO
+abstract class LocalFSO extends FSO
 {
 	/**
 	 * Enter description here ...
