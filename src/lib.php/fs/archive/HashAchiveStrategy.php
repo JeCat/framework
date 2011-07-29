@@ -23,7 +23,7 @@ class HashAchiveStrategy extends IAchiveStrategy
 	 */
 	public function makeFile(IFile $aOriginalFile,IFolder $aToDir) 
 	{
-		$sFileHash = $aFile->hash() ;
+		$sFileHash = $aOriginalFile->hash() ;
 		$sToPath = $aToDir->path() ;
 		
 		for($i=0;$i<$this->nDepth;$i++)
@@ -32,7 +32,7 @@ class HashAchiveStrategy extends IAchiveStrategy
 		}
 		
 		return $aToDir->fileSystem()->rootFileSystem()->findFile(
-			$sToPath.'/'.$this->makeFilename($aFile)
+			$sToPath.'/'.$this->makeFilename($aOriginalFile)
 		) ;
 	}
 

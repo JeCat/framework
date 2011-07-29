@@ -2,6 +2,11 @@
 
 namespace jc\fs\imp ;
 
+use jc\fs\IFolder;
+
+use jc\lang\Type;
+
+use jc\lang\Exception;
 use jc\fs\FSO;
 
 abstract class LocalFSO extends FSO
@@ -102,7 +107,7 @@ abstract class LocalFSO extends FSO
 	{
 		if( $to instanceof IFolder )
 		{
-			$aToFSO = $to->folder( $this->name() ) ;
+			$aToFSO = $to->findFolder( $this->name() ) ;
 		}
 		else if( is_string($to) )
 		{
@@ -137,7 +142,7 @@ abstract class LocalFSO extends FSO
 	{
 		if( $to instanceof IFolder )
 		{
-			$aToFSO = $to->folder( $this->name() ) ;
+			$aToFSO = $to->findFolder( $this->name() ) ;
 		}
 		else if( is_string($to) )
 		{
@@ -145,7 +150,7 @@ abstract class LocalFSO extends FSO
 		}
 		else 
 		{
-			throw new Exception('参数$from必须为 jc\\fs\\IFSO 或 表示路径的字符串格式，传入的参数格式为 %s',Type::detectType($to)) ;
+			throw new Exception('参数$from必须为 jc\\fs\\IFSO 或 表示路径的字符串格式，传入的参数格式为 %s',Type::reflectType($to)) ;
 		}
 		
 		// 同为 LocalFileSystem ，可直接 copy

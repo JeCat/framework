@@ -49,7 +49,7 @@ class DateAchiveStrategy extends IAchiveStrategy
 		}
 		
 		return $aToDir->fileSystem()->rootFileSystem()->findFile(
-			$sToPath.'/'.$this->makeFilename($aFile)
+			$sToPath.'/'.$this->makeFilename($aOriginalFile)
 		) ;
 	}
 }
