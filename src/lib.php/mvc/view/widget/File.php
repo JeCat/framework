@@ -62,13 +62,11 @@ class File extends FormWidget{
 	}
 	
 	public function valueToString() {
-		
 		$aFile = $this->value() ;
-		if(!$aFile)
+		if( $aFile->path() == $this->aUploadedFilePath )
 		{
 			$aFile = $this->moveToStoreFolder() ;
 		}
-		
 		return $aFile? strval($aFile->path()): null ;
 	}
 	
@@ -81,11 +79,11 @@ class File extends FormWidget{
 	}
 	
 	public function moveToStoreFolder(){
-		if($this->aUploadedFile == null)
+		if($this->value() == null)
 		{
 			return null ;
 		}
-		$aSavedFile = $this->aAchiveStrategy->makeFile($this->aUploadedFile, $this->aFolder);
+		$aSavedFile = $this->aAchiveStrategy->makeFile($this->value(), $this->aFolder);
 		$aFolderOfSavedFile = $aSavedFile->directory();
 		if(!$aFolderOfSavedFile->exists()){
 			if(!$aFolderOfSavedFile->create()){
@@ -93,7 +91,7 @@ class File extends FormWidget{
 			}
 		}
 		
-		$aSavedFile = $this->aUploadedFile->move($aSavedFile->path());
+		$aSavedFile = $this->value()->move($aSavedFile->path());
 		$this->setValue($aSavedFile) ;
 		
 		return $aSavedFile ;
@@ -109,14 +107,23 @@ class File extends FormWidget{
 	}
 	
 	public function setDataFromSubmit(IDataSrc $aDataSrc) {
-		
-		//TODO  删除文件?
 		//TODO 删除成功,就发送成功消息
+		$fileName = $aDataSrc->get (  $this->id().'_delete' );
+		if($this->value()!= null && $this->value()->exists() && $this->value()->name() == $fileName){
+			if($this->value()->delete()){
+				parent::setValue(null);
+				new Message(Message::success,'删除文件成功',array());
+			}else{
+				new Message(Message::error,'删除文件失败',array());
+			}
+		}
 		$uploadedFile = $aDataSrc->get ( $this->formName ());
 		if(! $uploadedFile instanceof IFile){
 			throw new Exception ( __CLASS__ . "的" . __METHOD__ . "传入了错误的参数(得到的参数是%s类型)", array ( Type::detectType($uploadedFile) ) );
 		}
-		$this->aUploadedFile = $uploadedFile;
+//		$this->aUploadedFile = $uploadedFile;
+		$this->aUploadedFilePath = $uploadedFile->path();
+		$this->setValue($uploadedFile);
 		//$this->setValueFromString ( $aDataSrc->get ( $this->formName () ));
 	}
 	
@@ -127,7 +134,7 @@ class File extends FormWidget{
 	/**
 	 * @var	jc\fs\imp\UploadFile
 	 */
-	private $aUploadedFile = null;
+	private $aUploadedFilePath;
 }
 
 ?>
