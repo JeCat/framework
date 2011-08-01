@@ -73,9 +73,9 @@ class File extends FormWidget{
 		$sFilePath = $aFile->path() ;
 		
 		// 文件在存储目录内
-		if( strlen($sFilePath,0,$nStorePathLen)==$sStorePath )
+		if( substr($sFilePath,0,$nStorePathLen)==$sStorePath )
 		{
-			return strlen($sFilePath,$nStorePathLen) ;
+			return substr($sFilePath,$nStorePathLen) ;
 		}
 		else 
 		{
@@ -130,7 +130,7 @@ class File extends FormWidget{
 			{
 				throw new Exception (
 						__METHOD__."() 请求中的%s数据必须是一个 jc\\fs\\IFile 对象，提供的是%s类型"
-						, array($this->formName(),Type::detectType($uploadedFile))
+						, array($this->formName(),Type::detectType($this->aUploadedFile))
 				);
 			}
 		}

@@ -19,11 +19,11 @@ class UploadFile extends LocalFile
 			$sLocalPath = $arrFileInfo['tmp_name'] ;
 		}
 		
-		else 
+		/*else 
 		{
 			$sFilename = md5(microtime()) ;
 			$sLocalPath = self::uploadTempDir().'/'.$sFilename ;
-		}
+		}*/
 		$sPath = $sUploadTmpPath.'/'.$sFilename ;
 		
 		parent::__construct($aFileSystem,$sPath,$sLocalPath) ;
