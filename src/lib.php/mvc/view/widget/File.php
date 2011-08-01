@@ -2,7 +2,6 @@
 namespace jc\mvc\view\widget;
 
 use jc\message\Message;
-
 use jc\mvc\view\DataExchanger;
 use jc\lang\Type;
 use jc\lang\Exception;
@@ -21,7 +20,7 @@ class File extends FormWidget{
 		if (empty($aFolder)) {
 			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的aFolder参数(得到的aFolder是:%s类型)", array (Type::detectType($aFolder) ) );
 		}
-		$this->aFolder = $aFolder;
+		$this->aStoreFolder = $aFolder;
 		if($aAchiveStrategy == null){
 			$this->aAchiveStrategy = DateAchiveStrategy::flyweight(Array(true,true,true));
 		}else{
@@ -62,12 +61,26 @@ class File extends FormWidget{
 	}
 	
 	public function valueToString() {
+		
 		$aFile = $this->value() ;
-		if( $aFile->path() == $this->aUploadedFilePath )
+		if( !$aFile )
 		{
-			$aFile = $this->moveToStoreFolder() ;
+			return null ;
 		}
-		return $aFile? strval($aFile->path()): null ;
+		
+		$sStorePath = $this->sStoreDir->path() ;
+		$nStorePathLen = strlen($sStorePath) ;
+		$sFilePath = $aFile->path() ;
+		
+		// 文件在存储目录内
+		if( strlen($sFilePath,0,$nStorePathLen)==$sStorePath )
+		{
+			return strlen($sFilePath,$nStorePathLen) ;
+		}
+		else 
+		{
+			return 	$sFilePath ;
+		}
 	}
 	
 	/**
@@ -78,63 +91,77 @@ class File extends FormWidget{
 		return $this->value() ;
 	}
 	
-	public function moveToStoreFolder(){
-		if($this->value() == null)
-		{
-			return null ;
-		}
-		$aSavedFile = $this->aAchiveStrategy->makeFile($this->value(), $this->aFolder);
+	public function moveToStoreFolder()
+	{
+		// 保存文件
+		$aSavedFile = $this->aAchiveStrategy->makeFile($this->aUploadedFile,$this->aStoreFolder);
+		
+		// 创建保存目录
 		$aFolderOfSavedFile = $aSavedFile->directory();
 		if(!$aFolderOfSavedFile->exists()){
 			if(!$aFolderOfSavedFile->create()){
-				throw new Exception ( __CLASS__ . "的" . __METHOD__ . "在创建路径\"%s\"时出错" ,array($this->aFolder->path()));
+				throw new Exception ( __CLASS__ . "的" . __METHOD__ . "在创建路径\"%s\"时出错" ,array($this->aStoreFolder->path()));
 			}
 		}
 		
-		$aSavedFile = $this->value()->move($aSavedFile->path());
+		$aSavedFile = $this->aUploadedFile->move($aSavedFile->path()) ;
 		$this->setValue($aSavedFile) ;
 		
 		return $aSavedFile ;
 	}
 	
-	public function setValueFromString($data) {
-		$file = $this->application()->fileSystem()->findFile($data);
-		if($file->exists()){
-			parent::setValue($file);
+	public function setValueFromString($sData)
+	{
+		$aFile = $this->aStoreFolder->findFile($sData) ;
+		if($aFile->exists()){
+			$this->setValue($aFile);
 		}else{
-			new Message(Message::error,'文件已丢失',array());
+			new Message(Message::error,'文件已丢失:%s',array(
+				$this->aAchiveStrategy->restoreOriginalFilename($aFile)
+			));
 		}
 	}
 	
-	public function setDataFromSubmit(IDataSrc $aDataSrc) {
-		//TODO 删除成功,就发送成功消息
-		$fileName = $aDataSrc->get (  $this->id().'_delete' );
-		if($this->value()!= null && $this->value()->exists() && $this->value()->name() == $fileName){
-			if($this->value()->delete()){
-				parent::setValue(null);
-				new Message(Message::success,'删除文件成功',array());
-			}else{
-				new Message(Message::error,'删除文件失败',array());
+	public function setDataFromSubmit(IDataSrc $aDataSrc)
+	{
+		if( $this->aUploadedFile = $aDataSrc->get($this->formName()) )
+		{
+			if(!$this->aUploadedFile instanceof IFile)
+			{
+				throw new Exception (
+						__METHOD__."() 请求中的%s数据必须是一个 jc\\fs\\IFile 对象，提供的是%s类型"
+						, array($this->formName(),Type::detectType($uploadedFile))
+				);
 			}
 		}
-		$uploadedFile = $aDataSrc->get ( $this->formName ());
-		if(! $uploadedFile instanceof IFile){
-			throw new Exception ( __CLASS__ . "的" . __METHOD__ . "传入了错误的参数(得到的参数是%s类型)", array ( Type::detectType($uploadedFile) ) );
+		
+		// 删除文件
+		if( $aOriginFile=$this->value() and ($this->aUploadedFile or $aDataSrc->get ($this->id().'_delete')) )
+		{
+			if($aOriginFile->delete())
+			{
+				parent::setValue(null);
+				new Message(Message::notice,'删除文件:%s',array($this->aAchiveStrategy->restoreOriginalFilename($aOriginFile)));
+			}else{
+				new Message(Message::error,'删除文件失败:%s',array($this->aAchiveStrategy->restoreOriginalFilename($aOriginFile)));
+			}
 		}
-//		$this->aUploadedFile = $uploadedFile;
-		$this->aUploadedFilePath = $uploadedFile->path();
-		$this->setValue($uploadedFile);
-		//$this->setValueFromString ( $aDataSrc->get ( $this->formName () ));
+		
+		// move file, and setValue
+		if( $this->aUploadedFile )
+		{
+			$this->moveToStoreFolder() ;
+		}
 	}
 	
 	private $sStoreDir;
 	private $aAchiveStrategy;
-	private $aFolder;
+	private $aStoreFolder;
 	
 	/**
 	 * @var	jc\fs\imp\UploadFile
 	 */
-	private $aUploadedFilePath;
+	private $aUploadedFile ;
 }
 
 ?>
