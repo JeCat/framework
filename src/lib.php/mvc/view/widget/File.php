@@ -68,7 +68,7 @@ class File extends FormWidget{
 			return null ;
 		}
 		
-		$sStorePath = $this->sStoreDir->path() ;
+		$sStorePath = $this->aStoreFolder->path() ;
 		$nStorePathLen = strlen($sStorePath) ;
 		$sFilePath = $aFile->path() ;
 		
@@ -153,13 +153,35 @@ class File extends FormWidget{
 			$this->moveToStoreFolder() ;
 		}
 	}
+
+	public function verifyData()
+	{
+		if( !parent::verifyData() )
+		{
+			// 删除widget中的文件
+			if( $aFile = $this->value() )
+			{
+				$aFile->delete() ;
+				$this->setValue(null) ;
+			}
+			
+			return false ;
+		}
+		else 
+		{
+			return true ;
+		}
+	}
 	
-	private $sStoreDir;
 	private $aAchiveStrategy;
+	
+	/**
+	 * @var	jc\fs\IFolder
+	 */
 	private $aStoreFolder;
 	
 	/**
-	 * @var	jc\fs\imp\UploadFile
+	 * @var	jc\fs\IFile
 	 */
 	private $aUploadedFile ;
 }
