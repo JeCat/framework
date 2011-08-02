@@ -53,7 +53,7 @@ abstract class FileSystem extends Object
 		list($aFileSystem,$sInnerPath) = $this->localeFileSystem($sPath) ;
 		if($aFileSystem!==$this)
 		{
-			return $aFileSystem->find($sInnerPath) ;
+			return $aFileSystem->find($sInnerPath,$type) ;
 		}
 		
 		//////////////
