@@ -181,6 +181,11 @@ abstract class LocalFSO extends FSO
 		}
 	}
 	
+	public function url() 
+	{
+		return 'file://' . $this->localPath() ;
+	}
+	
 	private $sLocalPath = "" ;
 }
 ?>

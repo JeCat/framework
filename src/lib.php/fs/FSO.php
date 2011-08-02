@@ -131,10 +131,46 @@ abstract class FSO extends Object implements IFSO
 		return ($nDotIdx===false)? $sFilename: substr($sFilename,0,$nDotIdx) ;
 	}
 	
+	/**
+	 * (non-PHPdoc)
+	 * @see jc\fs.IFSO::httpUrl()
+	 */
+	public function httpUrl()
+	{
+		if($this->sHttpUrl)
+		{
+			return $this->sHttpUrl ;
+		}
+		
+		if( !$aDir=$this->directory() )
+		{
+			return null ;
+		}
+		
+		if( $this->fileSystem()!=$aDir->fileSystem() )
+		{
+			return null ;
+		}
+		
+		if( !$sDirHttpUrl = $aDir->httpUrl() )
+		{
+			return null ;
+		}
+		
+		return $sDirHttpUrl.'/'.basename($this->sInnerPath) ;
+	}
+	
+	public function setHttpUrl($sHttpUrl)
+	{
+		$this->sHttpUrl = $sHttpUrl ;
+	}
+	
 	private $sInnerPath = "" ;
 	private $aFileSystem ;
 	private $sName = "" ;
 	private $sTitle = "" ;
 	private $sExtname = "" ;
+	
+	private $sHttpUrl ;
 }
 ?>
