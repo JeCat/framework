@@ -105,7 +105,7 @@ class ClassLoader extends \jc\lang\Object
 					{
 						if( !$aClassCompiled )
 						{
-							$aClassCompiled = $aFs->findFile($sClassCompiledFolder.'/'.$sClassName) ;
+							$aClassCompiled = $aFs->findFile($sClassCompiledFolder.'/'.$sClassName.'.php') ;
 						}
 						
 						// 存在编译目录但没有的编译文件，或编译文件过期，需要重新编译

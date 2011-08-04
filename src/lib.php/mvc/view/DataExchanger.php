@@ -76,14 +76,14 @@ class DataExchanger
 			case self::MODEL_TO_WIDGET :
 				
 				$sModelName = end($this->arrLinks[$sWidgetId]) ;
-				$aWidget->setValue( $aModel->data($sModelName) ) ;
+				$aWidget->setValueFromString( $aModel->data($sModelName) ) ;
 				
 				break ;
 
 			// 从ui窗体到模型控件
 			case self::WIDGET_TO_MODEL :
 				
-				$widgetVal = $aWidget->value() ;
+				$widgetVal = $aWidget->valueToString() ;
 				foreach($this->arrLinks[$sWidgetId] as $sModelName)
 				{
 					$aModel->setData($sModelName,$widgetVal) ;

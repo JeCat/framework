@@ -325,7 +325,7 @@ class Model extends BaseModel implements IModel
 			{
 				if( isset($keys[$nIdx]) and $aChild->data($keys[$nIdx])!=$sValue )
 				{
-					break(2) ;
+					continue(2) ;
 				}
 			}
 			return $aChild ;

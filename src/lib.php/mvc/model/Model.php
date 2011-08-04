@@ -285,6 +285,7 @@ abstract class Model extends Object implements IModel, \Serializable
 
 	public function __get($sName)
 	{
+		$nNameLen = strlen($sName) ;
 		if( $nNameLen>5 and substr($sName,0,5)=='model' )
     	{
     		$sModelName = substr($sName,5) ;
