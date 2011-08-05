@@ -78,7 +78,7 @@ interface IFSO
 	 */
 	public function httpUrl() ;
 	
-	public function setHttpUrl() ;
+	public function setHttpUrl($sHttpUrl) ;
 }
 
 ?>
