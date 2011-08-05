@@ -118,7 +118,7 @@ class Controller extends NamableComposite implements IController
     {
     	if( !$this->aMainView )
     	{
-    		$this->setMainView( new View('controllerMainView') ) ;
+    		$this->setMainView( new View('controllerMainView'.ucfirst($this->name())) ) ;
     	}
 
     	return $this->aMainView ;
