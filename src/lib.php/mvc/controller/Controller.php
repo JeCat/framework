@@ -210,7 +210,7 @@ class Controller extends NamableComposite implements IController
 		{
 			$this->takeOverView($object,$sName) ;
 
-			if( $object->params()!=$this->params())
+			if( $object->params()!==$this->params())
 			{
 				$object->params()->addChild($this->params()) ;
 			}
