@@ -8,9 +8,19 @@ use jc\util\FilterMangeger;
  */
 class StdOutputFilterMgr extends FilterMangeger 
 {
-	public function __construct()
+	static public function singleton ($bCreateNew=true,$createArgvs=null,$sClass=null)
 	{
-		ob_start(array($this,'handleForStdOutput')) ;
+		if( !$aInstance=self::singleton(false) )
+		{
+			$aInstance = new self() ;
+			self::setSingleton($aInstance) ;
+		}
+		
+		return $aInstance ;
+	}
+	
+	protected function StdOutputFilterMgr()
+	{
 		$this->start() ;
 	}
 		
@@ -19,6 +29,18 @@ class StdOutputFilterMgr extends FilterMangeger
 		$Ret = $this->handle($sData) ;
 		
 		return (is_array($Ret) and isset($Ret[0]))? $Ret[0]: null ;
+	}
+	
+	public function start()
+	{
+		ob_start(array($this,'handleForStdOutput')) ;
+		parent::start() ;
+	}
+
+	public function stop()
+	{
+		ob_end_flush() ;		
+		parent::stop() ;
 	}
 }
 
