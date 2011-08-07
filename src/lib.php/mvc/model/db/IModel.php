@@ -15,6 +15,11 @@ interface IModel extends IModelBase
 	public function setPrototype(PrototypeInFragment $aPrototype) ;
 	
 	public function loadData( IRecordSet $aRecordSet, $bSetSerialized=false ) ;
+	
+	/**
+	 * @return jc\db\sql\Criteria 
+	 */
+	public function loadCriteria() ;
 
 	
 	public function totalCount() ;

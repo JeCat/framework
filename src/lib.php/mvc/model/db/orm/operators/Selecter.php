@@ -16,7 +16,7 @@ use jc\db\sql\Select;
 
 class Selecter extends OperationStrategy
 {
-	public function select(DB $aDB, IModel $aModel, array $keyValues=null, SelectForAssocQuery $aSelect=null )
+	public function select(DB $aDB, IModel $aModel, Criteria $aCriteria=null, SelectForAssocQuery $aSelect=null )
 	{
 		// ----------------------------------------
 		// 对所有1对1关系，进行递归联合查询 
@@ -28,13 +28,9 @@ class Selecter extends OperationStrategy
 		$aSelect->setLimit( $aModel->limitLength(), $aModel->limitFrom() ) ;
 	
 		// 设置主键查询条件
-		if( $keyValues )
+		if( $aCriteria )
 		{
-			$aCriteria = $aSelect->criteria() ;
-			foreach($keyValues as $sKey=>$sValue)
-			{
-				$aCriteria->add( $aSelect->transColumn($sKey), $sValue ) ;
-			}
+			$aSelect->setCriteria($aCriteria) ;
 		}
 
 		//  执行
@@ -89,15 +85,15 @@ class Selecter extends OperationStrategy
 			// 一对多关联
 			else if( $aAssociation->type()==Association::hasMany )
 			{
-				$arrKeyValues = array() ;
+				$aCriteria = new Criteria() ;
 				$arrFromKeys = $aAssociation->fromKeys() ;
 				foreach($aAssociation->toKeys() as $nIdx=>$sKey)
 				{
-					$arrKeyValues[$sKey] = $aModel->data($arrFromKeys[$nIdx]) ;
+					$aCriteria->add($sKey,$aModel->data($arrFromKeys[$nIdx])) ;
 				}
 				
 				// 加载 child 类
-				if( !$this->select($aDB, $aModel->child($aAssociation->modelProperty()), $arrKeyValues ) )
+				if( !$this->select($aDB, $aModel->child($aAssociation->modelProperty()), $aCriteria ) )
 				{
 					return false ;
 				}
