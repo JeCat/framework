@@ -1,7 +1,7 @@
 <?php
 namespace jc\system ;
 
-class HttpAppFactory extends AppFactory
+class HttpAppFactory extends ApplicationFactory
 {
 	public function createRequest(CoreApplication $aApp)
 	{

@@ -4,7 +4,7 @@ namespace jc\system ;
 use jc\io\PrintStream;
 use jc\lang\Object ;
 
-abstract class AppFactory extends Object
+abstract class ApplicationFactory extends Object
 {
 	static public function singleton($bCreateNew=true)
 	{

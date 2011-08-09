@@ -19,7 +19,7 @@ require_once __DIR__."/src/lib.php/lang/Exception.php" ;
 require_once __DIR__."/src/lib.php/system/ClassLoader.php" ;
 require_once __DIR__."/src/lib.php/system/CoreApplication.php" ;
 require_once __DIR__."/src/lib.php/system/Application.php" ;
-require_once __DIR__."/src/lib.php/system/AppFactory.php" ;
+require_once __DIR__."/src/lib.php/system/ApplicationFactory.php" ;
 
 require_once __DIR__."/src/lib.php/fs/FileSystem.php" ;
 require_once __DIR__."/src/lib.php/fs/IFSO.php" ;
