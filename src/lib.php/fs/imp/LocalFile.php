@@ -50,7 +50,7 @@ class LocalFile extends LocalFSO implements IFile
 	{
 		if( $sLocalPath = file_exists($this->localPath()) )
 		{
-			unlink($sLocalPath) ;
+			return unlink($sLocalPath) ;
 		}
 		
 		else 
