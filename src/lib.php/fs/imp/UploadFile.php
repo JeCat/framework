@@ -17,23 +17,11 @@ class UploadFile extends LocalFile
 		{
 			$sFilename = basename($arrFileInfo['tmp_name']) ;
 			$sLocalPath = $arrFileInfo['tmp_name'] ;
-		}
-		else 
-		{
-			$sFilename = '' ;
-			$sLocalPath = '' ;
-		}
-		
-		/*else 
-		{
-			$sFilename = md5(microtime()) ;
-			$sLocalPath = self::uploadTempDir().'/'.$sFilename ;
-		}*/
-		$sPath = $sUploadTmpPath.'/'.$sFilename ;
-		
-		parent::__construct($aFileSystem,$sPath,$sLocalPath) ;
-		
-		$aFileSystem->setFSOFlyweight($sPath,$this) ;
+			$sPath = $sUploadTmpPath.'/'.$sFilename ;
+			
+			parent::__construct($aFileSystem,$sPath,$sLocalPath) ;
+			$aFileSystem->setFSOFlyweight($sPath,$this) ;
+		}		
 	}
 	
 	

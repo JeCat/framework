@@ -140,6 +140,13 @@ abstract class LocalFSO extends FSO
 	
 	public function move($to)
 	{
+		$sLocalFile = $this->localPath() ;
+		
+		if( !file_exists($sLocalFile) )
+		{
+			return false ;
+		}
+		
 		if( $to instanceof IFolder )
 		{
 			$aToFSO = $to->findFolder( $this->name() ) ;
@@ -156,7 +163,6 @@ abstract class LocalFSO extends FSO
 		// 同为 LocalFileSystem ，可直接 copy
 		if( $aToFSO instanceof LocalFSO )
 		{
-			$sLocalFile = $this->localPath() ;
 			
 			if( is_uploaded_file($sLocalFile)?								// 如果正在移动的文件是一个来自用户上传的文件，则使用 move_uploaded_file() 移动此文件
 					move_uploaded_file($sLocalFile,$aToFSO->localPath()):
