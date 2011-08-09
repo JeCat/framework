@@ -6,15 +6,25 @@ use jc\lang\Object ;
 
 abstract class AppFactory extends Object
 {
-	static public function createFactory()
+	static public function singleton($bCreateNew=true)
 	{
-		$sFactoryClassName = empty($_SERVER['HTTP_HOST'])? 'CLAppFactory': 'HttpAppFactory' ;
-		$sFactoryClassFullName = __NAMESPACE__.'\\'.$sFactoryClassName ;
-		if( !class_exists($sFactoryClassFullName,false) )
+		$aInstance = Object::singleton(false,null,__CLASS__) ;
+		
+		if( !$aInstance )
 		{
-			require __DIR__.'/'.$sFactoryClassName.'.php' ;
+			$sFactoryClassName = empty($_SERVER['HTTP_HOST'])? 'CLAppFactory': 'HttpAppFactory' ;
+			$sFactoryClassFullName = __NAMESPACE__.'\\'.$sFactoryClassName ;
+			if( !class_exists($sFactoryClassFullName,false) )
+			{
+				require __DIR__.'/'.$sFactoryClassName.'.php' ;
+			}
+			
+			$aInstance = new $sFactoryClassFullName() ;
+			
+			Object::setSingleton($aInstance,__CLASS__) ;
 		}
-		return new $sFactoryClassFullName() ;
+		
+		return $aInstance ;
 	}
 
 	public function create($sAppDirPath)
@@ -97,6 +107,8 @@ abstract class AppFactory extends Object
 		
 		return $aRespn ;
 	}
+	
+	static private $aGlobalInstance ;
 }
 
 ?>
