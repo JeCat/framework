@@ -147,11 +147,6 @@ abstract class FSO extends Object implements IFSO
 			return null ;
 		}
 		
-		if( $this->fileSystem()!=$aDir->fileSystem() )
-		{
-			return null ;
-		}
-		
 		if( !$sDirHttpUrl = $aDir->httpUrl() )
 		{
 			return null ;
