@@ -190,6 +190,8 @@ class Controller extends NamableComposite implements IController
     {
 		foreach($this->iterator() as $aChild)
 		{
+			$aChild->processChildren() ;
+			
 			$aChild->process() ;
 		}
     }

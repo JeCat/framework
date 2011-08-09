@@ -12,14 +12,14 @@ use jc\pattern\composite\Container;
 
 class MessageQueue extends Object implements IMessageQueue
 {
-	public function add(Message $aMsg)
+	public function add(Message $aMsg , $bIgnoreFilters=true)
 	{
 		if( in_array($aMsg, $this->arrMsgQueue) )
 		{
 			return ;
 		}
 		
-		if( $this->aFilterManager )
+		if( !$bIgnoreFilters and $this->aFilterManager )
 		{
 			list($aMsg)=$this->aFilterManager->handle($aMsg) ;
 			if(!$aMsg)
