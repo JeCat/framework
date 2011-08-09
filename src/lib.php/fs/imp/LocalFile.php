@@ -48,7 +48,15 @@ class LocalFile extends LocalFSO implements IFile
 	
 	public function delete()
 	{
-		return unlink($this->localPath()) ;
+		if( $sLocalPath = file_exists($this->localPath()) )
+		{
+			unlink($sLocalPath) ;
+		}
+		
+		else 
+		{
+			return false ;
+		}
 	}
 	
 	public function hash()

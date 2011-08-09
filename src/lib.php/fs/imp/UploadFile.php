@@ -18,6 +18,11 @@ class UploadFile extends LocalFile
 			$sFilename = basename($arrFileInfo['tmp_name']) ;
 			$sLocalPath = $arrFileInfo['tmp_name'] ;
 		}
+		else 
+		{
+			$sFilename = '' ;
+			$sLocalPath = '' ;
+		}
 		
 		/*else 
 		{
