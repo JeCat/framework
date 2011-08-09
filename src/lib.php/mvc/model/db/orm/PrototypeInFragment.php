@@ -34,21 +34,32 @@ class PrototypeInFragment extends Prototype
 					throw new Exception("orm 片段中的prototype对象必须为 PrototypeInFragment 类") ;
 				}
 				
-				$this->sTableAlias = $this->aAssociateBy->fromPrototype()->tableAlias() . '.[' .$this->aAssociateBy->modelProperty(). ']' ;
+				$sAssocFromTableAlias = $this->aAssociateBy->fromPrototype()->tableAlias() ;
+				$this->sTableAlias =  ($sAssocFromTableAlias? ($sAssocFromTableAlias.'.'):'') .$this->aAssociateBy->modelProperty() ;
 			}
 			else 
 			{
-				$this->sTableAlias = '['.$this->name().']' ;
+				$this->sTableAlias = $this->name() ;
 			}
 			
 		}
 		
 		return $this->sTableAlias ;
 	}
-	
+	public function setTableAlias($sTableAlias)
+	{
+		$this->sTableAlias = $sTableAlias ;
+	}
+
+	public function columnName($sClmName)
+	{
+		$sTableAlias = $this->tableAlias() ;
+		return "`{$sTableAlias}`.`{$sClmName}`" ;
+	}
 	public function columnAlias($sOriColumn)
 	{
-		return $this->tableAlias().'.'.$sOriColumn ;
+		$sTableAlias = $this->tableAlias() ;
+		return ($sTableAlias?($sTableAlias.'.'):'').$sOriColumn ;
 	}
 	
 	/**

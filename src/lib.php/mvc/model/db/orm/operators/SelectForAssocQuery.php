@@ -14,8 +14,7 @@ class SelectForAssocQuery extends StatementForAssocQuery
 		foreach($aPrototype->columnIterator() as $sClmName)
 		{
 			$this->realStatement()->addColumn(
-				'`'.$aPrototype->tableAlias()."`.`{$sClmName}`"
-				, $aPrototype->columnAlias($sClmName)
+				$aPrototype->columnName($sClmName), $aPrototype->columnAlias($sClmName)
 			) ;
 		}
 
@@ -42,7 +41,7 @@ class SelectForAssocQuery extends StatementForAssocQuery
 			$aPrototype = $aAssoc->toPrototype() ;
 		}
 		
-		return '`'.$aPrototype->tableAlias()."`.`{$sClmName}`" ;
+		return $aPrototype->columnName($sClmName) ;
 	}
 	
 	public function realStatement()

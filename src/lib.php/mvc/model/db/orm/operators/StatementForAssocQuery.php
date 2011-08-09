@@ -80,9 +80,9 @@ abstract class StatementForAssocQuery implements IStatement
 		foreach($aAssoc->fromKeys() as $nKeyIdx=>$sFromKey)
 		{
 			$aCriteria->addExpression(
-				'`'.$aAssoc->fromPrototype()->tableAlias().'`.`'.$sFromKey.'`'
+				$aAssoc->fromPrototype()->columnName($sFromKey)
 				. '=' .
-				'`'.$aAssoc->toPrototype()->tableAlias().'`.`'.$arrToKeys[$nKeyIdx].'`'
+				$aAssoc->toPrototype()->columnName($arrToKeys[$nKeyIdx])
 			) ;
 		}
 		

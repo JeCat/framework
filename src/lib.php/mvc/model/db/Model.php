@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\model\db ;
 
+use jc\db\sql\Criteria;
+
 use jc\mvc\model\db\orm\PrototypeAssociationMap;
 use jc\lang\Exception;
 use jc\mvc\model\db\orm\operators\Deleter;
@@ -179,18 +181,21 @@ class Model extends BaseModel implements IModel
 		$keys = (array) $keys ;
 		
 		if($values)
-		{
-			$values = (array) $values ;
-			
+		{			
 			if(!$keys)
 			{
 				$keys = $this->prototype()->primaryKeys() ;
 			}
+			$values = array_values((array) $values) ;
 			
-			$values = array_combine($keys,$values) ;
+			$aCriteria = $this->loadCriteria() ;
+			foreach($keys as $nIdx=>$sKey)
+			{
+				$aCriteria->add( $sKey, $values[$nIdx] ) ;
+			}
 		}
 		
-		return Selecter::singleton()->select( DB::singleton(), $this, $values ) ;
+		return Selecter::singleton()->select( DB::singleton(), $this, $this->aCriteria ) ;
 	}
 	
 	public function save()
@@ -307,6 +312,19 @@ class Model extends BaseModel implements IModel
 		}
 	}
 	
+	public function loadCriteria()
+	{
+		if( !$this->aCriteria )
+		{
+			$this->aCriteria = new Criteria() ;
+			$this->aCriteria->setDefaultTable(
+				$this->prototype()->tableAlias()
+			) ;
+		}
+		
+		return $this->aCriteria ;
+	}
+	
 	public function findChildBy($values,$keys=null)
 	{
 		if(!$keys)
@@ -391,6 +409,8 @@ class Model extends BaseModel implements IModel
 	private $nLimitFrom = 0 ;
 	
 	private $nLimitLength = 1 ;
+	
+	private $aCriteria ;
 }
 
 ?>

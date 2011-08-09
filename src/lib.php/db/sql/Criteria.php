@@ -14,7 +14,7 @@ class Criteria extends SubStatement
 		{
 			if( is_array($express) )
 			{
-				$arrExpressions[] = $express[0]
+				$arrExpressions[] = $this->transColumn($express[0])
 							." {$express[2]} '".addslashes($express[1])."'" ;
 			}
 			else if( $express instanceof Criteria )
@@ -52,8 +52,10 @@ class Criteria extends SubStatement
 	 */
 	public function add($column,$sValue=null,$sOperator='=',$sTernary=null)
 	{
+		// 只传入了一个参数
 		if( $sValue===null and $sOperator==='=' and $sTernary===null )
 		{
+			// 传入 Criterial 对象
 			if($column instanceof self)
 			{
 				$this->arrExpressions[] = $column ;
@@ -122,7 +124,10 @@ class Criteria extends SubStatement
 				
 				// column name
 				case 'c':
-					$sParam = $arrArgvs[$aReses->key()] ;
+					$sParam = $this->transColumn(
+						$arrArgvs[$aReses->key()]
+					) ;					
+					
 					break ;
 				
 				// value
@@ -135,6 +140,27 @@ class Criteria extends SubStatement
 		}
 		
 		return $sExpression ;
+	}
+	
+	public function transColumn($sColumn)
+	{
+		// 在没有表名的字段前 添加默认表名
+		if( $this->sDefaultTable and strstr($sColumn,'.')===false )
+		{
+			$sColumn = $this->sDefaultTable.'.'.$sColumn ;
+		}
+		
+		return $sColumn ;
+	}
+	
+	public function setDefaultTable($sDefaultTable)
+	{
+		$this->sDefaultTable = $sDefaultTable ;
+	}
+	
+	public function defaultTable()
+	{
+		return $this->sDefaultTable ;
 	}
 	
 	/**
@@ -150,6 +176,8 @@ class Criteria extends SubStatement
 	}
 	
 	private $sLogic = ' AND ' ;
+	
+	private $sDefaultTable = '' ;
 	
 	private $arrExpressions = array() ;
 	
