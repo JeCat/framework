@@ -1,6 +1,8 @@
 <?php
 namespace jc\ui\xhtml ;
 
+use jc\system\Application;
+
 use jc\util\String;
 use jc\ui\ICompiler;
 use jc\io\IOutputStream;
@@ -74,6 +76,29 @@ class ObjectBase extends Object implements IObject
 			$aChild->setParent($this) ;
 		}
 	}
+	
+	
+	public function summary()
+	{
+		if( $sSource = $this->source() )
+		{
+			$sSource = str_replace("\r",'',$sSource) ;
+			$sSource = str_replace("\n",'',$sSource) ;
+			
+			if(strlen($sSource)>60)
+			{
+				$sSource = substr($sSource,0,30).' ... '.substr($sSource,-30) ;
+			}
+		}
+		else 
+		{
+			$sSource = '<empty>' ;
+		}
+		
+		return parent::summary()." Line: " . $this->line() . "; Source: \"" . htmlspecialchars($sSource) . "\"" ;
+	}
+	
+	
 	
 	static public function getLine(String $aSource,$nObjectPos,$nFindStart=0)
 	{

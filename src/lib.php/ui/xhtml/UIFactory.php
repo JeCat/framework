@@ -1,6 +1,8 @@
 <?php
 namespace jc\ui\xhtml ;
 
+use jc\ui\xhtml\compiler\TextCompiler;
+
 use jc\ui\xhtml\parsers\ParserStateMacro;
 use jc\ui\xhtml\compiler\MacroCompiler;
 use jc\ui\xhtml\compiler\NodeCompiler;
@@ -39,6 +41,7 @@ class UIFactory extends UIFactoryBase
 		$aCompilers->add(__NAMESPACE__.'\\ObjectBase',__NAMESPACE__.'\\compiler\\BaseCompiler') ;
 		$aCompilers->add(__NAMESPACE__.'\\Node',$this->createNodeCompiler()) ;
 		$aCompilers->add(__NAMESPACE__.'\\Macro',$this->createMacroCompiler()) ;
+		$aCompilers->add(__NAMESPACE__.'\\Text',TextCompiler::singleton()) ;
 
 		return $aCompilers ;
 	}
@@ -84,6 +87,8 @@ class UIFactory extends UIFactoryBase
 			$aNodeCompiler->addSubCompiler('subtemplate:call',__NAMESPACE__."\\compiler\\node\\SubTemplateCallCompiler") ;
 			
 			$aNodeCompiler->addSubCompiler('nl',__NAMESPACE__."\\compiler\\node\\NlCompiler") ;
+			
+			$aNodeCompiler->addSubCompiler('code',__NAMESPACE__."\\compiler\\node\\CodeCompiler") ;
 		}
 		
 		$aNodeCompiler->addSubCompiler('clear',__NAMESPACE__."\\compiler\\node\\ClearCompiler") ;

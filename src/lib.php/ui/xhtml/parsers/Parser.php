@@ -1,6 +1,8 @@
 <?php
 namespace jc\ui\xhtml\parsers ;
 
+use jc\io\OutputStreamBuffer;
+
 use jc\lang\Exception;
 
 use jc\ui\IObject as IUiObject;
@@ -64,9 +66,13 @@ class Parser extends JcObject implements IInterpreter
 		// 未完成的对象
 		if( $aCurrentObject!=$aRootObject )
 		{
-			throw new Exception("分析UI模板时遇到未完成的对象(对象类型：%s，位置：%d行)",array(
-					get_class($aCurrentObject), $aCurrentObject->line()
-			)) ;
+			$aBuff = new OutputStreamBuffer() ;
+			$aRootObject->printStruct($aBuff) ;
+			
+			throw new Exception(
+				"<pre>\r\n分析UI模板时遇到未完成的对象：%s\r\n%s\r\n</pre>"
+				, array( $aCurrentObject->summary(), $aBuff )
+			) ;
 		}
 		
 		$aObjectContainer->clear() ;

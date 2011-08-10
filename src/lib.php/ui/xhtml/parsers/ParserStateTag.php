@@ -30,29 +30,7 @@ class ParserStateTag extends ParserState
 		$nStartPos = $nPosition ;
 		
 		// 标签名称
-		$sTagName = '' ;
-		$nSourceLen = $aSource->length() ; 
-		while(1)
-		{
-			$nPosition ++ ;
-			
-			if( $nPosition>=$nSourceLen )
-			{
-				break ;
-			}
-			$sByte = $aSource->byte($nPosition) ;
-			
-			if( ($sTagName and $sByte=='/') or preg_match('|[\'"\\s>]|',$sByte) )
-			{
-				break ;
-			}
-			
-			$sTagName.= $sByte ;
-		}
-		
-		$nPosition-- ;
-		
-		if(!$sTagName)
+		if( !$sTagName=$this->parseTagName($aSource,$nPosition) )
 		{
 			throw new Exception("UI引擎在分析模板时遇到无效的xhtml节点：缺少节点名称(位置：%d行)",$nLine) ;
 		}
@@ -94,8 +72,20 @@ class ParserStateTag extends ParserState
 		$sNextByte = $aSource->byte($nPosition+1) ;
 		
 		if( $sByte=='<' and preg_match('|[/\w:_\-\.]|',$sNextByte) )
-		{			
-			return true ;
+		{
+			$nPos=$nPosition ;
+			$sTagName = strtolower($this->parseTagName($aSource,$nPos)) ;
+			
+			// 清理为标签前的 /
+			if( strlen($sTagName)>=2 and $sTagName[0]=='/' )
+			{
+				$sTagName = substr($sTagName,1) ;
+			}
+			
+			if( in_array($sTagName,$this->arrTagNames) )
+			{
+				return true ;
+			}
 		}
 		
 		return false ;
@@ -184,7 +174,7 @@ class ParserStateTag extends ParserState
 			if( $aObject->isSingle() )
 			{
 				// 单行标签节点结束
-				return $aNode->parent() ;
+				return ParserStateNode::singleton()->complete($aNode,$aSource,$nPosition) ;
 			}
 			else 
 			{
@@ -206,7 +196,7 @@ class ParserStateTag extends ParserState
 			}
 			
 			// 节点结束
-			return $aNode->parent() ;
+			return ParserStateNode::singleton()->complete($aNode,$aSource,$nPosition) ;
 		}
 		
 		// 意外
@@ -215,6 +205,45 @@ class ParserStateTag extends ParserState
 			throw new Exception("遇到无效的xhtml标签。源文：%s",$sTagSource) ;
 		}
 	}
+	
+	public function parseTagName( String $aSource,&$nPosition )
+	{
+		$sTagName = '' ;
+		$nSourceLen = $aSource->length() ; 
+		while(1)
+		{
+			$nPosition ++ ;
+			
+			if( $nPosition>=$nSourceLen )
+			{
+				break ;
+			}
+			$sByte = $aSource->byte($nPosition) ;
+			
+			if( ($sTagName and $sByte=='/') or preg_match('|[\'"\\s>]|',$sByte) )
+			{
+				break ;
+			}
+			
+			$sTagName.= $sByte ;
+		}
+		
+		$nPosition-- ;
+		
+		return $sTagName ;
+	}
+	
+	public function addTagName($sName)
+	{
+		$sName = strtolower($sName) ;
+		
+		if( !in_array($sName,$this->arrTagNames) )
+		{
+			$this->arrTagNames[] = $sName ;
+		}
+	}
+	
+	private $arrTagNames = array("a","abbr","acronym","address","applet","area","article","aside","audio","b","base","basefont","bdo","big","blockquote","body","br","button","canvas","caption","center","cite","code","col","colgroup","command","datalist","dd","del","details","dfn","dir","div","dl","dt","em","embed","fieldset","figcaption","figure","font","footer","form","frame","frameset","h1","h2","h3","h4","h5","h6","h7","h8","h9","h10","head","header","hgroup","hr","html","i","iframe","img","input","ins","keygen","kbd","label","legend","li","link","map","mark","menu","meta","meter","nav","noframes","noscript","object","ol","optgroup","option","output","p","param","pre","progress","q","rp","rt","ruby","s","samp","script","section","select","small","source","span","strike","strong","style","sub","summary","sup","table","tbody","td","textarea","tfoot","th","thead","time","title","tr","tt","u","ul","var","video") ;
 }
 
 ?>

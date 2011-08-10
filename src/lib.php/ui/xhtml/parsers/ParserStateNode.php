@@ -23,12 +23,23 @@ class ParserStateNode extends ParserState
 		return null ;
 	}
 	public function examineEnd(String $aSource, &$nPosition,IObject $aObject)
-	{
+	{		
 		return false ;
 	}
 	public function examineStart(String $aSource, &$nPosition,IObject $aObject)
 	{
 		return false ;
+	} 
+
+	public function complete(IObject $aObject,String $aSource,$nPosition)
+	{
+		$aHead = $aObject->headTag() ;
+		$aTail = $aObject->tailTag()?:$aObject->headTag() ;
+		
+		$sSource = $aSource->substr($aHead->position(),$aTail->endPosition()-$aHead->position()+1) ;
+		$aObject->setSource($sSource) ;
+		
+		return $aObject->parent() ;
 	}
 }
 

@@ -28,6 +28,7 @@ class CodeCompiler extends NodeCompiler
 			$sVarName = parent::assignVariableName() ;
 			
 			$aDev->write("<?php\r\n") ;
+			$aDev->write("ob_flush() ;\r\n") ;
 			$aDev->write("\${$sVarName} = new \\jc\\ui\\xhtml\\compiler\\node\\CodeColor() ;\r\n") ;
 			$aDev->write("\\jc\\io\\StdOutputFilterMgr::singleton()->add(array(\${$sVarName},'outputFilter')) ;\r\n") ;
 			$aDev->write("?>") ;
