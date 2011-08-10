@@ -75,7 +75,7 @@ class File extends FormWidget{
 		// 文件在存储目录内
 		if( substr($sFilePath,0,$nStorePathLen)==$sStorePath )
 		{
-			return substr($sFilePath,$nStorePathLen) ;
+			return substr($sFilePath,$nStorePathLen + 1) ;
 		}
 		else 
 		{

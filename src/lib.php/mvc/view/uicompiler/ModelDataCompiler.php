@@ -33,7 +33,7 @@ class ModelDataCompiler extends NodeCompiler
 		}
 		
 		$aDev->write("<?php if(\$theModel=\$aVariables->get('theModel')){") ;
-		$aDev->write("echo \$theModel->get({$sName}) ;") ;
+		$aDev->write("echo \$theModel->data({$sName}) ;") ;
 		$aDev->write("} ?>") ;
 	}
 }
