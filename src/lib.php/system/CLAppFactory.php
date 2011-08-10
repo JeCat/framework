@@ -1,7 +1,7 @@
 <?php
 namespace jc\system ;
 
-class CLAppFactory extends AppFactory
+class CLAppFactory extends ApplicationFactory
 {
 	public function createRequest(CoreApplication $aApp)
 	{
