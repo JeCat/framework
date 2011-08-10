@@ -233,13 +233,18 @@ class ParserStateTag extends ParserState
 		return $sTagName ;
 	}
 	
-	public function addTagName($sName)
+	public function addTagNames($sName/*,...*/)
 	{
-		$sName = strtolower($sName) ;
+		$arrNames = func_get_args() ;
 		
-		if( !in_array($sName,$this->arrTagNames) )
+		foreach($arrNames as $sName)
 		{
-			$this->arrTagNames[] = $sName ;
+			$sName = strtolower($sName) ;
+			
+			if( !in_array($sName,$this->arrTagNames) )
+			{
+				$this->arrTagNames[] = $sName ;
+			}
 		}
 	}
 	

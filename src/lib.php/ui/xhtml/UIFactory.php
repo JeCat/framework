@@ -1,8 +1,8 @@
 <?php
 namespace jc\ui\xhtml ;
 
+use jc\ui\xhtml\parsers\ParserStateTag;
 use jc\ui\xhtml\compiler\TextCompiler;
-
 use jc\ui\xhtml\parsers\ParserStateMacro;
 use jc\ui\xhtml\compiler\MacroCompiler;
 use jc\ui\xhtml\compiler\NodeCompiler;
@@ -27,6 +27,21 @@ class UIFactory extends UIFactoryBase
 				->addMacroType('/')
 				->addMacroType('*') ;
 
+		// for ui
+		ParserStateTag::singleton()->addTagNames(
+				'if', 'else', 'if:else', 'elseif', 'loop', 'foreach', 'foreach:else', 'while', 'dowhile', 'do', 'signle:end'
+				, 'if:end', 'loop:end', 'while:end', 'dowhile:end', 'double:end', 'foreach:end'
+				, 'include', 'function', 'continue', 'break', 'script'
+				, 'subtemplate', 'subtemplate:define', 'subtemplate:call'
+				, 'nl', 'clear', 'code'
+		) ;
+		
+		// for mvc
+		ParserStateTag::singleton()->addTagNames(
+				'views', 'view', 'widget', 'form', 'msgqueue', 'view:msgqueue', 'widget:msgqueue', 'resrc', 'link', 'css', 'script'
+				, 'js', 'model:foreach', 'model:foreach:end', 'model:data', 'data'
+		) ;
+		
 		return $aInterpreters ;
 	}
 	
@@ -87,11 +102,11 @@ class UIFactory extends UIFactoryBase
 			$aNodeCompiler->addSubCompiler('subtemplate:call',__NAMESPACE__."\\compiler\\node\\SubTemplateCallCompiler") ;
 			
 			$aNodeCompiler->addSubCompiler('nl',__NAMESPACE__."\\compiler\\node\\NlCompiler") ;
+			$aNodeCompiler->addSubCompiler('clear',__NAMESPACE__."\\compiler\\node\\ClearCompiler") ;
 			
 			$aNodeCompiler->addSubCompiler('code',__NAMESPACE__."\\compiler\\node\\CodeCompiler") ;
 		}
 		
-		$aNodeCompiler->addSubCompiler('clear',__NAMESPACE__."\\compiler\\node\\ClearCompiler") ;
 		
 		return $aNodeCompiler ;
 	}
