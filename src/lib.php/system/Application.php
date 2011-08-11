@@ -4,7 +4,7 @@ namespace jc\system ;
 use jc\fs\imp\LocalFileSystem;
 use jc\fs\FileSystem;
 
-class Application extends CoreApplication
+class Application extends CoreApplication implements \Serializable
 {
 	public function __construct($sAppDirPath)
 	{
@@ -87,6 +87,16 @@ class Application extends CoreApplication
 	{
 		return $this->sEntrance ;
 	}
+	
+	public function serialize()
+	{
+		return '' ;
+	}
+	public function unserialize($sSerialized)
+	{
+		return ;
+	}
+	
 	
 	private $arrGlobalSingeltonInstance ;
 	 
