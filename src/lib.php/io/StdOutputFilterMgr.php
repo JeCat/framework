@@ -8,18 +8,7 @@ use jc\util\FilterMangeger;
  */
 class StdOutputFilterMgr extends FilterMangeger 
 {
-	static public function singleton ($bCreateNew=true,$createArgvs=null,$sClass=null)
-	{
-		if( !$aInstance=self::singleton(false) )
-		{
-			$aInstance = new self() ;
-			self::setSingleton($aInstance) ;
-		}
-		
-		return $aInstance ;
-	}
-	
-	protected function StdOutputFilterMgr()
+	public function __construct()
 	{
 		$this->start() ;
 	}

@@ -114,6 +114,11 @@ class Node extends ObjectBase
 	{
 		return parent::iterator() ;
 	}
+
+	public function summary()
+	{
+		return parent::summary() . "; tag name: " . $this->tagName() ;
+	}
 	
 	private $aHeadTag ;
 	

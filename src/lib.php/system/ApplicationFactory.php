@@ -1,6 +1,8 @@
 <?php
 namespace jc\system ;
 
+use jc\io\StdOutputFilterMgr;
+
 use jc\io\PrintStream;
 use jc\lang\Object ;
 
@@ -98,7 +100,7 @@ abstract class ApplicationFactory extends Object
 	
 	public function createResponse(CoreApplication $aApp,PrintStream $aPrinter)
 	{
-		$aFilter = new \jc\io\StdOutputFilterMgr() ;
+		$aFilter = StdOutputFilterMgr::singleton() ;
 		$aFilter->setApplication($aApp) ;
 		
 		$aRespn = new Response($aPrinter) ;

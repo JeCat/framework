@@ -142,9 +142,12 @@ class UI extends JcObject
 		}
 		if(!$aDevice)
 		{
-			$aDevice = $this->OutputStream() ;
+			$aDevice = $this->outputStream() ;
+			if(!$aDevice)
+			{
+				$aDevice = $this->application()->response()->printer() ;
+			}
 		}
-		
 		
 		// 模板变量
 		if( !$aVariables->has('theRequest') )
@@ -154,12 +157,9 @@ class UI extends JcObject
 		$aVariables->set('theDevice',$aDevice) ;
 		
 		// 拦截 output
-		if($aDevice)
-		{
-			ob_flush() ;
-			$aOutputFilters = $this->application(true)->response()->filters() ;
-			$aOutputFilters->add( array($aDevice,'write') ) ;
-		}
+		ob_flush() ;
+		$aOutputFilters = $this->application(true)->response()->filters() ;
+		$aOutputFilters->add( array($aDevice,'write') ) ;
 		
 		
 		try{
@@ -174,11 +174,8 @@ class UI extends JcObject
 		}
 		
 		// 解除拦截
-		if($aDevice)
-		{
-			ob_flush() ;
-			$aOutputFilters->remove( array($aDevice,'write') ) ;
-		}
+		ob_flush() ;
+		$aOutputFilters->remove( array($aDevice,'write') ) ;
 	}
 	
 	public function display($sSourceFile,$aVariables=null,IOutputStream $aDevice=null)

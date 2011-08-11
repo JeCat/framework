@@ -2,6 +2,8 @@
 
 namespace jc\ui ;
 
+use jc\system\Application;
+
 use jc\io\IOutputStream;
 use jc\pattern\composite\IContainer;
 use jc\pattern\composite\Composite;
@@ -33,6 +35,26 @@ class Object extends Composite implements IObject
 		}
 		
 		return null ;
+	}
+	
+	
+	public function summary()
+	{
+		return "[Class:".get_class($this)."]" ;
+	}
+
+	public function printStruct(IOutputStream $aDevice=null,$nDepth=0)
+	{
+		if(!$aDevice)
+		{
+			$aDevice = Application::singleton()->response()->printer() ;
+		}
+		
+		$aDevice->write( str_repeat("\t",$nDepth) . $this->summary() . "\r\n" ) ;
+		foreach ($this->iterator() as $aChild)
+		{
+			$aChild->printStruct($aDevice,$nDepth+1) ;
+		}
 	}
 	
 	private $aParent ;
