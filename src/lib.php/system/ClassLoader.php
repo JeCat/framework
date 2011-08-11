@@ -66,6 +66,12 @@ class ClassLoader extends \jc\lang\Object
 		}
 	}
 	
+	/**
+	 * 搜索一个class，返回这个class的定义文件。
+	 * @param unknown_type $sClassFullName
+	 * @throws Exception
+	 * @return jc\fs\IFile
+	 */
 	public function searchClass($sClassFullName)
 	{
 		$nNamespaceEnd = strrpos($sClassFullName,"\\") ;
