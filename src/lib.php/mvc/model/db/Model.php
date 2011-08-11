@@ -2,7 +2,6 @@
 namespace jc\mvc\model\db ;
 
 use jc\db\sql\Criteria;
-
 use jc\mvc\model\db\orm\PrototypeAssociationMap;
 use jc\lang\Exception;
 use jc\mvc\model\db\orm\operators\Deleter;
@@ -14,11 +13,11 @@ use jc\db\recordset\IRecordSet;
 use jc\db\sql\MultiTableStatement;
 use jc\mvc\model\db\orm\Association;
 use jc\mvc\model\db\orm\PrototypeInFragment ;
-use jc\mvc\model\Model as BaseModel ;
+use jc\mvc\model\AbstractModel ;
 use jc\db\sql\IDriver ;
 use jc\lang\Object;
 
-class Model extends BaseModel implements IModel
+class Model extends AbstractModel implements IModel
 {
 	static public function fromFragment($sPrototypeName,array $arrAssocFragment=array(),$bAggregation=false,PrototypeAssociationMap $aAssocMap=null)
 	{
