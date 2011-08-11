@@ -8,14 +8,6 @@ class UIFactory extends UIFactoryBase
 	/**
 	 * return SourceFileManager
 	 */
-	public function newInterpreterManager()
-	{
-		$aInterpreterManager = parent::newInterpreterManager() ;
-	}
-	
-	/**
-	 * return SourceFileManager
-	 */
 	public function createNodeCompiler()
 	{
 		$aNodeCompilers = parent::createNodeCompiler() ;
