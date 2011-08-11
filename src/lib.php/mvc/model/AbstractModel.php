@@ -5,7 +5,7 @@ use jc\io\IOutputStream;
 
 use jc\lang\Object;
 
-abstract class Model extends Object implements IModel, \Serializable
+abstract class AbstractModel extends Object implements IModel, \Serializable
 {
 	public function __construct($bAggregation=false)
 	{
