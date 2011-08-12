@@ -261,12 +261,9 @@ abstract class FileSystem extends Object
 			}else{
 				$aFile = $this->createFileObject($sPath);
 				if( !$aFile -> exists()){
-					if( !$aFile -> create( $nMode ) )
-					{
-						return null;
-					}
+					$aFile -> create( $nMode );
 				}
-				$this -> affFSOFlyweights[$sFlyweightKey] =$aFile;
+				$this -> arrFSOFlyweights[$sFlyweightKey] =$aFile;
 			}
 		}
 
@@ -293,7 +290,7 @@ abstract class FileSystem extends Object
 			if( $this->isFile($sPath) ){
 				throw new Exception('试图创建Folder，但由于存在同名File无法创建');
 			}else{
-				$aFolder = createFolderObject($sPath);
+				$aFolder = $this->createFolderObject($sPath);
 				if( !$aFolder -> exists()){
 					if( !$aFolder -> create( $nMode ,$bRecursive) )
 					{

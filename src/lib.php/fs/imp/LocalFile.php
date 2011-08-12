@@ -66,7 +66,7 @@ class LocalFile extends LocalFSO implements IFile
 	
 	public function includeFile($bOnce=false,$bRequire=false)
 	{
-		if($bRequire)
+		if(!$bRequire)
 		{
 			if($bOnce)
 			{
