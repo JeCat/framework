@@ -43,9 +43,13 @@ abstract class FileSystem extends Object
 		
 		return array($this,$sPath) ;
 	}
-	
+
 	/**
 	 * @return IFSO
+	 * @retval $type参数		不存在	存在为File	存在为Folder
+	 * @retval file			null	fileObject	null
+	 * @retval folder		null	null		folderObject
+	 * @retval unknow		null	fileObject	folderObject
 	 */
 	public function find($sPath,$type=self::unknow)
 	{
@@ -55,45 +59,43 @@ abstract class FileSystem extends Object
 		{
 			return $aFileSystem->find($sInnerPath,$type) ;
 		}
-		
-		//////////////
+
 		$sFlyweightKey = $this->fsoFlyweightKey($sPath) ;
-		
 		if( !isset($this->arrFSOFlyweights[$sFlyweightKey]) )
 		{
-			if( $type==self::file or $this->isFile($sPath) )
+			if( $this->exists($sPath) )
 			{
-				$this->arrFSOFlyweights[$sFlyweightKey] = $this->createFileObject($sPath) ;
-			}
-			else if( $type==self::folder or $this->isFolder($sPath) )
-			{
-				$this->arrFSOFlyweights[$sFlyweightKey] = $this->createFolderObject($sPath) ;
-			}
-			
-			else 
-			{
-				return null ;
+				if( $this->isFile($sPath) and ($type===self::file or $type===self::unknow) )
+				{
+					$this->arrFSOFlyweights[$sFlyweightKey] = $this->createFileObject($sPath) ; 
+				}
+				
+				else if($this->isFolder($sPath) and ($type===self::folder or $type===self::unknow) )
+				{
+					$this->arrFSOFlyweights[$sFlyweightKey] = $this->createFolderObject($sPath) ; 
+				}else{
+					return null;
+				}
+			}else{
+				return null;
 			}
 		}
-		
-		if( $type!=0 and ($this->arrFSOFlyweights[$sFlyweightKey] instanceof $type) )
-		{
-			throw new Exception("路径：%s 返回的不是指定的类型文件对象类型：%s",array($sPath,$type)) ;
-		}
-		
+
 		return $this->arrFSOFlyweights[$sFlyweightKey] ;
 	}
-	
+
 	/**
 	 * @return IFile
+	 * @sa find()
 	 */
 	public function findFile($sPath)
 	{
 		return $this->find($sPath,self::file) ;
 	}
-	
+
 	/**
 	 * @return IFolder
+	 * @sa find()
 	 */
 	public function findFolder($sPath)
 	{
@@ -126,7 +128,7 @@ abstract class FileSystem extends Object
 			}
 		}
 	}
-	
+
 	public function mount($sPath,self $aFileSystem)
 	{
 		$sPath = self::formatPath($sPath) ;
@@ -134,7 +136,7 @@ abstract class FileSystem extends Object
 		$aFileSystem->beMounted($this,$sPath) ;
 		$this->arrMounteds[$sPath] = $aFileSystem ;
 	}
-	
+
 	public function umount($sPath)
 	{
 		if( isset($this->arrMounteds[$sPath]) )
@@ -143,7 +145,7 @@ abstract class FileSystem extends Object
 			unset($this->arrMounteds[$sPath]) ;
 		}
 	}
-	
+
 	public function exists($sPath)
 	{
 		// 是否在挂载的文件系统中
@@ -156,7 +158,7 @@ abstract class FileSystem extends Object
 		//////////////
 		return $this->existsOperation($sPath) ;
 	}
-	
+
 	public function isFile($sPath)
 	{
 		// 是否在挂载的文件系统中
@@ -169,7 +171,7 @@ abstract class FileSystem extends Object
 		//////////////
 		return $this->isFileOperation($sPath) ;
 	}
-	
+
 	public function isFolder($sPath)
 	{
 		// 是否在挂载的文件系统中
@@ -182,11 +184,11 @@ abstract class FileSystem extends Object
 		//////////////
 		return $this->isFolderOperation($sPath) ;
 	}
-	
+
 	/**
 	 * 在文件系统内复制文件对象
-	 * @param string,IFSO 		$from		被复制的源文件或目录，可以是表示路径的字符串或IFSO对象
-	 * @param string 			$to			复制目标路径
+	 * @param string,IFSO		$from	被复制的源文件或目录，可以是表示路径的字符串或IFSO对象
+	 * @param string			$to		复制目标路径
 	 */
 	public function copy($from,$to)
 	{
@@ -197,6 +199,10 @@ abstract class FileSystem extends Object
 		else if( is_string($from) )
 		{
 			$aFromFSO = $this->find($from) ;
+			if($aFromFSO === null )
+			{
+				throw new Exception('参数$from对应源文件或目录不存在');
+			}
 		}
 		else 
 		{
@@ -205,11 +211,11 @@ abstract class FileSystem extends Object
 		
 		return $aFromFSO->copy($to) ;
 	}
-	
+
 	/**
 	 * 在文件系统内移动文件对象
-	 * @param string,IFSO 		$from		被移动的文件或目录，可以是表示路径的字符串或IFSO对象
-	 * @param string 			$to			移动目标路径
+	 * @param string,IFSO		$from	移动的文件或目录，可以是表示路径的字符串或IFSO对象
+	 * @param string			$to		移动目标路径
 	 */
 	public function move($from,$to)
 	{
@@ -220,6 +226,10 @@ abstract class FileSystem extends Object
 		else if( is_string($from) )
 		{
 			$aFromFSO = $this->find($from) ;
+			if($aFromFSO === null )
+			{
+				throw new Exception('参数$from对应源文件或目录不存在');
+			}
 		}
 		else 
 		{
@@ -231,38 +241,70 @@ abstract class FileSystem extends Object
 
 	/**
 	 * @return IFile
+	 * 如果存在同名Folder，会抛出异常
+	 * 如果存在同名File，会直接返回；否则会创建此File后返回。
 	 */
 	public function createFile($sPath,$nMode=0644)
 	{
-		//////////////
-		$aFile = $this->findFile($sPath) ;
-		if(!$aFile->exists())
-		{
-			if( !$aFile->create($nMode) )
-			{
-				return null ;
+		// 是否在挂载的文件系统中
+		list($aMountFS,$sInnerPath) = $this->localeFileSystem($sPath) ;
+		if($aMountFS!==$this){
+			return $aMountFS->createFile($sInnerPath,$nMode) ;
+		}
+
+		// 检查享元对象及类型是否匹配
+		$sFlyweightKey = $this->fsoFlyweightKey($sPath) ;
+		if( !isset($this->arrFSOFlyweights[$sFlyweightKey]) 
+				or ! $this->arrFSOFlyweights[$sFlyweightKey] instanceof IFile ){
+			if( $this->isFolder($sPath) ){
+				throw new Exception('试图创建File，但由于存在同名Folder无法创建');
+			}else{
+				$aFile = $this->createFileObject($sPath);
+				if( !$aFile -> exists()){
+					if( !$aFile -> create( $nMode ) )
+					{
+						return null;
+					}
+				}
+				$this -> affFSOFlyweights[$sFlyweightKey] =$aFile;
 			}
 		}
-		
-		return $aFile ;
+
+		return $this->arrFSOFlyweights[$sFlyweightKey] ;
 	}
-	
+
 	/**
 	 * @return IFolder
+	 * 如果存在同名File，会抛出异常
+	 * 如果存在同名Folder，会直接返回；否则会创建此Folder后返回。
 	 */
 	public function createFolder($sPath,$nMode=0755,$bRecursive=true)
 	{
-		//////////////
-		$aFolder = $this->findFolder($sPath) ;
-		if(!$aFolder->exists())
-		{
-			if( !$aFolder->create($nMode,$bRecursive) )
-			{
-				return null ;
+		// 是否在挂载的文件系统中
+		list($aMountFS,$sInnerPath) = $this->localeFileSystem($sPath) ;
+		if($aMountFS!==$this){
+			return $aMountFS->createFolder($sInnerPath,$nMode,$bRecursive) ;
+		}
+
+		// 检查享元对象及类型是否匹配
+		$sFlyweightKey = $this->fsoFlyweightKey($sPath) ;
+		if( !isset($this->arrFSOFlyweights[$sFlyweightKey]) 
+				or ! $this->arrFSOFlyweights[$sFlyweightKey] instanceof IFolder ){
+			if( $this->isFile($sPath) ){
+				throw new Exception('试图创建Folder，但由于存在同名File无法创建');
+			}else{
+				$aFolder = createFolderObject($sPath);
+				if( !$aFolder -> exists()){
+					if( !$aFolder -> create( $nMode ,$bRecursive) )
+					{
+						return null;
+					}
+				}
+				$this -> affFSOFlyweights[$sFlyweightKey] =$aFolder;
 			}
 		}
-		
-		return $aFolder ;
+
+		return $this->arrFSOFlyweights[$sFlyweightKey] ;
 	}
 	
 	public function delete($sPath)
@@ -308,8 +350,7 @@ abstract class FileSystem extends Object
 	}
 		
 	abstract public function iterator($sPath) ;
-	
-	
+		
 	////////////////////////////////////////////////////////////////////////////
 	abstract protected function deleteFileOperation(&$sPath) ;
 	
@@ -353,7 +394,7 @@ abstract class FileSystem extends Object
 		return $aFileSystem ;
 	}
 	
-	public function beMounted(self $aParentFileSystem=null,$sPath)
+	protected function beMounted(self $aParentFileSystem=null,$sPath)
 	{
 		$this->sMountPath = $sPath ;
 		$this->aParentFileSystem = $aParentFileSystem ;

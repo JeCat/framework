@@ -107,5 +107,9 @@ class LocalFile extends LocalFSO implements IFile
 		return true ;
 	}
 
+	public function exists()
+	{
+		return is_file($this->localPath());
+	}
 }
 ?>

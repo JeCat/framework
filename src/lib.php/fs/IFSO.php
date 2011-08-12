@@ -39,13 +39,13 @@ interface IFSO
 	
 	/**
 	 * 复制这个文件对象
-	 * @param string,IFolder 		$to	复制目标路径 或 目标目录
+	 * @param string,IFolder		 $to	复制目标路径 或 目标目录
 	 */
 	public function copy($to) ;
 	
 	/**
 	 * 移动这个文件对象
-	 * @param string,IFolder 		$to	移动目标路径 或 目标目录
+	 * @param string,IFolder		 $to	移动目标路径 或 目标目录
 	 */
 	public function move($to) ;
 	
@@ -57,6 +57,10 @@ interface IFSO
 	
 	public function isHidden() ;
 	
+	/**
+	 * 不仅检查是否存在，而且检查类型是否匹配。
+	 * 如果存在但是类型不匹配也会返回false。
+	 */
 	public function exists() ;
 	
 	public function create() ;

@@ -97,11 +97,6 @@ abstract class LocalFSO extends FSO
 	{
 		return false ;
 	}
-	
-	public function exists()
-	{
-		return file_exists($this->sLocalPath) ;
-	}
 
 	public function copy($to)
 	{
@@ -164,7 +159,7 @@ abstract class LocalFSO extends FSO
 		if( $aToFSO instanceof LocalFSO )
 		{
 			
-			if( is_uploaded_file($sLocalFile)?								// 如果正在移动的文件是一个来自用户上传的文件，则使用 move_uploaded_file() 移动此文件
+			if( is_uploaded_file($sLocalFile)?	// 如果正在移动的文件是一个来自用户上传的文件，则使用 move_uploaded_file() 移动此文件
 					move_uploaded_file($sLocalFile,$aToFSO->localPath()):
 					rename($sLocalFile,$aToFSO->localPath())
 			)
