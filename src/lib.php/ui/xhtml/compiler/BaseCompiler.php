@@ -22,8 +22,8 @@ class BaseCompiler extends JcObject implements ICompiler
 			$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
 		}
 	}
-	
-	public function compileChildren(IObject $aObject,IOutputStream $aDev,CompilerManager $aCompilerManager)
+		
+	protected function compileChildren(IObject $aObject,IOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		foreach ($aObject->iterator() as $aChild)
 		{

@@ -10,16 +10,24 @@ class TextCompiler extends BaseCompiler
 {
 	public function compile(IObject $aObject,IOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		Assert::type("jc\\ui\\xhtml\\Text",$aObject,'aObject') ;
-
-		$sSource = $aObject->source() ;
+		if( $aObject instanceof \jc\ui\xhtml\ObjectBase and !$aObject->count() )
+		{
+			Assert::type("jc\\ui\\xhtml\\Text",$aObject,'aObject') ;
+	
+			$sSource = $aObject->source() ;
+			
+			$sSource = str_replace('<?', "{~~~~{&@!", $sSource) ;
+			$sSource = str_replace('?>', "!@&}~~~~~}", $sSource) ;
+			$sSource = str_replace('{~~~~{&@!', "<? ob_flush(); echo '<','?' ; ?>", $sSource) ;
+			$sSource = str_replace('!@&}~~~~~}', "<? ob_flush(); echo '?','>' ; ?>", $sSource) ;
+			
+			$aDev->write($sSource) ;
+		}
 		
-		$sSource = str_replace('<?', "{~~~~{&@!", $sSource) ;
-		$sSource = str_replace('?>', "!@&}~~~~~}", $sSource) ;
-		$sSource = str_replace('{~~~~{&@!', "<? ob_flush(); echo '<','?' ; ?>", $sSource) ;
-		$sSource = str_replace('!@&}~~~~~}', "<? ob_flush(); echo '?','>' ; ?>", $sSource) ;
-		
-		$aDev->write($sSource) ;
+		else 
+		{
+			$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
+		}
 	}
 }
 
