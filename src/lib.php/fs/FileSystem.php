@@ -297,7 +297,7 @@ abstract class FileSystem extends Object
 						return null;
 					}
 				}
-				$this -> affFSOFlyweights[$sFlyweightKey] =$aFolder;
+				$this -> arrFSOFlyweights[$sFlyweightKey] =$aFolder;
 			}
 		}
 
@@ -330,7 +330,7 @@ abstract class FileSystem extends Object
 		}
 		else if( $this->isFolder($sPath) )
 		{
-			if( $this->deleteFolderOperation($sPath) )
+			if( $this->deleteDirOperation($sPath) )
 			{
 				$sFlyweightKey = $this->fsoFlyweightKey($sPath) ;
 				unset($this->arrFSOFlyweights[$sFlyweightKey]) ;

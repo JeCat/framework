@@ -54,7 +54,7 @@ class LocalFolder extends LocalFSO implements IFolder
 	
 	public function exists()
 	{
-		return is_folder($this->localPath());
+		return is_dir($this->localPath());
 	}
 } 
 
