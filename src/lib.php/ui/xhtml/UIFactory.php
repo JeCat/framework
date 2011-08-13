@@ -54,9 +54,9 @@ class UIFactory extends UIFactoryBase
 		
 		// 注册 compiler
 		$aCompilers->add(__NAMESPACE__.'\\ObjectBase',__NAMESPACE__.'\\compiler\\BaseCompiler') ;
+		$aCompilers->add(__NAMESPACE__.'\\Text',TextCompiler::singleton()) ;
 		$aCompilers->add(__NAMESPACE__.'\\Node',$this->createNodeCompiler()) ;
 		$aCompilers->add(__NAMESPACE__.'\\Macro',$this->createMacroCompiler()) ;
-		$aCompilers->add(__NAMESPACE__.'\\Text',TextCompiler::singleton()) ;
 
 		return $aCompilers ;
 	}
