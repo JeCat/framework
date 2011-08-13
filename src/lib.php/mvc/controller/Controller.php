@@ -110,7 +110,11 @@ class Controller extends NamableComposite implements IController
     	
     	return $aView ;
     }
-        
+    
+	public function createFormView($sName=null,$sSourceFile=null)
+    {
+    	return $this->createView($sName,$sSourceFile,'oc\\mvc\\view\\FormView') ;
+    }
     /**
      * @return IView
      */
