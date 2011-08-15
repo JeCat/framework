@@ -49,7 +49,7 @@ class LocalFolder extends LocalFSO implements IFolder
 	 */
 	public function iterator()
 	{
-		
+		return new LocalFolderIterator($this);
 	}
 	
 	public function exists()

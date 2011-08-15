@@ -11,11 +11,12 @@ abstract class FSIterator implements \Iterator{
 	const RETURN_FSO = 0x08 ; // 如果不置此位，返回路径名
 	const RETURN_ABSOLUTE_PATH = 0x10 ; // 如果不置此位，返回相对路径
 	const RECURSIVE_SEARCH = 0x20 ; // 如果不置此位，只搜索当前目录下
-	const RECURSIVE_BREADTH_FIRST = 0x40 ; //如果不置此位，默认深度优先
-	const FLAG_DEFAULT = 0x06 ; // FILE | FOLDER
+	const RECURSIVE_BREADTH_FIRST = 0x40 ; //如果不置此位，则按照深度优先进行搜索
+	const FLAG_DEFAULT = 0x36 ; // FILE | FOLDER
 	
-	public function __construct(IFolder $sFolderPath,$nFlags=self::FLAG_DEFAULT){
-		$this->sFolderPath = $sFolderPath;
+	public function __construct(IFolder $aParentFolder,$nFlags=self::FLAG_DEFAULT){
+		echo "FSIterator::__construct\n";
+		$this->aParentFolder = $aParentFolder;
 		$this->rewind();
 	}
 	
@@ -25,13 +26,13 @@ abstract class FSIterator implements \Iterator{
 				return $this->currentFSO();
 			}else{
 				if( $this->nFlags & self::RETURN_ABSOLUTE_PATH ){
-					return $this->currentFSO()->path();
+					return $this->FSOcurrent()->path();
 				}else{
-					return FileSystem::relativePath( $this->$sFolderPath , $this->currentFSO()->path() );
+					return FileSystem::relativePath( $this->aParentFolder , $this->FSOcurrent()->path() );
 				}
 			}
 		}else{
-			$this->stackTop()->current();
+			return $this->stackTop()->current();
 		}
 	}
 	
@@ -40,39 +41,49 @@ abstract class FSIterator implements \Iterator{
 	}
 	
 	public function next (){
-		if ( $this->isStackEmpty() ) return ;
+		echo "next :".$this->aParentFolder->path()."\n";
+		if ( $this->isStackEmpty() ){
+			echo "stack empty.return.\n";
+			return ;
+		}
 		do{
-			if ( $this->FSOcurrent() instanceof IFolder 
+			$aFSO=$this->stackTop()->FSOcurrent();
+			echo "aFSO=".$aFSO->path()."\t".$this->aParentFolder->path()."\n";
+			if ( $aFSO instanceof IFolder 
+					and $aFSO->name() != '.' 
+					and $aFSO->name() != '..'
 					and ( $this->nFlags & self::RECURSIVE_SEARCH ) ){
-				$aIterator = $this->FSOcurrent()->iterator($this->nFlags);
-				$aIterator -> rewind();
+				$aIterator = $aFSO->iterator();
 				$this->stackPush( $aIterator );
 			}else{
 				do{
-					if( $this == $this->getStackTop() ){
+					if( $this == $this->stackTop() ){
 						$this->FSOmoveNext();
 					}else{
 						$this->stackTop()->next();
 					}
-					if( !$this->stackTop()->valid() ) break;
+					if( $this->stackTop()->valid() ) break;
 					else $this->stackPop() ;
 				}while( !$this->isStackEmpty());
 			}
-		}while( ! ( $this->isStackEmpty() or $this->getStackTop()->satisfyFlags() ) );
+		}while( ! ( $this->isStackEmpty() or $this->stackTop()->satisfyFlags() ) );
 		$this->nKey ++;
 	}
 	
 	public function rewind (){
-		$this->$nKey = 0;
+		$this->	nKey = 0;
 		$this->FSOrewind();
 		$this->arrIteratorStack=array($this);
 	}
 	public function valid (){
-		return $this->FSOvalid();
+		$ret=$this->FSOvalid();
+		echo "valid=$ret\n";
+		return $ret;
 	}
 	
+	////////////////
 	protected $nFlags = self::FLAG_DEFAULT;
-	protected $sFolderPath = "";
+	protected $aParentFolder = "";
 	protected $nKey = 0;
 	
 	private function satisfyFlags(){
@@ -82,15 +93,15 @@ abstract class FSIterator implements \Iterator{
 					return false;
 				}else{
 					if( $this->FSOcurrent()->name() === '.' ){
-						return ($this->nFlags & self::DOT );
+						return ( $this->nFlags & self::DOT );
 					}else{
 						return true;
 					}
 				}
 			}else if( $this->FSOcurrent() instanceof IFile ){
-				return ( $this->nFlags & self::File );
+				return ( $this->nFlags & self::FILE );
 			}else{
-				throw new \jc\lang\Exception('即不是IFile也不是IFolder');
+				throw new \jc\lang\Exception($this->FSOcurrent()->path().'即不是IFile也不是IFolder');
 			}
 		}else{
 			return $this->stackTop()->satisfyFlags();
@@ -99,7 +110,7 @@ abstract class FSIterator implements \Iterator{
 	
 	private $arrIteratorStack = array () ;
 	protected function stackTop(){
-		return $this->arrIteratorStack[0];
+		return ($this->isStackEmpty() ? null : $this->arrIteratorStack[0] );
 	}
 	
 	protected function stackPop(){
@@ -107,6 +118,7 @@ abstract class FSIterator implements \Iterator{
 	}
 	
 	protected function stackPush(FSIterator $aIterator){
+		echo "stack push:".$this->aParentFolder->path()."\t".$aIterator->aParentFolder->path()."\n";
 		if( $this->nFlags & self::RECURSIVE_BREADTH_FIRST ){
 			array_push($this->arrIteratorStack , $aIterator );
 		}else{
