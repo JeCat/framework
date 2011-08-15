@@ -222,14 +222,13 @@ class Object implements IObject
 	}
 	
 	static public function flyweight($keys,$sClassName=null)
-	{		
+	{
 		if(!$sClassName)
 		{
 			$sClassName = get_called_class() ;
 		}
 		
-		$keys = (array)$keys ;
-		$sKey = implode(',', $keys) ;
+		$sKey = self::genFlyweightKey($keys) ;
 		
 		if( !isset(self::$arrFlyweightInstancs[$sClassName]) )
 		{
@@ -242,6 +241,36 @@ class Object implements IObject
 		}
 		
 		return self::$arrFlyweightInstancs[$sClassName][$sKey] ;
+	}
+	
+	static private genFlyweightKey(& $keys )
+	{
+		$keys = (array)$keys ;
+		$sKey = '' ;
+		
+		$nLoopIdx = 0 ;
+		foreach($keys as &$element)
+		{
+			if($nLoopIdx++)
+			{
+				$sKey.= ',' ;
+			}
+			
+			if( is_array($element) )
+			{
+				$sKey.= self::genFlyweightKey($element) ;
+			}
+			else if( is_object($element) )
+			{
+				$sKey.= spl_object_hash($element) ;
+			}
+			else
+			{
+				$sKey.= strval($element) ;
+			}
+		}
+		
+		return $sKey ;		
 	}
 	
 		
