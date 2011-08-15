@@ -37,7 +37,7 @@ class Association extends Object implements \Serializable
 			$arrCnf = self::assertCnfValid($arrCnf,$sType,true) ;
 		}
 		
-		$aToPrototype = Prototype::createFromCnf($arrCnf['model'],true,true,$bInFragment) ;
+		$aToPrototype = Prototype::createFromCnf($arrCnf['prototype'],true,true,$bInFragment) ;
 		
 		$aAsso = new self(
 			$sType
@@ -129,50 +129,57 @@ class Association extends Object implements \Serializable
 			, self::hasAndBelongsToMany
 	) ;
 
-	static public function assertCnfValid(array $arrAsso,$sType,$bNestingModel)
+	static public function assertCnfValid(array $arrAsso,$sType,$bNestingPrototype)
 	{
 		if( !in_array($sType, Association::allAssociationTypes()) )
 		{
 			throw new Exception("遇到无效的orm关联类型：%s；orm关联类型必须为：%s",array($sType,implode(", ", Association::allAssociationTypes()))) ;
 		}
-
+		
 		// 必须属性
-		if( empty($arrAsso['model']) )
+		if( empty($arrAsso['prototype']) )
 		{
-			throw new Exception("orm %s 关联缺少 model 属性",$sType) ;
+			if( !empty($arrAsso['model']) )
+			{
+				$arrAsso['prototype'] = $arrAsso['model'] ;
+			}
+			else
+			{
+				throw new Exception("orm %s 关联缺少 prototype 属性",$sType) ;
+			}
 		}
 		
-		// 递归检查  model 值
-		if( $bNestingModel )
+		// 递归检查  prototype 值
+		if( $bNestingPrototype )
 		{
-			if( !is_array($arrAsso['model']) )
+			if( !is_array($arrAsso['prototype']) )
 			{
-				throw new Exception("orm %s 关联的 model属性要求是一个完整的 orm config",$sType) ;			
+				throw new Exception("orm %s 关联的 prototype属性要求是一个完整的 orm config",$sType) ;			
 			}
 			
-			Prototype::assertCnfValid($arrAsso['model']) ;
+			Prototype::assertCnfValid($arrAsso['prototype']) ;
 		}
 		
 		if($sType==Association::hasAndBelongsToMany)
 		{
 			if( empty($arrAsso['bridge']) )
 			{
-				throw new Exception("orm %s(%s) 缺少 bridge 属性",array($sType,$arrAsso['model'])) ;
+				throw new Exception("orm %s(%s) 缺少 bridge 属性",array($sType,$arrAsso['prototype'])) ;
 			}
 			if( empty($arrAsso['bfromk']) )
 			{
-				throw new Exception("orm %s(%s) 缺少 bfromk 属性",array($sType,$arrAsso['model'])) ;
+				throw new Exception("orm %s(%s) 缺少 bfromk 属性",array($sType,$arrAsso['prototype'])) ;
 			}
 			if( empty($arrAsso['btok']) )
 			{
-				throw new Exception("orm %s(%s) 缺少 btok 属性",array($sType,$arrAsso['model'])) ;
+				throw new Exception("orm %s(%s) 缺少 btok 属性",array($sType,$arrAsso['prototype'])) ;
 			}
 		}
 		
 		// 可选属性
 		if( empty($arrAsso['prop']) )
 		{
-			$arrAsso['prop'] = $arrAsso['model'] ;
+			$arrAsso['prop'] = $arrAsso['prototype'] ;
 		}
 
 		// 统一格式
