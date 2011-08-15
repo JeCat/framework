@@ -117,6 +117,7 @@ class Controller extends NamableComposite implements IController
     }
         
     /**
+    /**
      * @return IView
      */
     public function mainView()
