@@ -243,7 +243,7 @@ class Object implements IObject
 		return self::$arrFlyweightInstancs[$sClassName][$sKey] ;
 	}
 	
-	static private genFlyweightKey(& $keys )
+	static private function genFlyweightKey(& $keys )
 	{
 		$keys = (array)$keys ;
 		$sKey = '' ;
