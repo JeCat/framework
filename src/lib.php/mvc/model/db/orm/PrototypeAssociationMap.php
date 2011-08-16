@@ -71,7 +71,7 @@ class PrototypeAssociationMap extends Object
 								$sAssoType
 								, $arrAsso['prop']
 								, $aPrototype
-								, $this->modelPrototype($arrAsso['model'])
+								, $this->modelPrototype($arrAsso['prototype'])
 								, $arrAsso['fromk'], $arrAsso['tok']
 						) ;
 						
@@ -141,8 +141,8 @@ class PrototypeAssociationMap extends Object
 				if( array_key_exists($arrAssocCnf['prop'],$arrAssocFragment) )
 				{
 					// 递归关联
-					$arrCnf[$sAssoType][$nAssocIdx]['model']
-							 = $this->fragment($arrAssocCnf['model'],$arrAssocFragment[$arrAssocCnf['prop']],false) ;
+					$arrCnf[$sAssoType][$nAssocIdx]['prototype']
+							 = $this->fragment($arrAssocCnf['prototype'],$arrAssocFragment[$arrAssocCnf['prop']],false) ;
 
 					unset($arrAssocFragment[$arrAssocCnf['prop']]) ;
 				}

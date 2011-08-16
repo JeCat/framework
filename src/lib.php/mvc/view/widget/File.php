@@ -45,7 +45,11 @@ class File extends FormWidget{
 	}
 	
 	public function getFileUrl(){
-		return '#';
+		if($this->value() instanceof IFile){
+			return $this->value()->httpURL();
+		}else{
+			return '#';
+		}
 	}
 	
 	public function getFileSize(){
