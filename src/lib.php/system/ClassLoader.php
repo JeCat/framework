@@ -114,18 +114,29 @@ class ClassLoader extends \jc\lang\Object
 							$aClassCompiled = $aFs->findFile($sClassCompiledFolder.'/'.$sClassName.'.php') ;
 						}
 						
-						// 存在编译目录但没有的编译文件，或编译文件过期，需要重新编译
-						if( !$aClassCompiled->exists() or $aClassSource->modifyTime()>$aClassCompiled->modifyTime() or !$aClassCompiled->length() )
+						// 编译文件不存在，或编译文件过期，需要重新编译
+						if( !$aClassCompiled or $aClassSource->modifyTime()>$aClassCompiled->modifyTime() or !$aClassCompiled->length() )
 						{
-							// 编译 class 文件
-							if( !$aFs->isFolder($aClassCompiled->dirPath()) )
+							// 新建编译文件
+							if( !$aClassCompiled )
 							{
-								if( !$aFs->createFolder($aClassCompiled->dirPath()) )
+								// 新建编译文件目录
+								if( !$aFs->isFolder($sClassCompiledFolder) )
 								{
-									throw new Exception("无法编译class，创建编译目录失败：%s",$aClassCompiled->dirPath()) ;
+									if( !$aFs->createFolder($sClassCompiledFolder) )
+									{
+										throw new Exception("无法编译class，创建编译目录失败：%s",$aClassCompiled->dirPath()) ;
+									}
+								}
+								
+								// 新建文件
+								if( !$aClassCompiled = $aFs->createFile($sClassCompiledFolder.'/'.$sClassName.'.php') )
+								{
+									throw new Exception("无法编译class，新建编译文件失败：%s",$sClassCompiledFolder.'/'.$sClassName.'.php') ;
 								}
 							}
-
+							
+							// 编译 class 文件
 							$this->compiler()->compile( $aClassSource->openReader(), $aClassCompiled->openWriter() ) ;
 						}
 						

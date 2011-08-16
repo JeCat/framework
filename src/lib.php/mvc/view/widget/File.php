@@ -116,10 +116,12 @@ class File extends FormWidget{
 	
 	public function setValueFromString($sData)
 	{
-		$aFile = $this->aStoreFolder->findFile($sData) ;
-		if($aFile->exists()){
+		if($this->aStoreFolder->findFile($sData))
+		{
 			$this->setValue($aFile);
-		}else{
+		}
+		else
+		{
 			new Message(Message::error,'文件已丢失:%s',array(
 				$this->aAchiveStrategy->restoreOriginalFilename($aFile)
 			));
