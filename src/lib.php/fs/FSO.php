@@ -160,6 +160,48 @@ abstract class FSO extends Object implements IFSO
 		$this->sHttpUrl = $sHttpUrl ;
 	}
 	
+	public function copy($to)
+	{
+		if ( ( is_string($to) and $this->fileSystem()->rootFileSystem()->exists($to) ) 
+				or ( ( $to instanceof IFile or $to instanceof IFolder) and $to->exists() ) ){
+			throw new \jc\lang\Exception('复制目标已存在，无法复制');
+		}
+		if ( is_string($to) ){
+			if( $this instanceof IFile ){
+				$to = $this->fileSystem()->rootFileSystem()->createFile($to) ;
+			}else if( $this instanceof IFolder ){
+				$to = $this->fileSystem()->rootFileSystem()->createFolder($to) ;
+			}else{
+				throw new \jc\lang\Exception('this即不是IFile也不是IFolder');
+			}
+		}
+		if( $this instanceof IFile ){
+			if ( $to instanceof IFile ){
+				$aSrcReader = $this->openReader();
+				$aToWriter = $to->openWriter();
+				$iBlockSize = 8*1024;
+				while( !$aSrcReader -> isEnd() ){
+					$str = $aSrcReader->read($iBlockSize);
+					$aToWriter -> write( $str );
+				}
+			}else{
+				throw new \jc\lang\Exception('this是IFile而to不是');
+			}
+		}else if ( $this instanceof IFolder ){
+			if( $to instanceof IFolder ){
+				// todo
+			}else{
+				throw new \jc\lang\Exception('this是IFolder而to不是');
+			}
+		}else{
+				throw new \jc\lang\Exception('this即不是IFile也不是IFolder');
+		}
+	}
+	public function move($to){
+		copy($to);
+		$this->delete();
+	}
+	
 	private $sInnerPath = "" ;
 	private $aFileSystem ;
 	private $sName = "" ;
