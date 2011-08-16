@@ -47,9 +47,9 @@ class LocalFolder extends LocalFSO implements IFolder
 	/**
 	 * @return \Iterator
 	 */
-	public function iterator()
+	public function iterator($nFlag=\jc\fs\FSIterator::FLAG_DEFAULT)
 	{
-		return new LocalFolderIterator($this);
+		return new LocalFolderIterator($this,$nFlag);
 	}
 	
 	public function exists()
