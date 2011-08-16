@@ -6,14 +6,14 @@ interface IFile extends IFSO
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return io\IOutputStream
+	 * @return jc\io\IOutputStream
 	 */
 	public function openWriter() ;
 	
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return io\IInputStream
+	 * @return jc\io\IInputStream
 	 */
 	public function openReader() ;
 	

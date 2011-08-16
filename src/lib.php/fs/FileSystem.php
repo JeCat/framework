@@ -1,10 +1,9 @@
 <?php
 namespace jc\fs ;
 
-use jc\lang\Exception;
-
 use jc\lang\Type;
 
+use jc\lang\Exception;
 use jc\lang\Object;
 
 abstract class FileSystem extends Object
@@ -19,6 +18,11 @@ abstract class FileSystem extends Object
 	 */
 	protected function localeFileSystem($sPath,$bRecurse=false)
 	{		
+		if( !is_string($sPath) )
+		{
+			throw new Exception("参数\$sPath必须为string格式，传入的格式为：%s",Type::detectType($sPath)) ;
+		}
+		
 		// 统一为绝对路径
 		if(substr($sPath,0,1)!='/')
 		{

@@ -1,7 +1,6 @@
 <?php
 namespace jc\resrc ;
 
-use jc\resrc\UrlResourceManager;
 use jc\lang\Exception;
 use jc\lang\Object;
 
@@ -10,12 +9,12 @@ class HtmlResourcePool extends Object
 	const 	RESRC_JS = 1 ;
 	const 	RESRC_CSS = 2 ;
 	
-	public function __construct(UrlResourceManager $aJsManager=null, UrlResourceManager $aCssManager=null)
+	public function __construct(ResourceManager $aJsManager=null, ResourceManager $aCssManager=null)
 	{
 		parent::__construct() ;
 		
-		$this->aJsManager = $aJsManager? $aJsManager: new UrlResourceManager() ;
-		$this->aCssManager = $aCssManager? $aCssManager: new UrlResourceManager() ;
+		$this->aJsManager = $aJsManager? $aJsManager: new ResourceManager() ;
+		$this->aCssManager = $aCssManager? $aCssManager: new ResourceManager() ;
 		
 		$this->addRequire('jc:style.css',self::RESRC_CSS) ;
 		
