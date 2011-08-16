@@ -66,7 +66,7 @@ class LocalFile extends LocalFSO implements IFile
 	
 	public function includeFile($bOnce=false,$bRequire=false)
 	{
-		if($bRequire)
+		if(!$bRequire)
 		{
 			if($bOnce)
 			{
@@ -107,5 +107,9 @@ class LocalFile extends LocalFSO implements IFile
 		return true ;
 	}
 
+	public function exists()
+	{
+		return is_file($this->localPath());
+	}
 }
 ?>

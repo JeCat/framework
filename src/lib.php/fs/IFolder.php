@@ -26,7 +26,7 @@ interface IFolder extends IFSO
 	/**
 	 * @return \Iterator
 	 */
-	public function iterator() ;
+	public function iterator($nFlag=FSIterator::FLAG_DEFAULT) ;
 }
 
 ?>

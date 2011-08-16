@@ -97,93 +97,48 @@ abstract class LocalFSO extends FSO
 	{
 		return false ;
 	}
-	
-	public function exists()
-	{
-		return file_exists($this->sLocalPath) ;
-	}
 
 	public function copy($to)
 	{
-		if( $to instanceof IFolder )
-		{
-			$aToFSO = $to->findFolder( $this->name() ) ;
+		if ( ( is_string($to) and $this->fileSystem()->rootFileSystem()->exists($to) ) 
+				or ( ( $to instanceof IFile or $to instanceof IFolder) and $to->exists() ) ){
+			throw new \jc\lang\Exception('复制目标已存在，无法复制');
 		}
-		else if( is_string($to) )
-		{
-			$aToFSO = $this->fileSystem()->rootFileSystem()->find($to) ;
-		}
-		else 
-		{
-			throw new Exception('参数$from必须为 jc\\fs\\IFSO 或 表示路径的字符串格式，传入的参数格式为 %s',Type::detectType($to)) ;
-		}
-		
-		// 同为 LocalFileSystem ，可直接 copy
-		if( $aToFSO instanceof LocalFSO )
-		{
-			if( copy($this->localPath(),$aToFSO->localPath()) )
-			{
-				return $aToFSO ;
-			}
-			else 
-			{
-				return null ;
+		if ( is_string($to) ){
+			if( $this instanceof IFile ){
+				$to = $this->fileSystem()->rootFileSystem()->createFile($to) ;
+			}else if( $this instanceof IFolder ){
+				$to = $this->fileSystem()->rootFileSystem()->createFolder($to) ;
+			}else{
+				throw new \jc\lang\Exception('this即不是IFile也不是IFolder');
 			}
 		}
-	
-		// 不同类型文件系统之间的操作
-		else 
-		{
-			// todo
+		if( $this instanceof IFile and $to instanceof IFile and $to instanceof LocalFSO ){
+			copy($this->localPath(),$to->localPath());
+		}else{
+			parent::copy($to);
 		}
 	}
 	
 	public function move($to)
 	{
-		$sLocalFile = $this->localPath() ;
-		
-		if( !file_exists($sLocalFile) )
-		{
-			return false ;
+		if ( ( is_string($to) and $this->fileSystem()->rootFileSystem()->exists($to) ) 
+				or ( ( $to instanceof IFile or $to instanceof IFolder) and $to->exists() ) ){
+			throw new \jc\lang\Exception('复制目标已存在，无法复制');
 		}
-		
-		if( $to instanceof IFolder )
-		{
-			$aToFSO = $to->findFolder( $this->name() ) ;
-		}
-		else if( is_string($to) )
-		{
-			$aToFSO = $this->fileSystem()->rootFileSystem()->find($to) ;
-		}
-		else 
-		{
-			throw new Exception('参数$from必须为 jc\\fs\\IFSO 或 表示路径的字符串格式，传入的参数格式为 %s',Type::reflectType($to)) ;
-		}
-		
-		// 同为 LocalFileSystem ，可直接 copy
-		if( $aToFSO instanceof LocalFSO )
-		{
-			
-			if( is_uploaded_file($sLocalFile)?								// 如果正在移动的文件是一个来自用户上传的文件，则使用 move_uploaded_file() 移动此文件
-					move_uploaded_file($sLocalFile,$aToFSO->localPath()):
-					rename($sLocalFile,$aToFSO->localPath())
-			)
-			{
-				// 从原来的文件系统中移除
-				$this->fileSystem()->setFSOFlyweight($this->innerPath(),null) ;
-				
-				return $aToFSO ;
-			}
-			else 
-			{
-				return null ;
+		if ( is_string($to) ){
+			if( $this instanceof IFile ){
+				$to = $this->fileSystem()->rootFileSystem()->createFile($to) ;
+			}else if( $this instanceof IFolder ){
+				$to = $this->fileSystem()->rootFileSystem()->createFolder($to) ;
+			}else{
+				throw new \jc\lang\Exception('this即不是IFile也不是IFolder');
 			}
 		}
-	
-		// 不同类型文件系统之间的操作
-		else 
-		{
-			// todo
+		if( $this instanceof IFile and $to instanceof IFile and $to instanceof LocalFSO ){
+			rename($this->localPath(),$to->localPath());
+		}else{
+			parent::move($to);
 		}
 	}
 	
