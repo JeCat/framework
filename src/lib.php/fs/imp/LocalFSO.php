@@ -3,7 +3,7 @@
 namespace jc\fs\imp ;
 
 use jc\fs\IFolder;
-
+use jc\fs\IFile;
 use jc\lang\Type;
 
 use jc\lang\Exception;

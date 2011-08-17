@@ -101,14 +101,13 @@ class File extends FormWidget{
 		$aSavedFile = $this->aAchiveStrategy->makeFile($this->aUploadedFile,$this->aStoreFolder);
 		
 		// 创建保存目录
-		$aFolderOfSavedFile = $aSavedFile->directory();
-		if(!$aFolderOfSavedFile->exists()){
-			if(!$aFolderOfSavedFile->create()){
+		if(!$aFolderOfSavedFile = $this->application()->fileSystem()->findFolder($aSavedFile)){
+			if(! $this->application()->fileSystem()->createFolder($aSavedFile)){
 				throw new Exception ( __CLASS__ . "的" . __METHOD__ . "在创建路径\"%s\"时出错" ,array($this->aStoreFolder->path()));
 			}
 		}
 		
-		$aSavedFile = $this->aUploadedFile->move($aSavedFile->path()) ;
+		$aSavedFile = $this->aUploadedFile->move($aSavedFile . $this->aAchiveStrategy->makeFilename($this->aUploadedFile)) ;
 		$this->setValue($aSavedFile) ;
 		
 		return $aSavedFile ;
