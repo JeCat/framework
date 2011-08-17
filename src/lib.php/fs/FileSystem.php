@@ -308,7 +308,7 @@ abstract class FileSystem extends Object
 		// 是否在挂载的文件系统中
 		list($aMountFS,$sInnerPath) = $this->localeFileSystem($sPath) ;
 		if($aMountFS!==$this){
-			return $aMountFS->createFolder($sInnerPath,$nMode,$bRecursive) ;
+			return $aMountFS->createFolder($sInnerPath,$nMode) ;
 		}
 
 		// 检查享元对象及类型是否匹配
