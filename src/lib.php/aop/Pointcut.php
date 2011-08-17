@@ -6,31 +6,60 @@ use jc\lang\Object;
 
 class Pointcut extends Object
 {
-	const around = 'around' ;
-	const before = 'before' ;
-	const after = 'after' ;
-	
-	static private $arrTypes = array(
-		self::around, self::before, self::after
-	) ;
-	
-	public function __construct($fnAdvice,$type=self::around,$jointPoints=array())
-	{
-		$this->fnAdvice = $fnAdvice ;
-	}
-
 	public function addJointPoint(JointPoint $aJointPoint)
 	{
 		
 	}
 	
-	public function iteratorJointPoints()
+	public function removeJointPoint(JointPoint $aJointPoint)
+	{
+		
+	}
+	
+	/**
+	 * @return \Iterator
+	 */
+	public function jointPointIterator()
 	{
 		return new ArrayIterator($this->arrJointPoints) ;
 	}
 	
-	private $fnAdvice ;
-	private $arrJointPoints ;
+	public function clearJointPoints()
+	{
+		
+	}
+	
+	public function addAdvice(Advice $aAdvice)
+	{
+		
+	}
+	
+	public function hasAdvice($sFnName)
+	{
+		
+	}
+	
+	public function removeAdvice($sFnName)
+	{
+		
+	}
+	
+	/**
+	 * @return \Iterator
+	 */
+	public function adviceIterator()
+	{
+		return new ArrayIterator($this->arrAdvices) ;
+	}
+	
+	public function clearAdvices()
+	{
+		
+	}
+	
+	private $arrJointPoints = array() ;
+	
+	private $arrAdvices = array() ;
 }
 
 ?>
