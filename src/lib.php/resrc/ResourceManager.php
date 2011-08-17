@@ -43,6 +43,11 @@ class ResourceManager extends Object implements IResourceManager
 	 */
 	public function find($sFilename,$sNamespace='*')
 	{
+		if( $sNamespace=='*' and strstr($sFilename,':')!==false )
+		{
+			list($sNamespace,$sFilename) = explode(':', $sFilename, 2) ;
+		}
+		
 		if( empty($this->arrFolders[$sNamespace]) )
 		{
 			return ;

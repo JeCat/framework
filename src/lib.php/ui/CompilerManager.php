@@ -3,8 +3,6 @@ namespace jc\ui ;
 
 use jc\lang\Exception;
 use jc\lang\Object as JcObject;
-use jc\fs\File;
-use jc\fs\Dir;
 use jc\fs\IFile;
 
 class CompilerManager extends JcObject
@@ -56,12 +54,15 @@ class CompilerManager extends JcObject
 	{
 		$this->aCompilingStatus = $aCompilingStatus ;
 		
-		$aFile = $this->createCompiledFile($aCompilingStatus->compiledFilepath()) ;
-		if(!$aFile)
+		$aFile = $aCompilingStatus->compiledFile() ;
+		if( !$aFile->exists() )
 		{
-			return false ;
+			if( !$aFile->create() )
+			{
+				throw new Exception("无法为 UI 创建编译文件：%s",$aFile->url()) ;
+			}
 		}
-		
+
 		$aWriter = $aFile->openWriter(false) ;
 		if(!$aWriter)
 		{
@@ -82,22 +83,21 @@ class CompilerManager extends JcObject
 		$this->aCompilingStatus = null ;
 	}
 	
-	/**
-	 * return IFile
-	 */
-	public function createCompiledFile($sCompiledPath)
+	public function createCompiledFile(IFile $aCompiledFile)
 	{
-		$sCompiledDir = dirname($sCompiledPath) ;
-		
-		if( !is_dir($sCompiledDir) )
+		$aCompiledsDir = $aCompiledFile->directory() ;
+		if( !$aCompiledsDir->exists() )
 		{
-			if( !Dir::mkdir($sCompiledDir,0777,true) )
+			if( !$aCompiledsDir->create() )
 			{
-				throw new Exception("无法创建编译文件目录：%s",array($sCompiledDir)) ;
+				throw new Exception("无法创建编译文件目录：%s",$aCompiledsDir->url()) ;
 			}
 		}
 
-		return new File($sCompiledPath) ;
+		if( !$aCompiledFile->exists() )
+		{
+			$aCompiledFile->create() ;
+		}
 	}
 	
 	/**

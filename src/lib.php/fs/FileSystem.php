@@ -12,42 +12,13 @@ abstract class FileSystem extends Object
 	const folder = 'jc\\fs\\IFolder' ;
 	const unknow = 0 ;
 	
-	/**
-	 * 定位一个路径具体所属的文件系统
-	 * 返回所属的文件系统对象 和 在该文件系统对象内部的路径
-	 */
-	protected function localeFileSystem($sPath,$bRecurse=false)
-	{		
-		if( !is_string($sPath) )
-		{
-			throw new Exception("参数\$sPath必须为string格式，传入的格式为：%s",Type::detectType($sPath)) ;
-		}
-		
-		// 统一为绝对路径
-		if(substr($sPath,0,1)!='/')
-		{
-			$sPath = '/'.$sPath ;
-		}
-		
-		foreach($this->arrMounteds as $sMountPoint=>$aFileSystem)
-		{
-			$nMountPointLen = strlen($sMountPoint) ;
-			if( substr($sPath,0,$nMountPointLen)==$sMountPoint and (strlen($sPath)==$nMountPointLen or substr($sPath,$nMountPointLen,1)=='/') )
-			{
-				if($bRecurse)
-				{
-					return $this->localeFileSystem($aFileSystem,substr($sPath,$nMountPointLen)) ;
-				}
-				else 
-				{
-					return array($aFileSystem,substr($sPath,$nMountPointLen)) ;
-				}
-			}
-		}
-		
-		return array($this,$sPath) ;
-	}
-
+	const CREATE_RECURSE_DIR = 020000 ;		// 创建文件或目录时，递归创建所属的目录
+	const CREATE_ONLY_OBJECT = 040000 ;		// 只创建IFSO对象，不创建文件/目录，如果文件/目录不存在
+	
+	const CREATE_FILE_DEFAULT = 020644 ; 	// CREATE_RECURSE_DIR | 0644
+	const CREATE_FOLDER_DEFAULT = 020755 ; 	// CREATE_RECURSE_DIR | 0755
+	const CREATE_PERM_BITS = 0777 ;
+	
 	/**
 	 * @return IFSO
 	 * @retval $type参数		不存在	存在为File	存在为Folder
@@ -105,6 +76,46 @@ abstract class FileSystem extends Object
 	{
 		return $this->find($sPath,self::folder) ;
 	}
+	
+	/**
+	 * @return IFolder
+	 */
+	public function directory(IFSO $aFSO)
+	{
+		if( $aFSO->fileSystem()!==$this )
+		{
+			throw new Exception(
+					"传入的 \$aFSO（%s） 对象不属于此文件系统。"
+					, array($aFSO->path(),$this->url())
+			) ;
+		}
+		
+		$sInnerPath = $aFSO->innerPath() ;
+		
+		if($sInnerPath=='/')
+		{
+			$aFSO = $this->mounted() ;
+			if( $aFSO )
+			{
+				return $aFSO->directory() ;
+			}
+			else 
+			{
+				return null ;
+			}
+		}
+		
+		$sInnerDirPath = dirname($sInnerPath) ;
+		
+		// 如果当前 FSO 对象是通过 FileSystem::CREATE_ONLY_OBJECT 标记创建的，上层目录可能并不存在，
+		// 在这种情况下，也返回一个 FileSystem::CREATE_ONLY_OBJECT 创建的 IFolder 对象
+		if( !$aDirectory=$this->findFolder($sInnerDirPath) )
+		{
+			$aDirectory = $aRootFs->createFolder($sInnerDirPath,FileSystem::CREATE_ONLY_OBJECT|FileSystem::CREATE_FOLDER_DEFAULT) ;
+		}
+		
+		return $aDirectory ;
+	}
 
 	public function setFSOFlyweight($sPath,IFSO $aFSO=null)
 	{	
@@ -137,7 +148,13 @@ abstract class FileSystem extends Object
 	{
 		$sPath = self::formatPath($sPath) ;
 		
-		$aFileSystem->beMounted($this,$sPath) ;
+		if(!$aToFSO = $this->find($sPath))
+		{
+			$aToFSO = $this->createFolder($sPath,self::CREATE_ONLY_OBJECT) ;	
+		}
+		
+		$aFileSystem->mountTo($aToFSO) ;
+		
 		$this->arrMounteds[$sPath] = $aFileSystem ;
 	}
 
@@ -145,7 +162,7 @@ abstract class FileSystem extends Object
 	{
 		if( isset($this->arrMounteds[$sPath]) )
 		{
-			$this->arrMounteds[$sPath]->beMounted(null,'/') ;
+			$this->arrMounteds[$sPath]->mountTo(null) ;
 			unset($this->arrMounteds[$sPath]) ;
 		}
 	}
@@ -248,7 +265,7 @@ abstract class FileSystem extends Object
 	 * 如果存在同名Folder，会抛出异常
 	 * 如果存在同名File，会直接返回；否则会创建此File后返回。
 	 */
-	public function createFile($sPath,$nMode=0644)
+	public function createFile($sPath,$nMode=self::CREATE_FILE_DEFAULT)
 	{
 		// 是否在挂载的文件系统中
 		list($aMountFS,$sInnerPath) = $this->localeFileSystem($sPath) ;
@@ -259,13 +276,20 @@ abstract class FileSystem extends Object
 		// 检查享元对象及类型是否匹配
 		$sFlyweightKey = $this->fsoFlyweightKey($sPath) ;
 		if( !isset($this->arrFSOFlyweights[$sFlyweightKey]) 
-				or ! $this->arrFSOFlyweights[$sFlyweightKey] instanceof IFile ){
-			if( $this->isFolder($sPath) ){
+				or ! $this->arrFSOFlyweights[$sFlyweightKey] instanceof IFile )
+		{
+			if( $this->isFolder($sPath) )
+			{
 				throw new Exception('试图创建File，但由于存在同名Folder无法创建');
-			}else{
+			}
+			else
+			{
 				$aFile = $this->createFileObject($sPath);
-				if( !$aFile -> exists()){
-					$aFile -> create( $nMode );
+				
+				// 如果文件不存在，且没有要求 self::CREATE_ONLY_OBJECT ，则创建之
+				if( !($nMode&self::CREATE_ONLY_OBJECT) and !$aFile->exists())
+				{
+					$aFile->create( $nMode );
 				}
 				$this -> arrFSOFlyweights[$sFlyweightKey] =$aFile;
 			}
@@ -279,7 +303,7 @@ abstract class FileSystem extends Object
 	 * 如果存在同名File，会抛出异常
 	 * 如果存在同名Folder，会直接返回；否则会创建此Folder后返回。
 	 */
-	public function createFolder($sPath,$nMode=0755,$bRecursive=true)
+	public function createFolder($sPath,$nMode=self::CREATE_FOLDER_DEFAULT)
 	{
 		// 是否在挂载的文件系统中
 		list($aMountFS,$sInnerPath) = $this->localeFileSystem($sPath) ;
@@ -290,17 +314,24 @@ abstract class FileSystem extends Object
 		// 检查享元对象及类型是否匹配
 		$sFlyweightKey = $this->fsoFlyweightKey($sPath) ;
 		if( !isset($this->arrFSOFlyweights[$sFlyweightKey]) 
-				or ! $this->arrFSOFlyweights[$sFlyweightKey] instanceof IFolder ){
-			if( $this->isFile($sPath) ){
+				or ! $this->arrFSOFlyweights[$sFlyweightKey] instanceof IFolder )
+		{
+			if( $this->isFile($sPath) )
+			{
 				throw new Exception('试图创建Folder，但由于存在同名File无法创建');
-			}else{
+			}
+			else
+			{
 				$aFolder = $this->createFolderObject($sPath);
-				if( !$aFolder -> exists()){
-					if( !$aFolder -> create( $nMode ,$bRecursive) )
+				
+				if( !($nMode&self::CREATE_ONLY_OBJECT) and !$aFolder->exists())
+				{
+					if( !$aFolder->create($nMode) )
 					{
 						return null;
 					}
 				}
+				
 				$this -> arrFSOFlyweights[$sFlyweightKey] =$aFolder;
 			}
 		}
@@ -349,10 +380,94 @@ abstract class FileSystem extends Object
 		
 		return true ;
 	}
+	
+	/**
+	 * @return FileSystem
+	 */
+	public function mounted()
+	{
+		return $this->aMounted ;
+	}
+	
+	public function mountedPath()
+	{
+		return $this->aMounted? $this->aMounted->path(): null ;
+	}
+
+	/**
+	 * @return FileSystem
+	 */
+	public function rootFileSystem()
+	{
+		$aFileSystem = $this ;
+		
+		while( $aMounted=$aFileSystem->mounted() )
+		{
+			$aFileSystem = $aMounted->fileSystem() ;
+		}
+		
+		return $aFileSystem ;
+	}
+
+	function isCaseSensitive()
+	{
+		return $this->bCaseSensitive ;
+	}
+	
+	function setCaseSensitive($bCaseSensitive=true)
+	{
+		return $this->bCaseSensitive = $bCaseSensitive ;
+	}
 		
 	abstract public function iterator($sPath) ;
+	
+	abstract public function url() ;
 		
+	
+	
 	////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * 定位一个路径具体所属的文件系统
+	 * 返回所属的文件系统对象 和 在该文件系统对象内部的路径
+	 */
+	protected function localeFileSystem($sPath,$bRecurse=false)
+	{		
+		if( !is_string($sPath) )
+		{
+			throw new Exception("参数\$sPath必须为string格式，传入的格式为：%s",Type::detectType($sPath)) ;
+		}
+		
+		// 统一为绝对路径
+		if(substr($sPath,0,1)!='/')
+		{
+			$sPath = '/'.$sPath ;
+		}
+		
+		foreach($this->arrMounteds as $sMountPoint=>$aFileSystem)
+		{
+			$nMountPointLen = strlen($sMountPoint) ;
+			if( substr($sPath,0,$nMountPointLen)==$sMountPoint and (strlen($sPath)==$nMountPointLen or substr($sPath,$nMountPointLen,1)=='/') )
+			{
+				if($bRecurse)
+				{
+					return $this->localeFileSystem($aFileSystem,substr($sPath,$nMountPointLen)) ;
+				}
+				else 
+				{
+					return array($aFileSystem,substr($sPath,$nMountPointLen)) ;
+				}
+			}
+		}
+		
+		return array($this,$sPath) ;
+	}
+	
+	protected function mountTo(IFSO $aMounted=null)
+	{
+		$this->aMounted = $aMounted ;
+	}
+	
 	abstract protected function deleteFileOperation(&$sPath) ;
 	
 	abstract protected function deleteDirOperation(&$sPath) ;
@@ -366,50 +481,6 @@ abstract class FileSystem extends Object
 	abstract protected function isFileOperation(&$sPath) ;
 	
 	abstract protected function isFolderOperation(&$sPath) ;
-	
-	public function mountPath()
-	{
-		return $this->sMountPath ;
-	}
-	
-	/**
-	 * @return FileSystem
-	 */
-	public function parentFileSystem()
-	{
-		return $this->aParentFileSystem ;
-	}
-
-	/**
-	 * @return FileSystem
-	 */
-	public function rootFileSystem()
-	{
-		$aFileSystem = $this ;
-		
-		while( $aParent=$aFileSystem->parentFileSystem() )
-		{
-			$aFileSystem = $aParent ;
-		}
-		
-		return $aFileSystem ;
-	}
-	
-	protected function beMounted(self $aParentFileSystem=null,$sPath)
-	{
-		$this->sMountPath = $sPath ;
-		$this->aParentFileSystem = $aParentFileSystem ;
-	}
-
-	function isCaseSensitive()
-	{
-		return $this->bCaseSensitive ;
-	}
-	
-	function setCaseSensitive($bCaseSensitive=true)
-	{
-		return $this->bCaseSensitive = $bCaseSensitive ;
-	}
 
 	static public function formatPath($sPath,$sPathSeparator=DIRECTORY_SEPARATOR)
 	{
@@ -462,7 +533,7 @@ abstract class FileSystem extends Object
 	private $arrMounteds = array() ;
 	private $bCaseSensitive = true ;
 	private $sMountPath = '/' ;
-	private $aParentFileSystem = null ;
+	private $aMounted = null ;
 	private $arrFSOFlyweights = array() ;
 }
 

@@ -20,6 +20,11 @@ class LocalFileSystem extends FileSystem
 		return $this->sLocalPath ;
 	}
 	
+	public function url()
+	{
+		return 'file://' . $this->localPath() ;
+	}
+	
 	/////////////////////////////////////////////////////////////////////////
 	
 	protected function existsOperation(&$sPath)

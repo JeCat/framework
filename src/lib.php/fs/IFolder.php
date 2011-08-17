@@ -16,12 +16,12 @@ interface IFolder extends IFSO
 	/**
 	 * @return IFile
 	 */
-	public function createFile($sPath) ;
+	public function createFile($sPath,$nMode=FileSystem::CREATE_FILE_DEFAULT) ;
 	
 	/**
 	 * @return IFolder
 	 */
-	public function createFolder($sPath) ;
+	public function createFolder($sPath,$nMode=FileSystem::CREATE_FOLDER_DEFAULT) ;
 	
 	/**
 	 * @return \Iterator

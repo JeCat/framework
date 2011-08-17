@@ -131,8 +131,9 @@ class HtmlResourcePool extends Object
 		try {
 			foreach($this->iterator(self::RESRC_JS,false) as $sFilename)
 			{
-				if( $sUrl = $this->aJsManager->find($sFilename) )
+				if( $aFile = $this->aJsManager->find($sFilename) )
 				{
+					$sUrl = $aFile->httpUrl() ;
 					$sRet.= "<script type=\"text/javascript\" src=\"{$sUrl}\"></script>\r\n" ;
 				}
 				else 
@@ -142,8 +143,9 @@ class HtmlResourcePool extends Object
 			}
 			foreach($this->iterator(self::RESRC_CSS,false) as $sFilename)
 			{
-				if( $sUrl = $this->aCssManager->find($sFilename) )
+				if( $aFile = $this->aCssManager->find($sFilename) )
 				{
+					$sUrl = $aFile->httpUrl() ;
 					$sRet.= "<link rel=\"stylesheet\" type=\"text/css\" href=\"{$sUrl}\" />\r\n" ;
 				}
 				else 

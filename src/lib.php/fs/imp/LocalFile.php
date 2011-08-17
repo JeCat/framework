@@ -1,6 +1,8 @@
 <?php
 namespace jc\fs\imp ;
 
+use jc\fs\FileSystem;
+
 use jc\lang\Type;
 
 use jc\lang\Exception;
@@ -91,9 +93,25 @@ class LocalFile extends LocalFSO implements IFile
 		}
 	}
 	
-	public function create($nMode=0644)
+	public function create($nMode=FileSystem::CREATE_FOLDER_DEFAULT)
 	{
 		$sLocalPath = $this->localPath() ;
+		
+		$sLocalDirPath = dirname($sLocalPath) ;
+		if( !is_dir($sLocalDirPath) )
+		{
+			if( $nMode & FileSystem::CREATE_RECURSE_DIR )
+			{
+				if( !mkdir($sLocalDirPath,0755,true) )
+				{
+					return false ;
+				}
+			}
+			else 
+			{
+				return false ;
+			}
+		}
 		
 		if( !$hHandle=fopen($sLocalPath,'w') )
 		{
@@ -102,7 +120,10 @@ class LocalFile extends LocalFSO implements IFile
 		
 		fclose($hHandle) ;
 		
-		chmod($sLocalPath, $nMode) ;
+		if( $this->perms()!=$nMode&FileSystem::CREATE_PERM_BITS and $this->canWrite() )
+		{
+			chmod( $sLocalPath, $nMode&FileSystem::CREATE_PERM_BITS ) ;
+		}
 		
 		return true ;
 	}

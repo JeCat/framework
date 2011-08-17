@@ -1,6 +1,8 @@
 <?php
 namespace jc\ui ;
 
+use jc\fs\IFile;
+
 use jc\pattern\composite\Container;
 use jc\util\String;
 use jc\ui\Object as UIObject;
@@ -31,14 +33,14 @@ class InterpreterManager extends Container
 	/**
 	 * @return IObject
 	 */
-	public function parse($sSourcePath)
+	public function parse(IFile $aSourceFile)
 	{
-		$aSource = String::createFromFile($sSourcePath) ;
+		$aSource = String::createFromFile($aSourceFile) ;
 		$aObjectContainer = new UIObject() ;
 		
 		foreach($this->iterator() as $aInterpreter)
 		{
-			$aInterpreter->parse($aSource,$aObjectContainer,$sSourcePath) ;
+			$aInterpreter->parse($aSource,$aObjectContainer,$aSourceFile) ;
 		}
 		
 		return $aObjectContainer ;
