@@ -30,7 +30,7 @@ class ClassLoader extends \jc\lang\Object
 	public function addPackage($sNamespace,$sCompiledFolder,$sFolder=null) 
 	{
 		$aFs = $this->application()->fileSystem() ;
-		if( !$aFs->exists($sCompiledFolder) )
+		if( $sCompiledFolder and !$aFs->exists($sCompiledFolder) )
 		{
 			if( !$aFs->createFolder($sCompiledFolder) )
 			{
