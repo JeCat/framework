@@ -17,6 +17,9 @@ class ClassDefine extends Token
 		$this->setBelongsClass($this) ;
 	}
 	
+	/**
+	 * 返回正在定义的class的包括命名控件的完整名称
+	 */
 	public function fullName()
 	{
 		$aNamespace = $this->belongsNamespace() ;
@@ -29,24 +32,39 @@ class ClassDefine extends Token
 			return $this->name() ;
 		}
 	}
-
+	/**
+	 * 返回正在定义的class的名称
+	 */
 	public function name()
 	{
 		return $this->aTokenName->sourceCode() ;
 	}
 	
+	/**
+	 * 返回定义class名称的token
+	 */
 	public function nameToken()
 	{
 		return $this->aTokenName ;
 	}
+	/**
+	 * 设置定义class名称的token
+	 */
 	public function setNameToken(Token $aTokenName)
 	{
 		$this->aTokenName = $aTokenName ;
 	}
+	
+	/**
+	 * 返回class body 开始的大括号token
+	 */
 	public function bodyToken()
 	{
 		return $this->aTokenBody ;
 	}
+	/**
+	 * 设置class body 开始的大括号token
+	 */
 	public function setBodyToken(ClosureToken $aTokenBody)
 	{
 		$this->aTokenBody = $aTokenBody ;
