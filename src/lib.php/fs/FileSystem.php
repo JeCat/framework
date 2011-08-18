@@ -61,7 +61,7 @@ abstract class FileSystem extends Object
 
 	/**
 	 * @return IFile
-	 * @sa find()
+	 * @see find()
 	 */
 	public function findFile($sPath)
 	{
@@ -70,7 +70,7 @@ abstract class FileSystem extends Object
 
 	/**
 	 * @return IFolder
-	 * @sa find()
+	 * @see find()
 	 */
 	public function findFolder($sPath)
 	{
@@ -78,7 +78,8 @@ abstract class FileSystem extends Object
 	}
 	
 	/**
-	 * @return IFolder
+	 * 返回$aFSO所在的目录
+	 * @return IFolder 。$aFSO在这个目录下。
 	 */
 	public function directory(IFSO $aFSO)
 	{
@@ -382,7 +383,7 @@ abstract class FileSystem extends Object
 	}
 	
 	/**
-	 * @return FileSystem
+	 * @return IFSO
 	 */
 	public function mounted()
 	{
@@ -432,7 +433,7 @@ abstract class FileSystem extends Object
 	 * 返回所属的文件系统对象 和 在该文件系统对象内部的路径
 	 */
 	protected function localeFileSystem($sPath,$bRecurse=false)
-	{		
+	{
 		if( !is_string($sPath) )
 		{
 			throw new Exception("参数\$sPath必须为string格式，传入的格式为：%s",Type::detectType($sPath)) ;
@@ -449,13 +450,15 @@ abstract class FileSystem extends Object
 			$nMountPointLen = strlen($sMountPoint) ;
 			if( substr($sPath,0,$nMountPointLen)==$sMountPoint and (strlen($sPath)==$nMountPointLen or substr($sPath,$nMountPointLen,1)=='/') )
 			{
+				$str=substr($sPath,$nMountPointLen);
+				if(!$str) $str='/';
 				if($bRecurse)
 				{
-					return $this->localeFileSystem($aFileSystem,substr($sPath,$nMountPointLen)) ;
+					return $this->localeFileSystem($aFileSystem,$str) ;
 				}
 				else 
 				{
-					return array($aFileSystem,substr($sPath,$nMountPointLen)) ;
+					return array($aFileSystem,$str);
 				}
 			}
 		}

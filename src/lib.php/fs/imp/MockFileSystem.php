@@ -7,6 +7,9 @@ class MockFileSystem extends FileSystem{
 	public function iterator($sPath){
 		//echo "Mock:iterator $sPath\n";
 	}
+	public function url(){
+		return "";
+	}
 	protected function deleteFileOperation(&$sPath){
 		//echo "Mock:deleteFileOperation $sPath\n";
 	}

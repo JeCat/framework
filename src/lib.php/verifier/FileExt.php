@@ -22,7 +22,7 @@ class FileExt extends Object implements IVerifier {
 		}else{
 			$this->arrExt = $arrExt;
 		}
-		$bAllow = (boolean)$bAllow;
+		$this->bAllow = (boolean)$bAllow;
 	}
 	
 	public function verify($data, $bThrowException) {
