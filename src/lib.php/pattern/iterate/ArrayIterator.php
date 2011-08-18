@@ -3,7 +3,7 @@ namespace jc\pattern\iterate ;
 
 use jc\lang\Object;
 
-class ArrayIterator extends Object implements INonlinearIterator
+class ArrayIterator extends Object implements INonlinearIterator, IReversableIterator
 {
 	public function __construct(array $array)
 	{
