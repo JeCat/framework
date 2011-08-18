@@ -100,22 +100,25 @@ abstract class LocalFSO extends FSO
 
 	public function copy($to)
 	{
-		if ( ( is_string($to) and $this->fileSystem()->rootFileSystem()->exists($to) ) 
-				or ( ( $to instanceof IFile or $to instanceof IFolder) and $to->exists() ) ){
-			throw new \jc\lang\Exception('复制目标已存在，无法复制');
-		}
-		if ( is_string($to) ){
-			if( $this instanceof IFile ){
-				$to = $this->fileSystem()->rootFileSystem()->createFile($to) ;
-			}else if( $this instanceof IFolder ){
-				$to = $this->fileSystem()->rootFileSystem()->createFolder($to) ;
+		if( $this instanceof IFile ){
+			if( is_string($to) ){
+				$toFSO = $this->fileSystem()->rootSystem()->createFile( $to ,FileSystem::CREATE_ONLY_OBJECT) ;
+			}else if($to instanceof FSO){
+				$toFSO = $to;
 			}else{
-				throw new \jc\lang\Exception('this即不是IFile也不是IFolder');
+				return parent::copy($to);
 			}
-		}
-		if( $this instanceof IFile and $to instanceof IFile and $to instanceof LocalFSO ){
-			copy($this->localPath(),$to->localPath());
-			return $to;
+			if( $toFSO -> exists() ){
+				throw new \jc\lang\Exception('复制目标已存在，无法复制');
+			}
+			if($toFSO instanceof IFile and $toFSO instanceof LocalFSO ){
+				// php 原生copy函数：如果目标文件已存在，将会被覆盖。
+				// http://http://www.php.net/manual/zh/function.copy.php
+				copy($this->localPath(),$toFSO->localPath());
+				return $toFSO;
+			}else{
+				return parent::copy($to);
+			}
 		}else{
 			return parent::copy($to);
 		}
@@ -123,24 +126,25 @@ abstract class LocalFSO extends FSO
 	
 	public function move($to)
 	{
-		if ( ( is_string($to) and $this->fileSystem()->rootFileSystem()->exists($to) ) 
-				or ( ( $to instanceof IFile or $to instanceof IFolder) and $to->exists() ) ){
-			throw new \jc\lang\Exception('复制目标已存在，无法复制');
-		}
-		if ( is_string($to) ){
-			if( $this instanceof IFile ){
-				$to = $this->fileSystem()->rootFileSystem()->createFile($to) ;
-			}else if( $this instanceof IFolder ){
-				$to = $this->fileSystem()->rootFileSystem()->createFolder($to) ;
+		if( $this instanceof IFile ){
+			if( is_string($to) ){
+				$toFSO = $this->fileSystem()->rootSystem()->createFile( $to ,FileSystem::CREATE_ONLY_OBJECT) ;
+			}else if($to instanceof FSO){
+				$toFSO = $to;
 			}else{
-				throw new \jc\lang\Exception('this即不是IFile也不是IFolder');
+				return parent::copy($to);
 			}
-		}
-		if( $this instanceof IFile and $to instanceof IFile and $to instanceof LocalFSO ){
-			rename($this->localPath(),$to->localPath());
-			return $to;
+			if( $toFSO -> exists() ){
+				throw new \jc\lang\Exception('复制目标已存在，无法复制');
+			}
+			if($toFSO instanceof IFile and $toFSO instanceof LocalFSO ){
+				rename($this->localPath(),$toFSO->localPath());
+				return $toFSO;
+			}else{
+				return parent::copy($to);
+			}
 		}else{
-			return parent::move($to);
+			return parent::copy($to);
 		}
 	}
 	
