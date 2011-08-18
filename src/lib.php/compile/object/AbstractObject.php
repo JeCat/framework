@@ -44,7 +44,7 @@ class AbstractObject extends Composite
 	}
 	public function length()
 	{
-		return strlen($this->nPostion) ;
+		return strlen($this->sSource) ;
 	}
 	public function endPosition()
 	{
