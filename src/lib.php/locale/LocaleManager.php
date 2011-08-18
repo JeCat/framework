@@ -51,9 +51,9 @@ class LocaleManager extends Object
 	}
 	
 	
-	public function loadSentenceFolder($sFolderPath)
+	public function loadSentenceFolder(IFolder $aFolder)
 	{
-		$aIter = FSOIterator::createFileIterator($sFolderPath) ;
+		$aIter = $aFolder->iterator() ;
 		for($aIter->rewind();$aIter->valid();$aIter->next())
 		{
 			$sFilename = $aIter->filename() ;

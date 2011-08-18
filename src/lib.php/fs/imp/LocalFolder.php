@@ -2,6 +2,7 @@
 namespace jc\fs\imp ;
 
 use jc\fs\IFolder;
+use jc\fs\FileSystem;
 
 class LocalFolder extends LocalFSO implements IFolder
 {
@@ -10,7 +11,7 @@ class LocalFolder extends LocalFSO implements IFolder
 	 */
 	public function findFile($sPath)
 	{
-		return $this->fileSystem()->findFile(
+		return $this->fileSystem()->rootFileSystem()->findFile(
 				(substr($sPath,0,1)=='/')? $sPath: ($this->path().'/'.$sPath)
 		) ;	
 	}
@@ -25,22 +26,28 @@ class LocalFolder extends LocalFSO implements IFolder
 		) ;	
 	}
 
-	public function create($nMode=0755,$bRecursive=true)
+	public function create($nMode=FileSystem::CREATE_FOLDER_DEFAULT)
 	{
-		return mkdir($this->localPath(),$nMode,$bRecursive) ;
-	}
-	
-	public function createFile($sPath)
-	{
-		return $this->fileSystem()->createFile(
-				(substr($sPath,0,1)=='/')? $sPath: ($this->path().'/'.$sPath)
+		return mkdir(
+			$this->localPath()
+			, ($nMode&FileSystem::CREATE_PERM_BITS)
+			, $nMode&FileSystem::CREATE_RECURSE_DIR
 		) ;
 	}
 	
-	public function createFolder($sPath)
+	public function createFile($sPath,$nMode=FileSystem::CREATE_FILE_DEFAULT)
 	{
-		return $this->fileSystem()->createFolder(
+		return $this->fileSystem()->rootFileSystem()->createFile(
 				(substr($sPath,0,1)=='/')? $sPath: ($this->path().'/'.$sPath)
+				, $nMode
+		) ;
+	}
+	
+	public function createFolder($sPath,$nMode=FileSystem::CREATE_FOLDER_DEFAULT)
+	{
+		return $this->fileSystem()->rootFileSystem()->createFolder(
+				(substr($sPath,0,1)=='/')? $sPath: ($this->path().'/'.$sPath)
+				, $nMode
 		) ;
 	}
 	

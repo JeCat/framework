@@ -36,7 +36,7 @@ require_once __DIR__."/src/lib.php/compile/CompilerFactory.php" ;
 
 
 define( __NAMESPACE__."\\VERSION", '0.6.1' ) ;
-define( __NAMESPACE__."\\PATH", __DIR__.'/' ) ;
+define( __NAMESPACE__."\\PATH", __DIR__ ) ;
 
 // 处理未捕获的异常
 set_exception_handler(function(\Exception $aException)

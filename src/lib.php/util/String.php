@@ -1,9 +1,8 @@
 <?php
 namespace jc\util ;
 
+use jc\fs\IFile ;
 use jc\lang\Exception;
-
-use jc\fs\File;
 use jc\lang\Object;
 use jc\util\match\RegExp;
 
@@ -56,9 +55,8 @@ class String extends Object
 		$this->sText = '' ;
 	}
 	
-	public function loadFile($sFilePath)
+	public function loadFile(IFile $aFile)
 	{
-		$aFile = new File($sFilePath) ;
 		$aReader = $aFile->openReader() ;
 		$nBytes = $aReader->readInString($this) ;
 		$aReader->close() ;
@@ -69,10 +67,10 @@ class String extends Object
 	/**
 	 * @return String
 	 */
-	static public function createFromFile($sFilePath)
+	static public function createFromFile(IFile $aFile)
 	{
 		$aString = new self() ;
-		$aString->loadFile($sFilePath) ;
+		$aString->loadFile($aFile) ;
 		return $aString ;
 	} 
 	

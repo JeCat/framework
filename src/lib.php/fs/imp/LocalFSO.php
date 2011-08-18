@@ -3,7 +3,7 @@
 namespace jc\fs\imp ;
 
 use jc\fs\IFolder;
-
+use jc\fs\IFile;
 use jc\lang\Type;
 
 use jc\lang\Exception;
@@ -115,8 +115,9 @@ abstract class LocalFSO extends FSO
 		}
 		if( $this instanceof IFile and $to instanceof IFile and $to instanceof LocalFSO ){
 			copy($this->localPath(),$to->localPath());
+			return $to;
 		}else{
-			parent::copy($to);
+			return parent::copy($to);
 		}
 	}
 	
@@ -137,8 +138,9 @@ abstract class LocalFSO extends FSO
 		}
 		if( $this instanceof IFile and $to instanceof IFile and $to instanceof LocalFSO ){
 			rename($this->localPath(),$to->localPath());
+			return $to;
 		}else{
-			parent::move($to);
+			return parent::move($to);
 		}
 	}
 	

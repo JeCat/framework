@@ -18,9 +18,27 @@ class CompilingStatus
 	}
 	public function sourceFilepath()
 	{
-		return isset($this->arrStatuses[__FUNCTION__])? $this->arrStatuses[__FUNCTION__]: null ;
+		$aSourceFile = $this->sourceFile() ;
+		return $aSourceFile? $aSourceFile->path(): null ;
 	}
 	public function compiledFilepath()
+	{
+		$aCompiledFile = $this->compiledFile() ;
+		return $aCompiledFile? $aCompiledFile->path(): null ;
+	}
+	
+	/**
+	 * @return IFile
+	 */
+	public function sourceFile()
+	{
+		return isset($this->arrStatuses[__FUNCTION__])? $this->arrStatuses[__FUNCTION__]: null ;
+	}
+	
+	/**
+	 * @return IFile
+	 */
+	public function compiledFile()
 	{
 		return isset($this->arrStatuses[__FUNCTION__])? $this->arrStatuses[__FUNCTION__]: null ;
 	}

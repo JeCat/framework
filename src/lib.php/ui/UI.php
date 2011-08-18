@@ -2,8 +2,8 @@
 
 namespace jc\ui ;
 
+use jc\fs\IFile;
 use jc\resrc\ResourceManager;
-
 use jc\lang\Assert;
 use jc\lang\Exception;
 use jc\util\HashTable;
@@ -117,7 +117,7 @@ class UI extends JcObject
 	{
 		// 解析
 		try{
-			$aObjectContainer = $this->interpreters()->parse($aCompilingStatus->sourceFilepath()) ;
+			$aObjectContainer = $this->interpreters()->parse($aCompilingStatus->sourceFile()) ;
 		}
 		catch (\Exception $e)
 		{
@@ -134,7 +134,7 @@ class UI extends JcObject
 		}
 	}
 	
-	public function render($sCompiledPath,IHashTable $aVariables=null,IOutputStream $aDevice=null)
+	public function render(IFile $aCompiledFile,IHashTable $aVariables=null,IOutputStream $aDevice=null)
 	{
 		if(!$aVariables)
 		{
@@ -163,7 +163,7 @@ class UI extends JcObject
 		
 		
 		try{
-			include $sCompiledPath ;
+			include $aCompiledFile->url()  ;
 		
 		// 处理异常
 		} catch (\Exception $e) {
@@ -190,29 +190,29 @@ class UI extends JcObject
 		// 定位文件
 		$aSrcMgr = $this->sourceFileManager() ;
 		list($sNamespace,$sSourceFile) = $aSrcMgr->detectNamespace($sSourceFile) ;
-		$sSourcePath = $aSrcMgr->find($sSourceFile,$sNamespace) ;
-		if(!$sSourcePath)
+		$aSourceFile = $aSrcMgr->find($sSourceFile,$sNamespace) ;
+		if(!$aSourceFile)
 		{
 			throw new Exception("无法找到指定的源文件：%s:%s",array($sNamespace,$sSourceFile)) ;
 		}
-		$sCompiledPath = $this->sourceFileManager()->compiledPath($sSourcePath) ;
+		$aCompiledFile = $this->sourceFileManager()->findCompiled($aSourceFile) ;
 		
 		// 检查编译文件是否有效
-		if( !$this->sourceFileManager()->isCompiledValid($sSourcePath,$sCompiledPath) )
+		if( !$this->sourceFileManager()->isCompiledValid($aSourceFile,$aCompiledFile) )
 		{
 			// 编译
 			$aCompilingStatus = new CompilingStatus( array(
 				'sourceNamespace' => $sNamespace,
 				'sourceFilename' => $sSourceFile,
-				'sourceFilepath' => $sSourcePath,
-				'compiledFilepath' => $sCompiledPath,
+				'sourceFile' => $aSourceFile,
+				'compiledFile' => $aCompiledFile,
 			) ) ;
 		
 			$this->compile($aCompilingStatus) ;
 		}
 		
 		// render
-		$this->render($sCompiledPath,$aVariables,$aDevice) ;
+		$this->render($aCompiledFile,$aVariables,$aDevice) ;
 	}
 	
 	private $aSourceFileManager ;

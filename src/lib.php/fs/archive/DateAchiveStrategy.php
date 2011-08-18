@@ -1,6 +1,8 @@
 <?php
 namespace jc\fs\archive ;
 
+use jc\fs\FileSystem;
+
 use jc\fs\IFolder;
 use jc\fs\IFile;
 
@@ -24,7 +26,7 @@ class DateAchiveStrategy extends IAchiveStrategy
 	/**
 	 * @return jc\fs\IFile
 	 */
-	public function makeFile(IFile $aOriginalFile,IFolder $aToDir) 
+	public function makeFilePath(IFile $aOriginalFile,IFolder $aToDir) 
 	{
 		$sToPath = $aToDir->path() ;
 		
@@ -48,9 +50,7 @@ class DateAchiveStrategy extends IAchiveStrategy
 			$sToPath.= '/'.date('H') ;
 		}
 		
-		return $aToDir->fileSystem()->rootFileSystem()->findFile(
-			$sToPath.'/'.$this->makeFilename($aOriginalFile)
-		) ;
+		return  $sToPath.'/';
 	}
 }
 

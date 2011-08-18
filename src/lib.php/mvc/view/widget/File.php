@@ -30,7 +30,7 @@ class File extends FormWidget{
 	}
 
 	public function hasFile(){
-		if(parent::value() != null){
+		if($this->value() != null){
 			return true;
 		}else{
 			return false;
@@ -53,10 +53,10 @@ class File extends FormWidget{
 	}
 	
 	public function getFileSize(){
-		if(parent::value() == null){
+		if($this->value() == null){
 			return '0字节';
 		}
-		return parent::value()->length().'字节';
+		return $this->value()->length().'字节';
 	}
 
 	public function setValue($data = null) {
@@ -98,17 +98,16 @@ class File extends FormWidget{
 	public function moveToStoreFolder()
 	{
 		// 保存文件
-		$aSavedFile = $this->aAchiveStrategy->makeFile($this->aUploadedFile,$this->aStoreFolder);
+		$aSavedFile = $this->aAchiveStrategy->makeFilePath($this->aUploadedFile,$this->aStoreFolder);
 		
 		// 创建保存目录
-		$aFolderOfSavedFile = $aSavedFile->directory();
-		if(!$aFolderOfSavedFile->exists()){
-			if(!$aFolderOfSavedFile->create()){
+		if(!$aFolderOfSavedFile = $this->application()->fileSystem()->findFolder($aSavedFile)){
+			if(! $this->application()->fileSystem()->createFolder($aSavedFile)){
 				throw new Exception ( __CLASS__ . "的" . __METHOD__ . "在创建路径\"%s\"时出错" ,array($this->aStoreFolder->path()));
 			}
 		}
 		
-		$aSavedFile = $this->aUploadedFile->move($aSavedFile->path()) ;
+		$aSavedFile = $this->aUploadedFile->move($aSavedFile . $this->aAchiveStrategy->makeFilename($this->aUploadedFile)) ;
 		$this->setValue($aSavedFile) ;
 		
 		return $aSavedFile ;
@@ -116,7 +115,8 @@ class File extends FormWidget{
 	
 	public function setValueFromString($sData)
 	{
-		if($this->aStoreFolder->findFile($sData))
+		$aFile = $this->aStoreFolder->findFile($sData);
+		if($aFile)
 		{
 			$this->setValue($aFile);
 		}
@@ -154,9 +154,9 @@ class File extends FormWidget{
 		}
 		
 		// move file, and setValue
-		if( $this->aUploadedFile )
+		if( $this->aUploadedFile && $this->aUploadedFile->exists())
 		{
-			$this->moveToStoreFolder() ;
+			$this->setValue($this->moveToStoreFolder()) ;
 		}
 	}
 
