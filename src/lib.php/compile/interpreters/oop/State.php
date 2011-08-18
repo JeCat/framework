@@ -8,6 +8,19 @@ use jc\compile\object\FunctionDefine;
 class State 
 {
 	/**
+	 * @return bool
+	 **/
+	public function isPHPCode()
+	{
+		return $this->bPHPCode ;
+	}
+	
+	public function setPHPCode($bPHPCode)
+	{
+		$this->bPHPCode = $bPHPCode? true: false ;
+	}
+	
+	/**
 	 * @return NamespaceDeclare
 	 **/
 	public function currentNamespace()
@@ -46,6 +59,10 @@ class State
 		$this->aCurrentClass = $aCurrentClass ;
 	}
 	
+	/**
+	 * @var bool
+	  **/
+	private $bPHPCode  = false ;
 	
 	/**
 	 * @var ClassDefine
