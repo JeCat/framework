@@ -1,6 +1,8 @@
 <?php
 namespace jc\compile\object ;
 
+use jc\compile\ClassCompileException;
+
 class ClassDefine extends Token
 {
 	public function __construct(
@@ -67,6 +69,11 @@ class ClassDefine extends Token
 	 */
 	public function setBodyToken(ClosureToken $aTokenBody)
 	{
+		if( $aTokenBody->sourceCode()!='{' )
+		{
+			throw new ClassCompileException($aTokenBody,"参数 \$aTokenBody 必须是一个内容为 “{” 的Token对象") ;
+		}
+		
 		$this->aTokenBody = $aTokenBody ;
 	}
 	
