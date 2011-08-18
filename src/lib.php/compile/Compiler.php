@@ -25,9 +25,14 @@ class Compiler extends JcObject
 		$this->scan($aSourceStream, $aObjectContainer) ;
 		
 		// 解析
-		foreach($this->arrInterpreters as $sInterpreterClass)
+		foreach($this->arrInterpreters as $interpreter)
 		{
-			$sInterpreterClass::singleton()->analyze($aObjectContainer) ;
+			if( is_string($interpreter) )
+			{
+				$interpreter = $this->interpreter($interpreter) ;
+			}
+			
+			$interpreter->analyze($aObjectContainer) ;
 		}
 		
 		// 编译
@@ -113,15 +118,31 @@ class Compiler extends JcObject
 			unset($this->mapGeneratorClasses[$sObjectClass][$nPos]) ;
 		}
 	}
-	
+
+	/**
+	 * @return IGenerator
+	 */
 	public function generator($sGeneratorClass)
 	{
 		if( empty($this->arrGenerators[$sGeneratorClass]) )
 		{
-			$this->arrGenerators[$sGeneratorClass] = $sGeneratorClass::singleton() ;
+			$this->arrGenerators[$sGeneratorClass] = new $sGeneratorClass() ;
 		}
 		
 		return $this->arrGenerators[$sGeneratorClass] ;
+	}
+	
+	/**
+	 * @return IInterpreter
+	 */
+	public function interpreter($sInterpreterClass)
+	{
+		if( empty($this->arrInterpreters[$sInterpreterClass]) )
+		{
+			$this->arrInterpreters[$sInterpreterClass] = new $sInterpreterClass() ;
+		}
+		
+		return $this->arrInterpreters[$sInterpreterClass] ;
 	}
 	
 	/**
@@ -164,12 +185,14 @@ class Compiler extends JcObject
 	
 	
 	private $sStrategySignature ;
+	
+	private $mapGeneratorClasses = array() ;
 
 	private $arrInterpreters = array() ;
 	
-	private $mapGeneratorClasses = array() ;
-	
 	private $arrGenerators = array() ;
+	
+	private 
 	
 	private $arrStrategySummaries = array() ;
 }
