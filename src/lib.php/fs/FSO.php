@@ -152,6 +152,12 @@ abstract class FSO extends Object implements IFSO
 		$this->sHttpUrl = $sHttpUrl ;
 	}
 	
+	/**
+	 * 将当前FSO对象拷贝到$to的位置。
+	 * 如果目标位置已存在，则会抛出异常'复制目标已存在，无法复制'。
+	 * @param $to 复制目标。可以是一个实际文件不存在的FSO对象，或者是一个字符串，表示复制目标的虚拟文件系统路径。
+	 * @return 如果复制成功，返回一个FSO对象，表示复制的目标；如果复制失败，返回null。
+	 */
 	public function copy($to)
 	{
 		if ( ( is_string($to) and $this->fileSystem()->rootFileSystem()->exists($to) ) 
@@ -176,22 +182,31 @@ abstract class FSO extends Object implements IFSO
 					$str = $aSrcReader->read($iBlockSize);
 					$aToWriter -> write( $str );
 				}
+				return $to;
 			}else{
-				throw new \jc\lang\Exception('this是IFile而to不是');
+				throw new \jc\lang\Exception('this是IFile而to不是IFile，无法将一个文件复制成其它类型');
 			}
 		}else if ( $this instanceof IFolder ){
 			if( $to instanceof IFolder ){
-				// todo
+				throw new \jc\lang\Exception('暂时还没实现将一个目录递归复制到另一个位置');
 			}else{
-				throw new \jc\lang\Exception('this是IFolder而to不是');
+				throw new \jc\lang\Exception('this是IFolder而to不是IFolder，无法将一个目录复制成其它类型');
 			}
 		}else{
 				throw new \jc\lang\Exception('this即不是IFile也不是IFolder');
 		}
 	}
+	
+	/**
+	 * 将当前FSO对象移动到$to的位置。
+	 * 如果目标位置已存在，则会抛出异常'复制目标已存在，无法复制'。
+	 * @param $to 移动目标。可以是一个实际文件不存在的FSO对象，或者是一个字符串，表示移动目标的虚拟文件系统路径。
+	 * @return 如果移动成功，返回一个FSO对象，表示移动的目标；如果移动失败，返回null。
+	 */
 	public function move($to){
-		copy($to);
+		$ret = copy($to);
 		$this->delete();
+		return $ret;
 	}
 	
 	private $sInnerPath = "" ;
