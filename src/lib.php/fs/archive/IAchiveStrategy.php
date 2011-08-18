@@ -10,7 +10,7 @@ abstract class IAchiveStrategy extends Object
 	/**
 	 * @return jc\fs\IFile
 	 */
-	abstract public function makeFile(IFile $aOriginalFile,IFolder $aToDir) ;
+	abstract public function makeFilePath(IFile $aOriginalFile,IFolder $aToDir) ;
 
 	public function restoreOriginalFilename(IFile $aAchiveFile)
 	{

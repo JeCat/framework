@@ -19,5 +19,4 @@ class NotEmpty extends Object implements IVerifier {
 		return true;
 	}
 }
-
 ?>

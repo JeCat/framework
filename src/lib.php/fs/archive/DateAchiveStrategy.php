@@ -26,7 +26,7 @@ class DateAchiveStrategy extends IAchiveStrategy
 	/**
 	 * @return jc\fs\IFile
 	 */
-	public function makeFile(IFile $aOriginalFile,IFolder $aToDir) 
+	public function makeFilePath(IFile $aOriginalFile,IFolder $aToDir) 
 	{
 		$sToPath = $aToDir->path() ;
 		
@@ -51,11 +51,6 @@ class DateAchiveStrategy extends IAchiveStrategy
 		}
 		
 		return  $sToPath.'/';
-		//.$this->makeFilename($aOriginalFile);
-		
-//		return $aToDir->fileSystem()->rootFileSystem()->createFile(
-//			$sToPath.'/'.$this->makeFilename($aOriginalFile)
-//		) ;
 	}
 }
 

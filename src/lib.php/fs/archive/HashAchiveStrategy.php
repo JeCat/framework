@@ -21,7 +21,7 @@ class HashAchiveStrategy extends IAchiveStrategy
 	/**
 	 * @return jc\fs\IFile
 	 */
-	public function makeFile(IFile $aOriginalFile,IFolder $aToDir) 
+	public function makeFilePath(IFile $aOriginalFile,IFolder $aToDir) 
 	{
 		$sFileHash = $aOriginalFile->hash() ;
 		$sToPath = $aToDir->path() ;
@@ -31,9 +31,7 @@ class HashAchiveStrategy extends IAchiveStrategy
 			$sToPath.= '/'.substr($sFileHash,$i,1) ;
 		}
 		
-		return $aToDir->fileSystem()->rootFileSystem()->findFile(
-			$sToPath.'/'.$this->makeFilename($aOriginalFile)
-		) ;
+		return $sToPath.'/';
 	}
 
 	private $nDepth ;
