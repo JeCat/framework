@@ -14,6 +14,9 @@ use jc\pattern\composite\IContainer;
 use jc\compile\IInterpreter;
 use jc\lang\Object;
 
+/**
+ * 闭合对象分析
+ */
 class ClosureObjectParser extends Object implements IInterpreter
 {
 	public function analyze(TokenPool $aObjectContainer)
