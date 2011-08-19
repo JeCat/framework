@@ -5,12 +5,12 @@ use jc\lang\Assert;
 use jc\lang\Exception;
 use jc\ui\IObject;
 use jc\ui\CompilerManager;
-use jc\io\IOutputStream;
+use jc\ui\TargetCodeOutputStream;
 use jc\ui\xhtml\compiler\NodeCompiler;
 
 class FormCompiler extends NodeCompiler
 {
-	public function compile(IObject $aObject,IOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Assert::type("jc\\ui\\xhtml\\Node",$aObject,'aObject') ;
 		

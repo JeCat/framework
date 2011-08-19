@@ -4,13 +4,13 @@ namespace jc\ui\xhtml\compiler ;
 use jc\ui\xhtml\Tag;
 use jc\ui\xhtml\Node;
 use jc\lang\Assert;
-use jc\io\IOutputStream;
+use jc\ui\TargetCodeOutputStream;
 use jc\ui\CompilerManager;
 use jc\ui\IObject;
 
 class NodeCompiler extends BaseCompiler
 {
-	public function compile(IObject $aObject,IOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Assert::type("jc\\ui\\xhtml\\Node",$aObject,'aObject') ;
 
@@ -32,64 +32,62 @@ class NodeCompiler extends BaseCompiler
 		}
 	}
 
-	protected function compileTag(Tag $aTag,IOutputStream $aDev,CompilerManager $aCompilerManager)
+	protected function compileTag(Tag $aTag,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		$this->outputTargetCode('<') ;
+		$aDev->output('<') ;
 		if( $aTag->isTail() )
 		{
-			$this->outputTargetCode('/') ;
+			$aDev->output('/') ;
 		}
 		
-		$this->outputTargetCode($aTag->name()) ;
+		$aDev->output($aTag->name()) ;
 		
 		// 属性
 		$aAttrs = $aTag->attributes() ;
 		foreach ($aAttrs->valueIterator() as $aAttrVal)
 		{
-			$this->outputTargetCode(' ') ;
+			$aDev->output(' ') ;
 			
 			// 具名属性
 			if($sName=$aAttrVal->name())
 			{
-				$this->outputTargetCode($sName) ;
-				$this->outputTargetCode('=') ;
+				$aDev->output($sName) ;
+				$aDev->output('=') ;
 			}
 			
-			$this->outputTargetCode($aAttrVal->quoteType()) ;
+			$aDev->output($aAttrVal->quoteType()) ;
 			if( $aAttrCompiler = $aCompilerManager->compiler($aAttrVal) )
 			{
-				$this->flushTargetCode($aDev) ;
 				$aAttrCompiler->compile($aAttrVal,$aDev,$aCompilerManager) ;
 			}
 			else 
 			{
 				if($sName)
 				{
-					$this->outputTargetCode(
+					$aDev->output(
 						addslashes($aAttrs->get($sName))
 					) ;
 				}
 				else 
 				{
-					$this->outputTargetCode(
+					$aDev->output(
 						addslashes($aAttrs->source())
 					) ;
 				}
 			}
 		
-			$this->outputTargetCode($aAttrVal->quoteType()) ;
+			$aDev->output($aAttrVal->quoteType()) ;
 		}
 		
 		if( $aTag->isSingle() )
 		{
-			$this->outputTargetCode(' /') ;
+			$aDev->output(' /') ;
 		}
 		
-		$this->outputTargetCode('>') ;
-		$this->flushTargetCode($aDev) ;
+		$aDev->output('>') ;
 	}
 	
-	public function compileChildren(Node $aNode,IOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compileChildren(Node $aNode,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		foreach($aNode->childElementsIterator() as $aObject)
 		{

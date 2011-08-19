@@ -2,7 +2,6 @@
 namespace jc\ui\xhtml ;
 
 use jc\ui\ICompiler;
-use jc\io\IOutputStream;
 use jc\lang\Type;
 
 class Tag extends ObjectBase

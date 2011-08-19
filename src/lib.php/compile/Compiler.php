@@ -8,7 +8,7 @@ use jc\lang\Exception;
 use jc\lang\Type;
 use jc\compile\object\Token;
 use jc\util\String;
-use jc\io\IOutputStream;
+use jc\ui\TargetCodeOutputStream;
 use jc\io\IInputStream;
 use jc\compile\object\IObject;
 use jc\pattern\composite\IContainer;

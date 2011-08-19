@@ -5,7 +5,6 @@ use jc\system\Application;
 
 use jc\util\String;
 use jc\ui\ICompiler;
-use jc\io\IOutputStream;
 use jc\lang\Exception;
 use jc\lang\Assert;
 use jc\pattern\composite\IContainedable;

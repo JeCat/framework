@@ -2,13 +2,13 @@
 namespace jc\ui\xhtml\compiler ;
 
 use jc\lang\Assert;
-use jc\io\IOutputStream;
+use jc\ui\TargetCodeOutputStream;
 use jc\ui\CompilerManager;
 use jc\ui\IObject;
 
 class MacroCompiler extends BaseCompiler
 {
-	public function compile(IObject $aObject,IOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Assert::type("jc\\ui\\xhtml\\Macro",$aObject,'aObject') ;
 		
