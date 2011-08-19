@@ -485,7 +485,7 @@ abstract class FileSystem extends Object
 	
 	abstract protected function isFolderOperation(&$sPath) ;
 
-	static public function formatPath($sPath,$sPathSeparator=DIRECTORY_SEPARATOR)
+	static public function formatPath($sPath)
 	{
 		// 统一、合并斜线
 		$sPath = preg_replace('|[/\\\\]+|', '/', $sPath) ;
@@ -517,7 +517,7 @@ abstract class FileSystem extends Object
 			array_push($arrFoldersStack,$sFolderName) ;
 		}
 		
-		return implode($sPathSeparator, $arrFoldersStack) ;
+		return implode('/', $arrFoldersStack) ;
 	}
 	
 	/**
