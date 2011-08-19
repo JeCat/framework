@@ -58,17 +58,6 @@ class Exception extends \Exception implements IException, IObject
 	}
 	
 	// for IJeCatObject //////////////////////////////////
-	public function create($sClassName,$sNamespace='\\',array $arrArgvs=array())
-	{
-		$aObject = Factory::createNewObject($sClassName,$sNamespace,$arrArgvs) ;
-		
-		if( $aObject instanceof IObject )
-		{
-			$aObject->setApplication($this->application(true)) ;
-		}
-		
-		return $aObject ;
-	}
 	public function application($bDefaultGlobal=true)
 	{
 		if($this->aApplication)
