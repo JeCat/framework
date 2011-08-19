@@ -46,9 +46,9 @@ class Token extends AbstractObject
 	{
 		$this->nType = $nType ;
 	}
-	public function tokenType($nOri=false)
+	public function tokenType($bOri=false)
 	{		
-		if( !$nOri and $this->nType==T_STRING and isset(self::$arrExtTypes[$this->sourceCode()]) )
+		if( !$bOri and $this->nType==T_STRING and isset(self::$arrExtTypes[$this->sourceCode()]) )
 		{
 			return $this->sourceCode() ;
 		}
