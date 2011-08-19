@@ -1,8 +1,14 @@
 <?php
 namespace jc\compile\interpreters\oop ;
 
-class ClassDefineParser {
+use jc\compile\object\Token;
 
+class ClassDefineParser implements ISyntaxPaser
+{
+	public function parse(Token $aToken,State $aState)
+	{
+		
+	}
 }
 
 ?>

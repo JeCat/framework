@@ -18,6 +18,10 @@ class CompilerFactory extends Object
 		// 添加编译策略概要，用于生成编译器的”策略签名“
 		$aCompiler->addStrategySummary("jc\\compile\\interpreters\\ClosureObjectParser") ;
 		$aCompiler->addStrategySummary("jc\\compile\\interpreters\\oop\\SyntaxScanner") ;
+		$aCompiler->addStrategySummary("jc\\compile\\interpreters\\oop\\PHPCodeParser") ;
+		$aCompiler->addStrategySummary("jc\\compile\\interpreters\\oop\\NamespaceParser") ;
+		$aCompiler->addStrategySummary("jc\\compile\\interpreters\\oop\\ClassDefineParser") ;
+		$aCompiler->addStrategySummary("jc\\compile\\interpreters\\oop\\FunctionDefineParser") ;
 		
 		return $aCompiler ;
 	}

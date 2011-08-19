@@ -192,8 +192,6 @@ class Compiler extends JcObject
 	
 	private $arrGenerators = array() ;
 	
-	private 
-	
 	private $arrStrategySummaries = array() ;
 }
 ?>

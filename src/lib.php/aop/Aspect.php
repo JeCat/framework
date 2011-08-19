@@ -1,43 +1,25 @@
 <?php
 namespace jc\aop ;
 
-class Aspect
+use jc\pattern\composite\Container;
+use jc\pattern\composite\NamedObject;
+
+class Aspect extends NamedObject
 {
-	public function addPointcut(Pointcut $aPointcut)
-	{
-		
-	}
-	
 	/**
-	 * @return Pointcut
+	 * @return jc\pattern\IContainer
 	 */
-	public function remvePointcut($sName)
+	public function pointcuts()
 	{
+		if( !$this->aPointcuts )
+		{
+			$this->aPointcuts = new Container('jc\\aop\\Pointcut') ;
+		}
 		
+		return $this->aPointcuts ;
 	}
 	
-	/**
-	 * @return Pointcut
-	 */
-	public function pointcut()
-	{
-		
-	}
-	
-	/**
-	 * @return \Iterator
-	 */
-	public function pointcutIterator()
-	{
-		
-	}
-	
-	public function clearPointcuts()
-	{
-		
-	}
-	
-	private $arrPointcuts = array() ;
+	private $aPointcuts ;
 	
 }
 

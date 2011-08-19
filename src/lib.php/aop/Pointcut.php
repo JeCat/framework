@@ -1,65 +1,42 @@
 <?php
 namespace jc\aop ;
 
+use jc\pattern\composite\Container;
+use jc\pattern\composite\NamedObject;
 use jc\pattern\iterate\ArrayIterator;
 use jc\lang\Object;
 
-class Pointcut extends Object
+class Pointcut extends NamedObject
 {
-	public function addJointPoint(JointPoint $aJointPoint)
+	/**
+	 * @return jc\pattern\IContainer
+	 */
+	public function jointPoints()
 	{
+		if( !$this->aJointPoints )
+		{
+			$this->aJointPoints = new Container('jc\\aop\\JointPoint') ;
+		}
 		
-	}
-	
-	public function removeJointPoint(JointPoint $aJointPoint)
-	{
-		
+		return $this->aJointPoints ;
 	}
 	
 	/**
-	 * @return \Iterator
+	 * @return jc\pattern\IContainer
 	 */
-	public function jointPointIterator()
+	public function advices()
 	{
-		return new ArrayIterator($this->arrJointPoints) ;
-	}
-	
-	public function clearJointPoints()
-	{
+		if( !$this->aAdvices )
+		{
+			$this->aAdvices = new Container('jc\\aop\\Advice') ;
+		}
 		
+		return $this->aAdvices ;
 	}
 	
-	public function addAdvice(Advice $aAdvice)
-	{
-		
-	}
+	private $aAdvices ;
 	
-	public function hasAdvice($sFnName)
-	{
-		
-	}
-	
-	public function removeAdvice($sFnName)
-	{
-		
-	}
-	
-	/**
-	 * @return \Iterator
-	 */
-	public function adviceIterator()
-	{
-		return new ArrayIterator($this->arrAdvices) ;
-	}
-	
-	public function clearAdvices()
-	{
-		
-	}
-	
-	private $arrJointPoints = array() ;
-	
-	private $arrAdvices = array() ;
+	private $aJointPoints ;
 }
 
 ?>
