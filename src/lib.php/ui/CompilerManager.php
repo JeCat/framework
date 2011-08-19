@@ -69,6 +69,8 @@ class CompilerManager extends JcObject
 			throw new Exception("保存XHTML模板的编译文件时无法打开文件:%s",$aCompilingStatus->compiledFilepath()) ;
 		}
 		
+		$aWriter->write("<?php\r\n") ;
+		
 		foreach($aObjectContainer->iterator() as $aObject)
 		{
 			$aCompiler = $this->compiler($aObject) ;
@@ -77,6 +79,8 @@ class CompilerManager extends JcObject
 				$aCompiler->compile($aObject,$aWriter,$this) ;
 			}
 		}
+		
+		$aWriter->write("?>") ;
 		
 		$aWriter->close() ;
 		

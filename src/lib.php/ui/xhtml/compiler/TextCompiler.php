@@ -21,7 +21,8 @@ class TextCompiler extends BaseCompiler
 			$sSource = str_replace('{~~~~{&@!', "<? ob_flush(); echo '<','?' ; ?>", $sSource) ;
 			$sSource = str_replace('!@&}~~~~~}', "<? ob_flush(); echo '?','>' ; ?>", $sSource) ;
 			
-			$aDev->write($sSource) ;
+			$this->outputTargetCode($sSource) ;
+			$this->flushTargetCode($aDev) ;
 		}
 		
 		else 

@@ -82,6 +82,18 @@ class BaseCompiler extends JcObject implements ICompiler
 		return $this->arrCompilers[$sName] ;
 	}
 	
+	public function outputTargetCode($sCode)
+	{
+		$this->sTargetCodes.= addslashes($sCode) ;
+	}
+	public function flushTargetCode(IOutputStream $aDev)
+	{
+		$aDev->write("\$aDevice->write(\"{$this->sTargetCodes}\") ;\r\n") ;
+		$this->sTargetCodes = '' ;
+	}
+	
+	private $sTargetCodes = '' ;
+	
 	private $arrCompilers = array() ;
 }
 

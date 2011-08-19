@@ -34,53 +34,59 @@ class NodeCompiler extends BaseCompiler
 
 	protected function compileTag(Tag $aTag,IOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		$aDev->write('<') ;
+		$this->outputTargetCode('<') ;
 		if( $aTag->isTail() )
 		{
-			$aDev->write('/') ;
+			$this->outputTargetCode('/') ;
 		}
 		
-		$aDev->write($aTag->name()) ;
+		$this->outputTargetCode($aTag->name()) ;
 		
 		// 属性
 		$aAttrs = $aTag->attributes() ;
 		foreach ($aAttrs->valueIterator() as $aAttrVal)
 		{
-			$aDev->write(" ") ;
+			$this->outputTargetCode(' ') ;
 			
 			// 具名属性
 			if($sName=$aAttrVal->name())
 			{
-				$aDev->write($sName) ;
-				$aDev->write('=') ;
+				$this->outputTargetCode($sName) ;
+				$this->outputTargetCode('=') ;
 			}
 			
-			$aDev->write($aAttrVal->quoteType()) ;
+			$this->outputTargetCode($aAttrVal->quoteType()) ;
 			if( $aAttrCompiler = $aCompilerManager->compiler($aAttrVal) )
 			{
+				$this->flushTargetCode($aDev) ;
 				$aAttrCompiler->compile($aAttrVal,$aDev,$aCompilerManager) ;
 			}
 			else 
 			{
 				if($sName)
 				{
-					$aDev->write(addslashes($aAttrs->get($sName))) ;
+					$this->outputTargetCode(
+						addslashes($aAttrs->get($sName))
+					) ;
 				}
 				else 
 				{
-					$aDev->write(addslashes($aAttrVal->source())) ;
+					$this->outputTargetCode(
+						addslashes($aAttrs->source())
+					) ;
 				}
 			}
 		
-			$aDev->write($aAttrVal->quoteType()) ;
+			$this->outputTargetCode($aAttrVal->quoteType()) ;
 		}
 		
 		if( $aTag->isSingle() )
 		{
-			$aDev->write(' /') ;
+			$this->outputTargetCode(' /') ;
 		}
 		
-		$aDev->write('>') ;
+		$this->outputTargetCode('>') ;
+		$this->flushTargetCode($aDev) ;
 	}
 	
 	public function compileChildren(Node $aNode,IOutputStream $aDev,CompilerManager $aCompilerManager)
