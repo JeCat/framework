@@ -52,7 +52,7 @@ class Exception extends \Exception implements IException, IObject
 		return $this->getTrace() ;
 	}
 	
-	public function getMessageArgvs()
+	public function messageArgvs()
 	{
 		return $this->arrArgvs ;
 	}
