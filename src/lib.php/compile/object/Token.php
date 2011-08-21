@@ -115,7 +115,7 @@ class Token extends AbstractObject
 			$sSignature.= $this->aFunction->name().'()' ;
 		}
 		
-		return '['.$sSignature.']' ;
+		return $sSignature? ('['.$sSignature.']'): '' ;
 	}
 	
 	private $nType ;

@@ -9,8 +9,14 @@ abstract class StructDefine extends Token
 	{
 		$this->cloneOf($aToken) ;
 		
-		$this->setNameToken($aTokenName) ;
-		$this->setBodyToken($aTokenBody) ;
+		if($aTokenName)
+		{
+			$this->setNameToken($aTokenName) ;
+		}
+		if($aTokenBody)
+		{
+			$this->setBodyToken($aTokenBody) ;
+		}
 	}
 
 	/**
@@ -18,7 +24,7 @@ abstract class StructDefine extends Token
 	 */
 	public function name()
 	{
-		return $this->aTokenName->sourceCode() ;
+		return $this->aTokenName? $this->aTokenName->sourceCode(): null ;
 	}
 	
 	/**
