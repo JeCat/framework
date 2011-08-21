@@ -1,22 +1,19 @@
 <?php
 namespace jc\compile\object ;
 
-class ClassDefine extends Token
+use jc\compile\ClassCompileException;
+
+class ClassDefine extends StructDefine
 {
-	public function __construct(
-			Token $aToken
-			, $aTokenName=null
-			, Token $aTokenBody=null
-	)
+	public function __construct(Token $aToken, $aTokenName=null, Token $aTokenBody=null)
 	{
-		$this->cloneOf($aToken) ;
-		
-		$this->aTokenName = $aTokenName ;
-		$this->aTokenBody = $aTokenBody ;
+		parent::__construct($aToken,$aTokenName,$aTokenBody) ;
 		
 		$this->setBelongsClass($this) ;
 	}
-	
+	/**
+	 * 返回正在定义的class的包括命名控件的完整名称
+	 */
 	public function fullName()
 	{
 		$aNamespace = $this->belongsNamespace() ;
@@ -28,28 +25,6 @@ class ClassDefine extends Token
 		{
 			return $this->name() ;
 		}
-	}
-
-	public function name()
-	{
-		return $this->aTokenName->sourceCode() ;
-	}
-	
-	public function nameToken()
-	{
-		return $this->aTokenName ;
-	}
-	public function setNameToken(Token $aTokenName)
-	{
-		$this->aTokenName = $aTokenName ;
-	}
-	public function bodyToken()
-	{
-		return $this->aTokenBody ;
-	}
-	public function setBodyToken(ClosureToken $aTokenBody)
-	{
-		$this->aTokenBody = $aTokenBody ;
 	}
 	
 	private $aTokenName ;

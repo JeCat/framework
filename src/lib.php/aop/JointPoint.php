@@ -99,11 +99,10 @@ class JointPoint
 	
 	static public function transRegexp($sPartten)
 	{
+		$sPartten = preg_quote($sPartten) ;
+		$sPartten = str_replace('\\*', '.*', $sPartten) ;
 		
-			$sPartten = preg_quote($sPartten) ;
-			$sPartten = str_replace('\\*', '.*', $sPartten) ;
-			
-			return '`' . $sPartten . '`is' ;
+		return '`' . $sPartten . '`is' ;
 	} 
 	
 	private $sExecutionRegexp ;
