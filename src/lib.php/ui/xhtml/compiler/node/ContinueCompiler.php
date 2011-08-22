@@ -1,4 +1,4 @@
-<?php
+<?php 
 /**
  *	continue
  *
@@ -22,9 +22,9 @@ class ContinueCompiler extends NodeCompiler {
 	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) {
 		Type::check ( "jc\\ui\\xhtml\\Node", $aObject );
 		
-		$aDev->write ( '<?php continue '
+		$aDev->write ( ' continue '
 						 . ExpressionCompiler::compileExpression ( $aObject->attributes ()->source () )
-						 . '; ?>' );
+						 . '; ' );
 	}
 }
 

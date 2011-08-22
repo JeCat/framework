@@ -1,4 +1,4 @@
-<?php
+<?php 
 /**
  * 
  * else , 如果else后面跟密名参数,则当作elseif处理
@@ -30,16 +30,16 @@ class ElseCompiler extends NodeCompiler
 		Type::check("jc\\ui\\xhtml\\Node",$aObject) ;
 		
 		if( $aObject->attributes ()->anonymous() ){
-			$aDev->write("<?php
+			$aDev->write("
 					}elseif( ");
 			$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes ()->anonymous()->source () ) );
 			$aDev->write("){
-					?>");
+					");
 			
 		}else{
-			$aDev->write("<?php
+			$aDev->write("
 					}else{
-					?>");
+					");
 		}
 	}
 }

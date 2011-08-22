@@ -25,11 +25,10 @@ class ForeachelseCompiler extends NodeCompiler
 	{
 		Type::check("jc\\ui\\xhtml\\Node",$aObject) ;
 
-		$aDev->write("<?php
-						} 
+		$aDev->write("} 
 					}else{
 					{
-					?>");
+					");
 	}
 }
 

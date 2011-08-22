@@ -40,8 +40,7 @@ class LoopCompiler extends NodeCompiler {
 		$sEndName = NodeCompiler::assignVariableName('$__loop_end_');
 		$sStepName = NodeCompiler::assignVariableName('$__loop_step_');
 		
-		$aDev->write ( "<?php
-								{$sEndName}  = {$sEndValue} ; 
+		$aDev->write ( "		{$sEndName}  = {$sEndValue} ; 
 								{$sStepName}  = {$sStepValue}  ;
 								for( {$sVarAutoName} = {$sStart} ; {$sVarAutoName} <= {$sEndName} ; {$sVarAutoName} += {$sStepName} ){  
 						" );
@@ -49,11 +48,11 @@ class LoopCompiler extends NodeCompiler {
 			$sVarUserName = $aAttrs->get ( "var" );
 			$aDev->write ( "			\$aVariables->set( {$sVarUserName}, {$sVarAutoName} ) ;" );
 		}
-		$aDev->write ( '?>' );
+		$aDev->write ( '' );
 		
 		if(!$aObject->headTag()->isSingle()){
 			$this->compileChildren ( $aObject, $aDev, $aCompilerManager );
-			$aDev->write ( '<?php } ?>' );
+			$aDev->write ( '} ' );
 		}
 	}
 }

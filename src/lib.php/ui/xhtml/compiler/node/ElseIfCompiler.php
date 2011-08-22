@@ -23,9 +23,9 @@ class ElseIfCompiler extends NodeCompiler {
 	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) {
 		Type::check ( "jc\\ui\\xhtml\\Node", $aObject );
 		
-		$aDev->write ( '<?php }elseif(' );
+		$aDev->write ( ' }elseif(' );
 		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes ()->source () ) );
-		$aDev->write ( "){ ?>" );
+		$aDev->write ( "){ " );
 		
 		$this->compileChildren ( $aObject, $aDev, $aCompilerManager );
 	}

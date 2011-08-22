@@ -1,4 +1,4 @@
-<?php
+ <?php
 namespace jc\ui\xhtml\compiler\node;
 
 use jc\lang\Exception;
@@ -31,14 +31,14 @@ class SubTemplateDefineCompiler extends NodeCompiler
 			$sSubTemplateName = '"' . addslashes($aNameVal->source()) . '"' ;
 		}
 		
-		$aDev->write("<?php \r\n") ;
-		$aDev->write("\$aVariables->set('__subtemplate_'.{$sSubTemplateName},function(\$aVariables,\$aDevice){?>\r\n") ;
+		$aDev->write("  \r\n") ;
+		$aDev->write("\$aVariables->set('__subtemplate_'.{$sSubTemplateName},function(\$aVariables,\$aDevice){ \r\n") ;
 		
 		$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
 		
-		$aDev->write("<?php })?>") ;
+		$aDev->write("  }) ") ;
 	}
 
 }
 
-?>
+ ?>

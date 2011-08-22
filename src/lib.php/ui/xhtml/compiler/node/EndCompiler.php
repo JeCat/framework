@@ -1,4 +1,4 @@
-<?php
+<?php 
 /**
  * 
  * else
@@ -28,10 +28,10 @@ class EndCompiler extends NodeCompiler
 	{
 		Type::check("jc\\ui\\xhtml\\Node",$aObject) ;
 
-		$aDev->write("<?php
+		$aDev->write("
 						}
 					}
-					?>");
+					");
 	}
 }
 

@@ -36,7 +36,7 @@ class IncludeCompiler extends NodeCompiler
 		$bExtendParentVars = $aAttributes->has("vars")? $aAttributes->bool('vars'): true ;
 		
 		// start
-		$aDev->write("<?php \r\n");
+		$aDev->write("\r\n");
 		
 		// variables
 		if(!$bExtendParentVars)
@@ -59,8 +59,7 @@ class IncludeCompiler extends NodeCompiler
 			}
 		}
 		
-		$aDev->write("\$this->display({$sFileName},\$__include_aVariables,\$aDevice) ; ?>") ;		
+		$aDev->write("\$this->display({$sFileName},\$__include_aVariables,\$aDevice) ; ") ;		
 	}
 }
-
 ?>

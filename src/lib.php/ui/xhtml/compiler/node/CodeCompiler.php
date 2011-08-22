@@ -1,4 +1,4 @@
-<?php
+<?php 
 namespace jc\ui\xhtml\compiler\node;
 
 use jc\ui\xhtml\AttributeValue;
@@ -27,21 +27,21 @@ class CodeCompiler extends NodeCompiler
 			// 设置代码"上色器"
 			$sVarName = parent::assignVariableName() ;
 			
-			$aDev->write("<?php\r\n") ;
+			$aDev->write("\r\n") ;
 			$aDev->write("ob_flush() ;\r\n") ;
 			$aDev->write("\${$sVarName} = new \\jc\\ui\\xhtml\\compiler\\node\\CodeColor() ;\r\n") ;
 			$aDev->write("\\jc\\io\\StdOutputFilterMgr::singleton()->add(array(\${$sVarName},'outputFilter')) ;\r\n") ;
-			$aDev->write("?>") ;
+			$aDev->write("") ;
 			
 			// 编译 node body
 			$this->compileChildren($aObject, $aDev, $aCompilerManager) ;
 			
 			// 输出代码
-			$aDev->write("<?php\r\n") ;
+			$aDev->write("\r\n") ;
 			$aDev->write("ob_flush() ;\r\n") ;
 			$aDev->write("\\jc\\io\\StdOutputFilterMgr::singleton()->remove( array(\${$sVarName},'outputFilter') ) ;\r\n") ;
 			$aDev->write("\${$sVarName}->output(\$aDevice) ;") ;
-			$aDev->write("?>") ;
+			$aDev->write("") ;
 			
 			// 编译尾标签
 			$this->compileTag($aTailTag, $aDev, $aCompilerManager) ;
