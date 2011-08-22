@@ -13,15 +13,8 @@ class TextCompiler extends BaseCompiler
 		if( $aObject instanceof \jc\ui\xhtml\ObjectBase and !$aObject->count() )
 		{
 			Assert::type("jc\\ui\\xhtml\\Text",$aObject,'aObject') ;
-	
-			$sSource = $aObject->source() ;
-			
-			$sSource = str_replace('<?', "{~~~~{&@!", $sSource) ;
-			$sSource = str_replace('?>', "!@&}~~~~~}", $sSource) ;
-			$sSource = str_replace('{~~~~{&@!', "<? ob_flush(); echo '<','?' ; ?>", $sSource) ;
-			$sSource = str_replace('!@&}~~~~~}', "<? ob_flush(); echo '?','>' ; ?>", $sSource) ;
-			
-			$aDev->output($sSource) ;
+
+			$aDev->output($aObject->source()) ;
 		}
 		
 		else 
