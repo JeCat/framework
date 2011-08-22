@@ -28,7 +28,7 @@ class State
 		return $this->aCurrentNamespace ;
 	}
 	
-	public function setCurrentNamespace(NamespaceDeclare $aCurrentNamespace)
+	public function setCurrentNamespace(NamespaceDeclare $aCurrentNamespace=null)
 	{
 		$this->aCurrentNamespace = $aCurrentNamespace ;
 	}
@@ -41,7 +41,7 @@ class State
 		return $this->aCurrentFunction ;
 	}
 	
-	public function setCurrentFunction(FunctionDefine $aCurrentFunction)
+	public function setCurrentFunction(FunctionDefine $aCurrentFunction=null)
 	{
 		$this->aCurrentFunction = $aCurrentFunction ;
 	}
@@ -54,7 +54,7 @@ class State
 		return $this->aCurrentClass ;
 	}
 	
-	public function setCurrentClass(ClassDefine $aCurrentClass)
+	public function setCurrentClass(ClassDefine $aCurrentClass=null)
 	{
 		$this->aCurrentClass = $aCurrentClass ;
 	}

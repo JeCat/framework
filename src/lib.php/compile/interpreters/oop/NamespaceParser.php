@@ -11,13 +11,12 @@ class NamespaceParser implements ISyntaxPaser
 	public function parse(TokenPool $aTokenPool,INonlinearIterator $aTokenPoolIter,State $aState)
 	{
 		$aOriToken = $aTokenPoolIter->current() ;
-		$aTokenPoolIter = clone $aTokenPoolIter ;
-		
 		if( !$aOriToken or $aOriToken->tokenType()!=T_NAMESPACE )
 		{
 			return ;
 		}
 		
+		$aTokenPoolIter = clone $aTokenPoolIter ;
 		$aNewToken = new NamespaceDeclare($aOriToken) ;
 		
 		for( 

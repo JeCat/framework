@@ -10,6 +10,7 @@ class Token extends AbstractObject
 	const T_BRACE_ROUND_OPEN = '(' ;
 	const T_BRACE_ROUND_CLOSE = ')' ;
 	const T_SEMICOLON = ';' ;
+	const T_COLON = ',' ;
 	
 	static private $arrExtTypes = array(
 			self::T_BRACE_OPEN => 'Token::T_BRACE_OPEN',
@@ -19,6 +20,7 @@ class Token extends AbstractObject
 			self::T_BRACE_ROUND_OPEN => 'Token::T_BRACE_ROUND_OPEN',
 			self::T_BRACE_ROUND_CLOSE => 'Token::T_BRACE_ROUND_CLOSE',
 			self::T_SEMICOLON => 'Token::T_SEMICOLON',
+			self::T_COLON => 'Token::T_COLON',
 	) ; 
 
 	public function __construct($nType,$sSource,$nPostion)
