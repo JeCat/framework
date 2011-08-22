@@ -1,6 +1,8 @@
 <?php
 
-namespace jc\compile\interpreters ;
+namespace jc\compile\interpreters\oop ;
+
+use jc\pattern\iterate\IReversableIterator;
 
 use jc\compile\object\TokenPool;
 use jc\pattern\iterate\INonlinearIterator;
@@ -13,16 +15,60 @@ use jc\pattern\composite\IContainer;
 use jc\compile\IInterpreter;
 use jc\lang\Object;
 
-class SyntaxParser extends Object implements IInterpreter
+class SyntaxScanner extends Object implements IInterpreter
 {
-	public function analyze(TokenPool $aObjectContainer)
+	public function __construct()
+	{
+		$this->arrParsers[] = new NamespaceParser() ;
+		$this->arrParsers[] = new ClassDefineParser() ;
+		$this->arrParsers[] = new FunctionDefineParser() ;
+		
+		$this->aPHPCodeParser = new PHPCodeParser() ;
+		
+		//$this->arrParsers[] = new FunctionCallParser() ;
+		//$this->arrParsers[] = new NewObjectParser() ;
+		//$this->arrParsers[] = new ThrowParser() ;
+	}
+	
+	public function analyze(TokenPool $aTokenPool)
+	{
+		$aState = new State() ;
+		$aTokenPoolIter = $aTokenPool->iterator() ;
+		
+		foreach($aTokenPoolIter as $aToken)
+		{
+			// 扫描php代码
+			$this->aPHPCodeParser->parse($aTokenPool,$aTokenPoolIter,$aState) ;
+			if( !$aState->isPHPCode() )
+			{
+				continue ;
+			}
+			
+			foreach($this->arrParsers as $aParser)
+			{
+				$aParser->parse($aTokenPool,$aTokenPoolIter,$aState) ;
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	private function scanPHPCode(TokenPool $aTokenPool,INonlinearIterator $aTokenPoolIter,State $aState)
+	{
+	
+	}
+		
+	
+	
+	public function analyzeDeprecated(TokenPool $aObjectContainer)
 	{
 		$this->bIsPHPCode = false ;
 		$this->aClass = null ;
 		
 		$aObjectPoolIter = $aObjectContainer->iterator() ;
 		foreach($aObjectPoolIter as $aObject)
-		{			
+		{
 			if( $aObject->tokenType()==T_OPEN_TAG )
 			{
 				$this->bIsPHPCode = true ;
@@ -262,6 +308,9 @@ class SyntaxParser extends Object implements IInterpreter
 	private $aNamespace ;
 	private $aClass ;
 	private $aFunction ;
+	
+	
+	private $arrParsers ;
 }
 
 ?>

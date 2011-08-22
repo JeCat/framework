@@ -7,12 +7,12 @@ class TokenPool extends Container
 {
 	public function addClass(ClassDefine $aClass)
 	{
-		$this->arrClassesMethds[$aClass->fullName()] = $aClass ;
+		$this->arrClasses[$aClass->fullName()] = $aClass ;
 	}
 	
 	public function addFunction(FunctionDefine $aFunction)
 	{
-		if( $aClass=$aFunction->classDefine() )
+		if( $aClass=$aFunction->belongsClass() )
 		{
 			$sClassName = $aClass->fullName() ;
 		}
@@ -24,6 +24,16 @@ class TokenPool extends Container
 		$sFuncName = $aFunction->name() ; 
 		
 		$this->arrMethods[$sClassName][$sFuncName] = $aFunction ;
+	}
+
+	public function findClass($sClassName)
+	{
+		return isset($this->arrClasses[$sClassName])? $this->arrClasses[$sClassName]: null ;
+	}
+	
+	public function findFunction($sFunctionName,$sClassName='')
+	{
+		return isset($this->arrMethods[$sClassName][$sFunctionName])? $this->arrMethods[$sClassName][$sFunctionName]: null ;
 	}
 	
 	private $arrClasses = array() ;

@@ -1,36 +1,42 @@
 <?php
 namespace jc\aop ;
 
+use jc\pattern\composite\Container;
+use jc\pattern\composite\NamedObject;
 use jc\pattern\iterate\ArrayIterator;
 use jc\lang\Object;
 
-class Pointcut extends Object
+class Pointcut extends NamedObject
 {
-	const around = 'around' ;
-	const before = 'before' ;
-	const after = 'after' ;
-	
-	static private $arrTypes = array(
-		self::around, self::before, self::after
-	) ;
-	
-	public function __construct($fnAdvice,$type=self::around,$jointPoints=array())
+	/**
+	 * @return jc\pattern\IContainer
+	 */
+	public function jointPoints()
 	{
-		$this->fnAdvice = $fnAdvice ;
-	}
-
-	public function addJointPoint(JointPoint $aJointPoint)
-	{
+		if( !$this->aJointPoints )
+		{
+			$this->aJointPoints = new Container('jc\\aop\\JointPoint') ;
+		}
 		
+		return $this->aJointPoints ;
 	}
 	
-	public function iteratorJointPoints()
+	/**
+	 * @return jc\pattern\IContainer
+	 */
+	public function advices()
 	{
-		return new ArrayIterator($this->arrJointPoints) ;
+		if( !$this->aAdvices )
+		{
+			$this->aAdvices = new Container('jc\\aop\\Advice') ;
+		}
+		
+		return $this->aAdvices ;
 	}
 	
-	private $fnAdvice ;
-	private $arrJointPoints ;
+	private $aAdvices ;
+	
+	private $aJointPoints ;
 }
 
 ?>

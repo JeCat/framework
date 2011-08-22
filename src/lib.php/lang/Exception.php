@@ -14,7 +14,9 @@ class Exception extends \Exception implements IException, IObject
 	public function __construct($sMessage,$Argvs=array(),\Exception $aCause=null)
 	{
 		$this->arrArgvs = (array)$Argvs ;
-		parent::__construct($sMessage, 0, $aCause) ;
+		$this->sMessage = $sMessage ;
+		
+		parent::__construct($this->message(), 0, $aCause) ;
 	}
 	
 	public function message(ILocale $aLocale=null)
@@ -28,8 +30,8 @@ class Exception extends \Exception implements IException, IObject
 		}
 		
 		return $aLocale?
-				$aLocale->trans($this->getMessage(),$this->arrArgvs) :
-				call_user_func_array('sprintf', array_merge(array($this->getMessage()),$this->arrArgvs)) ;
+				$aLocale->trans($this->sMessage,$this->arrArgvs) :
+				call_user_func_array('sprintf', array_merge(array($this->sMessage),$this->arrArgvs)) ;
 	}
 	
 	public function code() 
@@ -52,23 +54,12 @@ class Exception extends \Exception implements IException, IObject
 		return $this->getTrace() ;
 	}
 	
-	public function getMessageArgvs()
+	public function messageArgvs()
 	{
 		return $this->arrArgvs ;
 	}
 	
 	// for IJeCatObject //////////////////////////////////
-	public function create($sClassName,$sNamespace='\\',array $arrArgvs=array())
-	{
-		$aObject = Factory::createNewObject($sClassName,$sNamespace,$arrArgvs) ;
-		
-		if( $aObject instanceof IObject )
-		{
-			$aObject->setApplication($this->application(true)) ;
-		}
-		
-		return $aObject ;
-	}
 	public function application($bDefaultGlobal=true)
 	{
 		if($this->aApplication)
@@ -86,6 +77,8 @@ class Exception extends \Exception implements IException, IObject
 	}
 
 	private $aApplication ;
+	
+	private $sMessage ;
 	
 	private $arrArgvs = array() ;
 }

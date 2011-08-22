@@ -1,103 +1,84 @@
 <?php
 namespace jc\compile\object ;
 
-class FunctionDefine extends Token
+use jc\compile\ClassCompileException;
+
+class FunctionDefine extends StructDefine
 {
-	public function __construct(
-			Token $aToken
-			, $aTokenName=null
-			, Token $aTokenArgList=null
-			, Token $aTokenBody=null
-	)
+	public function __construct( Token $aToken, $aTokenName=null, Token $aTokenArgList=null, Token $aTokenBody=null )
 	{
-		$this->cloneOf($aToken) ;
+		parent::__construct($aToken,$aTokenName,$aTokenBody) ;
 		
-		$this->aTokenName = $aTokenName ;
-		$this->aTokenArgList = $aTokenArgList ;
-		$this->aTokenBody = $aTokenBody ;
-		
+		$this->setArgListToken($aTokenArgList) ;
 		$this->setBelongsFunction($this) ;
 	}
 
-	public function name()
-	{
-		return $this->aTokenName->sourceCode() ;
-	}
-	
-	public function nameToken()
-	{
-		return $this->aTokenName ;
-	}
 	public function argListToken()
 	{
 		return $this->aTokenArgList ;
 	}
-	public function bodyToken()
-	{
-		return $this->aTokenBody ;
-	}
-
-	public function setNameToken(Token $aTokenName)
-	{
-		$this->aTokenName = $aTokenName ;
-	}
 	public function setArgListToken(ClosureToken $aTokenArgList)
 	{
+		if( $aTokenArgList->tokenType()!=Token::T_BRACE_ROUND_OPEN or $aTokenArgList->sourceCode()!='(' )
+		{
+			throw new ClassCompileException($aTokenArgList,"参数 \$aTokenArgList 必须是一个内容为 “(” 的Token对象") ;
+		}
+		
 		$this->aTokenArgList = $aTokenArgList ;
 	}
-	public function setBodyToken(ClosureToken $aTokenBody)
-	{
-		$this->aTokenBody = $aTokenBody ;
-	}
-	
-	public function setClassDefine(ClassDefine $aToken)
-	{
-		$this->aClass = $aToken ;
-	}
-	
-	public function classDefine()
-	{
-		return $this->aClass ;
-	}
 
-	public function setAccessToken($aAccessToken)
-	{
-		$this->aAccessToken = $aAccessToken ;
-	}
 	public function accessToken()
 	{
 		return $this->aAccessToken ;		
 	}
-	public function setStaticToken($aStaticToken)
+	public function setAccessToken(Token $aAccessToken)
 	{
-		$this->aStaticToken = $aStaticToken ;
+		if( !in_array($aAccessToken->tokenType(),array(T_PRIVATE,T_PROTECTED,T_PUBLIC)) )
+		{
+			throw new ClassCompileException($aAccessToken,"参数 \$aAccessToken 必须为 T_PRIVATE, T_PROTECTED 或 T_PUBLIC 类型的Token对象") ;
+		} 
+		
+		$this->aAccessToken = $aAccessToken ;
 	}
 	public function staticToken()
 	{
 		return $this->aStaticToken ;		
 	}
-	public function setAbstractToken($aAbstractToken)
+	public function setStaticToken(Token $aStaticToken)
 	{
-		$this->aAbstractToken = $aAbstractToken ;
+		if( $aStaticToken->tokenType()!==T_STATIC )
+		{
+			throw new ClassCompileException($aStaticToken,"参数 \$aStaticToken 必须为 T_STATIC 类型的Token对象") ;
+		} 
+		
+		$this->aStaticToken = $aStaticToken ;
 	}
 	public function abstractToken()
 	{
 		return $this->aAbstractToken ;		
 	}
-	public function setDocToken($aDocToken)
+	public function setAbstractToken(Token $aAbstractToken)
 	{
-		$this->aDocToken = $aDocToken ;
+		if( $aAbstractToken->tokenType()!==T_ABSTRACT )
+		{
+			throw new ClassCompileException($aAbstractToken,"参数 \$aAbstractToken 必须为 T_ABSTRACT 类型的Token对象") ;
+		}
+		$this->aAbstractToken = $aAbstractToken ;
 	}
 	public function docToken()
 	{
 		return $this->aDocToken ;		
 	}
+	public function setDocToken($aDocToken)
+	{
+		if( $aDocToken->tokenType()!==T_DOC_COMMENT )
+		{
+			throw new ClassCompileException($aDocToken,"参数 \$aDocToken 必须为 T_DOC_COMMENT 类型的Token对象") ;
+		}
+		$this->aDocToken = $aDocToken ;
+	}
 	
-	private $aTokenName ;
 	private $aTokenArgList ;
-	private $aTokenBody ;
-	private $aClass ;
-	
 	private $aAccessToken ;
 	private $aStaticToken ;
 	private $aAbstractToken ;

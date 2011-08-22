@@ -57,9 +57,7 @@ class TargetCodeOutputStream implements IOutputStream
 			return ;
 		}
 		
-		$this->sOutputContents = addslashes($this->sOutputContents) ;
-		
-		$this->aCompiledWriter->write("\$aDevice->write(\"{$this->sOutputContents}\") ;\r\n") ;
+		$this->aCompiledWriter->write("\$aDevice->write(<<<OUTPUT\r\n{$this->sOutputContents}\r\nOUTPUT\r\n) ;\r\n") ;
 		$this->sOutputContents = '' ;
 	}
 	

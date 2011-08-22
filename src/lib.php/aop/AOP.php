@@ -1,35 +1,25 @@
 <?php
 namespace jc\aop ;
 
-use jc\lang\Assert;
-use jc\system\ClassLoader;
+use jc\pattern\composite\Container;
 use jc\lang\Object;
 
 class AOP extends Object
-{
-
-	public function addPointcut($fnAdvice,$sJointClass='*',$sJointMethod='*',$type='around')
+{	
+	/**
+	 * @return jc\pattern\IContainer
+	 */
+	public function aspects()
 	{
-		Assert::mustbe(
-			in_array($type,self::$arrTypes)
-			, "AOP的 pointcut 类型必须为：%s"
-			, implode(",", self::$arrTypes)
-		) ;
-
-		$this->arrPointcuts[$sJointClass][$sJointMethod][$type] = $fnAdvice ;
+		if( !$this->aAspects )
+		{
+			$this->aAspects = new Container('jc\\aop\\Aspect') ;
+		}
+		
+		return $this->aAspects ;
 	}
 	
-	public function enable()
-	{
-		
-	}
-
-	public function disable()
-	{
-		
-	}
-	
-	private $arrPointcuts = array() ;
+	private $aAspects ;
 }
 
 ?>
