@@ -65,7 +65,7 @@ class FormWidget extends Widget implements IViewFormWidget
 				new Message(
 					Message::error
 					, "栏位%s输入的内容无效：".$e->getMessage()
-					, array_merge(array($this->title()),$e->getMessageArgvs())
+					, array_merge(array($this->title()),$e->messageArgvs())
 				) ;
 				
 				return false ;
