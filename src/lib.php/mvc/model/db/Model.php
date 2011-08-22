@@ -46,7 +46,7 @@ class Model extends AbstractModel implements IModel
 		// orm config
 		if( is_array($prototype) )
 		{
-			$aPrototype = PrototypeInFragment::createFromCnf($prototype) ;
+			$aPrototype = PrototypeInFragment::createFromCnf($prototype,true,true,true) ;
 		}
 		
 		// Prototype
@@ -59,7 +59,7 @@ class Model extends AbstractModel implements IModel
 		else if( is_string($prototype) )
 		{
 			$aPrototype = PrototypeInFragment::createFromCnf(
-				array('table'=>$prototype)
+				array('table'=>$prototype),true,true,true
 			) ;
 		}
 		
