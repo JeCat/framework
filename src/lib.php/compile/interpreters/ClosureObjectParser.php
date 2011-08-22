@@ -41,7 +41,7 @@ class ClosureObjectParser extends Object implements IInterpreter
 			$nIdx = $aTokenIter->key() ;
 			
 			$tokenType = $aObject->tokenType() ;
-			if( !in_array($tokenType,ClosureToken::$arrClosureObjectBeginTypes) and !in_array($tokenType,ClosureToken::$arrClosureObjectEndTypes) )
+			if( !in_array($tokenType,ClosureToken::openClosureTokens()) and !in_array($tokenType,ClosureToken::closeClosureTokens()) )
 			{
 				continue ;
 			}
@@ -65,7 +65,6 @@ class ClosureObjectParser extends Object implements IInterpreter
 				}
 				
 				$aNewToken->setTheOther($aOpenToken) ;
-				$aOpenToken->setTheOther($aNewToken) ;
 			}
 		}
 		
