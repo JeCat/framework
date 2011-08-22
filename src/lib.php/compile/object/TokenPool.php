@@ -12,6 +12,12 @@ class TokenPool extends Container
 	
 	public function addFunction(FunctionDefine $aFunction)
 	{
+		// 判断匿名函数
+		if( !$aFunction->nameToken() )
+		{
+			return ;
+		}
+		
 		if( $aClass=$aFunction->belongsClass() )
 		{
 			$sClassName = $aClass->fullName() ;
