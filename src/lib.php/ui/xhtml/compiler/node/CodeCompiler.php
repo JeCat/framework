@@ -2,7 +2,7 @@
 namespace jc\ui\xhtml\compiler\node;
 
 use jc\ui\xhtml\AttributeValue;
-use jc\io\IOutputStream;
+use jc\ui\TargetCodeOutputStream;
 use jc\lang\Type;
 use jc\ui\xhtml\compiler\ExpressionCompiler;
 use jc\ui\CompilerManager;
@@ -11,7 +11,7 @@ use jc\ui\xhtml\compiler\NodeCompiler;
 
 class CodeCompiler extends NodeCompiler
 {
-	public function compile(IObject $aObject, IOutputStream $aDev, CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Type::check ( "jc\\ui\\xhtml\\Node", $aObject );
 

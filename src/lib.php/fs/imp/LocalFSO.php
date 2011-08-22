@@ -5,7 +5,7 @@ namespace jc\fs\imp ;
 use jc\fs\IFolder;
 use jc\fs\IFile;
 use jc\lang\Type;
-
+use jc\fs\FileSystem;
 use jc\lang\Exception;
 use jc\fs\FSO;
 
@@ -102,7 +102,7 @@ abstract class LocalFSO extends FSO
 	{
 		if( $this instanceof IFile ){
 			if( is_string($to) ){
-				$toFSO = $this->fileSystem()->rootSystem()->createFile( $to ,FileSystem::CREATE_ONLY_OBJECT) ;
+				$toFSO = $this->fileSystem()->rootFileSystem()->createFile( $to ,FileSystem::CREATE_ONLY_OBJECT) ;
 			}else if($to instanceof FSO){
 				$toFSO = $to;
 			}else{
@@ -128,7 +128,7 @@ abstract class LocalFSO extends FSO
 	{
 		if( $this instanceof IFile ){
 			if( is_string($to) ){
-				$toFSO = $this->fileSystem()->rootSystem()->createFile( $to ,FileSystem::CREATE_ONLY_OBJECT) ;
+				$toFSO = $this->fileSystem()->rootFileSystem()->createFile( $to ,FileSystem::CREATE_ONLY_OBJECT) ;
 			}else if($to instanceof FSO){
 				$toFSO = $to;
 			}else{

@@ -4,13 +4,13 @@ namespace jc\ui\xhtml\compiler ;
 use jc\ui\ICompiler;
 use jc\lang\Object as JcObject;
 use jc\lang\Type;
-use jc\io\IOutputStream;
+use jc\ui\TargetCodeOutputStream;
 use jc\ui\CompilerManager;
 use jc\ui\IObject;
 
 class BaseCompiler extends JcObject implements ICompiler
 {
-	public function compile(IObject $aObject,IOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{	
 		if( $aObject instanceof \jc\ui\xhtml\ObjectBase and !$aObject->count() )
 		{
@@ -23,7 +23,7 @@ class BaseCompiler extends JcObject implements ICompiler
 		}
 	}
 		
-	protected function compileChildren(IObject $aObject,IOutputStream $aDev,CompilerManager $aCompilerManager)
+	protected function compileChildren(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		foreach ($aObject->iterator() as $aChild)
 		{

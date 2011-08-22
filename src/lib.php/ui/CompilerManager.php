@@ -63,22 +63,19 @@ class CompilerManager extends JcObject
 			}
 		}
 
-		$aWriter = $aFile->openWriter(false) ;
-		if(!$aWriter)
-		{
-			throw new Exception("保存XHTML模板的编译文件时无法打开文件:%s",$aCompilingStatus->compiledFilepath()) ;
-		}
+		$aTargetCodeStream = new TargetCodeOutputStream ;
+		$aTargetCodeStream->open($aFile) ;
 		
 		foreach($aObjectContainer->iterator() as $aObject)
 		{
 			$aCompiler = $this->compiler($aObject) ;
 			if($aCompiler)
 			{
-				$aCompiler->compile($aObject,$aWriter,$this) ;
+				$aCompiler->compile($aObject,$aTargetCodeStream,$this) ;
 			}
 		}
-		
-		$aWriter->close() ;
+				
+		$aTargetCodeStream->close() ;
 		
 		$this->aCompilingStatus = null ;
 	}

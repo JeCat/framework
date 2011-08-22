@@ -6,7 +6,6 @@ use jc\util\CombinedIterator;
 use jc\lang\Type;
 use jc\ui\xhtml\nodes\TagLibrary;
 use jc\ui\ICompiler;
-use jc\io\IOutputStream;
 use jc\util\IDataSrc;
 
 class Node extends ObjectBase

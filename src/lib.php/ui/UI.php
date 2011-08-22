@@ -157,9 +157,9 @@ class UI extends JcObject
 		$aVariables->set('theDevice',$aDevice) ;
 		
 		// 拦截 output
-		ob_flush() ;
-		$aOutputFilters = $this->application(true)->response()->filters() ;
-		$aOutputFilters->add( array($aDevice,'write') ) ;
+		//ob_flush() ;
+		//$aOutputFilters = $this->application(true)->response()->filters() ;
+		//$aOutputFilters->add( array($aDevice,'write') ) ;
 		
 		
 		try{
@@ -169,13 +169,13 @@ class UI extends JcObject
 		} catch (\Exception $e) {
 			
 			// 解除拦截 然后再抛出异常
-			$aOutputFilters->remove( array($aDevice,'write') ) ;
+			//$aOutputFilters->remove( array($aDevice,'write') ) ;
 			throw $e ;
 		}
 		
 		// 解除拦截
-		ob_flush() ;
-		$aOutputFilters->remove( array($aDevice,'write') ) ;
+		//ob_flush() ;
+		//$aOutputFilters->remove( array($aDevice,'write') ) ;
 	}
 	
 	public function display($sSourceFile,$aVariables=null,IOutputStream $aDevice=null)

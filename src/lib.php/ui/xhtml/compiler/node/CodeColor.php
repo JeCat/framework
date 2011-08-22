@@ -1,7 +1,7 @@
 <?php
 namespace jc\ui\xhtml\compiler\node ;
 
-use jc\io\IOutputStream;
+use jc\ui\TargetCodeOutputStream;
 
 class CodeColor
 {
@@ -12,9 +12,9 @@ class CodeColor
 		return array(null) ;
 	}
 	
-	public function output(IOutputStream $aDev)
+	public function output(TargetCodeOutputStream $aDev)
 	{
-		$aDev->write( highlight_string($this->sCode,true) ) ;
+		$aDev->output( highlight_string($this->sCode,true) ) ;
 	}
 	
 	private $sCode ;

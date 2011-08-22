@@ -2,15 +2,14 @@
 namespace jc\mvc\view\uicompiler ;
 
 use jc\lang\Assert;
-
 use jc\ui\IObject;
 use jc\ui\CompilerManager;
-use jc\io\IOutputStream;
+use jc\ui\TargetCodeOutputStream;
 use jc\ui\xhtml\compiler\NodeCompiler;
 
 class CssCompiler extends NodeCompiler
 {
-	public function compile(IObject $aObject,IOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Assert::type("jc\\ui\\xhtml\\Node",$aObject,'aObject') ;
 		
