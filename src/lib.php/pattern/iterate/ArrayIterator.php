@@ -81,7 +81,7 @@ class ArrayIterator extends Object implements INonlinearIterator
 			$nPosition = $this->nEndPosition + 1 ;
 		}
 		
-		$this->nPosition = $this->nEndPosition ;
+		$this->nPosition = $nPosition ;
 	}
 	
 	public function search ($element)
