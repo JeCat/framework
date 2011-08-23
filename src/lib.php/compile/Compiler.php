@@ -19,10 +19,10 @@ class Compiler extends JcObject
 {
 	public function compile(IInputStream $aSourceStream,IOutputStream $aCompiledStream)
 	{
-		$aObjectContainer = new TokenPool('jc\\compile\\object\\AbstractObject') ;
+		$aTokenPool = new TokenPool('jc\\compile\\object\\AbstractObject') ;
 		
 		// 扫描 tokens
-		$this->scan($aSourceStream, $aObjectContainer) ;
+		$this->scan($aSourceStream, $aTokenPool) ;
 		
 		// 解析
 		foreach($this->arrInterpreters as $interpreter)
@@ -32,11 +32,11 @@ class Compiler extends JcObject
 				$interpreter = $this->interpreter($interpreter) ;
 			}
 			
-			$interpreter->analyze($aObjectContainer) ;
+			$interpreter->analyze($aTokenPool) ;
 		}
 		
 		// 编译
-		foreach($aObjectContainer->iterator() as $aObject)
+		foreach($aTokenPool->iterator() as $aObject)
 		{
 			for( $sClassName=get_class($aObject); $sClassName; $sClassName=get_parent_class($sClassName) )
 			{
@@ -55,13 +55,13 @@ class Compiler extends JcObject
 		}
 		
 		// 保存到编译文件中
-		foreach($aObjectContainer->iterator() as $aObject)
+		foreach($aTokenPool->iterator() as $aObject)
 		{
 			$aCompiledStream->write($aObject->targetCode()) ;
 		}
 	}
 	
-	protected function scan(IInputStream $aSourceStream,IContainer $aObjectContainer)
+	protected function scan(IInputStream $aSourceStream,IContainer $aTokenPool)
 	{
 		$aSource = new String() ;
 		$aSourceStream->readInString($aSource) ;
@@ -72,13 +72,13 @@ class Compiler extends JcObject
 			if( is_array($oneToken) )
 			{
 				$oneToken[3] = token_name($oneToken[0]) ;
-				$aObjectContainer->add(
+				$aTokenPool->add(
 					new Token($oneToken[0], $oneToken[1], $oneToken[2]), null, true
 				) ;
 			}
 			else if( is_string($oneToken) )
 			{
-				$aObjectContainer->add(
+				$aTokenPool->add(
 					new Token(T_STRING, $oneToken, 0), null, true
 				) ; 
 			}
