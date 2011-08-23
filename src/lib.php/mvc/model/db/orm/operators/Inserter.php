@@ -63,10 +63,26 @@ class Inserter extends OperationStrategy
 			switch ( $aAssociation->type() )
 			{
 			case Association::hasOne :
-			case Association::belongsTo :
 		
 				$this->setAssocModelData($aModel,$aAssocModel,$aAssociation) ;
+				
 				if( !$aAssocModel->save() )
+				{
+					return false ;
+				}
+				
+				break ;
+				
+			case Association::belongsTo :
+				
+				$this->setAssocModelData($aModel,$aAssocModel,$aAssociation) ;
+				
+				if( !$aAssocModel->save() )
+				{
+					return false ;
+				}
+				
+				if( !$this->updateForeignKeysAfterSaveBelongsToModel($aModel,$aAssocModel,$aAssociation) )
 				{
 					return false ;
 				}
@@ -75,7 +91,7 @@ class Inserter extends OperationStrategy
 				
 			case Association::hasMany :
 		
-				$this->setAssocModelData($aModel,$aAssocModel,$aAssociation) ;
+				$this->setAssocModelData($aModel,$aAssociation) ;
 				if( !$aAssocModel->save() )
 				{
 					return false ;
@@ -122,6 +138,31 @@ class Inserter extends OperationStrategy
 				$aChildModel->setData( $sKey, $aModel->data($arrFromKeys[$nIdx]) ) ;				
 			}
 		}
+	}
+	
+	/**
+	 * 这个函数名长到 已经不需要额外的注释了
+	 */
+	private function updateForeignKeysAfterSaveBelongsToModel(IModel $aModel,IModel $aAssocModel,Association $aAssociation)
+	{
+		$arrFromKeys = $aAssociation->fromKeys() ;
+		$bNeedUpdate = false ;
+		
+		foreach($aAssociation->toKeys() as $nIdx=>$sToKey)
+		{
+			$sFromKey = $arrFromKeys[$nIdx] ;
+			$value = $aAssocModel->data($sToKey) ;
+			
+			// 两个 model 的外键值不同 
+			if( $aModel->data($sFromKey)!==$value )
+			{
+				$aModel->setData($sFromKey,$value) ;
+				
+				$bNeedUpdate = true ;
+			}
+		}
+		
+		return $bNeedUpdate? $aModel->save(): false ;
 	}
 }
 
