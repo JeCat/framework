@@ -24,9 +24,12 @@ class Inserter extends OperationStrategy
 					continue ;
 				}
 				
-				$aAssocModel->save() ;
+				if( !$aAssocModel->save() )
+				{
+					return false ;
+				}
 				
-				$this->setAssocModelData($aAssocModel,$aModel,$aAssociation) ;
+				$this->setAssocModelData($aAssocModel,$aModel,$aAssociation->toKeys(),$aAssociation->fromKeys()) ;
 			}
 		}
 		
@@ -64,7 +67,7 @@ class Inserter extends OperationStrategy
 			{
 			case Association::hasOne :
 		
-				$this->setAssocModelData($aModel,$aAssocModel,$aAssociation) ;
+				$this->setAssocModelData($aModel,$aAssocModel,$aAssociation->fromKeys(),$aAssociation->toKeys()) ;
 				
 				if( !$aAssocModel->save() )
 				{
@@ -74,24 +77,12 @@ class Inserter extends OperationStrategy
 				break ;
 				
 			case Association::belongsTo :
-				
-				$this->setAssocModelData($aModel,$aAssocModel,$aAssociation) ;
-				
-				if( !$aAssocModel->save() )
-				{
-					return false ;
-				}
-				
-				if( !$this->updateForeignKeysAfterSaveBelongsToModel($aModel,$aAssocModel,$aAssociation) )
-				{
-					return false ;
-				}
-				
+				// nothing todo ...
 				break ;
 				
 			case Association::hasMany :
 		
-				$this->setAssocModelData($aModel,$aAssociation) ;
+				$this->setAssocModelData($aModel,$aAssocModel,$aAssociation->fromKeys(),$aAssociation->toKeys()) ;
 				if( !$aAssocModel->save() )
 				{
 					return false ;
@@ -120,10 +111,9 @@ class Inserter extends OperationStrategy
 		return true ;
 	}
 	
-	private function setAssocModelData(IModel $aModel,IModel $aChildModel,Association $aAssociation)
+	private function setAssocModelData(IModel $aModel,IModel $aChildModel,array $arrFromKeys,array $arrToKeys)
 	{
-		$arrFromKeys = $aAssociation->fromKeys() ;
-		foreach($aAssociation->toKeys() as $nIdx=>$sKey)
+		foreach($arrToKeys as $nIdx=>$sKey)
 		{
 			if( $aChildModel->isAggregation() )
 			{
@@ -138,31 +128,6 @@ class Inserter extends OperationStrategy
 				$aChildModel->setData( $sKey, $aModel->data($arrFromKeys[$nIdx]) ) ;				
 			}
 		}
-	}
-	
-	/**
-	 * 这个函数名长到 已经不需要额外的注释了
-	 */
-	private function updateForeignKeysAfterSaveBelongsToModel(IModel $aModel,IModel $aAssocModel,Association $aAssociation)
-	{
-		$arrFromKeys = $aAssociation->fromKeys() ;
-		$bNeedUpdate = false ;
-		
-		foreach($aAssociation->toKeys() as $nIdx=>$sToKey)
-		{
-			$sFromKey = $arrFromKeys[$nIdx] ;
-			$value = $aAssocModel->data($sToKey) ;
-			
-			// 两个 model 的外键值不同 
-			if( $aModel->data($sFromKey)!==$value )
-			{
-				$aModel->setData($sFromKey,$value) ;
-				
-				$bNeedUpdate = true ;
-			}
-		}
-		
-		return $bNeedUpdate? $aModel->save(): false ;
 	}
 }
 
