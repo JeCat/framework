@@ -10,11 +10,8 @@ class LoadResourceCompiler extends NodeCompiler
 {
 	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		$aDev->write("<?php \r\n") ;
-		$aDev->write("ob_flush() ;\r\n") ;
 		$aDev->write("\$theView = \$aVariables->get('theView') ;\r\n") ;
-		$aDev->write("\$theView->outputStream()->write(\\jc\\resrc\\HtmlResourcePool::singleton()) ;\r\n") ;
-		$aDev->write("?>") ;
+		$aDev->write("\$aDevice->write(\\jc\\resrc\\HtmlResourcePool::singleton()) ;\r\n") ;
 	}
 }
 

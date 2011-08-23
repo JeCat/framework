@@ -1,6 +1,7 @@
 <?php
 namespace jc\mvc\view\uicompiler ;
 
+use jc\ui\xhtml\compiler\node\ClearCompiler;
 use jc\lang\Assert;
 use jc\ui\xhtml\compiler\node\ScriptCompiler as UiScriptCompiler ;
 use jc\ui\IObject;
@@ -17,7 +18,10 @@ class ScriptCompiler extends UiScriptCompiler
 		if( $aAttrs->has('src') and !$aAttrs->bool('ignore') )
 		{
 			$sSrc = $aAttrs->get('src') ;
-			$aDev->write("<?php \\jc\\resrc\\HtmlResourcePool::singleton()->addRequire({$sSrc},\\jc\\resrc\\HtmlResourcePool::RESRC_JS) ; ?>") ;
+			$aDev->write("\\jc\\resrc\\HtmlResourcePool::singleton()->addRequire({$sSrc},\\jc\\resrc\\HtmlResourcePool::RESRC_JS) ;") ;
+			
+			// 清除后文中的空白字符
+			ClearCompiler::clearAfterWhitespace($aObject) ;
 		}
 		else 
 		{

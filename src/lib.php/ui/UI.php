@@ -154,28 +154,9 @@ class UI extends JcObject
 		{
 			$aVariables->set('theRequest',$this->application()->request()) ;
 		}
-		$aVariables->set('theDevice',$aDevice) ;
+		$aVariables->set('theDevice',$aDevice) ;		
 		
-		// 拦截 output
-		//ob_flush() ;
-		//$aOutputFilters = $this->application(true)->response()->filters() ;
-		//$aOutputFilters->add( array($aDevice,'write') ) ;
-		
-		
-		try{
-			include $aCompiledFile->url()  ;
-		
-		// 处理异常
-		} catch (\Exception $e) {
-			
-			// 解除拦截 然后再抛出异常
-			//$aOutputFilters->remove( array($aDevice,'write') ) ;
-			throw $e ;
-		}
-		
-		// 解除拦截
-		//ob_flush() ;
-		//$aOutputFilters->remove( array($aDevice,'write') ) ;
+		include $aCompiledFile->url()  ;
 	}
 	
 	public function display($sSourceFile,$aVariables=null,IOutputStream $aDevice=null)

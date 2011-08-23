@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\view\uicompiler ;
 
+use jc\ui\xhtml\compiler\node\ClearCompiler;
+
 use jc\lang\Assert;
 use jc\ui\IObject;
 use jc\ui\CompilerManager;
@@ -27,7 +29,10 @@ class CssCompiler extends NodeCompiler
 		if( strtolower($aAttrs->string('rel'))=='stylesheet' and !$aAttrs->bool('ignore') )
 		{
 			$sHref = $aAttrs->get('href') ;
-			$aDev->write("<?php \\jc\\resrc\\HtmlResourcePool::singleton()->addRequire({$sHref},\\jc\\resrc\\HtmlResourcePool::RESRC_CSS) ; ?>") ;
+			$aDev->write("\\jc\\resrc\\HtmlResourcePool::singleton()->addRequire({$sHref},\\jc\\resrc\\HtmlResourcePool::RESRC_CSS) ;") ;
+			
+			// 清除后文中的空白字符
+			ClearCompiler::clearAfterWhitespace($aObject) ;
 		}
 		else 
 		{

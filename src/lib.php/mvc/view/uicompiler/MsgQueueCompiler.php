@@ -13,9 +13,7 @@ class MsgQueueCompiler extends NodeCompiler
 	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Assert::type("jc\\ui\\xhtml\\Node",$aObject,'aObject') ;
-		
-		$aDev->write("<?php \r\n") ;
-		
+				
 		if( $aObject->attributes()->has('for') )
 		{
 			$sMsgQueue = $aObject->attributes()->expression('for') ;
@@ -27,13 +25,12 @@ class MsgQueueCompiler extends NodeCompiler
 		}
 		
 		$aDev->write("\$__ui_msgqueue = {$sMsgQueue} ;\r\n") ;		
-		$aDev->write("if( \$__ui_msgqueue instanceof \\jc\\message\\IMessageQueueHolder )\r\n") ;	
-		$aDev->write("{ \$__ui_msgqueue = \$__ui_msgqueue->messageQueue() ; }\r\n") ;			
+		$aDev->write("if( \$__ui_msgqueue instanceof \\jc\\message\\IMessageQueueHolder ){\r\n") ;	
+		$aDev->write("\t\$__ui_msgqueue = \$__ui_msgqueue->messageQueue() ;\r\n\t}\r\n") ;			
 		$aDev->write("\\jc\\lang\\Assert::type( '\\\\jc\\\\message\\\\IMessageQueue',\$__ui_msgqueue);\r\n") ;		
-		
 		$aDev->write("if( \$__ui_msgqueue->count() ){ \r\n") ;
-		$aDev->write("	\$__ui_msgqueue->display(\$this,\$aDevice) ;\r\n") ;
-		$aDev->write("} ?>\r\n") ;		
+		$aDev->write("\t\$__ui_msgqueue->display(\$this,\$aDevice) ;\r\n") ;
+		$aDev->write("}\r\n") ;		
 	}
 }
 

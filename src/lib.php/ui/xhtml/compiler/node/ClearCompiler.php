@@ -12,11 +12,14 @@ use jc\ui\xhtml\compiler\NodeCompiler;
 
 class ClearCompiler extends NodeCompiler
 {
-
 	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Type::check ( "jc\\ui\\xhtml\\Node", $aObject );
-		
+		self::clearAfterWhitespace($aObject) ;
+	}
+	
+	static public function clearAfterWhitespace (Node $aObject)
+	{
 		if( !$aParent=$aObject->parent() or !$aBrother=$aParent->childAfter($aObject) )
 		{
 			return ;

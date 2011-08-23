@@ -15,7 +15,6 @@ class ViewCompiler extends NodeCompiler
 
 		$aAttrs = $aObject->attributes() ;
 		
-		$aDev->write("<?php ob_flush() ;\r\n") ;
 		$aDev->write("\$theView = \$aVariables->get('theView') ;\r\n") ;
 		
 		if( $aAttrs->has('for') )
@@ -36,8 +35,6 @@ class ViewCompiler extends NodeCompiler
 			$aDev->write("\t\$theView->outputStream()->write(\$aChildView->outputStream()) ;\r\n") ;
 			$aDev->write("}\r\n") ;
 		}
-
-		$aDev->write("?>") ;
 	}
 	
 	static public function FindVagrantView()

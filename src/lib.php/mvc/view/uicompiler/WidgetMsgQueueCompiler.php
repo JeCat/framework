@@ -23,13 +23,12 @@ class WidgetMsgQueueCompiler extends NodeCompiler
 		
 		$sId = $aAttrs->get('id') ;
 		
-		$aDev->write("<?php \r\n") ;
 		$aDev->write("\$__ui_widget = \$aVariables->get('theView')->widget( {$sId} ) ;\r\n") ;
 		$aDev->write("if(!\$__ui_widget)") ;
 		$aDev->write("throw new \\jc\\lang\\Exception('指定的widget id(%s)不存在，无法显示该widget的消息队列',array({$sId})) ; \r\n") ;
 		$aDev->write("if( \$__ui_widget->messageQueue()->count() ){ \r\n") ;
 		$aDev->write("	\$__ui_widget->messageQueue()->display(\$this,\$aDevice) ;\r\n") ;
-		$aDev->write("} ?>\r\n") ;
+		$aDev->write("}\r\n") ;
 	}
 }
 

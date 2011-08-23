@@ -28,7 +28,6 @@ class CodeCompiler extends NodeCompiler
 			$sVarName = parent::assignVariableName() ;
 			
 			$aDev->write("\r\n") ;
-			$aDev->write("ob_flush() ;\r\n") ;
 			$aDev->write("\${$sVarName} = new \\jc\\ui\\xhtml\\compiler\\node\\CodeColor() ;\r\n") ;
 			$aDev->write("\\jc\\io\\StdOutputFilterMgr::singleton()->add(array(\${$sVarName},'outputFilter')) ;\r\n") ;
 			$aDev->write("") ;
@@ -38,7 +37,6 @@ class CodeCompiler extends NodeCompiler
 			
 			// 输出代码
 			$aDev->write("\r\n") ;
-			$aDev->write("ob_flush() ;\r\n") ;
 			$aDev->write("\\jc\\io\\StdOutputFilterMgr::singleton()->remove( array(\${$sVarName},'outputFilter') ) ;\r\n") ;
 			$aDev->write("\${$sVarName}->output(\$aDevice) ;") ;
 			$aDev->write("") ;

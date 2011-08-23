@@ -17,29 +17,28 @@ class ModelForeachCompiler extends NodeCompiler
 		$sIdx = $aAttrs->has ( 'idx' ) ? $aAttrs->get ( 'idx' ) : '' ;
 		$sFor = $aAttrs->has ( 'for' ) ? $aAttrs->get ( 'for' ) : "\$aVariables->get('theModel')" ;
 		
-		$aDev->write("<?php if(\$aForModel={$sFor}){\r\n") ;
+		$aDev->write("if(\$aForModel={$sFor}){\r\n") ;
 		
 		if($sIdx)
 		{
-			$aDev->write("\${$sIdx}=0;\r\n") ;
+			$aDev->write("\t\${$sIdx}=0;\r\n") ;
 		}
 		
-		$aDev->write("foreach(\$aForModel->childIterator() as \$aChildModel){\r\n") ;
-		$aDev->write("\$aVariables->set('theModel',\$aChildModel) ;\r\n") ;
+		$aDev->write("\tforeach(\$aForModel->childIterator() as \$aChildModel){\r\n") ;
+		$aDev->write("\t\t\$aVariables->set('theModel',\$aChildModel) ;\r\n") ;
 	
 		if($sIdx)
 		{
-			$aDev->write("\$aVariables->set('{$sIdx}',\${$sIdx}++) ;\r\n") ;
+			$aDev->write("\t\t\$aVariables->set('{$sIdx}',\${$sIdx}++) ;\r\n") ;
 		}
 		
-		$aDev->write("?>\r\n") ;
 		
 		if(!$aObject->headTag()->isSingle())
 		{
 			
 			$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
 
-			$aDev->write("<?php } } ?>") ;
+			$aDev->write("\t}\r\n}\r\n") ;
 		}
 	}
 }

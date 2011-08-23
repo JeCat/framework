@@ -16,16 +16,22 @@ class FormCompiler extends NodeCompiler
 		
 		if( $aTailTag = $aObject->tailTag() )
 		{
-			$aDev->write("<?php if( !(\$aVariables->get('theView') instanceof \\jc\\mvc\\view\\IFormView) or \$aVariables->get('theView')->isShowForm() ) { ?>\r\n") ;
+			$aDev->write("if( !(\$aVariables->get('theView') instanceof \\jc\\mvc\\view\\IFormView) or \$aVariables->get('theView')->isShowForm() )\r\n{\r\n") ;
 			
 			$this->compileTag($aObject->headTag(), $aDev, $aCompilerManager) ;
 
 			$this->compileChildren($aObject, $aDev, $aCompilerManager) ;
 
-			$aDev->write('<?php if($aVariables->get(\'theView\') instanceof \\jc\\mvc\\view\\IFormView){ ?><input type="hidden" name="<?php echo $aVariables->get(\'theView\')->htmlFormSignature()?>" value="1" /><?php } ?>') ;
+			$aDev->write("\tif(\$aVariables->get('theView') instanceof \\jc\\mvc\\view\\IFormView){\r\n") ;
+			$aDev->write("\t\t") ;
+			$aDev->output('<input type="hidden" name="') ;
+			$aDev->write("\t\techo \$aVariables->get('theView')->htmlFormSignature() ;") ;
+			$aDev->output('" value="1" />') ;
+			$aDev->write("\t}\r\n") ;
+			
 			$this->compileTag($aTailTag, $aDev, $aCompilerManager) ;
 			
-			$aDev->write("<?php } ?>\r\n") ;
+			$aDev->write("}\r\n") ;
 		}
 		
 		else

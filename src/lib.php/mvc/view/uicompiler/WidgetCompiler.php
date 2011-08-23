@@ -25,7 +25,7 @@ class WidgetCompiler extends NodeCompiler
 		
 		$sId = $aAttrs->get('id') ;
 			
-		$aDev->write("<?php \$_aWidget = \$aVariables->get('theView')->widget({$sId}) ;\r\n") ;
+		$aDev->write("\$_aWidget = \$aVariables->get('theView')->widget({$sId}) ;\r\n") ;
 		$aDev->write("if(\$_aWidget){\r\n") ;
 		
 		// 常规 html attr
@@ -57,7 +57,7 @@ class WidgetCompiler extends NodeCompiler
 		$aDev->write("	\$_aWidget->display(\$this,null,\$aDevice) ;\r\n") ;
 		$aDev->write("}else{\r\n") ;
 		$aDev->write("	echo '缺少 widget (id:'.{$sId}.')' ;\r\n") ;
-		$aDev->write("} ?>\r\n") ;
+		$aDev->write("}\r\n") ;
 	}
 
 }
