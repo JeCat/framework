@@ -22,9 +22,9 @@ class BreakCompiler extends NodeCompiler {
 	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) {
 		Type::check ( "jc\\ui\\xhtml\\Node", $aObject );
 		
-		$aDev->write ( '<?php break '
+		$aDev->write ( 'break '
 						 . ExpressionCompiler::compileExpression ( $aObject->attributes ()->source () )
-						 . '; ?>' );
+						 . ';' );
 	}
 }
 

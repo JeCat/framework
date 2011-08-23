@@ -46,13 +46,21 @@ class Model extends AbstractModel implements IModel
 		// orm config
 		if( is_array($prototype) )
 		{
-			$aPrototype = PrototypeInFragment::createFromCnf($prototype) ;
+			$aPrototype = PrototypeInFragment::createFromCnf($prototype,true,true,true) ;
 		}
 		
 		// Prototype
 		else if( $prototype instanceof PrototypeInFragment )
 		{
 			$aPrototype = $prototype ;
+		}
+		
+		// 字符串做为数据表的表名
+		else if( is_string($prototype) )
+		{
+			$aPrototype = PrototypeInFragment::createFromCnf(
+				array('table'=>$prototype),true,true,true
+			) ;
 		}
 		
 		else if( $prototype===null )
@@ -62,7 +70,7 @@ class Model extends AbstractModel implements IModel
 		
 		else 
 		{
-			throw new Exception("创建模型时传入的模型原型无效") ;
+			throw new Exception("创建模型时传入的模型原型类型无效") ;
 		}
 		
 		$this->setPrototype($aPrototype) ;

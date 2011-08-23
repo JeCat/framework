@@ -32,7 +32,7 @@ class SubTemplateCallCompiler extends NodeCompiler
 			$sSubTemplateName = '"' . addslashes($aSubTemplateNameVal->source()) . '"' ;
 		}
 		
-		$aDev->write("<?php \r\n") ;
+		$aDev->write(" \r\n") ;
 		
 		// 是否继承父模板中的变量
 		$bExtendParentVars = $aAttributes->has("vars")? $aAttributes->bool('vars'): false ;
@@ -62,9 +62,9 @@ class SubTemplateCallCompiler extends NodeCompiler
 			}
 		}
 		
-		$aDev->write("call_user_func_array(\$aVariables->get('__subtemplate_'.{$sSubTemplateName}),array(\$__subtemplate_aVariables,\$aDevice)) ;?>\r\n") ;
+		$aDev->write("call_user_func_array(\$aVariables->get('__subtemplate_'.{$sSubTemplateName}),array(\$__subtemplate_aVariables,\$aDevice)) ;\r\n") ;
 	}
 
 }
-
 ?>
+

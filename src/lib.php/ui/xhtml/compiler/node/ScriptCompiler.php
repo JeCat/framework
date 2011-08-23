@@ -18,7 +18,6 @@ class ScriptCompiler extends NodeCompiler
 		$sType = strtolower($aObject->attributes()->string('type')) ;
 		if( in_array($sType, array('text/php','php')) )
 		{
-			$aDev->write("<?php \r\n") ;
 			
 			foreach($aObject->iterator() as $aChild)
 			{
@@ -30,8 +29,6 @@ class ScriptCompiler extends NodeCompiler
 					ExpressionCompiler::compileExpression($aChild->source(),false,false)
 				) ;
 			}
-			
-			$aDev->write(" ?>") ;
 		}
 		
 		// 按照普通 html 节点处理

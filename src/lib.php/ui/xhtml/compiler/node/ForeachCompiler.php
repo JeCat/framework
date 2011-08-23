@@ -1,4 +1,4 @@
-<?php
+<?php 
 /**
  * foreach
  * 
@@ -49,7 +49,7 @@ class ForeachCompiler extends NodeCompiler {
 		$sKeyAutoName = NodeCompiler::assignVariableName ( '$__foreach_key_' ) ;
 		$sIdxAutoName = NodeCompiler::assignVariableName ( '$__foreach_idx_' ) ;
 		
-		$aDev->write ( "<?php
+		$aDev->write ( "
 				{$sForAutoName} = {$sForUserExp};
 				if(!empty({$sForAutoName})){ 
 					{$sIdxAutoName} = -1;
@@ -74,16 +74,16 @@ class ForeachCompiler extends NodeCompiler {
 			$aDev->write ( " \$aVariables->set({$sIdxUserName},{$sIdxAutoName} ); ");
 		}
 					
-		$aDev->write("?>");
+		$aDev->write("");
 		
 		//是否是单行标签?
 		if(!$aObject->headTag()->isSingle()){
 			//循环体，可能会包含foreach:else标签
 			$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
-			$aDev->write("<?php 
+			$aDev->write(" 
 					}
 				}
-			 		?>") ; // end if   (如果foreach的内容包含foreach:else标签,则此处为foreach:else的end)
+			 		") ; // end if   (如果foreach的内容包含foreach:else标签,则此处为foreach:else的end)
 		}
 	}
 }
