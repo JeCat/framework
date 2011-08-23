@@ -75,7 +75,7 @@ class Token extends AbstractObject
 		return $this->parent() ;
 	}
 
-	public function setBelongsNamespace(NamespaceDeclare $aToken)
+	public function setBelongsNamespace(NamespaceDeclare $aToken=null)
 	{
 		$this->aNamespace = $aToken ;
 	}
@@ -83,7 +83,7 @@ class Token extends AbstractObject
 	{
 		return $this->aNamespace ;
 	}
-	public function setBelongsClass(ClassDefine $aToken)
+	public function setBelongsClass(ClassDefine $aToken=null)
 	{
 		$this->aClass = $aToken ;
 	}
@@ -91,7 +91,7 @@ class Token extends AbstractObject
 	{
 		return $this->aClass ;
 	}
-	public function setBelongsFunction(FunctionDefine $aToken)
+	public function setBelongsFunction(FunctionDefine $aToken=null)
 	{
 		$this->aFunction = $aToken ;
 	}
