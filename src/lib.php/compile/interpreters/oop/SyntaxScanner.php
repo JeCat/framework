@@ -19,12 +19,11 @@ class SyntaxScanner extends Object implements IInterpreter
 {
 	public function __construct()
 	{
+		$this->aPHPCodeParser = new PHPCodeParser() ;
+		
 		$this->arrParsers[] = new NamespaceParser() ;
 		$this->arrParsers[] = new ClassDefineParser() ;
 		$this->arrParsers[] = new FunctionDefineParser() ;
-		
-		$this->aPHPCodeParser = new PHPCodeParser() ;
-		
 		//$this->arrParsers[] = new FunctionCallParser() ;
 		//$this->arrParsers[] = new NewObjectParser() ;
 		//$this->arrParsers[] = new ThrowParser() ;
@@ -43,24 +42,18 @@ class SyntaxScanner extends Object implements IInterpreter
 			{
 				continue ;
 			}
-			
+				
 			foreach($this->arrParsers as $aParser)
-			{
+			{				
 				$aParser->parse($aTokenPool,$aTokenPoolIter,$aState) ;
 			}
+			
+			$aToken->setBelongsNamespace($aState->currentNamespace()) ;
+			$aToken->setBelongsClass($aState->currentClass()) ;
+			$aToken->setBelongsFunction($aState->currentFunction()) ;
 		}
 	}
-	
-	/**
-	 * 
-	 */
-	private function scanPHPCode(TokenPool $aTokenPool,INonlinearIterator $aTokenPoolIter,State $aState)
-	{
-	
-	}
 		
-	
-	
 	public function analyzeDeprecated(TokenPool $aObjectContainer)
 	{
 		$this->bIsPHPCode = false ;

@@ -50,10 +50,12 @@ class ClassDefineParser implements ISyntaxPaser
 			
 			$aNewToken->setBodyToken($aToken) ;		
 	
-			
 			$aTokenPool->replace($aNewToken, $aOriToken) ;
-			$aTokenPool->addClass($aNewToken) ;
 			$aState->setCurrentClass($aNewToken) ;
+			
+			$aNewToken->setBelongsNamespace($aState->currentNamespace()) ;
+			
+			$aTokenPool->addClass($aNewToken) ;
 		}
 		
 	}

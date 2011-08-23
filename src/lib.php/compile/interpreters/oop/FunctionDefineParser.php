@@ -118,6 +118,10 @@ class FunctionDefineParser implements ISyntaxPaser
 			}
 			
 			$aTokenPool->replace($aNewToken, $aOriToken) ;
+			
+			$aNewToken->setBelongsNamespace($aState->currentNamespace()) ;
+			$aNewToken->setBelongsClass($aState->currentClass()) ;
+			
 			$aTokenPool->addFunction($aNewToken) ;
 		}
 		
