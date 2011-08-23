@@ -1,12 +1,10 @@
 <?php
 namespace jc\system ;
 
+use jc\compile\ClassCompileException;
 use jc\fs\FileSystem;
-
 use jc\io\OutputStream;
-
 use jc\io\InputStream;
-
 use jc\compile\CompilerFactory;
 use jc\lang\Exception;
 use jc\lang\Assert;
@@ -60,9 +58,9 @@ class ClassLoader extends \jc\lang\Object
 		/**
 		 * 在系统维护的包中根据路径规则和命名规则搜索类文件
 		 */
-		if( $aClassPath=$this->searchClass($sClassFullName) )
+		if( $aClassFile=$this->searchClass($sClassFullName) )
 		{
-			$aClassPath->includeFile(false,true) ;
+			$aClassFile->includeFile(false,true) ;
 		}
 	}
 	
@@ -137,7 +135,21 @@ class ClassLoader extends \jc\lang\Object
 							}
 							
 							// 编译 class 文件
-							$this->compiler()->compile( $aClassSource->openReader(), $aClassCompiled->openWriter() ) ;
+							try{
+								$this->compiler()->compile( $aClassSource->openReader(), $aClassCompiled->openWriter() ) ;
+							}
+							catch (ClassCompileException $e)
+							{
+								echo $e->message(). " <br />\r\n" ;
+								echo "class source file :" . $aClassSource->url(). " <br />\r\n" ;
+								if( $aToken=$e->causeToken() )
+								{
+									echo "problem on line: " , $aToken->line() , ", position:", $aToken->position(), " <br />\r\n" ;
+									echo "token source: “" , $aToken->sourceCode(), "” <br />\r\n" ;
+								}
+								echo "<pre>",$e->getTraceAsString(),"</pre>" ;
+								exit() ;
+							}
 						}
 						
 						return $aClassCompiled ;					

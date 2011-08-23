@@ -6,7 +6,7 @@ use jc\compile\object\TokenPool;
 
 interface IInterpreter
 {
-	public function analyze(TokenPool $aObjectContainer) ;
+	public function analyze(TokenPool $aTokenPool) ;
 }
 
 ?>

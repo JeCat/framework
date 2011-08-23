@@ -9,7 +9,11 @@ class FunctionDefine extends StructDefine
 	{
 		parent::__construct($aToken,$aTokenName,$aTokenBody) ;
 		
-		$this->setArgListToken($aTokenArgList) ;
+		if($aTokenArgList)
+		{
+			$this->setArgListToken($aTokenArgList) ;
+		}
+		
 		$this->setBelongsFunction($this) ;
 	}
 

@@ -10,6 +10,7 @@ use jc\compile\object\Token;
 use jc\util\String;
 use jc\ui\TargetCodeOutputStream;
 use jc\io\IInputStream;
+use jc\io\IOutputStream;
 use jc\compile\object\IObject;
 use jc\pattern\composite\IContainer;
 use jc\pattern\composite\Container;
@@ -19,10 +20,10 @@ class Compiler extends JcObject
 {
 	public function compile(IInputStream $aSourceStream,IOutputStream $aCompiledStream)
 	{
-		$aObjectContainer = new TokenPool('jc\\compile\\object\\AbstractObject') ;
+		$aTokenPool = new TokenPool('jc\\compile\\object\\AbstractObject') ;
 		
 		// 扫描 tokens
-		$this->scan($aSourceStream, $aObjectContainer) ;
+		$this->scan($aSourceStream, $aTokenPool) ;
 		
 		// 解析
 		foreach($this->arrInterpreters as $interpreter)
@@ -32,11 +33,11 @@ class Compiler extends JcObject
 				$interpreter = $this->interpreter($interpreter) ;
 			}
 			
-			$interpreter->analyze($aObjectContainer) ;
+			$interpreter->analyze($aTokenPool) ;
 		}
 		
 		// 编译
-		foreach($aObjectContainer->iterator() as $aObject)
+		foreach($aTokenPool->iterator() as $aObject)
 		{
 			for( $sClassName=get_class($aObject); $sClassName; $sClassName=get_parent_class($sClassName) )
 			{
@@ -49,37 +50,45 @@ class Compiler extends JcObject
 				{
 					$aGenerator = $this->generator($sGeneratorClass) ;
 
-					$aGenerator->generateTargetCode($aObject) ;
+					$aGenerator->generateTargetCode($aTokenPool,$aObject) ;
 				}
 			}
 		}
 		
 		// 保存到编译文件中
-		foreach($aObjectContainer->iterator() as $aObject)
+		foreach($aTokenPool->iterator() as $aObject)
 		{
 			$aCompiledStream->write($aObject->targetCode()) ;
 		}
 	}
 	
-	protected function scan(IInputStream $aSourceStream,IContainer $aObjectContainer)
+	protected function scan(IInputStream $aSourceStream,IContainer $aTokenPool)
 	{
 		$aSource = new String() ;
 		$aSourceStream->readInString($aSource) ;
+		$nLine = 1 ;
+		$nPosition = 1 ;
 		
 		$arrTokens = token_get_all($aSource) ;
 		foreach($arrTokens as &$oneToken)
 		{
 			if( is_array($oneToken) )
 			{
+				if( $nLine != $oneToken[2] )
+				{
+					$nLine = $oneToken[2] ;
+					$nPosition = 1 ;
+				}
+				
 				$oneToken[3] = token_name($oneToken[0]) ;
-				$aObjectContainer->add(
-					new Token($oneToken[0], $oneToken[1], $oneToken[2]), null, true
+				$aTokenPool->add(
+					new Token($oneToken[0], $oneToken[1], $nPosition++, $nLine), null, true
 				) ;
 			}
 			else if( is_string($oneToken) )
 			{
-				$aObjectContainer->add(
-					new Token(T_STRING, $oneToken, 0), null, true
+				$aTokenPool->add(
+					new Token(T_STRING, $oneToken, $nPosition++, $nLine), null, true
 				) ; 
 			}
 		}
@@ -105,6 +114,11 @@ class Compiler extends JcObject
 	
 	public function registerGenerator($sObjectClass,$sGeneratorClass,array $arrCreateArgs=array())
 	{
+		if( !isset($this->mapGeneratorClasses[$sObjectClass]) )
+		{
+			$this->mapGeneratorClasses[$sObjectClass] = array() ;
+		}
+		
 		if( !in_array($sGeneratorClass, $this->mapGeneratorClasses[$sObjectClass]) )
 		{
 			$this->mapGeneratorClasses[$sObjectClass][] = $sGeneratorClass ;

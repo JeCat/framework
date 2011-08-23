@@ -10,6 +10,7 @@ class Token extends AbstractObject
 	const T_BRACE_ROUND_OPEN = '(' ;
 	const T_BRACE_ROUND_CLOSE = ')' ;
 	const T_SEMICOLON = ';' ;
+	const T_COLON = ',' ;
 	
 	static private $arrExtTypes = array(
 			self::T_BRACE_OPEN => 'Token::T_BRACE_OPEN',
@@ -19,11 +20,12 @@ class Token extends AbstractObject
 			self::T_BRACE_ROUND_OPEN => 'Token::T_BRACE_ROUND_OPEN',
 			self::T_BRACE_ROUND_CLOSE => 'Token::T_BRACE_ROUND_CLOSE',
 			self::T_SEMICOLON => 'Token::T_SEMICOLON',
+			self::T_COLON => 'Token::T_COLON',
 	) ; 
 
-	public function __construct($nType,$sSource,$nPostion)
+	public function __construct($nType,$sSource,$nPostion,$nLine=0)
 	{
-		parent::__construct($sSource,$nPostion) ;
+		parent::__construct($sSource,$nPostion,$nLine) ;
 		
 		$this->nType = $nType ;
 		$this->setTokenType($nType) ;
@@ -38,6 +40,7 @@ class Token extends AbstractObject
 		$this->setSourceCode($aOther->sourceCode()) ;
 		$this->setTargetCode($aOther->targetCode()) ;
 		$this->setPosition($aOther->position()) ;
+		$this->setLine($aOther->line()) ;
 		
 		$this->sType = $this->tokenTypeName() ;
 	}
@@ -73,7 +76,7 @@ class Token extends AbstractObject
 		return $this->parent() ;
 	}
 
-	public function setBelongsNamespace(NamespaceDeclare $aToken)
+	public function setBelongsNamespace(NamespaceDeclare $aToken=null)
 	{
 		$this->aNamespace = $aToken ;
 	}
@@ -81,7 +84,7 @@ class Token extends AbstractObject
 	{
 		return $this->aNamespace ;
 	}
-	public function setBelongsClass(ClassDefine $aToken)
+	public function setBelongsClass(ClassDefine $aToken=null)
 	{
 		$this->aClass = $aToken ;
 	}
@@ -89,7 +92,7 @@ class Token extends AbstractObject
 	{
 		return $this->aClass ;
 	}
-	public function setBelongsFunction(FunctionDefine $aToken)
+	public function setBelongsFunction(FunctionDefine $aToken=null)
 	{
 		$this->aFunction = $aToken ;
 	}
@@ -115,7 +118,7 @@ class Token extends AbstractObject
 			$sSignature.= $this->aFunction->name().'()' ;
 		}
 		
-		return '['.$sSignature.']' ;
+		return $sSignature? ('['.$sSignature.']'): '' ;
 	}
 	
 	private $nType ;
