@@ -2,14 +2,13 @@
 namespace jc\compile\object ;
 
 use jc\lang\Exception;
-
 use jc\compile\ClassCompileException;
 
 class ClosureToken extends Token 
 {
 	public function __construct(Token $aToken)
 	{
-		if( !in_array($aToken->tokenType(),self::$arrClosureObjectBeginTypes,true) and !in_array($aToken->tokenType(),self::$arrClosureObjectEndTypes,true) )
+		if( !array_key_exists($aToken->tokenType(),self::$arrClosureObjectBeginTypes) and !array_key_exists($aToken->tokenType(),self::$arrClosureObjectEndTypes) )
 		{
 			throw new ClassCompileException(
 				$aToken
@@ -22,7 +21,7 @@ class ClosureToken extends Token
 	
 	public function isOpen()
 	{
-		return in_array($this->tokenType(),self::$arrClosureObjectBeginTypes) ;
+		return array_key_exists($this->tokenType(),self::$arrClosureObjectBeginTypes) ;
 	}
 
 	public function theOther()
@@ -51,28 +50,17 @@ class ClosureToken extends Token
 			
 			if( $this->isOpen() )
 			{
-				if( !isset(self::$arrClosureTokenPairs[ $thisTokenType ]) )
+				if( !self::isPair($thisTokenType,$aToken->tokenType()) )
 				{
-					throw new Exception("类型无效:%s，无法检查对应的闭合类型",$thisTokenType) ;
-				}
-				
-				if( $aToken->tokenType()!==self::$arrClosureTokenPairs[ $thisTokenType ] )
-				{
-					throw new Exception("遇到意外的闭合token类型，“%s”和“%s”类型不匹配。",array($thisTokenType,$aToken->tokenType())) ;
+					throw new ClassCompileException($aToken,"遇到意外的闭合token类型，“%s”和“%s”类型不匹配。",array($thisTokenType,$aToken->tokenTypeName())) ;
 				}
 			}
 			
 			else 
 			{
-				//if( !isset(self::$arrClosureTokenPairs[ $thisTokenType ]) )
-				if( !$openTokenType=array_search($thisTokenType,self::$arrClosureTokenPairs) )
+				if( !self::isPair($aToken->tokenType(),$thisTokenType) )
 				{
-					throw new Exception("类型无效:%s，无法检查对应的闭合类型",$thisTokenType) ;
-				}
-				
-				if( $aToken->tokenType()!==$openTokenType )
-				{
-					throw new Exception("遇到意外的闭合token类型，“%s”和“%s”类型不匹配。",array($thisTokenType,$aToken->tokenType())) ;
+					throw new ClassCompileException($aToken,"遇到意外的闭合token类型，“%s”和“%s”类型不匹配。",array($thisTokenType,$aToken->tokenTypeName())) ;
 				}
 			}
 			
@@ -83,53 +71,74 @@ class ClosureToken extends Token
 
 	static public function openClosureSymbols()
 	{
-		return array_keys(self::$arrClosureObjectBeginTypes) ;
+		return call_user_func_array('array_merge',self::$arrClosureObjectBeginTypes) ;
 	}
 	static public function closeClosureSymbols()
 	{
-		return array_keys(self::$arrClosureObjectEndTypes) ;
+		return call_user_func_array('array_merge',self::$arrClosureObjectEndTypes) ;
 	}
 	
 	static public function openClosureTokens()
 	{
-		return array_unique(self::$arrClosureObjectBeginTypes) ;
+		return array_keys(self::$arrClosureObjectBeginTypes) ;
 	}
 	static public function closeClosureTokens()
 	{
-		return array_unique(self::$arrClosureObjectEndTypes) ;
+		return array_keys(self::$arrClosureObjectEndTypes) ;
 	}
 
 	static public function closureTokenPairs()
 	{
 		return self::$arrClosureTokenPairs ;
 	}
+
+	static public function isPair($openTokenType,$closeTokenType)
+	{
+		foreach(self::$arrClosureTokenPairs as $arrPair)
+		{
+			if( $arrPair[0]===$openTokenType and $arrPair[1]===$closeTokenType)
+			{
+				return true ;
+			}
+		}
+		
+		return ;
+	}
 	
 	static private $arrClosureObjectBeginTypes = array(
+			Token::T_BRACE_OPEN => array('{') ,
+			Token::T_BRACE_SQUARE_OPEN => array('[') ,
+			Token::T_BRACE_ROUND_OPEN => array('(') ,
+			T_OPEN_TAG => array('<?','<?php') ,
+			T_OPEN_TAG_WITH_ECHO => array('<?=') ,
+			T_DOLLAR_OPEN_CURLY_BRACES => array('${') ,		// "ooo${xxx}ooo"
+			T_CURLY_OPEN => array('{') ,					// "ooo{$xxx}ooo"
+	/*
 			'{' => Token::T_BRACE_OPEN ,
 			'[' => Token::T_BRACE_SQUARE_OPEN ,
 			'(' => Token::T_BRACE_ROUND_OPEN ,
 			'<?' => T_OPEN_TAG ,
 			'<?php' => T_OPEN_TAG ,
 			'<?=' => T_OPEN_TAG_WITH_ECHO ,
-			'{$' => T_DOLLAR_OPEN_CURLY_BRACES ,		// "ooo{$xxx}ooo"
-			'${' => T_CURLY_OPEN ,						// "ooo${xxx}ooo"
+			'{$' => T_DOLLAR_OPEN_CURLY_BRACES ,		
+			'{' => T_CURLY_OPEN , */						
 	) ;	
 	
 	static private $arrClosureObjectEndTypes = array(
-			'}' => Token::T_BRACE_CLOSE ,
-			']' => Token::T_BRACE_SQUARE_CLOSE ,
-			')' => Token::T_BRACE_ROUND_CLOSE ,
-			'?>' => T_CLOSE_TAG ,
+			Token::T_BRACE_CLOSE => array('{') ,
+			Token::T_BRACE_SQUARE_CLOSE => array('[') ,
+			Token::T_BRACE_ROUND_CLOSE => array('(') ,
+			T_CLOSE_TAG => array('?>') ,
 	) ;
 	
 	static private $arrClosureTokenPairs = array(
-			Token::T_BRACE_OPEN => Token::T_BRACE_CLOSE ,					// { & }
-			Token::T_BRACE_SQUARE_OPEN => Token::T_BRACE_SQUARE_CLOSE ,		// [ & ]
-			Token::T_BRACE_ROUND_OPEN => Token::T_BRACE_ROUND_CLOSE ,		// 
-			T_OPEN_TAG => T_CLOSE_TAG ,						
-			T_OPEN_TAG_WITH_ECHO => T_CLOSE_TAG ,				
-			T_DOLLAR_OPEN_CURLY_BRACES => Token::T_BRACE_CLOSE ,		// {$ & }
-			T_CURLY_OPEN => Token::T_BRACE_CLOSE  ,			// ${ & }
+			array(Token::T_BRACE_OPEN,Token::T_BRACE_CLOSE) ,					// { & }
+			array(Token::T_BRACE_SQUARE_OPEN,Token::T_BRACE_SQUARE_CLOSE) ,		// [ & ]
+			array(Token::T_BRACE_ROUND_OPEN,Token::T_BRACE_ROUND_CLOSE) ,		// ( & )
+			array(T_OPEN_TAG,T_CLOSE_TAG) ,										// < ? & ? >
+			array(T_OPEN_TAG_WITH_ECHO,T_CLOSE_TAG) ,							// < ?= & ? >
+			array(T_DOLLAR_OPEN_CURLY_BRACES,Token::T_BRACE_CLOSE) ,			// ${ & }
+			array(T_CURLY_OPEN,Token::T_BRACE_CLOSE)  ,							// {$ & }
 	) ;
 	
 	private $aTheOther ;

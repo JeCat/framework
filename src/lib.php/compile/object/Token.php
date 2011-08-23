@@ -23,9 +23,9 @@ class Token extends AbstractObject
 			self::T_COLON => 'Token::T_COLON',
 	) ; 
 
-	public function __construct($nType,$sSource,$nPostion)
+	public function __construct($nType,$sSource,$nPostion,$nLine=0)
 	{
-		parent::__construct($sSource,$nPostion) ;
+		parent::__construct($sSource,$nPostion,$nLine) ;
 		
 		$this->nType = $nType ;
 		$this->setTokenType($nType) ;
@@ -40,6 +40,7 @@ class Token extends AbstractObject
 		$this->setSourceCode($aOther->sourceCode()) ;
 		$this->setTargetCode($aOther->targetCode()) ;
 		$this->setPosition($aOther->position()) ;
+		$this->setLine($aOther->line()) ;
 		
 		$this->sType = $this->tokenTypeName() ;
 	}

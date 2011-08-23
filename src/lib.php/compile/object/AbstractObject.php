@@ -5,10 +5,11 @@ use jc\pattern\composite\Composite;
 
 class AbstractObject extends Composite
 {
-	public function __construct($sSource,$nPostion)
+	public function __construct($sSource,$nPostion,$nLine=0)
 	{
 		$this->sSource = $this->sTarget = $sSource ;
 		$this->nPostion = $nPostion ;
+		$this->nLine = $nLine ;
 	}
 	
 	public function __toString()
@@ -50,6 +51,16 @@ class AbstractObject extends Composite
 	{
 		return $this->position() + $this->length() - 1 ;
 	}
+	public function line()
+	{
+		return $this->nLine ;
+	}
+	public function setLine($nLine)
+	{
+		$this->nLine = $nLine ;
+	}
+	
+	private $nLine ;
 	
 	private $sSource ;
 	

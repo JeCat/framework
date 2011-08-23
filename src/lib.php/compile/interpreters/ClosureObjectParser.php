@@ -2,13 +2,10 @@
 
 namespace jc\compile\interpreters ;
 
+use jc\compile\ClassCompileException;
 use jc\compile\object\TokenPool;
-use jc\lang\Exception;
-
 use jc\util\Stack;
-
 use jc\compile\object\ClosureToken;
-
 use jc\compile\object\Token;
 use jc\pattern\composite\IContainer;
 use jc\compile\IInterpreter;
@@ -58,8 +55,9 @@ class ClosureObjectParser extends Object implements IInterpreter
 			{
 				if( !$aOpenToken=$arrStacks[$tokenType]->out() )
 				{
-					throw new Exception(
-								"编译class时遇到了语法错误,闭合对象的结尾没有对应的开始:%s; on line %d"
+					throw new ClassCompileException(
+								$aNewToken
+								, "编译class时遇到了语法错误,闭合对象的结尾没有对应的开始:%s; on position %d"
 								, array($aNewToken->sourceCode(),$aNewToken->position())
 					) ;
 				}
