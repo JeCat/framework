@@ -20,7 +20,7 @@ abstract class StatementForAssocQuery implements IStatement
 	{
 		if(!$this->sSql)
 		{
-			$this->assocPrototype($this->aPrototype) ;
+			$this->preprocessMakeStatement($this->aPrototype) ;
 			
 			$this->sSql = $this->realStatement()->makeStatement($bFormat) ;
 		}
@@ -33,7 +33,7 @@ abstract class StatementForAssocQuery implements IStatement
 		return $this->realStatement()->checkValid($bThrowException) ;
 	}
 	
-	protected function assocPrototype(PrototypeInFragment $aPrototype)
+	protected function preprocessMakeStatement(PrototypeInFragment $aPrototype)
 	{
 		// 未被其他原型单属关联，做为"片段"的起点
 		if( !$aAssocBy=$aPrototype->associateBy() or !$aAssocBy->isOneToOne() )
