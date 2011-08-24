@@ -11,7 +11,7 @@ class PrintMacroCompiler extends MacroCompiler
 {
 	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		$aDev->write( "echo " . ExpressionCompiler::compileExpression($aObject->source()) . " ;" ) ;
+		$aDev->write( "\$aDevice->write(" . ExpressionCompiler::compileExpression($aObject->source()) . ") ;\r\n" ) ;
 	}
 }
 
