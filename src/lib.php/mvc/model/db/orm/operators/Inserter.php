@@ -120,12 +120,12 @@ class Inserter extends OperationStrategy
 				$value = $aModel->data($arrFromKeys[$nIdx]) ;
 				foreach ($aChildModel->childIterator() as $aChildChildModel)
 				{
-					$aChildChildModel->setData( $sKey, $value ) ;		
+					$aChildChildModel->setData( $sKey, $value ) ;
 				}
 			}
 			else 
 			{
-				$aChildModel->setData( $sKey, $aModel->data($arrFromKeys[$nIdx]) ) ;				
+				$aChildModel->setData( $sKey, $aModel->data($arrFromKeys[$nIdx]) ) ;			
 			}
 		}
 	}

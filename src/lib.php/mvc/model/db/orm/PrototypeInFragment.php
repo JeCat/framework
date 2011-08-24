@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\model\db\orm ;
 
+use jc\db\sql\Criteria;
+
 use jc\db\sql\TablesJoin;
 
 use jc\db\sql\Table;
@@ -70,15 +72,103 @@ class PrototypeInFragment extends Prototype
 		if( !$this->aTable )
 		{
 			$this->aTable = new Table($this->tableName(),$this->tableAlias()) ;
+			
+			// join 被其他原型多对多关系中的中间表
+			if( $aAssociateBy=$this->associateBy() and $aAssociateBy->type()===Association::hasAndBelongsToMany )
+			{
+				// bridge 表到 to表的关联条件					
+				$aBridgeCriteria=new Criteria() ;
+				$this->setAssociationCriteria(
+						$aBridgeCriteria
+						, $this->bridgeTableAlias(), $this->tableAlias()
+						, $aAssociateBy->bridgeFromKeys(), $aAssociateBy->toKeys()
+				) ;
+				
+				// build sql table join by association
+				$aTableJoin = new TablesJoin() ;
+				$aTableJoin->addTable(
+						new Table($aAssociateBy->bridgeTableName(),$this->bridgeTableAlias())
+						, $aBridgeCriteria
+				) ;
+				$this->sqlTable()->addJoin($aTableJoin) ;
+			}
+			
+			// 关联其他原型的数据表
+			foreach($this->associations() as $aAssoc)
+			{
+				// 只处理一对一关系
+				if( $aAssoc->isOneToOne() )
+				{
+					//$this->assocPrototype( $aAssoc->toPrototype() ) ;
+					if( !($aAssoc->toPrototype() instanceof PrototypeInFragment) )
+					{
+						throw new Exception("orm 片段中的prototype对象必须为 PrototypeInFragment 类") ;
+					}
+					
+					// build sql table join by association
+					$aTableJoin = new TablesJoin() ;
+					$aTableJoin->addTable($aAssoc->toPrototype()->sqlTable(),$this->createAssociationCriteria($aAssoc)) ;
+					$this->aTable->addJoin($aTableJoin) ;
+				}
+			}
 		}
 		
 		return $this->aTable ;
 	}
 
+	/**
+	 * create criteria object for "join on" 
+	 * @return jc\db\sql\Criteria
+	 */
+	protected function createAssociationCriteria(Association $aAssoc)
+	{
+		$aCriteria = new Criteria() ;
+		
+		$arrToKeys = $aAssoc->toKeys() ;
+		foreach($aAssoc->fromKeys() as $nKeyIdx=>$sFromKey)
+		{
+			$aCriteria->addExpression(
+				$aAssoc->fromPrototype()->columnName($sFromKey)
+				. '=' .
+				$aAssoc->toPrototype()->columnName($arrToKeys[$nKeyIdx])
+			) ;
+		}
+		
+		return $aCriteria ;
+	}
+
+	protected function setAssociationCriteria(Criteria $aCriteria,$sFromTable,$sToTable,array $arrFromKeys,array $arrToKeys)
+	{
+		foreach($arrFromKeys as $nIdx=>$sFromKey)
+		{
+			$aCriteria->addExpression( "`{$sFromTable}`.`{$sFromKey}` = `{$sToTable}`.`{$arrToKeys[$nIdx]}`" ) ;
+		}
+	}
+	
+	/**
+	 * 被多对多关联时，桥接表的表名
+	 */
+	public function bridgeTableAlias()
+	{
+		// 检查是否被多对多关联
+		if( !$aAssociateBy=$this->associateBy() and $aAssociateBy->type()!==Association::hasAndBelongsToMany )
+		{
+			throw new Exception("正在访问的".__CLASS__."没有被“多对多”关联，无须提供桥接表的别名。") ;
+		}
+		
+		if( !$this->sBridgeTableAlias )
+		{
+			$this->sBridgeTableAlias = $this->tableAlias().'#bridge' ;	
+		}
+		
+		return $this->sBridgeTableAlias ;
+	}
 	
 	private $aAssociateBy ;
 	
 	private $sTableAlias ;
+	
+	private $sBridgeTableAlias ;
 	
 	private $aTable ;
 }

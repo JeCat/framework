@@ -53,6 +53,8 @@ class Selecter extends OperationStrategy
 					return false ;
 				}
 			}
+			
+			return true ;
 		}
 		
 		// 加载独立模型
@@ -104,28 +106,10 @@ class Selecter extends OperationStrategy
 			else if( $aAssociation->type()==Association::hasAndBelongsToMany )
 			{
 				$aSelect = new SelectForAssocQuery($aAssociation->toPrototype()) ;
-				
-				// bridge 表到 to表的关联条件
-				$sBridgeTableAlias = $aAssociation->toPrototype()->tableAlias().'#bridge' ;
-				
-				$aBridgeCriteria=new Criteria() ;
-				$this->setAssociationCriteria(
-						$aBridgeCriteria
-						, $sBridgeTableAlias, $aAssociation->toPrototype()->tableAlias()
-						, $aAssociation->bridgeFromKeys(), $aAssociation->toKeys()
-				) ;
-				
-				// build sql table join by association
-				$aTableJoin = new TablesJoin() ;
-				$aTableJoin->addTable(
-						new Table($aAssociation->bridgeTableName(),$sBridgeTableAlias)
-						, $aBridgeCriteria
-				) ;
-				$aAssociation->toPrototype()->sqlTable()->addJoin($aTableJoin) ;
-				
-				
+								
 				// from 表到 bridge 表的关联条件
 				$arrFromKeys = $aAssociation->fromKeys() ;
+				$sBridgeTableAlias = $aAssociation->toPrototype()->bridgeTableAlias() ;
 				foreach($aAssociation->bridgeToKeys() as $nIdx=>$sKey)
 				{
 					$aSelect->criteria()->add("`{$sBridgeTableAlias}`.`{$sKey}`",$aModel->data($arrFromKeys[$nIdx])) ;
