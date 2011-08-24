@@ -1,5 +1,5 @@
-<select id="{=$theWidget->id()}" name="{? echo get_class($theWidget) == "jc\\mvc\\view\\widget\\SelectList" ? $theWidget->formName().'[]' : $theWidget->formName()}"  {? echo get_class($theWidget) == "jc\\mvc\\view\\widget\\SelectList" ? 'size='.$theWidget->size() : '' }  {? echo (get_class($theWidget) == "jc\\mvc\\view\\widget\\SelectList" and $theWidget->isMultiple()) ? 'multiple="multiple"' : '' }  {? echo $theWidget->isReadOnly() ? 'readonly="readonly"' : ''}  {? echo $theWidget->isDisabled() ? 'disabled="disabled"' : ''} {=$theWidget->displayInputAttributes()}>
+<select id="{=$theWidget->id()}" name="{= get_class($theWidget) == "jc\\mvc\\view\\widget\\SelectList" ? $theWidget->formName().'[]' : $theWidget->formName()}"  {= get_class($theWidget) == "jc\\mvc\\view\\widget\\SelectList" ? 'size='.$theWidget->size() : '' }  {= (get_class($theWidget) == "jc\\mvc\\view\\widget\\SelectList" and $theWidget->isMultiple()) ? 'multiple="multiple"' : '' }  {= $theWidget->isReadOnly() ? 'readonly="readonly"' : ''}  {= $theWidget->isDisabled() ? 'disabled="disabled"' : ''} {=$theWidget->displayInputAttributes()}>
 	<foreach for="{=$theWidget->optionIterator()}" item="item_name_for_select">
-		<option value ="{=$item_name_for_select[0]}" {? echo $item_name_for_select[2]? "selected=\"selected\"" : ''}>{=$item_name_for_select[1]}</option>
+		<option value ="{=$item_name_for_select[0]}" {= $item_name_for_select[2]? "selected=\"selected\"" : ''}>{=$item_name_for_select[1]}</option>
 	</foreach>
 </select>
