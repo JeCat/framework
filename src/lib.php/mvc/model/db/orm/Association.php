@@ -264,7 +264,6 @@ class Association extends Object implements \Serializable
 		$aOutput->write( "</pre>" ) ;
 	}
 	
-	
 	private $sType ;
 	private $sModelProperty ;
 	private $aFromPrototype ;

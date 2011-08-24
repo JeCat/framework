@@ -25,7 +25,7 @@ class FormCompiler extends NodeCompiler
 			$aDev->write("\tif(\$aVariables->get('theView') instanceof \\jc\\mvc\\view\\IFormView){\r\n") ;
 			$aDev->write("\t\t") ;
 			$aDev->output('<input type="hidden" name="') ;
-			$aDev->write("\t\techo \$aVariables->get('theView')->htmlFormSignature() ;") ;
+			$aDev->write("\t\t\$aDevice->write( \$aVariables->get('theView')->htmlFormSignature() ) ;\r\n") ;
 			$aDev->output('" value="1" />') ;
 			$aDev->write("\t}\r\n") ;
 			

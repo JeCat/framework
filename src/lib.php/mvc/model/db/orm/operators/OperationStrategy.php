@@ -67,42 +67,6 @@ abstract class OperationStrategy extends Object
 		}
 	}
 	
-	protected function setAssociationCriteria(Criteria $aCriteria,$sFromTable,$sToTable,array $arrFromKeys,array $arrToKeys)
-	{
-		foreach($arrFromKeys as $nIdx=>$sFromKey)
-		{
-			$aCriteria->addExpression( "`{$sFromTable}`.`{$sFromKey}` = `{$sToTable}`.`{$arrToKeys[$nIdx]}`" ) ;
-		}
-	}
-	
-	protected function makeAssociation(MultiTableStatement $aStatement,Prototype $aPrototype,$arrAssoTypes=array(Association::hasOne, Association::belongsTo))
-	{
-		$aTables = $aStatement->tables() ;
-		$aJoin = $aTables->sqlStatementJoin() ;
-		
-		// 处理关联表
-		foreach($aPrototype->associations() as $aAssoPrototype)
-		{
-			// 联合sql查询
-			if( in_array($aAssoPrototype->type(), $arrAssoTypes) )
-			{
-				$sAssoTableAlias = $aAssoPrototype->modelProperty() ;
-				$aTables->join( $aAssoPrototype->toPrototype()->tableName(), null, $sAssoTableAlias ) ;
-				
-				$this->setAssociationCriteria(
-						$aJoin->criteria()
-						, $aAssoPrototype->fromPrototype()->name()
-						, $sAssoTableAlias
-						, $aAssoPrototype->fromKeys()
-						, $aAssoPrototype->toKeys()
-				) ;
-				
-				// 递归关联
-				$this->makeAssociation($aStatement,$aAssoPrototype->toPrototype(),$arrAssoTypes) ;
-			}
-		}
-	}
-	
 	protected function buildBridge(DB $aDB,Association $aAssoPrototype,IModel $aFromModel,IModel $aToModel)
 	{
 		$aSelect = new Select($aAssoPrototype->bridgeTableName()) ;

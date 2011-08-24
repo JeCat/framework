@@ -24,18 +24,19 @@ class CompiledAlert extends Object implements IGenerator
 		// 函数开始
 		$aBodyToken->setTargetCode(
 			$aBodyToken->targetCode()
-			. "\r\n\t\t// ---------------------------------------------------------------------------------"
-			. "\r\n\t\t// ALERT: 此文件由 JeCat Class Compiler 自动生成和维护，请不要**直接编辑**此文件！"
-			. "\r\n\t\t//   对此文件的任何改动，都会在下次生成时被新生成的文件覆盖。"
+			. "\r\n\t// ---------------------------------------------------------------------------------"
+			. "\r\n\t// ALERT: 此文件由 JeCat Class Compiler 自动生成和维护，请不要**直接编辑**此文件！"
+			. "\r\n\t//   对此文件的任何改动，都会在下次生成时被新生成的文件覆盖。"
+			. "\r\n"
 		) ;
 		
 		// 函数结束
 		$aBodyEndToken = $aBodyToken->theOther() ;
 		$aBodyEndToken->setTargetCode(
-			          "// ALERT: 此文件由 JeCat Class Compiler 自动生成和维护，请不要**直接编辑**此文件！"
-			. "\r\n\t\t//   对此文件的任何改动，都会在下次生成时被新生成的文件覆盖。"
-			. "\r\n\t\t// ---------------------------------------------------------------------------------"
-			. "\r\n\t\t".$aBodyEndToken->targetCode()
+			  "\r\n\t// ALERT: 此文件由 JeCat Class Compiler 自动生成和维护，请不要**直接编辑**此文件！"
+			. "\r\n\t//   对此文件的任何改动，都会在下次生成时被新生成的文件覆盖。"
+			. "\r\n\t// ---------------------------------------------------------------------------------"
+			. "\r\n\t".$aBodyEndToken->targetCode()
 		) ;
 	}
 }

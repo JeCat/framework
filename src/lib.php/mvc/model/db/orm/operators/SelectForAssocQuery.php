@@ -7,7 +7,14 @@ use jc\mvc\model\db\orm\PrototypeInFragment;
 
 class SelectForAssocQuery extends StatementForAssocQuery 
 {
-	protected function assocPrototype(PrototypeInFragment $aPrototype)
+	protected function preprocessMakeStatement(PrototypeInFragment $aPrototype)
+	{
+		$this->buildClmLst($aPrototype) ;
+
+		parent::preprocessMakeStatement($aPrototype) ;
+	}
+	
+	private function buildClmLst(PrototypeInFragment $aPrototype)
 	{
 		// process columns in sql
 		// ----------------
@@ -17,8 +24,17 @@ class SelectForAssocQuery extends StatementForAssocQuery
 				$aPrototype->columnName($sClmName), $aPrototype->columnAlias($sClmName)
 			) ;
 		}
-
-		parent::assocPrototype($aPrototype) ;
+	
+		// process associasion prototype columns in sql
+		// ----------------
+		foreach($aPrototype->associations() as $aAssoc)
+		{
+			// 只处理一对一关系
+			if( $aAssoc->isOneToOne() )
+			{
+				$this->buildClmLst($aAssoc->toPrototype()) ;
+			}
+		}
 	}
 	
 	public function transColumn($sInputName)

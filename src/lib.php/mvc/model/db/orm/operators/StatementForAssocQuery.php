@@ -20,7 +20,7 @@ abstract class StatementForAssocQuery implements IStatement
 	{
 		if(!$this->sSql)
 		{
-			$this->assocPrototype($this->aPrototype) ;
+			$this->preprocessMakeStatement($this->aPrototype) ;
 			
 			$this->sSql = $this->realStatement()->makeStatement($bFormat) ;
 		}
@@ -33,61 +33,15 @@ abstract class StatementForAssocQuery implements IStatement
 		return $this->realStatement()->checkValid($bThrowException) ;
 	}
 	
-	protected function assocPrototype(PrototypeInFragment $aPrototype)
+	protected function preprocessMakeStatement(PrototypeInFragment $aPrototype)
 	{
-		// process table in sql
-		// ----------------
-		$aTable = $aPrototype->sqlTable() ;
-		
-		// 
-		if( $aAssociateBy=$aPrototype->associateBy() and $aAssociateBy->isOneToOne() )
-		{
-			if( !($aAssociateBy->fromPrototype() instanceof PrototypeInFragment) )
-			{
-				throw new Exception("orm 片段中的prototype对象必须为 PrototypeInFragment 类") ;
-			}
-			
-			// build sql table join by association
-			$aTableJoin = new TablesJoin() ;
-			$aTableJoin->addTable($aTable,$this->createAssociationCriteria($aAssociateBy)) ;
-			$aAssociateBy->fromPrototype()->sqlTable()->addJoin($aTableJoin) ;
-		}
-		
-		else
+		// 未被其他原型单属关联，做为"片段"的起点
+		if( !$aAssocBy=$aPrototype->associateBy() or !$aAssocBy->isOneToOne() )
 		{
 			$this->realStatement()->addTable( $aPrototype->sqlTable() ) ;
 		}
-		
-		// process association prototype
-		foreach($aPrototype->associations() as $aAssoc)
-		{
-			if( $aAssoc->isOneToOne() )
-			{
-				$this->assocPrototype( $aAssoc->toPrototype() ) ;
-			}
-		}
 	}
 	
-	/**
-	 * create criteria object for "join on" 
-	 * @return jc\db\sql\Criteria
-	 */
-	public function createAssociationCriteria(Association $aAssoc)
-	{
-		$aCriteria = new Criteria() ;
-		
-		$arrToKeys = $aAssoc->toKeys() ;
-		foreach($aAssoc->fromKeys() as $nKeyIdx=>$sFromKey)
-		{
-			$aCriteria->addExpression(
-				$aAssoc->fromPrototype()->columnName($sFromKey)
-				. '=' .
-				$aAssoc->toPrototype()->columnName($arrToKeys[$nKeyIdx])
-			) ;
-		}
-		
-		return $aCriteria ;
-	}
 	
 	public function __call($sMethod,$arrArgs=array())
 	{
