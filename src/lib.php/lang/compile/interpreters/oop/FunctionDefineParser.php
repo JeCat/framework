@@ -1,13 +1,13 @@
 <?php
-namespace jc\compile\interpreters\oop ;
+namespace jc\lang\compile\interpreters\oop ;
 
-use jc\compile\ClassCompileException;
+use jc\lang\compile\ClassCompileException;
 
 use jc\pattern\iterate\INonlinearIterator;
-use jc\compile\object\FunctionDefine;
-use jc\compile\object\TokenPool;
-use jc\compile\object\Token;
-use jc\compile\object\ClassDefine;
+use jc\lang\compile\object\FunctionDefine;
+use jc\lang\compile\object\TokenPool;
+use jc\lang\compile\object\Token;
+use jc\lang\compile\object\ClassDefine;
 
 class FunctionDefineParser implements ISyntaxPaser
 {

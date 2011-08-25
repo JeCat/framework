@@ -1,10 +1,10 @@
 <?php
-namespace jc\compile\interpreters\oop ;
+namespace jc\lang\compile\interpreters\oop ;
 
-use jc\compile\object\NamespaceDeclare;
+use jc\lang\compile\object\NamespaceDeclare;
 use jc\pattern\iterate\INonlinearIterator;
-use jc\compile\object\TokenPool;
-use jc\compile\object\Token;
+use jc\lang\compile\object\TokenPool;
+use jc\lang\compile\object\Token;
 
 class NamespaceParser implements ISyntaxPaser
 {

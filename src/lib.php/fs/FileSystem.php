@@ -15,8 +15,8 @@ abstract class FileSystem extends Object
 	const CREATE_RECURSE_DIR = 020000 ;		// 创建文件或目录时，递归创建所属的目录
 	const CREATE_ONLY_OBJECT = 040000 ;		// 只创建IFSO对象，不创建文件/目录，如果文件/目录不存在
 	
-	const CREATE_FILE_DEFAULT = 020644 ; 	// CREATE_RECURSE_DIR | 0644
-	const CREATE_FOLDER_DEFAULT = 020755 ; 	// CREATE_RECURSE_DIR | 0755
+	const CREATE_FILE_DEFAULT = 020664 ; 	// CREATE_RECURSE_DIR | 0664
+	const CREATE_FOLDER_DEFAULT = 020775 ; 	// CREATE_RECURSE_DIR | 0775
 	const CREATE_PERM_BITS = 0777 ;
 	
 	/**

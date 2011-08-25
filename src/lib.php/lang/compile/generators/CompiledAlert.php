@@ -1,10 +1,10 @@
 <?php
-namespace jc\compile\generators ;
+namespace jc\lang\compile\generators ;
 
-use jc\compile\object\FunctionDefine;
-use jc\compile\object\TokenPool;
-use jc\compile\object\Token;
-use jc\compile\IGenerator;
+use jc\lang\compile\object\FunctionDefine;
+use jc\lang\compile\object\TokenPool;
+use jc\lang\compile\object\Token;
+use jc\lang\compile\IGenerator;
 use jc\lang\Object;
 
 class CompiledAlert extends Object implements IGenerator

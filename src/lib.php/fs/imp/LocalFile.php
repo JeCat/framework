@@ -102,10 +102,13 @@ class LocalFile extends LocalFSO implements IFile
 		{
 			if( $nMode & FileSystem::CREATE_RECURSE_DIR )
 			{
-				if( !mkdir($sLocalDirPath,0755,true) )
+				$nOldMark = umask(0) ;
+				if( !mkdir($sLocalDirPath,FileSystem::CREATE_FOLDER_DEFAULT&FileSystem::CREATE_PERM_BITS,true) )
 				{
+					umask($nOldMark) ;
 					return false ;
 				}
+				umask($nOldMark) ;
 			}
 			else 
 			{
@@ -122,7 +125,9 @@ class LocalFile extends LocalFSO implements IFile
 		
 		if( $this->perms()!=$nMode&FileSystem::CREATE_PERM_BITS and $this->canWrite() )
 		{
+			$nOldMark = umask(0) ;
 			chmod( $sLocalPath, $nMode&FileSystem::CREATE_PERM_BITS ) ;
+			umask($nOldMark) ;
 		}
 		
 		return true ;

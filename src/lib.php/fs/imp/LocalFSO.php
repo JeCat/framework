@@ -75,7 +75,11 @@ abstract class LocalFSO extends FSO
 	 */
 	public function setPerms($nMode)
 	{
-		return chmod($this->sLocalPath,$nMode) ;
+		$nOldMark = umask(0) ;
+		$bRes = chmod($this->sLocalPath,$nMode) ;
+		umask($nOldMark) ;
+		
+		return $bRes ;
 	}
 	
 	public function createTime()

@@ -1,8 +1,8 @@
 <?php
-namespace jc\compile\interpreters\oop ;
+namespace jc\lang\compile\interpreters\oop ;
 
 use jc\pattern\iterate\INonlinearIterator;
-use jc\compile\object\TokenPool;
+use jc\lang\compile\object\TokenPool;
 
 class PHPCodeParser implements ISyntaxPaser
 {

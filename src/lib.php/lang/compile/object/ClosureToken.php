@@ -1,8 +1,8 @@
 <?php
-namespace jc\compile\object ;
+namespace jc\lang\compile\object ;
 
 use jc\lang\Exception;
-use jc\compile\ClassCompileException;
+use jc\lang\compile\ClassCompileException;
 
 class ClosureToken extends Token 
 {
@@ -11,7 +11,7 @@ class ClosureToken extends Token
 		if( !array_key_exists($aToken->tokenType(),self::$arrClosureObjectBeginTypes) and !array_key_exists($aToken->tokenType(),self::$arrClosureObjectEndTypes) )
 		{
 			throw new ClassCompileException(
-				$aToken
+				null, $aToken
 				,"参数 \$aToken 传入的不是一个有效的闭合token。该参数只接受以下类型的token:".implode(', ', array_merge(self::$arrClosureObjectBeginTypes,self::$arrClosureObjectEndTypes) )
 			) ;
 		}
@@ -52,7 +52,7 @@ class ClosureToken extends Token
 			{
 				if( !self::isPair($thisTokenType,$aToken->tokenType()) )
 				{
-					throw new ClassCompileException($aToken,"遇到意外的闭合token类型，“%s”和“%s”类型不匹配。",array($thisTokenType,$aToken->tokenTypeName())) ;
+					throw new ClassCompileException(null,$aToken,"遇到意外的闭合token类型，“%s”和“%s”类型不匹配。",array($thisTokenType,$aToken->tokenTypeName())) ;
 				}
 			}
 			
@@ -60,7 +60,7 @@ class ClosureToken extends Token
 			{
 				if( !self::isPair($aToken->tokenType(),$thisTokenType) )
 				{
-					throw new ClassCompileException($aToken,"遇到意外的闭合token类型，“%s”和“%s”类型不匹配。",array($thisTokenType,$aToken->tokenTypeName())) ;
+					throw new ClassCompileException(null,$aToken,"遇到意外的闭合token类型，“%s”和“%s”类型不匹配。",array($thisTokenType,$aToken->tokenTypeName())) ;
 				}
 			}
 			
