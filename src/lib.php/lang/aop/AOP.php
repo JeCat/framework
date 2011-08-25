@@ -1,5 +1,5 @@
 <?php
-namespace jc\aop ;
+namespace jc\lang\aop ;
 
 use jc\system\ClassLoader;
 use jc\pattern\composite\Container;
