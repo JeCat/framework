@@ -1,17 +1,17 @@
 <?php
 
-namespace jc\compile ;
+namespace jc\lang\compile ;
 
-use jc\compile\object\TokenPool;
-use jc\system\ClassLoader;
+use jc\lang\compile\object\TokenPool;
+use jc\lang\oop\ClassLoader;
 use jc\lang\Exception;
 use jc\lang\Type;
-use jc\compile\object\Token;
+use jc\lang\compile\object\Token;
 use jc\util\String;
 use jc\ui\TargetCodeOutputStream;
 use jc\io\IInputStream;
 use jc\io\IOutputStream;
-use jc\compile\object\IObject;
+use jc\lang\compile\object\IObject;
 use jc\pattern\composite\IContainer;
 use jc\pattern\composite\Container;
 use jc\lang\Object as JcObject ;
@@ -20,7 +20,7 @@ class Compiler extends JcObject
 {
 	public function compile(IInputStream $aSourceStream,IOutputStream $aCompiledStream)
 	{
-		$aTokenPool = new TokenPool('jc\\compile\\object\\AbstractObject') ;
+		$aTokenPool = new TokenPool('jc\\lang\\compile\\object\\AbstractObject') ;
 		
 		// 扫描 tokens
 		$this->scan($aSourceStream, $aTokenPool) ;

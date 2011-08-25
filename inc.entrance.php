@@ -16,7 +16,8 @@ require_once __DIR__."/src/lib.php/lang/IObject.php" ;
 require_once __DIR__."/src/lib.php/lang/Object.php" ;
 require_once __DIR__."/src/lib.php/lang/IException.php" ;
 require_once __DIR__."/src/lib.php/lang/Exception.php" ;
-require_once __DIR__."/src/lib.php/system/ClassLoader.php" ;
+require_once __DIR__."/src/lib.php/lang/oop/Package.php" ;
+require_once __DIR__."/src/lib.php/lang/oop/ClassLoader.php" ;
 require_once __DIR__."/src/lib.php/system/CoreApplication.php" ;
 require_once __DIR__."/src/lib.php/system/Application.php" ;
 require_once __DIR__."/src/lib.php/system/ApplicationFactory.php" ;
@@ -31,8 +32,8 @@ require_once __DIR__."/src/lib.php/fs/imp/LocalFile.php" ;
 require_once __DIR__."/src/lib.php/fs/imp/LocalFolder.php" ;
 require_once __DIR__."/src/lib.php/fs/imp/LocalFileSystem.php" ;
 
-require_once __DIR__."/src/lib.php/compile/Compiler.php" ;
-require_once __DIR__."/src/lib.php/compile/CompilerFactory.php" ;
+require_once __DIR__."/src/lib.php/lang/compile/Compiler.php" ;
+require_once __DIR__."/src/lib.php/lang/compile/CompilerFactory.php" ;
 
 
 define( __NAMESPACE__."\\VERSION", '0.6.1' ) ;

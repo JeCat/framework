@@ -1,9 +1,9 @@
 <?php
-namespace jc\compile\interpreters\oop ;
+namespace jc\lang\compile\interpreters\oop ;
 
-use jc\compile\object\NamespaceDeclare;
-use jc\compile\object\ClassDefine;
-use jc\compile\object\FunctionDefine;
+use jc\lang\compile\object\NamespaceDeclare;
+use jc\lang\compile\object\ClassDefine;
+use jc\lang\compile\object\FunctionDefine;
 
 class State 
 {

@@ -1,5 +1,5 @@
 <?php
-namespace jc\compile\object ;
+namespace jc\lang\compile\object ;
 
 use jc\pattern\composite\Container;
 

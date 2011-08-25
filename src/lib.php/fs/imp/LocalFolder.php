@@ -28,11 +28,15 @@ class LocalFolder extends LocalFSO implements IFolder
 
 	public function create($nMode=FileSystem::CREATE_FOLDER_DEFAULT)
 	{
-		return mkdir(
+		$nOldMark = umask(0) ;
+		$bRes = mkdir(
 			$this->localPath()
 			, ($nMode&FileSystem::CREATE_PERM_BITS)
 			, $nMode&FileSystem::CREATE_RECURSE_DIR
 		) ;
+		umask($nOldMark) ;
+		
+		return $bRes ;
 	}
 	
 	public function createFile($sPath,$nMode=FileSystem::CREATE_FILE_DEFAULT)

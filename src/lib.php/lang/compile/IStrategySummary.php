@@ -1,5 +1,5 @@
 <?php
-namespace jc\compile ;
+namespace jc\lang\compile ;
 
 interface IStrategySummary
 {

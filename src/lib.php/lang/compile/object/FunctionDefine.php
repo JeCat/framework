@@ -1,7 +1,7 @@
 <?php
-namespace jc\compile\object ;
+namespace jc\lang\compile\object ;
 
-use jc\compile\ClassCompileException;
+use jc\lang\compile\ClassCompileException;
 
 class FunctionDefine extends StructDefine
 {
@@ -25,7 +25,7 @@ class FunctionDefine extends StructDefine
 	{
 		if( $aTokenArgList->tokenType()!=Token::T_BRACE_ROUND_OPEN or $aTokenArgList->sourceCode()!='(' )
 		{
-			throw new ClassCompileException($aTokenArgList,"参数 \$aTokenArgList 必须是一个内容为 “(” 的Token对象") ;
+			throw new ClassCompileException(null,$aTokenArgList,"参数 \$aTokenArgList 必须是一个内容为 “(” 的Token对象") ;
 		}
 		
 		$this->aTokenArgList = $aTokenArgList ;
@@ -39,7 +39,7 @@ class FunctionDefine extends StructDefine
 	{
 		if( !in_array($aAccessToken->tokenType(),array(T_PRIVATE,T_PROTECTED,T_PUBLIC)) )
 		{
-			throw new ClassCompileException($aAccessToken,"参数 \$aAccessToken 必须为 T_PRIVATE, T_PROTECTED 或 T_PUBLIC 类型的Token对象") ;
+			throw new ClassCompileException(null,$aAccessToken,"参数 \$aAccessToken 必须为 T_PRIVATE, T_PROTECTED 或 T_PUBLIC 类型的Token对象") ;
 		} 
 		
 		$this->aAccessToken = $aAccessToken ;
@@ -52,7 +52,7 @@ class FunctionDefine extends StructDefine
 	{
 		if( $aStaticToken->tokenType()!==T_STATIC )
 		{
-			throw new ClassCompileException($aStaticToken,"参数 \$aStaticToken 必须为 T_STATIC 类型的Token对象") ;
+			throw new ClassCompileException(null,$aStaticToken,"参数 \$aStaticToken 必须为 T_STATIC 类型的Token对象") ;
 		} 
 		
 		$this->aStaticToken = $aStaticToken ;
@@ -65,7 +65,7 @@ class FunctionDefine extends StructDefine
 	{
 		if( $aAbstractToken->tokenType()!==T_ABSTRACT )
 		{
-			throw new ClassCompileException($aAbstractToken,"参数 \$aAbstractToken 必须为 T_ABSTRACT 类型的Token对象") ;
+			throw new ClassCompileException(null,$aAbstractToken,"参数 \$aAbstractToken 必须为 T_ABSTRACT 类型的Token对象") ;
 		}
 		$this->aAbstractToken = $aAbstractToken ;
 	}
@@ -77,7 +77,7 @@ class FunctionDefine extends StructDefine
 	{
 		if( $aDocToken->tokenType()!==T_DOC_COMMENT )
 		{
-			throw new ClassCompileException($aDocToken,"参数 \$aDocToken 必须为 T_DOC_COMMENT 类型的Token对象") ;
+			throw new ClassCompileException(null,$aDocToken,"参数 \$aDocToken 必须为 T_DOC_COMMENT 类型的Token对象") ;
 		}
 		$this->aDocToken = $aDocToken ;
 	}

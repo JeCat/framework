@@ -1,7 +1,7 @@
 <?php
-namespace jc\compile\object ;
+namespace jc\lang\compile\object ;
 
-use jc\compile\ClassCompileException;
+use jc\lang\compile\ClassCompileException;
 
 abstract class StructDefine extends Token
 {
@@ -41,7 +41,7 @@ abstract class StructDefine extends Token
 	{
 		if( $aTokenName->tokenType()!==T_STRING )
 		{
-			throw new ClassCompileException($aTokenName,"参数 \$aTokenName 必须是一个 T_STRING 类型 token 对象") ;
+			throw new ClassCompileException(null,$aTokenName,"参数 \$aTokenName 必须是一个 T_STRING 类型 token 对象") ;
 		}
 		
 		$this->aTokenName = $aTokenName ;
@@ -61,7 +61,7 @@ abstract class StructDefine extends Token
 	{
 		if( $aTokenBody->tokenType()!=Token::T_BRACE_OPEN or $aTokenBody->sourceCode()!='{' )
 		{
-			throw new ClassCompileException($aTokenBody,"参数 \$aTokenBody 必须是一个内容为 “{” 的Token对象") ;
+			throw new ClassCompileException(null,$aTokenBody,"参数 \$aTokenBody 必须是一个内容为 “{” 的Token对象") ;
 		}
 		
 		$this->aTokenBody = $aTokenBody ;

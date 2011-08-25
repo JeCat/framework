@@ -1,7 +1,5 @@
 <?php
-namespace jc\compile\object ;
-
-use jc\compile\ClassCompileException;
+namespace jc\lang\compile\object ;
 
 class ClassDefine extends StructDefine
 {

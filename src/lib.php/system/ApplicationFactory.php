@@ -1,8 +1,8 @@
 <?php
 namespace jc\system ;
 
+use jc\lang\oop\ClassLoader;
 use jc\io\StdOutputFilterMgr;
-
 use jc\io\PrintStream;
 use jc\lang\Object ;
 
@@ -76,7 +76,7 @@ abstract class ApplicationFactory extends Object
 		$aClassLoader = new ClassLoader() ;
 		$aClassLoader->setApplication($aApp) ;
 		//$aClassLoader->addPackage( 'jc', dirname(dirname(dirname(__DIR__))).'/bin/lib.php', dirname(__DIR__) ) ; // 将 jcat 加入到 class loader 中
-		$aClassLoader->addPackage( 'jc', '/framework/bin/lib.php', '/framework/src/lib.php' ) ; // 将 jcat 加入到 class loader 中
+		$aClassLoader->addPackage( 'jc', '/framework/src/lib.php', '/framework/bin/lib.php' ) ; // 将 jcat 加入到 class loader 中
 		
 		return $aClassLoader ;
 	}
