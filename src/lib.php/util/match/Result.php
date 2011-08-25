@@ -10,7 +10,7 @@ class Result extends Object
 		$this->arrResult = $arrResult ;
 	}
 	
-	public function result($nGrp=0) 
+	public function content($nGrp=0) 
 	{
 		return isset($this->arrResult[$nGrp][0])? $this->arrResult[$nGrp][0]: null ;
 	}

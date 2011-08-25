@@ -24,11 +24,29 @@ class ResultSet extends HashTable
 			return $this->rewind() ;
 		}
 	}
+
+	public function content($nGrp=0) 
+	{
+		return $this->count()? $this->rewind()->content($nGrp): null ;
+	}
+	
+	public function position($nGrp=0) 
+	{
+		return $this->count()? $this->rewind()->position($nGrp): null ;
+	}
+	
+	public function length($nGrp=0)
+	{
+		return $this->count()? $this->rewind()->length($nGrp): null ;
+	}
 	
 	public function add(Result $aResult)
 	{
 		parent::add($aResult) ;
 	}
+	
+	
+	
 }
 
 ?>
