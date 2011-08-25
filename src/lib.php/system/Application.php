@@ -8,6 +8,11 @@ class Application extends CoreApplication implements \Serializable
 {
 	public function __construct($sAppDirPath)
 	{
+		if( !self::singleton(false) )
+		{
+			self::setSingleton($this) ;
+		}
+		
 		$this->setFileSystem(
 			LocalFileSystem::flyweight($sAppDirPath)
 		) ;
