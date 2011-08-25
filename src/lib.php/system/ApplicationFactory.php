@@ -73,10 +73,10 @@ abstract class ApplicationFactory extends Object
 
 	public function createClassLoader(CoreApplication $aApp)
 	{
-		$aClassLoader = new ClassLoader() ;
-		$aClassLoader->setApplication($aApp) ;
-		//$aClassLoader->addPackage( 'jc', dirname(dirname(dirname(__DIR__))).'/bin/lib.php', dirname(__DIR__) ) ; // 将 jcat 加入到 class loader 中
-		$aClassLoader->addPackage( 'jc', '/framework/src/lib.php', '/framework/bin/lib.php' ) ; // 将 jcat 加入到 class loader 中
+		$aClassLoader = new ClassLoader(
+			$aApp->application()->fileSystem()->findFile("/classpath.php") 
+		) ;
+		$aClassLoader->addPackage( 'jc', '/framework/src/lib.php', '/framework/bin/lib.php' ) ; // 将 jecat 加入到 class loader 中
 		
 		return $aClassLoader ;
 	}

@@ -1,6 +1,8 @@
 <?php
 namespace jc\lang\oop ;
 
+use jc\fs\IFile;
+
 use jc\lang\Object;
 use jc\lang\compile\ClassCompileException;
 use jc\fs\FileSystem;
@@ -12,16 +14,18 @@ use jc\lang\Assert;
 
 class ClassLoader extends Object
 {
-	public function __construct()
+	public function __construct(IFile $aClasspathCache=null)
 	{
 		// 加载 classpath 缓存
-		if( $aCache = $this->application()->fileSystem()->findFile("/classpath.php") )
+		if( $aClasspathCache )
 		{
-			$arrClassPath = $aCache->includeFile() ;
+			$arrClassPath = $aClasspathCache->includeFile() ;
 			if( is_array($arrClassPath) )
 			{
 				$this->arrClassPathCache = $arrClassPath ;
 			}
+			
+			$this->aClasspathCache = $aClasspathCache ;
 		}
 		
 		
@@ -161,8 +165,10 @@ class ClassLoader extends Object
 	{
 		echo 'load class time:',$this->nLoadTime ;
 		
-		$aCache = $this->application()->fileSystem()->createFile("/classpath.php") ;
-		$aCache->openWriter()->write( '<?php return ' . var_export($this->arrClassPathCache,1) . ' ; ?>' ) ;
+		if( $this->aClasspathCache )
+		{
+			$this->aClasspathCache->openWriter()->write( '<?php return ' . var_export($this->arrClassPathCache,1) . ' ; ?>' ) ;
+		}
 	}
 	
 	private $arrPackages = array() ;
@@ -176,6 +182,7 @@ class ClassLoader extends Object
 	private $nLoadTime = 0 ;
 	
 	private $arrClassPathCache = array() ;
+	private $aClasspathCache = array() ;
 }
 
 ?>
