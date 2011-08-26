@@ -163,8 +163,6 @@ class ClassLoader extends Object
 	
 	public function __destruct()
 	{
-		echo 'load class time:',$this->nLoadTime ;
-		
 		if( $this->aClasspathCache )
 		{
 			$this->aClasspathCache->openWriter()->write( '<?php return ' . var_export($this->arrClassPathCache,1) . ' ; ?>' ) ;
