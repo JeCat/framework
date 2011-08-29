@@ -7,6 +7,135 @@ use jc\util\match\RegExp;
 
 class Criteria extends SubStatement
 {
+	
+	public function makeStatement($bFormat=false)
+	{}
+
+	public function checkValid($bThrowException=true)
+	{
+		return true ;
+	}
+
+	public function logic()
+	{
+		return $this->sLogic==' AND ' ;
+	}
+	
+	public function setLogic($bLogic)
+	{
+		$this->sLogic = $bLogic? ' AND ': ' OR ' ;
+	}
+
+	public function clear()
+	{
+		$this->arrExpressions = array() ;
+	}
+
+	public function eq($sClmName,$value)
+	{
+		
+	}
+	public function eqColumn($sClmName,$sOtherClmName)
+	{
+		
+	}
+	public function ne($sClmName,$value)
+	{
+		
+	}
+	public function ne($sClmName,$sOtherClmName)
+	{
+		
+	}
+	public function gt($sClmName,$value)
+	{
+		
+	}
+	public function ge($sClmName,$sOtherClmName)
+	{
+		
+	}
+	public function lt($sClmName,$value)
+	{
+		
+	}
+	public function le($sClmName,$sOtherClmName)
+	{
+		
+	}
+	public function like($sClmName,$value)
+	{
+		
+	}
+	public function likeColumn($sClmName,$sOtherClmName)
+	{
+		
+	}
+	public function in($sClmName,array $values)
+	{
+		
+	}
+	public function between($sClmName,$value,$otherValue)
+	{
+		
+	}
+	public function isNull($sClmName)
+	{
+		
+	}
+	public function isNotNull($sClmName)
+	{
+		
+	}
+	public function expression($sExpression)
+	{
+		
+	}
+	public function add(self $aOtherCriteria)
+	{
+		
+	}
+	
+	
+	public function createCriteria()
+	{
+		
+	}
+	
+	public __clone()
+	{
+		
+	}
+	
+	
+	public function setDefaultTable($sDefaultTable)
+	{
+		$this->sDefaultTable = $sDefaultTable ;
+	}
+	
+	public function defaultTable()
+	{
+		return $this->sDefaultTable ;
+	}
+	
+	protected function transColumn($sColumn)
+	{
+		// 在没有表名的字段前 添加默认表名
+		if( $this->sDefaultTable and strstr($sColumn,'.')===false )
+		{
+			$sColumn = $this->sDefaultTable.'.'.$sColumn ;
+		}
+		
+		return $sColumn ;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 	public function makeStatement($bFormat=false)
 	{
 		$arrExpressions = array() ;
@@ -28,22 +157,17 @@ class Criteria extends SubStatement
 		}
 		return implode($this->sLogic,$arrExpressions) ;
 	}
-
+	
 	public function checkValid($bThrowException=true)
 	{
 		return true ;
-	}
-
-	public function logic()
-	{
-		return $this->sLogic==' AND ' ;
-	}
+	}	
 	
-	public function setLogic($bLogic)
-	{
-		$this->sLogic = $bLogic? ' AND ': ' OR ' ;
-	}
-
+	
+	
+	
+	
+	
 	/**
 	 * public function add(string $sLeft,string $sRight,string $sOperator='=',string $sTernary=null)
 	 * public function add(Criteria $aCriteria)
@@ -94,11 +218,6 @@ class Criteria extends SubStatement
 		
 		$this->arrExpressions[] = $this->transExpression($sExpression,$arrArgs) ;
 	}
-	public function clear()
-	{
-		$this->arrExpressions = array() ;
-	}
-	
 	public function transExpression($sExpression,$arrArgvs)
 	{
 		// find mark
@@ -142,26 +261,6 @@ class Criteria extends SubStatement
 		return $sExpression ;
 	}
 	
-	public function transColumn($sColumn)
-	{
-		// 在没有表名的字段前 添加默认表名
-		if( $this->sDefaultTable and strstr($sColumn,'.')===false )
-		{
-			$sColumn = $this->sDefaultTable.'.'.$sColumn ;
-		}
-		
-		return $sColumn ;
-	}
-	
-	public function setDefaultTable($sDefaultTable)
-	{
-		$this->sDefaultTable = $sDefaultTable ;
-	}
-	
-	public function defaultTable()
-	{
-		return $this->sDefaultTable ;
-	}
 	
 	/**
 	 * @return RegExp
