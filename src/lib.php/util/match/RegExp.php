@@ -28,14 +28,13 @@ class RegExp extends Object
 	 */
 	function match($sSource,$nLimit=-1)
 	{
-		$aResSet = new ResultSet() ;
 		$arrResult = array() ;
 		
 		if($nLimit==1)
 		{
 			if(!preg_match($this->fullRegExp(),$sSource,$arrResult,PREG_OFFSET_CAPTURE))
 			{
-				return $aResSet ;
+				return null ;
 			}
 			$arrResult = array( $arrResult ) ;
 		}
@@ -44,7 +43,7 @@ class RegExp extends Object
 		{
 			if(!preg_match_all($this->fullRegExp(),$sSource,$arrResult,PREG_SET_ORDER|PREG_OFFSET_CAPTURE))
 			{
-				return $aResSet ;
+				return null ;
 			}
 			
 			if($nLimit>0)
@@ -52,6 +51,8 @@ class RegExp extends Object
 				$arrResult = array_slice($arrResult,0,$nLimit) ;
 			}
 		}
+		
+		$aResSet = new ResultSet() ;
 		
 		foreach($arrResult as $arrOneResult)
 		{
