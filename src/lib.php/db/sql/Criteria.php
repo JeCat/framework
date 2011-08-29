@@ -43,7 +43,7 @@ class Criteria extends SubStatement
 	{
 		
 	}
-	public function ne($sClmName,$sOtherClmName)
+	public function neColumn($sClmName,$sOtherClmName)
 	{
 		
 	}
@@ -51,7 +51,15 @@ class Criteria extends SubStatement
 	{
 		
 	}
-	public function ge($sClmName,$sOtherClmName)
+	public function gtColumn($sClmName,$sOtherClmName)
+	{
+		
+	}
+	public function ge($sClmName,$value)
+	{
+		
+	}
+	public function geColumn($sClmName,$sOtherClmName)
 	{
 		
 	}
@@ -59,7 +67,15 @@ class Criteria extends SubStatement
 	{
 		
 	}
-	public function le($sClmName,$sOtherClmName)
+	public function ltColumn($sClmName,$sOtherClmName)
+	{
+		
+	}
+	public function le($sClmName,$value)
+	{
+		
+	}
+	public function leColumn($sClmName,$sOtherClmName)
 	{
 		
 	}
@@ -114,7 +130,7 @@ class Criteria extends SubStatement
 	}
 	
 	public function defaultTable()
-	{
+	{		
 		return $this->sDefaultTable ;
 	}
 	
