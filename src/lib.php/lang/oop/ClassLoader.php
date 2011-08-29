@@ -46,7 +46,7 @@ class ClassLoader extends Object
 			$aCompiledFolder = null ;
 			if( $sCompiledFolder )
 			{
-				if( !$aCompiledFolder=$aFs->find($sCompiledFolder) or !$aCompiledFolder=$aFs->createFolder($sCompiledFolder) )
+				if( !$aCompiledFolder=$aFs->find($sCompiledFolder) and !$aCompiledFolder=$aFs->createFolder($sCompiledFolder) )
 				{
 					throw new Exception(
 							"注册 class package (%s)时，提供的class编译目录不存在，且无法自动创建：%s"
