@@ -79,9 +79,21 @@ class DocComment extends Object
 		return isset($this->arrItems[$sName])? $this->arrItems[$sName]: null ;
 	}
 
-	public function itemIterator()
+	public function hasItem($sName)
+	{
+		return array_key_exists($sName,$this->arrItems) ;
+	}
+
+	public function itemNameIterator()
 	{
 		return new ArrayIterator(array_keys($this->arrItems)) ;
+	}
+	
+	public function itemIterator($sName)
+	{
+		return isset($this->arrItems[$sName])?
+				new ArrayIterator($this->arrItems[$sName]):
+				new ArrayIterator() ;
 	}
 		
 	private $sDescription = '' ;
