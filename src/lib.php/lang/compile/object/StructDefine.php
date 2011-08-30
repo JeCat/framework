@@ -67,8 +67,21 @@ abstract class StructDefine extends Token
 		$this->aTokenBody = $aTokenBody ;
 	}
 	
+	/**
+	 * @return DocCommentDefine
+	 */
+	public function docToken()
+	{
+		return $this->aDocToken ;		
+	}
+	public function setDocToken(DocCommentDeclare $aDocToken)
+	{
+		$this->aDocToken = $aDocToken ;
+	}
+	
 	private $aTokenName ;
 	private $aTokenBody ;
+	private $aDocToken ;
 }
 
 ?>

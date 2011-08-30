@@ -1,6 +1,8 @@
 <?php
 namespace jc\lang\compile\interpreters\oop ;
 
+use jc\lang\compile\object\DocCommentDefine;
+
 use jc\lang\compile\ClassCompileException;
 
 use jc\pattern\iterate\INonlinearIterator;
@@ -74,7 +76,9 @@ class FunctionDefineParser implements ISyntaxPaser
 						$aNewToken->setAbstractToken($aToken) ;
 						break ;
 					case T_DOC_COMMENT :
-						$aNewToken->setDocToken($aToken) ;
+						$aNewToken->setDocToken(
+							new DocCommentDeclare($aToken)
+						) ;
 						break ;
 				}
 			}

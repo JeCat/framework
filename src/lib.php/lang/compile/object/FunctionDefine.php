@@ -69,24 +69,10 @@ class FunctionDefine extends StructDefine
 		}
 		$this->aAbstractToken = $aAbstractToken ;
 	}
-	public function docToken()
-	{
-		return $this->aDocToken ;		
-	}
-	public function setDocToken($aDocToken)
-	{
-		if( $aDocToken->tokenType()!==T_DOC_COMMENT )
-		{
-			throw new ClassCompileException(null,$aDocToken,"参数 \$aDocToken 必须为 T_DOC_COMMENT 类型的Token对象") ;
-		}
-		$this->aDocToken = $aDocToken ;
-	}
-	
 	private $aTokenArgList ;
 	private $aAccessToken ;
 	private $aStaticToken ;
 	private $aAbstractToken ;
-	private $aDocToken ;
 }
 
 ?>
