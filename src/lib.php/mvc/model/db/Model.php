@@ -1,7 +1,7 @@
 <?php
 namespace jc\mvc\model\db ;
 
-use jc\db\sql\Criteria;
+use jc\mvc\model\db\orm\Criteria;
 use jc\mvc\model\db\orm\PrototypeAssociationMap;
 use jc\lang\Exception;
 use jc\mvc\model\db\orm\operators\Deleter;
@@ -198,7 +198,7 @@ class Model extends AbstractModel implements IModel
 			$aCriteria = $this->loadCriteria() ;
 			foreach($keys as $nIdx=>$sKey)
 			{
-				$aCriteria->add( $sKey, $values[$nIdx] ) ;
+				$aCriteria->eq( $sKey, $values[$nIdx] ) ;
 			}
 		}
 		

@@ -17,7 +17,7 @@ interface IModel extends IModelBase
 	public function loadData( IRecordSet $aRecordSet, $bSetSerialized=false ) ;
 	
 	/**
-	 * @return jc\db\sql\Criteria 
+	 * @return jc\mvc\model\db\orm\Criteria;
 	 */
 	public function loadCriteria() ;
 

@@ -2,7 +2,6 @@
 namespace jc\mvc\model\db\orm\operators ;
 
 use jc\db\sql\IStatement;
-use jc\db\sql\Criteria;
 use jc\mvc\model\db\orm\Association;
 use jc\db\sql\TablesJoin;
 use jc\lang\Exception;

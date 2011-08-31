@@ -91,7 +91,7 @@ class Selecter extends OperationStrategy
 				$arrFromKeys = $aAssociation->fromKeys() ;
 				foreach($aAssociation->toKeys() as $nIdx=>$sKey)
 				{
-					$aCriteria->add($sKey,$aModel->data($arrFromKeys[$nIdx])) ;
+					$aCriteria->eq($sKey,$aModel->data($arrFromKeys[$nIdx])) ;
 				}
 				
 				// 加载 child 类
@@ -112,7 +112,7 @@ class Selecter extends OperationStrategy
 				$sBridgeTableAlias = $aAssociation->toPrototype()->bridgeTableAlias() ;
 				foreach($aAssociation->bridgeToKeys() as $nIdx=>$sKey)
 				{
-					$aSelect->criteria()->add("`{$sBridgeTableAlias}`.`{$sKey}`",$aModel->data($arrFromKeys[$nIdx])) ;
+					$aSelect->criteria()->eq("`{$sBridgeTableAlias}`.`{$sKey}`",$aModel->data($arrFromKeys[$nIdx])) ;
 				}
 				
 				// 加载 child 类
