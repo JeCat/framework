@@ -1,10 +1,8 @@
 <?php
 namespace jc\lang\compile\interpreters\oop ;
 
-use jc\lang\compile\object\DocCommentDefine;
-
+use jc\lang\compile\object\DocCommentDeclare;
 use jc\lang\compile\ClassCompileException;
-
 use jc\pattern\iterate\INonlinearIterator;
 use jc\lang\compile\object\FunctionDefine;
 use jc\lang\compile\object\TokenPool;
