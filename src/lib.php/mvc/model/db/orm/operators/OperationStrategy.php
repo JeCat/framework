@@ -34,7 +34,7 @@ abstract class OperationStrategy extends Object
 		
 		foreach($keys as $idx=>$sKey)
 		{
-			$aCriteria->add(
+			$aCriteria->eq(
 				"{$sTableName}`{$sKey}`"
 				, $aDataSource->data($names[$idx])
 			) ;

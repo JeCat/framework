@@ -39,7 +39,14 @@ class TablesJoin extends SubStatement
 		
 		if($criteria)
 		{
-			$this->criteria()->add($criteria) ;
+			if( is_string($criteria) )
+			{
+				$this->criteria()->expression($criteria) ;
+			}
+			else if( $criteria instanceof Criteria )
+			{
+				$this->criteria()->add($criteria) ;
+			}
 		}
 	}
 	
