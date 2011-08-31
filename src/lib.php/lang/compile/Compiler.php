@@ -20,6 +20,24 @@ class Compiler extends JcObject
 {
 	public function compile(IInputStream $aSourceStream,IOutputStream $aCompiledStream)
 	{
+		// 解释
+		$aTokenPool = $this->interprete($aSourceStream) ;
+		
+		// 生成
+		$this->generate($aTokenPool) ;
+		
+		// 编译结果写入文件
+		foreach($aTokenPool->iterator() as $aObject)
+		{
+			$aCompiledStream->write($aObject->targetCode()) ;
+		}
+	}
+
+	/**
+	 * @return jc\lang\compile\object\TokenPool
+	 */
+	public function interpret(IInputStream $aSourceStream)
+	{
 		$aTokenPool = new TokenPool('jc\\lang\\compile\\object\\AbstractObject') ;
 		
 		// 扫描 tokens
@@ -36,6 +54,11 @@ class Compiler extends JcObject
 			$interpreter->analyze($aTokenPool) ;
 		}
 		
+		return $aTokenPool ;
+	}
+	
+	public function generate(TokenPool $aTokenPool)
+	{
 		// 编译
 		foreach($aTokenPool->iterator() as $aObject)
 		{
@@ -53,12 +76,6 @@ class Compiler extends JcObject
 					$aGenerator->generateTargetCode($aTokenPool,$aObject) ;
 				}
 			}
-		}
-		
-		// 保存到编译文件中
-		foreach($aTokenPool->iterator() as $aObject)
-		{
-			$aCompiledStream->write($aObject->targetCode()) ;
 		}
 	}
 	
@@ -82,13 +99,13 @@ class Compiler extends JcObject
 				
 				$oneToken[3] = token_name($oneToken[0]) ;
 				$aTokenPool->add(
-					new Token($oneToken[0], $oneToken[1], $nPosition++, $nLine), null, true
+					new Token($oneToken[0], $oneToken[1], $nPosition++, $nLine)
 				) ;
 			}
 			else if( is_string($oneToken) )
 			{
 				$aTokenPool->add(
-					new Token(T_STRING, $oneToken, $nPosition++, $nLine), null, true
+					new Token(T_STRING, $oneToken, $nPosition++, $nLine)
 				) ; 
 			}
 		}
