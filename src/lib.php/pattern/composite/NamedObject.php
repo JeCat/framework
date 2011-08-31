@@ -3,9 +3,9 @@ namespace jc\pattern\composite ;
 
 use jc\lang\Object;
 
-abstract class NamedObject extends Object
+abstract class NamedObject extends Object implements INamable
 {
-	public function __construct($sName)
+	public function __construct($sName=null)
 	{
 		$this->setName($sName) ;
 	}
