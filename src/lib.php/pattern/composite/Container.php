@@ -73,47 +73,34 @@ class Container extends Object implements IContainer
 		{
 			throw new Exception(__METHOD__."() 方法无法接受 %s 类型的参数",Type::reflectType($object)) ;
 		}
-		
-		if( $sName===null and $object instanceof INamable )
-		{
-			$sName = $object->name() ;
-		}
-		
-		if( $sName===null )
-		{
-			if( !in_array($object,$this->arrObjects,is_object($object)) )
-			{
-				$this->arrObjects[] = $object ;
-			}
-		}
-		else 
-		{
-			$this->arrObjects[$sName] = $object ;
-		}
 	
-		if( $bAdoptRelative and ($object instanceof IContainedable) )
+		if( !in_array($object,$this->arrObjects,is_object($object)) )
 		{
-			$object->setParent($this) ;
+			$this->arrObjects[] = $object ;
+			
+			$this->attach($object,$sName) ;
 		}
 		
 		return $object ;
 	}
+	
 	public function remove($object)
 	{
+		// 移除对象
 		$nIdx = array_search($object,$this->arrObjects) ;
 		if($nIdx!==false)
 		{
 			unset($this->arrObjects[$nIdx]) ;
-		
-			if( $object instanceof IContainedable and $object->parent()==$this )
-			{
-				$object->setParent(null) ;
-			}
 		}
+		
+		$this->free($object) ;
 	}
 	public function clear()
 	{
-		$this->arrObjects = array() ;
+		foreach($this->arrObjects as $object)
+		{
+			$this->remove($object) ;
+		}
 	}
 	public function count()
 	{
@@ -131,7 +118,7 @@ class Container extends Object implements IContainer
 	 */
 	public function nameIterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator( array_keys($this->arrObjects) ) ;
+		return new \jc\pattern\iterate\ArrayIterator( array_keys($this->arrNames) ) ;
 	}
 	/**
 	 * @return \Iterate
@@ -153,12 +140,12 @@ class Container extends Object implements IContainer
 
 	public function getByName($sName)
 	{
-		return isset($this->arrObjects[$sName])? $this->arrObjects[$sName]: null ;
+		return isset($this->arrNames[$sName])? $this->arrNames[$sName]: null ;
 	}
 	
 	public function hasName($sName)
 	{
-		return array_key_exists($sName,$this->arrObjects) ;
+		return array_key_exists($sName,$this->arrNames) ;
 	}
 	
 	public function has($object)
@@ -166,29 +153,132 @@ class Container extends Object implements IContainer
 		return in_array($object,$this->arrObjects) ;
 	}
 	
-	public function replace($newObject,$object)
+	public function replace($object,$newObject,$sName=null)
 	{
-		$nKey = array_search( $object, $this->arrObjects, is_object($object) ) ;
-		
-		if($nKey===false)
+		$nPos = array_search( $object, $this->arrObjects, is_object($object) ) ;
+		if($nPos===false)
 		{
 			return ;
 		}
 		
-		$this->arrObjects[$nKey] = $newObject ;
+		$this->arrObjects[$nPos] = $newObject ;
 	
+		// 解除旧对象
+		$this->free($object) ;
+		
+		// 建立新对象的关系
+		$this->attach($newObject,$sName) ;
+	}
+	
+	public function insertBefore($object,$_)
+	{
+		$nPos = array_search($object, $this->arrObjects) ;
+		if($nPos===false)
+		{
+			return ;
+		}
+		
+		$arrArgs = func_get_args() ;
+		array_shift($arrArgs) ;
+	
+		foreach($arrArgs as $aInsObject)
+		{
+			if( $this->has($aInsObject) )
+			{
+				$this->remove($aInsObject) ;
+			}
+		}
+		
+		call_user_func_array('array_splice',array_merge(array($this->arrObjects,$nPos,0),$arrArgs)) ;
+	
+		foreach($arrArgs as $aInsObject)
+		{
+			$this->attach($aInsObject) ;
+		}
+	}
+	
+	public function insertAfter($object,$_)
+	{	
+		$arrArgs = func_get_args() ;
+		array_shift($arrArgs) ;
+	
+		// 最后一个
+		if( end($this->arrObjects) === $object )
+		{
+			foreach($arrArgs as $aInsObject)
+			{
+				if( $this->has($aInsObject) )
+				{
+					$this->remove($aInsObject) ;
+				}
+				
+				$this->add($aInsObject) ;
+			}
+		}
+		
+		else 
+		{
+			$nPos = array_search($object, $this->arrObjects) ;
+			if($nPos===false)
+			{
+				return ;
+			}
+		
+			foreach($arrArgs as $aInsObject)
+			{
+				if( $this->has($aInsObject) )
+				{
+					$this->remove($aInsObject) ;
+				}
+			}
+			
+			$nPos ++ ;
+			
+			call_user_func_array('array_splice',array_merge(array($this->arrObjects,$nPos,0),$arrArgs)) ;
+		
+			foreach($arrArgs as $aInsObject)
+			{
+				$this->attach($aInsObject) ;
+			}
+		}
+	}
+
+	private function attach($object,$sName=null)
+	{
+		if( $sName===null and $object instanceof INamable )
+		{
+			$sName = $object->name() ;
+		}
+		
+		if( $sName!==null )
+		{
+			$this->arrNames[$sName] = $object ;
+		}
+	
+		if( $bAdoptRelative and ($object instanceof IContainedable) )
+		{
+			$object->setParent($this) ;
+		}
+	}
+	private function free($object)
+	{
+		// 移除名称检索
+		$sName = array_search($object,$this->arrNames) ;
+		if($sName!==false)
+		{
+			unset($this->arrNames[$sName]) ;
+		}
+		
+		// 解除父子关系
 		if( $object instanceof IContainedable and $object->parent()==$this )
 		{
 			$object->setParent(null) ;
-			
-			if( $newObject instanceof IContainedable )
-			{
-				$newObject->setParent($this) ;
-			}
 		}
 	}
 	
 	private $arrObjects = array() ;
+	
+	private $arrNames = array() ;
 	
 	private $arrAcceptClasses = array() ;
 	
