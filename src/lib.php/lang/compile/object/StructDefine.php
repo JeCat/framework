@@ -1,6 +1,7 @@
 <?php
 namespace jc\lang\compile\object ;
 
+use jc\lang\Exception;
 use jc\lang\compile\ClassCompileException;
 
 abstract class StructDefine extends Token
@@ -77,6 +78,39 @@ abstract class StructDefine extends Token
 	public function setDocToken(DocCommentDeclare $aDocToken)
 	{
 		$this->aDocToken = $aDocToken ;
+	}
+
+	public function bodySource()
+	{
+		if( !$this->aTokenBody )
+		{
+			return null ;
+		}
+
+		if( !$aTokenPool = $this->parent() )
+		{
+			throw new ClassCompileException(null,$this,"%s 对象不属于一个 TokenPool 对象",get_class($this)) ;
+		}
+		
+		$aIter = $aTokenPool->iterator() ;
+		$nPos = $aIter->search($this->aTokenBody) ;
+		
+		if( $nPos===false )
+		{
+			throw new ClassCompileException(null,"%s 对象的 bodyToken 无效",get_class($this),$this) ;
+		}
+		
+		$aIter->seek($nPos) ;
+		$aIter->next() ;
+		
+		$sSource = '' ;
+		while( $aToken=$aIter->current() and $aToken!==$this->aTokenBody->theOther() )
+		{
+			$sSource.= $aToken->sourceCode() ;
+			$aIter->next() ;
+		}
+		
+		return $sSource ;
 	}
 	
 	private $aTokenName ;

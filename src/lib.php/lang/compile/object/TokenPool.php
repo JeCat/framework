@@ -1,10 +1,17 @@
 <?php
 namespace jc\lang\compile\object ;
 
+use jc\pattern\iterate\ArrayIterator;
+
 use jc\pattern\composite\Container;
 
 class TokenPool extends Container
 {
+	public function add($object,$sName=null,$bAdoptRelative=true)
+	{
+		parent::add($object,$sName,$bAdoptRelative) ;
+	}
+	
 	public function addClass(ClassDefine $aClass)
 	{
 		$this->arrClasses[$aClass->fullName()] = $aClass ;
@@ -37,6 +44,17 @@ class TokenPool extends Container
 	public function findFunction($sFunctionName,$sClassName='')
 	{
 		return isset($this->arrMethods[$sClassName][$sFunctionName])? $this->arrMethods[$sClassName][$sFunctionName]: null ;
+	}
+
+	public function classIterator()
+	{
+		return new ArrayIterator($this->arrClasses) ;
+	}
+	public function functionIterator($sClassName='')
+	{
+		return isset($this->arrMethods[$sClassName])?
+					new ArrayIterator($this->arrMethods[$sClassName]):
+					new ArrayIterator() ;
 	}
 	
 	private $arrClasses = array() ;
