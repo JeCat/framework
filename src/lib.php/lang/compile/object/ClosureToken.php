@@ -12,7 +12,8 @@ class ClosureToken extends Token
 		{
 			throw new ClassCompileException(
 				null, $aToken
-				,"参数 \$aToken 传入的不是一个有效的闭合token。该参数只接受以下类型的token:".implode(', ', array_merge(self::$arrClosureObjectBeginTypes,self::$arrClosureObjectEndTypes) )
+				, "参数 \$aToken 传入的不是一个有效的闭合token(%s:%s)。该参数只接受以下类型的token:".implode(', ', self::closureSymbols() )
+				, array($aToken->tokenTypeName(),$aToken->sourceCode())
 			) ;
 		}
 		
@@ -76,6 +77,10 @@ class ClosureToken extends Token
 	static public function closeClosureSymbols()
 	{
 		return call_user_func_array('array_merge',self::$arrClosureObjectEndTypes) ;
+	}
+	static public function closureSymbols()
+	{
+		return array_merge(self::openClosureSymbols(),self::closeClosureSymbols()) ;
 	}
 	
 	static public function openClosureTokens()
