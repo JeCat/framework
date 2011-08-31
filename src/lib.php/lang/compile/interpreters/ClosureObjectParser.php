@@ -44,7 +44,7 @@ class ClosureObjectParser extends Object implements IInterpreter
 			}
 			
 			$aNewToken = new ClosureToken($aObject) ;
-			$aObjectContainer->replace($aNewToken,$aObject) ;
+			$aObjectContainer->replace($aObject,$aNewToken) ;
 			
 			if( $aNewToken->isOpen() )
 			{

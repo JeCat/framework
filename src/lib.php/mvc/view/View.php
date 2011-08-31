@@ -48,7 +48,7 @@ class View extends NamableComposite implements IView
 		},$this) ;
 	}
 	
-	public function add($object,$sName=null,$bAdoptRelative=true)
+	public function add($object,$sName=null)
 	{
 		if($sName===null)
 		{
@@ -60,7 +60,7 @@ class View extends NamableComposite implements IView
 			throw new Exception("名称为：%s 的子视图在视图 %s 中已经存在，无法添加同名的子视图",array($sName,$this->name())) ;
 		}
 		
-		parent::add($object,$sName=null,$bAdoptRelative) ;
+		parent::add($object,$sName=null) ;
 	}
 	
 	/**

@@ -65,7 +65,7 @@ class Tag extends ObjectBase
 		return ($this->nType&self::TYPE_SINGLE)==self::TYPE_SINGLE ;
 	}
 	
-	public function add($aChild,$sName=null,$bAdoptRelative=true)
+	public function add($aChild,$sName=null)
 	{
 		if( $aChild instanceof Macro )
 		{

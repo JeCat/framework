@@ -62,7 +62,7 @@ class Container extends Object implements IContainer
 		return false ;
 	}
 	
-	public function add($object,$sName=null,$bAdoptRelative=false)
+	public function add($object,$sName=null)
 	{
 		if( $object==$this )
 		{
@@ -255,7 +255,7 @@ class Container extends Object implements IContainer
 			$this->arrNames[$sName] = $object ;
 		}
 	
-		if( $bAdoptRelative and ($object instanceof IContainedable) )
+		if( $object instanceof IContainedable )
 		{
 			$object->setParent($this) ;
 		}

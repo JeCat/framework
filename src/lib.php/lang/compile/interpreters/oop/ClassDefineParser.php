@@ -48,7 +48,7 @@ class ClassDefineParser implements ISyntaxPaser
 			do{ $aTokenPoolIter->next() ; }
 			while( $aToken=$aTokenPoolIter->current() and $aToken->tokenType()!=Token::T_BRACE_OPEN ) ;
 			
-			$aNewToken->setBodyToken($aToken) ;		
+			$aNewToken->setBodyToken($aToken) ;
 	
 			$aTokenPool->replace($aOriToken,$aNewToken) ;
 			$aState->setCurrentClass($aNewToken) ;

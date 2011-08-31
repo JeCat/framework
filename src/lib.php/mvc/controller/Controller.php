@@ -202,7 +202,7 @@ class Controller extends NamableComposite implements IController
 		}
     }
 
-	public function add($object,$sName=null,$bAdoptRelative=true)
+	public function add($object,$sName=null)
 	{
 		if($sName===null)
 		{
@@ -214,17 +214,14 @@ class Controller extends NamableComposite implements IController
 			throw new Exception("名称为：%s 的子控制器在控制器 %s 中已经存在，无法添加同名的子控制器",array($sName,$this->name())) ;
 		}
 		
-		if( $bAdoptRelative )
-		{
-			$this->takeOverView($object,$sName) ;
+		$this->takeOverView($object,$sName) ;
 
-			if( $object->params()!==$this->params())
-			{
-				$object->params()->addChild($this->params()) ;
-			}
+		if( $object->params()!==$this->params())
+		{
+			$object->params()->addChild($this->params()) ;
 		}
 		
-		parent::add($object,$sName,$bAdoptRelative) ;
+		parent::add($object,$sName) ;
 	}
 	
 	/**
