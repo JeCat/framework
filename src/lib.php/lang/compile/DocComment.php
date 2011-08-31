@@ -13,6 +13,8 @@ class DocComment extends Object
 {
 	public function __construct($sComment)
 	{
+		$this->sSource = $sComment ;
+		
 		$sComment = trim($sComment) ;
 		
 		// 统一换行符
@@ -95,7 +97,13 @@ class DocComment extends Object
 				new ArrayIterator($this->arrItems[$sName]):
 				new ArrayIterator() ;
 	}
+	
+	public function source()
+	{
+		return $this->sSource ;
+	}
 		
+	private $sSource = '' ;
 	private $sDescription = '' ;
 	private $arrItems = array() ;
 }
