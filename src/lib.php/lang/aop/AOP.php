@@ -2,11 +2,8 @@
 namespace jc\lang\aop ;
 
 use jc\lang\Exception;
-
 use jc\lang\oop\Package;
-
 use jc\lang\compile\CompilerFactory;
-
 use jc\system\ClassLoader;
 use jc\pattern\composite\Container;
 use jc\lang\Object;

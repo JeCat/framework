@@ -31,7 +31,7 @@ class NamespaceParser implements ISyntaxPaser
 			}
 		}
 		
-		$aTokenPool->replace($aNewToken, $aOriToken) ;
+		$aTokenPool->replace($aOriToken,$aNewToken) ;
 		$aState->setCurrentNamespace($aNewToken) ;
 	}
 }

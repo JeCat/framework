@@ -2,9 +2,7 @@
 namespace jc\mvc\model\db\orm ;
 
 use jc\db\sql\Criteria;
-
 use jc\db\sql\TablesJoin;
-
 use jc\db\sql\Table;
 use jc\lang\Exception;
 
@@ -127,10 +125,10 @@ class PrototypeInFragment extends Prototype
 		$arrToKeys = $aAssoc->toKeys() ;
 		foreach($aAssoc->fromKeys() as $nKeyIdx=>$sFromKey)
 		{
-			$aCriteria->addExpression(
+			$aCriteria->expression(
 				$aAssoc->fromPrototype()->columnName($sFromKey)
-				. '=' .
-				$aAssoc->toPrototype()->columnName($arrToKeys[$nKeyIdx])
+				. '='
+				. $aAssoc->toPrototype()->columnName($arrToKeys[$nKeyIdx])
 			) ;
 		}
 		
@@ -141,7 +139,7 @@ class PrototypeInFragment extends Prototype
 	{
 		foreach($arrFromKeys as $nIdx=>$sFromKey)
 		{
-			$aCriteria->addExpression( "`{$sFromTable}`.`{$sFromKey}` = `{$sToTable}`.`{$arrToKeys[$nIdx]}`" ) ;
+			$aCriteria->expression( "`{$sFromTable}`.`{$sFromKey}` = `{$sToTable}`.`{$arrToKeys[$nIdx]}`" ) ;
 		}
 	}
 	

@@ -30,7 +30,7 @@ namespace jc\pattern\composite ;
 
 interface IContainer
 {
-	public function add($object,$sName=null,$bAdoptRelative=true) ;
+	public function add($object,$sName=null) ;
 	
 	public function remove($object) ;
 	
@@ -54,7 +54,11 @@ interface IContainer
 	
 	public function has($object) ;
 	
-	public function replace($newObject,$object) ;
+	public function replace($object,$newObject,$sName=null) ;
+	
+	public function insertBefore($object,$_) ;
+	
+	public function insertAfter($object,$_) ;
 }
 
 ?>

@@ -15,11 +15,6 @@ class InterpreterManager extends Container
 		$this->addAcceptClasses('jc\\ui\\IInterpreter') ;
 	}
 	
-	public function add($aInterpreter,$sName=null,$bAdoptRelative=true)
-	{
-		parent::add($aInterpreter) ;
-	}
-	
 	public function remove($aInterpreter)
 	{
 		parent::remove($aInterpreter) ;
