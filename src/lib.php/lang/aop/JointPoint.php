@@ -13,10 +13,8 @@ class JointPoint
 	 * @return JointPoint
 	 */
 	static public function createDefineMethod($sClassName,$sMethodNamePattern='*')
-	{
-		$sClass = get_called_class() ;
-		
-		$aJointPoint = new $sClass() ;
+	{		
+		$aJointPoint = new self() ;
 		$aJointPoint->setExecutionPattern("{$sClassName}::{$sMethodNamePattern}()") ;
 		$aJointPoint->setWeaveClass($sClass) ;
 		$aJointPoint->setWeaveFunctionNamePattern($sMethodNamePattern) ;
@@ -28,9 +26,7 @@ class JointPoint
 	 */
 	static public function createCallFunction($sCallFunctionNamePattern,$sWeaveClass,$sWeaveMethodNamePattern='*')
 	{
-		$sClass = get_called_class() ;
-		
-		$aJointPoint = new $sClass() ;
+		$aJointPoint = new self() ;
 		$aJointPoint->setExecutionPattern("{$sClassName}::{$sFuncName}()") ;
 		$aJointPoint->setWeaveClass($sWeaveClass) ;
 		$aJointPoint->setWeaveFunctionNamePattern($sMethodNamePattern) ;
@@ -47,9 +43,7 @@ class JointPoint
 			throw new Exception('参数$sAccess值不合法，必须为：%s，输入值为“%s”',array(implode(',', array(self::ACCESS_SET,self::ACCESS_GET,self::ACCESS_ANY)),$sAccess)) ;
 		}
 		
-		$sClass = get_called_class() ;
-		
-		$aJointPoint = new $sClass() ;
+		$aJointPoint = new self() ;
 		$aJointPoint->setExecutionPattern("{$sClassName}::\${$sPropertyName} {$sAccess}") ;
 		$aJointPoint->setWeaveClass($sWeaveClass) ;
 		$aJointPoint->setWeaveFunctionNamePattern($sMethodNamePattern) ;
@@ -61,9 +55,7 @@ class JointPoint
 	 */
 	static public function createThrowException($sThrowClassNamePattern,$sWeaveClass,$sWeaveMethodNamePattern='*')
 	{
-		$sClass = get_called_class() ;
-		
-		$aJointPoint = new $sClass() ;
+		$aJointPoint = new self() ;
 		$aJointPoint->setExecutionPattern("throw {$sClassName}") ;
 		return $aJointPoint ;
 	}
@@ -73,8 +65,6 @@ class JointPoint
 	 */
 	static public function createNewObject($sNewClassNamePattern,$sWeaveClass,$sWeaveMethodNamePattern='*')
 	{
-		$sClass = get_called_class() ;
-		
 		$aJointPoint = new self() ;
 		$aJointPoint->setExecutionPattern("new {$sClassName}") ;
 		$aJointPoint->setWeaveClass($sWeaveClass) ;
