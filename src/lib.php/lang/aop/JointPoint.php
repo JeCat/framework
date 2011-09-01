@@ -8,23 +8,39 @@ class JointPoint
 	const ACCESS_SET = 'set' ;
 	const ACCESS_GET = 'get' ;
 	const ACCESS_ANY = '*' ;
-	
+
 	/**
 	 * @return JointPoint
 	 */
-	static public function createCallFunction($sFuncName='*',$sClassName='')
+	static public function createDefineMethod($sClassName,$sMethodNamePattern='*')
 	{
 		$sClass = get_called_class() ;
 		
 		$aJointPoint = new $sClass() ;
-		$aJointPoint->setExecutionPattern("{$sClassName}::{$sFuncName}()") ;
+		$aJointPoint->setExecutionPattern("{$sClassName}::{$sMethodNamePattern}()") ;
+		$aJointPoint->setWeaveClass($sClass) ;
+		$aJointPoint->setWeaveFunctionNamePattern($sMethodNamePattern) ;
 		return $aJointPoint ;
 	}
 	
 	/**
 	 * @return JointPoint
 	 */
-	static public function createAccessProperty($sClassName='*',$sPropertyName='*',$sAccess=self::ACCESS_ANY)
+	static public function createCallFunction($sCallFunctionNamePattern,$sWeaveClass,$sWeaveMethodNamePattern='*')
+	{
+		$sClass = get_called_class() ;
+		
+		$aJointPoint = new $sClass() ;
+		$aJointPoint->setExecutionPattern("{$sClassName}::{$sFuncName}()") ;
+		$aJointPoint->setWeaveClass($sWeaveClass) ;
+		$aJointPoint->setWeaveFunctionNamePattern($sMethodNamePattern) ;
+		return $aJointPoint ;
+	}
+	
+	/**
+	 * @return JointPoint
+	 */
+	static public function createAccessProperty($sCallPropertyNamePattern,$sWeaveClass,$sWeaveMethodNamePattern='*',$sAccess=self::ACCESS_ANY)
 	{
 		if( !in_array($sAccess, array(self::ACCESS_SET,self::ACCESS_GET,self::ACCESS_ANY)) )
 		{
@@ -35,13 +51,15 @@ class JointPoint
 		
 		$aJointPoint = new $sClass() ;
 		$aJointPoint->setExecutionPattern("{$sClassName}::\${$sPropertyName} {$sAccess}") ;
+		$aJointPoint->setWeaveClass($sWeaveClass) ;
+		$aJointPoint->setWeaveFunctionNamePattern($sMethodNamePattern) ;
 		return $aJointPoint ;
 	}
 	
 	/**
 	 * @return JointPoint
 	 */
-	static public function createThrowException($sClassName='*')
+	static public function createThrowException($sThrowClassNamePattern,$sWeaveClass,$sWeaveMethodNamePattern='*')
 	{
 		$sClass = get_called_class() ;
 		
@@ -53,12 +71,14 @@ class JointPoint
 	/**
 	 * @return JointPoint
 	 */
-	static public function createNewObject($sClassName='*')
+	static public function createNewObject($sNewClassNamePattern,$sWeaveClass,$sWeaveMethodNamePattern='*')
 	{
 		$sClass = get_called_class() ;
 		
 		$aJointPoint = new self() ;
 		$aJointPoint->setExecutionPattern("new {$sClassName}") ;
+		$aJointPoint->setWeaveClass($sWeaveClass) ;
+		$aJointPoint->setWeaveFunctionNamePattern($sMethodNamePattern) ;
 		return $aJointPoint ;
 	}
 	
@@ -103,11 +123,34 @@ class JointPoint
 		$sPartten = str_replace('\\*', '.*', $sPartten) ;
 		
 		return '`' . $sPartten . '`is' ;
-	} 
+	}
+
+	
+	public function setWeaveClass($sWeaveClass)
+	{
+		$this->sWeaveClass = $sWeaveClass ;
+	}
+	public function weaveClass()
+	{
+		return $this->sWeaveClass ;
+	}
+	
+	public function setWeaveFunctionNamePattern($sWeaveClass)
+	{
+		$this->sWeaveClass = $sWeaveClass ;
+	}
+	public function weaveFunctionNamePattern()
+	{
+		return $this->sWeaveClass ;
+	}
 	
 	private $sExecutionRegexp ;
 	
 	private $sCallTracRegexp ;
+	
+	private $sWeaveClass ;
+	
+	private $sWeaveFunction ;
 	
 }
 
