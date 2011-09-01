@@ -1,52 +1,39 @@
 <?php
 namespace jc\lang\oop ;
 
-use jc\lang\compile\ClassCompileException;
-use jc\lang\compile\Compiler;
 use jc\lang\Exception;
 use jc\fs\IFile;
 use jc\fs\IFolder;
 
 class Package 
-{
-	const SEARCH_COMPILED = 1 ;			// 在编译文件中搜索类
-	const SEARCH_SOURCE = 2 ;			// 在源文件中搜索类
-	
-	const AUTO_COMPILE = 7 ;			// 搜索时自动编译	
-	const SEARCH_COMPILED_FIRST = 3 ;	// 搜索时编译文件优先：SEARCH_COMPILED | SEARCH_SOURCE
-	const SEARCH_DEFAULT = 7 ;			// SEARCH_COMPILED_FIRST | AUTO_COMPILE
-	
-		
-	public function __construct($sNamespace,IFolder $aSourceFolder=null,IFolder $aCompiledFolder=null)
+{		
+	public function __construct($sNamespace,IFolder $aFolder)
 	{
 		$this->setNamespace($sNamespace) ;
 		
-		$this->aSourceFolder = $aSourceFolder ;
-		$this->aCompiledFolder = $aCompiledFolder ;
+		$this->aFolder = $aFolder ;
 		
 		// OOXX.php
 		$this->addClassFilenameWrapper(function ($sClassName){ return "{$sClassName}.php" ; }) ;		
 		
 		// OOXX.class.php
-		$this->addClassFilenameWrapper(function ($sClassName){ return "{$sClassName}.class.php" ; }) ;
+		// $this->addClassFilenameWrapper(function ($sClassName){ return "{$sClassName}.class.php" ; }) ;
 		
 		// class.OOXX.php
-		$this->addClassFilenameWrapper(function ($sClassName){ return "class.{$sClassName}.php" ; }) ;
+		// $this->addClassFilenameWrapper(function ($sClassName){ return "class.{$sClassName}.php" ; }) ;
 	}
 
 	/**
 	 * @return jc\fs\IFolder
 	 */
-	public function sourceFolder()
+	public function folder()
 	{
-		return $this->aSourceFolder ;
+		return $this->aFolder ;
 	}
-	/**
-	 * @return jc\fs\IFolder
-	 */
-	public function compiledFolder()
+	
+	public function setFolder(IFolder $aFolder)
 	{
-		return $this->aCompiledFolder ;
+		$this->aFolder = $aFolder ;
 	}
 
 	/**
@@ -75,92 +62,18 @@ class Package
 		$this->nNamespaceLen = strlen($this->sNamespace) ;
 	}
 
-	public function searchClass($sClassFullName,$nFlag=self::SEARCH_DEFAULT)
+	public function searchClass($sClassName)
 	{
-		list($sInnerFolderPath,$sClassName) = $this->parsePath($sClassFullName) ;
-		if( $sInnerFolderPath===null and $sClassName===null )
+		if(!$this->aFolder)
 		{
 			return null ;
 		}
-	
-		// 编译后的文件
-		$aClassCompiled = null ;
-		if($this->aCompiler)
-		{
-			$sClassCompiledInnerPath = 
-			$sClassCompiledInnerPath = $sInnerFolderPath?
-					($this->aCompiler->strategySignature() .'/'. $sInnerFolderPath):
-					$this->aCompiler->strategySignature() ;
-		}
-		else 
-		{
-			$sClassCompiledInnerPath = $sInnerFolderPath ;
-		}
 		
-		if( $this->aCompiledFolder and $nFlag&self::SEARCH_COMPILED )
+		if( list($sInnerFolderPath,$sClassName) = $this->parsePath($sClassName) )
 		{
-			$aClassCompiled = $this->searchClassFile( $this->aCompiledFolder, $sClassCompiledInnerPath, $sClassName ) ;
+			return $this->searchClassEx($sInnerFolderPath,$sClassName) ;
 		}
-
-		// 找到编译后的文件，且不要求自动编译，则直接返回
-		if( $aClassCompiled and ($nFlag&self::AUTO_COMPILE)!=self::AUTO_COMPILE )
-		{
-			return $aClassCompiled ;
-		}
-		
-		// 源文件
-		$aClassSource = null ;
-		if( $this->aSourceFolder and $nFlag&self::SEARCH_SOURCE )
-		{
-			$aClassSource = $this->searchClassFile($this->aSourceFolder,$sInnerFolderPath,$sClassName) ;
-		}
-		
-		// 自动编译(找到源文件，且提供了编译目录)
-		if( ($nFlag&self::AUTO_COMPILE)==self::AUTO_COMPILE and $aClassSource and $this->aCompiledFolder )
-		{
-			if( !$aClassCompiled or $aClassCompiled->modifyTime()<$aClassSource->modifyTime() or !$aClassCompiled->length() )
-			{
-				if( !$aClassCompiled )
-				{
-					if( $fnClassFilenameWraps = reset($this->arrClassFilenameWraps) )
-					{
-						$sClassCompilePath = $sClassCompiledInnerPath . '/' . call_user_func_array($fnClassFilenameWraps, array($sClassName)) ;
-					}
-					else 
-					{
-						$sClassCompilePath = $sClassCompiledInnerPath . '/' . $sClassName . '.php' ;
-					}
-					
-					if( !$aClassCompiled=$this->aCompiledFolder->createFile($sClassCompilePath) )
-					{
-						throw new Exception(
-							"无法在以下路径上创建类%s的编译文件：%s",array($sClassFullName,$sClassCompilePath)
-						) ;
-					}
-				}
-				
-				// 编译文件
-				try{
-					$this->aCompiler->compile( $aClassSource->openReader(), $aClassCompiled->openWriter() ) ;
-				}
-				catch (ClassCompileException $e)
-				{
-					$e->setClassSouce($aClassSource) ;
-					throw $e ;
-				}
-			}
-		}
-		
-		// 返回
-		if( $aClassCompiled and $nFlag&self::SEARCH_COMPILED )
-		{
-			return $aClassCompiled ;
-		}
-		else if( $aClassSource and $nFlag&self::SEARCH_SOURCE )
-		{
-			return $aClassSource ;
-		}
-		else 
+		else
 		{
 			return null ;
 		}
@@ -169,14 +82,20 @@ class Package
 	/**
 	 * @return js\fs\IFile
 	 */
-	private function searchClassFile(IFolder $aFolder,$sSubFolder,$sClassName)
+	public function searchClassEx($sSubFolder,$sShortClassName)
 	{
+		if(!$this->aFolder)
+		{
+			return null ;
+		}
+		
 		foreach($this->arrClassFilenameWraps as $func)
 		{
-			$sClassFilename = call_user_func_array($func, array($sClassName)) ;
+			$sClassFilename = call_user_func_array($func, array($sShortClassName)) ;
+			
 			$sClassFilePath = $sSubFolder? ($sSubFolder . '/' . $sClassFilename): $sClassFilename ;
 			
-			if( $aFile=$aFolder->findFile($sClassFilePath) and $aFile instanceof IFile )
+			if( $aFile=$this->aFolder->findFile($sClassFilePath) and $aFile instanceof IFile )
 			{
 				return $aFile ;
 			}
@@ -185,7 +104,7 @@ class Package
 		return null ;
 	}
 	
-	private function parsePath($sClassName)
+	public function parsePath($sClassName)
 	{
 		if( $this->nNamespaceLen===0 )
 		{
@@ -199,7 +118,7 @@ class Package
 		
 		else
 		{
-			return array(null,null) ;
+			return null ;
 		}
 		
 		$pos = strrpos($sPath,'\\') ;
@@ -220,28 +139,41 @@ class Package
 	{
 		$this->arrClassFilenameWraps[] = $func ;
 	}
-
-	public function setClassCompiler(Compiler $aCompiler)
+	
+	public function createClassFile($sInnerPath,$sShortClassName)
 	{
-		$this->aCompiler = $aCompiler ;
-	}
-	/**
-	 * @return Compiler
-	 */
-	public function classCompiler(Compiler $aCompiler)
-	{
-		return $this->aCompiler ;
+		if($this->aFolder)
+		{
+			if( $fnClassFilenameWraps = reset($this->arrClassFilenameWraps) )
+			{
+				$sClassPath = $sInnerPath . '/' . call_user_func_array($fnClassFilenameWraps, array($sShortClassName)) ;
+			}
+			else 
+			{
+				$sClassPath = $sInnerPath . '/' . $sShortClassName . '.php' ;
+			}
+			
+			if( !$aClassFile=$this->aFolder->createFile($sClassPath) )
+			{
+				throw new Exception(
+					"无法在以下路径上创建类%s的编译文件：%s",array($sClassFullName,$sClassCompilePath)
+				) ;
+			}
+			
+			return $aClassFile ;
+		}
+		
+		else
+		{
+			return null ;
+		}
 	}
 	
 	private $sNamespace ;
 	
 	private $nNamespaceLen = 0 ;
 	
-	private $aSourceFolder ;
-	
-	private $aCompiledFolder ;
-	
-	private $aCompiler ;
+	private $aFolder ;
 	
 	private $arrClassFilenameWraps = array() ;
 }
