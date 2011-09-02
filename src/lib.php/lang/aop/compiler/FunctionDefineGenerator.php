@@ -1,5 +1,5 @@
 <?php
-namespace jc\lang\aop\compile ;
+namespace jc\lang\aop\compiler ;
 
 use jc\lang\Assert;
 use jc\lang\Exception;

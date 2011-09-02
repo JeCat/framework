@@ -14,6 +14,14 @@ use jc\lang\Assert;
 
 class ClassLoader extends Object
 {
+	const SEARCH_COMPILED = 1 ;			// 在编译文件中搜索类
+	const SEARCH_SOURCE = 2 ;			// 在源文件中搜索类
+	
+	const AUTO_COMPILE = 7 ;			// 搜索时自动编译	
+	const SEARCH_COMPILED_FIRST = 3 ;	// 搜索时编译文件优先：SEARCH_COMPILED | SEARCH_SOURCE
+	const SEARCH_ALL = 3 ;				// 搜索编译文件和源文件：SEARCH_COMPILED | SEARCH_SOURCE
+	const SEARCH_DEFAULT = 7 ;			// SEARCH_COMPILED_FIRST | AUTO_COMPILE
+	
 	public function __construct(IFile $aClasspathCache=null)
 	{
 		// 加载 classpath 缓存
@@ -32,63 +40,58 @@ class ClassLoader extends Object
 		spl_autoload_register( array($this,"load") ) ;
 	}
 
-	public function addPackage($sNamespaceOrPackage,$sSourceFolder=null,$sCompiledFolder=null) 
+	public function addPackage($sNamespace,$sSourceFolder=null,$sCompiledFolder=null) 
 	{
-		if( $sNamespaceOrPackage instanceof Package )
-		{
-			$this->arrPackages[$sNamespaceOrPackage->ns()] = $sNamespaceOrPackage ;
-		}
+		$aFs = $this->application()->fileSystem() ;
 		
-		else 
+		$aCompiledFolder = null ;
+		if( $sCompiledFolder )
 		{
-			$aFs = $this->application()->fileSystem() ;
+			$sCompiledFolder.= '/' . $this->compiler()->strategySignature() ;
 			
-			$aCompiledFolder = null ;
-			if( $sCompiledFolder )
-			{
-				if( !$aCompiledFolder=$aFs->find($sCompiledFolder) and !$aCompiledFolder=$aFs->createFolder($sCompiledFolder) )
-				{
-					throw new Exception(
-							"注册 class package (%s)时，提供的class编译目录不存在，且无法自动创建：%s"
-							, array($sNamespaceOrPackage,$sCompiledFolder)
-					) ;
-				}
-			}
-			
-			$aSourceFolder = null ;
-			if( $sSourceFolder and !$aSourceFolder=$aFs->findFolder($sSourceFolder) )
+			if( !$aCompiledFolder=$aFs->find($sCompiledFolder) and !$aCompiledFolder=$aFs->createFolder($sCompiledFolder) )
 			{
 				throw new Exception(
-						"注册 class package (%s)时，提供的class源文件目录不存在：%s"
-						, array($sNamespaceOrPackage,$sSourceFolder)
+						"注册 class package (%s)时，提供的class编译目录不存在，且无法自动创建：%s"
+						, array($sNamespace,$sCompiledFolder)
 				) ;
 			}
-			
-			$this->arrPackages[$sNamespaceOrPackage] = new Package($sNamespaceOrPackage,$aSourceFolder,$aCompiledFolder) ;
-			$this->arrPackages[$sNamespaceOrPackage]->setClassCompiler($this->compiler()) ;
 		}
+		
+		$aSourceFolder = null ;
+		if( $sSourceFolder and !$aSourceFolder=$aFs->findFolder($sSourceFolder) )
+		{
+			throw new Exception(
+					"注册 class package (%s)时，提供的class源文件目录不存在：%s"
+					, array($sNamespace,$sSourceFolder)
+			) ;
+		}
+		
+		$this->arrPackages[$sNamespace] = array(
+			new Package($sNamespace,$aSourceFolder) , 
+			new Package($sNamespace,$aCompiledFolder) ,
+		) ;
 	}
 	
 	/**
 	 * 自动加载类文件
 	 */
-	public function load($sClassFullName)
+	public function load($sClassName)
 	{
 		// 从缓存的 classpath 中加载类
-		if( isset($this->arrClassPathCache[$sClassFullName]) and is_file($this->arrClassPathCache[$sClassFullName]) )
+		/*if( isset($this->arrClassPathCache[$sClassName]) and is_file($this->arrClassPathCache[$sClassName]) )
 		{
-			require $this->arrClassPathCache[$sClassFullName] ;
+			require $this->arrClassPathCache[$sClassName] ;
 			return ;
-		}
+		}*/
 		
 		// 搜索类
 		try{
-			if( $aClassFile=$this->searchClass($sClassFullName) )
+			if( $aClassFile=$this->searchClass($sClassName) )
 			{
-				$this->arrClassPathCache[$sClassFullName] = $aClassFile->url() ;
+				// $this->arrClassPathCache[$sClassName] = $aClassFile->url() ;
 				
-				require $this->arrClassPathCache[$sClassFullName] ;
-				
+				$aClassFile->includeFile(false,true) ;
 				return ;
 			}
 		}
@@ -109,25 +112,102 @@ class ClassLoader extends Object
 		}
 	}
 	
-	public function searchClass($sClassFullName,$nSearchFlag=null)
-	{		
+	public function searchClass($sClassName,$nSearchFlag=null)
+	{
 		if($nSearchFlag===null)
 		{
-			$nSearchFlag = Package::SEARCH_COMPILED_FIRST ;
-			if( $this->isEnableClassCompile() and !$this->skipForClassCompile($sClassFullName) )
+			$nSearchFlag = self::SEARCH_COMPILED_FIRST ;
+			if( $this->isEnableClassCompile() and !$this->skipForClassCompile($sClassName) )
 			{
-				$nSearchFlag|= Package::AUTO_COMPILE ;
+				$nSearchFlag|= self::AUTO_COMPILE ;
 			}
 		}
 		
-		for( end($this->arrPackages); $aPackage=current($this->arrPackages); prev($this->arrPackages) )
+		for( end($this->arrPackages); list($aSrcPackage,$aCmpdPackage)=current($this->arrPackages); prev($this->arrPackages) )
 		{
-			if( $aClassFile=$aPackage->searchClass($sClassFullName,$nSearchFlag) )
+			if( !list($sInnerPath,$sShortClassName)=$aSrcPackage->parsePath($sClassName) )
 			{
-				return $aClassFile ;
+				continue ;
 			}
+			
+			// 只搜索编译文件
+			if( ($nSearchFlag&self::SEARCH_ALL)==self::SEARCH_COMPILED )
+			{
+				if( $aCmpdClassFile=$aCmpdPackage->searchClassEx($sInnerPath,$sShortClassName) )
+				{
+					return $aCmpdClassFile ;
+				}
+			}
+			
+			// 只搜索源文件
+			else if( ($nSearchFlag&self::SEARCH_ALL)==self::SEARCH_SOURCE )
+			{
+				if( $aSrcClassFile=$aSrcPackage->searchClassEx($sInnerPath,$sShortClassName) )
+				{
+					return $aSrcClassFile ;
+				}
+			}
+			
+			// 编译文件优先
+			else if( ($nSearchFlag&self::SEARCH_COMPILED_FIRST)==self::SEARCH_COMPILED_FIRST )
+			{
+				// 编译后的文件
+				$aCmpdClassFile = $aCmpdPackage->searchClassEx($sInnerPath,$sShortClassName) ;
+			
+				// 找到编译后的文件，且不要求自动编译，则直接返回
+				if( $aCmpdClassFile and ($nSearchFlag&self::AUTO_COMPILE)!=self::AUTO_COMPILE )
+				{
+					return $aCmpdClassFile ;
+				}
+			
+				// 源文件
+				$aSrcClassFile = null ;
+				if( $nSearchFlag&self::SEARCH_SOURCE )
+				{
+					$aSrcClassFile = $aSrcPackage->searchClassEx($sInnerPath,$sShortClassName) ;
+				}
+			
+				// 确定是否需要自动编译（找到源文件，且提供了编译目录）
+				if( ($nSearchFlag&self::AUTO_COMPILE)==self::AUTO_COMPILE and $aSrcClassFile and $aCmpdPackage->folder() )
+				{
+					// 确定编译文件是否失效（编译文件不存在，最后修改时间小于源文件，文件为空）
+					if( !$aCmpdClassFile or $aCmpdClassFile->modifyTime()<$aSrcClassFile->modifyTime() or !$aCmpdClassFile->length() )
+					{
+						// 创建编译文件
+						if( !$aCmpdClassFile )
+						{
+							$aCmpdClassFile = $aCmpdPackage->createClassFile($sInnerPath,$sShortClassName) ;
+						}
+						
+						// 编译文件
+						try{
+							$this->aCompiler->compile( $aSrcClassFileReader=$aSrcClassFile->openReader(), $aCmpdClassFileReader=$aCmpdClassFile->openWriter() ) ;
+						}
+						catch (ClassCompileException $e)
+						{
+							$e->setClassSouce($aSrcClassFile) ;
+							throw $e ;
+						}
+						
+						$aSrcClassFileReader->close() ;
+						$aCmpdClassFileReader->close() ;
+					}
+				}
+				
+				// 返回
+				if( $aCmpdClassFile )
+				{
+					return $aCmpdClassFile ;
+				}
+				else if( $aSrcClassFile )
+				{
+					return $aSrcClassFile ;
+				}
+			}
+			
 		}
 	}
+		
 	
 	/**
 	 * @return \IIterator

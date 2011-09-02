@@ -21,7 +21,7 @@ class Compiler extends JcObject
 	public function compile(IInputStream $aSourceStream,IOutputStream $aCompiledStream)
 	{
 		// 解释
-		$aTokenPool = $this->interprete($aSourceStream) ;
+		$aTokenPool = $this->interpret($aSourceStream) ;
 		
 		// 生成
 		$this->generate($aTokenPool) ;
