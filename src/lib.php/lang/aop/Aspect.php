@@ -64,7 +64,7 @@ class Aspect extends NamedObject
 	}
 		
 	/**
-	 * @return jc\pattern\IContainer
+	 * @return jc\pattern\composite\IContainer
 	 */
 	public function pointcuts()
 	{
