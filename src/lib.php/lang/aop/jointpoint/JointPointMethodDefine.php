@@ -1,5 +1,5 @@
 <?php
-namespace jc\lang\aop ;
+namespace jc\lang\aop\jointpoint ;
 
 use jc\lang\compile\object\FunctionDefine;
 use jc\lang\compile\object\Token ;

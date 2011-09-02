@@ -1,5 +1,5 @@
 <?php
-namespace jc\lang\aop ;
+namespace jc\lang\aop\jointpoint ;
 
 use jc\lang\Object;
 use jc\lang\compile\object\Token;
