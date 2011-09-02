@@ -16,7 +16,7 @@ class Advice extends NamedObject
 		self::around, self::before, self::after
 	) ;
 	
-	public function __construct($sName,$fnSource,$sPosition=self::after)
+	public function __construct($sName,$sSource,$sPosition=self::after)
 	{
 		if( !in_array($sPosition,self::$arrPositionTypes) )
 		{
@@ -25,7 +25,7 @@ class Advice extends NamedObject
 		
 		parent::__construct($sName) ;
 		
-		$this->fnSource = $fnSource ;
+		$this->sSource = $sSource ;
 		$this->sPosition = $sPosition ;
 	}
 
@@ -68,10 +68,10 @@ class Advice extends NamedObject
 	
 	public function source()
 	{
-		return $this->fnSource ;
+		return $this->sSource ;
 	}
 	
-	private $fnSource ;
+	private $sSource ;
 	
 	private $sPosition ;
 }

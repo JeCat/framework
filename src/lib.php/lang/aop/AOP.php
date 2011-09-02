@@ -4,20 +4,20 @@ namespace jc\lang\aop ;
 use jc\lang\Exception;
 use jc\lang\oop\Package;
 use jc\lang\compile\CompilerFactory;
-use jc\system\ClassLoader;
+use jc\lang\oop\ClassLoader;
 use jc\pattern\composite\Container;
 use jc\lang\Object;
 
 class AOP extends Object
 {	
 	/**
-	 * @return jc\pattern\IContainer
+	 * @return jc\pattern\composite\IContainer
 	 */
 	public function aspects()
 	{
 		if( !$this->aAspects )
 		{
-			$this->aAspects = new Container('jc\\aop\\Aspect') ;
+			$this->aAspects = new Container('jc\\lang\\aop\\Aspect') ;
 		}
 		
 		return $this->aAspects ;
@@ -34,7 +34,7 @@ class AOP extends Object
 		}
 		
 		$arrJointPointIters = array() ;
-		foreach($this->aAspects() as $aAspects)
+		foreach($this->aspects() as $aAspects)
 		{
 			foreach ($aAspects->pointcuts()->iterator() as $aPointcut)
 			{
@@ -43,7 +43,7 @@ class AOP extends Object
 		}
 		
 		return new \RecursiveIteratorIterator(
-			\ArrayIterator(
+			new \ArrayIterator(
 				$arrJointPointIters
 			)
 		) ;

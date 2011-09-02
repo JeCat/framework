@@ -112,7 +112,7 @@ class Pointcut extends NamedObject
 	}
 
 	/**
-	 * @return jc\pattern\IContainer
+	 * @return jc\pattern\composite\IContainer
 	 */
 	public function jointPoints()
 	{
@@ -125,7 +125,7 @@ class Pointcut extends NamedObject
 	}
 	
 	/**
-	 * @return jc\pattern\IContainer
+	 * @return jc\pattern\composite\IContainer
 	 */
 	public function advices()
 	{
