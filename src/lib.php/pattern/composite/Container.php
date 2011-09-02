@@ -142,6 +142,11 @@ class Container extends Object implements IContainer
 	{
 		return isset($this->arrNames[$sName])? $this->arrNames[$sName]: null ;
 	}
+
+	public function getByPosition($nPosition)
+	{
+		return isset($this->arrObjects[$nPosition])? $this->arrObjects[$nPosition]: null ;
+	}
 	
 	public function hasName($sName)
 	{
