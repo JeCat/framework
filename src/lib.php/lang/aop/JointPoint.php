@@ -15,6 +15,7 @@ class JointPoint
 	static public function createDefineMethod($sClassName,$sMethodNamePattern='*')
 	{		
 		$aJointPoint = new self() ;
+		$sClass = get_called_class();
 		$aJointPoint->setExecutionPattern("{$sClassName}::{$sMethodNamePattern}()") ;
 		$aJointPoint->setWeaveClass($sClass) ;
 		$aJointPoint->setWeaveFunctionNamePattern($sMethodNamePattern) ;
@@ -27,9 +28,9 @@ class JointPoint
 	static public function createCallFunction($sCallFunctionNamePattern,$sWeaveClass,$sWeaveMethodNamePattern='*')
 	{
 		$aJointPoint = new self() ;
-		$aJointPoint->setExecutionPattern("{$sClassName}::{$sFuncName}()") ;
+		$aJointPoint->setExecutionPattern("{$sCallFunctionNamePattern}()") ;
 		$aJointPoint->setWeaveClass($sWeaveClass) ;
-		$aJointPoint->setWeaveFunctionNamePattern($sMethodNamePattern) ;
+		$aJointPoint->setWeaveFunctionNamePattern($sWeaveMethodNamePattern) ;
 		return $aJointPoint ;
 	}
 	
@@ -44,9 +45,9 @@ class JointPoint
 		}
 		
 		$aJointPoint = new self() ;
-		$aJointPoint->setExecutionPattern("{$sClassName}::\${$sPropertyName} {$sAccess}") ;
+		$aJointPoint->setExecutionPattern("->\${$sCallPropertyNamePattern} {$sAccess}") ;
 		$aJointPoint->setWeaveClass($sWeaveClass) ;
-		$aJointPoint->setWeaveFunctionNamePattern($sMethodNamePattern) ;
+		$aJointPoint->setWeaveFunctionNamePattern($sWeaveMethodNamePattern) ;
 		return $aJointPoint ;
 	}
 	
@@ -56,7 +57,9 @@ class JointPoint
 	static public function createThrowException($sThrowClassNamePattern,$sWeaveClass,$sWeaveMethodNamePattern='*')
 	{
 		$aJointPoint = new self() ;
-		$aJointPoint->setExecutionPattern("throw {$sClassName}") ;
+		$aJointPoint->setExecutionPattern("throw {$sThrowClassNamePattern}") ;
+		$aJointPoint->setWeaveClass($sWeaveClass) ;
+		$aJointPoint->setWeaveFunctionNamePattern($sWeaveMethodNamePattern) ;
 		return $aJointPoint ;
 	}
 	
@@ -66,9 +69,9 @@ class JointPoint
 	static public function createNewObject($sNewClassNamePattern,$sWeaveClass,$sWeaveMethodNamePattern='*')
 	{
 		$aJointPoint = new self() ;
-		$aJointPoint->setExecutionPattern("new {$sClassName}") ;
+		$aJointPoint->setExecutionPattern("new {$sNewClassNamePattern}") ;
 		$aJointPoint->setWeaveClass($sWeaveClass) ;
-		$aJointPoint->setWeaveFunctionNamePattern($sMethodNamePattern) ;
+		$aJointPoint->setWeaveFunctionNamePattern($sWeaveMethodNamePattern) ;
 		return $aJointPoint ;
 	}
 	
