@@ -18,7 +18,7 @@ class JointPoint
 		
 		$aJointPoint->setExecutionPattern("{$sClassName}::{$sMethodNamePattern}()") ;
 		
-		$aJointPoint->setWeaveClass($sClass) ;
+		$aJointPoint->setWeaveClass($sClassName) ;
 		$aJointPoint->setWeaveFunctionNamePattern($sMethodNamePattern) ;
 		
 		return $aJointPoint ;
