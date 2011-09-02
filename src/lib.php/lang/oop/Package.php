@@ -7,7 +7,7 @@ use jc\fs\IFolder;
 
 class Package 
 {		
-	public function __construct($sNamespace,IFolder $aFolder)
+	public function __construct($sNamespace,IFolder $aFolder=null)
 	{
 		$this->setNamespace($sNamespace) ;
 		
