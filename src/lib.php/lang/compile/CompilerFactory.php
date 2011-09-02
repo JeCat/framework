@@ -15,7 +15,7 @@ class CompilerFactory extends Object
 		$aCompiler->registerInterpreter("jc\\lang\\compile\\interpreters\\ClosureObjectParser") ;
 		$aCompiler->registerInterpreter("jc\\lang\\compile\\interpreters\\oop\\SyntaxScanner") ;
 		
-		$aCompiler->registerGenerator("jc\lang\compile\object\FunctionDefine","jc\\lang\\compile\\generators\\CompiledAlert") ;
+		$aCompiler->registerGenerator("jc\\lang\\compile\\object\\FunctionDefine","jc\\lang\\compile\\generators\\CompiledAlert") ;
 		
 		// 添加编译策略概要，用于生成编译器的”策略签名“
 		$aCompiler->addStrategySummary("jc\\lang\\compile\\interpreters\\ClosureObjectParser") ;

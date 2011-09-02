@@ -14,12 +14,13 @@ class JointPoint
 	 */
 	static public function createDefineMethod($sClassName,$sMethodNamePattern='*')
 	{
-		$sClass = get_called_class() ;
+		$aJointPoint = new self() ;
 		
-		$aJointPoint = new $sClass() ;
 		$aJointPoint->setExecutionPattern("{$sClassName}::{$sMethodNamePattern}()") ;
+		
 		$aJointPoint->setWeaveClass($sClass) ;
 		$aJointPoint->setWeaveFunctionNamePattern($sMethodNamePattern) ;
+		
 		return $aJointPoint ;
 	}
 	
@@ -28,9 +29,8 @@ class JointPoint
 	 */
 	static public function createCallFunction($sCallFunctionNamePattern,$sWeaveClass,$sWeaveMethodNamePattern='*')
 	{
-		$sClass = get_called_class() ;
+		$aJointPoint = new self() ;
 		
-		$aJointPoint = new $sClass() ;
 		$aJointPoint->setExecutionPattern("{$sClassName}::{$sFuncName}()") ;
 		$aJointPoint->setWeaveClass($sWeaveClass) ;
 		$aJointPoint->setWeaveFunctionNamePattern($sMethodNamePattern) ;

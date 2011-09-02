@@ -23,6 +23,32 @@ class AOP extends Object
 		return $this->aAspects ;
 	}
 	
+	/**
+	 * @return \Iterator
+	 */
+	public function jointPointIterator() 
+	{
+		if( !$this->aAspects )
+		{
+			return new \EmptyIterator() ;
+		}
+		
+		$arrJointPointIters = array() ;
+		foreach($this->aAspects() as $aAspects)
+		{
+			foreach ($aAspects->pointcuts()->iterator() as $aPointcut)
+			{
+				$arrJointPointIters[] = $aPointcut->jointPoints()->iterator() ;
+			}
+		}
+		
+		return new \RecursiveIteratorIterator(
+			\ArrayIterator(
+				$arrJointPointIters
+			)
+		) ;
+	}
+	
 	public function register($sAspectName)
 	{
 		if( !$aClassFile = $this->classLoader()->searchClass($sAspectName) )
@@ -41,6 +67,56 @@ class AOP extends Object
 		}
 		
 		$aAspect = Aspect::createFromToken($aClassToken,$aTokenPool) ;
+	}
+	
+	public function weave()
+	{
+		$aClassLoader = $this->classLoader() ;
+		$arrBeWeavedClasses = array() ;
+		$aCompiler = null ;
+		
+		foreach($this->jointPointIterator() as $aJointPoint)
+		{
+			$sBeWeavedClass = $aJointPoint->weaveClass() ;
+			if( !in_array($sBeWeavedClass,$arrBeWeavedClasses) )
+			{				
+				$aSrcClassFile = $aClassLoader->searchClass($sBeWeavedClass,ClassLoader::SEARCH_COMPILED) ;
+				$aCmpdClassFile = $aClassLoader->searchClass($sBeWeavedClass,ClassLoader::SEARCH_COMPILED) ;
+				
+				if( !$aSrcClassFile )
+				{
+					throw new Exception(
+						"AOP 无法将目标代码织入到 JointPoint %s 中：没有找到类 %s 的源文件。"
+						, array($aJointPoint->$sBeWeavedClass,$aJointPoint->name())
+					) ;
+				}
+				
+				if( !$aCmpdClassFile )
+				{
+					throw new Exception(
+						"AOP 无法将目标代码织入到 JointPoint %s 中：没有找到类 %s 的编译文件。"
+						, array($aJointPoint->$sBeWeavedClass,$aJointPoint->name())
+					) ;
+				}
+			
+				if(!$aCompiler)
+				{
+					$aCompiler = $this->createClassCompiler() ;
+				}
+				
+				$aCompiler->compile( $aSrcClassFile->openReader(), $aCmpdClassFile->openWriter() ) ;
+				
+				$arrBeWeavedClasses[] = $sBeWeavedClass ;
+			}
+		}
+	}
+	
+	public function createClassCompiler()
+	{
+		$aCompiler = CompilerFactory::createInstance()->create() ;
+		$aCompiler->registerGenerator("jc\\lang\\compile\\object\\FunctionDefine","jc\\lang\\aop\\compiler\\FunctionDefineGenerator") ;
+		
+		return $aCompiler ;
 	}
 	
 	/**
