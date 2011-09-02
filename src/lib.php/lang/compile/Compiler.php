@@ -20,8 +20,11 @@ class Compiler extends JcObject
 {
 	public function compile(IInputStream $aSourceStream,IOutputStream $aCompiledStream)
 	{
+		// 扫描 tokens
+		$aTokenPool = $this->scan($aSourceStream) ;
+		
 		// 解释
-		$aTokenPool = $this->interpret($aSourceStream) ;
+		$this->interpret($aTokenPool) ;
 		
 		// 生成
 		$this->generate($aTokenPool) ;
@@ -36,51 +39,10 @@ class Compiler extends JcObject
 	/**
 	 * @return jc\lang\compile\object\TokenPool
 	 */
-	public function interpret(IInputStream $aSourceStream)
+	public function scan(IInputStream $aSourceStream)
 	{
-		$aTokenPool = new TokenPool('jc\\lang\\compile\\object\\AbstractObject') ;
-		
-		// 扫描 tokens
-		$this->scan($aSourceStream, $aTokenPool) ;
-		
-		// 解析
-		foreach($this->arrInterpreters as $interpreter)
-		{
-			if( is_string($interpreter) )
-			{
-				$interpreter = $this->interpreter($interpreter) ;
-			}
-			
-			$interpreter->analyze($aTokenPool) ;
-		}
-		
-		return $aTokenPool ;
-	}
+		$aTokenPool = $this->createTokenPool() ;
 	
-	public function generate(TokenPool $aTokenPool)
-	{
-		// 编译
-		foreach($aTokenPool->iterator() as $aObject)
-		{
-			for( $sClassName=get_class($aObject); $sClassName; $sClassName=get_parent_class($sClassName) )
-			{
-				if( empty($this->mapGeneratorClasses[$sClassName]) )
-				{
-					continue ;
-				}
-
-				foreach($this->mapGeneratorClasses[$sClassName] as $sGeneratorClass)
-				{
-					$aGenerator = $this->generator($sGeneratorClass) ;
-
-					$aGenerator->generateTargetCode($aTokenPool,$aObject) ;
-				}
-			}
-		}
-	}
-	
-	protected function scan(IInputStream $aSourceStream,IContainer $aTokenPool)
-	{
 		$aSource = new String() ;
 		$aSourceStream->readInString($aSource) ;
 		$nLine = 1 ;
@@ -110,8 +72,47 @@ class Compiler extends JcObject
 			}
 		}
 		
-		return ;
+		return $aTokenPool ;
 	}	
+	
+	
+	public function interpret(TokenPool $aTokenPool)
+	{		
+		// 解析
+		foreach($this->arrInterpreters as $interpreter)
+		{
+			if( is_string($interpreter) )
+			{
+				$interpreter = $this->interpreter($interpreter) ;
+			}
+			
+			$interpreter->analyze($aTokenPool) ;
+		}
+		
+		return ;
+	}
+	
+	public function generate(TokenPool $aTokenPool)
+	{
+		// 编译
+		foreach($aTokenPool->iterator() as $aObject)
+		{
+			for( $sClassName=get_class($aObject); $sClassName; $sClassName=get_parent_class($sClassName) )
+			{
+				if( empty($this->mapGeneratorClasses[$sClassName]) )
+				{
+					continue ;
+				}
+
+				foreach($this->mapGeneratorClasses[$sClassName] as $sGeneratorClass)
+				{
+					$aGenerator = $this->generator($sGeneratorClass) ;
+
+					$aGenerator->generateTargetCode($aTokenPool,$aObject) ;
+				}
+			}
+		}
+	}
 	
 	public function registerInterpreter($sInterpreterClass)
 	{
@@ -213,6 +214,10 @@ class Compiler extends JcObject
 		$this->arrStrategySummaries[] = $summay ;
 	}
 	
+	public function createTokenPool()
+	{
+		return new TokenPool('jc\\lang\\compile\\object\\AbstractObject') ;
+	}
 	
 	
 	private $sStrategySignature ;
