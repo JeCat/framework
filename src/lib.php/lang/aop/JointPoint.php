@@ -1,9 +1,10 @@
 <?php
 namespace jc\lang\aop ;
 
+use jc\lang\compile\object\Token;
 use jc\lang\Exception;
 
-class JointPoint
+abstract class JointPoint
 {
 	const ACCESS_SET = 'set' ;
 	const ACCESS_GET = 'get' ;
@@ -80,38 +81,12 @@ class JointPoint
 	
 	//////////////////////////////////////////////////////////////////
 	
-	public function setExecutionPattern($sPartten)
+	public function __construct($sWeaveClass,$sWeaveMethodNamePattern='*')
 	{
-		$this->setExecutionRegexp(self::transRegexp($sPartten)) ;
+		$this->setWeaveClass($sWeaveClass) ;
+		$this->setWeaveMethodNamePattern($sWeaveMethodNamePattern) ;
 	}
-	
-	public function setExecutionRegexp($sRegexp)
-	{
-		$this->sExecutionRegexp = $sRegexp ;
-	}
-	
-	public function executionRegexp()
-	{
-		return $this->sExecutionRegexp ;
-	}
-	
-	public function setCallTrac($sPartten=null)
-	{
-		if($sPartten)
-		{
-			$this->sCallTracRegexp = self::transRegexp($sPartten) ;
-		}
-		else 
-		{
-			$this->sCallTracRegexp = null ;
-		}
-	}
-	
-	public function callTracRegexp()
-	{
-		return $this->sCallTracRegexp ;
-	}
-	
+		
 	static public function transRegexp($sPartten)
 	{
 		$sPartten = preg_quote($sPartten) ;
@@ -120,7 +95,6 @@ class JointPoint
 		return '`' . $sPartten . '`is' ;
 	}
 
-	
 	public function setWeaveClass($sWeaveClass)
 	{
 		$this->sWeaveClass = $sWeaveClass ;
@@ -130,22 +104,42 @@ class JointPoint
 		return $this->sWeaveClass ;
 	}
 	
-	public function setWeaveFunctionNamePattern($sWeaveClass)
+	public function setWeaveMethodNamePattern($sWeaveMethodNamePattern)
 	{
-		$this->sWeaveClass = $sWeaveClass ;
+		$this->sWeaveMethodNamePattern = $sWeaveMethodNamePattern ;
+		$this->sWeaveMethodNameRegexp = self::transRegexp($sWeaveMethodNamePattern) ;
 	}
-	public function weaveFunctionNamePattern()
+	public function weaveMethodNamePattern()
 	{
-		return $this->sWeaveClass ;
+		return $this->sWeaveMethodNamePattern ;
+	}
+	public function weaveMethodNameRegexp()
+	{
+		return $this->sWeaveMethodNameRegexp ;
+	}
+
+	public function matchWeaveMethod(Token $aToken)
+	{
+		if( !$aClass=$aToken->belongsClass() or $aMethod=$aToken->belongsFunction() )
+		{
+			return false ;
+		}
+		
+		if( $aClass->fullName()!=$this->weaveClass() )
+		{
+			return false ;
+		}
+		
+		return preg_match( $this->weaveMethodNameRegexp(), $aMethod->name() ) ;
 	}
 	
-	private $sExecutionRegexp ;
-	
-	private $sCallTracRegexp ;
+	abstract public function matchExecutionPoint(Token $aToken) ;
 	
 	private $sWeaveClass ;
 	
-	private $sWeaveFunction ;
+	private $sWeaveMethodNamePattern ;
+	
+	private $sWeaveMethodNameRegexp ;
 	
 }
 
