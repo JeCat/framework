@@ -1,10 +1,11 @@
 <?php
 namespace jc\lang\aop ;
 
+use jc\lang\Object;
 use jc\lang\compile\object\Token;
 use jc\lang\Exception;
 
-abstract class JointPoint
+abstract class JointPoint extends Object
 {
 	const ACCESS_SET = 'set' ;
 	const ACCESS_GET = 'get' ;

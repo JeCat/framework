@@ -2,7 +2,6 @@
 namespace jc\lang\aop ;
 
 use jc\lang\compile\object\FunctionDefine;
-
 use jc\lang\compile\object\Token ;
 
 class JointPointMethodDefine extends JointPoint
@@ -25,7 +24,7 @@ class JointPointMethodDefine extends JointPoint
 			return false ;
 		}
 		
-		return preg_match( $this->weaveMethodNameRegexp(), $aToken->name() ) ;
+		return preg_match( $this->weaveMethodNameRegexp(),$aToken->name() )? true: false ;
 	}
 }
 
