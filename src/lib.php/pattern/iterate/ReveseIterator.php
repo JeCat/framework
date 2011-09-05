@@ -12,32 +12,37 @@ class ReveseIterator extends Object implements IReversableIterator, \OuterIterat
 
 	public function rewind()
 	{
-		$this->getInnerIterator()->last() ;
+		$this->aOriginIterator->last() ;
 	}
 	
 	public function next()
 	{
-		$this->getInnerIterator()->prev() ;
+		$this->aOriginIterator->prev() ;
 	}
 
 	public function prev()
 	{
-		$this->getInnerIterator()->next() ;
+		$this->aOriginIterator->next() ;
 	}
 
 	public function key()
 	{
-		$this->getInnerIterator()->key() ;
+		$this->aOriginIterator->key() ;
 	}
 
 	public function valid()
 	{
-		$this->getInnerIterator()->valid() ;
+		return $this->aOriginIterator->valid() ;
 	}
 	
 	public function last()
 	{
-		$this->getInnerIterator()->rewind() ;
+		$this->aOriginIterator->rewind() ;
+	}
+	
+	public function current()
+	{
+		return $this->aOriginIterator->current();
 	}
 
 	/**

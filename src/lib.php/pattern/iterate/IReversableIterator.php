@@ -1,7 +1,7 @@
 <?php
 namespace jc\pattern\iterate ;
 
-interface IReversableIterator
+interface IReversableIterator extends \Iterator
 {
 	
 	public function prev() ;
