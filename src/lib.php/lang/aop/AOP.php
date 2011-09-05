@@ -43,7 +43,7 @@ class AOP extends Object
 		}
 		
 		return new \RecursiveIteratorIterator(
-			new \ArrayIterator(
+			new \RecursiveArrayIterator(
 				$arrJointPointIters
 			)
 		) ;

@@ -118,7 +118,7 @@ class Pointcut extends NamedObject
 	{
 		if( !$this->aJointPoints )
 		{
-			$this->aJointPoints = new Container('jc\\lang\\aop\\JointPoint') ;
+			$this->aJointPoints = new Container('jc\\lang\\aop\\jointpoint\\JointPoint') ;
 		}
 		
 		return $this->aJointPoints ;
