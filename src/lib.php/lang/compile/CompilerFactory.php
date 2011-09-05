@@ -21,9 +21,10 @@ class CompilerFactory extends Object
 		$aCompiler->addStrategySummary("jc\\lang\\compile\\interpreters\\ClosureObjectParser") ;
 		$aCompiler->addStrategySummary("jc\\lang\\compile\\interpreters\\oop\\SyntaxScanner") ;
 		$aCompiler->addStrategySummary("jc\\lang\\compile\\interpreters\\oop\\PHPCodeParser") ;
-		$aCompiler->addStrategySummary("jc\\lang\\compile\\interpreters\\oop\\NamespaceParser") ;
+		$aCompiler->addStrategySummary("jc\\lang\\compile\\interpreters\\oop\\NamespaceDeclareParser") ;
 		$aCompiler->addStrategySummary("jc\\lang\\compile\\interpreters\\oop\\ClassDefineParser") ;
 		$aCompiler->addStrategySummary("jc\\lang\\compile\\interpreters\\oop\\FunctionDefineParser") ;
+		$aCompiler->addStrategySummary("jc\\lang\\compile\\interpreters\\oop\\CallFunctionParser") ;
 		
 		$aCompiler->addStrategySummary("jc\\lang\\compile\\object\\FunctionDefine<jc\\lang\\compile\\generators\\CompiledAlert") ;
 		
