@@ -25,12 +25,12 @@ class ReveseIterator extends Object implements IReversableIterator, \OuterIterat
 		$this->getInnerIterator()->next() ;
 	}
 
-	abstract public function key()
+	public function key()
 	{
 		$this->getInnerIterator()->key() ;
 	}
 
-	abstract public function valid()
+	public function valid()
 	{
 		$this->getInnerIterator()->valid() ;
 	}
