@@ -3,11 +3,11 @@ namespace jc\pattern\iterate ;
 
 use jc\lang\Object;
 
-class ReveseIterator extends \IteratorIterator implements IReversableIterator, \OuterIterator
+class ReveseIterator extends Object implements IReversableIterator, \OuterIterator
 {
 	public function __construct (IReversableIterator $aOriginIterator)
 	{
-		parent::__construct($aOriginIterator) ;
+		$this->aOriginIterator = $aOriginIterator ;
 	}
 
 	public function rewind()
@@ -24,11 +24,31 @@ class ReveseIterator extends \IteratorIterator implements IReversableIterator, \
 	{
 		$this->getInnerIterator()->next() ;
 	}
+
+	abstract public function key()
+	{
+		$this->getInnerIterator()->key() ;
+	}
+
+	abstract public function valid()
+	{
+		$this->getInnerIterator()->valid() ;
+	}
 	
 	public function last()
 	{
 		$this->getInnerIterator()->rewind() ;
 	}
+
+	/**
+	 * @return IReversableIterator
+	 */
+	public function getInnerIterator ()
+	{
+		return $this->aOriginIterator ;
+	}
+	
+	private $aOriginIterator ;
 }
 
 ?>
