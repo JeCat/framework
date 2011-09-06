@@ -6,7 +6,7 @@ use jc\pattern\iterate\INonlinearIterator;
 use jc\lang\compile\object\TokenPool;
 use jc\lang\compile\object\Token;
 
-class NamespaceDeclareParser implements ISyntaxPaser
+class NamespaceDeclareParser implements ISyntaxParser
 {
 	public function parse(TokenPool $aTokenPool,INonlinearIterator $aTokenPoolIter,State $aState)
 	{

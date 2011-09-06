@@ -9,7 +9,7 @@ use jc\lang\compile\object\TokenPool;
 use jc\lang\compile\object\Token;
 use jc\lang\compile\object\ClassDefine;
 
-class FunctionDefineParser implements ISyntaxPaser
+class FunctionDefineParser implements ISyntaxParser
 {
 	public function parse(TokenPool $aTokenPool,INonlinearIterator $aTokenPoolIter,State $aState)
 	{
