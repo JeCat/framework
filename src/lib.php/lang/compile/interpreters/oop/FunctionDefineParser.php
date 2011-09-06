@@ -112,11 +112,18 @@ class FunctionDefineParser implements ISyntaxPaser
 			do{ $aTokenPoolIter->next() ; }
 			while( $aToken=$aTokenPoolIter->current() and !in_array($aToken->tokenType(),array(Token::T_BRACE_OPEN,Token::T_SEMICOLON)) ) ;
 			
-			if( $aToken and $aToken->tokenType()==Token::T_BRACE_OPEN )
+			if( $aToken )
 			{
-				$aNewToken->setBodyToken($aToken) ;
+				if( $aToken->tokenType()==Token::T_BRACE_OPEN )
+				{
+					$aNewToken->setBodyToken($aToken) ;
 				
-				$aState->setCurrentFunction($aNewToken) ;
+					$aState->setCurrentFunction($aNewToken) ;
+				}
+				else if( $aToken->tokenType()==Token::T_SEMICOLON )
+				{
+					$aNewToken->setEndToken($aToken) ;
+				}
 			}
 			
 			$aTokenPool->replace($aOriToken,$aNewToken) ;
