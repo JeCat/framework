@@ -3,13 +3,13 @@ namespace jc\lang\compile\interpreters\oop ;
 
 use jc\lang\compile\object\CallFunction;
 use jc\pattern\iterate\CallbackFilterIterator ;
-use jc\pattern\iterate\ReveseIterator ;
+use jc\pattern\iterate\ReverseIterator ;
 use jc\lang\compile\object\NamespaceDeclare;
 use jc\pattern\iterate\INonlinearIterator;
 use jc\lang\compile\object\TokenPool;
 use jc\lang\compile\object\Token;
 
-class CallFunctionParser implements ISyntaxPaser
+class CallFunctionParser implements ISyntaxParser
 {
 	public function parse(TokenPool $aTokenPool,INonlinearIterator $aTokenPoolIter,State $aState)
 	{
@@ -21,31 +21,32 @@ class CallFunctionParser implements ISyntaxPaser
 		
 		// 找参数括号前面的函数名
 		// ---------------------------------------------
-		$aFindIter = new CallbackFilterIterator(
-			new ReveseIterator($aTokenPoolIter)
+		$aFinderIter = new CallbackFilterIterator(
+			new ReverseIterator($aTokenPoolIter)
 			, function (INonlinearIterator $aTokenPoolIter){
 				switch ( $aTokenPoolIter->current()->tokenType() )
 				{
 					case T_WHITESPACE :		// 过滤空白token
 						return false ;
-					case T_STRING :			// 预期的token
+					case T_STRING :			// 预期的token ,函数名
 						return true ;
 					default:				// 遇到意外的token
 						$aTokenPoolIter->last() ;
-						return true ;
-				}			
+						return false ;
+				}
 			}
 		) ;
 		
-		if( !$aCallFunctionName = $aFindIter->next() )
+		$aFinderIter->next();
+		if( !$aCallFunctionName = $aFinderIter->current() )
 		{
 			return ;
 		}
 		
 		// 检查函数名前面的 function 声明
 		// ---------------------------------------------
-		$aFindIter = new CallbackFilterIterator(
-			new ReveseIterator(clone $aTokenPoolIter)
+		$aFinderIter = new CallbackFilterIterator(
+			new ReverseIterator(clone $aTokenPoolIter)
 			, function (INonlinearIterator $aTokenPoolIter){
 				switch ( $aTokenPoolIter->current()->tokenType() )
 				{
@@ -55,17 +56,17 @@ class CallFunctionParser implements ISyntaxPaser
 						return true ;
 					default:				// 遇到意外的token
 						$aTokenPoolIter->last() ;
-						return true ;
+						return false ;
 				}				
 			}
 		) ;
 		
 		// 找到 function 申明，这是函数定义 而不是函数调用
-		if( $aFindIter->next() )
+		$aFinderIter->next();
+		if( !$aFinderIter->current() )
 		{
 			return ;
 		}
-		
 		
 		$aCallFunction = new CallFunction($aCallFunctionName,$aToken) ;
 		
@@ -75,8 +76,8 @@ class CallFunctionParser implements ISyntaxPaser
 		
 		// 查找class成员访问符：-> 或 ::
 		// ---------------------------------------------
-		$aFindIter = new CallbackFilterIterator(
-			new ReveseIterator($aTokenPoolIter)
+		$aFinderIter = new CallbackFilterIterator(
+			new ReverseIterator($aTokenPoolIter)
 			, function (INonlinearIterator $aTokenPoolIter){
 				switch ( $aTokenPoolIter->current()->tokenType() )
 				{
@@ -89,30 +90,28 @@ class CallFunctionParser implements ISyntaxPaser
 						return true ;
 					default:						// 无效的token
 						$aTokenPoolIter->last() ;
-						return true ;
+						return false ;
 				}
 			}
 		) ;
 		
 		// 方法
-		if( $aAccessSymbol = $aFindIter->next() )
+		$aFinderIter->next();
+		if( $aAccessSymbol = $aFinderIter->current() )
 		{
-			$aFindIter = new CallbackFilterIterator(
-				new ReveseIterator($aTokenPoolIter)
+			$aFinderIter = new CallbackFilterIterator(
+				new ReverseIterator($aTokenPoolIter)
 				, function (INonlinearIterator $aTokenPoolIter){
 					// 过滤空白token
 					return $aTokenPoolIter->current()->tokenType()!==T_WHITESPACE ;
 				}
 			) ;
 			
-			$aClass = $aFindIter->next() ;
+			$aClass = $aFinderIter->next() ;
 			
 			$aCallFunction->setClassToken($aClass) ;
 			$aCallFunction->setAccessToken($aAccessSymbol) ;
 		}
-			
-	}
-	
+	}	
 }
-
 ?>

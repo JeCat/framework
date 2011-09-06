@@ -3,7 +3,7 @@ namespace jc\pattern\iterate ;
 
 use jc\lang\Object;
 
-class ReveseIterator extends Object implements IReversableIterator, \OuterIterator
+class ReverseIterator extends Object implements IReversableIterator, \OuterIterator
 {
 	public function __construct (IReversableIterator $aOriginIterator)
 	{
