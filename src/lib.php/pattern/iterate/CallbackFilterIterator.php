@@ -1,24 +1,86 @@
 <?php
 namespace jc\pattern\iterate ;
 
-class CallbackFilterIterator extends \FilterIterator
-{
+use jc\lang\Object;
 
-	public function __construct(\Iterator $iterator,$fnCallback=null)
+class CallbackFilterIterator extends Object implements \OuterIterator
+{
+	public function __construct(\Iterator $aOriginIterator,$fnCallback=null)
 	{
 		if($fnCallback)
 		{
 			$this->addCallback($fnCallback) ;
 		}
 		
-		parent::__construct($iterator);
+		$this->aOriginIterator = $aOriginIterator ;
 	}
 
+	public function rewind()
+	{
+		$this->aOriginIterator->rewind() ;
+		
+		if( $this->aOriginIterator->valid() and !$this->accept() )
+		{
+			$this->next() ;
+		}
+	}
+	
+	public function next()
+	{
+		do{
+			$this->aOriginIterator->next() ;
+		} while( $this->aOriginIterator->valid() and !$this->accept() ) ;
+	}
+
+	public function valid()
+	{
+		if( !$this->accept() )
+		{
+			$this->next() ;
+		}
+		
+		return $this->aOriginIterator->valid() ;
+	}
+	
+	public function current()
+	{
+		if( $this->aOriginIterator->valid() and !$this->accept() )
+		{
+			$this->next() ;
+		}
+		
+		return $this->aOriginIterator->current() ;
+	}
+
+
+	public function key()
+	{
+		if( $this->aOriginIterator->valid() and !$this->accept() )
+		{
+			$this->next() ;
+		}
+		
+		return $this->aOriginIterator->key() ;
+	}
+	
+	/**
+	 * @return IReversableIterator
+	 */
+	public function getInnerIterator ()
+	{
+		return $this->aOriginIterator ;
+	}
+	
 	public function accept ()
 	{
+		if( !$this->aOriginIterator->valid() )
+		{
+			return false ;
+		}
+		
 		foreach($this->arrCallbacks as $fnCallback)
 		{
-			if( call_user_func_array($fnCallback,array($this->getInnerIterator()))===false )
+			if( call_user_func_array($fnCallback,array($this->aOriginIterator))===false )
 			{
 				return false ;
 			}
@@ -44,6 +106,9 @@ class CallbackFilterIterator extends \FilterIterator
 	}
 	
 	private $arrCallbacks = array() ;
+	
+	private $aOriginIterator ;
+
 }
 
 ?>
