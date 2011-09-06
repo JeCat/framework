@@ -5,7 +5,6 @@ use jc\lang\compile\object\CallFunction;
 use jc\pattern\iterate\CallbackFilterIterator ;
 use jc\pattern\iterate\ReverseIterator ;
 use jc\lang\compile\object\NamespaceDeclare;
-use jc\pattern\iterate\IReversableIterator;
 use jc\pattern\iterate\INonlinearIterator;
 use jc\lang\compile\object\TokenPool;
 use jc\lang\compile\object\Token;
@@ -14,8 +13,6 @@ class CallFunctionParser implements ISyntaxParser
 {
 	public function parse(TokenPool $aTokenPool,INonlinearIterator $aTokenPoolIter,State $aState)
 	{
-		$aTokenPoolIter = clone $aTokenPoolIter ;
-		
 		$aToken = $aTokenPoolIter->current() ;
 		if( $aToken->tokenType()!==Token::T_BRACE_ROUND_OPEN )
 		{
@@ -26,7 +23,7 @@ class CallFunctionParser implements ISyntaxParser
 		// ---------------------------------------------
 		$aFinderIter = new CallbackFilterIterator(
 			new ReverseIterator($aTokenPoolIter)
-			, function (IReversableIterator $aTokenPoolIter){
+			, function (INonlinearIterator $aTokenPoolIter){
 				switch ( $aTokenPoolIter->current()->tokenType() )
 				{
 					case T_WHITESPACE :		// 过滤空白token
@@ -50,7 +47,7 @@ class CallFunctionParser implements ISyntaxParser
 		// ---------------------------------------------
 		$aFinderIter = new CallbackFilterIterator(
 			new ReverseIterator(clone $aTokenPoolIter)
-			, function (IReversableIterator $aTokenPoolIter){
+			, function (INonlinearIterator $aTokenPoolIter){
 				switch ( $aTokenPoolIter->current()->tokenType() )
 				{
 					case T_WHITESPACE :		// 过滤空白token
@@ -66,7 +63,7 @@ class CallFunctionParser implements ISyntaxParser
 		
 		// 找到 function 申明，这是函数定义 而不是函数调用
 		$aFinderIter->next();
-		if( !$aFinderIter->current() )
+		if( $aFinderIter->current() )
 		{
 			return ;
 		}
@@ -81,7 +78,7 @@ class CallFunctionParser implements ISyntaxParser
 		// ---------------------------------------------
 		$aFinderIter = new CallbackFilterIterator(
 			new ReverseIterator($aTokenPoolIter)
-			, function (IReversableIterator $aTokenPoolIter){
+			, function (INonlinearIterator $aTokenPoolIter){
 				switch ( $aTokenPoolIter->current()->tokenType() )
 				{
 					case T_WHITESPACE :				// 过滤空白token
@@ -104,7 +101,7 @@ class CallFunctionParser implements ISyntaxParser
 		{
 			$aFinderIter = new CallbackFilterIterator(
 				new ReverseIterator($aTokenPoolIter)
-				, function (IReversableIterator $aTokenPoolIter){
+				, function (INonlinearIterator $aTokenPoolIter){
 					// 过滤空白token
 					return $aTokenPoolIter->current()->tokenType()!==T_WHITESPACE ;
 				}

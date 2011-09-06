@@ -29,7 +29,6 @@ class JointPointCallFunction extends JointPoint
 		
 		return preg_match( $this->weaveMethodNameRegexp(),$aToken->name() )? true: false ;
 	}
-	
 
 	public function setWeaveMethodNamePattern($sWeaveMethodNamePattern)
 	{

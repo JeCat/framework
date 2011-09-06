@@ -69,58 +69,10 @@ class FunctionDefine extends StructDefine
 		}
 		$this->aAbstractToken = $aAbstractToken ;
 	}
-
-	public function startToken()
-	{
-		if( $aDocToken=$this->docToken() )
-		{
-			return $aDocToken ;	
-		}
-		
-		$arrTokens = array() ;
-		
-		foreach(array('aAccessToken','aStaticToken','aAbstractToken') as $sTokenName)
-		{
-			if($this->$sTokenName)
-			{
-				if( $aTokenPool = $this->$sTokenName->parent() )
-				{
-					$nPos = $aTokenPool->search($this->$sTokenName) ;
-					if($nPos!==false)
-					{
-						$arrTokens[$nPos] = $this->$sTokenName ;
-					}
-				}
-			}
-		}
-		
-		ksort($arrTokens) ;
-		return array_pop($arrTokens) ;
-	}
-	public function endToken()
-	{
-		if( $this->aEndToken )
-		{
-			return $this->aEndToken ;
-		}
-	
-		if( $aBody = $this->bodyToken() )
-		{
-			return $aBody->theOther() ;
-		}
-		
-		return null ;
-	}
-	public function setEndToken($aEndToken)
-	{
-		$this->aEndToken = $aEndToken ;
-	}
-	
 	private $aTokenArgList ;
 	private $aAccessToken ;
 	private $aStaticToken ;
 	private $aAbstractToken ;
-	private $aEndToken ;
 }
 
 ?>
