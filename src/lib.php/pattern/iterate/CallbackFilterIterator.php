@@ -19,7 +19,7 @@ class CallbackFilterIterator extends Object implements \OuterIterator
 	{
 		$this->aOriginIterator->rewind() ;
 		
-		if( !$this->accept() )
+		if( $this->aOriginIterator->valid() and !$this->accept() )
 		{
 			$this->next() ;
 		}
@@ -44,7 +44,7 @@ class CallbackFilterIterator extends Object implements \OuterIterator
 	
 	public function current()
 	{
-		if( !$this->accept() )
+		if( $this->aOriginIterator->valid() and !$this->accept() )
 		{
 			$this->next() ;
 		}
@@ -55,7 +55,7 @@ class CallbackFilterIterator extends Object implements \OuterIterator
 
 	public function key()
 	{
-		if( !$this->accept() )
+		if( $this->aOriginIterator->valid() and !$this->accept() )
 		{
 			$this->next() ;
 		}
@@ -73,6 +73,11 @@ class CallbackFilterIterator extends Object implements \OuterIterator
 	
 	public function accept ()
 	{
+		if( !$this->aOriginIterator->valid() )
+		{
+			return false ;
+		}
+		
 		foreach($this->arrCallbacks as $fnCallback)
 		{
 			if( call_user_func_array($fnCallback,array($this->aOriginIterator))===false )
