@@ -34,7 +34,7 @@ class AOP extends Object
 		}
 		
 		$arrJointPointIters = array() ;
-		foreach($this->aspects() as $aAspects)
+		foreach($this->aspects()->iterator() as $aAspects)
 		{
 			foreach ($aAspects->pointcuts()->iterator() as $aPointcut)
 			{
@@ -60,7 +60,7 @@ class AOP extends Object
 		}
 		
 		$arrJointPointIters = array() ;
-		foreach($this->aspects() as $aAspects)
+		foreach($this->aspects()->iterator() as $aAspects)
 		{
 			$arrJointPointIters[] = $aAspects->pointcuts()->iterator() ;
 		}
