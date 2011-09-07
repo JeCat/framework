@@ -4,6 +4,7 @@ namespace jc\lang\aop\compiler ;
 use jc\lang\compile\IGenerator;
 use jc\lang\compile\object\TokenPool;
 use jc\lang\aop\Advice;
+use jc\lang\aop\AOP;
 use jc\lang\Object ;
 use jc\lang\compile\object\Token;
 
@@ -35,6 +36,27 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 		
 		return new Token(T_STRING,"\r\n\r\n\t".$sCode) ;
 	}
+	
+	
+	
+	/**
+	 * @return jc\lang\aop\AOP 
+	 */
+	public function aop()
+	{
+		if( !$this->aAop )
+		{
+			$this->aAop = AOP::singleton() ;
+		}
+		
+		return $this->aAop ;
+	}
+	public function setAop(AOP $aAop)
+	{
+		$this->aAop = $aAop ;
+	}
+	
+	private $aAop ;
 }
 
 ?>

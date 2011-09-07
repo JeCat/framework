@@ -309,27 +309,7 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		
 		return implode(', ', $arrArgvs) ;
 	}
-	
-	
-	
-	/**
-	 * @return jc\lang\aop\AOP 
-	 */
-	public function aop()
-	{
-		if( !$this->aAop )
-		{
-			$this->aAop = AOP::singleton() ;
-		}
-		
-		return $this->aAop ;
-	}
-	public function setAop(AOP $aAop)
-	{
-		$this->aAop = $aAop ;
-	}
-	
-	private $aAop ;
+
 }
 
 ?>
