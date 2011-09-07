@@ -2,7 +2,6 @@
 namespace jc\lang\aop ;
 
 use jc\lang\Exception;
-
 use jc\lang\compile\object\FunctionDefine;
 use jc\pattern\composite\NamedObject;
 
@@ -16,7 +15,7 @@ class Advice extends NamedObject
 		self::around, self::before, self::after
 	) ;
 	
-	public function __construct($sName,$sSource,$sPosition=self::after)
+	public function __construct($sName,$sSource,$sPosition=self::after,FunctionDefine $aToken=null)
 	{
 		if( !in_array($sPosition,self::$arrPositionTypes) )
 		{
@@ -27,6 +26,7 @@ class Advice extends NamedObject
 		
 		$this->sSource = $sSource ;
 		$this->sPosition = $sPosition ;
+		$this->aToken = $aToken ;
 	}
 
 	static public function createFromToken(FunctionDefine $aFunctionDefine)
@@ -58,7 +58,7 @@ class Advice extends NamedObject
 			$sPosition = self::after ;
 		}
 
-		return new self($aFunctionDefine->name(),$aFunctionDefine->bodySource(),$sPosition) ;
+		return new self($aFunctionDefine->name(),$aFunctionDefine->bodySource(),$sPosition,$aFunctionDefine) ;
 	}
 	
 	public function position()
@@ -71,9 +71,67 @@ class Advice extends NamedObject
 		return $this->sSource ;
 	}
 	
+	public function token()
+	{
+		return $this->aToken ;
+	}
+	
+	public function isStatic()
+	{
+		return ($this->aToken and $this->aToken->staticToken())? true: false ;
+	}
+	
+	public function access()
+	{
+		if(!$this->aToken or !$aAccessToken=$this->aToken->accessToken() )
+		{
+			return 'public' ;
+		}
+		
+		return $aAccessToken->targetCode() ;
+	}
+
+	/**
+	 * 生成织入代码
+	 */
+	public function generateWeavedDefine($sArgvLst='')
+	{
+		$sCode = '' ;
+		
+		// static
+		if( $this->isStatic() )
+		{
+			$sCode.= 'static ' ;
+		}
+		
+		// public, protected, private
+		$sCode.= $this->access() . ' ' ;
+		
+		// function and name
+		$sCode.= 'function '. $this->generateWeavedFunctionName() . "({$sArgvLst})\r\n" ;
+		
+		// body
+		$sCode.= "\t{\r\n" ;
+		$sCode.= $this->sSource ;
+		$sCode.= "\r\n\t}" ;
+		
+		
+		return $sCode ;
+	}
+	
+	public function generateWeavedFunctionName()
+	{
+		return $this->aToken->name().'_'.md5($this->aToken->belongsClass()->fullName().'::'.$this->aToken->name()) ;
+	}
+	
 	private $sSource ;
 	
 	private $sPosition ;
+	
+	/**
+	 * @var jc\lang\compile\object\FunctionDefine
+	 */
+	private $aToken ;
 }
 
 ?>
