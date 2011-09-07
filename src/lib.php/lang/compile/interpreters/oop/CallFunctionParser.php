@@ -88,8 +88,8 @@ class CallFunctionParser implements ISyntaxParser
 						return false ;
 					case T_OBJECT_OPERATOR :		// 预期的token: "->"
 						return true ;
-					case T_DOUBLE_COLON:
 					case T_PAAMAYIM_NEKUDOTAYIM :	// 预期的token: "::"
+					case T_DOUBLE_COLON:
 						return true ;
 					default:						// 无效的token
 						$aTokenPoolIter->last() ;
@@ -110,7 +110,8 @@ class CallFunctionParser implements ISyntaxParser
 				}
 			) ;
 			
-			$aClass = $aFinderIter->next() ;
+			$aFinderIter->next() ;
+			$aClass = $aFinderIter->current() ;
 			
 			$aCallFunction->setClassToken($aClass) ;
 			$aCallFunction->setAccessToken($aAccessSymbol) ;
