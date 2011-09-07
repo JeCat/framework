@@ -14,24 +14,13 @@ use jc\lang\Assert;
 use jc\lang\Exception;
 
 class FunctionDefineGenerator extends AOPWeaveGenerator
-{
-	public function generateTargetCode(TokenPool $aTokenPool, Token $aObject)
+{	
+	protected function checkTokenType(Token $aObject)
 	{
-		Assert::type('jc\\lang\\compile\\object\\FunctionDefine', $aObject) ;
-
-		foreach($this->aop()->pointcutIterator() as $aPointcut)
-		{
-			foreach($aPointcut->jointPoints()->iterator() as $aJointPoint)
-			{
-				if( $aJointPoint->matchExecutionPoint($aObject) )
-				{
-					$this->weave($aTokenPool,$aObject,$aPointcut,$aJointPoint) ;
-				}
-			}
-		}
+		return ($aObject instanceof FunctionDefine) ;	
 	}
 	
-	private function weave(TokenPool $aTokenPool, FunctionDefine $aFunctionDefine,Pointcut $aPointcut,JointPoint $aJointPoint)
+	protected function weave(TokenPool $aTokenPool, FunctionDefine $aFunctionDefine,Pointcut $aPointcut,JointPoint $aJointPoint)
 	{
 		if( !$aFunctionDefine->belongsClass() )
 		{
