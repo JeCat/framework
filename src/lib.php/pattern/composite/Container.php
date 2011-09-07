@@ -87,7 +87,7 @@ class Container extends Object implements IContainer
 	public function remove($object)
 	{
 		// 移除对象
-		$nIdx = array_search($object,$this->arrObjects) ;
+		$nIdx = array_search($object,$this->arrObjects,is_object($object)) ;
 		if($nIdx!==false)
 		{
 			unset($this->arrObjects[$nIdx]) ;
@@ -155,7 +155,7 @@ class Container extends Object implements IContainer
 	
 	public function has($object)
 	{
-		return in_array($object,$this->arrObjects) ;
+		return in_array($object,$this->arrObjects,is_object($object)) ;
 	}
 	
 	public function replace($object,$newObject,$sName=null)
@@ -177,7 +177,7 @@ class Container extends Object implements IContainer
 	
 	public function insertBefore($object,$_)
 	{
-		$nPos = array_search($object, $this->arrObjects) ;
+		$nPos = array_search($object, $this->arrObjects,is_object($object)) ;
 		if($nPos===false)
 		{
 			return ;
@@ -186,18 +186,15 @@ class Container extends Object implements IContainer
 		$arrArgs = func_get_args() ;
 		array_shift($arrArgs) ;
 	
-		foreach($arrArgs as $aInsObject)
+		foreach(array_values($arrArgs) as $nIdx=>$aInsObject)
 		{
 			if( $this->has($aInsObject) )
 			{
 				$this->remove($aInsObject) ;
 			}
-		}
-		
-		call_user_func_array('array_splice',array_merge(array($this->arrObjects,$nPos,0),$arrArgs)) ;
-	
-		foreach($arrArgs as $aInsObject)
-		{
+			
+			array_splice($this->arrObjects,$nPos+$nIdx,0,array($aInsObject)) ;
+			
 			$this->attach($aInsObject) ;
 		}
 	}
@@ -223,26 +220,23 @@ class Container extends Object implements IContainer
 		
 		else 
 		{
-			$nPos = array_search($object, $this->arrObjects) ;
+			$nPos = array_search($object, $this->arrObjects,is_object($object)) ;
 			if($nPos===false)
 			{
 				return ;
 			}
 		
-			foreach($arrArgs as $aInsObject)
+			$nPos ++ ;
+			
+			foreach(array_values($arrArgs) as $nIdx=>$aInsObject)
 			{
 				if( $this->has($aInsObject) )
 				{
 					$this->remove($aInsObject) ;
 				}
-			}
-			
-			$nPos ++ ;
-			
-			call_user_func_array('array_splice',array_merge(array($this->arrObjects,$nPos,0),$arrArgs)) ;
-		
-			foreach($arrArgs as $aInsObject)
-			{
+				
+				array_splice($this->arrObjects,$nPos+$nIdx,0,array($aInsObject)) ;
+				
 				$this->attach($aInsObject) ;
 			}
 		}
@@ -268,7 +262,7 @@ class Container extends Object implements IContainer
 	private function free($object)
 	{
 		// 移除名称检索
-		$sName = array_search($object,$this->arrNames) ;
+		$sName = array_search($object,$this->arrNames,is_object($object)) ;
 		if($sName!==false)
 		{
 			unset($this->arrNames[$sName]) ;
