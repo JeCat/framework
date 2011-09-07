@@ -49,6 +49,29 @@ class AOP extends Object
 		) ;
 	}
 	
+	/**
+	 * @return \Iterator
+	 */
+	public function pointcutIterator() 
+	{
+		if( !$this->aAspects )
+		{
+			return new \EmptyIterator() ;
+		}
+		
+		$arrJointPointIters = array() ;
+		foreach($this->aspects() as $aAspects)
+		{
+			$arrJointPointIters[] = $aAspects->pointcuts()->iterator() ;
+		}
+		
+		return new \RecursiveIteratorIterator(
+			new \RecursiveArrayIterator(
+				$arrJointPointIters
+			)
+		) ;
+	}
+	
 	public function register($sAspectName)
 	{
 		if( !$aClassFile = $this->classLoader()->searchClass($sAspectName) )
@@ -66,7 +89,7 @@ class AOP extends Object
 			) ;
 		}
 		
-		$aAspect = Aspect::createFromToken($aClassToken,$aTokenPool) ;
+		$this->aspects()->add(Aspect::createFromToken($aClassToken,$aTokenPool)) ;
 	}
 	
 	public function weave()
