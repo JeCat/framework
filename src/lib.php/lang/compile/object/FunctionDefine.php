@@ -94,8 +94,15 @@ class FunctionDefine extends StructDefine
 			}
 		}
 		
-		ksort($arrTokens) ;
-		return array_pop($arrTokens) ;
+		if( empty($arrTokens) )
+		{
+			return $this ;
+		}
+		else
+		{
+			ksort($arrTokens) ;
+			return array_pop($arrTokens) ;
+		}
 	}
 	public function endToken()
 	{

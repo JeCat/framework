@@ -23,7 +23,7 @@ class Token extends AbstractObject
 			self::T_COLON => 'Token::T_COLON',
 	) ; 
 
-	public function __construct($nType,$sSource,$nPostion,$nLine=0)
+	public function __construct($nType,$sSource,$nPostion=0,$nLine=0)
 	{
 		parent::__construct($sSource,$nPostion,$nLine) ;
 		
@@ -33,7 +33,7 @@ class Token extends AbstractObject
 		$this->sType = $this->tokenTypeName() ;
 	}
 	
-	protected function cloneOf(self $aOther)
+	public function cloneOf(self $aOther)
 	{
 		$this->nType = $aOther->nType ;
 		
