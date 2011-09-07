@@ -55,17 +55,12 @@ class AOP extends Object
 			return new \EmptyIterator() ;
 		}
 		
-		$arrJointPointIters = array() ;
+		$aIterator = new \AppendIterator() ;
 		foreach($this->aspects()->iterator() as $aAspects)
 		{
-			$arrJointPointIters[] = $aAspects->pointcuts()->iterator() ;
+		$aIterator->append($aAspects->pointcuts()->iterator()) ;
 		}
-		
-		return new \RecursiveIteratorIterator(
-			new \RecursiveArrayIterator(
-				$arrJointPointIters
-			)
-		) ;
+		return $aIterator;
 	}
 	
 	public function register($sAspectName)
