@@ -36,7 +36,7 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 	
 	abstract protected function checkTokenType(Token $aObject) ;
 	
-	abstract protected function weave(TokenPool $aTokenPool, FunctionDefine $aFunctionDefine,Pointcut $aPointcut,JointPoint $aJointPoint) ;
+	abstract protected function weave(TokenPool $aTokenPool, Token $aExecutePoint,Pointcut $aPointcut,JointPoint $aJointPoint) ;
 	
 	/**
 	 * 生成织入代码

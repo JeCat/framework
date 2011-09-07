@@ -20,7 +20,7 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		return ($aObject instanceof FunctionDefine) ;	
 	}
 	
-	protected function weave(TokenPool $aTokenPool, FunctionDefine $aFunctionDefine,Pointcut $aPointcut,JointPoint $aJointPoint)
+	protected function weave(TokenPool $aTokenPool, Token $aFunctionDefine,Pointcut $aPointcut,JointPoint $aJointPoint)
 	{
 		if( !$aFunctionDefine->belongsClass() )
 		{
