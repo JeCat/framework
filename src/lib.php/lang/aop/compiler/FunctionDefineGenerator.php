@@ -14,149 +14,37 @@ use jc\lang\Assert;
 use jc\lang\Exception;
 
 class FunctionDefineGenerator extends AOPWeaveGenerator
-{	
-	protected function checkTokenType(Token $aObject)
+{
+	protected function generateAdviceDispatchFunction(GenerateStat $aStat)
 	{
-		return ($aObject instanceof FunctionDefine) ;	
-	}
+		Assert::type("jc\\lang\\compile\\object\\FunctionDefine", $aStat->aExecutePoint) ;
 	
-	protected function weave(TokenPool $aTokenPool, Token $aFunctionDefine,Pointcut $aPointcut,JointPoint $aJointPoint)
-	{
-		if( !$aFunctionDefine->belongsClass() )
-		{
-			throw new Exception("AOP织入遇到错误：正在对一个全局函数（%s）进行织入操作，只能对类方法进行织入。",array($aFunctionDefine->name())) ;
-		}
-		if( !$aFunctionDefine->bodyToken() )
+		if( !$aStat->aExecutePoint->bodyToken() )
 		{
 			throw new Exception("AOP织入遇到错误：正在对一个抽象方法（%s::%s）进行织入操作。"
-				,array($aFunctionDefine->belongsClass()->fullName(),$aFunctionDefine->name())) ;
+				,array($aStat->aExecutePoint->belongsClass()->fullName(),$aStat->aExecutePoint->name())) ;
 		}
 		
 		// --------------------------------
 		// 新建同名方法
-		$aNewFunctionDefine = $this->buildNewWeavedMethod($aTokenPool, $aFunctionDefine) ;
-		
+		$aStat->aAdvicesDispatchFunc = $this->buildNewWeavedMethod($aStat->aTokenPool, $aStat->aExecutePoint) ;
 		
 		// --------------------------------
 		// 原始方法改名
-		$sWeavedMethodName = $aFunctionDefine->name() ;
+		$sWeavedMethodName = $aStat->aExecutePoint->name() ;
 		$sNewMethodName = "__aop_jointpoint_".$sWeavedMethodName ;
-		$aFunctionDefine->nameToken()->setTargetCode($sNewMethodName) ;
-		
-		
-		// --------------------------------
-		// 织入advice代码
-		if( !$aBodyEnd=$aNewFunctionDefine->endToken() )
-		{
-			throw new Exception("AOP织入遇到错误：被织入的方法（%s::%s）的函数体定义没有正常结束。"
-				,array($aFunctionDefine->belongsClass()->fullName(),$aFunctionDefine->name())) ;
-		}
-		
-		$arrAdviceStacks = array(
-			Advice::before => new Stack() ,
-			Advice::around => new Stack() ,
-			Advice::after => new Stack() ,
-		) ;
-		
-		
-		foreach($aPointcut->advices()->iterator() as $aAdvice)
-		{
-			// 分拣
-			$arrAdviceStacks[ $aAdvice->position() ]->put($aAdvice) ;
-		}
-		
-		// advice 定义参数
-		$sAdviceDefineArgvLst = '' ;
-		foreach($this->cloneFunctionArgvLst($aTokenPool, $aNewFunctionDefine) as $aToken)
-		{
-			$sAdviceDefineArgvLst.= $aToken->targetCode() ;
-		}
-		
-		// advice 调用参数
-		$sArgvLstCode = $this->generateArgvs($aTokenPool,$aNewFunctionDefine) ;
-		
-		// 织入执行点上的置换代码：before	
-		$this->weaveAdvices($arrAdviceStacks[Advice::before],$aTokenPool,$aNewFunctionDefine,$sArgvLstCode,$sAdviceDefineArgvLst) ;
-				
-		// 织入执行点上的置换代码：around
-		$this->weaveAroundAdvices($arrAdviceStacks[Advice::around],$aTokenPool,$aNewFunctionDefine,$aFunctionDefine,$sArgvLstCode,$sAdviceDefineArgvLst) ;
-		
-		// 织入执行点上的置换代码：after
-		$this->weaveAdvices($arrAdviceStacks[Advice::after],$aTokenPool,$aNewFunctionDefine,$sArgvLstCode,$sAdviceDefineArgvLst) ;
-		
-		
-		$aTokenPool->insertBefore($aNewFunctionDefine->endToken(),new Token(T_WHITESPACE,"\r\n\t")) ;
-	}
-
-	private function weaveAdvices(Stack $aAdvices,TokenPool $aTokenPool,FunctionDefine $aNewFunctionDefine,$sArgvLstCode,$sAdviceDefineArgvLst)
-	{
-		$aBodyEnd = $aNewFunctionDefine->bodyToken()->theOther() ;
-				
-		while($aAdvice=$aAdvices->out())
-		{			
-			// 织入advice定义代码
-			$aTokenPool->insertAfter($aBodyEnd,$this->generateAdviceDefine($aAdvice,$sAdviceDefineArgvLst)) ;
-			
-			// 织入advice调用代码
-			$sAdviceFuncName = $aAdvice->generateWeavedFunctionName() ;
-			$aTokenPool->insertBefore( 
-					$aNewFunctionDefine->endToken()
-					, new Token(T_STRING, "\r\n\t\t".($aAdvice->isStatic()? 'self::': '$this->')."{$sAdviceFuncName}({$sArgvLstCode}) ;\r\n")
-			) ;
-		}
+		$aStat->aExecutePoint->nameToken()->setTargetCode($sNewMethodName) ;
 	}
 	
-	private function weaveAroundAdvices(Stack $aAdvices,TokenPool $aTokenPool,FunctionDefine $aNewFunctionDefine,FunctionDefine $aOriFunctionDefine,$sArgvLstCode,$sAdviceDefineArgvLst)
-	{
-		$aBodyEnd = $aNewFunctionDefine->endToken() ;
-		
-		// 调用原始函数
-		$sCallOriginFunction = ($aOriFunctionDefine->staticToken()? 'self::': '$this->') . $aOriFunctionDefine->nameToken()->targetCode() ;
 
-		// 织入advice调用代码
-		if( $aFirstAdvice=$aAdvices->get() )
-		{
-			$sAdviceFuncName = $aFirstAdvice->generateWeavedFunctionName() ;
-			$aTokenPool->insertBefore(
-				$aBodyEnd
-				, new Token(T_STRING, "\r\n\t\t" . ($aFirstAdvice->isStatic()? 'self::': '$this->') . "{$sAdviceFuncName}({$sArgvLstCode}) ;\r\n")
-			) ;
+	protected function generateOriginJointCode(GenerateStat $aStat)
+	{
+		Assert::type("jc\\lang\\compile\\object\\FunctionDefine", $aStat->aExecutePoint) ;
 		
-			while($aAdvice=$aAdvices->out())
-			{	
-				// 生成advice定义代码
-				// -----		
-				$aAdviceDefineCode = $this->generateAdviceDefine($aAdvice,$sAdviceDefineArgvLst) ;
-				
-				// 调用下一个advice
-				if( $aNextAdvice=$aAdvices->get() )
-				{
-					$aAdviceDefineCode = str_ireplace(
-						'aop_call_origin_method'
-						, ($aNextAdvice->isStatic()?
-								'self::'. $aNextAdvice->generateWeavedFunctionName():
-								'$this->'. $aNextAdvice->generateWeavedFunctionName())
-						, $aAdviceDefineCode) ;
-				}
-				
-				// 调用原始函数
-				else 
-				{
-					$aAdviceDefineCode = str_ireplace('aop_call_origin_method',$sCallOriginFunction,$aAdviceDefineCode) ;
-				}
-				
-				// 织入advice定义代码
-				// -----		
-				$aTokenPool->insertAfter($aBodyEnd,new Token(T_STRING,"\r\n\r\n\t\t".$aAdviceDefineCode)) ;
-			}
+		$aStat->sOriginJointCode = '' ;
 		
-		}
-		
-		// 没有 around advice， 直接调用原始函数
-		else 
-		{
-			$aTokenPool->insertBefore($aBodyEnd,new Token(T_STRING,"\r\n\r\n\t\t".$sCallOriginFunction."({$sArgvLstCode}) ;\r\n")) ;
-		}
+		$aStat->sOriginJointCode.= $aStat->aExecutePoint->staticToken()? 'self::': '$this->' ;
+		$aStat->sOriginJointCode.= $aStat->aExecutePoint->nameToken()->targetCode() ;
 	}
 	
 	private function buildNewWeavedMethod(TokenPool $aTokenPool,FunctionDefine $aOriFunctionDefine)
@@ -257,7 +145,7 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 	}
 	
 	private function generateArgvs(TokenPool $aTokenPool,FunctionDefine $aOriFunctionDefine)
-	{
+	{		
 		$aArgLstStart = $aOriFunctionDefine->argListToken() ;
 		$aArgLstEnd = $aArgLstStart->theOther() ;
 		
@@ -299,6 +187,17 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		return implode(', ', $arrArgvs) ;
 	}
 
+	protected function generateAdviceArgvs(GenerateStat $aStat)
+	{
+		$aStat->sAdviceDefineArgvsLit = '' ;
+		foreach($this->cloneFunctionArgvLst($aStat->aTokenPool, $aStat->aAdvicesDispatchFunc) as $aToken)
+		{
+			$aStat->sAdviceDefineArgvsLit.= $aToken->targetCode() ;
+		}
+		
+		// advice 调用参数
+		$aStat->sAdviceCallArgvsLit = $this->generateArgvs($aStat->aTokenPool,$aStat->aAdvicesDispatchFunc) ;
+	} 
 }
 
 ?>
