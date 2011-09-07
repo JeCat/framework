@@ -33,20 +33,16 @@ class AOP extends Object
 			return new \EmptyIterator() ;
 		}
 		
-		$arrJointPointIters = array() ;
+		$aIterator = new \AppendIterator() ;
 		foreach($this->aspects()->iterator() as $aAspects)
 		{
 			foreach ($aAspects->pointcuts()->iterator() as $aPointcut)
 			{
-				$arrJointPointIters[] = $aPointcut->jointPoints()->iterator() ;
+				$aIterator->append($aPointcut->jointPoints()->iterator()) ;
 			}
 		}
 		
-		return new \RecursiveIteratorIterator(
-			new \RecursiveArrayIterator(
-				$arrJointPointIters
-			)
-		) ;
+		return $aIterator ;
 	}
 	
 	/**
