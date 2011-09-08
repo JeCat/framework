@@ -18,7 +18,7 @@ class TokenPool extends Container
 	}
 	
 	public function addFunction(FunctionDefine $aFunction)
-	{		
+	{
 		if( $aClass=$aFunction->belongsClass() )
 		{
 			$sClassName = $aClass->fullName() ;
@@ -31,7 +31,7 @@ class TokenPool extends Container
 		if( !$sFuncName = $aFunction->name() )
 		{
 			$sFuncName = '' ;
-		} 
+		}
 		
 		$this->arrMethods[$sClassName][$sFuncName] = $aFunction ;
 	}

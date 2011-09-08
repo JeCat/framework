@@ -20,14 +20,6 @@ class JointPointNewObject extends JointPoint
 	{
 		return preg_match( $this->newObjectRegexp(),$aToken->sourceCode() )? true: false ;
 	}
-	
-	static public function transRegexp($sPartten)
-	{
-		$sPartten = preg_quote($sPartten) ;
-		$sPartten = str_replace('\\*', '.*', $sPartten) ;
-		
-		return '`new ' . $sPartten . '`is' ;
-	}
 
 	public function newObjectRegexp()
 	{
