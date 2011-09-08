@@ -40,6 +40,9 @@ class Token extends AbstractObject
 		$this->setSourceCode($aOther->sourceCode()) ;
 		$this->setTargetCode($aOther->targetCode()) ;
 		$this->setPosition($aOther->position()) ;
+		$this->setBelongsClass($aOther->belongsClass()) ;
+		$this->setBelongsFunction($aOther->belongsFunction()) ;
+		$this->setBelongsNamespace($aOther->belongsNamespace()) ;
 		$this->setLine($aOther->line()) ;
 		
 		$this->sType = $this->tokenTypeName() ;

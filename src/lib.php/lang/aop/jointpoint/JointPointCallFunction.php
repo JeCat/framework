@@ -1,6 +1,8 @@
 <?php
 namespace jc\lang\aop\jointpoint ;
 
+use jc\lang\compile\object\CallFunction;
+
 use jc\lang\compile\object\FunctionDefine;
 use jc\lang\compile\object\Token ;
 
@@ -10,41 +12,34 @@ class JointPointCallFunction extends JointPoint
 	{
 		parent::__construct($sWeaveClass,$sWeaveMethodNamePattern) ;
 		
-		$this->sCallFunctionNamePattern = $sCallFunctionNamePattern ;
-		$this->sCallFunctionNameRegexp = self::transRegexp($sCallFunctionNamePattern) ;
+		$this->setCallFunctionNamePattern( $sCallFunctionNamePattern );
+		$this->setCallFunctionNameRegexp( self::transRegexp($sCallFunctionNamePattern) );
 	}
 	
 	public function matchExecutionPoint(Token $aToken)
-	{		
-		// 必须是一个类方法
-		if( !($aToken instanceof FunctionDefine) or !$aClass=$aToken->belongsClass() )
-		{
-			return false ;
-		}
-		
-		if( $aClass->fullName()!=$this->weaveClass() )
-		{
-			return false ;
-		}
-		
-		return preg_match( $this->weaveMethodNameRegexp(),$aToken->name() )? true: false ;
+	{
+		return preg_match( $this->callFunctionNameRegexp(),$aToken->sourceCode() )? true: false ;
 	}
-	
 
-	public function setWeaveMethodNamePattern($sWeaveMethodNamePattern)
+	public function callFunctionNameRegexp()
 	{
-		$this->sWeaveMethodNamePattern = $sWeaveMethodNamePattern ;
-		$this->sWeaveMethodNameRegexp = self::transRegexp($sWeaveMethodNamePattern) ;
-	}
-	public function weaveMethodNamePattern()
-	{
-		return $this->sWeaveMethodNamePattern ;
-	}
-	public function weaveMethodNameRegexp()
-	{
-		return $this->sWeaveMethodNameRegexp ;
+		return $this->sCallFunctionNameRegexp;
 	}
 	
+	public function callFunctionNamePattern()
+	{
+		return $this->sCallFunctionNamePattern;
+	}
+	
+	public function setCallFunctionNameRegexp($sCallFunctionNameRegexp)
+	{
+		$this->sCallFunctionNameRegexp = $sCallFunctionNameRegexp;
+	}
+	
+	public function setCallFunctionNamePattern($sCallFunctionNamePattern)
+	{
+		$this->sCallFunctionNamePattern = $sCallFunctionNamePattern;
+	}
 	
 	private $sCallFunctionNamePattern ;
 	
