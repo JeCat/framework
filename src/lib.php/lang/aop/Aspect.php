@@ -1,6 +1,10 @@
 <?php
 namespace jc\lang\aop ;
 
+use jc\io\InputStreamCache;
+
+use jc\lang\compile\CompilerFactory;
+
 use jc\lang\compile\object\ClassDefine;
 use jc\lang\Exception;
 use jc\lang\compile\DocComment;
@@ -61,6 +65,39 @@ class Aspect extends NamedObject
 		}
 		
 		return $aAspect ;
+	}
+	
+	static public function createAspectsFromCode($sSource,$sAspectName=null)
+	{
+		eval($sSource) ;
+		
+		$aClassCompiler = CompilerFactory::singleton()->create() ;
+		$aAspectTokens = $aClassCompiler->scan( new InputStreamCache('<?php '.$sSource.' ?>') ) ;
+		$aClassCompiler->interpret($aAspectTokens) ;
+		
+		if( $sAspectName===null )
+		{
+			$arrAspects = array() ;
+			
+			foreach($aAspectTokens->classIterator() as $aClassToken)
+			{
+				$arrAspects[] = self::createFromToken($aClassToken) ;
+			}
+			
+			return $arrAspects ;
+		}
+		
+		else
+		{
+			if( $aClassToken = $aAspectTokens->findClass($sAspectName) )
+			{
+				return self::createFromToken($aClassToken) ;
+			}
+			else
+			{
+				return null ;
+			}
+		}
 	}
 		
 	/**

@@ -58,7 +58,7 @@ class AOP extends Object
 		$aIterator = new \AppendIterator() ;
 		foreach($this->aspects()->iterator() as $aAspects)
 		{
-		$aIterator->append($aAspects->pointcuts()->iterator()) ;
+			$aIterator->append($aAspects->pointcuts()->iterator()) ;
 		}
 		return $aIterator;
 	}

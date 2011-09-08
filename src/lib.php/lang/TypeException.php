@@ -11,16 +11,8 @@ class TypeException extends Exception
 		$this->Variable =& $Variable ;
 		$this->sVarName = $sVarName ;
 		$this->arrRequireTypes =& $arrRequireTypes ;
-	}
-	
-	public function message(ILocale $aLocale=null)
-	{
-		if( !$aLocale )
-		{
-			$aLocale = $this->application(true)->localeManager()->locale() ;
-		}
 		
-		return $aLocale->trans("变量%s类型为：%s，不满足要求的类型: %s",array(
+		parent::__construct("变量%s类型为：%s，不满足要求的类型: %s",array(
 			($this->sVarName?:'') ,
 			Type::reflectType($this->Variable) ,
 			implode(",", $this->arrRequireTypes) ,

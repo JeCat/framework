@@ -91,33 +91,6 @@ class Advice extends NamedObject
 		return $aAccessToken->targetCode() ;
 	}
 
-	/**
-	 * 生成织入代码
-	 */
-	public function generateWeavedDefine($sArgvLst='')
-	{
-		$sCode = '' ;
-		
-		// static
-		if( $this->isStatic() )
-		{
-			$sCode.= 'static ' ;
-		}
-		
-		// public, protected, private
-		$sCode.= $this->access() . ' ' ;
-		
-		// function and name
-		$sCode.= 'function '. $this->generateWeavedFunctionName() . "({$sArgvLst})\r\n" ;
-		
-		// body
-		$sCode.= "\t{\r\n" ;
-		$sCode.= $this->sSource ;
-		$sCode.= "\r\n\t}" ;
-		
-		
-		return $sCode ;
-	}
 	
 	public function generateWeavedFunctionName()
 	{

@@ -2,7 +2,7 @@
 namespace jc\lang\aop ;
 
 use jc\lang\Exception;
-
+use jc\lang\aop\jointpoint\JointPoint;
 use jc\lang\compile\object\FunctionDefine;
 use jc\pattern\composite\Container;
 use jc\pattern\composite\NamedObject;
