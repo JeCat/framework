@@ -45,6 +45,26 @@ class TokenPool extends Container
 	{
 		return isset($this->arrMethods[$sClassName][$sFunctionName])? $this->arrMethods[$sClassName][$sFunctionName]: null ;
 	}
+	
+	/**
+	 * @return Token
+	 */
+	public function findTokenBySource($sSource,$nSeek=0)
+	{
+		$nFound = 0 ;
+		foreach($this->iterator() as $aToken)
+		{
+			if( $aToken->sourceCode()===$sSource )
+			{
+				if($nSeek===$nFound++)
+				{
+					return $aToken ;
+				}
+			}
+		}
+		
+		return ;
+	}
 
 	public function classIterator()
 	{
