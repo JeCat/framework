@@ -20,33 +20,11 @@ class NewObjectParser implements ISyntaxParser
 			return ;
 		}
 		$aNewToken = $aToken;
-//				// 找到new后面的类名
-//		// ---------------------------------------------
-//		$aFinderIter = new CallbackFilterIterator(
-//			$aTokenPoolIter        //new ReverseIterator($aTokenPoolIter)
-//			, function (Iterator $aTokenPoolIter){
-//				switch ( $aTokenPoolIter->current()->tokenType() )
-//				{
-//					case T_WHITESPACE :		// 过滤空白token
-//						return false ;
-//					case T_STRING :			// 预期的token ,类名
-//						return true ;
-//					case T_NAMESPACE :		// 预期的token ,完整类名,包括命名空间
-//						return true ;
-//					case T_VARIABLE :		// 预期的token ,变量形式提供的类名
-//						return true ;
-//					default:				// 遇到意外的token
-//						$aTokenPoolIter->last() ;
-//						return false ;
-//				}
-//			}
-//		) ;
 		
 		// 找到new后面的类名
 		do{ $aTokenPoolIter->next() ; }
 		while( $aToken=$aTokenPoolIter->current() and !( $aToken->tokenType()==T_VARIABLE or $aToken->tokenType()==T_STRING or $aToken->tokenType()==T_NAMESPACE ) );
 		
-//		$aTokenPoolIter->next();
 		if( !$aClassName = $aTokenPoolIter->current() )
 		{
 			return ;
