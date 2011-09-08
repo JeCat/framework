@@ -90,12 +90,6 @@ class Advice extends NamedObject
 		
 		return $aAccessToken->targetCode() ;
 	}
-
-	
-	public function generateWeavedFunctionName()
-	{
-		return $this->aToken->name().'_'.md5($this->aToken->belongsClass()->fullName().'::'.$this->aToken->name()) ;
-	}
 	
 	private $sSource ;
 	

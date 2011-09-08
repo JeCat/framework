@@ -71,7 +71,8 @@ class AOP extends Object
 		}
 		
 		$aClassCompiler = CompilerFactory::singleton()->create() ;
-		$aTokenPool = $aClassCompiler->interpret($aClassFile->openReader()) ;
+		$aTokenPool = $aClassCompiler->scan($aClassFile->openReader()) ;
+		$aClassCompiler->interpret($aTokenPool) ;
 
 		if( !$aClassToken=$aTokenPool->findClass($sAspectName) )
 		{

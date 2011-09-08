@@ -25,17 +25,77 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 				,array($aStat->aExecutePoint->belongsClass()->fullName(),$aStat->aExecutePoint->name())) ;
 		}
 		
-		// --------------------------------
 		// 新建同名方法
-		$aStat->aAdvicesDispatchFunc = $this->buildNewWeavedMethod($aStat->aTokenPool, $aStat->aExecutePoint) ;
+		$aOriFuncStart = $aStat->aExecutePoint->startToken() ;
+		$aOriFuncEnd = $aStat->aExecutePoint->endToken() ;
+	
+		$aStat->aAdvicesDispatchFunc = new FunctionDefine(
+				$aStat->aExecutePoint
+				, new Token(T_STRING,$aStat->aExecutePoint->name(),0)
+				, null, null
+		) ;
 		
-		// --------------------------------
+		// static declare
+		if($aStat->aExecutePoint->staticToken())
+		{
+			$aStaticClareToken = new Token(T_STATIC,'static',0) ;
+			$aStat->aAdvicesDispatchFunc->setStaticToken($aStaticClareToken) ;
+			$aStat->aTokenPool->insertBefore($aOriFuncStart,$aStaticClareToken) ;
+			$aStat->aTokenPool->insertBefore($aOriFuncStart,new Token(T_WHITESPACE, ' ', 0)) ;
+		}
+		
+		// private, protected, public
+		$aOriAccess = $aStat->aExecutePoint->accessToken() ;
+		$aNewAccess = $aOriAccess?
+				new Token($aOriAccess->tokenType(),$aOriAccess->source(),0) :
+				new Token(T_PUBLIC,'public',0) ;
+		$aStat->aAdvicesDispatchFunc->setAccessToken($aNewAccess) ;
+		$aStat->aTokenPool->insertBefore($aOriFuncStart,$aNewAccess) ;
+		$aStat->aTokenPool->insertBefore($aOriFuncStart,new Token(T_WHITESPACE, ' ', 0)) ;
+		
+		// function keyword 
+		$aStat->aTokenPool->insertBefore($aOriFuncStart,$aStat->aAdvicesDispatchFunc) ;
+		$aStat->aTokenPool->insertBefore($aOriFuncStart,new Token(T_WHITESPACE, ' ', 0)) ;
+		
+		// function name
+		$aStat->aTokenPool->insertBefore($aOriFuncStart,$aStat->aAdvicesDispatchFunc->nameToken()) ;
+		
+		// 参数表
+		$aArgvLstStart = new ClosureToken( $aStat->aExecutePoint->argListToken() ) ;
+		$aArgvLstEnd = new ClosureToken( $aStat->aExecutePoint->argListToken()->theOther() ) ;
+		$aArgvLstStart->setTheOther($aArgvLstEnd) ;
+		$aStat->aAdvicesDispatchFunc->setArgListToken($aArgvLstStart) ;
+		
+		$aStat->aTokenPool->insertBefore($aOriFuncStart,$aArgvLstStart) ;
+		foreach($this->cloneFunctionArgvLst($aStat->aTokenPool,$aStat->aExecutePoint) as $aToken)
+		{
+			$aStat->aTokenPool->insertBefore($aOriFuncStart,$aToken) ;
+		}
+		$aStat->aTokenPool->insertBefore($aOriFuncStart,$aArgvLstEnd) ;
+		
+		// 换行
+		$aStat->aTokenPool->insertBefore($aOriFuncStart,new Token(T_WHITESPACE,"\r\n\t")) ;
+		
+		// 函数体
+		$aBodyStart = new ClosureToken( $aStat->aExecutePoint->bodyToken() ) ;
+		$aBodyEnd = new ClosureToken( $aOriFuncEnd ) ;
+		$aBodyStart->setTheOther($aBodyEnd) ;
+		$aStat->aAdvicesDispatchFunc->setBodyToken($aBodyStart) ;
+			
+		$aStat->aTokenPool->insertBefore($aOriFuncStart,$aBodyStart) ;
+		$aStat->aTokenPool->insertBefore($aOriFuncStart,$aBodyEnd) ;	
+		
+		// 换行
+		$aStat->aTokenPool->insertBefore($aOriFuncStart,new Token(T_WHITESPACE,"\r\n\r\n\t")) ;
+	}
+
+	protected function replaceOriginExecutePoint(GenerateStat $aStat)
+	{
 		// 原始方法改名
 		$sWeavedMethodName = $aStat->aExecutePoint->name() ;
 		$sNewMethodName = "__aop_jointpoint_".$sWeavedMethodName ;
 		$aStat->aExecutePoint->nameToken()->setTargetCode($sNewMethodName) ;
 	}
-	
 
 	protected function generateOriginJointCode(GenerateStat $aStat)
 	{
@@ -45,74 +105,6 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		
 		$aStat->sOriginJointCode.= $aStat->aExecutePoint->staticToken()? 'self::': '$this->' ;
 		$aStat->sOriginJointCode.= $aStat->aExecutePoint->nameToken()->targetCode() ;
-	}
-	
-	private function buildNewWeavedMethod(TokenPool $aTokenPool,FunctionDefine $aOriFunctionDefine)
-	{
-		$aOriFuncStart = $aOriFunctionDefine->startToken() ;
-		$aOriFuncEnd = $aOriFunctionDefine->endToken() ;
-	
-		$aNewFunctionDefine = new FunctionDefine(
-				$aOriFunctionDefine
-				, new Token(T_STRING,$aOriFunctionDefine->name(),0)
-				, null, null
-		) ;
-		
-		// static declare
-		if($aOriFunctionDefine->staticToken())
-		{
-			$aStaticClareToken = new Token(T_STATIC,'static',0) ;
-			$aNewFunctionDefine->setStaticToken($aStaticClareToken) ;
-			$aTokenPool->insertBefore($aOriFuncStart,$aStaticClareToken) ;
-			$aTokenPool->insertBefore($aOriFuncStart,new Token(T_WHITESPACE, ' ', 0)) ;
-		}
-		
-		// private, protected, public
-		$aOriAccess = $aOriFunctionDefine->accessToken() ;
-		$aNewAccess = $aOriAccess?
-				new Token($aOriAccess->tokenType(),$aOriAccess->source(),0) :
-				new Token(T_PUBLIC,'public',0) ;
-		$aNewFunctionDefine->setAccessToken($aNewAccess) ;
-		$aTokenPool->insertBefore($aOriFuncStart,$aNewAccess) ;
-		$aTokenPool->insertBefore($aOriFuncStart,new Token(T_WHITESPACE, ' ', 0)) ;
-		
-		// function keyword 
-		$aTokenPool->insertBefore($aOriFuncStart,$aNewFunctionDefine) ;
-		$aTokenPool->insertBefore($aOriFuncStart,new Token(T_WHITESPACE, ' ', 0)) ;
-		
-		// function name
-		$aTokenPool->insertBefore($aOriFuncStart,$aNewFunctionDefine->nameToken()) ;
-		
-		// 参数表
-		$aArgvLstStart = new ClosureToken( $aOriFunctionDefine->argListToken() ) ;
-		$aArgvLstEnd = new ClosureToken( $aOriFunctionDefine->argListToken()->theOther() ) ;
-		$aArgvLstStart->setTheOther($aArgvLstEnd) ;
-		$aNewFunctionDefine->setArgListToken($aArgvLstStart) ;
-		
-		$aTokenPool->insertBefore($aOriFuncStart,$aArgvLstStart) ;
-		foreach($this->cloneFunctionArgvLst($aTokenPool,$aOriFunctionDefine) as $aToken)
-		{
-			$aTokenPool->insertBefore($aOriFuncStart,$aToken) ;
-		}
-		$aTokenPool->insertBefore($aOriFuncStart,$aArgvLstEnd) ;
-		
-		// 换行
-		$aTokenPool->insertBefore($aOriFuncStart,new Token(T_WHITESPACE,"\r\n\t")) ;
-		
-		// 函数体
-		$aBodyStart = new ClosureToken( $aOriFunctionDefine->bodyToken() ) ;
-		$aBodyEnd = new ClosureToken( $aOriFuncEnd ) ;
-		$aBodyStart->setTheOther($aBodyEnd) ;
-		$aNewFunctionDefine->setBodyToken($aBodyStart) ;
-			
-		$aTokenPool->insertBefore($aOriFuncStart,$aBodyStart) ;
-		$aTokenPool->insertBefore($aOriFuncStart,$aBodyEnd) ;	
-		
-		// 换行
-		$aTokenPool->insertBefore($aOriFuncStart,new Token(T_WHITESPACE,"\r\n\r\n\t")) ;
-
-		
-		return $aNewFunctionDefine ;
 	}
 	
 	private function cloneFunctionArgvLst(TokenPool $aTokenPool,FunctionDefine $aOriFunctionDefine)
@@ -190,13 +182,13 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 	protected function generateAdviceArgvs(GenerateStat $aStat)
 	{
 		$aStat->sAdviceDefineArgvsLit = '' ;
-		foreach($this->cloneFunctionArgvLst($aStat->aTokenPool, $aStat->aAdvicesDispatchFunc) as $aToken)
+		foreach($this->cloneFunctionArgvLst($aStat->aTokenPool, $aStat->aExecutePoint) as $aToken)
 		{
 			$aStat->sAdviceDefineArgvsLit.= $aToken->targetCode() ;
 		}
 		
 		// advice 调用参数
-		$aStat->sAdviceCallArgvsLit = $this->generateArgvs($aStat->aTokenPool,$aStat->aAdvicesDispatchFunc) ;
+		$aStat->sAdviceCallArgvsLit = $this->generateArgvs($aStat->aTokenPool,$aStat->aExecutePoint) ;
 	} 
 }
 

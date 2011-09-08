@@ -1,6 +1,8 @@
 <?php
 namespace jc\lang\aop\compiler ;
 
+use jc\lang\compile\object\ClosureToken;
+
 use jc\util\Stack;
 
 use jc\lang\Exception;
@@ -25,7 +27,7 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 			{
 				if( $aJointPoint->matchExecutionPoint($aObject) )
 				{
-					$this->weave(new GenerateStat($aPointcut,$aObject,$aTokenPool)) ;
+					$this->weave(new GenerateStat($aTokenPool,$aObject,$aPointcut,$aJointPoint)) ;
 				}
 			}
 		}
@@ -38,6 +40,9 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 			throw new Exception("AOP织入遇到错误：正在对一段全局代码进行织入操作，只能对类方法进行织入。") ;
 		}
 		
+		// advice 参数
+		$this->generateAdviceArgvs($aStat) ;
+		
 		// generate and weave AdviceDispatchFunction
 		$this->generateAdviceDispatchFunction($aStat) ;
 		
@@ -46,8 +51,11 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 		
 		// weave AdviceDispatchFunction
 		$this->weaveAdvices($aStat) ;
+		
+		// replace origin execut point
+		$this->replaceOriginExecutePoint($aStat) ;
 	}
-
+	
 	protected function weaveAdvices(GenerateStat $aStat)
 	{
 		if( !$aStat->aExecutePoint->belongsClass() )
@@ -74,9 +82,6 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 			$arrAdviceStacks[ $aAdvice->position() ]->put($aAdvice) ;
 		}
 		
-		// advice 参数
-		$this->generateAdviceArgvs($aStat) ;
-		
 		// 织入执行点上的置换代码：before	
 		$this->weaveAdviceDefines($aStat,$arrAdviceStacks[Advice::before]) ;
 				
@@ -93,13 +98,58 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 	abstract protected function generateAdviceArgvs(GenerateStat $aStat) ;
 	
 	abstract protected function generateOriginJointCode(GenerateStat $aStat) ;
+
+	abstract protected function replaceOriginExecutePoint(GenerateStat $aStat) ;
 	
 	/**
 	 * 创建并织入一个用于集中调用各个advice的函数
 	 */
 	protected function generateAdviceDispatchFunction(GenerateStat $aStat)
-	{}
+	{		
+		// 执行点所在函数
+		if( !$aBelongsFunction=$aStat->aExecutePoint->belongsFunction() )
+		{
+			throw new Exception("正在切入的连接点不在一个函数中") ;
+		}
+				
+		// 函数体
+		$aBodyStart = new ClosureToken(new Token(T_STRING, '{')) ;
+		$aBodyEnd = new ClosureToken(new Token(T_STRING, '}')) ;
+		$aBodyStart->setTheOther($aBodyEnd) ;
 		
+		$aStat->aTokenPool->insertAfter($aBelongsFunction->endToken(),$aBodyStart) ;
+		$aStat->aTokenPool->insertAfter($aBodyStart,$aBodyEnd) ;
+		
+		$aStat->aTokenPool->insertBefore($aBodyStart,new Token(T_WHITESPACE, "\r\n\t")) ;
+		
+		// private
+		$aStat->aTokenPool->insertBefore($aBodyStart,new Token(T_PRIVATE, 'private')) ;
+		
+		// function
+		$aStat->aTokenPool->insertBefore($aBodyStart,new Token(T_WHITESPACE, ' ')) ;
+		$aStat->aAdvicesDispatchFunc = new FunctionDefine(new Token(T_FUNCTION, 'function')) ;
+		$aStat->aTokenPool->insertBefore($aBodyStart,$aStat->aAdvicesDispatchFunc) ;
+		$aStat->aAdvicesDispatchFunc->setBodyToken($aBodyStart) ;
+		
+		// function name
+		$aStat->aTokenPool->insertBefore($aBodyStart,new Token(T_WHITESPACE, ' ')) ;
+		$sFuncName = 'aop_advice_dispatch_' . md5(spl_object_hash($aStat->aExecutePoint)) ;
+		$aFuncNameToken = new Token(T_STRING,$sFuncName) ;
+		$aStat->aAdvicesDispatchFunc->setNameToken($aFuncNameToken) ;
+		$aStat->aTokenPool->insertBefore($aBodyStart,$aFuncNameToken) ;
+		
+		// 参数表
+		$aArgvLstStart = new ClosureToken(new Token(T_STRING, '(')) ;
+		$aArgvLstEnd = new ClosureToken(new Token(T_STRING, ')')) ;
+		$aArgvLstStart->setTheOther($aArgvLstEnd) ;
+		$aStat->aAdvicesDispatchFunc->setArgListToken($aArgvLstStart) ;
+		$aStat->aTokenPool->insertBefore($aBodyStart,$aArgvLstStart) ;
+		$aStat->aTokenPool->insertBefore($aBodyStart,new Token(T_STRING,$aStat->sAdviceDefineArgvsLit)) ;
+		$aStat->aTokenPool->insertBefore($aBodyStart,$aArgvLstEnd) ;
+		
+		$aStat->aTokenPool->insertBefore($aBodyStart,new Token(T_WHITESPACE, "\r\n\t")) ;
+	}
+
 	private function weaveAdviceDefines(GenerateStat $aStat,$aAdvices)
 	{
 		$aBodyEnd = $aStat->aAdvicesDispatchFunc->endToken() ;
@@ -110,7 +160,7 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 			$aStat->aTokenPool->insertAfter($aBodyEnd,$this->generateAdviceDefine($aAdvice,$aStat)) ;
 			
 			// 织入advice调用代码
-			$sAdviceFuncName = $aAdvice->generateWeavedFunctionName() ;
+			$sAdviceFuncName = $this->generateAdviceWeavedFunctionName($aStat,$aAdvice) ;
 			$sAdviceCallCode = "\r\n\t\t".($aAdvice->isStatic()? 'self::': '$this->')."{$sAdviceFuncName}({$aStat->sAdviceCallArgvsLit}) ;\r\n" ;
 			$aStat->aTokenPool->insertBefore( $aBodyEnd, new Token(T_STRING,$sAdviceCallCode) ) ;
 		}
@@ -123,7 +173,7 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 		// 织入advice调用代码
 		if( $aFirstAdvice=$aAdvices->get() )
 		{
-			$sAdviceFuncName = $aFirstAdvice->generateWeavedFunctionName() ;
+			$sAdviceFuncName = $this->generateAdviceWeavedFunctionName($aStat,$aFirstAdvice) ;
 			$aStat->aTokenPool->insertBefore(
 				$aBodyEnd
 				, new Token(T_STRING, "\r\n\t\t" . ($aFirstAdvice->isStatic()? 'self::': '$this->') . "{$sAdviceFuncName}({$aStat->sAdviceCallArgvsLit}) ;\r\n")
@@ -141,8 +191,8 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 					$aAdviceDefineCode = str_ireplace(
 						'aop_call_origin_method'
 						, ($aNextAdvice->isStatic()?
-								'self::'. $aNextAdvice->generateWeavedFunctionName():
-								'$this->'. $aNextAdvice->generateWeavedFunctionName())
+								'self::'. $this->generateAdviceWeavedFunctionName($aStat,$aNextAdvice):
+								'$this->'. $this->generateAdviceWeavedFunctionName($aStat,$aNextAdvice))
 						, $aAdviceDefineCode) ;
 				}
 				
@@ -165,6 +215,15 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 			$aStat->aTokenPool->insertBefore($aBodyEnd,new Token(T_STRING,"\r\n\r\n\t\t".$aStat->sOriginJointCode."({$aStat->sAdviceCallArgvsLit}) ;\r\n")) ;
 		}
 	}
+
+	private function generateAdviceWeavedFunctionName(GenerateStat $aStat,Advice $aAdvice)
+	{
+		$aToken = $aAdvice->token() ;
+		
+		return $aToken->name().'_cut_'.$aAdvice->position().'_'.md5(
+			spl_object_hash($aStat->aExecutePoint) . '<<' . $aToken->belongsClass()->fullName().'::'.$aToken->name()
+		) ;
+	}
 	
 	/**
 	 * 生成织入代码
@@ -183,7 +242,7 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 		$sCode.= $aAdvice->access() . ' ' ;
 		
 		// function and name
-		$sCode.= 'function '. $aAdvice->generateWeavedFunctionName() . "({$aStat->sAdviceDefineArgvsLit})\r\n" ;
+		$sCode.= 'function '. $this->generateAdviceWeavedFunctionName($aStat,$aAdvice) . "({$aStat->sAdviceDefineArgvsLit})\r\n" ;
 		
 		// body
 		$sCode.= "\t{\r\n" ;

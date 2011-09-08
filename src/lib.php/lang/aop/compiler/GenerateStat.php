@@ -2,17 +2,19 @@
 
 namespace jc\lang\aop\compiler ;
 
+use jc\lang\aop\jointpoint\JointPoint;
 use jc\lang\compile\object\TokenPool;
 use jc\lang\compile\object\Token;
 use jc\lang\aop\Pointcut;
 
 class GenerateStat 
 {
-	public function __construct(Pointcut $aPointcut,Token $aToken,TokenPool $aTokenPool)
+	public function __construct(TokenPool $aTokenPool,Token $aToken,Pointcut $aPointcut,JointPoint $aJointPoint)
 	{
-		$this->aPointcut = $aPointcut ;
-		$this->aExecutePoint = $aToken ;
 		$this->aTokenPool = $aTokenPool ;
+		$this->aExecutePoint = $aToken ;
+		$this->aPointcut = $aPointcut ;
+		$this->aJointPoint = $aJointPoint ;
 	}
 	
 	/**
@@ -24,6 +26,11 @@ class GenerateStat
 	 * @var	jc\lang\aop\Pointcut
 	 */
 	public $aPointcut ;
+	
+	/**
+	 * @var	jc\lang\aop\JointPoint
+	 */
+	public $aJointPoint ;
 	
 	/**
 	 * @var	jc\lang\compile\object\TokenPool
