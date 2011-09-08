@@ -8,35 +8,35 @@ interface ICache
 	 * 
 	 * @return string
 	 */
-	function get($sDataName) ;
+	function get($sDataPath) ;
 	
 	/**
 	 * Enter description here ...
 	 * 
 	 * @return void
 	 */
-	function set($sName,$sData,$nCreateTimeMicroSec=-1) ;
+	function set($sDataPath,$sData) ;
 	
 	/**
 	 * Enter description here ...
 	 * 
 	 * @return bool
 	 */
-	function delete($sDataName) ;
+	function delete($sDataPath) ;
 	
 	/**
 	 * Enter description here ...
 	 * 
 	 * @return bool
 	 */
-	function isExpire($sDataName,$nCreateTimeMicroSec=-1) ;
+	function isExpire($sDataPath,$fValidSec) ;
 	
 	/**
 	 * Enter description here ...
 	 * 
 	 * @return int
 	 */
-	function createTime($sDataName) ;
+	function createTime($sDataPath) ;
 	
 }
 ?>

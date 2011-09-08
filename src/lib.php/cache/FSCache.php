@@ -1,26 +1,50 @@
 <?php
 namespace jc\cache ;
 
+use jc\fs\FileSystem;
+
 class FSCache implements ICache
 {
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return string
-	 */
-	function get($sDataName)
+	public function __construct(FileSystem $aCacheFilesystem)
 	{
-		// todo ...
+		$this->aCacheFilesystem = $aCacheFilesystem ;
 	}
 	
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return void
-	 */
-	function set($sName,$sData,$nCreateTimeMicroSec=-1)
+	function get($sDataPath)
 	{
-		// todo ...
+		if( !$aFile = $this->aCacheFilesystem->findFile($sDataPath) )
+		{
+			return ;
+		}
+
+		list( ,$data ) = $aFile->includeFile(false,false) ;
+		return $data ;
+	}
+	
+	function set($sDataPath,$data,$fCreateTimeMicroSec=-1)
+	{
+		if( !$aFile=$this->aCacheFilesystem->findFile($sDataPath) and !$aFile=$this->aCacheFilesystem->createFile($sDataPath) )
+		{
+			return false ;
+		}
+		
+		if( is_object($data) )
+		{
+			$sSerialize = 'unserialize("'.addslahes(serialize($data)).'")' ;
+		}
+		else 
+		{
+			$sSerialize = var_export($data,true) ;
+		}
+		
+		if($fCreateTimeMicroSec<0)
+		{
+			$fCreateTimeMicroSec = microtime(true) ;
+		}
+		
+		$aWriter = $aFile->openWriter() ;
+		$aWriter->write("<?php return array( 'create'=>{$fCreateTimeMicroSec}, 'data'=>" . $sSerialize) . ") ;" ;
+		$aWriter->close() ;
 	}
 	
 	/**
@@ -28,9 +52,9 @@ class FSCache implements ICache
 	 * 
 	 * @return bool
 	 */
-	function delete($sDataName)
+	function delete($sDataPath)
 	{
-		// todo ...
+		$this->aCacheFilesystem->delete($sDataPath) ;
 	}
 	
 	/**
@@ -38,20 +62,36 @@ class FSCache implements ICache
 	 * 
 	 * @return bool
 	 */
-	function isExpire($sDataName,$nCreateTimeMicroSec=-1)
+	function isExpire($sDataPath,$fValidSec)
 	{
-		// todo ...
+		if( !$aFile = $this->aCacheFilesystem->findFile($sDataPath) )
+		{
+			return ;
+		}
+
+		list( $fTime ) = $aFile->includeFile(false,false) ;
+		return $fTime + $fValidSec < microtime(true) ;
 	}
 	
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return int
+	 * @return float
 	 */
-	function createTime($sDataName)
+	function createTime($sDataPath)
 	{
-		// todo ...
+		if( !$aFile = $this->aCacheFilesystem->findFile($sDataPath) )
+		{
+			return ;
+		}
+
+		list( $fTime ) = $aFile->includeFile(false,false) ;
+		return $fTime ;
 	}
 	
+	/**
+	 * @var jc\fs\FileSystem
+	 */
+	private $aCacheFilesystem ;
 }
 ?>
