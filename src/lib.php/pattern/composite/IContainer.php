@@ -42,8 +42,14 @@ interface IContainer
 	
 	public function accept($object) ;
 	
+	/**
+	 * @return jc\pattern\iterate\INonlinearIterator
+	 */
 	public function iterator() ;
 	
+	/**
+	 * @return jc\pattern\iterate\INonlinearIterator
+	 */
 	public function nameIterator() ;
 	
 	public function acceptClassIterator() ;

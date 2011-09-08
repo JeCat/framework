@@ -90,7 +90,7 @@ class Container extends Object implements IContainer
 		$nIdx = array_search($object,$this->arrObjects,is_object($object)) ;
 		if($nIdx!==false)
 		{
-			unset($this->arrObjects[$nIdx]) ;
+			array_splice($this->arrObjects,$nIdx,1) ;
 		}
 		
 		$this->free($object) ;
@@ -107,14 +107,14 @@ class Container extends Object implements IContainer
 		return count($this->arrObjects) ;
 	}
 	/**
-	 * @return \Iterate
+	 * @return jc\pattern\iterate\INonlinearIterator
 	 */
 	public function iterator()
 	{
 		return new \jc\pattern\iterate\ArrayIterator($this->arrObjects) ;
 	}
 	/**
-	 * @return \Iterate
+	 * @return jc\pattern\iterate\INonlinearIterator
 	 */
 	public function nameIterator()
 	{
