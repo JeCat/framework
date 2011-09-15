@@ -6,16 +6,16 @@ interface ICache
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return string
+	 * @return mixed
 	 */
-	function get($sDataPath) ;
+	function item($sDataPath) ;
 	
 	/**
 	 * Enter description here ...
 	 * 
 	 * @return void
 	 */
-	function set($sDataPath,$sData) ;
+	function setItem($sDataPath,$data) ;
 	
 	/**
 	 * Enter description here ...

@@ -10,7 +10,7 @@ class FSCache implements ICache
 		$this->aCacheFilesystem = $aCacheFilesystem ;
 	}
 	
-	function get($sDataPath)
+	function item($sDataPath)
 	{
 		if( !$aFile = $this->aCacheFilesystem->findFile($sDataPath) )
 		{
@@ -21,7 +21,7 @@ class FSCache implements ICache
 		return $data ;
 	}
 	
-	function set($sDataPath,$data,$fCreateTimeMicroSec=-1)
+	function setItem($sDataPath,$data,$fCreateTimeMicroSec=-1)
 	{
 		if( !$aFile=$this->aCacheFilesystem->findFile($sDataPath) and !$aFile=$this->aCacheFilesystem->createFile($sDataPath) )
 		{

@@ -78,6 +78,8 @@ class ClassLoader extends Object
 	 */
 	public function load($sClassName)
 	{
+		$fTime = microtime(true) ;
+		
 		// 从缓存的 classpath 中加载类
 		/*if( isset($this->arrClassPathCache[$sClassName]) and is_file($this->arrClassPathCache[$sClassName]) )
 		{
@@ -92,7 +94,6 @@ class ClassLoader extends Object
 				// $this->arrClassPathCache[$sClassName] = $aClassFile->url() ;
 				
 				$aClassFile->includeFile(false,true) ;
-				return ;
 			}
 		}
 		catch (ClassCompileException $e)
@@ -110,6 +111,9 @@ class ClassLoader extends Object
 			echo "<pre>",$e->getTraceAsString(),"</pre>" ;
 			exit() ;
 		}
+		
+		
+		$this->fLoadTime+= microtime(true) - $fTime ;
 	}
 	
 	public function searchClass($sClassName,$nSearchFlag=null)
@@ -249,6 +253,11 @@ class ClassLoader extends Object
 		}
 	}
 	
+	public function totalLoadTime()
+	{
+		return $this->fLoadTime ;
+	}
+	
 	private $arrPackages = array() ;
 
 	private $aCompiler = null ;
@@ -257,7 +266,7 @@ class ClassLoader extends Object
 	
 	private $sSkipClassesForCompile = '`^jc\\\\(util|io|system|lang|pattern)\\\\`' ;
 	
-	private $nLoadTime = 0 ;
+	private $fLoadTime = 0 ;
 	
 	private $arrClassPathCache = array() ;
 	private $aClasspathCache = array() ;
