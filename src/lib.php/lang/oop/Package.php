@@ -146,11 +146,15 @@ class Package
 		{
 			if( $fnClassFilenameWraps = reset($this->arrClassFilenameWraps) )
 			{
-				$sClassPath = $sInnerPath . '/' . call_user_func_array($fnClassFilenameWraps, array($sShortClassName)) ;
+				$sClassPath = call_user_func_array($fnClassFilenameWraps, array($sShortClassName)) ;
 			}
 			else 
 			{
-				$sClassPath = $sInnerPath . '/' . $sShortClassName . '.php' ;
+				$sClassPath = $sShortClassName . '.php' ;
+			}
+			if($sInnerPath)
+			{
+				$sClassPath = $sInnerPath.'/'.$sClassPath ;
 			}
 			
 			if( !$aClassFile=$this->aFolder->createFile($sClassPath) )

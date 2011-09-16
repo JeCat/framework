@@ -7,17 +7,17 @@ use jc\fs\FileSystem;
 class LocalFolder extends LocalFSO implements IFolder
 {
 	/**
-	 * @return \IFSO
+	 * @return \IFile
 	 */
 	public function findFile($sPath)
 	{
 		return $this->fileSystem()->rootFileSystem()->findFile(
 				(substr($sPath,0,1)=='/')? $sPath: ($this->path().'/'.$sPath)
-		) ;	
+		) ;
 	}
 
 	/**
-	 * @return \IFSO
+	 * @return \IFolder
 	 */
 	public function findFolder($sPath)
 	{
