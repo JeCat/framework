@@ -8,6 +8,9 @@ use jc\mvc\view\Webpage;
 use jc\ui\xhtml\Factory;
 use jc\system\Application;
 
+// 设置编码
+header("Content-type: text/html; charset=UTF-8");
+
 // 报告所有错误
 error_reporting(E_ALL & ~E_DEPRECATED) ;
 
