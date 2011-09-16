@@ -115,13 +115,41 @@ class UI extends JcObject
 		$this->aVariables = $aVariables ;
 	}
 	
-	public function compile(/*CompilingStatus $aCompilingStatus*/IInputStream $aSourceInput, IOutputStream $aCompiledOutput)
+	public function compileSourceFile($sSourceFile)
 	{
-		// 解析
-		$aObjectContainer = $this->interpreters()->parse($aSourceInput) ;
+		// 定位文件
+		$aSrcMgr = $this->sourceFileManager() ;
+		list($sNamespace,$sSourceFile) = $aSrcMgr->detectNamespace($sSourceFile) ;
+		$aSourceFile = $aSrcMgr->find($sSourceFile,$sNamespace) ;
+		if(!$aSourceFile)
+		{
+			throw new Exception("无法找到指定的源文件：%s:%s",array($sNamespace,$sSourceFile)) ;
+		}
+		$aCompiledFile = $this->sourceFileManager()->findCompiled($aSourceFile) ;
+		
+		// 检查编译文件是否有效
+		if( !$this->sourceFileManager()->isCompiledValid($aSourceFile,$aCompiledFile) )
+		{
+			// 解析
+			try{
+				$aObjectContainer = $this->interpreters()->parse($aSourceFile->openReader()) ;
+			}
+			catch (\Exception $e)
+			{
+				throw new Exception("UI引擎在解析模板文件时遇到了错误: %s",$aSourceFile->url(),$e) ;
+			}
 			
-		// 解析
-		$this->compilers()->compile($aObjectContainer,$aCompiledOutput) ;
+			// 编译
+			try{
+				$this->compilers()->compile($aObjectContainer,$aCompiledFile->openWriter()) ;
+			}
+			catch (\Exception $e)
+			{
+				throw new Exception("UI引擎在编译模板文件时遇到了错误: %s",$aCompiledFile->url(),$e) ;
+			}
+		}
+		
+		return $aCompiledFile ;
 	}
 	
 	public function render(IFile $aCompiledFile,IHashTable $aVariables=null,IOutputStream $aDevice=null)
@@ -158,27 +186,8 @@ class UI extends JcObject
 			$aVariables = new HashTable($aVariables) ;
 		}
 		
-		// 定位文件
-		$aSrcMgr = $this->sourceFileManager() ;
-		list($sNamespace,$sSourceFile) = $aSrcMgr->detectNamespace($sSourceFile) ;
-		$aSourceFile = $aSrcMgr->find($sSourceFile,$sNamespace) ;
-		if(!$aSourceFile)
-		{
-			throw new Exception("无法找到指定的源文件：%s:%s",array($sNamespace,$sSourceFile)) ;
-		}
-		$aCompiledFile = $this->sourceFileManager()->findCompiled($aSourceFile) ;
-		
-		// 检查编译文件是否有效
-		if( !$this->sourceFileManager()->isCompiledValid($aSourceFile,$aCompiledFile) )
-		{
-			try{
-				$this->compile($aSourceFile->openReader(),$aCompiledFile->openWriter()) ;
-			}
-			catch (\Exception $e)
-			{
-				throw new Exception("UI引擎在解析模板文件时遇到了错误: %s",$aSourceFile->url(),$e) ;
-			}
-		}
+		// compile
+		$aCompiledFile = $this->compileSourceFile($sSourceFile) ;
 		
 		// render
 		$this->render($aCompiledFile,$aVariables,$aDevice) ;
