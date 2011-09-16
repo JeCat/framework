@@ -1,6 +1,8 @@
 <?php
 namespace jc\ui ;
 
+use jc\io\IOutputStream;
+
 use jc\lang\Exception;
 use jc\lang\Object as JcObject;
 use jc\fs\IFile;
@@ -50,21 +52,10 @@ class CompilerManager extends JcObject
 	/**
 	 * @return ICompiled
 	 */
-	public function compile(IObject $aObjectContainer,CompilingStatus $aCompilingStatus)
+	public function compile(IObject $aObjectContainer,IOutputStream $aCompiledOutput)
 	{
-		$this->aCompilingStatus = $aCompilingStatus ;
-		
-		$aFile = $aCompilingStatus->compiledFile() ;
-		if( !$aFile->exists() )
-		{
-			if( !$aFile->create() )
-			{
-				throw new Exception("无法为 UI 创建编译文件：%s",$aFile->url()) ;
-			}
-		}
-
 		$aTargetCodeStream = new TargetCodeOutputStream ;
-		$aTargetCodeStream->open($aFile) ;
+		$aTargetCodeStream->open($aCompiledOutput) ;
 		
 		foreach($aObjectContainer->iterator() as $aObject)
 		{
@@ -76,8 +67,6 @@ class CompilerManager extends JcObject
 		}
 				
 		$aTargetCodeStream->close() ;
-		
-		$this->aCompilingStatus = null ;
 	}
 	
 	public function createCompiledFile(IFile $aCompiledFile)
@@ -97,17 +86,7 @@ class CompilerManager extends JcObject
 		}
 	}
 	
-	/**
-	 * @return CompilingStatus
-	 */
-	public function compilingStatus()
-	{
-		return $this->aCompilingStatus ;
-	}
-	
 	private $arrCompilers = array() ;
-	
-	private $aCompilingStatus ;
 }
 
 ?>

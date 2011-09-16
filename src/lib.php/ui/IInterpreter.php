@@ -6,7 +6,7 @@ use jc\util\String;
 
 interface IInterpreter
 {
-	public function parse(String $aSource,IObject $aObjectContainer,IFile $aSourceFile) ; 
+	public function parse(String $aSource,IObject $aObjectContainer) ; 
 }
 
 ?>

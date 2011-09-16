@@ -19,7 +19,7 @@ class Parser extends JcObject implements IInterpreter
 	/**
 	 * return IObject
 	 */
-	public function parse(String $aSource,IUiObject $aObjectContainer,IFile $aSourceFile)
+	public function parse(String $aSource,IUiObject $aObjectContainer)
 	{
 		$nProcIndex = 0 ;
 		

@@ -2,6 +2,8 @@
 
 namespace jc\ui ;
 
+use jc\io\IInputStream;
+
 use jc\fs\IFile;
 use jc\resrc\ResourceManager;
 use jc\lang\Assert;
@@ -113,25 +115,13 @@ class UI extends JcObject
 		$this->aVariables = $aVariables ;
 	}
 	
-	public function compile(CompilingStatus $aCompilingStatus)
+	public function compile(/*CompilingStatus $aCompilingStatus*/IInputStream $aSourceInput, IOutputStream $aCompiledOutput)
 	{
 		// 解析
-		try{
-			$aObjectContainer = $this->interpreters()->parse($aCompilingStatus->sourceFile()) ;
-		}
-		catch (\Exception $e)
-		{
-			throw new Exception("UI引擎在解析模板文件时遇到了错误: %s",$aCompilingStatus->sourceFilepath(),$e) ;
-		}
-		
-		// 编译
-		try{
-			$this->compilers()->compile($aObjectContainer,$aCompilingStatus) ;
-		}
-		catch (\Exception $e)
-		{
-			throw new Exception("UI引擎在编译模板文件时遇到了错误: %s",$aCompilingStatus->sourceFilepath(),$e) ;
-		}
+		$aObjectContainer = $this->interpreters()->parse($aSourceInput) ;
+			
+		// 解析
+		$this->compilers()->compile($aObjectContainer,$aCompiledOutput) ;
 	}
 	
 	public function render(IFile $aCompiledFile,IHashTable $aVariables=null,IOutputStream $aDevice=null)
@@ -181,15 +171,13 @@ class UI extends JcObject
 		// 检查编译文件是否有效
 		if( !$this->sourceFileManager()->isCompiledValid($aSourceFile,$aCompiledFile) )
 		{
-			// 编译
-			$aCompilingStatus = new CompilingStatus( array(
-				'sourceNamespace' => $sNamespace,
-				'sourceFilename' => $sSourceFile,
-				'sourceFile' => $aSourceFile,
-				'compiledFile' => $aCompiledFile,
-			) ) ;
-		
-			$this->compile($aCompilingStatus) ;
+			try{
+				$this->compile($aSourceFile->openReader(),$aCompiledFile->openWriter()) ;
+			}
+			catch (\Exception $e)
+			{
+				throw new Exception("UI引擎在解析模板文件时遇到了错误: %s",$aSourceFile->url(),$e) ;
+			}
 		}
 		
 		// render

@@ -7,13 +7,13 @@ use jc\io\IOutputStream;
 
 class TargetCodeOutputStream implements IOutputStream
 {
-	public function open(IFile $aCompiledFile)
+	public function open(IOutputStream $aWriter)
 	{
-		$aWriter = $aCompiledFile->openWriter(false) ;
+		/*$aWriter = $aCompiledFile->openWriter(false) ;
 		if(!$aWriter)
 		{
 			throw new Exception("保存XHTML模板的编译文件时无法打开文件:%s",$aCompiledFile->url()) ;
-		}
+		}*/
 		
 		$this->aCompiledWriter = $aWriter ;
 		
