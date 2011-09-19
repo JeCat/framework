@@ -152,6 +152,15 @@ class UI extends JcObject
 		return $aCompiledFile ;
 	}
 	
+	public function compile()
+	{
+			// 解析
+		$aObjectContainer = $this->interpreters()->parse($aSourceFile->openReader()) ;
+		
+			// 编译
+		$this->compilers()->compile($aObjectContainer,$aCompiledFile->openWriter()) ;
+	}
+	
 	public function render(IFile $aCompiledFile,IHashTable $aVariables=null,IOutputStream $aDevice=null)
 	{
 		if(!$aVariables)
