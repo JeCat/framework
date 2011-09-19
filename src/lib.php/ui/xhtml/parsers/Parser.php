@@ -4,7 +4,7 @@ namespace jc\ui\xhtml\parsers ;
 use jc\fs\IFile;
 use jc\io\OutputStreamBuffer;
 use jc\lang\Exception;
-use jc\ui\IObject as IUiObject;
+use jc\ui\ObjectContainer ;
 use jc\util\String;
 use jc\ui\IInterpreter;
 use jc\util\Stack ;
@@ -19,7 +19,7 @@ class Parser extends JcObject implements IInterpreter
 	/**
 	 * return IObject
 	 */
-	public function parse(String $aSource,IUiObject $aObjectContainer)
+	public function parse(String $aSource,ObjectContainer $aObjectContainer)
 	{
 		$nProcIndex = 0 ;
 		

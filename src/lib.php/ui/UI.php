@@ -130,35 +130,32 @@ class UI extends JcObject
 		// 检查编译文件是否有效
 		if( !$this->sourceFileManager()->isCompiledValid($aSourceFile,$aCompiledFile) )
 		{
-			// 解析
-			try{
-				$aObjectContainer = $this->interpreters()->parse($aSourceFile->openReader()) ;
-			}
-			catch (\Exception $e)
-			{
-				throw new Exception("UI引擎在解析模板文件时遇到了错误: %s",$aSourceFile->url(),$e) ;
-			}
+			$aObjectContainer = new ObjectContainer($sSourceFile,$sNamespace) ;
 			
-			// 编译
 			try{
-				$this->compilers()->compile($aObjectContainer,$aCompiledFile->openWriter()) ;
+				$this->compile($aSourceFile->openReader(),$aCompiledFile->openWriter(),$aObjectContainer) ;
 			}
 			catch (\Exception $e)
 			{
-				throw new Exception("UI引擎在编译模板文件时遇到了错误: %s",$aCompiledFile->url(),$e) ;
+				throw new Exception("UI引擎在编译模板文件时遇到了错误: %s",$aSourceFile->url(),$e) ;
 			}
 		}
 		
 		return $aCompiledFile ;
 	}
 	
-	public function compile()
+	public function compile(IInputStream $aSourceInput,IOutputStream $aCompiledOutput,ObjectContainer $aObjectContainer=null)
 	{
-			// 解析
-		$aObjectContainer = $this->interpreters()->parse($aSourceFile->openReader()) ;
+		if(!$aObjectContainer)
+		{
+			$aObjectContainer = new ObjectContainer() ;
+		}
 		
-			// 编译
-		$this->compilers()->compile($aObjectContainer,$aCompiledFile->openWriter()) ;
+		// 解析
+		$this->interpreters()->parse($aSourceInput,$aObjectContainer) ;
+		
+		// 编译
+		$this->compilers()->compile($aObjectContainer,$aCompiledOutput) ;
 	}
 	
 	public function render(IFile $aCompiledFile,IHashTable $aVariables=null,IOutputStream $aDevice=null)

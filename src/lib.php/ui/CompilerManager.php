@@ -52,7 +52,7 @@ class CompilerManager extends JcObject
 	/**
 	 * @return ICompiled
 	 */
-	public function compile(IObject $aObjectContainer,IOutputStream $aCompiledOutput)
+	public function compile(ObjectContainer $aObjectContainer,IOutputStream $aCompiledOutput)
 	{
 		$aTargetCodeStream = new TargetCodeOutputStream ;
 		$aTargetCodeStream->open($aCompiledOutput) ;
