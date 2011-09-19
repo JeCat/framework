@@ -128,8 +128,13 @@ class UI extends JcObject
 		$aCompiledFile = $this->sourceFileManager()->findCompiled($aSourceFile) ;
 		
 		// 检查编译文件是否有效
-		if( !$this->sourceFileManager()->isCompiledValid($aSourceFile,$aCompiledFile) )
+		if( !$aCompiledFile or !$this->sourceFileManager()->isCompiledValid($aSourceFile,$aCompiledFile) )
 		{
+			if(!$aCompiledFile)
+			{
+				$aCompiledFile = $this->sourceFileManager()->createCompiled($aSourceFile) ;
+			}
+			
 			$aObjectContainer = new ObjectContainer($sSourceFile,$sNamespace) ;
 			
 			try{

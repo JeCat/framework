@@ -3,7 +3,6 @@
 namespace jc\ui ;
 
 use jc\fs\FileSystem;
-
 use jc\fs\IFile;
 use jc\resrc\ResourceManager;
 
@@ -18,16 +17,21 @@ class SourceFileManager extends ResourceManager
 		
 		return $aCompiledFile->exists() and $aSourceFile->modifyTime()<=$aCompiledFile->modifyTime() ;
 	}
-	
+
 	/**
 	 * @return jc\fs\IFile
 	 */
 	public function findCompiled(IFile $aSourceFile)
 	{
-		return $aSourceFile->directory()->createFile(
-			'compileds/'.$aSourceFile->name().'.php'
-			, FileSystem::CREATE_FILE_DEFAULT | FileSystem::CREATE_ONLY_OBJECT
-		) ;		
+		return $aSourceFile->directory()->findFile('compileds/'.$aSourceFile->name().'.php') ;	
+	}
+	
+	/**
+	 * @return jc\fs\IFile
+	 */
+	public function createCompiled(IFile $aSourceFile)
+	{
+		return $aSourceFile->directory()->createFile('compileds/'.$aSourceFile->name().'.php') ;		
 	}
 	
 	
