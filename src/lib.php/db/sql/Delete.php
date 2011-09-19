@@ -19,7 +19,7 @@ class Delete extends MultiTableStatement
 				. ($aCriteria? (' WHERE '.$aCriteria->makeStatement($bFormat)): '') ;
 		
 		// limit
-		$sStatement.= $this->makeStatementLimit($bFormat) ;
+//		$sStatement.= $this->makeStatementLimit($bFormat) ;
 		
 		return $sStatement ;
 	}

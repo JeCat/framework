@@ -27,7 +27,7 @@ class Select extends MultiTableStatement
 			. $this->makeStatementPredicate($bFormat)
 			. " count(*) AS {$sCntClmName} "
 			. parent::makeStatement($bFormat)
-			. $this->makeStatementLimit()
+//			. $this->makeStatementLimit()
 			. ' ;' ;
 	}
 	
@@ -39,7 +39,7 @@ class Select extends MultiTableStatement
 			. $this->makeStatementPredicate($bFormat)
 			. ' ' . ($this->arrColumns? implode(',', $this->arrColumns): '*')
 			. parent::makeStatement($bFormat)
-			. $this->makeStatementLimit()
+//			. $this->makeStatementLimit()
 			. ' ;' ;
 	}
 
@@ -54,17 +54,17 @@ class Select extends MultiTableStatement
 		) ;
 	}
 
-	public function makeStatementLimit($bFormat=false)
-	{
-		if( $this->limitLen()!==null )
-		{
-			return " LIMIT " . $this->limitFrom() . ", " . $this->limitLen() ;
-		}
-		else
-		{
-			return '' ;
-		}
-	}
+//	public function makeStatementLimit($bFormat=false)
+//	{
+//		if( $this->limitLen()!==null )
+//		{
+//			return " LIMIT " . $this->limitFrom() . ", " . $this->limitLen() ;
+//		}
+//		else
+//		{
+//			return '' ;
+//		}
+//	}
 	
 	public function checkValid($bThrowException=true)
 	{
@@ -94,20 +94,20 @@ class Select extends MultiTableStatement
 		$this->arrColumns[] = $sClmName ;
 	}
 
-	public function setLimit($nLen=null,$nFrom=null)
-	{
-		parent::setLimit($nLen) ;
-		
-		if($nFrom!==null)
-		{
-			$this->nLimitFrom = intval($nFrom) ;
-		}
-	}
+//	public function setLimit($nLen=null,$nFrom=null)
+//	{
+//		parent::setLimit($nLen) ;
+//		
+//		if($nFrom!==null)
+//		{
+//			$this->nLimitFrom = intval($nFrom) ;
+//		}
+//	}
 	
-	public function limitFrom()
-	{
-		return $this->nLimitFrom ;
-	}
+//	public function limitFrom()
+//	{
+//		return $this->nLimitFrom ;
+//	}
 	
 	private $arrColumns = array() ;
 	
@@ -134,7 +134,7 @@ class Select extends MultiTableStatement
 	private $nPredicateTopLen = 30 ;
 	
 	
-	private $nLimitFrom = 0 ;
+//	private $nLimitFrom = 0 ;
 }
 
 ?>

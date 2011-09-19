@@ -94,18 +94,18 @@ abstract class MultiTableStatement extends Statement
 		return true ;
 	}
 	
-	public function setLimit($nLen=null)
-	{
-		if($nLen!==null)
-		{
-			$this->nLimitLen = intval($nLen) ;
-		}
-	}
-	
-	public function limitLen()
-	{
-		return $this->nLimitLen ;
-	}
+//	public function setLimit($nLen=null)
+//	{
+//		if($nLen!==null)
+//		{
+//			$this->nLimitLen = intval($nLen) ;
+//		}
+//	}
+//	
+//	public function limitLen()
+//	{
+//		return $this->nLimitLen ;
+//	}
 	
 	private $arrTables = array() ;
 	
@@ -116,7 +116,7 @@ abstract class MultiTableStatement extends Statement
 	 */
 	private $aCriteria = null ;
 	
-	private $nLimitLen = null ;
+//	private $nLimitLen = null ;
 	
 }
 
