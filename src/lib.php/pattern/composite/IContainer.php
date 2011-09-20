@@ -63,8 +63,10 @@ interface IContainer
 	public function replace($object,$newObject,$sName=null) ;
 	
 	public function insertBefore($object,$_) ;
+	public function insertBeforeByPosition($nPos,$_) ;
 	
 	public function insertAfter($object,$_) ;
+	public function insertAfterByPosition($nPos,$_) ;
 }
 
 ?>
