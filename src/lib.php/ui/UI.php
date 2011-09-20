@@ -115,6 +115,9 @@ class UI extends JcObject
 		$this->aVariables = $aVariables ;
 	}
 	
+	/**
+	 * @return jc\fs\IFile
+	 */
 	public function compileSourceFile($sSourceFile)
 	{
 		// 定位文件
