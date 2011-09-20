@@ -54,9 +54,12 @@ class Order implements IStatement {
 	}
 	
 	public function iterator() {
-		return ;
+		return new \ArrayIterator($this->arrOrderBys);
 	}
 	
+	/**
+	 * @see jc\db\sql.IStatement::makeStatement()
+	 */
 	public function makeStatement($bFormat=false){
 		$sOrderBy = 'ORDER BY ';
 		$arrOrderBys = '';

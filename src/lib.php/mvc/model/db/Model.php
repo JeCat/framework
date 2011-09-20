@@ -1,7 +1,6 @@
 <?php
 namespace jc\mvc\model\db ;
 
-use jc\mvc\model\db\orm\Criteria;
 use jc\mvc\model\db\orm\PrototypeAssociationMap;
 use jc\lang\Exception;
 use jc\mvc\model\db\orm\operators\Deleter;
@@ -11,6 +10,7 @@ use jc\mvc\model\db\orm\operators\Updater;
 use jc\db\DB;
 use jc\db\recordset\IRecordSet;
 use jc\db\sql\MultiTableStatement;
+use jc\db\sql\Criteria;
 use jc\mvc\model\db\orm\Association;
 use jc\mvc\model\db\orm\PrototypeInFragment ;
 use jc\mvc\model\AbstractModel ;
