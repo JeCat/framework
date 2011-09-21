@@ -29,9 +29,13 @@ abstract class MultiTableStatement extends Statement
 	{
 		if(!$this->aCriteria)
 		{
-			$this->aCriteria = new Criteria($this) ;
+			$this->aCriteria = $this->createCriteria() ;
 		}
 		return $this->aCriteria ;
+	}
+	
+	public function createCriteria(){
+		return new Criteria();
 	}
 
 	public function setCriteria(Criteria $aCriteria)
@@ -94,19 +98,6 @@ abstract class MultiTableStatement extends Statement
 		return true ;
 	}
 	
-	public function setLimit($nLen=null)
-	{
-		if($nLen!==null)
-		{
-			$this->nLimitLen = intval($nLen) ;
-		}
-	}
-	
-	public function limitLen()
-	{
-		return $this->nLimitLen ;
-	}
-	
 	private $arrTables = array() ;
 	
 	/**
@@ -115,8 +106,6 @@ abstract class MultiTableStatement extends Statement
 	 * @var Criteria
 	 */
 	private $aCriteria = null ;
-	
-	private $nLimitLen = null ;
 	
 }
 

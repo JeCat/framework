@@ -38,7 +38,7 @@ class Update extends MultiTableStatement implements IDataSettableStatement
 		}
 		
 		// limit
-		$sStatement.= $this->makeStatementLimit($bFormat) ;
+//		$sStatement.= $this->makeStatementLimit($bFormat) ;
 			
 		return $sStatement ;
 	}

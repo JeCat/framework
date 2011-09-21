@@ -1,9 +1,9 @@
 <?php
 namespace jc\mvc\model\db\orm ;
 
-use jc\db\sql\Criteria as ParentCriteria;
+use jc\db\sql\Restriction as ParentRestriction;
 
-class Criteria extends ParentCriteria {
+class Restriction extends ParentRestriction {
 	public function setDefaultTable($sDefaultTable) {
 		$this->sDefaultTable = (string)$sDefaultTable;
 	}

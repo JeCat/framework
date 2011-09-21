@@ -3,6 +3,7 @@
 namespace jc\db\sql ;
 
 use jc\lang\Exception;
+use jc\db\sql\Criteria;
 
 class Select extends MultiTableStatement 
 {
@@ -27,7 +28,6 @@ class Select extends MultiTableStatement
 			. $this->makeStatementPredicate($bFormat)
 			. " count(*) AS {$sCntClmName} "
 			. parent::makeStatement($bFormat)
-			. $this->makeStatementLimit()
 			. ' ;' ;
 	}
 	
@@ -39,7 +39,6 @@ class Select extends MultiTableStatement
 			. $this->makeStatementPredicate($bFormat)
 			. ' ' . ($this->arrColumns? implode(',', $this->arrColumns): '*')
 			. parent::makeStatement($bFormat)
-			. $this->makeStatementLimit()
 			. ' ;' ;
 	}
 
@@ -52,18 +51,6 @@ class Select extends MultiTableStatement
 								' PERCENT': ''
 					): ''
 		) ;
-	}
-
-	public function makeStatementLimit($bFormat=false)
-	{
-		if( $this->limitLen()!==null )
-		{
-			return " LIMIT " . $this->limitFrom() . ", " . $this->limitLen() ;
-		}
-		else
-		{
-			return '' ;
-		}
 	}
 	
 	public function checkValid($bThrowException=true)
@@ -93,21 +80,27 @@ class Select extends MultiTableStatement
 		}
 		$this->arrColumns[] = $sClmName ;
 	}
-
-	public function setLimit($nLen=null,$nFrom=null)
-	{
-		parent::setLimit($nLen) ;
-		
-		if($nFrom!==null)
-		{
-			$this->nLimitFrom = intval($nFrom) ;
-		}
-	}
 	
-	public function limitFrom()
-	{
-		return $this->nLimitFrom ;
+	public function createCriteria(){
+		$aCriteria = new Criteria();
+		$aCriteria->setEnableLimitStart(true);
+		return $aCriteria;
 	}
+
+//	public function setLimit($nLen=null,$nFrom=null)
+//	{
+//		parent::setLimit($nLen) ;
+//		
+//		if($nFrom!==null)
+//		{
+//			$this->nLimitFrom = intval($nFrom) ;
+//		}
+//	}
+	
+//	public function limitFrom()
+//	{
+//		return $this->nLimitFrom ;
+//	}
 	
 	private $arrColumns = array() ;
 	
@@ -134,7 +127,7 @@ class Select extends MultiTableStatement
 	private $nPredicateTopLen = 30 ;
 	
 	
-	private $nLimitFrom = 0 ;
+//	private $nLimitFrom = 0 ;
 }
 
 ?>

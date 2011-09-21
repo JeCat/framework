@@ -1,7 +1,6 @@
 <?php
 namespace jc\mvc\model\db ;
 
-use jc\mvc\model\db\orm\Criteria;
 use jc\mvc\model\db\orm\PrototypeAssociationMap;
 use jc\lang\Exception;
 use jc\mvc\model\db\orm\operators\Deleter;
@@ -11,6 +10,8 @@ use jc\mvc\model\db\orm\operators\Updater;
 use jc\db\DB;
 use jc\db\recordset\IRecordSet;
 use jc\db\sql\MultiTableStatement;
+use jc\db\sql\Criteria;
+use jc\mvc\model\db\orm\Restriction;
 use jc\mvc\model\db\orm\Association;
 use jc\mvc\model\db\orm\PrototypeInFragment ;
 use jc\mvc\model\AbstractModel ;
@@ -185,20 +186,24 @@ class Model extends AbstractModel implements IModel
 	
 	public function load($values=null,$keys=null)
 	{
-		$keys = (array) $keys ;
-		
-		if($values)
-		{			
-			if(!$keys)
-			{
+		if(!$values){
+			if(!$keys){
 				$keys = $this->prototype()->primaryKeys() ;
+			}else{
+				$keys = (array)$keys;
 			}
-			$values = array_values((array) $values) ;
-			
-			$aCriteria = $this->loadCriteria() ;
-			foreach($keys as $nIdx=>$sKey)
-			{
-				$aCriteria->eq( $sKey, $values[$nIdx] ) ;
+			if($values instanceof Criteria){
+				$this->aCriteria = $values;
+			}else if($values instanceof Restriction){
+				$aCriteria = $this->loadCriteria() ;
+				$aCriteria->restriction()->add($values);
+			}else{
+				$values = array_values((array) $values) ;
+				$aCriteria = $this->loadCriteria() ;
+				foreach($keys as $nIdx=>$sKey)
+				{
+					$aCriteria->restriction()->eq( $sKey, $values[$nIdx] ) ;
+				}
 			}
 		}
 		
@@ -378,45 +383,15 @@ class Model extends AbstractModel implements IModel
 		return $aChildModel ;
 	}
 	
-	
 	public function totalCount()
 	{
 		
-	}
-	
-	const ignore = -1 ;
-	
-	public function setLimit($nLength=1,$nFrom=self::ignore)
-	{
-		if( $nFrom!=self::ignore )
-		{
-			$this->nLimitFrom = $nFrom ;
-		}
-		if( $nLength!=self::ignore )
-		{
-			$this->nLimitLength = $nLength ;
-		}
-	}
-	
-	public function limitFrom()
-	{
-		return $this->nLimitFrom ;
-	}
-	
-	public function limitLength()
-	{
-		return $this->nLimitLength ;
 	}
 	
 	/**
 	 * @var jc\mvc\model\db\orm\PrototypeInFragment
 	 */
 	private $aPrototype ;
-	
-	private $nLimitFrom = 0 ;
-	
-	private $nLimitLength = 1 ;
-	
 	private $aCriteria ;
 }
 
