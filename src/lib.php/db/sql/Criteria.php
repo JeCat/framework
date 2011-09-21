@@ -33,12 +33,22 @@ class Criteria implements IStatement {
 		$this->bEnableLimitStart = $bEnableLimitStart;
 	}
 	
+	/**
+	 *  设置limit条件
+	 *  默认是只设置limit长度,如果需要在select语句中设置limit区间,就使用setEnableLimitStart()方法打开from锁定,
+	 *  在通过本方法的第2个参数设置from值,未打开锁定就设置from值会报异常
+	 * @param int $nLimitLen limit 长度
+	 * @param int $nLimitFrom limit 开始
+	 */
 	public function setLimit($nLimitLen , $nLimitFrom = 0){
 		$this->setLimitLen($nLimitLen);
 		$this->setLimitFrom($nLimitFrom);
 	}
 	
 	public function limit(){
+		if($this->nLimitLen === -1){
+			return '';
+		}
 		$sLimit = ' LIMIT ';
 		if($this->bEnableLimitStart and $this->nLimitFrom != 0){
 			$sLimit .= $this->nLimitFrom . ',';
@@ -91,7 +101,7 @@ class Criteria implements IStatement {
 	private $aRestriction = null;
 	private $aOrder = null;
 	private $nLimitFrom = 0;
-	private $nLimitLen = 0;
+	private $nLimitLen = 30;
 	private $bEnableLimitStart = false;
 }
 ?>
