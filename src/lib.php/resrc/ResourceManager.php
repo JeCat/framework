@@ -57,7 +57,10 @@ class ResourceManager extends Object implements IResourceManager
 		{
 			if( empty($this->arrFilenameWrappers) )
 			{
-				return $aFolder->findFile($sFilename) ;
+				if( $aFile=$aFolder->findFile($sFilename) )
+				{
+					return $aFile ;
+				}
 			}
 			else 
 			{

@@ -30,19 +30,15 @@ class InterpreterManager extends Container
 	/**
 	 * @return IObject
 	 */
-	public function parse(IInputStream $aSourceInput)
+	public function parse(IInputStream $aSourceInput,ObjectContainer $aObjectContainer)
 	{
 		$aSource = new String ;
 		$aSourceInput->readInString($aSource) ;
-		
-		$aObjectContainer = new UIObject() ;
-		
+				
 		foreach($this->iterator() as $aInterpreter)
 		{
 			$aInterpreter->parse($aSource,$aObjectContainer) ;
 		}
-		
-		return $aObjectContainer ;
 	}
 }
 

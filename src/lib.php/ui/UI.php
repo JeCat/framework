@@ -115,6 +115,9 @@ class UI extends JcObject
 		$this->aVariables = $aVariables ;
 	}
 	
+	/**
+	 * @return jc\fs\IFile
+	 */
 	public function compileSourceFile($sSourceFile)
 	{
 		// 定位文件
@@ -128,28 +131,39 @@ class UI extends JcObject
 		$aCompiledFile = $this->sourceFileManager()->findCompiled($aSourceFile) ;
 		
 		// 检查编译文件是否有效
-		if( !$this->sourceFileManager()->isCompiledValid($aSourceFile,$aCompiledFile) )
+		if( !$aCompiledFile or !$this->sourceFileManager()->isCompiledValid($aSourceFile,$aCompiledFile) )
 		{
-			// 解析
-			try{
-				$aObjectContainer = $this->interpreters()->parse($aSourceFile->openReader()) ;
-			}
-			catch (\Exception $e)
+			if(!$aCompiledFile)
 			{
-				throw new Exception("UI引擎在解析模板文件时遇到了错误: %s",$aSourceFile->url(),$e) ;
+				$aCompiledFile = $this->sourceFileManager()->createCompiled($aSourceFile) ;
 			}
 			
-			// 编译
+			$aObjectContainer = new ObjectContainer($sSourceFile,$sNamespace) ;
+			
 			try{
-				$this->compilers()->compile($aObjectContainer,$aCompiledFile->openWriter()) ;
+				$this->compile($aSourceFile->openReader(),$aCompiledFile->openWriter(),$aObjectContainer) ;
 			}
 			catch (\Exception $e)
 			{
-				throw new Exception("UI引擎在编译模板文件时遇到了错误: %s",$aCompiledFile->url(),$e) ;
+				throw new Exception("UI引擎在编译模板文件时遇到了错误: %s",$aSourceFile->url(),$e) ;
 			}
 		}
 		
 		return $aCompiledFile ;
+	}
+	
+	public function compile(IInputStream $aSourceInput,IOutputStream $aCompiledOutput,ObjectContainer $aObjectContainer=null)
+	{
+		if(!$aObjectContainer)
+		{
+			$aObjectContainer = new ObjectContainer() ;
+		}
+		
+		// 解析
+		$this->interpreters()->parse($aSourceInput,$aObjectContainer) ;
+		
+		// 编译
+		$this->compilers()->compile($aObjectContainer,$aCompiledOutput) ;
 	}
 	
 	public function render(IFile $aCompiledFile,IHashTable $aVariables=null,IOutputStream $aDevice=null)

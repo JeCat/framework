@@ -184,6 +184,14 @@ class Container extends Object implements IContainer
 		}
 		
 		$arrArgs = func_get_args() ;
+		$arrArgs[0] = $nPos ;
+		
+		call_user_func_array(array($this,'insertBeforeByPosition'),$arrArgs) ;
+	}
+	
+	public function insertBeforeByPosition($nPos=0,$_)
+	{
+		$arrArgs = func_get_args() ;
 		array_shift($arrArgs) ;
 	
 		foreach(array_values($arrArgs) as $nIdx=>$aInsObject)
@@ -192,20 +200,34 @@ class Container extends Object implements IContainer
 			{
 				$this->remove($aInsObject) ;
 			}
-			
+		
 			array_splice($this->arrObjects,$nPos+$nIdx,0,array($aInsObject)) ;
 			
 			$this->attach($aInsObject) ;
 		}
 	}
-	
+
 	public function insertAfter($object,$_)
+	{	
+		$nPos = array_search($object, $this->arrObjects,is_object($object)) ;
+		if($nPos===false)
+		{
+			return ;
+		}
+		
+		$arrArgs = func_get_args() ;
+		$arrArgs[0] = $nPos ;
+		
+		call_user_func_array(array($this,'insertAfterByPosition'),$arrArgs) ;
+	}
+	
+	public function insertAfterByPosition($nPos,$_)
 	{	
 		$arrArgs = func_get_args() ;
 		array_shift($arrArgs) ;
 	
 		// 最后一个
-		if( end($this->arrObjects) === $object )
+		if( count($this->arrObjects)-1 === $nPos )
 		{
 			foreach($arrArgs as $aInsObject)
 			{
@@ -219,13 +241,7 @@ class Container extends Object implements IContainer
 		}
 		
 		else 
-		{
-			$nPos = array_search($object, $this->arrObjects,is_object($object)) ;
-			if($nPos===false)
-			{
-				return ;
-			}
-		
+		{		
 			$nPos ++ ;
 			
 			foreach(array_values($arrArgs) as $nIdx=>$aInsObject)
