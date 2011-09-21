@@ -15,7 +15,9 @@ class Criteria implements IStatement {
 	 */
 	public function makeStatement($bFormat = false) {
 		$sStatement = $this->restriction()->makeStatement($bFormat);
-		
+		$sStatement .= ' ' . $this->order()->makeStatement($bFormat);
+		$sStatement .= ' ' . $this->limit();
+		return $sStatement;
 	}
 	
 	public function checkValid($bThrowException = true) {
@@ -32,12 +34,12 @@ class Criteria implements IStatement {
 	}
 	
 	public function setLimit($nLimitLen , $nLimitFrom = 0){
-		$this->nLimitLen = $nLimitLen;
-		$this->nLimitFrom = $nLimitFrom;
+		$this->setLimitLen($nLimitLen);
+		$this->setLimitFrom($nLimitFrom);
 	}
 	
 	public function limit(){
-		$sLimit = 'Limit ';
+		$sLimit = ' LIMIT ';
 		if($this->bEnableLimitStart and $this->nLimitFrom != 0){
 			$sLimit .= $this->nLimitFrom . ',';
 		}
@@ -46,7 +48,7 @@ class Criteria implements IStatement {
 	}
 	
 	public function setLimitFrom($nLimitFrom) {
-		if($this->bEnableLimitStart === true){
+		if($this->bEnableLimitStart === true OR $nLimitFrom == 0){
 			$this->nLimitFrom = (int)$nLimitFrom;
 		}else{
 			throw new Exception('在不允许使用limit from的情况下尝试设置from的值,请确保使用了合法的sql语句,或者检查是否忘记打开允许使用limit from的标记');
@@ -74,11 +76,15 @@ class Criteria implements IStatement {
 		$this->aOrder = $aOrder;
 	}
 	
+	/**
+	 * 
+	 * @return Order 
+	 */
 	public function order(){
 		if($this->aOrder != null){
 			return $this->aOrder;
 		}else{
-			return $this->aOrder = new Order($sColumn);
+			return $this->aOrder = new Order();
 		}
 	}
 	

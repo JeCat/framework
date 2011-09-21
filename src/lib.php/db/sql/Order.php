@@ -9,7 +9,7 @@ class Order implements IStatement {
 	 * @param string $sColumn 列名
 	 * @param boolean $bOrderType true代表ASC , false代表DESC ，默认为true
 	 */
-	public function __construct($sColumn , $bOrderType=true){
+	public function __construct($sColumn=null , $bOrderType=true){
 		$this->addColumn($sColumn , $bOrderType);
 	}
 	
@@ -30,8 +30,20 @@ class Order implements IStatement {
 		return new self($sColumn , false);
 	}
 	
+	/**
+	 * 增加一个需要排序的列
+	 * @param string $sColumn 列名
+	 * @param boolen $bOrderType 排序方式,true代表ASC , false代表DESC ，默认为true
+	 */
 	public function addColumn($sColumn , $bOrderType=true) {
-		$this->arrOrderBys[] = array($sColumn , $bOrderType);
+		if($sColumn === null){
+			return;
+		}
+		$sOrderType = 'ASC';
+		if(!$bOrderType){
+			$sOrderType = 'DESC';
+		}
+		$this->arrOrderBys[] = array($sColumn , $sOrderType);
 	}
 	
 	/**
@@ -61,12 +73,17 @@ class Order implements IStatement {
 	 * @see jc\db\sql.IStatement::makeStatement()
 	 */
 	public function makeStatement($bFormat=false){
-		$sOrderBy = 'ORDER BY ';
-		$arrOrderBys = '';
+		$sOrderBy = ' ORDER BY ';
+		$arrOrderBys = array();
+		//如果arrOrderBys中什么也没有,就返回空字符串 , 以此满足空Order对象的稳定(即什么也不做的Order,sql语句没有Order部分的情况)
+		if( count($this->arrOrderBys) <= 0 ){
+			return '';
+		}
+		//sql中有Order部分的情况
 		foreach ($this->arrOrderBys as $key=>$arrOrder){
 			$arrOrderBys[] = implode(' ', $arrOrder);
 		}
-		$sOrderBy .= implode(',', $arrOrderBys);
+		$sOrderBy .= implode(',' , $arrOrderBys);
 		return $sOrderBy;
 	}
 	
