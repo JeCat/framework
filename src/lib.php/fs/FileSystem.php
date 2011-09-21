@@ -290,7 +290,10 @@ abstract class FileSystem extends Object
 				// 如果文件不存在，且没有要求 self::CREATE_ONLY_OBJECT ，则创建之
 				if( !($nMode&self::CREATE_ONLY_OBJECT) and !$aFile->exists())
 				{
-					$aFile->create( $nMode );
+					if( !$aFile->create( $nMode ) )
+					{
+						throw new Exception('无法创建文件:%s',$sPath) ;
+					}
 				}
 				$this -> arrFSOFlyweights[$sFlyweightKey] =$aFile;
 			}
@@ -329,7 +332,7 @@ abstract class FileSystem extends Object
 				{
 					if( !$aFolder->create($nMode) )
 					{
-						return null;
+						throw new Exception('无法创建目录:%s',$sPath) ;
 					}
 				}
 				
