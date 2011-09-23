@@ -182,7 +182,7 @@ class Model extends AbstractModel implements IModel
 	
 	public function load($values=null,$keys=null)
 	{
-		if(!$values){
+		if($values){
 			if(!$keys){
 				$keys = $this->prototype()->primaryKeys() ;
 			}else{
