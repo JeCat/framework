@@ -11,6 +11,10 @@ use jc\system\Application;
 // 报告所有错误
 error_reporting(E_ALL & ~E_DEPRECATED) ;
 
+// 默认的时区
+date_default_timezone_set('Asia/Shanghai') ;
+
+
 // 预加载类(Before Class Loader)
 require_once __DIR__."/src/lib.php/lang/IObject.php" ;
 require_once __DIR__."/src/lib.php/lang/Object.php" ;
