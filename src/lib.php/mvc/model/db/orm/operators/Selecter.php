@@ -24,8 +24,6 @@ class Selecter extends OperationStrategy
 		{
 			$aSelect = new SelectForAssocQuery($aModel->prototype()) ;
 		}
-		
-		$aSelect->setLimit( $aModel->limitLength(), $aModel->limitFrom() ) ;
 	
 		// 设置主键查询条件
 		if( $aCriteria )
