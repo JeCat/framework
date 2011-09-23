@@ -1,8 +1,8 @@
 <?php
 namespace jc\mvc\model\db\orm\operators ;
 
+use jc\db\sql\Restriction;
 use jc\db\sql\Select;
-
 use jc\db\sql\IDataSettableStatement;
 use jc\mvc\model\db\orm\Association;
 use jc\db\sql\Criteria;
@@ -15,7 +15,7 @@ use jc\db\sql\Insert;
 
 abstract class OperationStrategy extends Object
 {
-	protected function setCondition(Criteria $aCriteria,$keys,$names=null,IModel $aDataSource,$sTableName='')
+	protected function setCondition(Restriction $aRestriction,$keys,$names=null,IModel $aDataSource,$sTableName='')
 	{
 		$keys = array_values((array)$keys) ;
 		if($names)
@@ -34,7 +34,7 @@ abstract class OperationStrategy extends Object
 		
 		foreach($keys as $idx=>$sKey)
 		{
-			$aCriteria->eq(
+			$aRestriction->eq(
 				"{$sTableName}`{$sKey}`"
 				, $aDataSource->data($names[$idx])
 			) ;
@@ -70,8 +70,8 @@ abstract class OperationStrategy extends Object
 	protected function buildBridge(DB $aDB,Association $aAssoPrototype,IModel $aFromModel,IModel $aToModel)
 	{
 		$aSelect = new Select($aAssoPrototype->bridgeTableName()) ;
-		$this->setCondition($aSelect->criteria(),$aAssoPrototype->bridgeToKeys(),$aAssoPrototype->fromKeys(),$aFromModel) ;
-		$this->setCondition($aSelect->criteria(),$aAssoPrototype->bridgeFromKeys(),$aAssoPrototype->toKeys(),$aFromModel) ;
+		$this->setCondition($aSelect->criteria()->restriction(),$aAssoPrototype->bridgeToKeys(),$aAssoPrototype->fromKeys(),$aFromModel) ;
+		$this->setCondition($aSelect->criteria()->restriction(),$aAssoPrototype->bridgeFromKeys(),$aAssoPrototype->toKeys(),$aFromModel) ;
 		
 		// 检查对应的桥接表记录是否存在
 		if( !$aDB->queryCount($aSelect) )

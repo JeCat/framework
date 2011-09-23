@@ -14,7 +14,7 @@ class Deleter extends OperationStrategy
 		$aDelete = new Delete($aModel->prototype()->tableName()) ;
 		
 		// 主键条件
-		$this->setCondition($aDelete->criteria(),$aPrototype->primaryKeys(),null,$aModel,$aPrototype->tableName()) ;
+		$this->setCondition($aDelete->criteria()->restriction(),$aPrototype->primaryKeys(),null,$aModel,$aPrototype->tableName()) ;
 		
 		// -----------------
 		foreach($aPrototype->associations() as $aAssoPrototype)
@@ -28,7 +28,7 @@ class Deleter extends OperationStrategy
 				$aDeleteForBridge = new Delete($sBridgeTable) ;
 				
 				// from表 条件
-				$this->setCondition($aDeleteForBridge->criteria(),$aAssoPrototype->fromKeys(),$aAssoPrototype->bridgeToKeys(),$aModel,$sBridgeTable) ;
+				$this->setCondition($aDeleteForBridge->criteria()->restriction(),$aAssoPrototype->fromKeys(),$aAssoPrototype->bridgeToKeys(),$aModel,$sBridgeTable) ;
 				
 				$aDB->execute($aDeleteForBridge->makeStatement()) ;
 			}

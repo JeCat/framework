@@ -42,8 +42,6 @@ class Model extends AbstractModel implements IModel
 	{
 		parent::__construct($bAggregation) ;
 		
-		$this->setLimit( $bAggregation? 30: 1 ) ;
-		
 		// orm config
 		if( is_array($prototype) )
 		{
@@ -75,6 +73,9 @@ class Model extends AbstractModel implements IModel
 		}
 		
 		$this->setPrototype($aPrototype) ;
+		
+		
+		$this->criteria()->setLimitLen( $bAggregation? 30: 1 ) ;
 	}
 
 	public function serialize ()
@@ -116,7 +117,7 @@ class Model extends AbstractModel implements IModel
 					$aChild->setAggregation(true) ;
 				}
 				
-				$aChild->setLimit( $aAssociation->count() ) ;
+				$aChild->criteria()->setLimit( $aAssociation->count() ) ;
 			}
 		}
 		
@@ -195,11 +196,11 @@ class Model extends AbstractModel implements IModel
 			if($values instanceof Criteria){
 				$this->aCriteria = $values;
 			}else if($values instanceof Restriction){
-				$aCriteria = $this->loadCriteria() ;
+				$aCriteria = $this->criteria() ;
 				$aCriteria->restriction()->add($values);
 			}else{
 				$values = array_values((array) $values) ;
-				$aCriteria = $this->loadCriteria() ;
+				$aCriteria = $this->criteria() ;
 				foreach($keys as $nIdx=>$sKey)
 				{
 					$aCriteria->restriction()->eq( $sKey, $values[$nIdx] ) ;
@@ -324,12 +325,15 @@ class Model extends AbstractModel implements IModel
 		}
 	}
 	
-	public function loadCriteria()
+	public function criteria()
 	{
 		if( !$this->aCriteria )
 		{
 			$this->aCriteria = new Criteria() ;
-			$this->aCriteria->setDefaultTable(
+			$this->aCriteria->setRestriction(
+				$aRestriction = new Restriction()
+			) ;
+			$aRestriction->setDefaultTable(
 				$this->prototype()->tableAlias()
 			) ;
 		}

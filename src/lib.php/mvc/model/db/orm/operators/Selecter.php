@@ -91,7 +91,7 @@ class Selecter extends OperationStrategy
 				$arrFromKeys = $aAssociation->fromKeys() ;
 				foreach($aAssociation->toKeys() as $nIdx=>$sKey)
 				{
-					$aCriteria->eq($sKey,$aModel->data($arrFromKeys[$nIdx])) ;
+					$aCriteria->restriction()->eq($sKey,$aModel->data($arrFromKeys[$nIdx])) ;
 				}
 				
 				// 加载 child 类

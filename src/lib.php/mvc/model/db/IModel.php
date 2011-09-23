@@ -19,7 +19,7 @@ interface IModel extends IModelBase
 	/**
 	 * @return jc\mvc\model\db\orm\Criteria;
 	 */
-	public function loadCriteria() ;
+	public function criteria() ;
 
 	
 	public function totalCount() ;
