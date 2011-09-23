@@ -39,6 +39,18 @@ class Composite extends Container implements IContainedable
 		return $this->aParent ;
 	}
 	
+	public function root()
+	{
+		$aParent = $aCurrent = $this ;
+		
+		while($aCurrent=$aParent->parent())
+		{
+			$aParent = $aCurrent ;
+		}
+		
+		return $aParent ;
+	}
+	
 	private $aParent = null ;
 }
 
