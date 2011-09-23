@@ -77,9 +77,9 @@ class PrototypeInFragment extends Prototype
 			if( $aAssociateBy=$this->associateBy() and $aAssociateBy->type()===Association::hasAndBelongsToMany )
 			{
 				// bridge 表到 to表的关联条件					
-				$aBridgeCriteria=new Criteria() ;
+				$aBridgeRestriction=new Restriction() ;
 				$this->setAssociationRestriction(
-						$aBridgeCriteria
+						$aBridgeRestriction
 						, $this->bridgeTableAlias(), $this->tableAlias()
 						, $aAssociateBy->bridgeFromKeys(), $aAssociateBy->toKeys()
 				) ;
@@ -88,7 +88,7 @@ class PrototypeInFragment extends Prototype
 				$aTableJoin = new TablesJoin() ;
 				$aTableJoin->addTable(
 						new Table($aAssociateBy->bridgeTableName(),$this->bridgeTableAlias())
-						, $aBridgeCriteria
+						, $aBridgeRestriction
 				) ;
 				$this->sqlTable()->addJoin($aTableJoin) ;
 			}
