@@ -21,14 +21,7 @@ interface IModel extends IModelBase
 	 */
 	public function criteria() ;
 
-	
 	public function totalCount() ;
-	
-//	public function setLimit($nLength=1,$nFrom=0) ;
-//	
-//	public function limitFrom() ;
-//	
-//	public function limitLength() ;
 }
 
 ?>
