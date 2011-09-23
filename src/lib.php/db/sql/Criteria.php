@@ -14,9 +14,17 @@ class Criteria implements IStatement {
 	 * @return string
 	 */
 	public function makeStatement($bFormat = false) {
-		$sStatement = $this->restriction()->makeStatement($bFormat);
-		$sStatement .= ' ' . $this->order()->makeStatement($bFormat);
-		$sStatement .= ' ' . $this->limit();
+		if($this->aRestriction)
+		{
+			$sStatement = ' WHERE ' . $this->aRestriction->makeStatement($bFormat);
+		}
+		if( $this->aOrder )
+		{
+			$sStatement .= ' ' . $this->aOrder->makeStatement($bFormat);
+		}
+		
+		$sStatement .= ' ' . $this->makeStatementLimit() ;
+		
 		return $sStatement;
 	}
 	
@@ -45,7 +53,7 @@ class Criteria implements IStatement {
 		$this->setLimitFrom($nLimitFrom);
 	}
 	
-	public function limit(){
+	public function makeStatementLimit($bFormat = false){
 		if($this->nLimitLen === -1){
 			return '';
 		}
@@ -74,12 +82,15 @@ class Criteria implements IStatement {
 		$this->aRestriction = $aRestriction;
 	}
 	
-	public function restriction(){
-		if($this->aRestriction != null){
-			return $this->aRestriction;
-		}else{
-			return $this->aRestriction = new Restriction();
+	/**
+	 * @return Restriction
+	 */
+	public function restriction($bCreate=true){
+		if( !$this->aRestriction and $bCreate )
+		{
+			$this->aRestriction = new Restriction();
 		}
+		return $this->aRestriction ;
 	}
 	
 	public function setOrder(Order $aOrder){

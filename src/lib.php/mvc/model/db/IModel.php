@@ -7,6 +7,8 @@ use jc\mvc\model\IModel as IModelBase ;
 
 interface IModel extends IModelBase
 {
+	public function __construct($prototype=null) ;
+	
 	/**
 	 * @return jc\mvc\model\db\orm\PrototypeInFragment
 	 */
@@ -19,7 +21,7 @@ interface IModel extends IModelBase
 	/**
 	 * @return jc\mvc\model\db\orm\Criteria;
 	 */
-	public function criteria() ;
+	public function criteria($bAutoCreate=true) ;
 
 	public function totalCount() ;
 }

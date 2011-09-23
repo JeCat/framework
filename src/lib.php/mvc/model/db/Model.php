@@ -62,11 +62,6 @@ class Model extends AbstractModel implements IModel
 			) ;
 		}
 		
-		else if( $prototype===null )
-		{
-			$aPrototype = null ;
-		}
-		
 		else 
 		{
 			throw new Exception("创建模型时传入的模型原型类型无效") ;
@@ -325,16 +320,21 @@ class Model extends AbstractModel implements IModel
 		}
 	}
 	
-	public function criteria()
+	public function criteria($bAutoCreate=true)
 	{
-		if( !$this->aCriteria )
+		if( !$this->aCriteria and $bAutoCreate )
 		{
 			$this->aCriteria = new Criteria() ;
 			$this->aCriteria->setRestriction(
 				$aRestriction = new Restriction()
 			) ;
+			
+			if(!$this->aPrototype)
+			{
+				throw new Exception("无效的db\\Model,缺少原型对象") ;
+			}
 			$aRestriction->setDefaultTable(
-				$this->prototype()->tableAlias()
+				$this->aPrototype->tableAlias()
 			) ;
 		}
 		
