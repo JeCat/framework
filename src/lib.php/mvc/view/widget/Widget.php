@@ -107,16 +107,9 @@ class Widget extends Object implements IViewWidget
 		if(!$aVariables)
 		{
 			$aVariables = new HashTable() ;
-			$aVariables->set("theWidget", $this) ;			
-			$aUI->display($sTemplateName,$aVariables,$aDevice) ;
 		}
 
-		else 
-		{
-			$aOldVal = $aVariables->set("theWidget", $this) ;			
-			$aUI->display($sTemplateName,$aVariables,$aDevice) ;			
-			$aVariables->set("theWidget", $aOldVal) ;
-		}
+		$aUI->display($sTemplateName,$aVariables,$aDevice) ;	
 	}
 
 	/**

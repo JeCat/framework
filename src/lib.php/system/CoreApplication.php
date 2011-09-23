@@ -37,7 +37,7 @@ class CoreApplication extends Object
     }
 
 	/**
-     * @return IRequest
+     * @return Request
      */
     public function request ()
     {
