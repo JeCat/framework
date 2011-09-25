@@ -4,7 +4,7 @@ namespace jc\setting ;
 use jc\lang\Object;
 
 abstract class Setting extends Object implements ISetting
-{	
+{
 	/**
 	 * @return \Iterator 
 	 */
@@ -35,13 +35,13 @@ abstract class Setting extends Object implements ISetting
 		return $aKey->itemIterator() ;
 	}
 	
-	public function item($sPath,$sName='*')
+	public function item($sPath,$sName='*',$defaultValue=null)
 	{
 		if(!$aKey = $this->key($sPath))
 		{
 			return null ;			
 		}
-		return $aKey->item($sName) ;
+		return $aKey->item($sName,$defaultValue) ;
 	}
 	
 	public function setItem($sPath,$sName,$value)
