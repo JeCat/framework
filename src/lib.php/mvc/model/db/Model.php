@@ -42,7 +42,7 @@ class Model extends AbstractModel implements IModel
 	{
 		parent::__construct($bAggregation) ;
 		
-		$this->setLimit( $bAggregation? 30: 1 ) ;
+		$this->loadCriteria()->setLimit( $bAggregation? 30: 1 ) ;
 		
 		// orm config
 		if( is_array($prototype) )
@@ -328,8 +328,8 @@ class Model extends AbstractModel implements IModel
 	{
 		if( !$this->aCriteria )
 		{
-			$this->aCriteria = new Criteria() ;
-			$this->aCriteria->setDefaultTable(
+			$this->aCriteria = new Criteria(new Restriction()) ;
+			$this->aCriteria->restriction()->setDefaultTable(
 				$this->prototype()->tableAlias()
 			) ;
 		}

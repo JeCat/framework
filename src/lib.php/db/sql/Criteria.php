@@ -7,6 +7,11 @@ use jc\db\sql\Restriction;
 use jc\db\sql\Order;
 
 class Criteria implements IStatement {
+	public function __construct(Restriction $aRestriction = null){
+		if($aRestriction !== null){
+			$this->setRestriction($aRestriction);
+		}
+	}
 	/**
 	 * 把所有条件拼接成字符串,相当于把这个对象字符串化
 	 * 
@@ -68,7 +73,6 @@ class Criteria implements IStatement {
 	public function setLimitLen($nLimitLen){
 		$this->nLimitLen = $nLimitLen;
 	}
-	
 	
 	public function setRestriction(Restriction $aRestriction){
 		$this->aRestriction = $aRestriction;
