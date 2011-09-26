@@ -38,7 +38,7 @@ interface IKey
 	public function itemIterator() ;
 	
 	/**
-	 *  获得所有键的名字的迭代器
+	 * 获得所有键的名字的迭代器
 	 * @return \Iterator 
 	 */
 	public function keyIterator() ;

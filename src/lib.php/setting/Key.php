@@ -24,7 +24,7 @@ abstract class Key extends Object implements IKey
 	
 	public function setItem($sName,$value)
 	{
-		if( array_key_exists($sName,$this->arrItems) and $this->arrItems[$sName]!==$value)
+		if( !array_key_exists($sName,$this->arrItems) or $this->arrItems[$sName]!==$value)
 		{
 			$this->bDataChanged = true ;
 		}

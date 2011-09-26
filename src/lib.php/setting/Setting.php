@@ -48,9 +48,9 @@ abstract class Setting extends Object implements ISetting
 	{
 		if(!$aKey = $this->key($sPath))
 		{
-			return null ;			
+			$aKey = $this->createKey($sPath);
 		}
-		return $aKey->setItem($sName,$value) ;
+		$aKey->setItem($sName,$value) ;
 	}
 	
 	public function hasItem($sPath,$sName)

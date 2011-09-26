@@ -19,7 +19,6 @@ interface ISetting
 	 */
 	public function keyIterator($sPath) ;
 	
-	
 	public function item($sPath,$sName='*',$defaultValue=null) ;
 	
 	public function setItem($sPath,$sName,$value) ;
