@@ -20,7 +20,7 @@ class Updater extends OperationStrategy
 			$aUpdate->setData($sClmName,$aModel->data($sClmName)) ;
 		}
 		
-		$this->setCondition($aUpdate->criteria(), $aPrototype->primaryKeys(), null, $aModel) ;
+		$this->setCondition($aUpdate->criteria()->restriction(), $aPrototype->primaryKeys(), null, $aModel) ;
 		
 		$aDB->execute( $aUpdate ) ;
 		

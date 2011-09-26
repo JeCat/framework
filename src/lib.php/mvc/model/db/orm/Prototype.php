@@ -221,8 +221,7 @@ class Prototype extends Object implements \Serializable
 			throw new Exception("%s 不是一个有效的Model类（必须实现 jc\mvc\model\db\IModel 接口）",$sClassName) ;
 		}
 		
-		$aModel = new $sClassName() ;
-		$aModel->setPrototype($this) ;
+		$aModel = new $sClassName($this) ;
 		
 		return $aModel ;
 	}

@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\model\db\orm\operators ;
 
+use jc\db\sql\Restriction;
+
 use jc\db\sql\TablesJoin;
 
 use jc\db\sql\Table;
@@ -24,8 +26,6 @@ class Selecter extends OperationStrategy
 		{
 			$aSelect = new SelectForAssocQuery($aModel->prototype()) ;
 		}
-		
-		$aSelect->setLimit( $aModel->limitLength(), $aModel->limitFrom() ) ;
 	
 		// 设置主键查询条件
 		if( $aCriteria )
@@ -91,7 +91,7 @@ class Selecter extends OperationStrategy
 				$arrFromKeys = $aAssociation->fromKeys() ;
 				foreach($aAssociation->toKeys() as $nIdx=>$sKey)
 				{
-					$aCriteria->eq($sKey,$aModel->data($arrFromKeys[$nIdx])) ;
+					$aCriteria->restriction()->eq($sKey,$aModel->data($arrFromKeys[$nIdx])) ;
 				}
 				
 				// 加载 child 类
@@ -112,7 +112,7 @@ class Selecter extends OperationStrategy
 				$sBridgeTableAlias = $aAssociation->toPrototype()->bridgeTableAlias() ;
 				foreach($aAssociation->bridgeToKeys() as $nIdx=>$sKey)
 				{
-					$aSelect->criteria()->eq("`{$sBridgeTableAlias}`.`{$sKey}`",$aModel->data($arrFromKeys[$nIdx])) ;
+					$aSelect->criteria()->restriction()->eq("`{$sBridgeTableAlias}`.`{$sKey}`",$aModel->data($arrFromKeys[$nIdx])) ;
 				}
 				
 				// 加载 child 类

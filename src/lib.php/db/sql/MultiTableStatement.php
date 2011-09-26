@@ -25,9 +25,9 @@ abstract class MultiTableStatement extends Statement
 	/**
 	 * @return Criteria
 	 */
-	public function criteria()
+	public function criteria($bCreate=true)
 	{
-		if(!$this->aCriteria)
+		if( !$this->aCriteria and $bCreate )
 		{
 			$this->aCriteria = $this->createCriteria() ;
 		}
@@ -51,7 +51,7 @@ abstract class MultiTableStatement extends Statement
 	
 		if($this->aCriteria)
 		{
-			$sStatement.= " WHERE " . $this->aCriteria->makeStatement($bFormat) ;
+			$sStatement.= $this->aCriteria->makeStatement($bFormat) ;
 		}
 		
 		return $sStatement ;
@@ -68,18 +68,6 @@ abstract class MultiTableStatement extends Statement
 			}
 			
 			return ' ' . implode(", ",$arrTables) ;
-		}
-	}
-	
-	public function makeStatementLimit($bFormat=false)
-	{
-		if($this->nLimitLen!==null)
-		{
-			return " LIMIT " . $this->nLimitLen ;
-		}
-		else
-		{
-			return '' ;
 		}
 	}
 	

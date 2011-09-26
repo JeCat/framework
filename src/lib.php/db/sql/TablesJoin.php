@@ -33,19 +33,19 @@ class TablesJoin extends SubStatement
 		return $this->sType ;
 	}
 	
-	public function addTable($table,$criteria=null)
+	public function addTable($table,$restriction=null)
 	{
 		$this->arrTables[] = $table ;
 		
-		if($criteria)
+		if($restriction)
 		{
-			if( is_string($criteria) )
+			if( is_string($restriction) )
 			{
-				$this->criteria()->expression($criteria) ;
+				$this->restriction()->expression($restriction) ;
 			}
-			else if( $criteria instanceof Criteria )
+			else if( $restriction instanceof Restriction )
 			{
-				$this->criteria()->add($criteria) ;
+				$this->restriction()->add($restriction) ;
 			}
 		}
 	}
@@ -76,17 +76,26 @@ class TablesJoin extends SubStatement
 			$arrTables[] = ($table instanceof Table)? $table->makeStatement($bFormat): "`{$table}`" ;
 		}
 		
-		return $this->sType . "( " . implode(", ",$arrTables)
-					. " ) ON " . $this->aCriteria->makeStatement($bFormat) ;
+		$sSql = $this->sType . "( " . implode(", ",$arrTables) . " )" ;
+		
+		if( $this->aRestriction )
+		{
+			$sSql.= " ON " . $this->aRestriction->makeStatement($bFormat) ;
+		}
+		
+		return $sSql ;
 	}
 	
-	public function criteria()
+	/**
+	 * @return Restriction
+	 */
+	public function restriction()
 	{
-		if(!$this->aCriteria)
+		if(!$this->aRestriction)
 		{
-			$this->aCriteria = new Criteria() ;
+			$this->aRestriction = new Restriction() ;
 		}
-		return $this->aCriteria ;
+		return $this->aRestriction ;
 	}
 	
 	/**
@@ -108,7 +117,7 @@ class TablesJoin extends SubStatement
 	 * 
 	 * @var array
 	 */
-	private $aCriteria = null ;
+	private $aRestriction = null ;
 }
 
 ?>

@@ -9,7 +9,7 @@ class PrintStream extends OutputStream
 
 	public function __destruct()
 	{}
-	
+		
 	public function printstr($sBytes)
 	{
 		$this->write($sBytes) ;

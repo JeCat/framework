@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\model\db\orm ;
 
+use jc\db\sql\Restriction;
+
 use jc\db\sql\Criteria;
 use jc\db\sql\TablesJoin;
 use jc\db\sql\Table;
@@ -75,9 +77,9 @@ class PrototypeInFragment extends Prototype
 			if( $aAssociateBy=$this->associateBy() and $aAssociateBy->type()===Association::hasAndBelongsToMany )
 			{
 				// bridge 表到 to表的关联条件					
-				$aBridgeCriteria=new Criteria() ;
-				$this->setAssociationCriteria(
-						$aBridgeCriteria
+				$aBridgeRestriction=new Restriction() ;
+				$this->setAssociationRestriction(
+						$aBridgeRestriction
 						, $this->bridgeTableAlias(), $this->tableAlias()
 						, $aAssociateBy->bridgeFromKeys(), $aAssociateBy->toKeys()
 				) ;
@@ -86,7 +88,7 @@ class PrototypeInFragment extends Prototype
 				$aTableJoin = new TablesJoin() ;
 				$aTableJoin->addTable(
 						new Table($aAssociateBy->bridgeTableName(),$this->bridgeTableAlias())
-						, $aBridgeCriteria
+						, $aBridgeRestriction
 				) ;
 				$this->sqlTable()->addJoin($aTableJoin) ;
 			}
@@ -105,7 +107,7 @@ class PrototypeInFragment extends Prototype
 					
 					// build sql table join by association
 					$aTableJoin = new TablesJoin() ;
-					$aTableJoin->addTable($aAssoc->toPrototype()->sqlTable(),$this->createAssociationCriteria($aAssoc)) ;
+					$aTableJoin->addTable($aAssoc->toPrototype()->sqlTable(),$this->createAssociationRestriction($aAssoc)) ;
 					$this->aTable->addJoin($aTableJoin) ;
 				}
 			}
@@ -118,28 +120,28 @@ class PrototypeInFragment extends Prototype
 	 * create criteria object for "join on" 
 	 * @return jc\db\sql\Criteria
 	 */
-	protected function createAssociationCriteria(Association $aAssoc)
+	protected function createAssociationRestriction(Association $aAssoc)
 	{
-		$aCriteria = new Criteria() ;
+		$aRestriction = new Restriction() ;
 		
 		$arrToKeys = $aAssoc->toKeys() ;
 		foreach($aAssoc->fromKeys() as $nKeyIdx=>$sFromKey)
 		{
-			$aCriteria->expression(
+			$aRestriction->expression(
 				$aAssoc->fromPrototype()->columnName($sFromKey)
 				. '='
 				. $aAssoc->toPrototype()->columnName($arrToKeys[$nKeyIdx])
 			) ;
 		}
 		
-		return $aCriteria ;
+		return $aRestriction ;
 	}
 
-	protected function setAssociationCriteria(Criteria $aCriteria,$sFromTable,$sToTable,array $arrFromKeys,array $arrToKeys)
+	protected function setAssociationRestriction(Restriction $aRestriction,$sFromTable,$sToTable,array $arrFromKeys,array $arrToKeys)
 	{
 		foreach($arrFromKeys as $nIdx=>$sFromKey)
 		{
-			$aCriteria->expression( "`{$sFromTable}`.`{$sFromKey}` = `{$sToTable}`.`{$arrToKeys[$nIdx]}`" ) ;
+			$aRestriction->expression( "`{$sFromTable}`.`{$sFromKey}` = `{$sToTable}`.`{$arrToKeys[$nIdx]}`" ) ;
 		}
 	}
 	

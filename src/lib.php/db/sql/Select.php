@@ -17,7 +17,7 @@ class Select extends MultiTableStatement
 	{
 		parent::__construct($sTableName,$sTableAlias) ;
 		
-		parent::setLimit(30) ;
+		$this->criteria()->setLimit(30) ;
 	}
 	
 	public function makeStatementForCount($sCntClmName='rowCount',$bFormat=false)
@@ -86,21 +86,6 @@ class Select extends MultiTableStatement
 		$aCriteria->setEnableLimitStart(true);
 		return $aCriteria;
 	}
-
-//	public function setLimit($nLen=null,$nFrom=null)
-//	{
-//		parent::setLimit($nLen) ;
-//		
-//		if($nFrom!==null)
-//		{
-//			$this->nLimitFrom = intval($nFrom) ;
-//		}
-//	}
-	
-//	public function limitFrom()
-//	{
-//		return $this->nLimitFrom ;
-//	}
 	
 	private $arrColumns = array() ;
 	
@@ -125,9 +110,6 @@ class Select extends MultiTableStatement
 	 * @var int
 	 */
 	private $nPredicateTopLen = 30 ;
-	
-	
-//	private $nLimitFrom = 0 ;
 }
 
 ?>

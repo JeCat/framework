@@ -32,13 +32,10 @@ class Update extends MultiTableStatement implements IDataSettableStatement
 		
 		$sStatement.= implode(", ", $arrValues) ;
 		
-		if( $aCriteria )
+		if( $aCriteria=$this->criteria(false) )
 		{
-			$sStatement.= ' WHERE ' . $aCriteria->makeStatement($bFormat) ;
+			$sStatement.= ' ' . $aCriteria->makeStatement($bFormat) ;
 		}
-		
-		// limit
-//		$sStatement.= $this->makeStatementLimit($bFormat) ;
 			
 		return $sStatement ;
 	}

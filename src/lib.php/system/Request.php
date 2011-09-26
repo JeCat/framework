@@ -6,6 +6,19 @@ use jc\util\DataSrc ;
 
 class Request extends DataSrc
 {
+	public function get($sName,$default=null)
+	{
+		$value = parent::get($sName);
+		
+		if( $value===null and $default!==null )
+		{
+			$value = $default ;
+			$this->set($sName,$value) ;
+		}
+		
+		return $value ;
+	}
+	
 	/**
 	 * @return IFilterMangeger
 	 */

@@ -64,17 +64,15 @@ class Model extends AbstractModel implements IModel
 			) ;
 		}
 		
-		else if( $prototype===null )
-		{
-			$aPrototype = null ;
-		}
-		
 		else 
 		{
 			throw new Exception("创建模型时传入的模型原型类型无效") ;
 		}
 		
 		$this->setPrototype($aPrototype) ;
+		
+		
+		$this->criteria()->setLimitLen( $bAggregation? 30: 1 ) ;
 	}
 
 	public function serialize ()
@@ -116,7 +114,7 @@ class Model extends AbstractModel implements IModel
 					$aChild->setAggregation(true) ;
 				}
 				
-				$aChild->setLimit( $aAssociation->count() ) ;
+				$aChild->criteria()->setLimit( $aAssociation->count() ) ;
 			}
 		}
 		
@@ -186,7 +184,7 @@ class Model extends AbstractModel implements IModel
 	
 	public function load($values=null,$keys=null)
 	{
-		if(!$values){
+		if($values){
 			if(!$keys){
 				$keys = $this->prototype()->primaryKeys() ;
 			}else{
@@ -195,11 +193,11 @@ class Model extends AbstractModel implements IModel
 			if($values instanceof Criteria){
 				$this->aCriteria = $values;
 			}else if($values instanceof Restriction){
-				$aCriteria = $this->loadCriteria() ;
+				$aCriteria = $this->criteria() ;
 				$aCriteria->restriction()->add($values);
 			}else{
 				$values = array_values((array) $values) ;
-				$aCriteria = $this->loadCriteria() ;
+				$aCriteria = $this->criteria() ;
 				foreach($keys as $nIdx=>$sKey)
 				{
 					$aCriteria->restriction()->eq( $sKey, $values[$nIdx] ) ;
@@ -324,13 +322,21 @@ class Model extends AbstractModel implements IModel
 		}
 	}
 	
-	public function loadCriteria()
+	public function criteria($bAutoCreate=true)
 	{
-		if( !$this->aCriteria )
+		if( !$this->aCriteria and $bAutoCreate )
 		{
-			$this->aCriteria = new Criteria(new Restriction()) ;
-			$this->aCriteria->restriction()->setDefaultTable(
-				$this->prototype()->tableAlias()
+			$this->aCriteria = new Criteria() ;
+			$this->aCriteria->setRestriction(
+				$aRestriction = new Restriction()
+			) ;
+			
+			if(!$this->aPrototype)
+			{
+				throw new Exception("无效的db\\Model,缺少原型对象") ;
+			}
+			$aRestriction->setDefaultTable(
+				$this->aPrototype->tableAlias()
 			) ;
 		}
 		

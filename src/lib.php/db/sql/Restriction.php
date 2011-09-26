@@ -1,7 +1,7 @@
 <?php
 namespace jc\db\sql;
 
-class Restriction extends SubStatement {
+class Restriction extends Statement {
 	/**
 	 * 把所有条件拼接成字符串,相当于把这个对象字符串化
 	 * 
@@ -13,12 +13,16 @@ class Restriction extends SubStatement {
 		$arrExpressions = array ();
 		foreach ( $this->arrExpressions as $express ) {
 			if ($express instanceof Restriction) {
-				$arrExpressions [] = '( ' . $express->makeStatement ( $bFormat = false ) . ' )';
+				$sExpress = $express->makeStatement ($bFormat) ;
+				if($sExpress!='1')
+				{
+					$arrExpressions[] = $sExpress ;
+				}
 			} else {
 				$arrExpressions [] = $express;
 			}
 		}
-		return implode ( $this->sLogic, $arrExpressions );
+		return empty($arrExpressions)? '1': ('('.implode($this->sLogic,$arrExpressions).')');
 	}
 	
 	public function checkValid($bThrowException = true) {

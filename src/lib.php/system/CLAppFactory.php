@@ -20,7 +20,7 @@ class CLAppFactory extends ApplicationFactory
 	
 	public function createResponse(CoreApplication $aApp)
 	{
-		$aPrinter = new \jc\io\PrintStream() ;
+		$aPrinter = new \jc\io\ShellPrintStream() ;
 		$aPrinter->setApplication($aApp) ;
 		
 		$aRespn = parent::createResponse($aApp,$aPrinter) ;

@@ -20,6 +20,9 @@ class HttpAppFactory extends ApplicationFactory
 	
 	public function createResponse(CoreApplication $aApp)
 	{
+		// 向客户端发送有效的编码		
+		header("Content-type: text/html; charset=UTF-8");
+
 		$aPrinter = new \jc\io\HtmlPrintStream() ;
 		$aPrinter->setApplication($aApp) ;
 		

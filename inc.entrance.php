@@ -8,11 +8,12 @@ use jc\mvc\view\Webpage;
 use jc\ui\xhtml\Factory;
 use jc\system\Application;
 
-// 设置编码
-header("Content-type: text/html; charset=UTF-8");
-
 // 报告所有错误
 error_reporting(E_ALL & ~E_DEPRECATED) ;
+
+// 默认的时区
+date_default_timezone_set('Asia/Shanghai') ;
+
 
 // 预加载类(Before Class Loader)
 require_once __DIR__."/src/lib.php/lang/IObject.php" ;

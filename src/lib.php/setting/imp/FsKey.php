@@ -42,11 +42,6 @@ class FsKey extends Key
 		) ;
 	}
 	
-	public function __destruct()
-	{
-		$this->save() ;
-	}
-	
 	/**
 	 * @var jc\fs\IFolder
 	 */

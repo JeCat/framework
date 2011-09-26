@@ -22,8 +22,13 @@ abstract class Key extends Object implements IKey
 		return $this->arrItems[$sName] ; 
 	}
 	
-	public function setItem($value,$sName)
+	public function setItem($sName,$value)
 	{
+		if( !array_key_exists($sName,$this->arrItems) or $this->arrItems[$sName]!==$value)
+		{
+			$this->bDataChanged = true ;
+		}
+		
 		$this->arrItems[$sName] = $value ;
 	}
 	
@@ -42,7 +47,15 @@ abstract class Key extends Object implements IKey
 	 */
 	public function itemIterator()
 	{
-		return new \ArrayIterator( array_keys($this->Items) ) ;
+		return new \ArrayIterator( array_keys($this->arrItems) ) ;
+	}
+	
+	public function __destruct()
+	{
+		if( $this->bDataChanged )
+		{
+			$this->save() ;
+		}
 	}
 	
 	protected $arrItems = array() ;
