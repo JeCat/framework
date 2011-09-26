@@ -42,7 +42,7 @@ class Model extends AbstractModel implements IModel
 	{
 		parent::__construct($bAggregation) ;
 		
-		$this->loadCriteria()->setLimit( $bAggregation? 30: 1 ) ;
+		//$this->criteria()->setLimit( $bAggregation? 30: 1 ) ;
 		
 		// orm config
 		if( is_array($prototype) )
