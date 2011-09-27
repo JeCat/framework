@@ -106,7 +106,7 @@ class WidgetCompiler extends NodeCompiler
 		// 使用 <widget> 节点内部的模板内容
 		else
 		{
-			$aDev->write("	{$sOldWidgetVarVarName}=\$aVariables->get('theWidget',{$sWidgetVarName}) ;") ;
+			$aDev->write("	{$sOldWidgetVarVarName}=\$aVariables->get('theWidget') ;") ;
 			$aDev->write("	\$aVariables->set('theWidget',{$sWidgetVarName}) ;") ;
 		
 			$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
