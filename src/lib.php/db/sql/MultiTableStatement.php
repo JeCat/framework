@@ -23,29 +23,17 @@ abstract class MultiTableStatement extends Statement
 	/**
 	 * @return Criteria
 	 */
-	public function criteria($bCreate=true)
+	public function criteria($bAutoCreate=true)
 	{
-		if( !$this->aCriteria and $bCreate )
+		if( !$this->aCriteria and $bAutoCreate )
 		{
-			$this->aCriteria = $this->createCriteria() ;
+			$this->aCriteria = $this->statementFactory()->createCriteria() ;
 		}
 		return $this->aCriteria ;
-	}
-	
-	public function createCriteria(){
-		$aCriteria = new Criteria();
-		$aCriteria->setNameTransfer($this->nameTransfer()) ;
-		return $aCriteria ;
 	}
 
 	public function setCriteria(Criteria $aCriteria)
 	{
-		if($this->aCriteria)
-		{
-			$this->aCriteria->setStatement(null) ;
-		}
-		$aCriteria->setStatement($this) ;
-		
 		$this->aCriteria = $aCriteria ;
 	}
 
@@ -97,7 +85,7 @@ abstract class MultiTableStatement extends Statement
 	 */
 	public function createTable($sName,$sAlias=null,$bAdd=true)
 	{
-		$aTable = Table::createInstance($this,$sName,$sAlias) ;
+		$aTable = $this->statementFactory()->createTable($sName,$sAlias) ;
 		if($bAdd)
 		{
 			$this->addTable($aTable) ;

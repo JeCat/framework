@@ -9,16 +9,11 @@ class Order extends SubStatement
 	 * @param string $sColumn 列名
 	 * @param boolean $bOrderType true代表ASC , false代表DESC ，默认为true
 	 */
-	static public function createInstance(Statement $aStatement=null,$sColumn=null,$bOrderType=true)
-	{
-		$aSubStatement = new self($aStatement) ;
-	
+	public function __construct($sColumn=null , $bOrderType=true){
 		if($sColumn)
 		{
-			$this->addColumn($sColumn,$bOrderType);			
+			$this->add($sColumn,$bOrderType) ;
 		}
-		
-		return $aSubStatement ;
 	}
 	
 	/**
@@ -26,16 +21,16 @@ class Order extends SubStatement
 	 * @param string $sColumn 列名
 	 * @return self 
 	 */
-	static public function asc(Statement $aStatement,$sColumn){
-		return self::createInstance($aStatement,$sColumn);
+	static public function asc($sColumn){
+		return new self($sColumn);
 	}
 	/**
 	 * 获得一个order实例,按照所给参数生成OrderBy语句,降序
 	 * @param string $sColumn 列名
 	 * @return self 
 	 */
-	static public function decs(Statement $aStatement,$sColumn){
-		return self::createInstance($aStatement,$sColumn,false);
+	static public function decs($sColumn){
+		return new self($sColumn,false);
 	}
 	
 	/**
@@ -43,30 +38,24 @@ class Order extends SubStatement
 	 * @param string $sColumn 列名
 	 * @param boolen $bOrderType 排序方式,true代表ASC , false代表DESC ，默认为true
 	 */
-	public function addColumn($sColumn , $bOrderType=true) {
+	public function add($sColumn , $bOrderType=true) {
 		if($sColumn === null){
 			return;
 		}
+		
 		$sOrderType = 'ASC';
 		if(!$bOrderType){
 			$sOrderType = 'DESC';
 		}
-		$this->arrOrderBys[] = array($sColumn , $sOrderType);
+		$this->arrOrderBys[$sColumn] = array($this->transColumn($sColumn) , $sOrderType);
 	}
 	
 	/**
 	 * 根据提供的列名删除相应的OrderBy语句
 	 * @param unknown_type $sColumn
-	 * @return boolen 删除成功返回true,删除失败或者没有这个列名所对应的orderby语句则返回false
 	 */	
 	public function removeColumn($sColumn) {
-		foreach ($this->arrOrderBys as $key=>$Order){
-			if($Order[0] === $sColumn){
-				unset($this->arrOrderBys[$key]);
-				return true;
-			}
-		}
-		return false;
+		reset($this->arrOrderBys[$sColumn]) ;
 	}
 	
 	public function clearColumns() {

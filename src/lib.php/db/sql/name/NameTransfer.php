@@ -50,6 +50,19 @@ class NameTransfer
 		
 		return $this->$sProperty ;
 	}
+
+	/**
+	 * 确保字符串被反引号包围 (如果字符串没有反引号包围 , 用反引号包围字符串)
+	 * @param string 需要加上反引号的字符串
+	 * @return string 加上反引号后的字符串
+	 */
+	static public function makeSureBackQuote($sName) {
+		if (substr ( $sName, 0, 1 ) == "`" and substr ( $sName, - 1, 1 ) == "`") {
+			return $sName;
+		}else{
+			return "`" . $sName . "`";
+		}
+	}
 	
 	private $aColumnNameFilter ;
 	

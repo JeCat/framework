@@ -3,26 +3,10 @@ namespace jc\db\sql ;
 
 class Table extends SubStatement
 {
-	static public function createInstance(Statement $aStatement=null,$sTableName,$sAlias=null)
+	public function __construct($sTableName,$sAlias=null)
 	{
-		$aTable = new Table($aStatement) ;
-		$aTable->sTableName = $sTableName ;
-		$aTable->sAlias = $sAlias?:$sTableName ;
-		
-		return $aTable ;
-	}
-
-	public function setStatement(Statement $aStatement=null)
-	{
-		parent::setStatement($aStatement) ;
-	
-		foreach ($this->arrJoinSubStatements as $aJoin)
-		{
-			if( $aJoin instanceof SubStatement )
-			{
-				$aJoin->setStatement($aStatement) ;
-			}
-		}
+		$this->sTableName = $sTableName ;
+		$this->sAlias = $sAlias?:$sTableName ;
 	}
 	
 	public function makeStatement($bFormat=false)

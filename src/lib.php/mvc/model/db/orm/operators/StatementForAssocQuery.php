@@ -36,7 +36,7 @@ abstract class StatementForAssocQuery extends Statement
 		if( !$aAssocBy=$aPrototype->associateBy() or !$aAssocBy->isOneToOne() )
 		{
 			$aStatement = $this->realStatement() ;
-			$aStatement->addTable( $aPrototype->sqlTable($aStatement) ) ;
+			$aStatement->addTable( $aPrototype->sqlTable() ) ;
 		}
 	}
 	
@@ -60,15 +60,9 @@ abstract class StatementForAssocQuery extends Statement
 		if(!$this->aStatement)
 		{
 			$this->aStatement = $this->createRealStatement() ;
-			$this->aStatement->nameTransfer(true)->addColumnNameHandle(array(__CLASS__,'columnNameTransfer'),(array)$this->aPrototype) ;
 		}
 		
 		return $this->aStatement ;
-	}
-	
-	static public function columnNameTransfer($sColumnName,PrototypeInFragment $aPrototype)
-	{
-		echo $sColumnName, "\r\n" ;
 	}
 	
 	/**

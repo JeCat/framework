@@ -339,7 +339,12 @@ class Model extends AbstractModel implements IModel
 	{
 		if( !$this->aCriteria and $bAutoCreate )
 		{
-			$this->aCriteria = Criteria::createInstance() ;
+			if(!$this->aPrototype)
+			{
+				throw new Exception("无效的db\\Model,缺少原型对象") ;
+			}
+			
+			$this->aCriteria = $this->aPrototype->sqlFactory()->createCriteria() ;
 		}
 		
 		return $this->aCriteria ;

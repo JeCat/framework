@@ -1,20 +1,14 @@
 <?php
 namespace jc\db\sql;
 
+use jc\db\sql\name\NameTransfer;
+
 class Restriction extends SubStatement
 {
-	public function setStatement(Statement $aStatement=null)
+	public function __construct($bLogic=true)
 	{
-		parent::setStatement($aStatement) ;
-	
-		foreach ($this->arrExpressions as $expression)
-		{
-			if( $expression instanceof SubStatement )
-			{
-				$expression->setStatement($aStatement) ;
-			}
-		}
-	}
+		$this->setLogic($bLogic) ;
+	} 
 	
 	/**
 	 * 把所有条件拼接成字符串,相当于把这个对象字符串化
@@ -289,57 +283,9 @@ class Restriction extends SubStatement
 	 * @return self 被创建的Restriction对象
 	 */
 	public function createRestriction($bLogic=true) {
-		$aRestriction = self::createInstance($this->statement())->setLogic($bLogic) ;
+		$aRestriction = $this->statementFactory()->createRestriction($bLogic) ;
 		$this->add($aRestriction);
 		return $aRestriction;
-	}
-	
-	/**
-	 * 
-	 * 对字段名进行转化,使其在组合后的sql语句中合法.
-	 * @param string $sColumn 字段名
-	 * @return string 转化后的合法sql语句成分
-	 */
-	protected function transColumn($sColumn) {
-		if( $aNamer = $this->nameTransfer() )
-		{
-			$sColumn = $aNamer->transColumn($sColumn) ;
-		}
-		return $this->makeSureBackQuote ( strval($sColumn) );
-	}
-	
-	/**
-	 * 
-	 * 对直接量进行转化,使其在组合后的sql语句中合法.
-	 * @param mix $value 条件语句中的直接量
-	 * @return string 
-	 */
-	protected function tranValue($value) {
-		if (is_string ( $value )) {
-			$sValue = "'" . addslashes ( $value ) . "'";
-		}else if (is_numeric ( $value )) {
-			$sValue = "'" . strval ( $value ) . "'";
-		} else if (is_bool ( $value )) {
-			$sValue = $value ? "'1'" : "'0'";
-		} else if ($value === null) {
-			$sValue = "null";
-		} else {
-			$sValue = "'" . strval ( $value ) . "'";
-		}
-		return $sValue;
-	}
-	
-	/**
-	 * 确保字符串被反引号包围 (如果字符串没有反引号包围 , 用反引号包围字符串)
-	 * @param string 需要加上反引号的字符串
-	 * @return string 加上反引号后的字符串
-	 */
-	protected function makeSureBackQuote($sStr) {
-		if (substr ( $sStr, 0, 1 ) == "`" and substr ( $sStr, - 1, 1 ) == "`") {
-			return $sStr;
-		}else{
-			return "`" . $sStr . "`";
-		}
 	}
 	
 	

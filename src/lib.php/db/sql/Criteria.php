@@ -5,28 +5,9 @@ use jc\lang\Exception;
 
 class Criteria extends SubStatement
 {
-	static public function createInstance(Statement $aStatement=null,Restriction $aRestriction=null)
-	{
-		$aSubStatement = new self($aStatement) ;
-	
+	public function __construct(Restriction $aRestriction = null){
 		if($aRestriction !== null){
-			$aSubStatement->setRestriction($aRestriction);
-		}
-		
-		return $aSubStatement ;
-	}
-	
-	public function setStatement(Statement $aStatement=null)
-	{
-		parent::setStatement($aStatement) ;
-	
-		if( $this->aOrder )
-		{
-			$this->aOrder->setStatement($aStatement) ;
-		}
-		if( $this->aRestriction )
-		{
-			$this->aRestriction->setStatement($aStatement) ;
+			$this->setRestriction($aRestriction);
 		}
 	}
 	
@@ -110,7 +91,7 @@ class Criteria extends SubStatement
 	public function restriction($bAutoCreate=true){
 		if( !$this->aRestriction and $bAutoCreate )
 		{
-			$this->aRestriction = Restriction::createInstance($this->statement());
+			$this->aRestriction = $this->statementFactory()->createRestriction();
 		}
 		return $this->aRestriction ;
 	}
@@ -123,11 +104,10 @@ class Criteria extends SubStatement
 	 * 
 	 * @return Order 
 	 */
-	public function order($bAutoCreate=true){
+	public function orders($bAutoCreate=true){
 		if(!$this->aOrder and $bAutoCreate)
 		{
-			$this->aOrder = Order::createInstance($this->statement());
-			$this->aOrder->setNameTransfer($this->nameTransfer(false)) ;
+			$this->aOrder = $this->statementFactory()->createOrder();
 		}
 
 		return $this->aOrder;
