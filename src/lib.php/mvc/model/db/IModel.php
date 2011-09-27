@@ -22,8 +22,6 @@ interface IModel extends IModelBase
 	 * @return jc\mvc\model\db\orm\Criteria;
 	 */
 	public function criteria($bAutoCreate=true) ;
-
-	public function totalCount() ;
 }
 
 ?>

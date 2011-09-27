@@ -17,8 +17,10 @@ use jc\mvc\model\db\orm\PrototypeInFragment ;
 use jc\mvc\model\AbstractModel ;
 use jc\db\sql\IDriver ;
 use jc\lang\Object;
+use jc\mvc\model\IPaginal;
+use jc\mvc\view\widget\Paginator;
 
-class Model extends AbstractModel implements IModel
+class Model extends AbstractModel implements IModel , IPaginal
 {
 	static public function fromFragment($sPrototypeName,array $arrAssocFragment=array(),$bAggregation=false,PrototypeAssociationMap $aAssocMap=null)
 	{
@@ -389,7 +391,11 @@ class Model extends AbstractModel implements IModel
 	
 	public function totalCount()
 	{
-		
+		return 53 ;
+	}
+	
+	public function setPaginator(Paginator $paginator){
+		$this->paginator=$paginator;
 	}
 	
 	/**

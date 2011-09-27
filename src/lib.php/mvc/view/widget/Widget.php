@@ -141,7 +141,7 @@ class Widget extends Object implements IViewWidget
 	}
 	public function attribute($sName,$sValue)
 	{
-		return isset($this->arrAttributes[$sName])? $this->arrAttributes[$sName]: null ;
+		return isset($this->arrAttributes[$sName])? $this->arrAttributes[$sName]: $sValue ;
 	}
 	public function attributeNameIterator()
 	{
