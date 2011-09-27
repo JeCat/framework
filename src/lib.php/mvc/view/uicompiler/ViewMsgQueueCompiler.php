@@ -14,9 +14,26 @@ class ViewMsgQueueCompiler extends NodeCompiler
 	{
 		Assert::type("jc\\ui\\xhtml\\Node",$aObject,'aObject') ;
 		
-		$aDev->write("if( \$aVariables->get('theView')->messageQueue()->count() ){ \r\n") ;
-		$aDev->write("	\$aVariables->get('theView')->messageQueue()->display(\$this,\$aDevice) ;\r\n") ;
-		$aDev->write("}\r\n") ;
+		// 使用默认模板
+		if( $aObject->headTag()->isSingle() )
+		{
+			$aDev->write("if( \$aVariables->get('theView')->messageQueue()->count() ){ \r\n") ;
+			$aDev->write("	\$aVariables->get('theView')->messageQueue()->display(\$this,\$aDevice) ;\r\n") ;
+			$aDev->write("}\r\n") ;
+		}
+		
+		// 现场定义的模板
+		else 
+		{
+			$sOldMsgQueueVarVarName = '$' . parent::assignVariableName('_aOldMsgQueueVar') ;
+		
+			$aDev->write("	{$sOldMsgQueueVarVarName}=\$aVariables->get('aMsgQueue') ;") ;
+			$aDev->write("	\$aVariables->set('aMsgQueue',\$aVariables->get('theView')->messageQueue()) ;") ;
+		
+			$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
+			
+			$aDev->write("	\$aVariables->set('aMsgQueue',{$sOldMsgQueueVarVarName}) ;") ;
+		}
 	}
 }
 
