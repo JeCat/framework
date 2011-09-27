@@ -15,25 +15,38 @@ class SelectForAssocQuery extends StatementForAssocQuery
 	}
 	
 	private function buildClmLst(PrototypeInFragment $aPrototype)
-	{
-		// process columns in sql
-		// ----------------
-		foreach($aPrototype->columnIterator() as $sClmName)
+	{		
+		if( !$this->bOnlyCount )
+		{
+			// process columns in sql
+			// ----------------
+			foreach($aPrototype->columnIterator() as $sClmName)
+			{
+				$this->realStatement()->addColumn(
+					$aPrototype->columnName($sClmName), $aPrototype->columnAlias($sClmName)
+				) ;
+			}
+		
+			// process associasion prototype columns in sql
+			// ----------------
+			foreach($aPrototype->associations() as $aAssoc)
+			{
+				// 只处理一对一关系
+				if( $aAssoc->isOneToOne() )
+				{
+					$this->buildClmLst($aAssoc->toPrototype()) ;
+				}
+			}
+			
+			$aValid = true ;
+		}
+		
+		// 加入记录集长度
+		if( $this->sCountColumnName )
 		{
 			$this->realStatement()->addColumn(
-				$aPrototype->columnName($sClmName), $aPrototype->columnAlias($sClmName)
+					'count(*)', $this->sCountColumnName
 			) ;
-		}
-	
-		// process associasion prototype columns in sql
-		// ----------------
-		foreach($aPrototype->associations() as $aAssoc)
-		{
-			// 只处理一对一关系
-			if( $aAssoc->isOneToOne() )
-			{
-				$this->buildClmLst($aAssoc->toPrototype()) ;
-			}
 		}
 	}
 	
@@ -70,8 +83,22 @@ class SelectForAssocQuery extends StatementForAssocQuery
 		return $this->aStatemen ;
 	}
 	
+	public function setCountColumnName($sName=null)
+	{
+		$this->sCountColumnName = $sName ;
+	}
+	
+	public function setOnlyCount($sCountColumnName='_count',$bOnlyCount=true)
+	{
+		$this->bOnlyCount = $bOnlyCount ;
+		$this->sCountColumnName = $sCountColumnName ;
+	}
 	
 	private $aStatemen ;
+	
+	private $bOnlyCount = false ;
+	
+	private $sCountColumnName = null ;
 }
 
 ?>
