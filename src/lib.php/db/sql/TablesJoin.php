@@ -8,9 +8,11 @@ class TablesJoin extends SubStatement
 	const JOIN_LEFT = "LEFT JOIN" ;
 	const JOIN_RIGHT = "RIGHT JOIN" ;
 	const JOIN_INNER = "INNER JOIN" ;
-	
-	public function __construct($sType=self::JOIN_LEFT)
+
+	static public function createInstance(Statement $aStatement=null,$sType=self::JOIN_LEFT)
 	{
+		$aSubStatement = new self($aStatement) ;
+		
 		if( !in_array($sType,array(
 				self::JOIN_LEFT ,
 				self::JOIN_RIGHT ,
@@ -20,7 +22,26 @@ class TablesJoin extends SubStatement
 			throw new Exception("unknow sql join type: %s",array($sType)) ;
 		}
 		
-		$this->sType = $sType ;
+		$aSubStatement->sType = $sType ;
+		
+		return $aSubStatement ;
+	}
+
+	public function setStatement(Statement $aStatement=null)
+	{
+		parent::setStatement($aStatement) ;
+	
+		if( $this->aRestriction )
+		{
+			$this->aRestriction->setStatement($aStatement) ;
+		}
+		foreach ($this->arrTables as $table)
+		{
+			if( $table instanceof SubStatement )
+			{
+				$table->setStatement($aStatement) ;
+			}
+		}
 	}
 	
 	public function setType($sType)

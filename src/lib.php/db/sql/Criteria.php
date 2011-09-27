@@ -2,16 +2,34 @@
 namespace jc\db\sql;
 
 use jc\lang\Exception;
-use jc\db\sql\IStatement;
-use jc\db\sql\Restriction;
-use jc\db\sql\Order;
 
-class Criteria implements IStatement {
-	public function __construct(Restriction $aRestriction = null){
+class Criteria extends SubStatement
+{
+	static public function createInstance(Statement $aStatement=null,Restriction $aRestriction=null)
+	{
+		$aSubStatement = new self($aStatement) ;
+	
 		if($aRestriction !== null){
-			$this->setRestriction($aRestriction);
+			$aSubStatement->setRestriction($aRestriction);
+		}
+		
+		return $aSubStatement ;
+	}
+	
+	public function setStatement(Statement $aStatement=null)
+	{
+		parent::setStatement($aStatement) ;
+	
+		if( $this->aOrder )
+		{
+			$this->aOrder->setStatement($aStatement) ;
+		}
+		if( $this->aRestriction )
+		{
+			$this->aRestriction->setStatement($aStatement) ;
 		}
 	}
+	
 	/**
 	 * 把所有条件拼接成字符串,相当于把这个对象字符串化
 	 * 
@@ -89,10 +107,10 @@ class Criteria implements IStatement {
 	/**
 	 * @return Restriction
 	 */
-	public function restriction($bCreate=true){
-		if( !$this->aRestriction and $bCreate )
+	public function restriction($bAutoCreate=true){
+		if( !$this->aRestriction and $bAutoCreate )
 		{
-			$this->aRestriction = new Restriction();
+			$this->aRestriction = Restriction::createInstance($this->statement());
 		}
 		return $this->aRestriction ;
 	}
@@ -105,12 +123,14 @@ class Criteria implements IStatement {
 	 * 
 	 * @return Order 
 	 */
-	public function order(){
-		if($this->aOrder != null){
-			return $this->aOrder;
-		}else{
-			return $this->aOrder = new Order();
+	public function order($bAutoCreate=true){
+		if(!$this->aOrder and $bAutoCreate)
+		{
+			$this->aOrder = Order::createInstance($this->statement());
+			$this->aOrder->setNameTransfer($this->nameTransfer(false)) ;
 		}
+
+		return $this->aOrder;
 	}
 	
 	private $aRestriction = null;

@@ -73,14 +73,9 @@ class SelectForAssocQuery extends StatementForAssocQuery
 		return $aPrototype->columnName($sClmName) ;
 	}
 	
-	public function realStatement()
+	public function createRealStatement()
 	{
-		if(!$this->aStatemen)
-		{
-			$this->aStatemen = new Select() ;
-		}
-		
-		return $this->aStatemen ;
+		return new Select() ;
 	}
 	
 	public function setCountColumnName($sName=null)
@@ -93,8 +88,6 @@ class SelectForAssocQuery extends StatementForAssocQuery
 		$this->bOnlyCount = $bOnlyCount ;
 		$this->sCountColumnName = $sCountColumnName ;
 	}
-	
-	private $aStatemen ;
 	
 	private $bOnlyCount = false ;
 	

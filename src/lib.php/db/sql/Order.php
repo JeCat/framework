@@ -1,16 +1,24 @@
 <?php
 namespace jc\db\sql;
 
-use jc\db\sql\IStatement;
 
-class Order implements IStatement {
+class Order extends SubStatement
+{
 	/**
 	 * 生成OrderBy的类
 	 * @param string $sColumn 列名
 	 * @param boolean $bOrderType true代表ASC , false代表DESC ，默认为true
 	 */
-	public function __construct($sColumn=null , $bOrderType=true){
-		$this->addColumn($sColumn , $bOrderType);
+	static public function createInstance(Statement $aStatement=null,$sColumn=null,$bOrderType=true)
+	{
+		$aSubStatement = new self($aStatement) ;
+	
+		if($sColumn)
+		{
+			$this->addColumn($sColumn,$bOrderType);			
+		}
+		
+		return $aSubStatement ;
 	}
 	
 	/**
@@ -18,16 +26,16 @@ class Order implements IStatement {
 	 * @param string $sColumn 列名
 	 * @return self 
 	 */
-	static public function asc($sColumn){
-		return new self($sColumn);
+	static public function asc(Statement $aStatement,$sColumn){
+		return self::createInstance($aStatement,$sColumn);
 	}
 	/**
 	 * 获得一个order实例,按照所给参数生成OrderBy语句,降序
 	 * @param string $sColumn 列名
 	 * @return self 
 	 */
-	static public function decs($sColumn){
-		return new self($sColumn , false);
+	static public function decs(Statement $aStatement,$sColumn){
+		return self::createInstance($aStatement,$sColumn,false);
 	}
 	
 	/**
@@ -70,7 +78,7 @@ class Order implements IStatement {
 	}
 	
 	/**
-	 * @see jc\db\sql.IStatement::makeStatement()
+	 * @see jc\db\sql\Statement::makeStatement()
 	 */
 	public function makeStatement($bFormat=false){
 		$sOrderBy = ' ORDER BY ';

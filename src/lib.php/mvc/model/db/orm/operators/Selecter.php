@@ -2,10 +2,6 @@
 namespace jc\mvc\model\db\orm\operators ;
 
 use jc\db\sql\Restriction;
-
-use jc\db\sql\TablesJoin;
-
-use jc\db\sql\Table;
 use jc\db\sql\Criteria;
 use jc\db\recordset\IRecordSet;
 use jc\mvc\model\db\Model;
@@ -65,7 +61,7 @@ class Selecter extends OperationStrategy
 	}
 
 	protected function loadModel( DB $aDB, IModel $aModel, IRecordSet $aRecordSet )
-	{		
+	{
 		// load 自己
 		$aModel->loadData($aRecordSet,true) ;
 		

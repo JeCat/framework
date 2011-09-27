@@ -1,9 +1,7 @@
 <?php 
-
 namespace jc\db\sql ;
 
 use jc\util\HashTable;
-
 use jc\lang\Exception;
 
 abstract class MultiTableStatement extends Statement
@@ -35,11 +33,19 @@ abstract class MultiTableStatement extends Statement
 	}
 	
 	public function createCriteria(){
-		return new Criteria();
+		$aCriteria = new Criteria();
+		$aCriteria->setNameTransfer($this->nameTransfer()) ;
+		return $aCriteria ;
 	}
 
 	public function setCriteria(Criteria $aCriteria)
 	{
+		if($this->aCriteria)
+		{
+			$this->aCriteria->setStatement(null) ;
+		}
+		$aCriteria->setStatement($this) ;
+		
 		$this->aCriteria = $aCriteria ;
 	}
 
@@ -84,6 +90,19 @@ abstract class MultiTableStatement extends Statement
 		}
 		
 		return true ;
+	}
+	
+	/**
+	 * @return Table
+	 */
+	public function createTable($sName,$sAlias=null,$bAdd=true)
+	{
+		$aTable = Table::createInstance($this,$sName,$sAlias) ;
+		if($bAdd)
+		{
+			$this->addTable($aTable) ;
+		}
+		return $aTable ;
 	}
 	
 	private $arrTables = array() ;

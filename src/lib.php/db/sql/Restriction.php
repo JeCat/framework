@@ -1,7 +1,21 @@
 <?php
 namespace jc\db\sql;
 
-class Restriction extends Statement {
+class Restriction extends SubStatement
+{
+	public function setStatement(Statement $aStatement=null)
+	{
+		parent::setStatement($aStatement) ;
+	
+		foreach ($this->arrExpressions as $expression)
+		{
+			if( $expression instanceof SubStatement )
+			{
+				$expression->setStatement($aStatement) ;
+			}
+		}
+	}
+	
 	/**
 	 * 把所有条件拼接成字符串,相当于把这个对象字符串化
 	 * 
@@ -45,6 +59,7 @@ class Restriction extends Statement {
 	 */
 	public function setLogic($bLogic) {
 		$this->sLogic = $bLogic ? ' AND ' : ' OR ';
+		return $this ;
 	}
 	
 	/**
@@ -52,6 +67,7 @@ class Restriction extends Statement {
 	 */
 	public function clear() {
 		$this->arrExpressions = array ();
+		return $this ;
 	}
 	
 	/**
@@ -272,9 +288,9 @@ class Restriction extends Statement {
 	 * 创建一个新的Restriction对象并把它作为条件语句的一部分添加到方法调用者中
 	 * @return self 被创建的Restriction对象
 	 */
-	public function createRestriction() {
-		$aRestriction = new self ();
-		$this->add ( $aRestriction );
+	public function createRestriction($bLogic=true) {
+		$aRestriction = self::createInstance($this->statement())->setLogic($bLogic) ;
+		$this->add($aRestriction);
 		return $aRestriction;
 	}
 	
@@ -285,6 +301,10 @@ class Restriction extends Statement {
 	 * @return string 转化后的合法sql语句成分
 	 */
 	protected function transColumn($sColumn) {
+		if( $aNamer = $this->nameTransfer() )
+		{
+			$sColumn = $aNamer->transColumn($sColumn) ;
+		}
 		return $this->makeSureBackQuote ( strval($sColumn) );
 	}
 	

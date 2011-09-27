@@ -2,6 +2,8 @@
 
 namespace jc\db\sql ;
 
+use jc\system\Application;
+
 use jc\lang\Exception;
 use jc\db\sql\Criteria;
 
@@ -82,8 +84,8 @@ class Select extends MultiTableStatement
 	}
 	
 	public function createCriteria(){
-		$aCriteria = new Criteria();
-		$aCriteria->setEnableLimitStart(true);
+		$aCriteria = parent::createCriteria() ;
+		$aCriteria->setEnableLimitStart(true) ;
 		return $aCriteria;
 	}
 	
