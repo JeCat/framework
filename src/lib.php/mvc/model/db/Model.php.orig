@@ -404,6 +404,13 @@ class Model extends AbstractModel implements IModel , IPaginal
 	
 	public function totalCount()
 	{
+<<<<<<< HEAD
+		return 53 ;
+	}
+	
+	public function setPaginator(Paginator $paginator){
+		$this->paginator=$paginator;
+=======
 		$aSelect = new SelectForAssocQuery($this->prototype()) ;
 
 		if( $this->aCriteria )
@@ -428,6 +435,7 @@ class Model extends AbstractModel implements IModel , IPaginal
 	public function db()
 	{
 		return DB::singleton() ;
+>>>>>>> ae97217ebbe51a4f60ee3f24b6eefb8b5af93abc
 	}
 	
 	/**

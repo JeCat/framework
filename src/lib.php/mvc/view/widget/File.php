@@ -20,6 +20,7 @@ class File extends FormWidget{
 		if (empty($aFolder)) {
 			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的aFolder参数(得到的aFolder是:%s类型)", array (Type::detectType($aFolder) ) );
 		}
+		
 		$this->aStoreFolder = $aFolder;
 		if($aAchiveStrategy == null){
 			$this->aAchiveStrategy = DateAchiveStrategy::flyweight(Array(true,true,true));
@@ -72,6 +73,11 @@ class File extends FormWidget{
 			return null ;
 		}
 		
+		if(!$this->aStoreFolder->exists())
+		{
+			$this->aStoreFolder = $this->aStoreFolder->create();
+		}
+		
 		$sStorePath = $this->aStoreFolder->path() ;
 		$nStorePathLen = strlen($sStorePath) ;
 		$sFilePath = $aFile->path() ;
@@ -97,6 +103,11 @@ class File extends FormWidget{
 	
 	public function moveToStoreFolder()
 	{
+		if(!$this->aStoreFolder->exists())
+		{
+			$this->aStoreFolder = $this->aStoreFolder->create();
+		}
+		
 		// 保存文件
 		$aSavedFile = $this->aAchiveStrategy->makeFilePath($this->aUploadedFile,$this->aStoreFolder);
 		
@@ -115,6 +126,11 @@ class File extends FormWidget{
 	
 	public function setValueFromString($sData)
 	{
+		if(!$this->aStoreFolder->exists())
+		{
+			$this->aStoreFolder = $this->aStoreFolder->create();
+		}
+		
 		$aFile = $this->aStoreFolder->findFile($sData);
 		if($aFile)
 		{
@@ -122,9 +138,7 @@ class File extends FormWidget{
 		}
 		else
 		{
-			new Message(Message::error,'文件已丢失:%s',array(
-				$this->aAchiveStrategy->restoreOriginalFilename($aFile)
-			));
+			new Message(Message::error,'文件已丢失:%s',array($sData));
 		}
 	}
 	

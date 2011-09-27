@@ -100,23 +100,43 @@ class Attributes extends HashTable
 		$this->add($aVal) ;
 	}
 	
-	public function string($sName)
+	public function string($sName,$sDefault=null)
 	{
+		if( !$this->has($sName) and $sDefault!==null )
+		{
+			return (string) $sDefault ;
+		}
+		
 		return ($aText=parent::get($sName))? $aText->source() :null ;
 	}
-	public function bool($sName)
+	public function bool($sName,$bDefault=null)
 	{
+		if( !$this->has($sName) and $bDefault!==null )
+		{
+			return $bDefault? true: false ;
+		}
+		
 		return !in_array( 
 				strtolower( ($aText=parent::get($sName))?$aText->source():'' )
 				, self::$arrFalseValues
 				, true ) ;
 	}
-	public function int($sName)
+	public function int($sName,$nDefault=null)
 	{
+		if( !$this->has($sName) and $nDefault!==null )
+		{
+			return intval($nDefault) ;
+		}
+		
 		return ($aText=parent::get($sName))?intval($aText->source()):0 ;
 	}
-	public function float($sName)
+	public function float($sName,$fDefault=null)
 	{
+		if( !$this->has($sName) and $fDefault!==null )
+		{
+			return floatval($fDefault) ;
+		}
+		
 		return ($aText=parent::get($sName))?floatval($aText->source()):0 ;
 	}
 	public function expression($sName)

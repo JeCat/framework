@@ -18,20 +18,50 @@ class WidgetCompiler extends NodeCompiler
 		
 
 		$aAttrs = $aObject->attributes() ;
+			
+		$sWidgetVarName = '$' . parent::assignVariableName('_aWidget') ;
+		$aDev->write("\$theView = \$aVariables->get('theView') ;") ;
 		
-		if( !$aAttrs->has('id') )
+		// 通过 id 获得 widget 对象
+		if( $aAttrs->has('id') )
 		{
-			throw new Exception("widget标签缺少必要属性:%s",'id') ;
+			$sId = $aAttrs->get('id') ;
+			$aDev->write("\r\n//// ------- 显示 Widget: {$sId} ---------------------") ;		
+			$aDev->write("{$sWidgetVarName} = \$theView->widget({$sId}) ;") ;
+				
+			$aDev->write("if(!{$sWidgetVarName}){") ;
+			$aDev->output("缺少 widget (id:{$sId})") ;
+			$aDev->write("}else{") ;
+			
 		}
 		
-		$sId = $aAttrs->get('id') ;
-		$aDev->write("\r\n//// ------- 显示 Widget: {$sId} ---------------------") ;
-		
-		
-		$sWidgetVarName = '$' . parent::assignVariableName('_aWidget') ;
+		// 通过 表达式 取得 widget 对象
+		else if( $sInstanceExpress=$aAttrs->expression('ins') or $sInstanceExpress=$aAttrs->expression('instance')  )
+		{
+			$sId = '' ;
+			$sInstanceOrigin=$aAttrs->string('ins') or $sInstanceOrigin=$aAttrs->string('instance') ;
 			
-		$aDev->write("{$sWidgetVarName} = \$aVariables->get('theView')->widget({$sId}) ;") ;
-		$aDev->write("if({$sWidgetVarName}){") ;
+			$aDev->write("\r\n//// ------- 显示 Widget Instance ---------------------") ;
+			$aDev->write("{$sWidgetVarName} = {$sInstanceExpress} ;") ;
+
+			$aDev->write("if( !{$sWidgetVarName} or !({$sWidgetVarName} instanceof \\jc\\mvc\\view\\widget\\IViewWidget) ){") ;
+			$aDev->output("无效的widget对象：".$sInstanceOrigin ) ;
+			$aDev->write("} else {") ;
+				
+			if( $aAttrs->bool('instance.autoAddToView') or $aAttrs->bool('ins.autoAddToView')
+				or (!$aAttrs->has('instance.autoAddToView') and !$aAttrs->has('ins.autoAddToView')) )
+			{
+				$aDev->write("	// ins.autoAddToView=true") ;
+				$aDev->write("	if( \$theView and {$sWidgetVarName}->view()===\$theView ){") ;
+				$aDev->write("		\$theView->addWidget({$sWidgetVarName}) ;") ;
+				$aDev->write("	}") ;
+			}			
+		}
+		else 
+		{
+			throw new Exception("widget标签缺少必要属性:%s 或 %s",array('id','instance')) ;
+		}
+		
 		
 		// 常规 html attr
 		foreach(array('class','name','title','style') as $sName)
@@ -84,11 +114,7 @@ class WidgetCompiler extends NodeCompiler
 			$aDev->write("	\$aVariables->set('theWidget',{$sOldWidgetVarVarName}) ;") ;
 		}
 		
-		
-		$aDev->write("}else{") ;
-		$aDev->write("	echo '缺少 widget (id:'.{$sId}.')' ;") ;
 		$aDev->write("}") ;
-		
 		$aDev->write("//// ---------------------------------------------------\r\n") ;
 	}
 

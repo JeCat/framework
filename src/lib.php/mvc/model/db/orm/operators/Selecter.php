@@ -27,7 +27,7 @@ class Selecter extends OperationStrategy
 			$aSelect = new SelectForAssocQuery($aModel->prototype()) ;
 		}
 	
-		// 设置主键查询条件
+		// 使用传入的查询条件
 		if( $aCriteria )
 		{
 			$aSelect->setCriteria($aCriteria) ;
