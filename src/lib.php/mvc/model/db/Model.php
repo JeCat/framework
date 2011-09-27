@@ -1,6 +1,10 @@
 <?php
 namespace jc\mvc\model\db ;
 
+use jc\mvc\model\db\orm\operators\SelectForAssocQuery;
+
+use jc\db\sql\Select;
+
 use jc\mvc\model\db\orm\PrototypeAssociationMap;
 use jc\lang\Exception;
 use jc\mvc\model\db\orm\operators\Deleter;
@@ -212,7 +216,7 @@ class Model extends AbstractModel implements IModel
 			}
 		}
 		
-		return Selecter::singleton()->select( DB::singleton(), $this, $this->aCriteria ) ;
+		return Selecter::singleton()->select( $this->db(), $this, $this->aCriteria ) ;
 	}
 	
 	public function save()
@@ -248,12 +252,12 @@ class Model extends AbstractModel implements IModel
 
 	public function insert()
 	{
-		return Inserter::singleton()->insert(DB::singleton(), $this) ;
+		return Inserter::singleton()->insert($this->db(), $this) ;
 	}
 	
 	public function update()
 	{
-		return Updater::singleton()->update(DB::singleton(), $this) ;
+		return Updater::singleton()->update($this->db(), $this) ;
 	}
 	
 	public function delete()
@@ -275,7 +279,7 @@ class Model extends AbstractModel implements IModel
 		{
 			if( $this->hasSerialized() )
 			{
-				return Deleter::singleton()->delete(DB::singleton(), $this) ;	
+				return Deleter::singleton()->delete($this->db(), $this) ;	
 			}
 			
 			else 
@@ -398,7 +402,30 @@ class Model extends AbstractModel implements IModel
 	
 	public function totalCount()
 	{
+		$aSelect = new SelectForAssocQuery($this->prototype()) ;
+
+		if( $this->aCriteria )
+		{
+			$aSelect->setCriteria($this->aCriteria) ;
+		}
 		
+		$aSelect->setOnlyCount('_cnt',true) ;
+	
+		$aRecordSet = $this->db()->query($aSelect) ;
+		if( !$aRecordSet or !$aRecordSet->rowCount() )
+		{
+			return 0 ;
+		}
+		
+		return intval($aRecordSet->field('_cnt')) ;		
+	}
+	
+	/**
+	 * @return jc\db\DB
+	 */
+	public function db()
+	{
+		return DB::singleton() ;
 	}
 	
 	/**
