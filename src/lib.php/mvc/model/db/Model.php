@@ -24,6 +24,15 @@ use jc\lang\Object;
 
 class Model extends AbstractModel implements IModel
 {
+	/**
+	 * 
+	 * @param string $sPrototypeName
+	 * @param array $arrAssocFragment
+	 * @param boolen $bAggregation
+	 * @param PrototypeAssociationMap $aAssocMap
+	 * @throws Exception
+	 * @return IModel
+	 */
 	static public function fromFragment($sPrototypeName,array $arrAssocFragment=array(),$bAggregation=false,PrototypeAssociationMap $aAssocMap=null)
 	{
 		if( !$aAssocMap )
