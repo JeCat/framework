@@ -59,14 +59,16 @@ class Criteria implements IStatement {
 	}
 	
 	public function makeStatementLimit($bFormat = false){
-		if($this->nLimitLen === -1){
+		$nLimitLen = $this->limitLen();
+		$nLimitFrom = $this->limitFrom();
+		if($nLimitLen === -1){
 			return '';
 		}
 		$sLimit = ' LIMIT ';
-		if($this->bEnableLimitStart and $this->nLimitFrom != 0){
-			$sLimit .= $this->nLimitFrom . ',';
+		if($this->bEnableLimitStart and $nLimitFrom != 0){
+			$sLimit .= $nLimitFrom . ',';
 		}
-		$sLimit .= $this->nLimitLen;
+		$sLimit .= $nLimitLen;
 		return $sLimit;
 	}
 	
@@ -77,9 +79,18 @@ class Criteria implements IStatement {
 			throw new Exception('在不允许使用limit from的情况下尝试设置from的值,请确保使用了合法的sql语句,或者检查是否忘记打开允许使用limit from的标记');
 		}
 	}
+	public function limitFrom()
+	{
+		return $this->nLimitFrom;
+	}
 	
 	public function setLimitLen($nLimitLen){
 		$this->nLimitLen = $nLimitLen;
+	}
+	
+	public function limitLen()
+	{
+		return $this->nLimitLen;
 	}
 	
 	public function setRestriction(Restriction $aRestriction){
