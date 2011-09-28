@@ -157,7 +157,7 @@ class Widget extends Object implements IViewWidget
 		$sRet = '' ;
 		foreach($this->arrAttributes as $sName=>$sValue)
 		{
-			$sRet.= ' ' . $sName . '="' . addslashes($sValue) . '"' ;
+			$sRet.= ' ' . $sName . '="' . addcslashes($sValue,'"\\') . '"' ;
 		}
 		return $sRet ;
 	}
