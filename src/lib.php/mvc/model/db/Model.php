@@ -412,6 +412,9 @@ class Model extends AbstractModel implements IModel , IPaginal
 
 		if( $this->aCriteria )
 		{
+		    $ilimitLen = $this->aCriteria->limitLen();
+		    $ilimitFrom = $this->aCriteria->limitFrom();
+		    $this->aCriteria->setLimit(1000);
 			$aSelect->setCriteria($this->aCriteria) ;
 		}
 		
@@ -423,7 +426,14 @@ class Model extends AbstractModel implements IModel , IPaginal
 			return 0 ;
 		}
 		
+		if( $this->aCriteria ){
+		    $this->aCriteria->setLimit($ilimitLen,$ilimitFrom);
+		}
 		return intval($aRecordSet->field('_cnt')) ;		
+	}
+	
+	public function setPagination($iPerPage,$iPageNum){
+	    $this->criteria()->setLimit( $iPerPage, $iPerPage*($iPageNum-1) ) ;
 	}
 	
 	/**

@@ -7,6 +7,11 @@ use jc\mvc\model\db\Model;
 use jc\mvc\view\View;
 use jc\mvc\view\IView;
 use jc\mvc\view\widget\paginatorstrategy\AbstractStrategy;
+use jc\mvc\model\IPaginal;
+use jc\util\IDataSrc;
+use jc\system\Application;
+use jc\system\HttpRequest;
+
 
 /*!
     attr.nums : int 显示几页 5
@@ -19,12 +24,11 @@ use jc\mvc\view\widget\paginatorstrategy\AbstractStrategy;
     pageNumList() 由 PaginatorStrategy 对象控制。
 */
 class Paginator extends FormWidget implements IModelChangeObserver{
-    public function __construct($sId, $sTitle = null, IView $aView = null) {
-        parent::__construct ( $sId, 'jc:WidgetPaginator.template.html', $sTitle, $aView );
-        $this->setCurrentPageNum((int)$_GET[$this->UrlKey()]);
-        $this->aPaginal = $aView->model();
+    public function __construct($sId =null ,IDataSrc $aDataSource = null , IView $aView = null) {
+        parent::__construct ( $sId , 'jc:WidgetPaginator.template.html', null , $aView );
         $this->iCount=5;
         $this->iShowWidth=5;
+        if( $aDataSource) $this->setDataFromSubmit($aDataSource);
     }
 	
     public function setPerPageCount($iCount){
@@ -36,23 +40,31 @@ class Paginator extends FormWidget implements IModelChangeObserver{
     }
     
     public function totalPageCount(){
+        if( null === $this->aPaginal ) return 1;
         return (int) ( ($this->aPaginal->totalCount()+$this->perPageCount()-1)/$this->perPageCount() );
     }
     
     public function setCurrentPageNum($iNum){
-        $this->iCurrentPageNum=(int)$iNum;
+        $this->setValue($iNum);
     }
     
     public function currentPageNum(){
-        return $this->iCurrentPageNum;
+        $iNum=(int)$this->value();
+        if( $iNum < 1) $iNum =1 ;
+        if( $iNum > $this->totalPageCount() ) $iNum = $this->totalPageCount();
+        return $iNum;
     }
     
     public function onModelChanging(View $aView){
-        $this->setPaginal($aView);
+        $this->setPaginal($aView->model());
     }
     
-    public function setPaginal(IPaginal $aPaginal){
+    public function setPaginal($aPaginal){
         $this->aPaginal=$aPaginal;
+        if( $this->aPaginal === null ) return;
+        $iPerPage = (int) $this->perPageCount();
+        $iPageNum = (int) $this->currentPageNum();
+        $aPaginal->setPagination($iPerPage,$iPageNum);
     }
     
     public function pageNumList(){
@@ -66,11 +78,29 @@ class Paginator extends FormWidget implements IModelChangeObserver{
     }
     
     public function pageUrl($iPageNum){
-        return '?'.$this->UrlKey().'='.(string)$iPageNum;
-    }
-    
-    protected function UrlKey(){
-        return $this->id().'_page';
+        $aRequest = Application::singleton()->request();
+        if( $aRequest instanceof HttpRequest )
+        {
+            $str=$aRequest -> urlQuery();
+            $arrQuery = explode( $str , '&' );
+            $bFlag =  false;
+            $arrQuery1 = array_map( function( $str){
+                        if(substr( $str,0,strlen($this->formName())) === $this->formName() ){
+                            $bFlag = true;
+                            return $this->formName().'='.(string)$iPageNum;
+                        }else{
+                            return $str;
+                        }
+                    });
+            if( ! $bFlag ){
+                $arrQuery1[]=$this->formName().'='.(string)$iPageNum;
+            }
+            return '?'.implode('&',$arrQuery1);
+        }
+        else
+        {
+            return '#' ;
+        }
     }
     
     public function attributeBool($sName,$bValue=true){
@@ -87,7 +117,26 @@ class Paginator extends FormWidget implements IModelChangeObserver{
 	public function setStrategy($Strategy){
 	    if( is_string($Strategy) ){
 	        $this->aStrategy=AbstractStrategy::createByName($Strategy);
+	    }else if( $Strategy instanceof AbstractStrategy){
+	        $this->aStrategy=$Strategy;
+	    }else{
+	        throw new Exception('setStrategy error : nether a string not an instanceof AbstractStrategy');
 	    }
+	}
+	
+	public function setView(IView $aView)
+	{
+	    $formerView = $this->view();
+	    if( $formerView ){
+	        if ( $former === $aView ){
+	            return;
+	        }else{
+	            $formerView -> removeModelObserver( $this ) ;
+	        }
+	    }
+	    parent::setView($aView);
+	    $aView -> addModelObserver($this);
+	    if( $aView ) $this->onModelChanging($aView);
 	}
     
     private $iCount;

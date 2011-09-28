@@ -76,8 +76,11 @@ class Widget extends Object implements IViewWidget
 		$this->aView = $aView ;
 	}
 
-	public function id()
+	public function id($bAutoId=true)
 	{
+	    if( $this -> sId === null and $bAutoId){
+	        $this -> sId = get_class($this).self::$nAutoIncreaseId++;
+	    }
 		return $this->sId ;
 	}
 
@@ -161,6 +164,8 @@ class Widget extends Object implements IViewWidget
 		}
 		return $sRet ;
 	}
+	
+	static private $nAutoIncreaseId=0;
 	
 	private $aView ;
 

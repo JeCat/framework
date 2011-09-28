@@ -3,6 +3,9 @@ namespace jc\mvc\view\widget\paginatorstrategy;
 
 class Middle extends AbstractStrategy{
     public function pageNumList($iWidth,$iCurrent,$iTotal){
+        if($iWidth > $iTotal){
+            return range(1,$iTotal);
+        }
         $iStart = $iCurrent - (int)( $iWidth /2 );
         if( $iStart <1 ) $iStart = 1;
         else if($iStart + $iWidth -1 > $iTotal ) $iStart = $iTotal +1 -$iWidth;
