@@ -20,14 +20,14 @@ class Criteria extends SubStatement
 	public function makeStatement($bFormat = false) {
 		if($this->aRestriction)
 		{
-			$sStatement = ' WHERE ' . $this->aRestriction->makeStatement($bFormat);
+			@$sStatement = ' WHERE ' . $this->aRestriction->makeStatement($bFormat);
 		}
 		if( $this->aOrder )
 		{
-			$sStatement .= ' ' . $this->aOrder->makeStatement($bFormat);
+			@$sStatement .= ' ' . $this->aOrder->makeStatement($bFormat);
 		}
 		
-		$sStatement .= ' ' . $this->makeStatementLimit() ;
+		@$sStatement .= ' ' . $this->makeStatementLimit() ;
 		
 		return $sStatement;
 	}
