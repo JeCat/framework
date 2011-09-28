@@ -57,7 +57,7 @@ class Select extends MultiTableStatement
 
 	protected function makeStatementCriteria($bFormat=false)
 	{
-		return $this->aCriteria? $this->aCriteria->makeStatement($bFormat,true): '' ;
+		return ($aCriteria=$this->criteria(false))? $aCriteria->makeStatement($bFormat,true): '' ;
 	}
 	
 	public function checkValid($bThrowException=true)
