@@ -20,8 +20,10 @@ use jc\mvc\model\db\orm\PrototypeInFragment ;
 use jc\mvc\model\AbstractModel ;
 use jc\db\sql\IDriver ;
 use jc\lang\Object;
+use jc\mvc\model\IPaginal;
+use jc\mvc\view\widget\Paginator;
 
-class Model extends AbstractModel implements IModel
+class Model extends AbstractModel implements IModel , IPaginal
 {
 	/**
 	 * 
@@ -407,6 +409,9 @@ class Model extends AbstractModel implements IModel
 
 		if( $this->aCriteria )
 		{
+		    $ilimitLen = $this->aCriteria->limitLen();
+		    $ilimitFrom = $this->aCriteria->limitFrom();
+		    $this->aCriteria->setLimit(1000);
 			$aSelect->setCriteria($this->aCriteria) ;
 		}
 		
@@ -418,7 +423,14 @@ class Model extends AbstractModel implements IModel
 			return 0 ;
 		}
 		
+		if( $this->aCriteria ){
+		    $this->aCriteria->setLimit($ilimitLen,$ilimitFrom);
+		}
 		return intval($aRecordSet->field('_cnt')) ;		
+	}
+	
+	public function setPagination($iPerPage,$iPageNum){
+	    $this->criteria()->setLimit( $iPerPage, $iPerPage*($iPageNum-1) ) ;
 	}
 	
 	/**
