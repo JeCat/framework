@@ -41,7 +41,7 @@ class Selecter extends OperationStrategy
 		{
 			for( $aRecordSet->rewind(); $aRecordSet->valid(); $aRecordSet->next() )
 			{
-				$aChildModel = $aModel->prototype()->createModel() ;
+				$aChildModel = $aModel->prototype()->createModel(false) ;
 				$aModel->addChild($aChildModel) ;
 				
 				if(!$this->loadModel($aDB,$aChildModel,$aRecordSet))

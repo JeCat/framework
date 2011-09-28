@@ -1,10 +1,9 @@
 <?php
 namespace jc\mvc\model\db\orm ;
 
+use jc\lang\Type;
 use jc\db\sql\name\NameTransfer;
-
 use jc\db\sql\StatementFactory;
-
 use jc\db\sql\Statement;
 use jc\db\sql\Restriction;
 use jc\db\sql\TablesJoin;
@@ -205,6 +204,59 @@ class PrototypeInFragment extends Prototype
 		}
 		
 		return $sColumn ;
+	}
+
+
+	/**
+	 * @return jc\mvc\model\db\IModel
+	 */
+	public function createModel($bTearOut=false)
+	{
+		$sClassName = $this->modelClass() ;
+		if( !class_exists($sClassName,true) )
+		{
+			throw new Exception("Model类:%s 不存在",$sClassName) ;
+		}
+		if( $sClassName!="jc\\mvc\\model\\db\\Model" and !Type::hasImplements($sClassName,'jc\mvc\model\db\IModel') )
+		{
+			throw new Exception("%s 不是一个有效的Model类（必须实现 jc\\mvc\\model\\db\\IModel 接口）",$sClassName) ;
+		}
+		
+		$aModel = new $sClassName( $bTearOut? $this->tearOut(): $this ) ;
+		
+		return $aModel ;
+	}
+	
+	/**
+	 * @return PrototypeInFragment
+	 */
+	public function tearOut()
+	{
+		$aNewIns = clone $this ;
+		
+		$aNewIns->aAssociateBy = null ;
+		$aNewIns->sTableAlias = null ;
+		$aNewIns->sBridgeTableAlias = null ;
+		$aNewIns->aTable = null ;
+		$aNewIns->aSqlFactory = null ;
+	
+	
+		if( $aAssocs=$this->associations(false) )
+		{
+			foreach($aAssocs as $aAssoc)
+			{
+				$aNewAssoc = clone $aAssoc ;
+				$aToPrototype = $aAssoc->toPrototype()->tearOut() ;	// 递归 clone 一个 prototype
+				
+				$aNewAssoc->setFromPrototype($aNewIns) ;
+				$aNewAssoc->setToPrototype($aToPrototype) ;
+				$aToPrototype->setAssociateBy($aNewAssoc) ;
+				
+				$aNewIns->addAssociation($aNewAssoc) ;
+			}
+		}
+		
+		return $aNewIns ;
 	}
 	
 	private $aAssociateBy ;
