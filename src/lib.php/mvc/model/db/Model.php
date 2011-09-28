@@ -1,10 +1,10 @@
 <?php
 namespace jc\mvc\model\db ;
 
+use jc\db\sql\Statement;
+
 use jc\mvc\model\db\orm\operators\SelectForAssocQuery;
-
 use jc\db\sql\Select;
-
 use jc\mvc\model\db\orm\PrototypeAssociationMap;
 use jc\lang\Exception;
 use jc\mvc\model\db\orm\operators\Deleter;
@@ -15,7 +15,6 @@ use jc\db\DB;
 use jc\db\recordset\IRecordSet;
 use jc\db\sql\MultiTableStatement;
 use jc\db\sql\Criteria;
-use jc\mvc\model\db\orm\Restriction;
 use jc\mvc\model\db\orm\Association;
 use jc\mvc\model\db\orm\PrototypeInFragment ;
 use jc\mvc\model\AbstractModel ;
@@ -335,25 +334,30 @@ class Model extends AbstractModel implements IModel , IPaginal
 		}
 	}
 	
+	/**
+	 * @return jc\db\sql\Criteria
+	 */
 	public function criteria($bAutoCreate=true)
 	{
 		if( !$this->aCriteria and $bAutoCreate )
 		{
-			$this->aCriteria = new Criteria() ;
-			$this->aCriteria->setRestriction(
-				$aRestriction = new Restriction()
-			) ;
-			
 			if(!$this->aPrototype)
 			{
 				throw new Exception("无效的db\\Model,缺少原型对象") ;
 			}
-			$aRestriction->setDefaultTable(
-				$this->aPrototype->tableAlias()
-			) ;
+			
+			$this->aCriteria = $this->aPrototype->sqlFactory()->createCriteria() ;
 		}
 		
 		return $this->aCriteria ;
+	}
+	
+	/**
+	 * @return jc\db\sql\Restriction
+	 */
+	public function createRestriction($bLogic=true)
+	{
+		return $this->criteria(true)->restriction(true)->createRestriction($bLogic) ;
 	}
 	
 	public function findChildBy($values,$keys=null)

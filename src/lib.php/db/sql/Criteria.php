@@ -2,23 +2,22 @@
 namespace jc\db\sql;
 
 use jc\lang\Exception;
-use jc\db\sql\IStatement;
-use jc\db\sql\Restriction;
-use jc\db\sql\Order;
 
-class Criteria implements IStatement {
+class Criteria extends SubStatement
+{
 	public function __construct(Restriction $aRestriction = null){
 		if($aRestriction !== null){
 			$this->setRestriction($aRestriction);
 		}
 	}
+	
 	/**
 	 * 把所有条件拼接成字符串,相当于把这个对象字符串化
 	 * 
 	 * @param $bFormat 是否添加换行以便阅读
 	 * @return string
 	 */
-	public function makeStatement($bFormat = false) {
+	public function makeStatement($bFormat = false,$bEnableLimitStart=false) {
 		if($this->aRestriction)
 		{
 			$sStatement = ' WHERE ' . $this->aRestriction->makeStatement($bFormat);
@@ -28,7 +27,7 @@ class Criteria implements IStatement {
 			$sStatement .= ' ' . $this->aOrder->makeStatement($bFormat);
 		}
 		
-		$sStatement .= ' ' . $this->makeStatementLimit() ;
+		$sStatement .= ' ' . $this->makeStatementLimit($bFormat,$bEnableLimitStart) ;
 		
 		return $sStatement;
 	}
@@ -38,18 +37,7 @@ class Criteria implements IStatement {
 	}
 	
 	/**
-	 * 参数为true时允许设置limit的开始值,比如:"LIMIT 5,10"
-	 * 参数为false时只能设置limit的结束值,比如:"LIMIT 30" 
-	 * @param boolen $bEnableLimitStart
-	 */
-	public function setEnableLimitStart($bEnableLimitStart) {
-		$this->bEnableLimitStart = $bEnableLimitStart;
-	}
-	
-	/**
 	 *  设置limit条件
-	 *  默认是只设置limit长度,如果需要在select语句中设置limit区间,就使用setEnableLimitStart()方法打开from锁定,
-	 *  在通过本方法的第2个参数设置from值,未打开锁定就设置from值会报异常
 	 * @param int $nLimitLen limit 长度
 	 * @param int $nLimitFrom limit 开始
 	 */
@@ -58,14 +46,14 @@ class Criteria implements IStatement {
 		$this->setLimitFrom($nLimitFrom);
 	}
 	
-	public function makeStatementLimit($bFormat = false){
+	public function makeStatementLimit($bFormat = false,$bEnableLimitStart=false){
 		$nLimitLen = $this->limitLen();
 		$nLimitFrom = $this->limitFrom();
 		if($nLimitLen === -1){
 			return '';
 		}
 		$sLimit = ' LIMIT ';
-		if($this->bEnableLimitStart and $nLimitFrom != 0){
+		if($bEnableLimitStart and $nLimitFrom != 0){
 			$sLimit .= $nLimitFrom . ',';
 		}
 		$sLimit .= $nLimitLen;
@@ -73,11 +61,7 @@ class Criteria implements IStatement {
 	}
 	
 	public function setLimitFrom($nLimitFrom) {
-		if($this->bEnableLimitStart === true OR $nLimitFrom == 0){
-			$this->nLimitFrom = (int)$nLimitFrom;
-		}else{
-			throw new Exception('在不允许使用limit from的情况下尝试设置from的值,请确保使用了合法的sql语句,或者检查是否忘记打开允许使用limit from的标记');
-		}
+		$this->nLimitFrom = (int)$nLimitFrom;
 	}
 	public function limitFrom()
 	{
@@ -100,10 +84,10 @@ class Criteria implements IStatement {
 	/**
 	 * @return Restriction
 	 */
-	public function restriction($bCreate=true){
-		if( !$this->aRestriction and $bCreate )
+	public function restriction($bAutoCreate=true){
+		if( !$this->aRestriction and $bAutoCreate )
 		{
-			$this->aRestriction = new Restriction();
+			$this->aRestriction = $this->statementFactory()->createRestriction();
 		}
 		return $this->aRestriction ;
 	}
@@ -116,18 +100,18 @@ class Criteria implements IStatement {
 	 * 
 	 * @return Order 
 	 */
-	public function order(){
-		if($this->aOrder != null){
-			return $this->aOrder;
-		}else{
-			return $this->aOrder = new Order();
+	public function orders($bAutoCreate=true){
+		if(!$this->aOrder and $bAutoCreate)
+		{
+			$this->aOrder = $this->statementFactory()->createOrder();
 		}
+
+		return $this->aOrder;
 	}
 	
 	private $aRestriction = null;
 	private $aOrder = null;
 	private $nLimitFrom = 0;
 	private $nLimitLen = 30;
-	private $bEnableLimitStart = false;
 }
 ?>

@@ -2,6 +2,8 @@
 
 namespace jc\db\sql ;
 
+use jc\system\Application;
+
 use jc\lang\Exception;
 use jc\db\sql\Criteria;
 
@@ -52,6 +54,11 @@ class Select extends MultiTableStatement
 					): ''
 		) ;
 	}
+
+	protected function makeStatementCriteria($bFormat=false)
+	{
+		return ($aCriteria=$this->criteria(false))? $aCriteria->makeStatement($bFormat,true): '' ;
+	}
 	
 	public function checkValid($bThrowException=true)
 	{
@@ -79,12 +86,6 @@ class Select extends MultiTableStatement
 			$sClmName.= " AS '".$sAlias."'" ;
 		}
 		$this->arrColumns[] = $sClmName ;
-	}
-	
-	public function createCriteria(){
-		$aCriteria = new Criteria();
-		$aCriteria->setEnableLimitStart(true);
-		return $aCriteria;
 	}
 	
 	private $arrColumns = array() ;

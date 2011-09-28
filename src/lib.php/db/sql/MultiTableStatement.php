@@ -1,9 +1,7 @@
 <?php 
-
 namespace jc\db\sql ;
 
 use jc\util\HashTable;
-
 use jc\lang\Exception;
 
 abstract class MultiTableStatement extends Statement
@@ -25,17 +23,13 @@ abstract class MultiTableStatement extends Statement
 	/**
 	 * @return Criteria
 	 */
-	public function criteria($bCreate=true)
+	public function criteria($bAutoCreate=true)
 	{
-		if( !$this->aCriteria and $bCreate )
+		if( !$this->aCriteria and $bAutoCreate )
 		{
-			$this->aCriteria = $this->createCriteria() ;
+			$this->aCriteria = $this->statementFactory()->createCriteria() ;
 		}
 		return $this->aCriteria ;
-	}
-	
-	public function createCriteria(){
-		return new Criteria();
 	}
 
 	public function setCriteria(Criteria $aCriteria)
@@ -49,15 +43,12 @@ abstract class MultiTableStatement extends Statement
 		
 		$sStatement.= " FROM" . $this->makeStatementTableList($bFormat) ;
 	
-		if($this->aCriteria)
-		{
-			$sStatement.= $this->aCriteria->makeStatement($bFormat) ;
-		}
+		$sStatement.= $this->makeStatementCriteria($bFormat) ;
 		
 		return $sStatement ;
 	}
 	
-	public function makeStatementTableList($bFormat=false)
+	protected function makeStatementTableList($bFormat=false)
 	{
 		foreach($this->arrTables as $table)
 		{
@@ -69,6 +60,11 @@ abstract class MultiTableStatement extends Statement
 			
 			return ' ' . implode(", ",$arrTables) ;
 		}
+	}
+	
+	protected function makeStatementCriteria($bFormat=false)
+	{
+		return $this->aCriteria? $this->aCriteria->makeStatement($bFormat,false): '' ;
 	}
 	
 	public function checkValid($bThrowException=true)
@@ -84,6 +80,19 @@ abstract class MultiTableStatement extends Statement
 		}
 		
 		return true ;
+	}
+	
+	/**
+	 * @return Table
+	 */
+	public function createTable($sName,$sAlias=null,$bAdd=true)
+	{
+		$aTable = $this->statementFactory()->createTable($sName,$sAlias) ;
+		if($bAdd)
+		{
+			$this->addTable($aTable) ;
+		}
+		return $aTable ;
 	}
 	
 	private $arrTables = array() ;

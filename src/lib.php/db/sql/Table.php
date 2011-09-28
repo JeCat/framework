@@ -2,7 +2,7 @@
 namespace jc\db\sql ;
 
 class Table extends SubStatement
-{	
+{
 	public function __construct($sTableName,$sAlias=null)
 	{
 		$this->sTableName = $sTableName ;

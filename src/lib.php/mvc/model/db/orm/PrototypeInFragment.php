@@ -1,9 +1,12 @@
 <?php
 namespace jc\mvc\model\db\orm ;
 
-use jc\db\sql\Restriction;
+use jc\db\sql\name\NameTransfer;
 
-use jc\db\sql\Criteria;
+use jc\db\sql\StatementFactory;
+
+use jc\db\sql\Statement;
+use jc\db\sql\Restriction;
 use jc\db\sql\TablesJoin;
 use jc\db\sql\Table;
 use jc\lang\Exception;
@@ -71,13 +74,15 @@ class PrototypeInFragment extends Prototype
 	{
 		if( !$this->aTable )
 		{
-			$this->aTable = new Table($this->tableName(),$this->tableAlias()) ;
+			$aSqlFactory = $this->sqlFactory() ;
+			
+			$this->aTable = $aSqlFactory->createTable($this->tableName(),$this->tableAlias()) ;
 			
 			// join 被其他原型多对多关系中的中间表
 			if( $aAssociateBy=$this->associateBy() and $aAssociateBy->type()===Association::hasAndBelongsToMany )
 			{
 				// bridge 表到 to表的关联条件					
-				$aBridgeRestriction=new Restriction() ;
+				$aBridgeRestriction = $aSqlFactory->createRestriction() ;
 				$this->setAssociationRestriction(
 						$aBridgeRestriction
 						, $this->bridgeTableAlias(), $this->tableAlias()
@@ -85,12 +90,12 @@ class PrototypeInFragment extends Prototype
 				) ;
 				
 				// build sql table join by association
-				$aTableJoin = new TablesJoin() ;
+				$aTableJoin = $aSqlFactory->createTablesJoin() ;
 				$aTableJoin->addTable(
-						new Table($aAssociateBy->bridgeTableName(),$this->bridgeTableAlias())
+						$aSqlFactory->createTable($aAssociateBy->bridgeTableName(),$this->bridgeTableAlias())
 						, $aBridgeRestriction
 				) ;
-				$this->sqlTable()->addJoin($aTableJoin) ;
+				$this->aTable->addJoin($aTableJoin) ;
 			}
 			
 			// 关联其他原型的数据表
@@ -106,7 +111,7 @@ class PrototypeInFragment extends Prototype
 					}
 					
 					// build sql table join by association
-					$aTableJoin = new TablesJoin() ;
+					$aTableJoin = $aSqlFactory->createTablesJoin() ;
 					$aTableJoin->addTable($aAssoc->toPrototype()->sqlTable(),$this->createAssociationRestriction($aAssoc)) ;
 					$this->aTable->addJoin($aTableJoin) ;
 				}
@@ -164,6 +169,44 @@ class PrototypeInFragment extends Prototype
 		return $this->sBridgeTableAlias ;
 	}
 	
+	/**
+	 * jc\db\sql\StatementFactory
+	 */
+	public function sqlFactory()
+	{
+		// 被其他原型关联
+		if( $this->aAssociateBy )
+		{
+			return $this->aAssociateBy->fromPrototype()->sqlFactory() ;
+		}
+		
+		else 
+		{
+			if( !$this->aSqlFactory )
+			{
+				$this->aSqlFactory = new StatementFactory() ;
+				
+				$aNameTransfer = $this->aSqlFactory->createNameTransferFactory()->create() ;
+				$this->aSqlFactory->setNameTransfer($aNameTransfer) ;
+				$aNameTransfer->addColumnNameHandle( array($this,'columnNameTransfer') ) ;
+			}
+			
+			return $this->aSqlFactory ;
+		}
+		
+	}
+	
+	public function columnNameTransfer($sColumnName)
+	{
+		// 在没有表名的字段前 添加默认表名
+		if( strstr($sColumnName,'.')===false )
+		{
+			$sColumn = NameTransfer::makeSureBackQuote($this->tableAlias()) . '.' . NameTransfer::makeSureBackQuote($sColumnName) ;
+		}
+		
+		return $sColumn ;
+	}
+	
 	private $aAssociateBy ;
 	
 	private $sTableAlias ;
@@ -171,6 +214,8 @@ class PrototypeInFragment extends Prototype
 	private $sBridgeTableAlias ;
 	
 	private $aTable ;
+	
+	private $aSqlFactory ;
 }
 
 ?>

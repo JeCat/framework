@@ -1,14 +1,12 @@
 <?php
 namespace jc\mvc\model\db\orm\operators ;
 
-use jc\db\sql\IStatement;
+use jc\db\sql\Statement;
 use jc\mvc\model\db\orm\Association;
-use jc\db\sql\TablesJoin;
 use jc\lang\Exception;
-use jc\db\sql\Table;
 use jc\mvc\model\db\orm\PrototypeInFragment;
 
-abstract class StatementForAssocQuery implements IStatement 
+abstract class StatementForAssocQuery extends Statement 
 {
 	public function __construct(PrototypeInFragment $aPrototype)
 	{
@@ -37,7 +35,8 @@ abstract class StatementForAssocQuery implements IStatement
 		// 未被其他原型单属关联，做为"片段"的起点
 		if( !$aAssocBy=$aPrototype->associateBy() or !$aAssocBy->isOneToOne() )
 		{
-			$this->realStatement()->addTable( $aPrototype->sqlTable() ) ;
+			$aStatement = $this->realStatement() ;
+			$aStatement->addTable( $aPrototype->sqlTable() ) ;
 		}
 	}
 	
@@ -52,12 +51,30 @@ abstract class StatementForAssocQuery implements IStatement
 	{
 		return $this->aPrototype ;
 	}
+
+	/**
+	 * @return jc\db\sql\Statement
+	 */
+	public function realStatement()
+	{
+		if(!$this->aStatement)
+		{
+			$this->aStatement = $this->createRealStatement() ;
+		}
+		
+		return $this->aStatement ;
+	}
 	
-	abstract public function realStatement() ;
+	/**
+	 * @return jc\db\sql\Statement
+	 */
+	abstract public function createRealStatement() ;
 	
 	private $aPrototype ;
 	
 	private $sSql ;
+	
+	private $aStatement ;
 }
 
 ?>

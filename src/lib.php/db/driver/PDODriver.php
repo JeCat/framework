@@ -4,7 +4,7 @@ namespace jc\db\driver ;
 
 use jc\db\recordset\PDORecordSet;
 use jc\db\ExecuteException;
-use jc\db\sql\IStatement;
+use jc\db\sql\Statement;
 
 class PDODriver extends \PDO implements IDriver
 {
@@ -36,7 +36,7 @@ class PDODriver extends \PDO implements IDriver
 	 */
 	public function query($sql)
 	{
-		$arrLog['sql'] = ($sql instanceof IStatement)?
+		$arrLog['sql'] = ($sql instanceof Statement)?
 					$sql->makeStatement(): strval($sql) ;
 
 		$fBefore = microtime(true) ;
@@ -60,7 +60,7 @@ class PDODriver extends \PDO implements IDriver
 	
 	public function execute($sql)
 	{		
-		$arrLog['sql'] = ($sql instanceof IStatement)?
+		$arrLog['sql'] = ($sql instanceof Statement)?
 					$sql->makeStatement(): strval($sql) ;
 
 		$fBefore = microtime(true) ;

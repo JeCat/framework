@@ -8,7 +8,7 @@ class TablesJoin extends SubStatement
 	const JOIN_LEFT = "LEFT JOIN" ;
 	const JOIN_RIGHT = "RIGHT JOIN" ;
 	const JOIN_INNER = "INNER JOIN" ;
-	
+
 	public function __construct($sType=self::JOIN_LEFT)
 	{
 		if( !in_array($sType,array(

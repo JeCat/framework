@@ -59,19 +59,20 @@ class NodeCompiler extends BaseCompiler
 			if( $aAttrCompiler = $aCompilerManager->compiler($aAttrVal) )
 			{
 				$aAttrCompiler->compile($aAttrVal,$aDev,$aCompilerManager) ;
+				get_class($aAttrCompiler) ;
 			}
 			else 
 			{
 				if($sName)
 				{
 					$aDev->output(
-						addslashes($aAttrs->get($sName))
+						addcslashes($aAttrs->get($sName),$aAttrVal->quoteType().'\\')
 					) ;
 				}
 				else 
 				{
 					$aDev->output(
-						addslashes($aAttrs->source())
+						addcslashes($aAttrs->source(),$aAttrVal->quoteType().'\\')
 					) ;
 				}
 			}
