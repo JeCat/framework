@@ -12,16 +12,46 @@ use jc\util\IDataSrc;
 use jc\system\Application;
 use jc\system\HttpRequest;
 
-
 /*!
-    attr.nums : int 显示几页 5
+    attr.nums : int 显示几页（即分页器的宽度） 5
     attr.showFirst
     attr.showLast ： bool 是否显示“第一页”与“最后一页” true
     attr.showTotal : bool 是否显示“共*页” true
     attr.showPre
     attr.showNext : bool 是否显示“上一页”与“下一页” true
     
-    pageNumList() 由 PaginatorStrategy 对象控制。
+    pageNumList() 由 PaginatorStrategy 对象控制。目前只提供一个Middle策略。
+*/
+/*!
+    // example:
+    // code:
+    class TryPaginatorController extends Controller {
+        protected function init() {
+            $this->createFormView( "TryPaginator" );
+            $aPaginator = new Paginator( 'paginator' ,$this->aParams);
+            $this->viewTryPaginator->addWidget( $aPaginator );
+            $aModel = new Model('electronicnewspaper_newspaper',true);
+            $aPaginator -> setPerPageCount(2);
+            $this->viewTryPaginator->setModel($aModel);
+            $aPaginator -> setPerPageCount(3);
+            $aModel->load();
+            $arrTitle = array();
+            foreach($aModel->childIterator() as $b){
+                $arrTitle[] = $b['title'];
+            }
+            $this->viewTryPaginator->variables()->set('arrTitle',$arrTitle);
+        }
+    }
+    // template:
+    <msgqueue for="$theView" />
+    <table border="1">
+        <foreach for='{=$arrTitle}' item='title'>
+            <tr><td>{=$title}</td></tr>
+        </foreach>
+    </table>
+    <form id="theform" method='post'>
+	    <widget id='paginator' attr.nums='7' attr.strategy.type='expression' attr.strategy='new \jc\mvc\view\widget\paginatorstrategy\Middle' />
+    </form>
 */
 class Paginator extends FormWidget implements IModelChangeObserver{
     public function __construct($sId =null ,IDataSrc $aDataSource = null , IView $aView = null) {
@@ -33,6 +63,7 @@ class Paginator extends FormWidget implements IModelChangeObserver{
 	
     public function setPerPageCount($iCount){
         $this->iCount=(int)$iCount;
+        $this->updatePaginal();
     }
     
     public function perPageCount(){
@@ -46,6 +77,7 @@ class Paginator extends FormWidget implements IModelChangeObserver{
     
     public function setCurrentPageNum($iNum){
         $this->setValue($iNum);
+        $this->updatePaginal();
     }
     
     public function currentPageNum(){
@@ -61,10 +93,13 @@ class Paginator extends FormWidget implements IModelChangeObserver{
     
     public function setPaginal($aPaginal){
         $this->aPaginal=$aPaginal;
+    }
+    
+    protected function updatePaginal(){
         if( $this->aPaginal === null ) return;
         $iPerPage = (int) $this->perPageCount();
         $iPageNum = (int) $this->currentPageNum();
-        $aPaginal->setPagination($iPerPage,$iPageNum);
+        $this->aPaginal->setPagination($iPerPage,$iPageNum);
     }
     
     public function pageNumList(){
@@ -82,7 +117,7 @@ class Paginator extends FormWidget implements IModelChangeObserver{
         if( $aRequest instanceof HttpRequest )
         {
             $str=$aRequest -> urlQuery();
-            $arrQuery = explode(  '&',$str);
+            if(!empty($str)) $arrQuery = explode('&',$str);
             $strKeyName = $this->formName();
             $bFlag =  false;
             $arrQuery1 = array_map( function( $str) use($strKeyName,&$bFlag,$iPageNum) {
