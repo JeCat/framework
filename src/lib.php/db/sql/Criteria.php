@@ -17,17 +17,20 @@ class Criteria extends SubStatement
 	 * @param $bFormat 是否添加换行以便阅读
 	 * @return string
 	 */
-	public function makeStatement($bFormat = false) {
+	public function makeStatement($bFormat = false,$bEnableLimitStart=false) {
+		
+		$sStatement = '' ;
+		
 		if($this->aRestriction)
 		{
-			@$sStatement = ' WHERE ' . $this->aRestriction->makeStatement($bFormat);
+			$sStatement = ' WHERE ' . $this->aRestriction->makeStatement($bFormat);
 		}
 		if( $this->aOrder )
 		{
-			@$sStatement .= ' ' . $this->aOrder->makeStatement($bFormat);
+			$sStatement .= ' ' . $this->aOrder->makeStatement($bFormat);
 		}
 		
-		@$sStatement .= ' ' . $this->makeStatementLimit() ;
+		$sStatement .= ' ' . $this->makeStatementLimit($bFormat,$bEnableLimitStart) ;
 		
 		return $sStatement;
 	}
@@ -37,18 +40,7 @@ class Criteria extends SubStatement
 	}
 	
 	/**
-	 * 参数为true时允许设置limit的开始值,比如:"LIMIT 5,10"
-	 * 参数为false时只能设置limit的结束值,比如:"LIMIT 30" 
-	 * @param boolen $bEnableLimitStart
-	 */
-	public function setEnableLimitStart($bEnableLimitStart) {
-		$this->bEnableLimitStart = $bEnableLimitStart;
-	}
-	
-	/**
 	 *  设置limit条件
-	 *  默认是只设置limit长度,如果需要在select语句中设置limit区间,就使用setEnableLimitStart()方法打开from锁定,
-	 *  在通过本方法的第2个参数设置from值,未打开锁定就设置from值会报异常
 	 * @param int $nLimitLen limit 长度
 	 * @param int $nLimitFrom limit 开始
 	 */
@@ -57,14 +49,14 @@ class Criteria extends SubStatement
 		$this->setLimitFrom($nLimitFrom);
 	}
 	
-	public function makeStatementLimit($bFormat = false){
+	public function makeStatementLimit($bFormat = false,$bEnableLimitStart=false){
 		$nLimitLen = $this->limitLen();
 		$nLimitFrom = $this->limitFrom();
 		if($nLimitLen === -1){
 			return '';
 		}
 		$sLimit = ' LIMIT ';
-		if($this->bEnableLimitStart and $nLimitFrom != 0){
+		if($bEnableLimitStart and $nLimitFrom != 0){
 			$sLimit .= $nLimitFrom . ',';
 		}
 		$sLimit .= $nLimitLen;
@@ -72,11 +64,7 @@ class Criteria extends SubStatement
 	}
 	
 	public function setLimitFrom($nLimitFrom) {
-		if($this->bEnableLimitStart === true OR $nLimitFrom == 0){
-			$this->nLimitFrom = (int)$nLimitFrom;
-		}else{
-			throw new Exception('在不允许使用limit from的情况下尝试设置from的值,请确保使用了合法的sql语句,或者检查是否忘记打开允许使用limit from的标记');
-		}
+		$this->nLimitFrom = (int)$nLimitFrom;
 	}
 	public function limitFrom()
 	{
@@ -128,6 +116,5 @@ class Criteria extends SubStatement
 	private $aOrder = null;
 	private $nLimitFrom = 0;
 	private $nLimitLen = 30;
-	private $bEnableLimitStart = false;
 }
 ?>

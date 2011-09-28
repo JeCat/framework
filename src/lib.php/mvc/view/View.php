@@ -77,6 +77,9 @@ class View extends NamableComposite implements IView
 	public function setModel(IModel $aModel)
 	{
 		$this->aModel = $aModel ;
+		foreach($this->arrObserver as $aObserver){
+		    $aObserver->onModelChanging($this);
+		}
 		return $this ;
 	}
 	
@@ -353,6 +356,19 @@ class View extends NamableComposite implements IView
     	
 		throw new Exception("正在访问视图 %s 中不存在的属性: %s",array($this->name(),$sName)) ;
     }
+    
+    public function addModelObserver(IModelChangeObserver $aObserver){
+        $this->arrObserver[]=$aObserver;
+    }
+    
+    public function removeModelObserver(IModelChangeObserver $aObserver){
+        $k = array_search($aObserver,$this->arrObserver,true);
+        unset($this->arrObserver[$k]);
+    }
+    
+    public function clearModelObserver(){
+        $this->arrObserver=array();
+    }
 	
 	private $aModel ;
 	private $aWidgets ;
@@ -363,6 +379,7 @@ class View extends NamableComposite implements IView
 	private $aDataExchanger ;
 	private $aMsgQueue ;
 	private $bEnable = true ;
+	private $arrObserver = array();
 }
 
 ?>

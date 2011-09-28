@@ -54,6 +54,11 @@ class Select extends MultiTableStatement
 					): ''
 		) ;
 	}
+
+	protected function makeStatementCriteria($bFormat=false)
+	{
+		return ($aCriteria=$this->criteria(false))? $aCriteria->makeStatement($bFormat,true): '' ;
+	}
 	
 	public function checkValid($bThrowException=true)
 	{
@@ -81,12 +86,6 @@ class Select extends MultiTableStatement
 			$sClmName.= " AS '".$sAlias."'" ;
 		}
 		$this->arrColumns[] = $sClmName ;
-	}
-	
-	public function createCriteria(){
-		$aCriteria = parent::createCriteria() ;
-		$aCriteria->setEnableLimitStart(true) ;
-		return $aCriteria;
 	}
 	
 	private $arrColumns = array() ;

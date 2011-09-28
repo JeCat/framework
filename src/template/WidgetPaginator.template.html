@@ -1,0 +1,22 @@
+<if "{=$theWidget->attributeBool('showfirst',true) }" >
+    <a href="{=$theWidget->pageUrl(1)}">第一页</a>
+</if>
+<if "{=$theWidget->attributeBool('showpre',true) && $theWidget->currentPageNum() != 1 }" >
+    <a href="{=$theWidget->pageUrl($theWidget->currentPageNum() -1 )}">上一页</a>
+</if>
+<foreach for='{=$theWidget->pageNumList()}' item='index'>
+    <if "{= ($index == $theWidget->currentPageNum() )}" >
+        <a>第{=$index}页</a>
+	<else />
+	    <a href="{=$theWidget->pageUrl($index)}">第{=$index}页</a>
+	</if>
+</foreach>
+<if "{=$theWidget->attributeBool('shownext',true) && $theWidget->currentPageNum() != $theWidget->totalPageCount() }" >
+    <a href="{=$theWidget->pageUrl($theWidget->currentPageNum() +1 )}">下一页</a>
+</if>
+<if "{=$theWidget->attributeBool('showlast',true)}" >
+    <a href="{=$theWidget->pageUrl($theWidget->totalPageCount()  )}">最后一页</a>
+</if>
+<if "{=$theWidget->attributeBool('showtotal',true)}" >
+    共{=$theWidget->totalPageCount()}页
+</if>

@@ -20,8 +20,10 @@ use jc\mvc\model\db\orm\PrototypeInFragment ;
 use jc\mvc\model\AbstractModel ;
 use jc\db\sql\IDriver ;
 use jc\lang\Object;
+use jc\mvc\model\IPaginal;
+use jc\mvc\view\widget\Paginator;
 
-class Model extends AbstractModel implements IModel
+class Model extends AbstractModel implements IModel , IPaginal
 {
 	/**
 	 * 
@@ -115,7 +117,7 @@ class Model extends AbstractModel implements IModel
 			// 根据 原型 自动创建子模型
 			if( $aAssocs=$this->prototype()->associations(false) and $aAssociation=$aAssocs->get($sName) )
 			{
-				$aChild = $aAssociation->toPrototype()->createModel() ;
+				$aChild = $aAssociation->toPrototype()->createModel(false) ;
 				$this->addChild($aChild,$aAssociation->modelProperty()) ;
 				
 				// 多属关系
@@ -153,7 +155,7 @@ class Model extends AbstractModel implements IModel
 			
 			while( $aRecordSet->valid() )
 			{
-				$aModel = $aPrototype? $aPrototype->createModel(): new self() ;
+				$aModel = $aPrototype? $aPrototype->createModel(false): new self() ;
 				$aModel->loadData($aRecordSet,$bSetSerialized) ;
 
 				$this->addChild($aModel) ;
@@ -290,7 +292,7 @@ class Model extends AbstractModel implements IModel
 	
 	
 	
-	public function createChild()
+	public function createChild($bAdd=true,$bTearoutPrototype=true)
 	{
 		if( !$this->aPrototype )
 		{
@@ -301,27 +303,24 @@ class Model extends AbstractModel implements IModel
 			throw new Exception("模型(%s)不是一个聚合模型，无法为其创建子模型",$this->aPrototype->name()) ;
 		}
 		
-		$aChild = $this->aPrototype->createModel() ;
-		$this->addChild($aChild) ;
+		$aChild = $this->aPrototype->createModel($bTearoutPrototype) ;
+		
+		if($bAdd)
+		{
+			$this->addChild($aChild) ;
+		}
 		
 		return $aChild ;
 	}
 	
 	public function loadChild($values=null,$keys=null)
 	{
-		if( !$this->aPrototype )
-		{
-			throw new Exception("模型没有缺少对应的原型，无法为其创建子模型") ;
-		}
-		if( !$this->isAggregation() )
-		{
-			throw new Exception("模型(%s)不是一个聚合模型，无法为其创建子模型",$this->aPrototype->name()) ;
-		}
-		
-		$aChild = $this->aPrototype->createModel() ;
+		$aChild = $this->createChild(false,true) ;
 		
 		$arrArgvs = func_get_args() ;
-		if( call_user_func_array( array($aChild,'load'), $arrArgvs ) )
+		call_user_func_array( array($aChild,'load'), $arrArgvs ) ;
+
+		if( $aChild->hasSerialized() )
 		{
 			$this->addChild($aChild) ;
 			return $aChild ;
@@ -389,7 +388,7 @@ class Model extends AbstractModel implements IModel
 	{
 		if( !$aChildModel=$this->findChildBy($values,$keys) and !$aChildModel=$this->loadChild($values,$keys) )
 		{
-			$aChildModel = $this->createChild() ;
+			$aChildModel = $this->createChild(true,true) ;
 			
 			if( $keys )
 			{
@@ -410,6 +409,9 @@ class Model extends AbstractModel implements IModel
 
 		if( $this->aCriteria )
 		{
+		    $ilimitLen = $this->aCriteria->limitLen();
+		    $ilimitFrom = $this->aCriteria->limitFrom();
+		    $this->aCriteria->setLimit(1000);
 			$aSelect->setCriteria($this->aCriteria) ;
 		}
 		
@@ -421,7 +423,14 @@ class Model extends AbstractModel implements IModel
 			return 0 ;
 		}
 		
+		if( $this->aCriteria ){
+		    $this->aCriteria->setLimit($ilimitLen,$ilimitFrom);
+		}
 		return intval($aRecordSet->field('_cnt')) ;		
+	}
+	
+	public function setPagination($iPerPage,$iPageNum){
+	    $this->criteria()->setLimit( $iPerPage, $iPerPage*($iPageNum-1) ) ;
 	}
 	
 	/**

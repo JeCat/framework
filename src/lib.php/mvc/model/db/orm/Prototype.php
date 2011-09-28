@@ -206,26 +206,6 @@ class Prototype extends Object implements \Serializable
 		$aAssociations->set($aAssociation->modelProperty(), $aAssociation) ;
 	}
 
-	/**
-	 * @return jc\mvc\model\db\IModel
-	 */
-	public function createModel()
-	{
-		$sClassName = $this->modelClass() ;
-		if( !class_exists($sClassName,true) )
-		{
-			throw new Exception("Model类:%s 不存在",$sClassName) ;
-		}
-		if( $sClassName!="jc\\mvc\\model\\db\\Model" and !Type::hasImplements($sClassName,'jc\mvc\model\db\IModel') )
-		{
-			throw new Exception("%s 不是一个有效的Model类（必须实现 jc\mvc\model\db\IModel 接口）",$sClassName) ;
-		}
-		
-		$aModel = new $sClassName($this) ;
-		
-		return $aModel ;
-	}
-
 	/** 
 	 * array(
 	 * 	'name' => 'xxxx' ,

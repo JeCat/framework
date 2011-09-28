@@ -43,15 +43,12 @@ abstract class MultiTableStatement extends Statement
 		
 		$sStatement.= " FROM" . $this->makeStatementTableList($bFormat) ;
 	
-		if($this->aCriteria)
-		{
-			$sStatement.= $this->aCriteria->makeStatement($bFormat) ;
-		}
+		$sStatement.= $this->makeStatementCriteria($bFormat) ;
 		
 		return $sStatement ;
 	}
 	
-	public function makeStatementTableList($bFormat=false)
+	protected function makeStatementTableList($bFormat=false)
 	{
 		foreach($this->arrTables as $table)
 		{
@@ -63,6 +60,11 @@ abstract class MultiTableStatement extends Statement
 			
 			return ' ' . implode(", ",$arrTables) ;
 		}
+	}
+	
+	protected function makeStatementCriteria($bFormat=false)
+	{
+		return $this->aCriteria? $this->aCriteria->makeStatement($bFormat,false): '' ;
 	}
 	
 	public function checkValid($bThrowException=true)
