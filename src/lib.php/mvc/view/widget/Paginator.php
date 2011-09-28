@@ -95,6 +95,7 @@ class Paginator extends FormWidget implements IModelChangeObserver{
     
     public function setPaginal($aPaginal){
         $this->aPaginal=$aPaginal;
+        $this->updatePaginal();
     }
     
     protected function updatePaginal(){
