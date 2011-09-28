@@ -19,6 +19,8 @@ use jc\system\HttpRequest;
     attr.showTotal : bool 是否显示“共*页” true
     attr.showPre
     attr.showNext : bool 是否显示“上一页”与“下一页” true
+    attr.strategy : PaginatorStrategy 显示策略（显示哪些页码），可以是一个字符串（表示类名）或者一个对象（需要设置type为expression） new \jc\mvc\view\widget\paginatorstrategy\Middle
+    attr.onclick : string js代码，onclick事件 null
     
     pageNumList() 由 PaginatorStrategy 对象控制。目前只提供一个Middle策略。
 */
@@ -50,7 +52,7 @@ use jc\system\HttpRequest;
         </foreach>
     </table>
     <form id="theform" method='post'>
-	    <widget id='paginator' attr.nums='7' attr.strategy.type='expression' attr.strategy='new \jc\mvc\view\widget\paginatorstrategy\Middle' />
+	    <widget id='paginator' attr.nums='7' attr.strategy.type='expression' attr.strategy='new \jc\mvc\view\widget\paginatorstrategy\Middle' attr.onclick='alert(\"hello\")' />
     </form>
 */
 class Paginator extends FormWidget implements IModelChangeObserver{
