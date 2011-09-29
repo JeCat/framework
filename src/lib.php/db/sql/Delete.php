@@ -16,10 +16,10 @@ class Delete extends MultiTableStatement
 		$aCriteria = $this->criteria() ;
 		
 		$sStatement = "DELETE FROM " . $this->makeStatementTableList($bFormat) ;
-		
-		if($this->aCriteria)
+	
+		if($aaCriteria=$this->criteria(false))
 		{
-			$sStatement.= $this->aCriteria->makeStatement($bFormat) ;
+			$sStatement.= $aaCriteria->makeStatement($bFormat) ;
 		}
 		// limit
 //		$sStatement.= $this->makeStatementLimit($bFormat) ;
