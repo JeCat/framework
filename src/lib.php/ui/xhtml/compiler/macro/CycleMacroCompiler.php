@@ -1,65 +1,100 @@
 <?php
-namespace jc\ui\xhtml\compiler\macro ;
+namespace jc\ui\xhtml\compiler\macro;
+
+use jc\lang\Exception;
 
 use jc\ui\xhtml\compiler\NodeCompiler;
 
-use jc\ui\xhtml\compiler\MacroCompiler ;
+use jc\ui\xhtml\compiler\MacroCompiler;
 use jc\ui\TargetCodeOutputStream;
 use jc\ui\CompilerManager;
 use jc\ui\IObject;
 
 class CycleMacroCompiler extends MacroCompiler
 {
-	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject, TargetCodeOutputStream $aDev, CompilerManager $aCompilerManager)
 	{
-		$sSource = $aObject->source() ;
+		$sSource = $aObject->source ();
 		
-		$arrStrings = array();
+		$arrStrings = array ();
 		$sTemp = '';
 		
-		//测试字符串{@11, ,bb\\\,b\1\nb,\ 22 ,344}
-		for($i = 0; $i < strlen($sSource) ; $i++ )
+		$bIsDefine = false;
+		$bIsCall = false;
+		
+		//如果开头是变量
+		if (substr ( $sSource, 0, 1 ) === '$')
 		{
-			if( $sSource[$i] == '\\')
+			//初步判断是定义
+			$bIsDefine = true;
+		}
+		
+		//分辨是定义还是调用
+		if($bIsDefine and $nEqual = stripos($sSource, '=') and strlen(substr($sSource, $nEqual)) > 0)
+		{
+			//这是定义
+			$bIsCall = false;
+			
+			
+		}else{
+			//这是调用
+			$bIsDefine = false;
+			$bIsCall = true;
+		}
+		
+		$sVName = substr($sSource, 1, $nEqual);
+		
+		
+		//参数 分解成数组
+		for($i = 0; $i < strlen ( $sSource ); $i ++)
+		{
+			if ($sSource [$i] == '\\')
 			{
-				if($sSource[$i+1] == '\\')
+				//转义反斜线
+				if ($sSource [$i + 1] == '\\')
 				{
-					$sTemp.='\\';
-					$i++;
+					$sTemp .= '\\';
+					$i ++;
 				}
-				elseif($sSource[$i+1] == ',')
+				//转移逗号
+				elseif ($sSource [$i + 1] == ',')
 				{
-					$sTemp.=',';
-					$i++;
+					$sTemp .= ',';
+					$sTemp .= '=';
+					$i ++;
+				
+		//转义等号
+				}
+				elseif ($sSource [$i + 1] == '=')
+				{
+					$sTemp .= '=';
+					$i ++;
 				}
 				continue;
 			}
 			
-			if( $sSource[$i] == ',' )
+			if ($sSource [$i] == ',')
 			{
-				$arrStrings[] = $sTemp;
+				$arrStrings [] = $sTemp;
 				$sTemp = '';
 				continue;
 			}
 			
-			$sTemp .= $sSource[$i];
+			$sTemp .= $sSource [$i];
 		}
-		$arrStrings[] = $sTemp;
 		
-		$sArrName ='$'. NodeCompiler::assignVariableName('arrChangByLoopIndex');
-		$sObjName ='$'. NodeCompiler::assignVariableName('aStrChangByLoopIndex');
+		$arrStrings [] = $sTemp;
 		
-		$aDev->write("{$sArrName} = " . var_export($arrStrings,true) .";
+		$sArrName = '$' . NodeCompiler::assignVariableName ( 'arrChangByLoopIndex' );
+		$sObjName = '$' . NodeCompiler::assignVariableName ( 'aStrChangByLoopIndex' );
+		
+		$aDev->write ( "{$sArrName} = " . var_export ( $arrStrings, true ) . ";
 			if(!isset({$sObjName}))
 			{
 				{$sObjName} = new jc\\ui\\xhtml\\compiler\\macro\\Cycle({$sArrName});
 			}
 			{$sObjName}->printArr(\$aDevice);
-		") ;
-		
-		
-//		$aDev->write("\$aDevice->write('this is Cycle Macro <br />');") ;
-		
-//		$aDev->output("macro's content is :{$sSource}") ;
+			$aVariables->set( substr({$sObjName},1) , {$sObjName} ) ;
+		" );
 	}
 }
