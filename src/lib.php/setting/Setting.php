@@ -1,5 +1,5 @@
 <?php
-namespace jc\setting ;
+namespace jc\setting;
 
 use jc\lang\Object;
 
@@ -10,14 +10,14 @@ abstract class Setting extends Object implements ISetting
 	 */
 	public function keyIterator($sPath)
 	{
-		$aKey = $this->key($sPath) ;
+		$aKey = $this->key ( $sPath );
 		
-		if(!$aKey)
+		if (! $aKey)
 		{
-			return new \EmptyIterator() ;			
+			return new \EmptyIterator ();
 		}
 		
-		return $aKey->keyIterator() ;
+		return $aKey->keyIterator ();
 	}
 	
 	/**
@@ -25,51 +25,50 @@ abstract class Setting extends Object implements ISetting
 	 */
 	public function itemIterator($sPath)
 	{
-		$aKey = $this->key($sPath) ;
+		$aKey = $this->key ( $sPath );
 		
-		if(!$aKey)
+		if (! $aKey)
 		{
-			return new \EmptyIterator() ;			
+			return new \EmptyIterator ();
 		}
 		
-		return $aKey->itemIterator() ;
+		return $aKey->itemIterator ();
 	}
 	
-	public function item($sPath,$sName='*',$defaultValue=null)
+	public function item($sPath, $sName = '*', $defaultValue = null)
 	{
-		if(!$aKey = $this->key($sPath))
+		if (! $aKey = $this->key ( $sPath ))
 		{
-			return null ;			
+			return null;
 		}
-		return $aKey->item($sName,$defaultValue) ;
+		return $aKey->item ( $sName, $defaultValue );
 	}
 	
-	public function setItem($sPath,$sName,$value)
+	public function setItem($sPath, $sName, $value)
 	{
-		if(!$aKey = $this->key($sPath))
+		if (! $aKey = $this->key ( $sPath ))
 		{
-			$aKey = $this->createKey($sPath);
+			$aKey = $this->createKey ( $sPath );
 		}
-		$aKey->setItem($sName,$value) ;
+		$aKey->setItem ( $sName, $value );
 	}
 	
-	public function hasItem($sPath,$sName)
+	public function hasItem($sPath, $sName)
 	{
-		if(!$aKey = $this->key($sPath))
+		if (! $aKey = $this->key ( $sPath ))
 		{
-			return null ;			
+			return null;
 		}
-		return $aKey->hasItem($sName) ;
+		return $aKey->hasItem ( $sName );
 	}
 	
-	public function deleteItem($sPath,$sName)
+	public function deleteItem($sPath, $sName)
 	{
-		if(!$aKey = $this->key($sPath))
+		if (! $aKey = $this->key ( $sPath ))
 		{
-			return null ;			
+			return;
 		}
-		return $aKey->deleteItem($sName) ;
+		$aKey->deleteItem ( $sName );
 	}
 }
-
 ?>

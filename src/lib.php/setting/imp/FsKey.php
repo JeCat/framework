@@ -1,7 +1,7 @@
 <?php
 namespace jc\setting\imp ;
 
-
+use jc\fs\FSIterator;
 use jc\setting\Key;
 
 class FsKey extends Key
@@ -26,13 +26,9 @@ class FsKey extends Key
 		}
 	}
 	
-	
-	/**
-	 * @return \Iterator 
-	 */
 	public function keyIterator()
 	{
-		
+		return $this->aKeyFolder->iterator(FSIterator::FOLDER | FSIterator::RETURN_FSO);
 	}
 	
 	public function save()

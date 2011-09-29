@@ -1,7 +1,7 @@
 <?php
 namespace jc\setting\imp ;
 
-
+use jc\setting\IKey;
 use jc\setting\Setting;
 
 class FsSetting extends Setting
@@ -16,19 +16,28 @@ class FsSetting extends Setting
 	 */
 	public function key($sPath)
 	{
-		self::trimRootSlash($sPath) ;
+		$sPath = self::trimRootSlash($sPath) ;
 		
-		
+		return;
 	}
 	
 	public function createKey($sPath)
 	{
-		self::trimRootSlash($sPath) ;
+		$sPath = self::trimRootSlash($sPath) ;
+		return ;
 	}
 	
 	public function hasKey($sPath)
 	{
-		self::trimRootSlash($sPath) ;
+		$sPath = self::trimRootSlash($sPath) ;
+		
+		
+		if(!$aFolder = $this->aRootFolder->findFolder($sPath))
+		{
+			return false;
+		}
+		$aFolder;
+		
 	}
 	
 	public function deleteKey($sPath)
@@ -41,11 +50,14 @@ class FsSetting extends Setting
 	 */
 	public function keyIterator($sPath)
 	{
+		$sPath = self::trimRootSlash($sPath) ;
 		
+		if(!$aKey = $this->key($sPath))
+		{
+			return new \EmptyIterator();
+		}
+		return $aKey->keyIterator();
 	}
-	
-	
-	
 	
 	static public function trimRootSlash(&$sPath)
 	{
@@ -53,9 +65,13 @@ class FsSetting extends Setting
 		{
 			$sPath = substr($sPath,1) ;
 		}
+		return $sPath;
 	}
 	
-	
+	/**
+	 * 
+	 * @var jc\fs\IFolder
+	 */
 	private $aRootFolder ;
 }
 

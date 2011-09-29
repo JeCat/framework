@@ -1,6 +1,8 @@
 <?php
 namespace jc\ui\xhtml\compiler\macro ;
 
+use jc\ui\xhtml\compiler\NodeCompiler;
+
 use jc\ui\xhtml\compiler\MacroCompiler ;
 use jc\ui\TargetCodeOutputStream;
 use jc\ui\CompilerManager;
@@ -12,9 +14,52 @@ class CycleMacroCompiler extends MacroCompiler
 	{
 		$sSource = $aObject->source() ;
 		
+		$arrStrings = array();
+		$sTemp = '';
 		
-		$aDev->write("\$aDevice->write('this is Cycle Macro <br />');") ;
+		//测试字符串{@11, ,bb\\\,b\1\nb,\ 22 ,344}
+		for($i = 0; $i < strlen($sSource) ; $i++ )
+		{
+			if( $sSource[$i] == '\\')
+			{
+				if($sSource[$i+1] == '\\')
+				{
+					$sTemp.='\\';
+					$i++;
+				}
+				elseif($sSource[$i+1] == ',')
+				{
+					$sTemp.=',';
+					$i++;
+				}
+				continue;
+			}
+			
+			if( $sSource[$i] == ',' )
+			{
+				$arrStrings[] = $sTemp;
+				$sTemp = '';
+				continue;
+			}
+			
+			$sTemp .= $sSource[$i];
+		}
+		$arrStrings[] = $sTemp;
 		
-		$aDev->output("macro's content is :{$sSource}") ;
+		$sArrName ='$'. NodeCompiler::assignVariableName('arrChangByLoopIndex');
+		$sObjName ='$'. NodeCompiler::assignVariableName('aStrChangByLoopIndex');
+		
+		$aDev->write("{$sArrName} = " . var_export($arrStrings,true) .";
+			if(!isset({$sObjName}))
+			{
+				{$sObjName} = new jc\\ui\\xhtml\\compiler\\macro\\Cycle({$sArrName});
+			}
+			{$sObjName}->printArr(\$aDevice);
+		") ;
+		
+		
+//		$aDev->write("\$aDevice->write('this is Cycle Macro <br />');") ;
+		
+//		$aDev->output("macro's content is :{$sSource}") ;
 	}
 }
