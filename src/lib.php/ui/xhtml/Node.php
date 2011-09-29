@@ -119,6 +119,17 @@ class Node extends ObjectBase
 		return parent::summary() . "; tag name: " . $this->tagName() ;
 	}
 	
+	public function getChildNodeByTagName($sTagName)
+	{
+		foreach($this->childElementsIterator() as $aChild)
+		{
+			if( ($aChild instanceof Node) and ($aChild->tagName()==$sTagName) )
+			{
+				return $aChild ;
+			}
+		}
+	}
+	
 	private $aHeadTag ;
 	
 	private $aTailTag ;	

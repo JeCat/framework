@@ -1,10 +1,28 @@
 <?php
 namespace jc\mvc\view ;
 
+use jc\ui\xhtml\parsers\ParserStateTag;
+
 use jc\ui\xhtml\UIFactory as UIFactoryBase;
 
 class UIFactory extends UIFactoryBase
 {
+	/**
+	 * return SourceFileManager
+	 */
+	public function newInterpreterManager()
+	{
+		$aInterpreters = parent::newInterpreterManager() ;
+		
+		// for mvc
+		ParserStateTag::singleton()->addTagNames(
+				'views', 'view', 'widget', 'form', 'msgqueue', 'view:msgqueue', 'widget:msgqueue', 'resrc', 'link', 'css', 'script'
+				, 'js', 'model:foreach', 'model:foreach:end', 'model:data', 'data', 'template'
+		) ;
+		
+		return $aInterpreters ;
+	}
+	
 	/**
 	 * return SourceFileManager
 	 */

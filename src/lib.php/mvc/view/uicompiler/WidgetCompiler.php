@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\view\uicompiler ;
 
+use jc\ui\xhtml\Node;
+
 use jc\ui\xhtml\compiler\ExpressionCompiler;
 use jc\ui\xhtml\compiler\NodeCompiler;
 use jc\lang\Exception;
@@ -91,7 +93,18 @@ class WidgetCompiler extends NodeCompiler
 		
 		$sOldWidgetVarVarName = '$' . parent::assignVariableName('_aOldWidgetVar') ;
 		
-		if( $aObject->headTag()->isSingle() )
+		// 使用 <widget> 节点内部的模板内容
+		if( $aTemplate=$aObject->getChildNodeByTagName('template') )
+		{
+			$aDev->write("	{$sOldWidgetVarVarName}=\$aVariables->get('theWidget') ;") ;
+			$aDev->write("	\$aVariables->set('theWidget',{$sWidgetVarName}) ;") ;
+		
+			$this->compileChildren($aTemplate,$aDev,$aCompilerManager) ;
+			
+			$aDev->write("	\$aVariables->set('theWidget',{$sOldWidgetVarVarName}) ;") ;
+		}
+		
+		else
 		{
 			$aDev->write("	if(empty(\$__aVariablesForWidgets)){	// 创建一个被所有 widget 共享的 Variables 对象") ;
 			$aDev->write("		\$__aVariablesForWidgets = new \\jc\\util\\HashTable() ;") ;
@@ -102,17 +115,6 @@ class WidgetCompiler extends NodeCompiler
 			$aDev->write("	{$sWidgetVarName}->display(\$this,\$__aVariablesForWidgets,\$aDevice) ;") ;
 			
 			$aDev->write("	\$__aVariablesForWidgets->set('theWidget',{$sOldWidgetVarVarName}) ;") ;
-		}
-		
-		// 使用 <widget> 节点内部的模板内容
-		else
-		{
-			$aDev->write("	{$sOldWidgetVarVarName}=\$aVariables->get('theWidget') ;") ;
-			$aDev->write("	\$aVariables->set('theWidget',{$sWidgetVarName}) ;") ;
-		
-			$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
-			
-			$aDev->write("	\$aVariables->set('theWidget',{$sOldWidgetVarVarName}) ;") ;
 		}
 		
 		$aDev->write("}") ;

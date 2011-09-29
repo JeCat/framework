@@ -36,12 +36,6 @@ class UIFactory extends UIFactoryBase
 				, 'nl', 'clear', 'code'
 		) ;
 		
-		// for mvc
-		ParserStateTag::singleton()->addTagNames(
-				'views', 'view', 'widget', 'form', 'msgqueue', 'view:msgqueue', 'widget:msgqueue', 'resrc', 'link', 'css', 'script'
-				, 'js', 'model:foreach', 'model:foreach:end', 'model:data', 'data'
-		) ;
-		
 		return $aInterpreters ;
 	}
 	
