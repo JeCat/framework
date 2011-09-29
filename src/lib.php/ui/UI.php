@@ -2,6 +2,8 @@
 
 namespace jc\ui ;
 
+use jc\system\Application;
+
 use jc\io\IInputStream;
 
 use jc\fs\IFile;
@@ -205,6 +207,14 @@ class UI extends JcObject
 		
 		// render
 		$this->render($aCompiledFile,$aVariables,$aDevice) ;
+	}
+	
+	/**
+	 * @return jc\locale\Locale
+	 */
+	public function locale()
+	{
+		return Application::singleton()->localeManager()->locale() ;
 	}
 	
 	private $aSourceFileManager ;

@@ -59,7 +59,8 @@ class WidgetCompiler extends NodeCompiler
 		}
 		else 
 		{
-			throw new Exception("widget标签缺少必要属性:%s 或 %s",array('id','instance')) ;
+			$aDev->write("\$aDevice->write(\$this->locale()->trans('&lt;widget&gt;标签缺少必要属性:id 或 instance')) ;") ;
+			return ;
 		}
 		
 		
