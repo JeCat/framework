@@ -28,25 +28,25 @@ class MsgQueueCompiler extends NodeCompiler
 		$aDev->write("\\jc\\lang\\Assert::type( '\\\\jc\\\\message\\\\IMessageQueue',\$__ui_msgqueue);\r\n") ;
 		
 		
-		// 使用默认模板
-		if( $aObject->headTag()->isSingle() )
-		{
-			$aDev->write("if( \$__ui_msgqueue->count() ){ \r\n") ;
-			$aDev->write("	\$__ui_msgqueue->display(\$this,\$aDevice) ;\r\n") ;
-			$aDev->write("}\r\n") ;
-		}
-		
-		// 现场定义的模板
-		else 
+		// 使用 <msgqueue> 节点内部的模板内容
+		if( $aTemplate=$aObject->getChildNodeByTagName('template') )
 		{
 			$sOldMsgQueueVarVarName = '$' . parent::assignVariableName('_aOldMsgQueueVar') ;
 		
 			$aDev->write("{$sOldMsgQueueVarVarName}=\$aVariables->get('aMsgQueue',\$__ui_msgqueue) ;") ;
 			$aDev->write("\$aVariables->set('aMsgQueue',\$__ui_msgqueue) ;") ;
 		
-			$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
+			$this->compileChildren($aTemplate,$aDev,$aCompilerManager) ;
 			
 			$aDev->write("\$aVariables->set('aMsgQueue',{$sOldMsgQueueVarVarName}) ;") ;
+		}
+		
+		// 使用默认模板
+		else 
+		{
+			$aDev->write("if( \$__ui_msgqueue->count() ){ \r\n") ;
+			$aDev->write("	\$__ui_msgqueue->display(\$this,\$aDevice) ;\r\n") ;
+			$aDev->write("}\r\n") ;
 		}
 	}
 }
