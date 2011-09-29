@@ -25,7 +25,8 @@ class UIFactory extends UIFactoryBase
 				->addMacroType('?')
 				->addMacroType('=')
 				->addMacroType('/')
-				->addMacroType('*') ;
+				->addMacroType('*')
+				->addMacroType('@') ;
 
 		// for ui
 		ParserStateTag::singleton()->addTagNames(
@@ -117,6 +118,7 @@ class UIFactory extends UIFactoryBase
 			$aMacroCompiler->addSubCompiler('?',__NAMESPACE__."\\compiler\\macro\\EvalMacroCompiler") ;
 			$aMacroCompiler->addSubCompiler('=',__NAMESPACE__."\\compiler\\macro\\PrintMacroCompiler") ;
 			$aMacroCompiler->addSubCompiler('/',__NAMESPACE__."\\compiler\\macro\\PathMacroCompiler") ;
+			$aMacroCompiler->addSubCompiler('@',__NAMESPACE__."\\compiler\\macro\\CycleMacroCompiler") ;
 		}
 		
 		return $aMacroCompiler ;
