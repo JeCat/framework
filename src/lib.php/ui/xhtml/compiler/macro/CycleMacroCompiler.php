@@ -2,9 +2,7 @@
 namespace jc\ui\xhtml\compiler\macro;
 
 use jc\lang\Exception;
-
 use jc\ui\xhtml\compiler\NodeCompiler;
-
 use jc\ui\xhtml\compiler\MacroCompiler;
 use jc\ui\TargetCodeOutputStream;
 use jc\ui\CompilerManager;
@@ -20,22 +18,22 @@ class CycleMacroCompiler extends MacroCompiler
 		if (substr ( $sSource, 0, 1 ) === '$')
 		{
 			//分辨是定义还是调用
-			if($bIsDefine and $nEqual = stripos($sSource, '=') and strlen(substr($sSource, $nEqual)) > 0)
+			if( $nEqual = stripos($sSource, '=') and strlen(substr($sSource, $nEqual)) > 0)
 			{
 				//这是定义
-				$sObjName = substr($sSource, 1, $nEqual);
-				$arrStrings = $this->getElementsBySource(substr($sSource, $nEqual));
+				$sObjName = '$' . substr($sSource, 1, $nEqual-1);
+				$arrStrings = $this->getElementsBySource(substr($sSource, $nEqual+1));
 				$sArrName = '$' . NodeCompiler::assignVariableName ( 'arrChangByLoopIndex' );
 				$aDev->write ( "{$sArrName} = " . var_export ( $arrStrings, true ) . ";
 								if(!isset({$sObjName}))
 								{
 									{$sObjName} = new jc\\ui\\xhtml\\compiler\\macro\\Cycle({$sArrName});
 								}
-								$aVariables->set( substr({$sObjName},1) , {$sObjName} ) ;
+								\$aVariables->set( '" . substr($sObjName,1) . "' , {$sObjName} ) ;
 								");
 			}else{
 				//这是调用
-				$sObjName = substr($sSource, 1, $nEqual);
+				$sObjName = '$' . substr($sSource, 1);
 				$aDev->write ( "
 								if(isset({$sObjName}))
 								{
@@ -51,13 +49,13 @@ class CycleMacroCompiler extends MacroCompiler
 			$sArrName = '$' . NodeCompiler::assignVariableName ( 'arrChangByLoopIndex' );
 			$sObjName = '$' . NodeCompiler::assignVariableName ( 'aStrChangByLoopIndex' );
 			
-			$aDev->write ( "{$sArrName} = " . var_export ( $arrStrings, true ) . ";
+			$aDev->write ( "{$sArrName} = " . var_export ( $this->getElementsBySource($sSource), true ) . ";
 				if(!isset({$sObjName}))
 				{
 					{$sObjName} = new jc\\ui\\xhtml\\compiler\\macro\\Cycle({$sArrName});
 				}
 				{$sObjName}->printArr(\$aDevice);
-				$aVariables->set( substr({$sObjName},1) , {$sObjName} ) ;
+				\$aVariables->set( '" . substr($sObjName,1) . "' ,{$sObjName} ) ;
 			" );
 		}
 	}
@@ -87,15 +85,9 @@ class CycleMacroCompiler extends MacroCompiler
 				elseif ($sSource [$i + 1] == ',')
 				{
 					$sTemp .= ',';
-					$sTemp .= '=';
 					$i ++;
 				
 				//转义等号
-				}
-				elseif ($sSource [$i + 1] == '=')
-				{
-					$sTemp .= '=';
-					$i ++;
 				}
 				continue;
 			}
