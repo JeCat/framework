@@ -1,0 +1,3 @@
+jc.lang.Namespace = {
+	
+}
