@@ -200,10 +200,10 @@ class PrototypeInFragment extends Prototype
 		// 在没有表名的字段前 添加默认表名
 		if( strstr($sColumnName,'.')===false )
 		{
-			$sColumn = NameTransfer::makeSureBackQuote($this->tableAlias()) . '.' . NameTransfer::makeSureBackQuote($sColumnName) ;
+			$sColumnName = NameTransfer::makeSureBackQuote($this->tableAlias()) . '.' . NameTransfer::makeSureBackQuote($sColumnName) ;
 		}
 		
-		return $sColumn ;
+		return $sColumnName ;
 	}
 
 
