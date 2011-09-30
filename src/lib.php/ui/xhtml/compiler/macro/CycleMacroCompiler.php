@@ -16,34 +16,61 @@ class CycleMacroCompiler extends MacroCompiler
 	{
 		$sSource = $aObject->source ();
 		
-		$arrStrings = array ();
-		$sTemp = '';
-		
-		$bIsDefine = false;
-		$bIsCall = false;
-		
 		//如果开头是变量
 		if (substr ( $sSource, 0, 1 ) === '$')
 		{
-			//初步判断是定义
-			$bIsDefine = true;
+			//分辨是定义还是调用
+			if($bIsDefine and $nEqual = stripos($sSource, '=') and strlen(substr($sSource, $nEqual)) > 0)
+			{
+				//这是定义
+				$sObjName = substr($sSource, 1, $nEqual);
+				$arrStrings = $this->getElementsBySource(substr($sSource, $nEqual));
+				$sArrName = '$' . NodeCompiler::assignVariableName ( 'arrChangByLoopIndex' );
+				$aDev->write ( "{$sArrName} = " . var_export ( $arrStrings, true ) . ";
+								if(!isset({$sObjName}))
+								{
+									{$sObjName} = new jc\\ui\\xhtml\\compiler\\macro\\Cycle({$sArrName});
+								}
+								$aVariables->set( substr({$sObjName},1) , {$sObjName} ) ;
+								");
+			}else{
+				//这是调用
+				$sObjName = substr($sSource, 1, $nEqual);
+				$aDev->write ( "
+								if(isset({$sObjName}))
+								{
+									{$sObjName}->printArr(\$aDevice);
+								}
+								" );
+				
+			}
 		}
-		
-		//分辨是定义还是调用
-		if($bIsDefine and $nEqual = stripos($sSource, '=') and strlen(substr($sSource, $nEqual)) > 0)
+		//如果开头不是变量，是基本用法
+		else
 		{
-			//这是定义
-			$bIsCall = false;
+			$sArrName = '$' . NodeCompiler::assignVariableName ( 'arrChangByLoopIndex' );
+			$sObjName = '$' . NodeCompiler::assignVariableName ( 'aStrChangByLoopIndex' );
 			
-			
-		}else{
-			//这是调用
-			$bIsDefine = false;
-			$bIsCall = true;
+			$aDev->write ( "{$sArrName} = " . var_export ( $arrStrings, true ) . ";
+				if(!isset({$sObjName}))
+				{
+					{$sObjName} = new jc\\ui\\xhtml\\compiler\\macro\\Cycle({$sArrName});
+				}
+				{$sObjName}->printArr(\$aDevice);
+				$aVariables->set( substr({$sObjName},1) , {$sObjName} ) ;
+			" );
 		}
-		
-		$sVName = substr($sSource, 1, $nEqual);
-		
+	}
+	
+	/**
+	 * Enter description here ...
+	 * @param string $sSource
+	 * @return array 
+	 */
+	public function getElementsBySource($sSource)
+	{
+		$arrStrings = array ();
+		$sTemp = '';
 		
 		//参数 分解成数组
 		for($i = 0; $i < strlen ( $sSource ); $i ++)
@@ -63,7 +90,7 @@ class CycleMacroCompiler extends MacroCompiler
 					$sTemp .= '=';
 					$i ++;
 				
-		//转义等号
+				//转义等号
 				}
 				elseif ($sSource [$i + 1] == '=')
 				{
@@ -85,16 +112,6 @@ class CycleMacroCompiler extends MacroCompiler
 		
 		$arrStrings [] = $sTemp;
 		
-		$sArrName = '$' . NodeCompiler::assignVariableName ( 'arrChangByLoopIndex' );
-		$sObjName = '$' . NodeCompiler::assignVariableName ( 'aStrChangByLoopIndex' );
-		
-		$aDev->write ( "{$sArrName} = " . var_export ( $arrStrings, true ) . ";
-			if(!isset({$sObjName}))
-			{
-				{$sObjName} = new jc\\ui\\xhtml\\compiler\\macro\\Cycle({$sArrName});
-			}
-			{$sObjName}->printArr(\$aDevice);
-			$aVariables->set( substr({$sObjName},1) , {$sObjName} ) ;
-		" );
+		return $arrStrings;
 	}
 }
