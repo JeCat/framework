@@ -15,7 +15,6 @@ class FsKey extends Key
 			$this->aItemFile = $this->aKeyFolder->createFile('items.php') ;
 			$this->arrItems = array() ;
 		}
-		
 		else 
 		{
 			$this->arrItems = $this->aItemFile->includeFile(false,false) ;
