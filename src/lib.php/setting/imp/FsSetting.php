@@ -69,7 +69,6 @@ class FsSetting extends Setting
 	}
 	
 	/**
-	 * 
 	 * @var jc\fs\IFolder
 	 */
 	private $aRootFolder ;
