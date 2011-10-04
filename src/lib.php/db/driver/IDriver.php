@@ -1,6 +1,9 @@
 <?php
-
 namespace jc\db\driver ;
+
+
+use jc\db\sql\reflecter\AbstractReflecterFactory;
+use jc\db\DB;
 
 interface IDriver
 {
@@ -27,6 +30,13 @@ interface IDriver
 	
 	public function currentDBName() ;
 	
+	/**
+	 * 
+	 * Enter description here ...
+	 * @param DB $aDB
+	 * @return AbstractReflecterFactory
+	 */
+	public function reflectFactory(DB $aDB);
 }
 
 ?>
