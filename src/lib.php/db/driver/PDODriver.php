@@ -8,6 +8,16 @@ use jc\db\sql\Statement;
 
 class PDODriver extends \PDO implements IDriver
 {
+	public function __construct ($sDsn, $sUsername, $sPasswd, $sOptions=null)
+	{
+		parent::__construct($sDsn, $sUsername, $sPasswd, $sOptions) ;
+	
+		if( preg_match('/dbname=(.+?)(;|$)/i',$sDsn,$arrRes) )
+		{
+			$this->sCurrentDBName = $arrRes[1] ;
+		}
+	}
+
 	public function error()
 	{
 		$arrErr = \PDO::errorInfo() ;
@@ -90,7 +100,21 @@ class PDODriver extends \PDO implements IDriver
 		return $this->arrExecuteLog ;
 	}
 	
+	public function selectDB($sName)
+	{
+		$this->execute("USE {$sName} ;") ;
+		
+		$this->sCurrentDBName = $sName ;
+	}
+	
+	public function currentDBName()
+	{
+		return $this->sCurrentDBName ;
+	}
+	
 	private $arrExecuteLog = array() ;
+	
+	private $sCurrentDBName ; 
 }
 
 ?>

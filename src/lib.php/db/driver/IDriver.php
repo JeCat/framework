@@ -23,6 +23,10 @@ interface IDriver
 	
 	public function rollBack() ;
 	
+	public function selectDB($sName) ;
+	
+	public function currentDBName() ;
+	
 }
 
 ?>
