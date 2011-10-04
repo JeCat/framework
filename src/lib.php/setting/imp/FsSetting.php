@@ -1,6 +1,8 @@
 <?php
 namespace jc\setting\imp;
 
+use jc\pattern\iterate\ReverseIterator;
+use jc\fs\FSIterator;
 use jc\fs\IFolder;
 use jc\setting\IKey;
 use jc\setting\imp\FsKey;
@@ -8,6 +10,10 @@ use jc\setting\Setting;
 
 class FsSetting extends Setting
 {
+	/**
+	 * 
+	 * @param IFolder $aRootFolder
+	 */
 	public function __construct(IFolder $aRootFolder)
 	{
 		$this->aRootFolder = $aRootFolder;
@@ -20,9 +26,9 @@ class FsSetting extends Setting
 	{
 		$sPath = self::trimRootSlash ( $sPath );
 		
-		if($aFolder = $this->aRootFolder->findFolder ( $sPath ))
+		if ($aFolder = $this->aRootFolder->findFolder ( $sPath ))
 		{
-			return new FsKey($aFolder);
+			return new FsKey ( $aFolder );
 		}
 		return null;
 	}
@@ -30,11 +36,10 @@ class FsSetting extends Setting
 	public function createKey($sPath)
 	{
 		$sPath = self::trimRootSlash ( $sPath );
-		if ($this->hasKey ( $sPath ))
+		if ($aFolder = $this->aRootFolder->findFolder ( $sPath ))
 		{
-			return $this->key ( $sPath );
-		}
-		else
+			return new FsKey ( $aFolder );
+		} else
 		{
 			$aNewFolder = $this->aRootFolder->createFolder ( $sPath );
 			return new FsKey ( $aNewFolder );
@@ -48,8 +53,7 @@ class FsSetting extends Setting
 		if (! $this->aRootFolder->findFolder ( $sPath ))
 		{
 			return false;
-		}
-		else
+		} else
 		{
 			return true;
 		}
@@ -61,10 +65,26 @@ class FsSetting extends Setting
 		
 		if ($aFolderToDel = $this->aRootFolder->findFolder ( $sPath ))
 		{
-			return $aFolderToDel->delete ();
+			$bDelWell = 1;
+//			$aFileIter = $aFolderToDel->iterator ( FSIterator::RECURSIVE_SEARCH | FSIterator::RETURN_FSO | FSIterator::FILE);
+//			foreach($aFileIter as $aFile)
+//			{
+//				$bDelWell *= (int)$aFile->delete();
+//			}
+			
+			//将文件迭代器反向遍历，前提是迭代器内部机制是浅层文件夹在前，深层文件夹在后
+			$aFolderIter = $aFolderToDel->iterator (  FSIterator::RECURSIVE_SEARCH | FSIterator::RETURN_FSO | FSIterator::FOLDER); //
+			foreach($aFolderIter as $aFolder)
+			{
+				echo $aFolder->path() . "\n";
+				$bDelWell *= (int)$aFolder->delete();
+			}
+			
+			$bDelWell *= (int)$aFolderToDel->delete();
 		}
-		return false;
+		return (bool)$bDelWell;
 	}
+	
 	
 	/**
 	 * @return \Iterator 
