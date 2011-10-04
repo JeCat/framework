@@ -12,6 +12,7 @@ class PDODriver extends \PDO implements IDriver
 	{
 		parent::__construct($sDsn, $sUsername, $sPasswd, $sOptions) ;
 	
+		$this->sDsn = $sDsn ;
 		if( preg_match('/dbname=(.+?)(;|$)/i',$sDsn,$arrRes) )
 		{
 			$this->sCurrentDBName = $arrRes[1] ;
@@ -115,6 +116,8 @@ class PDODriver extends \PDO implements IDriver
 	private $arrExecuteLog = array() ;
 	
 	private $sCurrentDBName ; 
+	
+	private $sDsn ; 
 }
 
 ?>
