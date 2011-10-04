@@ -1,34 +1,20 @@
 <?php
 namespace jc\db\sql\reflecter;
 
-
-
-
 class AbStractIndexReflecter extends DBStructReflecter
 {
-	function __construct($sDB ,$sTable,$sIndexName, $sDBName = null)
-	{
-	}
+	abstract function __construct($sDB, $sTable, $sIndexName, $sDBName = null);
 	
-	public function isPrimary()
-	{
-		
-	}
+	abstract public function isPrimary();
 	
-	public function isUnique() {
-		;
-	}
+	abstract public function isUnique();
 	
-	public function isFullText() {
-		;
-	}
+	abstract public function isFullText();
 	
 	/**
 	 * 
 	 * Enter description here ...
 	 * @return array
 	 */
-	public function columnNames() {
-		;
-	}
+	abstract public function columnNames();
 }

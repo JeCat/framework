@@ -2,21 +2,14 @@
 namespace jc\db\sql\reflecter;
 
 
-
-
 class AbStractDBReflecter extends DBStructReflecter
 {
-	function __construct($sDB , $sDBName)
-	{
-	}
+	abstract function __construct($sDB , $sDBName);
 	
 	/**
 	 * 
 	 * Enter description here ...
 	 * @return \iterator
 	 */
-	public function tableNameIterator()
-	{
-		
-	}
+	abstract public function tableNameIterator();
 }

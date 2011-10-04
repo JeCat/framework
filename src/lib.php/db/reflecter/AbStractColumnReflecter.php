@@ -3,57 +3,25 @@ namespace jc\db\sql\reflecter;
 
 class AbStractColumnReflecter extends DBStructReflecter
 {
-	function __construct($sDB, $sTable, $sColumn, $sDBName = null)
-	{
+	abstract function __construct($sDB, $sTable, $sColumn, $sDBName = null);
 	
-	}
+	abstract public function type();
 	
-	public function type()
-	{
+	abstract public function isString();
 	
-	}
+	abstract public function isBool();
 	
-	public function isString()
-	{
-		;
-	}
+	abstract public function isInts();
 	
-	public function isBool()
-	{
-		;
-	}
+	abstract public function isFloat();
 	
-	public function isInts()
-	{
-		;
-	}
+	abstract public function length();
 	
-	public function isFloat()
-	{
-		;
-	}
+	abstract public function allowNull();
 	
-	public function length()
-	{
-		;
-	}
+	abstract public function defaultValue();
 	
-	public function allowNull()
-	{
-		;
-	}
-	
-	public function defaultValue()
-	{
-		;
-	}
-	
-	public function comment()
-	{
-		;
-	}
-	public function isAutoIncrement()
-	{
-		;
-	}
+	abstract public function comment();
+
+	abstract public function isAutoIncrement();
 }

@@ -4,31 +4,18 @@ namespace jc\db\sql\reflecter;
 
 class AbStractTableReflecter extends DBStructReflecter
 {
-	function __construct($sDB ,$sTable, $sDBName=null)
-	{
-		
-	}
+	abstract function __construct($sDB ,$sTable, $sDBName=null);
 	
-	public function primaryName()
-	{
-		
-	}
+	abstract public function primaryName();
 	
-	public function autoIncrement() {
-		;
-	}
+	abstract public function autoIncrement();
 	
-	public function comment() {
-		;
-	}
+	abstract public function comment();
 	
 	/**
 	 * 
 	 * Enter description here ...
 	 * @return \Iterator
 	 */
-	public function columnNameIterator() {
-		;
-	}
-	
+	abstract public function columnNameIterator();
 }
