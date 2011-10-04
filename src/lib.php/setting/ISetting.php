@@ -27,6 +27,7 @@ interface ISetting
 	/**
 	 * 删除一个键
 	 * @param string $sPath 键路径
+	 * @return boolen 删除成功返回true，失败返回false
 	 */
 	public function deleteKey($sPath) ;
 	

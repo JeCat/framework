@@ -28,7 +28,6 @@ abstract class Key extends Object implements IKey
 		{
 			$this->bDataChanged = true ;
 		}
-		
 		$this->arrItems[$sName] = $value ;
 	}
 	

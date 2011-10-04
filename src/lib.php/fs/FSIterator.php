@@ -24,7 +24,7 @@ abstract class FSIterator implements \Iterator{
 	public function current (){
 		if ( $this == $this->stackTop() ){
 			if ( $this->nFlags & self::RETURN_FSO ){
-				return $this->currentFSO();
+				return $this->FSOcurrent();
 			}else{
 				if( $this->nFlags & self::RETURN_ABSOLUTE_PATH ){
 					return $this->FSOcurrent()->path();
