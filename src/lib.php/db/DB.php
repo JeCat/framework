@@ -61,6 +61,11 @@ class DB extends Object
 		return $this->driver()->lastInsertId() ;
 	}
 	
+	public function reflectFactory()
+	{
+		$this->aDriver->reflecterFactory($this);
+	}
+	
 	private $aDriver ;
 }
 

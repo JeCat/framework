@@ -23,6 +23,7 @@ interface IDriver
 	
 	public function rollBack() ;
 	
+	public function 
 }
 
 ?>
