@@ -1,5 +1,5 @@
 <?php
-namespace jc\db\sql\reflecter;
+namespace jc\db\reflecter;
 
 use jc\system\Application;
 use jc\cache\ICache;
@@ -172,12 +172,12 @@ class AbstractReflecterFactory
 	
 	static public function columnCachePath($sTable,$sDBName,$sColumn)
 	{
-		return $sDBName . '/' . $sTable . '/' .$sColumn;
+		return $sDBName . '/' . $sTable . '/column_' .$sColumn;
 	}
 	
 	static public function indexCachePath($sTable,$sDBName,$sIndex)
 	{
-		return $sDBName . '/' . $sTable . '/' .$sIndex;
+		return $sDBName . '/' . $sTable . '/index_' .$sIndex;
 	}
 	
 	/**

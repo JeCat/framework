@@ -1,11 +1,14 @@
 <?php
-namespace jc\db\sql\reflecter;
+namespace jc\db\reflecter;
 
 
 class AbStractTableReflecter extends DBStructReflecter
 {
-	abstract function __construct($sDB ,$sTable, $sDBName=null);
+	abstract function __construct($aDBReflecterFactory ,$sTable, $sDBName=null);
 	
+	/**
+	 * @return string 如果主键不存在返回null
+	 */
 	abstract public function primaryName();
 	
 	abstract public function autoIncrement();
@@ -18,4 +21,10 @@ class AbStractTableReflecter extends DBStructReflecter
 	 * @return \Iterator
 	 */
 	abstract public function columnNameIterator();
+	
+	/**
+	 * 表是否存在(有效)
+	 * @return boolen 如果存在返回true 如果不存在返回false 
+	 */
+	abstract public function isExist();
 }

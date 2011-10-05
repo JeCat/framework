@@ -1,10 +1,10 @@
 <?php
-namespace jc\db\sql\reflecter;
+namespace jc\db\reflecter;
 
 class DBStructReflecter
 {
 	/**
-	 * 获得数据库名称
+	 * 返回对象名称
 	 * @return string
 	 */
 	abstract public function name();
