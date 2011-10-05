@@ -1,5 +1,5 @@
 <?php
-namespace jc\mvc\model ;
+namespace jc\mvc\model;
 
 use jc\io\IOutputStream;
 
@@ -7,88 +7,56 @@ use jc\lang\Object;
 
 abstract class AbstractModel extends Object implements IModel, \Serializable
 {
-	public function __construct($bAggregation=false)
+	public function __construct($bAggregation = false)
 	{
-		parent::__construct() ;
+		parent::__construct ();
 		
-		$this->bAggregation = $bAggregation ;
+		$this->bAggregation = $bAggregation;
 	}
-
-	public function serialize ()
-	{
-		return serialize( array(
-				'arrData' => &$this->arrData ,
-				'arrChildren' => &$this->arrChildren ,
-				'bAggregation' => &$this->bAggregation ,
-				'bSerialized' => &$this->bSerialized ,
-		) ) ;
-	}
-
-	public function unserialize ($sSerialized)
-	{
-		$arrData = unserialize($sSerialized) ;
-		
-		$this->arrData =& $arrData['arrData'] ;
-		$this->arrChildren =& $arrData['arrChildren'] ;
-		$this->bAggregation =& $arrData['bAggregation'] ;
-		$this->bSerialized =& $arrData['bSerialized'] ;
-	}
-
+	
 	public function isAggregation()
 	{
-		return $this->bAggregation ;
+		return $this->bAggregation;
 	}
-	public function setAggregation($bAggregation=true)
+	public function setAggregation($bAggregation = true)
 	{
-		$this->bAggregation = $bAggregation ;
-	}
-		
-	public function hasSerialized()
-	{
-		return $this->bSerialized ;
+		$this->bAggregation = $bAggregation;
 	}
 	
-	public function setSerialized($bSerialized=true)
-	{
-		$this->bSerialized = $bSerialized ;
-	}
-	
-
 	// for child model ///////////////////////////////
-	public function addChild(IModel $aModel,$sName=null)
+	public function addChild(IModel $aModel, $sName = null)
 	{
-		if($sName)
+		if ($sName)
 		{
-			$this->arrChildren[$sName] = $aModel ;
+			$this->arrChildren [$sName] = $aModel;
 		}
-		else 
+		else
 		{
-			$this->arrChildren[] = $aModel ;
+			$this->arrChildren [] = $aModel;
 		}
 	}
 	
 	public function removeChild(IModel $aModel)
 	{
-		unset($this->arrChildren[$aModel->name()]) ;
+		unset ( $this->arrChildren [$aModel->name ()] );
 	}
 	
 	public function clearChildren()
 	{
-		$this->arrChildren = array() ; 
+		$this->arrChildren = array ();
 	}
 	
 	public function childrenCount()
 	{
-		return count($this->arrChildren) ;
+		return count ( $this->arrChildren );
 	}
-
+	
 	/**
 	 * @return IModel
 	 */
 	public function child($sName)
 	{
-		return isset($this->arrChildren[$sName])?
-				$this->arrChildren[$sName]: null ;
+		return isset ( $this->arrChildren [$sName] ) ? $this->arrChildren [$sName] : null;
 	}
 	
 	/**
@@ -97,252 +65,340 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	 */
 	public function childAgg($sName)
 	{
-		$aChild = $this->child($sName) ;
-		return ($aChild and $aChild->isAggregation())? $aChild: null ;
+		$aChild = $this->child ( $sName );
+		return ($aChild and $aChild->isAggregation ()) ? $aChild : null;
 	}
-
+	
 	/**
 	 * @return IIterator
 	 */
 	public function childIterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator($this->arrChildren) ;
+		return new \jc\pattern\iterate\ArrayIterator ( $this->arrChildren );
 	}
-
+	
 	/**
 	 * @return IIterator
 	 */
 	public function childNameIterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator( array_keys($this->arrChildren) ) ;
+		return new \jc\pattern\iterate\ArrayIterator ( array_keys ( $this->arrChildren ) );
 	}
-
+	
 	// for data ///////////////////////////////
 	public function data($sName)
 	{
-		$arrKeys = array_keys($this->arrData) ;
-		if( array_key_exists($sName, $this->arrData) )
+		if ($this->isEmpty ())
 		{
-			return $this->arrData[$sName] ;
+			return null;
 		}
 		
-		list($aModel,$sName) = $this->findDataByPath($sName) ;
-		if($aModel)
+		$arrKeys = array_keys ( $this->arrDatas );
+		if (array_key_exists ( $sName, $this->arrDatas ))
 		{
-			return $aModel->data($sName) ;
+			return $this->arrDatas [$sName];
 		}
 		
-		return null ;
+		list ( $aModel, $sName ) = $this->findDataByPath ( $sName );
+		if ($aModel)
+		{
+			return $aModel->data ( $sName );
+		}
+		
+		return null;
 	}
 	
-	public function setData($sName,$sValue)
+	public function setData($sName, $sValue)
 	{
-		list($aModel,$sChildName) = $this->findDataByPath($sName) ;
-		if($aModel)
+		list ( $aModel, $sChildName ) = $this->findDataByPath ( $sName );
+		if ($aModel)
 		{
-			$aModel->setData($sChildName,$sValue) ;
+			$aModel->setData ( $sChildName, $sValue );
 		}
-		else 
+		else
 		{
-			$this->arrData[$sName]=$sValue ;
+			if ($this->isEmpty ())
+			{
+				$this->arrDatas = array ();
+			}
+			$this->arrDatas [$sName] = $sValue;
+			$this->setChanged($sName);
 		}
 	}
 	
 	public function hasData($sName)
 	{
-		if(array_key_exists($sName,$this->arrData))
+		if ($this->isEmpty ())
 		{
-			return true ;
+			return false;
 		}
 		
-		else 
+		if (array_key_exists ( $sName, $this->arrDatas ))
 		{
-			list($aModel) = $this->findDataByPath($sName) ;
-			return $aModel? true: false ;
+			return true;
+		}
+		
+		else
+		{
+			list ( $aModel ) = $this->findDataByPath ( $sName );
+			return $aModel ? true : false;
 		}
 	}
 	
 	public function removeData($sName)
 	{
-		if(array_key_exists($sName,$this->arrData))
+		if ($this->isEmpty ())
 		{
-			unset($this->arrData[$sName]) ;
+			return;
 		}
 		
-		else 
+		if (array_key_exists ( $sName, $this->arrDatas ))
 		{
-			list($aModel) = $this->findDataByPath($sName) ;
-			if($aModel)
+			unset ( $this->arrDatas [$sName] );
+			$this->removeChanged($sName);
+		}
+		
+		else
+		{
+			list ( $aModel ) = $this->findDataByPath ( $sName );
+			if ($aModel)
 			{
-				$aModel->removeData($sName) ;
+				$aModel->removeData ( $sName );
 			}
 		}
 	}
 	
 	public function clearData()
 	{
-		$this->arrData = array() ;
+		if ($this->isEmpty ())
+		{
+			return;
+		}
+		$this->clearChanged();
 	}
 	
 	public function dataIterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator($this->arrData) ;
+		if ($this->isEmpty ())
+		{
+			return new \EmptyIterator ();
+		}
+		return new \jc\pattern\iterate\ArrayIterator ( $this->arrDatas );
 	}
 	
 	public function dataNameIterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator( array_keys($this->arrData) ) ;
+		if ($this->isEmpty ())
+		{
+			return new \EmptyIterator ();
+		}
+		return new \jc\pattern\iterate\ArrayIterator ( array_keys ( $this->arrDatas ) );
 	}
 	
 	///////////////////////////////////////////
 	public function offsetExists($offset)
 	{
-		return $this->hasData($offset) ;	
+		return $this->hasData ( $offset );
 	}
-
+	
 	public function offsetGet($offset)
-	{	
-		return $this->data($offset) ;
-	}
-
-	public function offsetSet($offset,$value)
 	{
-		return $this->setData($offset,$value) ;		
+		return $this->data ( $offset );
 	}
-
-	public function offsetUnset($offset) {
-		return $this->removeData($offset) ;	
+	
+	public function offsetSet($offset, $value)
+	{
+		return $this->setData ( $offset, $value );
 	}
-
+	
+	public function offsetUnset($offset)
+	{
+		return $this->removeData ( $offset );
+	}
+	
 	// implement Iterator
 	/**
 	 * 
 	 * @return mixed
 	 */
-	public function current ()
+	public function current()
 	{
-		return current($this->arrDatas) ;
+		if ($this->isEmpty ())
+		{
+			return null;
+		}
+		return current ( $this->arrDatas );
 	}
-
+	
 	/**
 	 * 
 	 * @return mixed
 	 */
-	public function next ()
+	public function next()
 	{
-		return next($this->arrDatas) ;
+		if ($this->isEmpty ())
+		{
+			return null;
+		}
+		return next ( $this->arrDatas );
 	}
-
+	
 	/**
 	 * 
 	 * @return mixed
 	 */
-	public function key ()
+	public function key()
 	{
-		return key($this->arrDatas) ;
+		if ($this->isEmpty ())
+		{
+			return null;
+		}
+		return key ( $this->arrDatas );
 	}
-
+	
 	/**
 	 * 
 	 * @return mixed
 	 */
-	public function valid ()
+	public function valid()
 	{
 		// 使用 null 作为数字索引，会被转换成空字符串 ''，因此可以使用 key()===null 来检查迭代状态
 		//
 		// $arr = array(null=>1,2,3) ;
 		// key($arr)===''
-		 
-		return key($this->arrDatas)!==null ;
+		if ($this->isEmpty ())
+		{
+			return false;
+		}
+		
+		return key ( $this->arrDatas ) !== null;
 	}
-
-	public function rewind ()
+	
+	public function rewind()
 	{
-		return reset($this->arrDatas) ;
+		if ($this->isEmpty ())
+		{
+			return false;
+		}
+		return reset ( $this->arrDatas );
 	}
 	
 	protected function findDataByPath($sDataPath)
 	{
-		$arrSlices = explode('.', $sDataPath) ;
-		if( count($arrSlices)>1 )
+		$arrSlices = explode ( '.', $sDataPath );
+		if (count ( $arrSlices ) > 1)
 		{
-			$sName = array_pop($arrSlices) ;
-			$aModel = $this ;
-			do{
-				
-				$sModelName = array_shift($arrSlices) ;
-				
-			}while( $aModel=$aModel->child($sModelName) and !empty($arrSlices) ) ;
-			
-			if( $aModel )
+			$sName = array_pop ( $arrSlices );
+			$aModel = $this;
+			do
 			{
-				return array($aModel,$sName) ;
+				$sModelName = array_shift ( $arrSlices );
+			} while ( $aModel = $aModel->child ( $sModelName ) and ! empty ( $arrSlices ) );
+			
+			if ($aModel)
+			{
+				return array ($aModel, $sName );
 			}
 		}
 		
-		return array(null,null) ;
-	}
-
-	public function __get($sName)
-	{
-		$nNameLen = strlen($sName) ;
-		if( $nNameLen>5 and substr($sName,0,5)=='model' )
-    	{
-    		$sModelName = substr($sName,5) ;
-    		return $this->child($sModelName) ;
-    	}
-		
-		return $this->data($sName) ;
+		return array (null, null );
 	}
 	
-	public function __set($sName,$value)
+	public function __get($sName)
 	{
-		$this->setData($sName, $value) ;
+		$nNameLen = strlen ( $sName );
+		if ($nNameLen > 5 and substr ( $sName, 0, 5 ) == 'model')
+		{
+			$sModelName = substr ( $sName, 5 );
+			return $this->child ( $sModelName );
+		}
+		
+		return $this->data ( $sName );
+	}
+	
+	public function __set($sName, $value)
+	{
+		$this->setData ( $sName, $value );
 	}
 	
 	// misc
-	public function printStruct(IOutputStream $aOutput=null,$nDepth=0)
+	public function printStruct(IOutputStream $aOutput = null, $nDepth = 0)
 	{
-		if(!$aOutput)
+		if (! $aOutput)
 		{
-			$aOutput = $this->application()->response()->printer() ;
+			$aOutput = $this->application ()->response ()->printer ();
 		}
 		
-		$aOutput->write( "<pre>\r\n" ) ;
+		$aOutput->write ( "<pre>\r\n" );
 		
-		$aOutput->write( str_repeat("\t", $nDepth) ) ;
-		$aOutput->write( ($this->isAggregation()? "[Aggregation Model]": "[Model]") ) ;
-		$aOutput->write( "\r\n" ) ;
+		$aOutput->write ( str_repeat ( "\t", $nDepth ) );
+		$aOutput->write ( ($this->isAggregation () ? "[Aggregation Model]" : "[Model]") );
+		$aOutput->write ( "\r\n" );
 		
-		foreach($this->arrData as $sName=>$value)
+		if (! $this->isEmpty ())
 		{
-			$aOutput->write( str_repeat("\t", $nDepth)."{$sName}: ".strval($value)."\r\n" ) ;
+			foreach ( $this->arrDatas as $sName => $value )
+			{
+				$aOutput->write ( str_repeat ( "\t", $nDepth ) . "{$sName}: " . strval ( $value ) . "\r\n" );
+			}
 		}
 		
-		foreach($this->childNameIterator() as $sName) 
+		foreach ( $this->childNameIterator () as $sName )
 		{
-			$aOutput->write( str_repeat("\t", $nDepth)."\"{$sName}\" =>\r\n" ) ;
-			$this->child($sName)->printStruct($aOutput,$nDepth+1) ;
+			$aOutput->write ( str_repeat ( "\t", $nDepth ) . "\"{$sName}\" =>\r\n" );
+			$this->child ( $sName )->printStruct ( $aOutput, $nDepth + 1 );
 		}
 		
-		$aOutput->write( "</pre>" ) ;
+		$aOutput->write ( "</pre>" );
 	}
 	
-	public function setChildrenData($sName,$value)
+	public function setChildrenData($sName, $value)
 	{
-		foreach( $this->childIterator() as $aChild )
+		foreach ( $this->childIterator () as $aChild )
 		{
-			$aChild->setData($sName,$aChild) ;
+			$aChild->setData ( $sName, $aChild );
 		}
 	}
 	
-	private $arrData = array() ;
+	public function isEmpty()
+	{
+		if ($this->arrDatas === null)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 	
-	private $arrChildren = array() ;
+	public function changed()
+	{
+		return $this->arrChanged;
+	}
 	
-	private $bAggregation = false ;
+	public function clearChanged()
+	{
+		$this->arrChanged = array();
+	}
 	
-	private $bSerialized = false ;
+	public function removeChanged($sName)
+	{
+		unset($this->arrChanged[$sName]);
+	}
+	
+	public function setChanged($sName)
+	{
+		$this->arrChanged[] = $sName;
+		$this->arrChanged = array_unique($this->arrChanged);
+	}
+	
+	private $arrDatas = null;
+	
+	private $arrChildren = array ();
+	
+	private $bAggregation = false;
+	
+	private $arrChanged = array ();
 }
-
 ?>

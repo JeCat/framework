@@ -1,6 +1,8 @@
 <?php
 namespace jc\db\reflecter;
 
+use jc\db\reflecter\AbStractIndexReflecter;
+
 class MySQLIndexReflecter extends AbStractIndexReflecter
 {
 	function __construct($aDBReflecterFactory, $sTable, $sIndexName, $sDBName = null)

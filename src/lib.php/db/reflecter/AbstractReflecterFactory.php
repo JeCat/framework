@@ -6,7 +6,7 @@ use jc\cache\ICache;
 use jc\cache\DBCache;
 use jc\db\DB;
 
-class AbstractReflecterFactory
+abstract class AbstractReflecterFactory
 {
 	function __construct(DB $aDB)
 	{

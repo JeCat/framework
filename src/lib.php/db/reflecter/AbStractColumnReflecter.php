@@ -1,7 +1,7 @@
 <?php
 namespace jc\db\reflecter;
 
-class AbStractColumnReflecter extends DBStructReflecter
+abstract class AbStractColumnReflecter extends DBStructReflecter
 {
 	abstract function __construct($aDBReflecterFactory, $sTable, $sColumn, $sDBName = null);
 	
