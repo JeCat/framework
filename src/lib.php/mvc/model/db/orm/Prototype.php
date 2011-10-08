@@ -3,6 +3,7 @@
 namespace jc\mvc\model\db\orm;
 
 use jc\lang\Exception;
+use jc\db\DB;
 
 class Prototype{
     // static creator
@@ -10,14 +11,16 @@ class Prototype{
         $aPrototype = new Prototype;
         $aPrototype->setTableName($sTableName);
         $aPrototype->setName($sTableName);
-        if($keys !== null ){
-            $aPrototype ->setKeys($keys );
-        }else{
-            $aPrototype->setKeys(self::reflectKeys($sTableName,$aDB));
+        if($keys === null){
+            $keys = self::reflectKeys($sTableName,$aDB);
+        }
+        if($keys !== null and $keys !== array()){
+            $aPrototype->setKeys($keys);
         }
         if($columns === '*'){
-            $aPrototype->addColumn(self::reflectAllColumnsInTable($sTableName,$aDB));
-        }else{
+            $columns = self::reflectAllColumnsInTable($sTableName,$aDB);
+        }
+        if($columns !== null and $columns !== array()){
             $aPrototype->addColumn($columns);
         }
         return $aPrototype;
@@ -33,24 +36,23 @@ class Prototype{
     public function keys(){
         return $this->arrKeys;
     }
-    /*!
-        \brief 设置键
-        
-        键可以为多个。本函数接受一个数组（多个键）或一个字符串（一个键）。
-    */
+    /**
+     *  \brief 设置键
+     *
+     *   键可以为多个。本函数接受一个数组（多个键）或一个字符串（一个键）。
+     */
     public function setKeys( $Keys ){
         if(is_string($Keys)){
             $Keys = array($Keys);
         }
         if(is_array($Keys)){
             if(empty($Keys)){
-                echo "setKeys is empty";
+                throw new Exception('函数 Prototype::setKeys() 的参数 keys 为空');
             }else{
                 $this->arrKeys = $Keys;
             }
         }else{
-            ;
-            //throw new Exception('函数 Prototype::setKeys() 的参数 keys 既不是数组也不是字符串');
+            throw new Exception('函数 Prototype::setKeys() 的参数 keys 既不是数组也不是字符串');
         }
         return $this;
     }
@@ -71,18 +73,18 @@ class Prototype{
     public function columns(){
         return $this->arrColumns;
     }
-    /*!
-        \brief 添加列
-        
-        本函数接受一个数组（多个列）或一个字符串（一个列）。
-    */
+    /**
+     *  \brief 添加列
+     *
+     *  本函数接受一个数组（多个列）或一个字符串（一个列）。
+     */
     public function addColumn($Column){
         if(is_string($Column)){
             $this->arrColumns[]=$Column;
         }else if(is_array($Column)){
             $this->arrColumns = array_merge($this->arrColumns,$Column);
         }else{
-            //throw new Exception('函数 Prototype::addColumn() 的参数 Column 既不是数组也不是字符串');
+            throw new Exception('函数 Prototype::addColumn() 的参数 Column 既不是数组也不是字符串');
         }
         return $this;
     }
@@ -91,6 +93,7 @@ class Prototype{
         if($key!=false){
             unset($this->arrColumns[$key]);
         }
+        return $this;
     }
     public function clearColumns(){
         $this->arrColumns=array();
@@ -139,9 +142,9 @@ class Prototype{
     public function hasAndBelongsTo($toTable,$BridgeTable,$fromKeys=null,$toKeys=null,$toBridgeKeys=null,$fromBridgeKeys=null){
         return $this->addAssociation(Association::hasAndBelongsTo,$toTable,$fromKeys,$toKeys,$BridgeTable,$toBridgeKeys,$fromBridgeKeys);
     }
-    /*!
-        \a $toTable 可以是一个字符串，也可以是一个Prototype对象，表示关联的表。
-    */
+    /**
+     *  \a $toTable 可以是一个字符串，也可以是一个Prototype对象，表示关联的表。
+     */
     public function addAssociation($nType,$toTable,$fromKeys=null,$toKeys=null,$BridgeTable=null,$toBridgeKeys=null,$fromBridgeKeys=null){
         if(is_string($toTable)){
             $aToPrototype = self::create($toTable);
@@ -212,31 +215,37 @@ class Prototype{
     private function __construct(){}
     
     // static private reflecter
-    /*!
-        \brief 反射数据表的键。
-        
-        返回$aDB对象中$sTableName对应的表的键。
-        如果$aDB为null，则会从系统中得到一个单件。
-    */
+    /**
+     *  反射数据表的键。
+     *
+     *  返回$aDB对象中$sTableName对应的表的键。
+     *  如果$aDB为null，则会从系统中得到一个单件。
+     */
     static private function reflectKeys($sTableName,$aDB){
-        return null;
-        return array(
-                'Prototype::reflectKeys',
-                '函数未完成'
-                );
+        if($aDB === null){
+            $aDB = DB::singleton();
+        }
+        $aIndexReflecter = $aDB->reflecterFactory()->createIndexReflecter($sTableName, 'PRIMARY');
+        $keys = $aIndexReflecter->columnNames();
+        return $keys;
     }
-    /*!
-        \brief 反射数据表中所有列。
-        
-        返回$aDB对象中$sTableName对应的表的所有列。
-        如果$aDB为null，则会从系统中得到一个单件。
-    */
+    /**
+     *  反射数据表中所有列。
+     *
+     *  返回$aDB对象中$sTableName对应的表的所有列。
+     *  如果$aDB为null，则会从系统中得到一个单件。
+     */
     static private function reflectAllColumnsInTable($sTableName,$aDB){
-        return null;
-        return array(
-                'Prototype::reflectAllColumnsInTable',
-                '函数未完成'
-                );
+        if($aDB === null){
+            $aDB = DB::singleton();
+        }
+        $aTableReflecter = $aDB->reflecterFactory()->createTableReflecter($sTableName, 'PRIMARY');
+        $aIter = $aTableReflecter->columnNameIterator();
+        $columns = array();
+        foreach($aIter as $v){
+            $columns[] = $v;
+        }
+        return $columns;
     }
     
     // private data

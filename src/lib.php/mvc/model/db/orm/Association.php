@@ -59,14 +59,14 @@ class Association{
             throw new Exception('函数 Association::setToKeys() 的参数 tokeys 既不是数组也不是字符串');
         }
     }
-    /*!
-        \brief 设置连桥表的原型、左连键和右连键
-        
-        \a $BridgeTable，连桥表。接受字符串或Prototype对象，表示表名或原型。
-        \a $toBridgeKeys 和 \a $fromBridgeKeys 接受字符串或数组。
-        
-        \sa setToBridgeKeys() , setFromBridgeKeys() 
-    */
+    /**
+     *  设置连桥表的原型、左连键和右连键
+     *
+     *  \a $BridgeTable，连桥表。接受字符串或Prototype对象，表示表名或原型。
+     *  \a $toBridgeKeys 和 \a $fromBridgeKeys 接受字符串或数组。
+     *
+     *  \sa setToBridgeKeys() , setFromBridgeKeys() 
+     */
     public function setBridge($BridgeTable,$toBridgeKeys,$fromBridgeKeys){
         if($this->nType != self::hasAndBelongsTo){
             throw new Exception('函数 Association::setBridge() 只有在 nType 是 hasAndBelongsTo时才可以被调用');
@@ -197,6 +197,10 @@ class Association{
             if( $this->toKeys() === array ()){
                 throw new Exception('%s 的 toKeys 为空数组',$this->name());
             }
+            if( count($this->toKeys()) === count($this->fromKeys())){
+                throw new Exception('%s 的 toKeys 与 fromKeys 数量不同：toKeys的数量为 %d , fromKeys的数量为 %d',
+                            array($this->name(),count($this->toKeys()),count($this->fromKeys())));
+            }
         }else{
             throw new Exception('%s 的 type 不正确 : %d',array($this->name(),$this->type()));
         }
@@ -210,7 +214,10 @@ class Association{
             if($this->fromBridgeKeys() === array()){
                 throw new Exception('%s 的 类型为 hasAndBelongsTo 但 fromBridgeKeys 为空数组',$this->name());
             }
-            throw new Exception('%s 的 类型为 hasAndBelongsTo 但 fromBridgeKeys 为空数组',$this->name());
+            if( count($this->toBridgeKeys()) === count($this->fromBridgeKeys())){
+                throw new Exception('%s 的 toBridgeKeys 与 fromBridgeKeys 数量不同：toBridgeKeys的数量为 %d , fromBridgeKeys的数量为 %d',
+                            array($this->name(),count($this->toBridgeKeys()),count($this->fromBridgeKeys())));
+            }
         }
     }
     
