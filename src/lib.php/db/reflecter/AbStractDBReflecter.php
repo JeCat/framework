@@ -2,7 +2,7 @@
 namespace jc\db\reflecter;
 
 
-abstract class AbStractDBReflecter extends DBStructReflecter
+class AbStractDBReflecter extends DBStructReflecter
 {
 	abstract function __construct($aDBReflecterFactory , $sDBName);
 	

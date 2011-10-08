@@ -1,9 +1,7 @@
 <?php
 namespace jc\db\reflecter;
 
-use jc\db\reflecter\DBStructReflecter;
-
-abstract class AbStractIndexReflecter extends DBStructReflecter
+class AbStractIndexReflecter extends DBStructReflecter
 {
 	abstract function __construct($aDBReflecterFactory, $sTable, $sIndexName, $sDBName = null);
 	

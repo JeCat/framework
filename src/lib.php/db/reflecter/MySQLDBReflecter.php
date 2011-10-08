@@ -1,8 +1,6 @@
 <?php
 namespace jc\db\reflecter;
 
-use jc\db\reflecter\AbStractDBReflecter;
-
 class MySQLDBReflecter extends AbStractDBReflecter
 {
 	function __construct($aDBReflecterFactory, $sDBName)
@@ -37,11 +35,6 @@ class MySQLDBReflecter extends AbStractDBReflecter
 	public function name()
 	{
 		return $this->sName;
-	}
-	
-	public function isExist()
-	{
-		return $this->bIsExist;
 	}
 	
 	private $arrTableNames;
