@@ -93,7 +93,7 @@ class Association{
             $this->setToBridgeKeys($toBridgeKeys);
         }
         if($fromBridgeKeys === null ){
-            if($aToProfromtype === null){
+            if($this->aToPrototype === null){
                 throw new Exception('函数 Association::setBridge() 的参数 fromBridgeKeys 是 null，并且无法反射得到 this->aToPrototype 的键。原因： this->aToPrototype 是 null');
             }else{
                 $fromBridgeKeys = $this->aToPrototype ->keys();
@@ -129,7 +129,9 @@ class Association{
     }
 
     public function isType($nType){
-        if($nType <self::oneToOne ){
+        if($nType === self::total){
+            return true;
+        }else if($nType <self::oneToOne ){
             return $this->nType === $nType;
         }else if($nType === self::oneToOne){
             return ( $this->nType === self::hasOne || $this->nType === self::belongsTo);
@@ -150,9 +152,23 @@ class Association{
         return $this->nType;
     }
     public function fromKeys(){
+        if( $this->arrFromKeys === array() ){
+            if($this->fromPrototype()->keys() !== array() ){
+                $this->setFromKeys( $this->fromPrototype()->keys());
+            }else{
+                throw new Exception('%s 的fromKeys为空数组并且fromPrototype的键也为空');
+            }
+        }
         return $this->arrFromKeys;
     }
     public function toKeys(){
+        if( $this->arrToKeys === array() ){
+            if($this->toPrototype()->keys() !== array() ){
+                $this->setToKeys( $this->toPrototype()->keys());
+            }else{
+                throw new Exception('%s 的toKeys为空数组并且toPrototype的键也为空',$this->name());
+            }
+        }
         return $this->arrToKeys;
     }
     public function bridgeTable(){
@@ -163,6 +179,39 @@ class Association{
     }
     public function fromBridgeKeys(){
         return $this->arrFromBridgeKeys;
+    }
+    public function check(){
+        if($this->type() === self::hasOne ||
+            $this->type() === self::belongsTo ||
+            $this->type() === self::hasMany ||
+            $this->type() === self::hasAndBelongsTo){
+            if( ! ($this->fromPrototype() instanceof Prototype) ){
+                throw new Exception('%s 的 fromPrototype 不正确。',$this->name());
+            }
+            if( ! ($this->toPrototype() instanceof Prototype) ){
+                throw new Exception('%s 的 toPrototype 不正确。',$this->name());
+            }
+            if( $this->fromKeys() === array ()){
+                throw new Exception('%s 的 fromKeys 为空数组',$this->name());
+            }
+            if( $this->toKeys() === array ()){
+                throw new Exception('%s 的 toKeys 为空数组',$this->name());
+            }
+        }else{
+            throw new Exception('%s 的 type 不正确 : %d',array($this->name(),$this->type()));
+        }
+        if($this->type() === self::hasAndBelongsTo ){
+            if($this->bridgeTable() === null){
+                throw new Exception('%s 的 类型为 hasAndBelongsTo 但 bridgeTable 为 null',$this->name());
+            }
+            if($this->toBridgeKeys() === array()){
+                throw new Exception('%s 的 类型为 hasAndBelongsTo 但 toBridgeKeys 为空数组',$this->name());
+            }
+            if($this->fromBridgeKeys() === array()){
+                throw new Exception('%s 的 类型为 hasAndBelongsTo 但 fromBridgeKeys 为空数组',$this->name());
+            }
+            throw new Exception('%s 的 类型为 hasAndBelongsTo 但 fromBridgeKeys 为空数组',$this->name());
+        }
     }
     
     // private data
