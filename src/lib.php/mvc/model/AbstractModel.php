@@ -330,35 +330,10 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	
 	public function setChildrenData($sName,$value)
 	{
-<<<<<<< HEAD
-		return $this->arrDatas === null;
-	}
-	
-	public function changed()
-	{
-		return $this->arrChanged;
-	}
-	
-	public function clearChanged()
-	{
-		$this->arrChanged = array();
-	}
-	
-	public function removeChanged($sName)
-	{
-		unset($this->arrChanged[$sName]);
-	}
-	
-	public function setChanged($sName)
-	{
-		$this->arrChanged[] = $sName;
-		$this->arrChanged = array_unique($this->arrChanged);
-=======
 		foreach( $this->childIterator() as $aChild )
 		{
 			$aChild->setData($sName,$aChild) ;
 		}
->>>>>>> parent of c5de109... Reflecter系列补充,AbstractModel开始
 	}
 	
 	private $arrData = array() ;
