@@ -3,6 +3,7 @@ namespace jc\db\reflecter;
 
 class MySQLReflecterFactory extends AbstractReflecterFactory
 {
+<<<<<<< HEAD
 	public function createDBReflecter($sDBName)
 	{
 		return new MySQLDBReflecter ( $this, $sDBName );
@@ -22,5 +23,9 @@ class MySQLReflecterFactory extends AbstractReflecterFactory
 	{
 		return new MySQLIndexReflecter ( $this, $sTable, $sIndexName );
 	}
+=======
+	
+>>>>>>> parent of 6da5192... 数据库反射抽象类完成
 }
+
 ?>

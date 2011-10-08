@@ -1,8 +1,6 @@
 <?php
 namespace jc\system ;
 
-use jc\cache\ICache;
-
 use jc\fs\imp\LocalFileSystem;
 use jc\fs\FileSystem;
 
@@ -104,23 +102,6 @@ class Application extends CoreApplication implements \Serializable
 		return ;
 	}
 	
-	/**
-	 * 
-	 * @param jc\cache\ICache
-	 */
-	public function setCache(ICache $aCache)
-	{
-		$this->aCache = $aCache;
-	}
-	
-	/**
-	 * @return jc\cache\ICache
-	 */
-	public function cache()
-	{
-		return $this->aCache;
-	}
-	
 	
 	private $arrGlobalSingeltonInstance ;
 	 
@@ -129,8 +110,6 @@ class Application extends CoreApplication implements \Serializable
 	private $sEntrance = '' ; 
 	
 	private $aFileSystem ;
-	
-	private $aCache = null;
 	
 	static private $aGlobalSingeltonInstance ; 
 }

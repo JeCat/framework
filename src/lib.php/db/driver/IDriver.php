@@ -31,9 +31,10 @@ interface IDriver
 	public function currentDBName() ;
 	
 	/**
-	 * 获得数据库反射对象工厂
+	 * 
+	 * Enter description here ...
 	 * @param DB $aDB
-	 * @return AbstractReflecterFactory or null when no database support
+	 * @return AbstractReflecterFactory
 	 */
 	public function reflectFactory(DB $aDB);
 }

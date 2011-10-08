@@ -125,8 +125,6 @@ class PDODriver extends \PDO implements IDriver
 		{
 			return new MySQLReflecterFactory($aDB);
 		}
-		
-		return null;
 	}
 	
 	private $arrExecuteLog = array() ;

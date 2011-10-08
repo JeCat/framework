@@ -1,32 +1,35 @@
 <?php
 namespace jc\db\reflecter;
 
-class DBStructReflecter
+
+
+class DBStructReflecter 
 {
+<<<<<<< HEAD
 	/**
 	 * 返回对象名称
 	 * @return string
 	 */
 	abstract public function name();
+=======
+	public function name() {
+		;
+	}
+>>>>>>> parent of 6da5192... 数据库反射抽象类完成
 	
 	/**
-	 * 获取数据库反射工厂对象
 	 * @return AbstractReflecterFactory
 	 */
-	public function factory()
-	{
-		return $this->aFactory;
+	public function factory() {
+		;
 	}
 	
 	/**
-	 * 设置数据库反射工厂
 	 * @param AbstractReflecterFactory
 	 */
-	public function setFactory(AbstractReflecterFactory $aFacotry)
-	{
-		$this->aFactory = $aFacotry;
+	public function setFactory(AbstractReflecterFactory $aFacotry) {
+		
 	}
-	
-	private $aFactory;
 }
+
 ?>
