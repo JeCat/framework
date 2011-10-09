@@ -222,6 +222,7 @@ class Prototype{
      *  如果$aDB为null，则会从系统中得到一个单件。
      */
     static private function reflectKeys($sTableName,$aDB){
+        return null;
         if($aDB === null){
             $aDB = DB::singleton();
         }
@@ -236,6 +237,7 @@ class Prototype{
      *  如果$aDB为null，则会从系统中得到一个单件。
      */
     static private function reflectAllColumnsInTable($sTableName,$aDB){
+        return null;
         if($aDB === null){
             $aDB = DB::singleton();
         }

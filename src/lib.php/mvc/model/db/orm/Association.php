@@ -181,10 +181,10 @@ class Association{
         return $this->arrFromBridgeKeys;
     }
     public function check(){
-        if($this->type() === self::hasOne ||
-            $this->type() === self::belongsTo ||
-            $this->type() === self::hasMany ||
-            $this->type() === self::hasAndBelongsTo){
+        if(in_array($this->type(),array( self::hasOne , 
+                                         self::belongsTo ,
+                                         self::hasMany ,
+                                         self::hasAndBelongsTo))){
             if( ! ($this->fromPrototype() instanceof Prototype) ){
                 throw new Exception('%s 的 fromPrototype 不正确。',$this->name());
             }
@@ -197,7 +197,7 @@ class Association{
             if( $this->toKeys() === array ()){
                 throw new Exception('%s 的 toKeys 为空数组',$this->name());
             }
-            if( count($this->toKeys()) === count($this->fromKeys())){
+            if( count($this->toKeys()) !== count($this->fromKeys())){
                 throw new Exception('%s 的 toKeys 与 fromKeys 数量不同：toKeys的数量为 %d , fromKeys的数量为 %d',
                             array($this->name(),count($this->toKeys()),count($this->fromKeys())));
             }
@@ -214,7 +214,7 @@ class Association{
             if($this->fromBridgeKeys() === array()){
                 throw new Exception('%s 的 类型为 hasAndBelongsTo 但 fromBridgeKeys 为空数组',$this->name());
             }
-            if( count($this->toBridgeKeys()) === count($this->fromBridgeKeys())){
+            if( count($this->toBridgeKeys()) !== count($this->fromBridgeKeys())){
                 throw new Exception('%s 的 toBridgeKeys 与 fromBridgeKeys 数量不同：toBridgeKeys的数量为 %d , fromBridgeKeys的数量为 %d',
                             array($this->name(),count($this->toBridgeKeys()),count($this->fromBridgeKeys())));
             }
