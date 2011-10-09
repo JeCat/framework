@@ -71,11 +71,6 @@ class MySQLTableReflecter extends AbStractTableReflecter
 		return $this->sName;
 	}
 	
-	public function isExist()
-	{
-		return $this->bIsExist;
-	}
-	
 	private $sPrimaryName = null;
 	
 	private $nAutoINcrement;
