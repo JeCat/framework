@@ -78,10 +78,7 @@ class ShellPrintStream extends PrintStream
 		) ;
 		echo `echo -e "{$sOutput}"` ;
 		
-		if($bFlush)
-		{
-			$this->flush() ;
-		}
+		$this->flush() ;
 	}
 }
 
