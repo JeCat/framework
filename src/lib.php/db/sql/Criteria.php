@@ -112,6 +112,10 @@ class Criteria extends SubStatement
 		return $this->aOrder;
 	}
 	
+	function __clone(){
+	    $this->aRestriction = clone $this->aRestriction;
+	    $this->aOrder = clone $this->aOrder;
+	}
 	private $aRestriction = null;
 	private $aOrder = null;
 	private $nLimitFrom = 0;

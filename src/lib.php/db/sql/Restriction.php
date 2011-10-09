@@ -304,6 +304,17 @@ class Restriction extends SubStatement
 //		return "'" . $sStr . "'";
 //	}
 
+    function __clone(){
+        $arrTemp = $this->arrExpressions;
+        $this->arrExpressions = array();
+        foreach( $arrTemp as $tmp){
+            if(is_object($tmp)){
+                $this->arrExpressions [] = clone $tmp;
+            }else{
+                $this->arrExpressions [] = $tmp;
+            }
+        }
+    }
 	private $sLogic = ' AND ';
 	
 	private $arrExpressions = array ();
