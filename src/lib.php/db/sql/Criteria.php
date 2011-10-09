@@ -25,6 +25,10 @@ class Criteria extends SubStatement
 		{
 			$sStatement = ' WHERE ' . $this->aRestriction->makeStatement($bFormat);
 		}
+		if( $this->arrGroupByClms )
+		{
+			$sStatement.= ' GROUP BY ' . implode(', ',$this->arrGroupByClms) ;
+		}
 		if( $this->aOrder )
 		{
 			$sStatement .= ' ' . $this->aOrder->makeStatement($bFormat);
@@ -112,9 +116,33 @@ class Criteria extends SubStatement
 		return $this->aOrder;
 	}
 	
+	public function setGroupBy($columns=null)
+	{
+		if( empty($columns) )
+		{
+			$this->arrGroupByClms = null ;
+			return ;
+		}
+		
+		else
+		{
+			$this->arrGroupByClms = (array) $columns ;
+			foreach($this->arrGroupByClms as &$sColumn)
+			{
+				$sColumn = $this->transColumn($sColumn) ;
+			}
+		}
+	}
+	
+	public function groupBy()
+	{
+		return $this->arrGroupByClms ;
+	}
+	
 	private $aRestriction = null;
 	private $aOrder = null;
 	private $nLimitFrom = 0;
 	private $nLimitLen = 30;
+	private $arrGroupByClms = array() ;
 }
 ?>
