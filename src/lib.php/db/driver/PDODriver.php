@@ -2,10 +2,8 @@
 
 namespace jc\db\driver ;
 
-use jc\db\sql\reflecter\MySQLReflecterFactory;
-
+use jc\db\reflecter\MySQLReflecterFactory;
 use jc\db\DB;
-
 use jc\db\recordset\PDORecordSet;
 use jc\db\ExecuteException;
 use jc\db\sql\Statement;
@@ -127,8 +125,6 @@ class PDODriver extends \PDO implements IDriver
 		{
 			return new MySQLReflecterFactory($aDB);
 		}
-		
-		return null;
 	}
 	
 	private $arrExecuteLog = array() ;
