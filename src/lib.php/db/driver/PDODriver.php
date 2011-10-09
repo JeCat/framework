@@ -2,6 +2,10 @@
 
 namespace jc\db\driver ;
 
+use jc\db\sql\reflecter\MySQLReflecterFactory;
+
+use jc\db\DB;
+
 use jc\db\recordset\PDORecordSet;
 use jc\db\ExecuteException;
 use jc\db\sql\Statement;
@@ -111,6 +115,20 @@ class PDODriver extends \PDO implements IDriver
 	public function currentDBName()
 	{
 		return $this->sCurrentDBName ;
+	}
+	
+	public function reflectFactory(DB $aDB)
+	{
+		//识别数据库的名称(mysql,oracle)
+		$sDBType = substr($this->sDsn, 0 ,stripos($this->sDsn, ':')-1 );
+		
+		//如果是mysql,创建mysql的工厂
+		if($sDBType == 'Mysql')
+		{
+			return new MySQLReflecterFactory($aDB);
+		}
+		
+		return null;
 	}
 	
 	private $arrExecuteLog = array() ;

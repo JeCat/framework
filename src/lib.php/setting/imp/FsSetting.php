@@ -65,22 +65,24 @@ class FsSetting extends Setting
 		
 		if ($aFolderToDel = $this->aRootFolder->findFolder ( $sPath ))
 		{
-			$bDelWell = 1;
-//			$aFileIter = $aFolderToDel->iterator ( FSIterator::RECURSIVE_SEARCH | FSIterator::RETURN_FSO | FSIterator::FILE);
-//			foreach($aFileIter as $aFile)
-//			{
+//			$bDelWell = 1;
+			$aFileIter = $aFolderToDel->iterator ( FSIterator::RECURSIVE_SEARCH | FSIterator::RETURN_FSO | FSIterator::FILE);
+			foreach($aFileIter as $aFile)
+			{
+				$aFile->delete();
 //				$bDelWell *= (int)$aFile->delete();
-//			}
+			}
 			
 			//将文件迭代器反向遍历，前提是迭代器内部机制是浅层文件夹在前，深层文件夹在后
 			$aFolderIter = $aFolderToDel->iterator (  FSIterator::RECURSIVE_SEARCH | FSIterator::RETURN_FSO | FSIterator::FOLDER); //
 			foreach($aFolderIter as $aFolder)
 			{
-				echo $aFolder->path() . "\n";
-				$bDelWell *= (int)$aFolder->delete();
+				$aFolder->delete();
+//				$bDelWell *= (int)$aFolder->delete();
 			}
 			
-			$bDelWell *= (int)$aFolderToDel->delete();
+//			$bDelWell *= (int)$aFolderToDel->delete();
+			return true;
 		}
 		return (bool)$bDelWell;
 	}
