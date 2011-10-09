@@ -15,6 +15,8 @@ class Application extends CoreApplication implements \Serializable
 			self::setSingleton($this) ;
 		}
 		
+		$this->setApplicationDir($sAppDirPath) ;
+		
 		$this->setFileSystem(
 			LocalFileSystem::flyweight($sAppDirPath)
 		) ;
@@ -34,7 +36,7 @@ class Application extends CoreApplication implements \Serializable
 			{
 				return null ;
 			}
-		} 
+		}
 		else 
 		{
 			return $this->arrGlobalSingeltonInstance[$sClass] ;
@@ -70,7 +72,7 @@ class Application extends CoreApplication implements \Serializable
 	
 	public function setApplicationDir($sFolder)
 	{
-		$this->sApplicationDir = FileSystem::formatPath($sFolder).'/' ;
+		$this->sApplicationDir = FileSystem::formatPath($sFolder) ;
 	}
 
 	/**
