@@ -4,6 +4,9 @@ namespace jc\mvc\controller;
 
 class Relocater extends Controller
 {
+	const notBack = 'back://notBack' ;
+	const backToReferer = 'back://backToReferer' ;
+	
 	static public function locate($sUrl,$sTitle,$nWaitSec=3,IController $aParentController=null)
 	{
 		$aRelocater = new self($sUrl,$sTitle,$nWaitSec) ;
@@ -45,8 +48,20 @@ class Relocater extends Controller
 	public function __construct($sUrl,$sTitle,$nWaitSec=3)
 	{
 		parent::__construct() ;
+	
+		if( $sUrl===self::backToReferer and !empty($_SERVER['HTTP_REFERER']) )
+		{
+			$this->sUrl = $_SERVER['HTTP_REFERER'] ;
+		}
+		else if( $sUrl===self::notBack )
+		{
+			$this->sUrl = null ;
+		}
+		else 
+		{
+			$this->sUrl = $sUrl ;
+		}
 		
-		$this->sUrl = $sUrl ;
 		$this->sTitle = $sTitle ;
 		$this->nWaitSec = $nWaitSec ;
 	}
