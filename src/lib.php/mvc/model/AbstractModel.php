@@ -382,11 +382,17 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 		$this->arrChanged = array();
 	}
 	
+	/**
+	 *  @bug unset bug
+	 */
 	public function removeChanged($sName)
 	{
 		unset($this->arrChanged[$sName]);
 	}
 	
+	/**
+	 *  @optimize 1.in_array 2.add
+	 */
 	public function setChanged($sName)
 	{
 		$this->arrChanged[] = $sName;
