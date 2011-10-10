@@ -110,7 +110,11 @@ class Prototype{
         if(isset($this->arrColumnAliases[$sAlias])){
             return $this->arrColumnAliases[$sAlias];
         }else{
-            return '';
+            if(in_array($sAlias,$this->columns())){
+                return $sAlias;
+            }else{
+                return '';
+            }
         }
     }
     public function addColumnAlias($sColumn,$sAlias){

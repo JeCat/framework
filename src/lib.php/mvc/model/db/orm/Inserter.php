@@ -12,18 +12,12 @@ class Inserter extends Object{
         $aPrototype = $aModel->prototype();
         $sTableName = $aPrototype ->tableName();
         $aSqlInsert = StatementFactory::singleton()->createInsert($sTableName);
-        $aCriteria = clone $aPrototype->criteria();
-        $aRestriction = $aCriteria->restriction();
-        $aSqlInsert ->setCriteria($aCriteria);
-        $keys = $aPrototype->keys();
-        foreach($keys as $k){
-            $aRestriction->eq($k,$aModel->data($k));
+        foreach($aModel->dataIterator() as $alias => $data){
+            $column = $aPrototype->getColumnByAlias($alias);
+            $aSqlInsert->setData($column,$data);
+            $aModel->removeChange($alias);
         }
         $aDB->execute($aSqlInsert->makeStatement());
-        $arrColumns = $aPrototype->columns();
-        foreach($arrColumns as $column){
-            $aModel->removeChanged($column);
-        }
         foreach($aModel->prototype()->associationIterator() as $aAssociation){
             if( $aAssociation->isType(Association::hasAndBelongsTo) ){
                 $aBridgeInsert = StatementFactory::singleton()->createInsert($aAssociation->bridgeTable()->name());
@@ -33,10 +27,10 @@ class Inserter extends Object{
                 $toKeys = $aAssociation->toKeys();
                 $n = count($toKeys);
                 for($i=0;$i<$n;++$i){
-                    $aBridgeInsert->criteria()->restriction()->eq($toBridgeKeys[$i],$aModel->data($fromKeys[$i]));
-                    $aBridgeInsert->criteria()->restriction()->eq($fromBridgeKeys[$i],$aModel->child($aAssociation->name())->data($toKeys[$i]));
+                    $aBridgeInsert->setData($toBridgeKeys[$i],$aModel->data($fromKeys[$i]));
+                    $aBridgeInsert->setData($fromBridgeKeys[$i],$aModel->child($aAssociation->name())->data($toKeys[$i]));
                 }
-                $aDB->execute($aSqlDelete->makeStatement());
+                $aDB->execute($aBridgeInsert->makeStatement());
             }
         }
     }

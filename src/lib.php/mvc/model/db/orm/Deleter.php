@@ -13,11 +13,19 @@ class Deleter extends Object{
         $sTableName = $aPrototype ->tableName();
         $aSqlDelete = StatementFactory::singleton()->createDelete($sTableName);
         $aCriteria = clone $aPrototype->criteria();
-        $aRestriction = $aCriteria->restriction();
         $aSqlDelete ->setCriteria($aCriteria);
-        $keys = $aPrototype->keys();
-        foreach($keys as $k){
-            $aRestriction->eq($k,$aModel->data($k));
+        $aRestriction = $aCriteria->restriction();
+        $arrKeys = $aPrototype->keys();
+        $arrChanged = $Model->changed();
+        foreach($aModel->dataIterator() as $alias => $data){
+            $column = $aPrototype->getColumnByAlias($alias);
+            if( in_array($column,$arrKeys)){
+                if( in_array( $column,$arrChanged) ){
+                    throw new Exception('jc\mvc\model\db\orm\Deleter : Key 有修改');
+                }else{
+                    $aRestriction->eq($column,$data);
+                }
+            }
         }
         $aDB->execute($aSqlDelete->makeStatement());
         $arrColumns = $aPrototype->columns();
@@ -36,7 +44,7 @@ class Deleter extends Object{
                     $aBridgeDelete->criteria()->restriction()->eq($toBridgeKeys[$i],$aModel->data($fromKeys[$i]));
                     $aBridgeDelete->criteria()->restriction()->eq($fromBridgeKeys[$i],$aModel->child($aAssociation->name())->data($toKeys[$i]));
                 }
-                $aDB->execute($aSqlDelete->makeStatement());
+                $aDB->execute($aBridgeDelete->makeStatement());
             }
         }
         /**
