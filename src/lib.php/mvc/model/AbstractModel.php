@@ -362,14 +362,7 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	
 	public function isEmpty()
 	{
-		if ($this->arrDatas === null)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return $this->arrDatas === null;
 	}
 	
 	public function changed()

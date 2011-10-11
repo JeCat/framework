@@ -1,7 +1,7 @@
 <?php
 namespace jc\db\reflecter;
 
-abstract class DBStructReflecter
+class DBStructReflecter
 {
 	/**
 	 * 返回对象名称

@@ -57,7 +57,8 @@ class TargetCodeOutputStream implements IOutputStream
 			return ;
 		}
 		
-		// 转义 $
+		// 转义 \ 和 $
+		$this->sOutputContents = addcslashes($this->sOutputContents, '\\') ;
 		$this->sOutputContents = str_replace('$','\\$',$this->sOutputContents) ;
 		
 		$this->aCompiledWriter->write("\$aDevice->write(<<<OUTPUT\r\n{$this->sOutputContents}\r\nOUTPUT\r\n) ;\r\n") ;
