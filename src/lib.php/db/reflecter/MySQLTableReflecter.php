@@ -16,7 +16,7 @@ class MySQLTableReflecter extends AbStractTableReflecter
 		
 		foreach ( $aIterResults as $aResult )
 		{
-			$this->arrColumnNames [] = $aResult;
+			$this->arrColumnNames [] = $aResult['Field'];
 		}
 		
 		$aIterStatus = $aDB->query ( $this->makeTableStatusSql($sTable) );

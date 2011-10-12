@@ -35,7 +35,7 @@ interface IDriver
 	 * @param DB $aDB
 	 * @return AbstractReflecterFactory or null when no database support
 	 */
-	public function reflectFactory(DB $aDB);
+	public function reflecterFactory(DB $aDB);
 }
 
 ?>

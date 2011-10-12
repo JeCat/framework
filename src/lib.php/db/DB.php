@@ -63,7 +63,7 @@ class DB extends Object
 	/**
 	 * @return jc\db\sql\reflecter\AbstractReflecterFactory 
 	 */
-	public function reflectFactory()
+	public function reflecterFactory()
 	{
 		return $this->aDriver->reflecterFactory($this);
 	}
