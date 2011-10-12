@@ -104,6 +104,9 @@ class Application extends CoreApplication implements \Serializable
 		return ;
 	}
 	
+	public function cache(){
+	    return null;
+	}
 	
 	private $arrGlobalSingeltonInstance ;
 	 

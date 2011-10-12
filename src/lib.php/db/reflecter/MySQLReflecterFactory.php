@@ -19,11 +19,11 @@ class MySQLReflecterFactory extends AbstractReflecterFactory
 	}
 	public function createColumnReflecter($sTable, $sColumn, $sDBName = null)
 	{
-		return new MySQLColumnReflecter ( $this, $sTable, $sColumn );
+		return new MySQLColumnReflecter ( $this, $sTable, $sColumn , $sDBName);
 	}
 	public function createIndexReflecter($sTable, $sIndexName, $sDBName = null)
 	{
-		return new MySQLIndexReflecter ( $this, $sTable, $sIndexName );
+		return new MySQLIndexReflecter ( $this, $sTable, $sIndexName , $sDBName);
 	}
 }
 ?>

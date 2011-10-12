@@ -8,7 +8,7 @@ use jc\db\sql\Select;
 use jc\mvc\model\db\orm\PrototypeAssociationMap;
 use jc\lang\Exception;
 use jc\mvc\model\db\orm\operators\Deleter;
-use jc\mvc\model\db\orm\operators\Selecter;
+use jc\mvc\model\db\orm\Selecter;
 use jc\mvc\model\db\orm\operators\Inserter;
 use jc\mvc\model\db\orm\operators\Updater;
 use jc\db\DB;
@@ -16,17 +16,19 @@ use jc\db\recordset\IRecordSet;
 use jc\db\sql\MultiTableStatement;
 use jc\db\sql\Criteria;
 use jc\mvc\model\db\orm\Association;
-use jc\mvc\model\db\orm\PrototypeInFragment ;
 use jc\mvc\model\AbstractModel ;
 use jc\db\sql\IDriver ;
 use jc\lang\Object;
 use jc\mvc\model\IPaginal;
 use jc\mvc\view\widget\Paginator;
+use jc\mvc\model\db\orm\Prototype;
 
 class Model extends AbstractModel implements IModel , IPaginal
 {
-	private function __construct()
+	public function __construct(Prototype $aPrototype=null)
 	{
+	    parent::__construct();
+	    $this->setPrototype($aPrototype);
 	}
 	
 	public static function create($prototype=null)
@@ -38,7 +40,7 @@ class Model extends AbstractModel implements IModel , IPaginal
 		}
 		
 		// Prototype
-		else if( $prototype instanceof PrototypeInFragment )
+		else if( $prototype instanceof Prototype )
 		{
 			$aPrototype = $prototype ;
 		}
@@ -56,10 +58,9 @@ class Model extends AbstractModel implements IModel , IPaginal
 			throw new Exception("创建模型时传入的模型原型类型无效") ;
 		}
 		
-		$this->setPrototype($aPrototype) ;
-		
-		
-		$this->criteria()->setLimitLen( $bAggregation? 30: 1 ) ;
+		$object = new self($aPrototype);
+		$object->criteria()->setLimitLen( 1 ) ;
+		return $object;
 	}
 
 	public function serialize ()
@@ -116,7 +117,7 @@ class Model extends AbstractModel implements IModel , IPaginal
 		return $this->aPrototype ;
 	}
 
-	public function setPrototype(PrototypeInFragment $aPrototype=null)
+	public function setPrototype(Prototype $aPrototype=null)
 	{
 		$this->aPrototype = $aPrototype ;
 	}
@@ -171,15 +172,6 @@ class Model extends AbstractModel implements IModel , IPaginal
 	
 	public function load($values=null,$keys=null)
 	{
-		$aPrototypeB = Prototype::create('tableB') 
-								->hasOne('tableC') ;
-		
-		Prototype::create('tableA','')
-					->hasOne($aPrototypeB,'uid','pid') ;
-		
-				
-		
-		
 		if($values){
 			if(!$keys){
 				$keys = $this->prototype()->primaryKeys() ;
@@ -201,7 +193,7 @@ class Model extends AbstractModel implements IModel , IPaginal
 			}
 		}
 		
-		return Selecter::singleton()->select( $this->db(), $this, $this->aCriteria ) ;
+		return Selecter::singleton()->execute( $this->db(), $this, $this->aCriteria ) ;
 	}
 	
 	public function save()
@@ -327,7 +319,7 @@ class Model extends AbstractModel implements IModel , IPaginal
 				throw new Exception("无效的db\\Model,缺少原型对象") ;
 			}
 			
-			$this->aCriteria = $this->aPrototype->sqlFactory()->createCriteria() ;
+			$this->aCriteria = $this->aPrototype->criteria() ;
 		}
 		
 		return $this->aCriteria ;

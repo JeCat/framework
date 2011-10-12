@@ -115,6 +115,11 @@ class Criteria extends SubStatement
 
 		return $this->aOrder;
 	}
+
+	function __clone(){
+	    if($this->aOrder !== null) $this->aOrder = clone $this->aOrder;
+	    if($this->aRestriction !== null) $this->aRestriction = clone $this->aRestriction;
+	}
 	
 	public function setGroupBy($columns=null)
 	{

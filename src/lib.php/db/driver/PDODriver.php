@@ -115,13 +115,12 @@ class PDODriver extends \PDO implements IDriver
 		return $this->sCurrentDBName ;
 	}
 	
-	public function reflectFactory(DB $aDB)
+	public function reflecterFactory(DB $aDB)
 	{
 		//识别数据库的名称(mysql,oracle)
-		$sDBType = substr($this->sDsn, 0 ,stripos($this->sDsn, ':')-1 );
-		
+		$sDBType = substr($this->sDsn, 0 ,stripos($this->sDsn, ':') );
 		//如果是mysql,创建mysql的工厂
-		if($sDBType == 'Mysql')
+		if($sDBType == 'mysql')
 		{
 			return new MySQLReflecterFactory($aDB);
 		}

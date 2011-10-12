@@ -2,6 +2,7 @@
 namespace jc\mvc\model\db ;
 
 use jc\mvc\model\IModel as IModelBase ;
+use jc\mvc\model\db\orm\Prototype;
 
 interface IModel extends IModelBase
 {
@@ -10,5 +11,5 @@ interface IModel extends IModelBase
 	 */
 	public function prototype() ;
 
-	public function setPrototype(PrototypeInFragment $aPrototype) ;
+	public function setPrototype(Prototype $aPrototype) ;
 }
