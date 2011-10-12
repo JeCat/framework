@@ -6,6 +6,7 @@ use jc\lang\Object;
 use jc\db\DB;
 use jc\mvc\model\db\IModel ;
 use jc\db\sql\StatementFactory ;
+use jc\lang\Exception;
 
 class Selecter extends Object{
     public function execute(DB $aDB, IModel $aModel){
@@ -16,7 +17,7 @@ class Selecter extends Object{
         $aSqlSelect ->setCriteria($aCriteria);
         $aRestriction = $aCriteria->restriction();
         $arrKeys = $aPrototype->keys();
-        $arrChanged = $Model->changed();
+        $arrChanged = $aModel->changed();
         /**
             array(
                     0 => array(
@@ -39,11 +40,10 @@ class Selecter extends Object{
                             'association' => array(),
                             'father node' => -1
                             );
-        $arrPrototypeTree[0]['Table object'] = StatementFactory::createTable(
+        $arrPrototypeTree[0]['Table object'] = StatementFactory::singleton()->createTable(
                                                                     $arrPrototypeTree[0]['Prototype']->tableName(),
                                                                     $arrPrototypeTree[0]['Table alias']
                                                                             );
-        $aSqlSelect -> addTable ( $arrPrototypeTree[0]['Table object']);
         $arrTravelQueue = array();
         $arrTravelQueue [] = 0;
         while( ! empty($arrTravelQueue)){
@@ -66,7 +66,6 @@ class Selecter extends Object{
                                                                     $arrPrototypeTree[$nNext]['Prototype']->tableName(),
                                                                     $arrPrototypeTree[$nNext]['Table alias']
                                                                             );
-                $aSqlSelect -> addTable ( $arrPrototypeTree[$nNext]['Table object']);
                 $arrTravelQueue[]=$nNext;
             }
         }
@@ -91,7 +90,6 @@ class Selecter extends Object{
                 }
             }
         }
-        $aSqlSelect -> addTable ( $arrPrototypeTree[0]['Table object'] );
         $arrHeadQueue = array(0);
         while( ! empty( $arrHeadQueue) ){
             $nHead = array_shift( $arrHeadQueue );
@@ -124,7 +122,11 @@ class Selecter extends Object{
                 }
             }
         }
-        $aRecordSet = $aDB->execute( $aSqlSelect->makeStatement() );
+        $aRecordSet = $aDB->query( $aSqlSelect->makeStatement() );
+        foreach($aRecordSet as $a){
+            var_dump($a);
+        }
+        $aModel->loadData($aRecordSet);
     }
 }
 ?>

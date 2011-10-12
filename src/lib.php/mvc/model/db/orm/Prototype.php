@@ -4,6 +4,7 @@ namespace jc\mvc\model\db\orm;
 
 use jc\lang\Exception;
 use jc\db\DB;
+use jc\db\sql\StatementFactory;
 
 class Prototype{
     // static creator
@@ -62,7 +63,10 @@ class Prototype{
     public function setTableName($sTableName){
         $this->sTableName = $sTableName;
     }
-    public function cirteria(){
+    public function criteria($bCreate=true){
+        if( $this->aCriteria === null and $bCreate){
+            $this->aCriteria = StatementFactory::singleton()->createCriteria();
+        }
         return $this->aCriteria;
     }
     public function associateBy(){
@@ -226,11 +230,10 @@ class Prototype{
      *  如果$aDB为null，则会从系统中得到一个单件。
      */
     static private function reflectKeys($sTableName,$aDB){
-        return null;
         if($aDB === null){
             $aDB = DB::singleton();
         }
-        $aIndexReflecter = $aDB->reflecterFactory()->createIndexReflecter($sTableName, 'PRIMARY');
+        $aIndexReflecter = $aDB->reflecterFactory()->createIndexReflecter($sTableName, 'PRIMARY','learnphp');
         $keys = $aIndexReflecter->columnNames();
         return $keys;
     }
@@ -241,13 +244,12 @@ class Prototype{
      *  如果$aDB为null，则会从系统中得到一个单件。
      */
     static private function reflectAllColumnsInTable($sTableName,$aDB){
-        return null;
         if($aDB === null){
             $aDB = DB::singleton();
         }
-        $aTableReflecter = $aDB->reflecterFactory()->createTableReflecter($sTableName, 'PRIMARY');
-        $aIter = $aTableReflecter->columnNameIterator();
         $columns = array();
+        $aTableReflecter = $aDB->reflecterFactory()->createTableReflecter($sTableName,'learnphp');
+        $aIter = $aTableReflecter->columnNameIterator();
         foreach($aIter as $v){
             $columns[] = $v;
         }

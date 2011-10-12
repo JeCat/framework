@@ -392,6 +392,14 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 		$this->arrChanged = array_unique($this->arrChanged);
 	}
 	
+	public function hasSerialized(){
+	    throw new Exception('%s::%s 未完成',__METHOD__);
+	}
+	
+	public function setSerialized($bSerialized=true){
+	    throw new Exception('%s::%s 未完成',__METHOD__);
+	}
+	
 	private $arrDatas = null;
 	
 	private $arrChildren = array ();

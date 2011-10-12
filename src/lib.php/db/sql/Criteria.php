@@ -117,8 +117,8 @@ class Criteria extends SubStatement
 	}
 
 	function __clone(){
-	    $this->aRestriction = clone $this->aRestriction;
-	    $this->aOrder = clone $this->aOrder;
+	    if($this->aOrder !== null) $this->aOrder = clone $this->aOrder;
+	    if($this->aRestriction !== null) $this->aRestriction = clone $this->aRestriction;
 	}
 	
 	public function setGroupBy($columns=null)
