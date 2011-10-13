@@ -81,7 +81,7 @@ class MockupColumnReflecter extends AbStractColumnReflecter
 	public $sComment = '';
 	public $bIsAutoIncrement = true;
 	public $arrMetainfo = array ();
-	public $bIsExist = true;
+	public $bIsExist = false;
 	public $bIsAllowNull = true;
 	
 	public $sName;

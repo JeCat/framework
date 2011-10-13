@@ -42,7 +42,7 @@ class MockupIndexReflecter extends AbStractIndexReflecter{
 	
 	public $sName;
 	
-	public $bIsExist = true ;
+	public $bIsExist = false ;
 	public $arrColumnNames = array();
 	public $bIsPrimary = false;
 	public $bIsUnique = false;

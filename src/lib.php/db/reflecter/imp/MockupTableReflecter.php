@@ -53,7 +53,7 @@ class MockupTableReflecter extends AbStractTableReflecter
 	
 	public $sName;
 	
-	public $bIsExist=true;
+	public $bIsExist=false;
 }
 
 ?>
