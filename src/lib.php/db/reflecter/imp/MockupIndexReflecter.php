@@ -40,13 +40,13 @@ class MockupIndexReflecter extends AbStractIndexReflecter{
 		return $this->arrColumnNames;
 	}
 	
-	private $sName;
+	public $sName;
 	
-	private $bIsExist = true ;
-	private $arrColumnNames = array();
-	private $bIsPrimary = false;
-	private $bIsUnique = false;
-	private $bIsFullText = false ;
+	public $bIsExist = true ;
+	public $arrColumnNames = array();
+	public $bIsPrimary = false;
+	public $bIsUnique = false;
+	public $bIsFullText = false ;
 	
 }
 

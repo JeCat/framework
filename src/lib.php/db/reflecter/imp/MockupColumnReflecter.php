@@ -70,20 +70,20 @@ class MockupColumnReflecter extends AbStractColumnReflecter
 		return $this->bIsExist;
 	}
 	
-	private $bIsString = false;
-	private $bIsInt = false;
-	private $bIsBool = false;
-	private $bIsFloat = false;
+	public $bIsString = false;
+	public $bIsInt = false;
+	public $bIsBool = false;
+	public $bIsFloat = false;
 	
-	private $nLength = 0;
-	private $sType = '';
-	private $sDefaultValue = '';
-	private $sComment = '';
-	private $bIsAutoIncrement = true;
-	private $arrMetainfo = array ();
-	private $bIsExist = true;
-	private $bIsAllowNull = true;
+	public $nLength = 0;
+	public $sType = '';
+	public $sDefaultValue = '';
+	public $sComment = '';
+	public $bIsAutoIncrement = true;
+	public $arrMetainfo = array ();
+	public $bIsExist = true;
+	public $bIsAllowNull = true;
 	
-	private $sName;
+	public $sName;
 }
 ?>
