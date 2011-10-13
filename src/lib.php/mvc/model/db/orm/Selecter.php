@@ -2,131 +2,135 @@
 
 namespace jc\mvc\model\db\orm;
 
+
+use jc\mvc\model\db\ModelList;
+use jc\db\sql\Table;
+use jc\db\sql\Select;
 use jc\lang\Object;
 use jc\db\DB;
 use jc\mvc\model\db\IModel ;
 use jc\db\sql\StatementFactory ;
 use jc\lang\Exception;
 
-class Selecter extends Object{
-    public function execute(DB $aDB, IModel $aModel){
-        $aPrototype = $aModel->prototype();
-        $sTableName = $aPrototype ->tableName();
-        $aSqlSelect = StatementFactory::singleton()->createSelect($sTableName);
-        $aCriteria = clone $aPrototype->criteria();
-        $aSqlSelect ->setCriteria($aCriteria);
-        $aRestriction = $aCriteria->restriction();
-        $arrKeys = $aPrototype->keys();
-        $arrChanged = $aModel->changed();
-        /**
-            array(
-                    0 => array(
-                            ['Prototype'] => $aPrototype,
-                            ['Table alias'] => 'xxx',
-                            ['Table object'] => $aTable ,
-                            ['association'] =>array(
-                                    0 =>array(
-                                            ['object'] => $aAssociation,
-                                            ['node no'] => 1
-                                            ),
-                                    1 => array(),
-                                    ),
-                            ['father node'] => -1
-        */
-        $arrPrototypeTree = array();
-        $arrPrototypeTree[0] = array(
-                            'Prototype' => $aPrototype,
-                            'Table alias' => $aPrototype->name(),
-                            'association' => array(),
-                            'father node' => -1
-                            );
-        $arrPrototypeTree[0]['Table object'] = StatementFactory::singleton()->createTable(
-                                                                    $arrPrototypeTree[0]['Prototype']->tableName(),
-                                                                    $arrPrototypeTree[0]['Table alias']
-                                                                            );
-        $arrTravelQueue = array();
-        $arrTravelQueue [] = 0;
-        while( ! empty($arrTravelQueue)){
-            $nTmp = array_shift ( $arrTravelQueue );
-            $aTmpPrototype = $arrPrototypeTree[$nTmp]['Prototype'];
-            $aTmpTableAlias = $arrPrototypeTree[$nTmp]['Table alias'];
-            foreach($aTmpPrototype->associationIterator() as $aAssociation){
-                $nNext = count($arrTravelQueue);
-                $arrPrototypeTree[$nTmp]['association'][]=array(
-                                                            'object' => $aAssociation,
-                                                            'node no' => $nNext
-                                                        );
-                $arrPrototypeTree[$nNext] = array(
-                                                'Prototype' => $aAssociation->toPrototype(),
-                                                'Table alias' => $aTmpTableAlias.'.'.$aAssociation->name(),
-                                                'association' => array(),
-                                                'father node' => $nTmp
-                                            );
-                $arrPrototypeTree[$nNext]['Table object'] = StatementFactory::createTable(
-                                                                    $arrPrototypeTree[$nNext]['Prototype']->tableName(),
-                                                                    $arrPrototypeTree[$nNext]['Table alias']
-                                                                            );
-                $arrTravelQueue[]=$nNext;
-            }
-        }
-        $arrHeadQueue = array(0);
-        while( ! empty( $arrHeadQueue) ){
-            $nHead = array_shift( $arrHeadQueue );
-            $arrJoinQueue = array( $nHead );
-            while( !empty( $arrJoinQueue ) ){
-                $nJoin = array_shift( $arrJoinQueue );
-                $aNowTable = $arrPrototypeTree[$nJoin]['Table object'];
-                $arrAssociation = $arrPrototypeTree[$nJoin]['association'];
-                foreach( $arrAssociation as $association ){
-                    $nNode = $association['node no'];
-                    $aTablesJoin = StatementFactory::createTablesJoin();
-                    $aTablesJoin->addTable( $arrPrototypeTree[$nNode] ['Table object'] );
-                    $aNowTable -> addJoin($aTablesJoin);
-                    if( $association['object']->isType(Association::oneToOne)){
-                        $arrJoinQueue[]=$nNode;
-                    }else{
-                        $arrHeadQueue[]=$nNode;
-                    }
-                }
-            }
-        }
-        $arrHeadQueue = array(0);
-        while( ! empty( $arrHeadQueue) ){
-            $nHead = array_shift( $arrHeadQueue );
-            $arrJoinQueue = array( $nHead );
-            $aHeadPrototype = $arrPrototypeTree[$nHead]['Prototype'];
-            $aSqlSelect -> clearColumn();
-            $aSqlSelect -> criteria()->setLimitFrom(
-                                                $aHeadPrototype->criteria()->limitFrom()
-                                                    );
-            $aSqlSelect -> criteria()->setLimitLen(
-                                                $aHeadPrototype->criteria()->limitLen()
-                                                    );
-            $aSqlSelect -> criteria() -> setOrder(
-                                                $aHeadPrototype->criteria()->orders()
-                                                    );
-            while( !empty( $arrJoinQueue ) ){
-                $nJoin = array_shift( $arrJoinQueue );
-                $strTableAlias = $arrPrototypeTree[$nJoin]['Table alias'];
-                $aNowPrototype = $arrPrototypeTree[$nJoin]['Prototype'];
-                foreach($aNowPrototype->columnIterator() as $column){
-                    $aSqlSelect -> addColumn( $column , $strTableAlias.$column);
-                }
-                foreach( $arrAssociation as $association ){
-                    $nNode = $association['node no'];
-                    if( $association['object']->isType(Association::oneToOne)){
-                        $arrJoinQueue[]=$nNode;
-                    }else{
-                        $arrHeadQueue[]=$nNode;
-                    }
-                }
-            }
-        }
-        $aRecordSet = $aDB->query( $aSqlSelect->makeStatement() );
-        foreach($aRecordSet as $a){
-            var_dump($a);
-        }
-        $aModel->loadData($aRecordSet);
-    }
+class Selecter extends Object
+{
+	public function execute(DB $aDB, IModel $aModel)
+	{
+		$aPrototype = $aModel->prototype() ;
+		
+		// -----------------
+		// step 1. 组装用于查询的 Select 对象
+		$aSelect = $this->buildSelect($aPrototype) ;
+		
+		
+		// -----------------
+		// step 2. query for all one to one association tables 
+		$arrMultitermAssociations = array() ;
+		$this->addColumnsForOneToOne($aSelect,$aPrototype,$aPrototype->name(),$arrMultitermAssociations) ;
+		
+		if( !($aModel instanceof ModelList) )
+		{
+			$aSelect->criteria()->setLimitLen(1) ;
+		}
+		if( !$aRecordset = $aDB->query($aSelect) )
+		{
+			return ;
+		}
+		$aModel->loadData($aRecordset) ;
+		
+		
+		// -----------------
+		// step 2. query alonely for multiterm associated prototype 
+		foreach($arrMultitermAssociations as $aMultitermAssoc)
+		{
+		}
+	}
+	
+	private function buildSelect(Prototype $aPrototype)
+	{
+		$aSqlFactory = StatementFactory::singleton() ;
+		$aSqlFactory instanceof StatementFactory ;
+		$aSelect = $aSqlFactory->createSelect() ;
+		
+		// 主表的名称
+		$aTable = $aSqlFactory->createTable( $aPrototype->tableName(), $aPrototype->name() ) ;
+		$aSelect->addTable($aTable) ;
+		
+		// criteria
+		$aCriteria = clone $aPrototype->criteria() ;
+		$aSelect->setCriteria( $aCriteria ) ;
+		
+		// 递归连接所有关联原型的 table
+		$this->joinTables( $aTable, $aPrototype, $aSqlFactory ) ;
+	}
+	
+	private function joinTables(Table $aFromTable,Prototype $aForPrototype, StatementFactory $aSqlFactory)
+	{
+		foreach( $aForPrototype->associationIterator() as $aAssoc )
+		{
+			$aPrototype = $aAssoc->toPrototype() ;
+			
+			// create table
+			$aTable = $aSqlFactory->createTable(
+				$aPrototype->tableName()
+				, $aFromTable->alias().'.'.$aPrototype->alias()
+			) ;
+						
+			// create table join
+			$aTablesJoin = $aSqlFactory->createTablesJoin() ;
+			$aTablesJoin->addTable($aTable) ;
+			
+			$aFromTable->addJoin(
+				$aTablesJoin
+				, $this->makeResrictionForForeignKey($aFromTable->alias(),$aTable->alias(),$aAssoc,$aSqlFactory)
+			) ;
+
+			// 递归
+			$this->joinTables( $aTable, $aPrototype ) ;
+		}
+	}
+	
+	private function addColumnsForOneToOne(Select $aSelect,Prototype $aPrototype,$sPrototypeTableAlias,& $arrMultitermAssociations)
+	{		
+		// add columns for pass in prototype 
+		foreach($aPrototype->columns() as $sColumnName)
+		{
+			$aSelect->addColumn($sColumnName,"{$sPrototypeTableAlias}.{$sColumnName}") ;
+		}
+
+		// add columns for one to one associated prototypes
+		foreach( $aPrototype->associationIterator() as $aAssoc )
+		{
+			if( $aAssoc->isOneToOne() )
+			{
+				$aToPrototype = $aAssoc->toPrototype() ;
+				
+				// add columns recursively
+				$this->addColumnsForOneToOne( $aSelect, $aToPrototype, $sPrototypeTableAlias.'.'.$aToPrototype->alias() ) ;
+			}
+			
+			else
+			{
+				$arrMultitermAssociations[] = $aAssoc ;
+			}
+		}
+	}
+		
+	private function makeResrictionForForeignKey(Table $sFromTableName,Table $sToTableName,Association $aAssociation, StatementFactory $aSqlFactory)
+	{
+		$aRestriction = $aSqlFactory->createRestriction() ;
+		$arrToKeys = $aAssociation->toKeys() ;
+		
+		foreach ($aAssociation->fromKeys() as $nIdx=>$sFromKey)
+		{
+			$aRestriction->eqColumn(
+				"{$sFromTableName}.{$sFromKey}"
+				, "{$sToTableName}.{$arrToKeys[$nIdx]}"
+			) ;
+		}
+		
+		return $aRestriction ;
+	}
+
 }
 ?>

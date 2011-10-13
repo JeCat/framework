@@ -4,7 +4,8 @@ namespace jc\mvc\model\db\orm;
 
 use jc\lang\Exception;
 
-class Association{
+class Association
+{
     const hasOne = 1;
     const belongsTo = 2;
     const hasMany = 3;

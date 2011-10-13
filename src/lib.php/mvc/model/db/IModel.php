@@ -7,7 +7,7 @@ use jc\mvc\model\db\orm\Prototype;
 interface IModel extends IModelBase
 {
 	/**
-	 * @return jc\mvc\model\db\orm\PrototypeInFragment
+	 * @return jc\mvc\model\db\orm\Prototype
 	 */
 	public function prototype() ;
 
