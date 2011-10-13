@@ -8,21 +8,22 @@ class MockupTableReflecter extends AbStractTableReflecter
 	function __construct($aDBReflecterFactory, $sTable, $sDBName = null) 
 	{
 		$this->sName = $sTable;
+		$this->sDBName = $sDBName;
 	}
 	
 	public function primaryName()
 	{
-		return $this->sPrimaryName;
+		return $this->arrMetainfo['primaryName'];
 	}
 	
 	public function autoIncrement()
 	{
-		return $this->nAutoIncrement;
+		return $this->arrMetainfo['autoIncrement'];
 	}
 	
 	public function comment()
 	{
-		return $this->sComment;
+		return $this->arrMetainfo['comment'];
 	}
 	
 	/**
@@ -30,7 +31,7 @@ class MockupTableReflecter extends AbStractTableReflecter
 	 */
 	public function columnNameIterator()
 	{
-		return new \ArrayIterator ( $this->arrColumnNames );
+		return new \ArrayIterator ( array_keys($this->arrMetainfo['columns']) );
 	}
 	
 	public function name()
@@ -43,15 +44,11 @@ class MockupTableReflecter extends AbStractTableReflecter
 		return $this->bIsExist;
 	}
 	
-	public $sPrimaryName = null;
-	
-	public $nAutoIncrement;
-	
-	public $sComment;
-	
-	public $arrColumnNames;
+	public $arrMetainfo = array();
 	
 	public $sName;
+	
+	public $sDBName;
 	
 	public $bIsExist=false;
 }
