@@ -55,7 +55,18 @@ class MockupReflecterFactory extends AbstractReflecterFactory
 		if( $sDBName and isset($this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]) )
 		{
 			$aReflecter->bIsExist = true ;
+			$aReflecter->bIsAllowNull = $this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]['allowNull'] ;
+			$aReflecter->nLength = $this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]['length'] ;
+			$aReflecter->sType = $this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]['type'] ;
+			$aReflecter->sDefaultValue = $this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]['defaultValue'] ;
+			$aReflecter->sComment = $this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]['comment'] ;
+			$aReflecter->bIsAutoIncrement = $this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]['isAutoIncrement'] ;
 			$aReflecter->arrMetainfo = $this->arrMockupStruct[$sDBName][$sTable] ;
+			
+			$aReflecter->bIsString = $this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]['type'] === 'string' ? true:false;
+			$aReflecter->bIsInt = $this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]['type'] === 'int' ? true:false;
+			$aReflecter->bIsBool = $this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]['type'] === 'bool' ? true:false;
+			$aReflecter->bIsFloat = $this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]['type'] === 'float' ? true:false;
 		}
 		
 		return $aReflecter ;
@@ -63,7 +74,23 @@ class MockupReflecterFactory extends AbstractReflecterFactory
 	
 	public function createIndexReflecter($sTable, $sIndexName, $sDBName = null)
 	{
-		return new MySQLIndexReflecter ( $this, $sTable, $sIndexName , $sDBName);
+		if(!$sDBName)
+		{
+			$sDBName = $this->currentDBName() ;
+		}
+		
+		$aReflecter = new MySQLIndexReflecter ( $this, $sTable, $sIndexName , $sDBName);
+	
+		if( $sDBName and isset($this->arrMockupStruct[$sDBName][$sTable]['indexes'][$sIndexName]) )
+		{
+			$aReflecter->bIsExist = true ;
+			$aReflecter->arrColumnNames = $this->arrMockupStruct[$sDBName][$sTable]['indexes'][$sIndexName]['columns'] ;
+			$aReflecter->bIsPrimary = $this->arrMockupStruct[$sDBName][$sTable]['indexes'][$sIndexName]['isPrimary'] ;
+			$aReflecter->bIsUnique = $this->arrMockupStruct[$sDBName][$sTable]['indexes'][$sIndexName]['isUnique'] ;
+			$aReflecter->bIsFullText = $this->arrMockupStruct[$sDBName][$sTable]['indexes'][$sIndexName]['isFullText'] ;
+		}
+		
+		return $aReflecter ;
 	}
 	
 	public function currentDBName()
@@ -72,63 +99,70 @@ class MockupReflecterFactory extends AbstractReflecterFactory
 		{
 			$this->sCurrentDBName = key($this->arrMockupStruct) ;
 		}
-		
 		return $this->sCurrentDBName ;
 	}
 	
-	/**
-	 * array(
-	 * 	'db1' => array(
-	 * 		'table1' => array(
-	 * 			
-	 * 			'primaryName' => 'index1'
-	 * 			'autoIncrement' => 0 ,
-	 * 			'comment' => 'xxx' ,
-	 * 
-	 * 			'columns' => array(
-	 * 				'column1' => array(
-	 * 					'type' => 'int' ,
-	 * 					'length' => 10 ,
-	 * 					'allowNull' => true ,
-	 * 					'defaultValue' => 0 ,
-	 * 					'comment' => 'xxxx' ,
-	 * 					'isAutoIncrement' => true ,
-	 * 				),
-	 * 				'column2' => array(
-	 * 					'type' => 'int' ,
-	 * 					'length' => 10 ,
-	 * 					'allowNull' => true ,
-	 * 					'defaultValue' => 0 ,
-	 * 					'comment' => 'xxxx' ,
-	 * 					'isAutoIncrement' => true ,
-	 * 				),
-	 * 				'column3' => array(
-	 * 					'type' => 'int' ,
-	 * 					'length' => 10 ,
-	 * 					'allowNull' => true ,
-	 * 					'defaultValue' => 0 ,
-	 * 					'comment' => 'xxxx' ,
-	 * 					'isAutoIncrement' => true ,
-	 * 				),
-	 * 			) ,
-	 * 
-	 * 			'indexes' => array(
-	 * 				'index1' => array(
-	 * 					'columns' => array('column1')
-	 * 				),
-	 * 				'index2' => array(
-	 * 					'columns' => array('column1','column2')
-	 * 				),
-	 * 				'index3' => array(
-	 * 					'columns' => array('column2','column3')
-	 * 				),
-	 * 			) ,
-	 * 		)
-	 * 	)
-	 * 
-	 * )
-	 */
-	public $arrMockupStruct = array() ;
+	
+//	array(
+//	  	'db1' => array(
+//	  		'table1' => array(
+//	  			'primaryName' => 'index1',
+//	  			'autoIncrement' => 0 ,
+//	  			'comment' => 'xxx' ,
+//	  
+//	  			'columns' => array(
+//	  				'column1' => array(
+//	  					'type' => 'int' ,
+//	  					'length' => 10 ,
+//	  					'allowNull' => true ,
+//	  					'defaultValue' => 0 ,
+//	  					'comment' => 'xxxx' ,
+//	  					'isAutoIncrement' => true ,
+//	  				),
+//	  				'column2' => array(
+//	  					'type' => 'int' ,
+//	  					'length' => 10 ,
+//	  					'allowNull' => true ,
+//	  					'defaultValue' => 0 ,
+//	  					'comment' => 'xxxx' ,
+//	  					'isAutoIncrement' => true ,
+//	  				),
+//	  				'column3' => array(
+//	  					'type' => 'int' ,
+//	  					'length' => 10 ,
+//	  					'allowNull' => true ,
+//	  					'defaultValue' => 0 ,
+//	  					'comment' => 'xxxx' ,
+//	  					'isAutoIncrement' => true ,
+//	  				),
+//	  			) ,
+//	  
+//	  			'indexes' => array(
+//	  				'index1' => array(
+//	  					'columns' => array('column1'),
+//						'isPrimary' => true,
+//						'isUnique' => true,
+//						'isFullText' => false,
+//	  				),
+//	  				'index2' => array(
+//	  					'columns' => array('column1','column2')
+//						'isPrimary' => false,
+//						'isUnique' => true,
+//						'isFullText' => false,
+//	  				),
+//	  				'index3' => array(
+//	  					'columns' => array('column2','column3')
+//						'isPrimary' => false,
+//						'isUnique' => true,
+//						'isFullText' => false,
+//	  				),
+//	  			) ,
+//	  		)
+//	  	)
+//	  );
+	
+	
+	public $arrMockupStruct = array();
 	
 	public $sCurrentDBName ;
 }
