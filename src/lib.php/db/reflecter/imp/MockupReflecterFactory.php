@@ -37,6 +37,10 @@ class MockupReflecterFactory extends AbstractReflecterFactory
 		{
 			$aReflecter->bIsExist = true ;
 			$aReflecter->arrMetainfo = $this->arrMockupStruct[$sDBName][$sTable] ;
+			$aReflecter->sPrimaryName = $this->arrMockupStruct[$sDBName][$sTable]['primaryName'];
+			$aReflecter->nAutoIncrement = $this->arrMockupStruct[$sDBName][$sTable]['autoIncrement'];
+			$aReflecter->sComment = $this->arrMockupStruct[$sDBName][$sTable]['comment'];
+			$aReflecter->arrColumnNames = array_keys($this->arrMockupStruct[$sDBName][$sTable]['columns']);
 		}
 		
 		return $aReflecter ;
