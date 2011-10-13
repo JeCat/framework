@@ -43,17 +43,17 @@ class MockupTableReflecter extends AbStractTableReflecter
 		return $this->bIsExist;
 	}
 	
-	private $sPrimaryName = null;
+	public $sPrimaryName = null;
 	
-	private $nAutoINcrement;
+	public $nAutoINcrement;
 	
-	private $sComment;
+	public $sComment;
 	
-	private $arrColumnNames;
+	public $arrColumnNames;
 	
-	private $sName;
+	public $sName;
 	
-	private $bIsExist=true;
+	public $bIsExist=false;
 }
 
 ?>
