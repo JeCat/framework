@@ -1,13 +1,16 @@
 <?php
-
 namespace jc\mvc\model\db\orm;
 
 use jc\lang\Exception;
 use jc\db\DB;
 use jc\db\sql\StatementFactory;
 
-class Prototype{
+class Prototype
+{
     // static creator
+	/**
+	 * @return Prototype
+	 */
     static public function create($sTableName,$keys=null,$columns = '*' , $aDB = null ){
         $aPrototype = new Prototype;
         $aPrototype->setTableName($sTableName);
@@ -24,33 +27,42 @@ class Prototype{
         if($columns !== null and $columns !== array()){
             $aPrototype->addColumn($columns);
         }
+        
+        $aPrototype->aDB = $aDB ;
+        
         return $aPrototype;
     }
     
     // getter and setter
+    
     public function name(){
         return $this->sName;
     }
+	/**
+	 * @return Prototype
+	 */
     public function setName($sName){
         $this->sName = $sName;
+        return $this;
     }
     public function keys(){
         return $this->arrKeys;
     }
-    /**
-     *  \brief 设置键
-     *
-     *   键可以为多个。本函数接受一个数组（多个键）或一个字符串（一个键）。
-     */
-    public function setKeys( $Keys ){
-        if(is_string($Keys)){
-            $Keys = array($Keys);
+	/**
+	 *  \brief 设置键
+	 *
+	 *   键可以为多个。本函数接受一个数组（多个键）或一个字符串（一个键）。
+	 * @return Prototype
+	 */
+    public function setKeys( $keys ){
+        if(is_string($keys)){
+            $keys = array($keys);
         }
-        if(is_array($Keys)){
-            if(empty($Keys)){
+        if(is_array($keys)){
+            if(empty($keys)){
                 throw new Exception('函数 Prototype::setKeys() 的参数 keys 为空');
             }else{
-                $this->arrKeys = $Keys;
+                $this->arrKeys = $keys;
             }
         }else{
             throw new Exception('函数 Prototype::setKeys() 的参数 keys 既不是数组也不是字符串');
@@ -60,8 +72,12 @@ class Prototype{
     public function tableName(){
         return $this->sTableName;
     }
+	/**
+	 * @return Prototype
+	 */
     public function setTableName($sTableName){
         $this->sTableName = $sTableName;
+        return $this;
     }
     public function criteria($bCreate=true){
         if( $this->aCriteria === null and $bCreate){
@@ -81,12 +97,13 @@ class Prototype{
      *  \brief 添加列
      *
      *  本函数接受一个数组（多个列）或一个字符串（一个列）。
+	 * @return Prototype
      */
-    public function addColumn($Column){
-        if(is_string($Column)){
-            $this->arrColumns[]=$Column;
-        }else if(is_array($Column)){
-            $this->arrColumns = array_merge($this->arrColumns,$Column);
+    public function addColumn($columns){
+        if(is_string($columns)){
+            $this->arrColumns[]=$columns;
+        }else if(is_array($columns)){
+            $this->arrColumns = array_merge($this->arrColumns,$columns);
         }else{
             throw new Exception('函数 Prototype::addColumn() 的参数 Column 既不是数组也不是字符串');
         }
@@ -121,14 +138,26 @@ class Prototype{
             }
         }
     }
+	/**
+	 * @return Prototype
+	 */
     public function addColumnAlias($sColumn,$sAlias){
         $this->arrColumnAliases[$sAlias]=$sColumn;
+        return $this;
     }
+	/**
+	 * @return Prototype
+	 */
     public function removeColumnAlias($sAlias){
         unset($this->arrColumnAliases[$sAlias]);
+        return $this;
     }
+	/**
+	 * @return Prototype
+	 */
     public function clearColumnAliases(){
         $this->arrColumnAliases=array();
+        return $this;
     }
     public function aliasColumnMapIterator(){
         return new \ArrayIterator($this->arrColumnAliases);
@@ -138,24 +167,38 @@ class Prototype{
     public function associations(){
         return $this->arrAssociations;
     }
+    
+	/**
+	 * @return Association
+	 */
     public function hasOne($toTable,$fromKeys=null,$toKeys=null){
         return $this->addAssociation(Association::hasOne,$toTable,$fromKeys,$toKeys);
     }
-    public function hasMany($toTable,$fromKeys=null,$toKeys=null){
+	/**
+	 * @return Association
+	 */
+	public function hasMany($toTable,$fromKeys=null,$toKeys=null){
         return $this->addAssociation(Association::hasMany,$toTable,$fromKeys,$toKeys);
     }
+	/**
+	 * @return Association
+	 */
     public function belongsTo($toTable,$fromKeys=null,$toKeys=null){
         return $this->addAssociation(Association::belongsTo,$toTable,$fromKeys,$toKeys);
     }
+	/**
+	 * @return Association
+	 */
     public function hasAndBelongsTo($toTable,$BridgeTable,$fromKeys=null,$toKeys=null,$toBridgeKeys=null,$fromBridgeKeys=null){
         return $this->addAssociation(Association::hasAndBelongsTo,$toTable,$fromKeys,$toKeys,$BridgeTable,$toBridgeKeys,$fromBridgeKeys);
     }
-    /**
-     *  \a $toTable 可以是一个字符串，也可以是一个Prototype对象，表示关联的表。
-     */
+	/**
+	 * $toTable 可以是一个字符串，也可以是一个Prototype对象，表示关联的表。
+	 * @return Association
+	 */
     public function addAssociation($nType,$toTable,$fromKeys=null,$toKeys=null,$BridgeTable=null,$toBridgeKeys=null,$fromBridgeKeys=null){
         if(is_string($toTable)){
-            $aToPrototype = self::create($toTable);
+            $aToPrototype = self::create($toTable,null,'*',$this->aDB);
         }else if( $toTable instanceof Prototype){
             $aToPrototype = $toTable;
         }else{
@@ -179,6 +222,9 @@ class Prototype{
         $aToPrototype -> aAssociationBy = $aAsso;
         return $aAsso -> toPrototype();
     }
+	/**
+	 * @return Prototype
+	 */
     public function removeAssociation($aAssociation){
         $key=array_search($aAssociation,$this->arrAssociations,true);
         if($key!==false){
@@ -186,6 +232,9 @@ class Prototype{
         }
         return $this;
     }
+	/**
+	 * @return Prototype
+	 */
     public function clearAssociations(){
         $this->arrAssociations=array();
         return $this;
@@ -199,6 +248,9 @@ class Prototype{
     }
     
     // done and check
+	/**
+	 * @return Prototype
+	 */
     public function done(){
         $this->check();
         foreach($this->associationIterator() as $it){
@@ -265,5 +317,7 @@ class Prototype{
     private $aCriteria = null;
     private $arrAssociations =  array();
     private $aAssociationBy = null;
+    
+    private $aDB ;
 }
 ?>
