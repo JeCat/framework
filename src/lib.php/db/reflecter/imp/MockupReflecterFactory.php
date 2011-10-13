@@ -53,9 +53,8 @@ class MockupReflecterFactory extends AbstractReflecterFactory
 			$sDBName = $this->currentDBName() ;
 		}
 		
-		$aReflecter = new MockupTableReflecter ( $this, $sTable, $sDBName );
+		$aReflecter = new MockupColumnReflecter ( $this, $sTable, $sDBName );
 		
-	
 		if( $sDBName and isset($this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]) )
 		{
 			$aReflecter->bIsExist = true ;
@@ -83,7 +82,7 @@ class MockupReflecterFactory extends AbstractReflecterFactory
 			$sDBName = $this->currentDBName() ;
 		}
 		
-		$aReflecter = new MySQLIndexReflecter ( $this, $sTable, $sIndexName , $sDBName);
+		$aReflecter = new MockupIndexReflecter ( $this, $sTable, $sIndexName , $sDBName);
 	
 		if( $sDBName and isset($this->arrMockupStruct[$sDBName][$sTable]['indexes'][$sIndexName]) )
 		{
