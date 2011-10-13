@@ -17,7 +17,7 @@ class MockupTableReflecter extends AbStractTableReflecter
 	
 	public function autoIncrement()
 	{
-		return $this->nAutoINcrement;
+		return $this->nAutoIncrement;
 	}
 	
 	public function comment()
@@ -45,7 +45,7 @@ class MockupTableReflecter extends AbStractTableReflecter
 	
 	public $sPrimaryName = null;
 	
-	public $nAutoINcrement;
+	public $nAutoIncrement;
 	
 	public $sComment;
 	
