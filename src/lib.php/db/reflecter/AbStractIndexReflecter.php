@@ -1,31 +1,17 @@
 <?php
 namespace jc\db\reflecter;
 
+use jc\db\reflecter\DBStructReflecter;
 
-
-
-class AbStractIndexReflecter extends DBStructReflecter
+abstract class AbStractIndexReflecter extends DBStructReflecter
 {
-<<<<<<< HEAD
 	abstract function __construct($aDBReflecterFactory, $sTable, $sIndexName, $sDBName = null);
-=======
-	function __construct($sDB ,$sTable,$sIndexName, $sDBName = null)
-	{
-	}
->>>>>>> parent of 6da5192... 数据库反射抽象类完成
 	
-	public function isPrimary()
-	{
-		
-	}
+	abstract public function isPrimary();
 	
-	public function isUnique() {
-		;
-	}
+	abstract public function isUnique();
 	
-	public function isFullText() {
-		;
-	}
+	abstract public function isFullText();
 	
 	/**
 	 * 索引是否存在(有效)
@@ -38,7 +24,5 @@ class AbStractIndexReflecter extends DBStructReflecter
 	 * Enter description here ...
 	 * @return array
 	 */
-	public function columnNames() {
-		;
-	}
+	abstract public function columnNames();
 }
