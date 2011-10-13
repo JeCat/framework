@@ -61,6 +61,11 @@ class MockupColumnReflecter extends AbStractColumnReflecter
 		return $this->bIsAutoIncrement;
 	}
 	
+	public function name()
+	{
+		return $this->sName;
+	}
+	
 	/**
 	 * 列是否存在(有效)
 	 * @return boolen 如果存在返回true 如果不存在返回false 
@@ -85,5 +90,6 @@ class MockupColumnReflecter extends AbStractColumnReflecter
 	public $bIsAllowNull = true;
 	
 	public $sName;
+	
 }
 ?>

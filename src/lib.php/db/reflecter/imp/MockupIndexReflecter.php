@@ -40,6 +40,10 @@ class MockupIndexReflecter extends AbStractIndexReflecter{
 		return $this->arrColumnNames;
 	}
 	
+	public function name(){
+		return $this->sName;
+	}
+	
 	public $sName;
 	
 	public $bIsExist = false ;
