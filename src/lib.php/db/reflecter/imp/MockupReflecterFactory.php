@@ -37,10 +37,6 @@ class MockupReflecterFactory extends AbstractReflecterFactory
 		{
 			$aReflecter->bIsExist = true ;
 			$aReflecter->arrMetainfo = $this->arrMockupStruct[$sDBName][$sTable] ;
-			$aReflecter->sPrimaryName = $this->arrMockupStruct[$sDBName][$sTable]['primaryName'];
-			$aReflecter->nAutoIncrement = $this->arrMockupStruct[$sDBName][$sTable]['autoIncrement'];
-			$aReflecter->sComment = $this->arrMockupStruct[$sDBName][$sTable]['comment'];
-			$aReflecter->arrColumnNames = array_keys($this->arrMockupStruct[$sDBName][$sTable]['columns']);
 		}
 		
 		return $aReflecter ;
@@ -58,19 +54,8 @@ class MockupReflecterFactory extends AbstractReflecterFactory
 		if( $sDBName and isset($this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]) )
 		{
 			$aReflecter->bIsExist = true ;
-			$aReflecter->bIsAllowNull = $this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]['allowNull'] ;
-			$aReflecter->nLength = $this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]['length'] ;
-			$aReflecter->sType = $this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]['type'] ;
-			$aReflecter->sDefaultValue = $this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]['defaultValue'] ;
-			$aReflecter->sComment = $this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]['comment'] ;
-			$aReflecter->bIsAutoIncrement = $this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]['isAutoIncrement'] ;
-			$aReflecter->arrMetainfo = $this->arrMockupStruct[$sDBName][$sTable] ;
-			
-			$aReflecter->bIsString = $this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]['type'] === 'string' ? true:false;
-			$aReflecter->bIsInt = $this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]['type'] === 'int' ? true:false;
-			$aReflecter->bIsBool = $this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]['type'] === 'bool' ? true:false;
-			$aReflecter->bIsFloat = $this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn]['type'] === 'float' ? true:false;
-		}
+			$aReflecter->arrMetainfo = $this->arrMockupStruct[$sDBName][$sTable]['columns'][$sColumn] ;
+			}
 		
 		return $aReflecter ;
 	}
@@ -87,10 +72,7 @@ class MockupReflecterFactory extends AbstractReflecterFactory
 		if( $sDBName and isset($this->arrMockupStruct[$sDBName][$sTable]['indexes'][$sIndexName]) )
 		{
 			$aReflecter->bIsExist = true ;
-			$aReflecter->arrColumnNames = $this->arrMockupStruct[$sDBName][$sTable]['indexes'][$sIndexName]['columns'] ;
-			$aReflecter->bIsPrimary = $this->arrMockupStruct[$sDBName][$sTable]['indexes'][$sIndexName]['isPrimary'] ;
-			$aReflecter->bIsUnique = $this->arrMockupStruct[$sDBName][$sTable]['indexes'][$sIndexName]['isUnique'] ;
-			$aReflecter->bIsFullText = $this->arrMockupStruct[$sDBName][$sTable]['indexes'][$sIndexName]['isFullText'] ;
+			$aReflecter->arrMetainfo = $this->arrMockupStruct[$sDBName][$sTable]['indexes'][$sIndexName];
 		}
 		
 		return $aReflecter ;

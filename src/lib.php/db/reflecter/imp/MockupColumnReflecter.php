@@ -9,56 +9,82 @@ class MockupColumnReflecter extends AbStractColumnReflecter
 	function __construct($aDBReflecterFactory, $sTable, $sColumn, $sDBName = null)
 	{
 		$this->sName = $sColumn;
+		$this->sDBName = $sDBName;
+		$this->sTable = $sTable;
 	}
 	
 	public function type()
 	{
-		return $this->sType;
+		if(!isset($this->arrMetainfo['type']))
+		{
+			return null;
+		}
+		return $this->arrMetainfo['type'] ;
 	}
 	
 	public function isString()
 	{
-		return $this->bIsString;
+		return $this->arrMetainfo['type'] === 'string' ? true:false;
 	}
 	
 	public function isBool()
 	{
-		return $this->bIsBool;
+		return $this->arrMetainfo['type'] === 'bool' ? true:false;
 	}
 	
 	public function isInts()
 	{
-		return $this->bIsInt;
+		return $this->arrMetainfo['type'] === 'int' ? true:false;
 	}
 	
 	public function isFloat()
 	{
-		return $this->bIsFloat;
+		return $this->arrMetainfo['type'] === 'float' ? true:false;
 	}
 	
 	public function length()
 	{
-		return $this->nLength;
+		if(!isset($this->arrMetainfo['length']))
+		{
+			return null;
+		}
+		return $this->arrMetainfo['length'] ;
 	}
 	
 	public function allowNull()
 	{
-		return $this->bIsAllowNull;
+		if(!isset($this->arrMetainfo['allowNull']))
+		{
+			return null;
+		}
+		return $this->arrMetainfo['allowNull'] ;
 	}
 	
 	public function defaultValue()
 	{
-		return $this->sDefaultValue;
+		if(!isset($this->arrMetainfo['defaultValue']))
+		{
+			return null;
+		}
+		return $this->arrMetainfo['defaultValue'] ;
 	}
 	
 	public function comment()
 	{
-		return $this->sComment;
+		if(!isset($this->arrMetainfo['comment']))
+		{
+			return null;
+		}
+		return $this->arrMetainfo['comment'] ;
 	}
 	
 	public function isAutoIncrement()
 	{
-		return $this->bIsAutoIncrement;
+		if(!isset($this->arrMetainfo['isAutoIncrement']))
+		{
+			return null;
+		}
+		return $this->arrMetainfo['isAutoIncrement'] ;
 	}
 	
 	public function name()
@@ -75,20 +101,11 @@ class MockupColumnReflecter extends AbStractColumnReflecter
 		return $this->bIsExist;
 	}
 	
-	public $bIsString = false;
-	public $bIsInt = false;
-	public $bIsBool = false;
-	public $bIsFloat = false;
-	
-	public $nLength = 0;
-	public $sType = '';
-	public $sDefaultValue = '';
-	public $sComment = '';
-	public $bIsAutoIncrement = true;
 	public $arrMetainfo = array ();
 	public $bIsExist = false;
-	public $bIsAllowNull = true;
 	
+	public $sDBName;
+	public $sTable;
 	public $sName;
 	
 }
