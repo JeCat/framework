@@ -1,5 +1,7 @@
 <?php
-namespace jc\db\reflecter;
+namespace jc\db\reflecter\imp;
+
+use jc\db\reflecter\AbStractColumnReflecter;
 
 
 use jc\db\reflecter\AbStractColumnReflecter;
@@ -151,10 +153,10 @@ class MySQLColumnReflecter extends AbStractColumnReflecter
 	
 	private $bIsAutoIncrement = false;
 	
-	private $arrInt = array ('INT', 'TINYINT', 'SMALLINT', 'MEDIUMINT', 'BIGINT', 'SERIAL', 'BIT' );
-	private $arrFloat = array ('DECIMAL', 'FLOAT', 'DOUBLE', 'REAL' );
-	private $arrString = array ('VARCHAR', 'TEXT', 'DATE', 'DATETIME', 'TIMESTAMP', 'TIME', 'YEAR', 'CHAR', 'LONGTEXT', 'TINYTEXT', 'MEDIUMTEXT', 'BINARY', 'VARBINARY', 'TINYBLOB', 'MEDIUMBLOB', 'BLOB', 'LONGBLOB', 'ENUM', 'SET' );
-	private $arrBool = array ('BIT', 'BOOLEAN' );
+	private static $arrInt = array ('INT', 'TINYINT', 'SMALLINT', 'MEDIUMINT', 'BIGINT', 'SERIAL', 'BIT' );
+	private static $arrFloat = array ('DECIMAL', 'FLOAT', 'DOUBLE', 'REAL' );
+	private static $arrString = array ('VARCHAR', 'TEXT', 'DATE', 'DATETIME', 'TIMESTAMP', 'TIME', 'YEAR', 'CHAR', 'LONGTEXT', 'TINYTEXT', 'MEDIUMTEXT', 'BINARY', 'VARBINARY', 'TINYBLOB', 'MEDIUMBLOB', 'BLOB', 'LONGBLOB', 'ENUM', 'SET' );
+	private static $arrBool = array ('BIT', 'BOOLEAN' );
 	
 	private $sName;
 	

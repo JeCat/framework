@@ -1,5 +1,7 @@
 <?php
-namespace jc\db\reflecter;
+namespace jc\db\reflecter\imp;
+
+use jc\db\reflecter\AbStractTableReflecter;
 
 class MySQLTableReflecter extends AbStractTableReflecter
 {

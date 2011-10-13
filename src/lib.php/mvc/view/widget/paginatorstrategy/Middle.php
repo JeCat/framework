@@ -3,6 +3,7 @@ namespace jc\mvc\view\widget\paginatorstrategy;
 
 class Middle extends AbstractStrategy{
     public function pageNumList($iWidth,$iCurrent,$iTotal){
+        if($iTotal < 1) return array();
         if($iWidth > $iTotal){
             return range(1,$iTotal);
         }

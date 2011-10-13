@@ -2,10 +2,10 @@
 namespace jc\db\reflecter;
 
 use jc\db\reflecter\AbstractReflecterFactory;
-use jc\db\reflecter\MySQLColumnReflecter;
-use jc\db\reflecter\MySQLDBReflecter;
-use jc\db\reflecter\MySQLIndexReflecter;
-use jc\db\reflecter\MySQLTableReflecter;
+use jc\db\reflecter\imp\MySQLColumnReflecter;
+use jc\db\reflecter\imp\MySQLDBReflecter;
+use jc\db\reflecter\imp\MySQLIndexReflecter;
+use jc\db\reflecter\imp\MySQLTableReflecter;
 
 class MySQLReflecterFactory extends AbstractReflecterFactory
 {
