@@ -62,15 +62,6 @@ class Select extends MultiTableStatement
 	
 	public function checkValid($bThrowException=true)
 	{
-		/*if( !$this->aColumns )
-		{
-			if($bThrowException)
-			{
-				throw new Exception("对象尚未准备好：没有设置返回字段。") ;
-			}
-			return false ;
-		}*/
-		
 		return true ;
 	}
 	

@@ -8,6 +8,11 @@ use jc\db\sql\Statement;
 
 class DB extends Object
 {
+	public function __construct(IDriver $aDriver=null)
+	{
+		$this->aDriver = $aDriver ;
+	}
+	
 	/**
 	 * @return IDriver
 	 */

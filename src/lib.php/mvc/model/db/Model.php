@@ -148,7 +148,7 @@ class Model extends AbstractModel implements IModel , IPaginal
 			{
 				foreach( $aPrototype->columns() as $sClm )
 				{
-					$this->setData( $sClm, $aRecordSet->field($aPrototype->columnAlias($sClm)) ) ;
+					$this->setData( $sClm, $aRecordSet->field($aPrototype->sqlColumnAlias($sClm)) ) ;
 				}
 			}
 			

@@ -3,8 +3,6 @@ namespace jc\db\reflecter\imp;
 
 use jc\db\reflecter\AbStractIndexReflecter;
 
-use jc\db\reflecter\AbStractIndexReflecter;
-
 class MySQLIndexReflecter extends AbStractIndexReflecter
 {
 	function __construct($aDBReflecterFactory, $sTable, $sIndexName, $sDBName = null)

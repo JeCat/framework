@@ -2,7 +2,7 @@
 
 namespace jc\db\driver ;
 
-use jc\db\reflecter\MySQLReflecterFactory;
+use jc\db\reflecter\imp\MySQLReflecterFactory;
 use jc\db\DB;
 use jc\db\recordset\PDORecordSet;
 use jc\db\ExecuteException;

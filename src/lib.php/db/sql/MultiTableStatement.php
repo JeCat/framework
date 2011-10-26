@@ -1,6 +1,7 @@
 <?php 
 namespace jc\db\sql ;
 
+use jc\lang\Type;
 use jc\util\HashTable;
 use jc\lang\Exception;
 
@@ -15,9 +16,20 @@ abstract class MultiTableStatement extends Statement
 		}
 	}
 	
-	public function addTable($aTable)
+	public function addTable($table)
 	{
-		$this->arrTables[] = $aTable ;
+		Type::check(array('string','jc\\db\\sql\\Table'),$table) ;
+		$this->arrTables[] = $table ;
+	}
+
+	public function clearTables()
+	{
+		$this->arrTables = array() ;
+	}
+	
+	public function tables()
+	{
+		return $this->arrTables ;
 	}
 	
 	/**

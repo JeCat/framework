@@ -26,7 +26,7 @@ class Selecter extends Object
 		// -----------------
 		// step 2. query for all one to one association tables 
 		$arrMultitermAssociations = array() ;
-		$this->addColumnsForOneToOne($aSelect,$aPrototype,$aPrototype->name(),$arrMultitermAssociations) ;
+		$this->addColumnsForOneToOne($aSelect,$aPrototype,$arrMultitermAssociations) ;
 		
 		if( !($aModel instanceof ModelList) )
 		{
@@ -43,6 +43,7 @@ class Selecter extends Object
 		// step 2. query alonely for multiterm associated prototype 
 		foreach($arrMultitermAssociations as $aMultitermAssoc)
 		{
+			
 		}
 	}
 	
@@ -62,51 +63,102 @@ class Selecter extends Object
 		
 		// 递归连接所有关联原型的 table
 		$this->joinTables( $aTable, $aPrototype, $aSqlFactory ) ;
+		
+		return $aSelect ;
 	}
 	
 	private function joinTables(Table $aFromTable,Prototype $aForPrototype, StatementFactory $aSqlFactory)
 	{
+		$sFromTableAlias = $aFromTable->alias() ;
+			
 		foreach( $aForPrototype->associationIterator() as $aAssoc )
 		{
 			$aPrototype = $aAssoc->toPrototype() ;
+			$sToTableAlias = $sFromTableAlias.'.'.$aPrototype->name() ;
 			
-			// create table
-			$aTable = $aSqlFactory->createTable(
-				$aPrototype->tableName()
-				, $aFromTable->alias().'.'.$aPrototype->alias()
-			) ;
-						
-			// create table join
-			$aTablesJoin = $aSqlFactory->createTablesJoin() ;
-			$aTablesJoin->addTable($aTable) ;
+			// 两表关联
+			if( $aAssoc->isType(Association::pair) )
+			{
+				$aTable = $this->joinTwoTables(
+						$aFromTable
+						, $aPrototype->tableName()
+						, $aPrototype->sqlTableAlias()
+						, $aAssoc->fromKeys()
+						, $aAssoc->toKeys()
+						, $aSqlFactory
+				) ;
+			}
 			
-			$aFromTable->addJoin(
-				$aTablesJoin
-				, $this->makeResrictionForForeignKey($aFromTable->alias(),$aTable->alias(),$aAssoc,$aSqlFactory)
-			) ;
+			// 三表关联
+			else if( $aAssoc->isType(Association::triplet) )
+			{
+				// 从左表连接到中间表
+				$sBridgeTableAlias = $sToTableAlias.'#bridge' ;
+				$aBridgeTable = $this->joinTwoTables(
+						$aFromTable
+						, $aAssoc->bridgeTableName()
+						, $sBridgeTableAlias
+						, $aAssoc->fromKeys()
+						, $aAssoc->toBridgeKeys()
+						, $aSqlFactory
+				) ;
+				
+				// 从中间表连接到右表
+				$aTable = $this->joinTwoTables(
+						$aBridgeTable
+						, $aPrototype->tableName()
+						, $sToTableAlias
+						, $aAssoc->fromBridgeKeys()
+						, $aAssoc->toKeys()
+						, $aSqlFactory
+				) ;
+			}
+			
+			else 
+			{
+				throw new Exception("what's this?") ;
+			}
 
 			// 递归
-			$this->joinTables( $aTable, $aPrototype ) ;
+			$this->joinTables( $aTable, $aPrototype, $aSqlFactory ) ;
 		}
 	}
 	
-	private function addColumnsForOneToOne(Select $aSelect,Prototype $aPrototype,$sPrototypeTableAlias,& $arrMultitermAssociations)
-	{		
-		// add columns for pass in prototype 
+	private function joinTwoTables(Table $aFromTable,$sToTable,$sToTableAlias,array $arrFromKeys,$arrToKeys,StatementFactory $aSqlFactory)
+	{
+		// create table
+		$aTable = $aSqlFactory->createTable( $sToTable, $sToTableAlias ) ;
+		
+		// create table join
+		$aTablesJoin = $aSqlFactory->createTablesJoin() ;
+		$aTablesJoin->addTable(
+				$aTable, $this->makeResrictionForForeignKey($aFromTable->alias(),$sToTableAlias,$arrFromKeys,$arrToKeys,$aSqlFactory)
+		) ;
+		$aFromTable->addJoin($aTablesJoin) ;
+		
+		return $aTable ;
+	}
+	
+	private function addColumnsForOneToOne(Select $aSelect,Prototype $aPrototype,& $arrMultitermAssociations)
+	{
+		// add columns for pass in prototype
 		foreach($aPrototype->columns() as $sColumnName)
 		{
-			$aSelect->addColumn($sColumnName,"{$sPrototypeTableAlias}.{$sColumnName}") ;
+			$aSelect->addColumn(
+				'`'.$aPrototype->sqlTableAlias().'`.`'.$sColumnName.'`'
+				, $aPrototype->sqlColumnAlias($sColumnName)
+			) ;
 		}
 
 		// add columns for one to one associated prototypes
 		foreach( $aPrototype->associationIterator() as $aAssoc )
 		{
-			if( $aAssoc->isOneToOne() )
+			if( $aAssoc->isType(Association::oneToOne) )
 			{
 				$aToPrototype = $aAssoc->toPrototype() ;
-				
+
 				// add columns recursively
-				$this->addColumnsForOneToOne( $aSelect, $aToPrototype, $sPrototypeTableAlias.'.'.$aToPrototype->alias() ) ;
+				$this->addColumnsForOneToOne( $aSelect, $aToPrototype, $arrMultitermAssociations ) ;
 			}
 			
 			else
@@ -115,17 +167,16 @@ class Selecter extends Object
 			}
 		}
 	}
-		
-	private function makeResrictionForForeignKey(Table $sFromTableName,Table $sToTableName,Association $aAssociation, StatementFactory $aSqlFactory)
+
+	private function makeResrictionForForeignKey($sFromTableName,$sToTableName,$arrFromKeys,$arrToKeys, StatementFactory $aSqlFactory)
 	{
 		$aRestriction = $aSqlFactory->createRestriction() ;
-		$arrToKeys = $aAssociation->toKeys() ;
 		
-		foreach ($aAssociation->fromKeys() as $nIdx=>$sFromKey)
+		foreach ($arrFromKeys as $nIdx=>$sFromKey)
 		{
 			$aRestriction->eqColumn(
-				"{$sFromTableName}.{$sFromKey}"
-				, "{$sToTableName}.{$arrToKeys[$nIdx]}"
+				"`{$sFromTableName}`.`{$sFromKey}`"
+				, "`{$sToTableName}`.`{$arrToKeys[$nIdx]}`"
 			) ;
 		}
 		

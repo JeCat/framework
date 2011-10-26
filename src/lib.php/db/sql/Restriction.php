@@ -16,24 +16,39 @@ class Restriction extends SubStatement
 	 * @param $bFormat 是否添加换行以便阅读
 	 * @return string
 	 */
-	public function makeStatement($bFormat = false) {
+	public function makeStatement($bFormat = false)
+	{
 		//TODO format换行和缩进,增加可读性
 		$arrExpressions = array ();
-		foreach ( $this->arrExpressions as $express ) {
-			if ($express instanceof Restriction) {
+		foreach ( $this->arrExpressions as $express )
+		{
+			if ($express instanceof Restriction)
+			{
 				$sExpress = $express->makeStatement ($bFormat) ;
 				if($sExpress!='1')
 				{
 					$arrExpressions[] = $sExpress ;
 				}
-			} else {
+			}
+			else
+			{
 				$arrExpressions [] = $express;
 			}
 		}
-		return empty($arrExpressions)? '1': ('('.implode($this->sLogic,$arrExpressions).')');
+		
+		switch (count($arrExpressions))
+		{
+			case 0 :
+				return '1' ;
+			case 1 :
+				return $arrExpressions[0] ;
+			default :
+				return '('.implode($this->sLogic,$arrExpressions).')' ;
+		}
 	}
 	
-	public function checkValid($bThrowException = true) {
+	public function checkValid($bThrowException = true)
+	{
 		return true;
 	}
 	
