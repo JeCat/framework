@@ -7,20 +7,9 @@ use jc\lang\Object;
 
 abstract class AbstractModel extends Object implements IModel, \Serializable
 {
-	public function __construct($bAggregation = false)
+	public function __construct()
 	{
 		parent::__construct ();
-		
-		$this->bAggregation = $bAggregation;
-	}
-	
-	public function isAggregation()
-	{
-		return $this->bAggregation;
-	}
-	public function setAggregation($bAggregation = true)
-	{
-		$this->bAggregation = $bAggregation;
 	}
 	
 	// for child model ///////////////////////////////
@@ -57,16 +46,6 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	public function child($sName)
 	{
 		return isset ( $this->arrChildren [$sName] ) ? $this->arrChildren [$sName] : null;
-	}
-	
-	/**
-	 * 这个方法仅返回聚合模式的child，他只是为了开发人员从函数名上就能判断返回模型的类型
-	 * @return IModel
-	 */
-	public function childAgg($sName)
-	{
-		$aChild = $this->child ( $sName );
-		return ($aChild and $aChild->isAggregation ()) ? $aChild : null;
 	}
 	
 	/**
@@ -332,7 +311,7 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 		$aOutput->write ( "<pre>\r\n" );
 		
 		$aOutput->write ( str_repeat ( "\t", $nDepth ) );
-		$aOutput->write ( ($this->isAggregation () ? "[Aggregation Model]" : "[Model]") );
+		$aOutput->write ( (($this instanceof ModelList)? "[Model List]" : "[Model]") );
 		$aOutput->write ( "\r\n" );
 		
 		if (! $this->isEmpty ())
@@ -403,8 +382,6 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	private $arrDatas = null;
 	
 	private $arrChildren = array ();
-	
-	private $bAggregation = false;
 	
 	private $arrChanged = array ();
 }

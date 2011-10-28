@@ -45,6 +45,11 @@ class ShellPrintStream extends PrintStream
 		$this->write($sBytes) ;
 	}
 	
+	public function enableEscape($bEnable=true)
+	{
+		$this->bEnableEscape = $bEnable ;
+	}
+	
 	public function printfont($sText,$sAttr=self::normal,$sFrontColor=self::normal,$sBackgroundColor=self::normal)
 	{
 		$arrVal = array() ;
@@ -76,10 +81,20 @@ class ShellPrintStream extends PrintStream
 		$sOutput = addcslashes(
 			$nLen===null? strval($Contents): substr(strval($Contents),0,$nLen), '"' 
 		) ;
-		echo `echo -e "{$sOutput}"` ;
+		
+		if( $this->bEnableEscape )
+		{
+			echo `echo -e "{$sOutput}"` ;
+		}
+		else
+		{
+			echo $sOutput ;
+		}
 		
 		$this->flush() ;
 	}
+	
+	private $bEnableEscape = false ;
 }
 
 ?>

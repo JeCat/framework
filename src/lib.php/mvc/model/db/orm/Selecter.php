@@ -14,13 +14,19 @@ use jc\lang\Exception;
 
 class Selecter extends Object
 {
-	public function execute(DB $aDB, IModel $aModel)
+	public function execute(DB $aDB, IModel $aModel,Select $aSelect=null)
 	{
-		$aPrototype = $aModel->prototype() ;
+		if( !$aPrototype = $aModel->prototype() )
+		{
+			throw new Exception("传入了无效的 IModel 对象，\$aModel的 prototype() 方法返回null") ;	
+		}
 		
 		// -----------------
 		// step 1. 组装用于查询的 Select 对象
-		$aSelect = $this->buildSelect($aPrototype) ;
+		if(!$aSelect)
+		{
+			$aSelect = $this->buildSelect($aPrototype) ;
+		}
 		
 		
 		// -----------------
@@ -28,10 +34,15 @@ class Selecter extends Object
 		$arrMultitermAssociations = array() ;
 		$this->addColumnsForOneToOne($aSelect,$aPrototype,$arrMultitermAssociations) ;
 		
+		// set limit
 		if( !($aModel instanceof ModelList) )
 		{
 			$aSelect->criteria()->setLimitLen(1) ;
 		}
+		// set group by
+		$this->setGroupBy($aSelect,$aPrototype) ;
+		
+		// query
 		if( !$aRecordset = $aDB->query($aSelect) )
 		{
 			return ;
@@ -43,8 +54,35 @@ class Selecter extends Object
 		// step 2. query alonely for multiterm associated prototype 
 		foreach($arrMultitermAssociations as $aMultitermAssoc)
 		{
+			$this->queryForMultitermAssoc($aDB,$aMultitermAssoc,$aModel,$aSelect) ;
+		}
+	}
+	
+	private function queryForMultitermAssoc(DB $aDB,Association $aMultitermAssoc,IModel $aModel,Select $aSelect)
+	{	
+		$aPrototype = $aMultitermAssoc->toProperty() ;
+		
+		// 清理一些 select 状态
+		$aSelect->clearColumns() ;
+
+		// 根据上一轮查询设置条件
+		if( $aMultitermAssoc->isType(Association::hasMany) )
+		{
+			$this->makeResrictionForAsscotion($aModel,$aPrototype->alias()) ;
+		}
+		else if( $aMultitermAssoc->isType(Association::hasAndBelongsTo) )
+		{
 			
 		}
+		else
+		{
+			throw new Exception("what's this?") ;
+		}
+		
+		
+		// 
+		$aChildModel = $aPrototype->createModel(true) ;
+		$this->execute($aDB,$aChildModel,$aSelect) ;
 	}
 	
 	private function buildSelect(Prototype $aPrototype)
@@ -139,6 +177,17 @@ class Selecter extends Object
 		return $aTable ;
 	}
 	
+	private function setGroupBy(Select $aSelect,Prototype $aPrototype)
+	{
+		$aCriteria = $aSelect->criteria() ;
+		$aCriteria->clearGroupBy() ;
+		
+		foreach($aPrototype->keys() as $sClmName)
+		{
+			$aCriteria->addGroupBy('`'.$aPrototype->sqlTableAlias().'`.`'.$sClmName.'`') ;
+		}
+	}
+	
 	private function addColumnsForOneToOne(Select $aSelect,Prototype $aPrototype,& $arrMultitermAssociations)
 	{
 		// add columns for pass in prototype
@@ -168,6 +217,18 @@ class Selecter extends Object
 		}
 	}
 
+	private function makeResrictionForAsscotion(Model $aModel,$sToTableName,array $arrFromKeys,array $arrToKeys, StatementFactory $aSqlFactory)
+	{
+		$aRestriction = $aSqlFactory->createRestriction() ;
+		
+		foreach($arrFromKeys as $nIdx=>$sFromKey)
+		{
+			$aRestriction->eq( "`{$sToTableName}`.`{$arrToKeys[$nIdx]}`", $aModel->data($sFromKey) ) ;
+		}
+		
+		return $aRestriction ;
+	}
+
 	private function makeResrictionForForeignKey($sFromTableName,$sToTableName,$arrFromKeys,$arrToKeys, StatementFactory $aSqlFactory)
 	{
 		$aRestriction = $aSqlFactory->createRestriction() ;
@@ -182,6 +243,5 @@ class Selecter extends Object
 		
 		return $aRestriction ;
 	}
-
 }
 ?>

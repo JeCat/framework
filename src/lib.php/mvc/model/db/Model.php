@@ -85,24 +85,16 @@ class Model extends AbstractModel implements IModel , IPaginal
 	/**
 	 * @return IModel
 	 */
-	public function child($sName)
+	public function child($sName,$bCreateByAssoc=true)
 	{
 		$aChild = parent::child($sName) ;
-		if(!$aChild)
+		if( !$aChild and $bCreateByAssoc )
 		{
 			// 根据 原型 自动创建子模型
-			if( $aAssocs=$this->prototype()->associations(false) and $aAssociation=$aAssocs->get($sName) )
+			if( $aAssoc=$this->prototype()->associationByName($sName) )
 			{
-				$aChild = $aAssociation->toPrototype()->createModel(false) ;
-				$this->addChild($aChild,$aAssociation->modelProperty()) ;
-				
-				// 多属关系
-				if( !$aAssociation->isOneToOne() )
-				{
-					$aChild->setAggregation(true) ;
-				}
-				
-				$aChild->criteria()->setLimit( $aAssociation->count() ) ;
+				$aChild = $aAssoc->toPrototype()->createModel( $aAssoc->isType(Association::oneToOne) ) ;
+				$this->addChild($aChild,$sName) ;
 			}
 		}
 		
@@ -110,7 +102,7 @@ class Model extends AbstractModel implements IModel , IPaginal
 	}
 	
 	/**
-	 * @return jc\mvc\model\db\orm\PrototypeInFragment
+	 * @return jc\mvc\model\db\orm\Prototype
 	 */
 	public function prototype()
 	{
@@ -124,48 +116,38 @@ class Model extends AbstractModel implements IModel , IPaginal
 
 	public function loadData( IRecordSet $aRecordSet, $bSetSerialized=false )
 	{
-		// 聚合模型
-		if( $this->isAggregation() )
+		// 通过 prototype 加载各字段数据
+		if( $aPrototype=$this->prototype() )
 		{
-			$aPrototype = $this->prototype() ;
-			
-			while( $aRecordSet->valid() )
+			foreach( $aPrototype->columns() as $sClm )
 			{
-				$aModel = $aPrototype? $aPrototype->createModel(false): new self() ;
-				$aModel->loadData($aRecordSet,$bSetSerialized) ;
-
-				$this->addChild($aModel) ;
-				
-				$aRecordSet->next() ;
+				$this->setData( $sClm, $aRecordSet->field($aPrototype->sqlColumnAlias($sClm)) ) ;
+			}
+			
+			// 加载所有单属关系的子模型
+			foreach($aPrototype->associations() as $aAssoc)
+			{
+				if( $aAssoc->isType(Association::oneToOne) )
+				{
+					$this->child($aAssoc->name())->loadData($aRecordSet,$bSetSerialized) ;					
+				}
 			}
 		}
 		
-		// 常规模型
+		// 通过 数据集 加载各字段数据
 		else 
 		{
-			// 通过 prototype 加载各字段数据
-			if( $aPrototype=$this->prototype() )
+			$arrRow = $aRecordSet->current() ;
+			foreach ($arrRow as $sClmName=>&$sValue)
 			{
-				foreach( $aPrototype->columns() as $sClm )
-				{
-					$this->setData( $sClm, $aRecordSet->field($aPrototype->sqlColumnAlias($sClm)) ) ;
-				}
+				$this->setData($sClmName,$sValue) ;
 			}
-			
-			// 通过 数据集 加载各字段数据
-			else 
-			{
-				$arrRow = $aRecordSet->current() ;
-				foreach ($arrRow as $sClmName=>&$sValue)
-				{
-					$this->setData($sClmName,$sValue) ;
-				}
-			}
-			
-			if($bSetSerialized)
-			{
-				$this->setSerialized(true) ;
-			}
+		}
+		
+		
+		if($bSetSerialized)
+		{
+			$this->setSerialized(true) ;
 		}
 	}
 	

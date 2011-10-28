@@ -79,7 +79,7 @@ class Select extends MultiTableStatement
 		$this->arrColumns[] = $sClmName ;
 	}
 	
-	public function clearColumn(){
+	public function clearColumns(){
 	    $this->arrColumns=array();
 	}
 	

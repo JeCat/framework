@@ -121,7 +121,7 @@ class Criteria extends SubStatement
 	    if($this->aRestriction !== null) $this->aRestriction = clone $this->aRestriction;
 	}
 	
-	public function setGroupBy($columns=null)
+	public function addGroupBy($columns=null)
 	{
 		if( empty($columns) )
 		{
@@ -142,6 +142,11 @@ class Criteria extends SubStatement
 	public function groupBy()
 	{
 		return $this->arrGroupByClms ;
+	}
+	
+	public function clearGroupBy()
+	{
+		$this->arrGroupByClms = array() ;
 	}
 	
 	private $aRestriction = null;

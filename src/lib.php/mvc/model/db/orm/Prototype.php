@@ -1,8 +1,9 @@
 <?php
 namespace jc\mvc\model\db\orm;
 
+use jc\mvc\model\db\ModelList;
+use jc\mvc\model\db\Model;
 use jc\db\reflecter\AbstractReflecterFactory;
-
 use jc\lang\Exception;
 use jc\db\DB;
 use jc\db\sql\StatementFactory;
@@ -79,6 +80,9 @@ class Prototype
 		return $this;
 	}
 	
+	/**
+	 * @return jc\db\sql\Criteria
+	 */
 	public function criteria($bCreate=true)
 	{
 		if( !$this->aCriteria and $bCreate )
@@ -249,6 +253,20 @@ class Prototype
 	}
 	
 	/**
+	 * @return Association
+	 */
+	public function associationByName($sName)
+	{
+		foreach($this->arrAssociations as $aAssoc)
+		{
+			if($aAssoc->name()==$sName)
+			{
+				return $aAssoc ;
+			}
+		}
+	}
+	
+	/**
 	 * @return Prototype
 	 */
 	public function removeAssociation($aAssociation)
@@ -342,6 +360,9 @@ class Prototype
 		return implode('.',array_reverse($arrPath)) ;
 	}
 	
+	/**
+	 * @return jc\db\reflecter\AbstractReflecterFactory
+	 */
 	public function tableReflecter()
 	{
 		$aTableReflecter = $this->aDB->reflecterFactory()->tableReflecter($this->sTableName) ;
@@ -372,6 +393,32 @@ class Prototype
 		}
 		
 		return $this->arrSqlColumnAliasCaches[$sColumnName] ;
+	}
+	
+	/**
+	 * @return jc\mvc\model\db\IModel
+	 */
+	public function createModel($bList=false)
+	{
+		return $bList? new ModelList($this): new Model($this) ;
+	}
+	
+	// criteria setter
+	/**
+	 * @return Prototype
+	 */
+	public function setLimit($nLen,$nFrom=0)
+	{
+		$this->criteria(true)->setLimit($nLen,$nFrom) ;
+		return $this ;
+	}
+	/**
+	 * @return Prototype
+	 */
+	public function addOrderBy($sColumnName,$bAsc=true)
+	{
+		$this->criteria(true)->orders(true)->add($sColumnName,$bAsc) ;
+		return $this ;
 	}
 	
 	// private constructor
