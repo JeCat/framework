@@ -97,7 +97,7 @@ class Association
 
 	public function bridgeSqlTableAlias()
 	{
-		return $this->sBridgeTable ;
+		return $this->toPrototype()->sqlTableAlias().'#bridge' ;
 	}
 
 	public function toBridgeKeys()

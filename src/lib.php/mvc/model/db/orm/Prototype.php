@@ -1,6 +1,7 @@
 <?php
 namespace jc\mvc\model\db\orm;
 
+use jc\db\sql\name\NameTransfer;
 use jc\mvc\model\db\ModelList;
 use jc\mvc\model\db\Model;
 use jc\db\reflecter\AbstractReflecterFactory;
@@ -87,7 +88,7 @@ class Prototype
 	{
 		if( !$this->aCriteria and $bCreate )
 		{
-			$this->aCriteria = StatementFactory::singleton()->createCriteria() ;
+			$this->aCriteria = $this->statementFactory()->createCriteria() ;
 		}
 		
 		return $this->aCriteria;
@@ -435,6 +436,58 @@ class Prototype
 		return $this ;
 	}
 	
+	/**
+	 * @return jc\db\sql\StatementFactory ;
+	 */
+	public function statementFactory()
+	{
+		if($this->aAssociationBy)
+		{
+			return $this->aAssociationBy->fromPrototype()->statementFactory() ;
+		}
+		
+		else 
+		{
+			if( !$this->aStatementFactory )
+			{
+				$this->aStatementFactory = new StatementFactory() ;
+				
+				$aNameTransfer = new NameTransfer() ;
+				$aNameTransfer->addColumnNameHandle(array($this,'statementColumnNameHandle')) ;
+				
+				$this->aStatementFactory->setNameTransfer($aNameTransfer) ;
+			}
+			
+			return $this->aStatementFactory ;
+		}
+	}
+	public function statementColumnNameHandle($sName)
+	{
+		// 自由输入的字段名，省略关系片段中第一个prototype的名字
+		if( substr($sName,0,1)!='`' )
+		{
+			// 切分 原型名称 和 字段名称
+			$pos = strrpos($sName,'.') ;
+			if($pos!==false)
+			{
+				$sPrototypeName = substr($sName,0,$pos) ;
+				$sDataName = substr($sName,$pos+1) ;
+			}
+			else 
+			{
+				$sPrototypeName = null ;
+				$sDataName = $sName ;
+			}
+			
+			// 转换字段别名
+			// todo
+			
+			$sName = '`'.$this->name().".{$sPrototypeName}`.`{$sDataName}`" ;
+		}
+		
+		return array($sName) ;
+	}
+	
 	// private constructor
 	private function __construct(){}
 	
@@ -451,6 +504,8 @@ class Prototype
 	
 	private $sSqlTableAliasCache ;
 	private $arrSqlColumnAliasCaches = array() ;
+	
+	private $aStatementFactory ;
 	
 	private $aDB ;
 }

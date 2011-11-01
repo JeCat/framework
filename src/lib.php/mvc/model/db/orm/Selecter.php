@@ -101,7 +101,7 @@ class Selecter extends Object
 					, $aToPrototype->fromKeys()
 					, $aToPrototype->full(false)
 					, $aMultitermAssoc->toKeys()
-					, StatementFactory::singleton()
+					, $aFromPrototype->statementFactory()
 			) ;
 		}
 		else if( $aMultitermAssoc->isType(Association::hasAndBelongsTo) )	// hasAndBelongsTo
@@ -111,7 +111,7 @@ class Selecter extends Object
 					, $aMultitermAssoc->fromKeys()
 					, $aMultitermAssoc->bridgeSqlTableAlias()
 					, $aMultitermAssoc->toBridgeKeys()
-					, StatementFactory::singleton()
+					, $aFromPrototype->statementFactory()
 			) ;
 		}
 		else
@@ -137,8 +137,7 @@ class Selecter extends Object
 	
 	private function buildSelect(Prototype $aPrototype)
 	{
-		$aSqlFactory = StatementFactory::singleton() ;
-		$aSqlFactory instanceof StatementFactory ;
+		$aSqlFactory = $aPrototype->statementFactory() ;
 		$aSelect = $aSqlFactory->createSelect() ;
 		
 		// 主表的名称
