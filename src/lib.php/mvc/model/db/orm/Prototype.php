@@ -112,8 +112,13 @@ class Prototype
 	 *  本函数接受一个数组（多个列）或一个字符串（一个列）。
 	 * @return Prototype
 	 */
-	public function addColumn($sColumnName,$_=self::youKnow)
+	public function addColumns($sColumnName,$_=self::youKnow)
 	{
+		if( $this->arrColumns===self::youKnow or $this->arrColumns=='*' )
+		{
+			$this->arrColumns = array() ;
+		}
+		
 		$this->arrColumns = array_merge($this->arrColumns,func_get_args()) ;
 		return $this;
 	}
@@ -337,7 +342,11 @@ class Prototype
 		}
 	}
 	
-	public function path()
+	/**
+	 * 
+	 * @param bool 	$bFull		是否省略关系片段中的第一个原型的名称
+	 */
+	public function path($bFull=true)
 	{
 		$arrPath = array() ;
 		$aPrototype = $this ;
@@ -354,7 +363,11 @@ class Prototype
 			{
 				break ;
 			}
-			
+		}
+		
+		if(!$bFull)
+		{
+			array_pop($bFull) ;
 		}
 				
 		return implode('.',array_reverse($arrPath)) ;
@@ -412,6 +425,7 @@ class Prototype
 		$this->criteria(true)->setLimit($nLen,$nFrom) ;
 		return $this ;
 	}
+	
 	/**
 	 * @return Prototype
 	 */

@@ -2,8 +2,9 @@
 namespace jc\mvc\model\db ;
 
 use jc\db\recordset\IRecordSet;
+use jc\mvc\model\IModelList ;
 
-class ModelList extends Model
+class ModelList extends Model implements IModelList
 {
 	public function loadData( IRecordSet $aRecordSet, $bSetSerialized=false )
 	{

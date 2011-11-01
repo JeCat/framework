@@ -293,6 +293,19 @@ class Restriction extends SubStatement
 	}
 	
 	/**
+	 * 把一个 Restriction 实例添加到条件集合中去.
+	 * @param self 被添加的Restriction对象
+	 * @return self 
+	 */
+	public function remove(self $aOtherRestriction) {
+		$nIdx = array_search($aOtherRestriction,$this->arrExpressions,true) ;
+		if($nIdx!==false)
+		{
+			unset($this->arrExpressions[$nIdx]) ;
+		}
+	}
+	
+	/**
 	 * 
 	 * 创建一个新的Restriction对象并把它作为条件语句的一部分添加到方法调用者中
 	 * @return self 被创建的Restriction对象

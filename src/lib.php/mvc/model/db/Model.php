@@ -93,7 +93,7 @@ class Model extends AbstractModel implements IModel , IPaginal
 			// 根据 原型 自动创建子模型
 			if( $aAssoc=$this->prototype()->associationByName($sName) )
 			{
-				$aChild = $aAssoc->toPrototype()->createModel( $aAssoc->isType(Association::oneToOne) ) ;
+				$aChild = $aAssoc->toPrototype()->createModel( !$aAssoc->isType(Association::oneToOne) ) ;
 				$this->addChild($aChild,$sName) ;
 			}
 		}

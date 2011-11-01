@@ -3,7 +3,8 @@
 namespace jc\mvc\model\db\orm;
 
 
-use jc\mvc\model\db\ModelList;
+use jc\mvc\model\db\Model;
+use jc\mvc\model\IModelList;
 use jc\db\sql\Table;
 use jc\db\sql\Select;
 use jc\lang\Object;
@@ -35,10 +36,15 @@ class Selecter extends Object
 		$this->addColumnsForOneToOne($aSelect,$aPrototype,$arrMultitermAssociations) ;
 		
 		// set limit
-		if( !($aModel instanceof ModelList) )
+		if( !($aModel instanceof IModelList) )
 		{
 			$aSelect->criteria()->setLimitLen(1) ;
 		}
+		else
+		{
+			$aSelect->criteria()->setLimit( $aPrototype->criteria()->limitLen(), $aPrototype->criteria()->limitFrom() ) ;
+		}
+		
 		// set group by
 		$this->setGroupBy($aSelect,$aPrototype) ;
 		
@@ -52,37 +58,81 @@ class Selecter extends Object
 		
 		// -----------------
 		// step 2. query alonely for multiterm associated prototype 
-		foreach($arrMultitermAssociations as $aMultitermAssoc)
+		if($aModel instanceof IModelList)
 		{
-			$this->queryForMultitermAssoc($aDB,$aMultitermAssoc,$aModel,$aSelect) ;
+			$modelIter = $aModel->childIterator() ;
+		}
+		else 
+		{
+			$modelIter = array($aModel) ;
+		}
+		foreach($modelIter as $aModel)
+		{
+			foreach($arrMultitermAssociations as $aMultitermAssoc)
+			{
+				$this->queryForMultitermAssoc($aDB,$aMultitermAssoc,$aModel,$aSelect) ;
+			}
 		}
 	}
 	
 	private function queryForMultitermAssoc(DB $aDB,Association $aMultitermAssoc,IModel $aModel,Select $aSelect)
-	{	
-		$aPrototype = $aMultitermAssoc->toProperty() ;
+	{
+		$aToPrototype = $aMultitermAssoc->toPrototype() ;
+		$aFromPrototype = $aMultitermAssoc->fromPrototype() ;
 		
 		// 清理一些 select 状态
 		$aSelect->clearColumns() ;
+		
+		// 被直接关联的model
+		if( $aFromPrototype->associatedBy() )
+		{
+			$aFromModel = $aModel->child($aFromPrototype->path(false)) ;
+		}
+		else
+		{
+			$aFromModel = $aModel ;
+		}
 
 		// 根据上一轮查询设置条件
-		if( $aMultitermAssoc->isType(Association::hasMany) )
+		if( $aMultitermAssoc->isType(Association::hasMany) )				// hasMany
 		{
-			$this->makeResrictionForAsscotion($aModel,$aPrototype->alias()) ;
+			$aRestraction = $this->makeResrictionForAsscotion(
+					$aFromModel
+					, $aToPrototype->fromKeys()
+					, $aToPrototype->full(false)
+					, $aMultitermAssoc->toKeys()
+					, StatementFactory::singleton()
+			) ;
 		}
-		else if( $aMultitermAssoc->isType(Association::hasAndBelongsTo) )
+		else if( $aMultitermAssoc->isType(Association::hasAndBelongsTo) )	// hasAndBelongsTo
 		{
-			
+			$aRestraction = $this->makeResrictionForAsscotion(
+					$aFromModel
+					, $aMultitermAssoc->fromKeys()
+					, $aMultitermAssoc->bridgeSqlTableAlias()
+					, $aMultitermAssoc->toBridgeKeys()
+					, StatementFactory::singleton()
+			) ;
 		}
 		else
 		{
 			throw new Exception("what's this?") ;
 		}
+	
+		if( !$aTablesJoin=$aMultitermAssoc->sqlTablesJoin() )
+		{
+			throw new Exception("关联对象没有TablesJoin对象") ;
+		}
 		
-		
+		$aSelect->criteria()->restriction()->add($aRestraction) ;
+			
 		// 
-		$aChildModel = $aPrototype->createModel(true) ;
+		$aChildModel = $aToPrototype->createModel(true) ;
+		$aModel->addChild($aChildModel,$aToPrototype->name()) ;
 		$this->execute($aDB,$aChildModel,$aSelect) ;
+		
+		// 清理条件
+		$aSelect->criteria()->restriction()->remove($aRestraction) ;
 	}
 	
 	private function buildSelect(Prototype $aPrototype)
@@ -112,40 +162,47 @@ class Selecter extends Object
 		foreach( $aForPrototype->associationIterator() as $aAssoc )
 		{
 			$aPrototype = $aAssoc->toPrototype() ;
-			$sToTableAlias = $sFromTableAlias.'.'.$aPrototype->name() ;
+			$sToTableAlias = $aPrototype->sqlTableAlias() ;
 			
 			// 两表关联
 			if( $aAssoc->isType(Association::pair) )
 			{
-				$aTable = $this->joinTwoTables(
+				// create table for toPrototype
+				$aTable = $aSqlFactory->createTable( $aPrototype->tableName(), $sToTableAlias ) ;
+		
+				 $aTablesJoin = $this->joinTwoTables(
 						$aFromTable
-						, $aPrototype->tableName()
-						, $aPrototype->sqlTableAlias()
+						, $aTable
 						, $aAssoc->fromKeys()
 						, $aAssoc->toKeys()
 						, $aSqlFactory
 				) ;
+				
+				// 记录 TablesJoin 对象
+				$aAssoc->setSqlTablesJoin($aTablesJoin) ;
 			}
 			
 			// 三表关联
 			else if( $aAssoc->isType(Association::triplet) )
 			{
 				// 从左表连接到中间表
-				$sBridgeTableAlias = $sToTableAlias.'#bridge' ;
-				$aBridgeTable = $this->joinTwoTables(
+				$aBridgeTable = $aSqlFactory->createTable( $aAssoc->bridgeTableName(), $aAssoc->bridgeSqlTableAlias() ) ;
+				$aTablesJoin = $this->joinTwoTables(
 						$aFromTable
-						, $aAssoc->bridgeTableName()
-						, $sBridgeTableAlias
+						, $aBridgeTable
 						, $aAssoc->fromKeys()
 						, $aAssoc->toBridgeKeys()
 						, $aSqlFactory
 				) ;
 				
+				// 记录中间表的 TablesJoin 对象
+				$aAssoc->setSqlTablesJoin($aTablesJoin) ;
+				
 				// 从中间表连接到右表
-				$aTable = $this->joinTwoTables(
+				$aTable = $aSqlFactory->createTable( $aPrototype->tableName(), $sToTableAlias ) ;
+				$this->joinTwoTables(
 						$aBridgeTable
-						, $aPrototype->tableName()
-						, $sToTableAlias
+						, $aTable
 						, $aAssoc->fromBridgeKeys()
 						, $aAssoc->toKeys()
 						, $aSqlFactory
@@ -162,19 +219,16 @@ class Selecter extends Object
 		}
 	}
 	
-	private function joinTwoTables(Table $aFromTable,$sToTable,$sToTableAlias,array $arrFromKeys,$arrToKeys,StatementFactory $aSqlFactory)
+	private function joinTwoTables( $aFromTable,Table $aTable,array $arrFromKeys,$arrToKeys,StatementFactory $aSqlFactory)
 	{
-		// create table
-		$aTable = $aSqlFactory->createTable( $sToTable, $sToTableAlias ) ;
-		
 		// create table join
 		$aTablesJoin = $aSqlFactory->createTablesJoin() ;
 		$aTablesJoin->addTable(
-				$aTable, $this->makeResrictionForForeignKey($aFromTable->alias(),$sToTableAlias,$arrFromKeys,$arrToKeys,$aSqlFactory)
+				$aTable, $this->makeResrictionForForeignKey($aFromTable->alias(),$aTable->alias(),$arrFromKeys,$arrToKeys,$aSqlFactory)
 		) ;
 		$aFromTable->addJoin($aTablesJoin) ;
 		
-		return $aTable ;
+		return $aTablesJoin ;
 	}
 	
 	private function setGroupBy(Select $aSelect,Prototype $aPrototype)
@@ -217,7 +271,7 @@ class Selecter extends Object
 		}
 	}
 
-	private function makeResrictionForAsscotion(Model $aModel,$sToTableName,array $arrFromKeys,array $arrToKeys, StatementFactory $aSqlFactory)
+	private function makeResrictionForAsscotion(Model $aModel,array $arrFromKeys,$sToTableName,array $arrToKeys, StatementFactory $aSqlFactory)
 	{
 		$aRestriction = $aSqlFactory->createRestriction() ;
 		

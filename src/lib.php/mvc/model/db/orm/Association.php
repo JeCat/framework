@@ -2,6 +2,8 @@
 
 namespace jc\mvc\model\db\orm;
 
+use jc\db\sql\TablesJoin;
+
 use jc\db\DB;
 use jc\lang\Exception;
 use jc\mvc\model\db\orm\Prototype;
@@ -89,6 +91,11 @@ class Association
 	}
 
 	public function bridgeTableName()
+	{
+		return $this->sBridgeTable ;
+	}
+
+	public function bridgeSqlTableAlias()
 	{
 		return $this->sBridgeTable ;
 	}
@@ -211,9 +218,21 @@ class Association
 		return $this->aToPrototype->name() ;
 	}
 	
-	public function path()
+	public function path($bFull=true)
 	{
-		return $this->aToPrototype->path() ;
+		return $this->aToPrototype->path($bFull) ;
+	}
+
+	/**
+	 * @return jc\db\sql\TablesJoin
+	 */
+	public function sqlTablesJoin()
+	{
+		return $this->aTablesJoin ;
+	}
+	public function setSqlTablesJoin(TablesJoin $aTablesJoin)
+	{
+		$this->aTablesJoin = $aTablesJoin ;
 	}
 	
 	// private data
@@ -226,6 +245,7 @@ class Association
 	private $sBridgeTable;
 	private $arrToBridgeKeys = array();
 	private $arrFromBridgeKeys = array();
+	private $aTablesJoin = null ;
 	
 }
 ?>
