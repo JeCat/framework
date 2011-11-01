@@ -398,9 +398,27 @@ class Model extends AbstractModel implements IModel , IPaginal
 	{
 		return DB::singleton() ;
 	}
+
+	
+	protected function _data(&$sName)
+	{
+		$data = parent::_data($sName) ;
+		
+		// 原型中的别名
+		if( $data===null and $this->aPrototype )
+		{
+			$sName = $this->aPrototype->getColumnByAlias($sName) ;
+			if( $sName!==null )
+			{
+				return parent::_data($sName) ;
+			}
+		}
+		
+		return $data ;
+	}
 	
 	/**
-	 * @var jc\mvc\model\db\orm\PrototypeInFragment
+	 * @var jc\mvc\model\db\orm\Prototype
 	 */
 	private $aPrototype ;
 	private $aCriteria ;

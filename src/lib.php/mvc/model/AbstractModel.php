@@ -72,10 +72,10 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 			return null;
 		}
 		
-		$arrKeys = array_keys ( $this->arrDatas );
-		if (array_key_exists ( $sName, $this->arrDatas ))
+		$sData = $this->_data($sName) ;
+		if($sData!==null)
 		{
-			return $this->arrDatas [$sName];
+			return $sData ;
 		}
 		
 		list ( $aModel, $sName ) = $this->findDataByPath ( $sName );
@@ -112,15 +112,15 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 			return false;
 		}
 		
-		if (array_key_exists ( $sName, $this->arrDatas ))
+		if ($this->_data($sName)!==null)
 		{
 			return true;
 		}
 		
 		else
 		{
-			list ( $aModel ) = $this->findDataByPath ( $sName );
-			return $aModel ? true : false;
+			list ( $aChildModel, $sName ) = $this->findDataByPath ( $sName );
+			return $aChildModel ? $aChildModel->_data($sName)!==null : false ;
 		}
 	}
 	
@@ -377,6 +377,12 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	
 	public function setSerialized($bSerialized=true){
 	    throw new Exception('%s::%s 未完成',__METHOD__);
+	}
+	
+	
+	protected function _data(&$sName)
+	{
+		return isset($this->arrDatas[$sName])?  $this->arrDatas[$sName]: null ;
 	}
 	
 	private $arrDatas = null;
