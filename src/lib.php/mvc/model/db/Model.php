@@ -398,7 +398,21 @@ class Model extends AbstractModel implements IModel , IPaginal
 	{
 		return DB::singleton() ;
 	}
-
+	
+	public function setData($sName, $sValue)
+	{
+		// 原型中的别名
+		if( $this->aPrototype )
+		{
+			$sRealName = $this->aPrototype->getColumnByAlias($sName) ;
+			if( $sRealName!==null )
+			{
+				$sName = $sRealName ;
+			}
+		}
+		
+		parent::setData($sRealName) ;
+	}
 	
 	protected function _data(&$sName)
 	{
