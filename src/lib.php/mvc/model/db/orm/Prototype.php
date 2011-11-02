@@ -58,6 +58,7 @@ class Prototype
 		}
 		return $this->arrKeys;
 	}
+	
 	/**
 	 *   键可以为多个。本函数接受一个数组（多个键）或一个字符串（一个键）。
 	 * @return Prototype
@@ -66,6 +67,22 @@ class Prototype
 	{
 		$this->arrKeys = (array)$keys ;
 		return $this;
+	}
+	
+	/**
+	 *   数据表定义的主键
+	 */
+	public function devicePrimaryKey()
+	{
+		if( $this->sDevicePrimaryKey===self::youKnow )
+		{
+			if( !$this->sDevicePrimaryKey = $this->tableReflecter()->primaryName() )
+			{
+				$this->sDevicePrimaryKey = '' ;
+			}
+		}
+		
+		return $this->sDevicePrimaryKey ?: null ;
 	}
 	
 	public function tableName()
@@ -498,6 +515,7 @@ class Prototype
 	private $arrColumns ;
 	private $arrColumnAliases = array();
 	private $arrKeys = array();
+	private $sDevicePrimaryKey = null ;
 	private $aCriteria = null;
 	private $arrAssociations =  array();
 	private $aAssociationBy = null;

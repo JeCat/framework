@@ -1,5 +1,4 @@
 <?php
-
 namespace jc\mvc\model\db\orm;
 
 
@@ -270,31 +269,5 @@ class Selecter extends Object
 		}
 	}
 
-	private function makeResrictionForAsscotion(Model $aModel,array $arrFromKeys,$sToTableName,array $arrToKeys, StatementFactory $aSqlFactory)
-	{
-		$aRestriction = $aSqlFactory->createRestriction() ;
-		
-		foreach($arrFromKeys as $nIdx=>$sFromKey)
-		{
-			$aRestriction->eq( "`{$sToTableName}`.`{$arrToKeys[$nIdx]}`", $aModel->data($sFromKey) ) ;
-		}
-		
-		return $aRestriction ;
-	}
-
-	private function makeResrictionForForeignKey($sFromTableName,$sToTableName,$arrFromKeys,$arrToKeys, StatementFactory $aSqlFactory)
-	{
-		$aRestriction = $aSqlFactory->createRestriction() ;
-		
-		foreach ($arrFromKeys as $nIdx=>$sFromKey)
-		{
-			$aRestriction->eqColumn(
-				"`{$sFromTableName}`.`{$sFromKey}`"
-				, "`{$sToTableName}`.`{$arrToKeys[$nIdx]}`"
-			) ;
-		}
-		
-		return $aRestriction ;
-	}
 }
 ?>

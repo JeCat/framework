@@ -1,26 +1,19 @@
 <?php
 namespace jc\mvc\model\db ;
 
-use jc\db\sql\Statement;
-
+use jc\db\sql\Restriction;
 use jc\mvc\model\db\orm\operators\SelectForAssocQuery;
-use jc\db\sql\Select;
-use jc\mvc\model\db\orm\PrototypeAssociationMap;
 use jc\lang\Exception;
-use jc\mvc\model\db\orm\operators\Deleter;
+use jc\mvc\model\db\orm\Deleter;
 use jc\mvc\model\db\orm\Selecter;
-use jc\mvc\model\db\orm\operators\Inserter;
-use jc\mvc\model\db\orm\operators\Updater;
+use jc\mvc\model\db\orm\Inserter;
+use jc\mvc\model\db\orm\Updater;
 use jc\db\DB;
 use jc\db\recordset\IRecordSet;
-use jc\db\sql\MultiTableStatement;
 use jc\db\sql\Criteria;
 use jc\mvc\model\db\orm\Association;
 use jc\mvc\model\AbstractModel ;
-use jc\db\sql\IDriver ;
-use jc\lang\Object;
 use jc\mvc\model\IPaginal;
-use jc\mvc\view\widget\Paginator;
 use jc\mvc\model\db\orm\Prototype;
 
 class Model extends AbstractModel implements IModel , IPaginal
@@ -412,6 +405,29 @@ class Model extends AbstractModel implements IModel , IPaginal
 		}
 		
 		parent::setData($sRealName) ;
+	}
+	
+	public function setChanged($sName,$bChanged=true)
+	{
+		// 原型中的别名
+		if( $this->aPrototype && $sRealName=$this->aPrototype->getColumnByAlias($sName) )
+		{
+			$sName = $sRealName ;
+		}
+		parent::setChanged($sName,$bChanged) ;
+	}
+	
+	/**
+	 * @param string $sName	$sName=null返回一个数组，或返回指定数据项的“是否变化”状态
+	 */
+	public function changed($sName=null)
+	{
+		// 原型中的别名
+		if( $this->aPrototype && $sRealName=$this->aPrototype->getColumnByAlias($sName) )
+		{
+			$sName = $sRealName ;
+		}
+		return parent::changed($sName) ;
 	}
 	
 	protected function _data(&$sName)

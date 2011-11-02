@@ -311,7 +311,7 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 		$aOutput->write ( "<pre>\r\n" );
 		
 		$aOutput->write ( str_repeat ( "\t", $nDepth ) );
-		$aOutput->write ( (($this instanceof ModelList)? "[Model List]" : "[Model]") );
+		$aOutput->write ( (($this instanceof IModelList)? "[Model List]" : "[Model]") );
 		$aOutput->write ( "\r\n" );
 		
 		if (! $this->isEmpty ())
@@ -344,9 +344,19 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 		return $this->arrDatas === null;
 	}
 	
-	public function changed()
+	/**
+	 * @param string $sName	$sName=null返回一个数组，或返回指定数据项的“是否变化”状态
+	 */
+	public function changed($sName=null)
 	{
-		return $this->arrChanged;
+		if($sName)
+		{
+			return isset($this->arrChanged[$sName])? true: false ;
+		}
+		else
+		{
+			return $this->arrChanged ;
+		}
 	}
 	
 	public function clearChanged()
@@ -354,29 +364,26 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 		$this->arrChanged = array();
 	}
 	
-	/**
-	 *  @bug unset bug
-	 */
-	public function removeChanged($sName)
+	public function setChanged($sName,$bChanged=true)
 	{
-		unset($this->arrChanged[$sName]);
+		if($bChanged)
+		{
+			$this->arrChanged[$sName] = $sName ;
+		}
+		else
+		{
+			unset($this->arrChanged[$sName]) ;
+		}
 	}
 	
-	/**
-	 *  @optimize 1.in_array 2.add
-	 */
-	public function setChanged($sName)
+	public function hasSerialized()
 	{
-		$this->arrChanged[] = $sName;
-		$this->arrChanged = array_unique($this->arrChanged);
+		return $this->bSerialized ;
 	}
 	
-	public function hasSerialized(){
-	    throw new Exception('%s::%s 未完成',__METHOD__);
-	}
-	
-	public function setSerialized($bSerialized=true){
-	    throw new Exception('%s::%s 未完成',__METHOD__);
+	public function setSerialized($bSerialized=true)
+	{
+		$this->bSerialized = $bSerialized? true: false ;
 	}
 	
 	
@@ -390,5 +397,7 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	private $arrChildren = array ();
 	
 	private $arrChanged = array ();
+	
+	private $bSerialized = false ;
 }
 ?>
