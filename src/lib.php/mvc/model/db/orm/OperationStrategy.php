@@ -1,6 +1,9 @@
 <?php
 namespace jc\mvc\model\db\orm ;
 
+use jc\db\sql\IDataSettableStatement;
+use jc\mvc\model\IModel;
+use jc\db\sql\StatementFactory;
 use jc\lang\Object;
 
 abstract class OperationStrategy extends Object

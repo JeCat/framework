@@ -111,58 +111,6 @@ class Inserter extends OperationStrategy
 		return true ;
 	}
 
-	protected function setCondition(Restriction $aRestriction,$keys,$names=null,IModel $aDataSource,$sTableName='')
-	{
-		$keys = array_values((array)$keys) ;
-		if($names)
-		{
-			$names = array_values((array)$names) ;
-		}
-		else 
-		{
-			$names = $keys ;
-		}
-	
-		if($sTableName)
-		{
-			$sTableName = "`{$sTableName}`." ;
-		}
-		
-		foreach($keys as $idx=>$sKey)
-		{
-			$aRestriction->eq(
-				"{$sTableName}`{$sKey}`"
-				, $aDataSource->data($names[$idx])
-			) ;
-		}
-	}
-	
-	protected function buildBridge(DB $aDB,Association $aAssociation,IModel $aFromModel,IModel $aToModel)
-	{
-		$aStatementFactory = $aAssociation->fromPrototype()->statementFactory() ;
-		$aSelect = $aStatementFactory->createSelect($aAssociation->bridgeTableName()) ;
-		$aSelect->criteria()->restrication()->add(
-			$this->makeResrictionForAsscotion($aFromModel,$aAssociation->fromKeys(),null,$aAssociation->toBridgeKeys(),$aStatementFactory)
-		) ;
-		$aSelect->criteria()->restrication()->add(
-			$this->makeResrictionForAsscotion($aToModel,$aAssociation->toKeys(),null,$aAssociation->fromBridgeKeys(),$aStatementFactory)
-		) ;
-		
-		// 检查对应的桥接表记录是否存在
-		if( !$aDB->queryCount($aSelect) )
-		{
-			$aInsertForBridge = $aStatementFactory->createInsert($aAssociation->bridgeTableName()) ;
-			
-			// from table key vale
-			$this->setValue($aInsertForBridge,$aAssociation->bridgeToKeys(),$aAssociation->fromKeys(),$aFromModel) ;
-			
-			// to table key vale
-			$this->setValue($aInsertForBridge,$aAssociation->bridgeFromKeys(),$aAssociation->toKeys(),$aToModel) ;
-			
-			$aDB->execute($aInsertForBridge) ;
-		}
-	}
-
 	private function setAssocModelData(IModel $aModel,IModel $aChildModel,array $arrFromKeys,array $arrToKeys)
 	{
 		foreach($arrToKeys as $nIdx=>$sKey)

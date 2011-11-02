@@ -1,7 +1,6 @@
 <?php
 namespace jc\mvc\model\db\orm;
 
-
 use jc\mvc\model\db\Model;
 use jc\mvc\model\IModelList;
 use jc\db\sql\Table;
@@ -12,7 +11,7 @@ use jc\mvc\model\db\IModel ;
 use jc\db\sql\StatementFactory ;
 use jc\lang\Exception;
 
-class Selecter extends Object
+class Selecter extends OperationStrategy
 {
 	public function execute(DB $aDB, IModel $aModel,Select $aSelect=null)
 	{
