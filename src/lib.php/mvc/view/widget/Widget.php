@@ -1,6 +1,7 @@
 <?php
 namespace jc\mvc\view\widget ;
 
+use jc\bean\IBean;
 use jc\resrc\HtmlResourcePool;
 use jc\util\StopFilterSignal;
 use jc\message\Message;
@@ -14,9 +15,9 @@ use jc\lang\Exception;
 use jc\util\IHashTable;
 use jc\lang\Object ;
 
-class Widget extends Object implements IViewWidget
+class Widget extends Object implements IViewWidget, IBean
 {	
-	public function __construct($sId,$sTemplateName,$sTitle=null,IView $aView=null)
+	public function __construct($sId=null,$sTemplateName,$sTitle=null,IView $aView=null)
 	{
 		parent::__construct() ;
 		
@@ -51,6 +52,38 @@ class Widget extends Object implements IViewWidget
 		{
 			$aView->addWidget($this) ;
 		}
+	}
+
+	
+    /**
+     * properties:
+     * 	id				string
+     *  title			string
+     *  template		string
+     *   
+     * @see jc\bean\IBean::build()
+     */
+	public function build(array & $arrConfig)
+	{
+		if( !empty($arrConfig['id']) )
+		{
+			$this->setId($arrConfig['id']) ;
+		}
+		if( !empty($arrConfig['title']) )
+		{
+			$this->setTitle($arrConfig['title']) ;
+		}
+		if( !empty($arrConfig['template']) )
+		{
+			$this->setTemplateName($arrConfig['template']) ;
+		}
+		
+    	$this->arrBeanConfig = $arrConfig ;
+    }
+    
+	public function beanConfig()
+	{
+		return $this->arrBeanConfig ;
 	}
 
 	public function title()
@@ -178,6 +211,8 @@ class Widget extends Object implements IViewWidget
 	private $sTitle ;
 	
 	private $arrAttributes = array() ;
+	
+    private $arrBeanConfig ;
 }
 
 ?>

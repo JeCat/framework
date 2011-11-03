@@ -2,6 +2,9 @@
 
 namespace jc\mvc\controller ;
 
+use jc\bean\BeanFactory;
+
+use jc\bean\IBean ;
 use jc\mvc\model\IModel;
 use jc\pattern\composite\Container;
 use jc\mvc\view\DataExchanger;
@@ -22,10 +25,8 @@ use jc\pattern\composite\NamableComposite ;
 
 /** 
  * @author root
- * 
- * 
  */
-class Controller extends NamableComposite implements IController
+class Controller extends NamableComposite implements IController, IBean
 {
     function __construct ($params=null,$sName=null)
     {
@@ -50,6 +51,67 @@ class Controller extends NamableComposite implements IController
     protected function init()
     {}
     
+    /**
+     * properties:
+     * 	name				string						名称
+     * 	params				array,jc\util\IDataSrc 		参数
+     *  model.ooxx			config
+     *  view.ooxx			config
+     *  controller.ooxx		config
+     * 
+     * @see jc\bean\IBean::build()
+     */
+    public function build(array & $arrConfig)
+    {
+    	if( isset($arrConfig['name']) )
+    	{
+    		$this->setName($arrConfig['name']) ;
+    	}
+    	
+    	if( isset($arrConfig['params']) )
+    	{
+    		$this->buildParams($arrConfig['params']) ;
+    	}
+    	
+    	$aBeanFactory = BeanFactory::singleton() ;
+    	
+    	// -------------------------------
+    	// models
+    	$aModelContainer = $this->modelContainer() ;
+		foreach($aBeanFactory->createBeanArray($arrConfig,'model.','jc\\mvc\\model\\db\\Model') as $aModel)
+		{				
+			$aModelContainer->add( $aModel ) ;
+		}
+    
+    	// -------------------------------
+    	// views
+    	foreach($aBeanFactory->createBeanArray($arrConfig,'view.','jc\\mvc\\view\\View') as $aView)
+		{				
+			$this->addView( $aView ) ;
+		}
+    	
+    	// -------------------------------
+    	// controllers
+		foreach($aBeanFactory->createBeanArray($arrConfig,'controller.','jc\\mvc\\controller\\Controller') as $aController)
+		{				
+			$this->add( $aController ) ;
+		}
+    	
+    	// -------------------------------
+    	// actions
+    	
+    	// -------------------------------
+    	// process
+    	
+    	
+    	$this->arrBeanConfig = $arrConfig ;
+    }
+    
+	public function beanConfig()
+	{
+		return $this->arrBeanConfig ;
+	}
+	
     public function createModel($prototype,array $arrProperties=array(),$bAgg=false,$sName=null,$sClass='jc\\mvc\\model\\db\\Model')
     {
     	if( $prototype instanceof Prototype )
@@ -505,5 +567,7 @@ class Controller extends NamableComposite implements IController
     private $aModelContainer = null ;
     
     private $aFrame = null ;
+    
+    private $arrBeanConfig ;
 }
 ?>

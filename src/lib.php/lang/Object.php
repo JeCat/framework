@@ -111,6 +111,9 @@ class Object implements IObject
 		return $aObject ;
 	}
 	
+	/**
+	 * @return jc\lang\Object
+	 */
 	static public function singleton ($bCreateNew=true,$createArgvs=null,$sClass=null)
 	{
 		if(!$sClass)

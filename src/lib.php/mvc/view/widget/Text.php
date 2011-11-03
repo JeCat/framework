@@ -4,7 +4,8 @@ namespace jc\mvc\view\widget;
 use jc\mvc\view\IView;
 use jc\lang\Exception;
 
-class Text extends FormWidget {
+class Text extends FormWidget
+{
 	
 	const single = 0;
 	const password = 1;
@@ -14,10 +15,19 @@ class Text extends FormWidget {
 	private static $nTypeMin = 0;
 	private static $nTypeMax = 3;
 	
-	public function __construct($sId, $sTitle = null, $sValue=null, $nType = self::single, IView $aView = null) {
+	public function __construct($sId=null, $sTitle = null, $sValue=null, $nType = self::single, IView $aView = null)
+	{
 		$this->setType ( $nType );
 		$this->setValue ( $sValue );
 		parent::__construct ( $sId, 'jc:WidgetText.template.html', $sTitle, $aView );
+	}
+	
+	public function build(array & $arrConfig)
+	{
+		parent::build($arrConfig) ;
+		
+		// todo ... 
+		
 	}
 	
 	public function type() {

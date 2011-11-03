@@ -1,6 +1,11 @@
 <?php
 namespace jc\mvc\view ;
 
+use jc\bean\BeanFactory;
+
+use jc\lang\Exception;
+
+use jc\bean\IBean;
 use jc\resrc\HtmlResourcePool;
 use jc\util\CombinedIterator;
 use jc\util\StopFilterSignal;
@@ -17,9 +22,9 @@ use jc\io\OutputStreamBuffer;
 use jc\pattern\composite\NamableComposite;
 use jc\ui\UI;
 
-class View extends NamableComposite implements IView
+class View extends NamableComposite implements IView, IBean
 {
-	public function __construct($sName,$sSourceFilename=null,UI $aUI=null)
+	public function __construct($sName=null,$sSourceFilename=null,UI $aUI=null)
 	{
 		parent::__construct("jc\\mvc\\view\\IView") ;
 		
@@ -46,6 +51,53 @@ class View extends NamableComposite implements IView
 			
 			StopFilterSignal::stop() ;
 		},$this) ;
+	}
+	
+    /**
+     * properties:
+     * 	name				string						名称
+     * 	model				string						关联模型的实例（在constroller中实现）
+     *  widget.ooxx			config
+     *  view.ooxx			config
+     * 
+     * @see jc\bean\IBean::build()
+     */
+    public function build(array & $arrConfig)
+    {
+    	if( empty($arrConfig['name']) )
+    	{
+    		throw new Exception("View bean对象的配置数组缺少必要的属性 name") ;
+    	}
+    	$this->setName($arrConfig['name']) ;
+    	
+    	if( !empty($arrConfig['template']) )
+    	{
+    		$this->setSourceFilename($arrConfig['template']) ;
+    	}
+    	
+    	$aBeanFactory = BeanFactory::singleton() ;
+    	
+    	// -------------------------------
+    	// views
+    	foreach($aBeanFactory->createBeanArray($arrConfig,'view.','jc\\mvc\\view\\View') as $aView)
+		{				
+			$this->add( $aView ) ;
+		}
+    
+    	// -------------------------------
+    	// widgets
+    	foreach($aBeanFactory->createBeanArray($arrConfig,'widget.',null,'id') as $aWidget)
+		{
+			$arrConfig = $aWidget->beanConfig() ;
+			$this->addWidget( $aWidget, isset($arrConfig['exchange'])?$arrConfig['exchange']:null ) ;
+		}
+    
+    	$this->arrBeanConfig = $arrConfig ;
+    }
+    
+	public function beanConfig()
+	{
+		return $this->arrBeanConfig ;
 	}
 	
 	public function add($object,$sName=null)
@@ -380,6 +432,7 @@ class View extends NamableComposite implements IView
 	private $aMsgQueue ;
 	private $bEnable = true ;
 	private $arrObserver = array();
+    private $arrBeanConfig ;
 }
 
 ?>

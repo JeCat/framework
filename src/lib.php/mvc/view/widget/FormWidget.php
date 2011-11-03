@@ -1,6 +1,10 @@
 <?php
 namespace jc\mvc\view\widget;
 
+use jc\bean\BeanFactory;
+
+use jc\lang\Exception;
+
 use jc\verifier\IVerifier;
 
 use jc\verifier\VerifierManager;
@@ -10,6 +14,61 @@ use jc\util\IDataSrc;
 
 class FormWidget extends Widget implements IViewFormWidget
 {	
+    /**
+     * properties:	
+     *  value				mixed
+     *  valueString			string
+     *  formName			string
+     *  readOnly			bool
+     *  disabled			bool
+     *  exchange			string 		( 在 View中实现 )
+     *  verifier.ooxx		array
+     *  
+     *   
+     * @see jc\bean\IBean::build()
+     */
+	public function build(array & $arrConfig)
+	{
+		parent::build($arrConfig) ;
+	
+		if( array_key_exists('value',$arrConfig) )
+		{
+			$this->setValue($arrConfig['value']) ;
+		}
+		if( array_key_exists('valueString',$arrConfig) )
+		{
+			$this->setValueFromString($arrConfig['valueString']) ;
+		}
+		if( !empty($arrConfig['formName']) )
+		{
+			$this->setFormName($arrConfig['formName']) ;
+		}
+		if( array_key_exists('readOnly',$arrConfig) )
+		{
+			$this->setReadOnly($arrConfig['readOnly']?true:false) ;
+		}
+		if( array_key_exists('disabled',$arrConfig) )
+		{
+			$this->setDisabled($arrConfig['disabled']?true:false) ;
+		}
+		
+		// -------------------
+		// verifiers
+    	$aBeanFactory = BeanFactory::singleton() ;
+    	foreach($aBeanFactory->createBeanArray($arrConfig,'verifier.',null,null) as $aVerifier)
+		{
+			$arrConfig = $aVerifier->beanConfig() ;
+			
+			$this->addVerifier(
+				$aVerifier
+				, isset($arrConfig['word'])? $arrConfig['word']: null
+				
+				, isset($arrConfig['callback'])? $arrConfig['callback']: null
+				, isset($arrConfig['callback.argvs'])? $arrConfig['callback.argvs']: null
+			) ;
+		}
+	}
+	
 	public function value()
 	{
 		return $this->value ;
