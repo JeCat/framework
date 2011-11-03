@@ -1,6 +1,7 @@
 <?php
 namespace jc\mvc\model\db\orm ;
 
+use jc\mvc\model\db\Model;
 use jc\db\sql\IDataSettableStatement;
 use jc\mvc\model\IModel;
 use jc\db\sql\StatementFactory;

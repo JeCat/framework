@@ -392,7 +392,7 @@ class Model extends AbstractModel implements IModel , IPaginal
 		return DB::singleton() ;
 	}
 	
-	public function setData($sName, $sValue)
+	public function setData($sName,$sValue)
 	{
 		// 原型中的别名
 		if( $this->aPrototype )
@@ -404,7 +404,7 @@ class Model extends AbstractModel implements IModel , IPaginal
 			}
 		}
 		
-		parent::setData($sRealName) ;
+		parent::setData($sRealName,$sValue) ;
 	}
 	
 	public function setChanged($sName,$bChanged=true)
