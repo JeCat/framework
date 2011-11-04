@@ -57,7 +57,7 @@ class Inserter extends OperationStrategy
 		// insert 关联model
 		foreach($aPrototype->associations() as $aAssociation)
 		{
-			$aAssocModel = $aModel->child( $aAssociation->modelProperty() ) ;
+			$aAssocModel = $aModel->child( $aAssociation->name() ) ;
 			if(!$aAssocModel)
 			{
 				continue ;
@@ -90,7 +90,7 @@ class Inserter extends OperationStrategy
 			
 				break ;
 				
-			case Association::hasAndBelongsToMany :
+			case Association::hasAndBelongsTo :
 				
 				if( !$aAssocModel->save() )
 				{
@@ -110,12 +110,38 @@ class Inserter extends OperationStrategy
 		
 		return true ;
 	}
+		
+	protected function buildBridge(DB $aDB,Association $aAssociation,IModel $aFromModel,IModel $aToModel)
+	{
+		$aStatementFactory = $aAssociation->fromPrototype()->statementFactory() ;
+		$aSelect = $aStatementFactory->createSelect($aAssociation->bridgeTableName()) ;
+		$aSelect->criteria()->restriction()->add(
+			$this->makeResrictionForAsscotion($aFromModel,$aAssociation->fromKeys(),null,$aAssociation->toBridgeKeys(),$aStatementFactory)
+		) ;
+		$aSelect->criteria()->restriction()->add(
+			$this->makeResrictionForAsscotion($aToModel,$aAssociation->toKeys(),null,$aAssociation->fromBridgeKeys(),$aStatementFactory)
+		) ;
+		
+		// 检查对应的桥接表记录是否存在
+		if( !$aDB->queryCount($aSelect) )
+		{
+			$aInsertForBridge = $aStatementFactory->createInsert($aAssociation->bridgeTableName()) ;
+			
+			// from table key vale
+			$this->setValue($aInsertForBridge,$aAssociation->toBridgeKeys(),$aAssociation->fromKeys(),$aFromModel) ;
+			
+			// to table key vale
+			$this->setValue($aInsertForBridge,$aAssociation->fromBridgeKeys(),$aAssociation->toKeys(),$aToModel) ;
+			
+			$aDB->execute($aInsertForBridge) ;
+		}
+	}
 
 	private function setAssocModelData(IModel $aModel,IModel $aChildModel,array $arrFromKeys,array $arrToKeys)
 	{
 		foreach($arrToKeys as $nIdx=>$sKey)
 		{
-			if( $aChildModel->isAggregation() )
+			if( $aChildModel instanceof IModelList )
 			{
 				$value = $aModel->data($arrFromKeys[$nIdx]) ;
 				foreach ($aChildModel->childIterator() as $aChildChildModel)

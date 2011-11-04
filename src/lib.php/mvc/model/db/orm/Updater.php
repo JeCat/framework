@@ -16,7 +16,10 @@ class Updater extends Object{
         $aSqlUpdate ->setCriteria($aCriteria);
         $aRestriction = $aCriteria->restriction();
         $arrKeys = $aPrototype->keys();
-        $arrChanged = $Model->changed();
+        $arrChanged = $aModel->changed();
+        if(empty($arrChanged)){// 如果没有列发生更改，不做任何操作
+        	return;
+    	}
         foreach($aModel->dataIterator() as $alias => $data){
             $column = $aPrototype->getColumnByAlias($alias);
             if( in_array($column,$arrKeys)){

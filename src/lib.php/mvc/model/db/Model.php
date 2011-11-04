@@ -114,7 +114,7 @@ class Model extends AbstractModel implements IModel , IPaginal
 		{
 			foreach( $aPrototype->columns() as $sClm )
 			{
-				$this->setData( $sClm, $aRecordSet->field($aPrototype->sqlColumnAlias($sClm)) ) ;
+				$this->setData( $sClm, $aRecordSet->field($aPrototype->sqlColumnAlias($sClm)) ,false) ;
 			}
 			
 			// 加载所有单属关系的子模型
@@ -133,7 +133,7 @@ class Model extends AbstractModel implements IModel , IPaginal
 			$arrRow = $aRecordSet->current() ;
 			foreach ($arrRow as $sClmName=>&$sValue)
 			{
-				$this->setData($sClmName,$sValue) ;
+				$this->setData($sClmName,$sValue,false) ;
 			}
 		}
 		
@@ -147,6 +147,7 @@ class Model extends AbstractModel implements IModel , IPaginal
 	
 	public function load($values=null,$keys=null)
 	{
+		$selectCriteria = null;//一个临时的Criteria对象，仅在此次load中有效。load结束后立即销毁。
 		if($values){
 			if(!$keys){
 				$keys = $this->prototype()->primaryKeys() ;
@@ -154,62 +155,47 @@ class Model extends AbstractModel implements IModel , IPaginal
 				$keys = (array)$keys;
 			}
 			if($values instanceof Criteria){
-				$this->aCriteria = $values;
+				$selectCriteria = $values;
 			}else if($values instanceof Restriction){
-				$aCriteria = $this->criteria() ;
-				$aCriteria->restriction()->add($values);
+				$selectCriteria = clone $this->criteria() ;
+				$selectCriteria->restriction()->add($values);
 			}else{
 				$values = array_values((array) $values) ;
-				$aCriteria = $this->criteria() ;
+				$selectCriteria = clone $this->criteria();
 				foreach($keys as $nIdx=>$sKey)
 				{
-					$aCriteria->restriction()->eq( $sKey, $values[$nIdx] ) ;
+					$selectCriteria->restriction()->eq( $sKey, $values[$nIdx] ) ;
 				}
 			}
 		}
-		
-		return Selecter::singleton()->execute( $this->db(), $this, $this->aCriteria ) ;
+		$this->setSerialized(true);
+		$this->clearChanged();
+		return Selecter::singleton()->execute( $this->db(), $this, null,$selectCriteria ) ;
 	}
 	
 	public function save()
 	{
-		if($this->isAggregation())
+		// update
+		if( $this->hasSerialized() )
 		{
-			foreach($this->childIterator() as $aChildModel)
-			{
-				if( !$aChildModel->save() )
-				{
-					return false ;
-				}
-			}
-			
-			return true ;
+			return $this->update() ;
 		}
 		
+		// insert
 		else 
 		{
-			// update
-			if( $this->hasSerialized() )
-			{
-				return $this->update() ;
-			}
-			
-			// insert
-			else 
-			{
-				return $this->insert() ;
-			}
+			return $this->insert() ;
 		}
 	}
 
-	public function insert()
+	protected function insert()
 	{
-		return Inserter::singleton()->insert($this->db(), $this) ;
+		return Inserter::singleton()->execute($this->db(), $this) ;
 	}
 	
-	public function update()
+	protected function update()
 	{
-		return Updater::singleton()->update($this->db(), $this) ;
+		return Updater::singleton()->execute($this->db(), $this) ;
 	}
 	
 	public function delete()
@@ -392,7 +378,7 @@ class Model extends AbstractModel implements IModel , IPaginal
 		return DB::singleton() ;
 	}
 	
-	public function setData($sName,$sValue)
+	public function setData($sName,$sValue, $bStrikeChange=true)
 	{
 		// 原型中的别名
 		if( $this->aPrototype )
@@ -404,7 +390,7 @@ class Model extends AbstractModel implements IModel , IPaginal
 			}
 		}
 		
-		parent::setData($sName,$sValue) ;
+		parent::setData($sName,$sValue, $bStrikeChange) ;
 	}
 	
 	public function setChanged($sName,$bChanged=true)

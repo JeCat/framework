@@ -487,7 +487,7 @@ class Prototype
 			$pos = strrpos($sName,'.') ;
 			if($pos!==false)
 			{
-				$sPrototypeName = substr($sName,0,$pos) ;
+				$sPrototypeName = '.'.substr($sName,0,$pos) ;
 				$sDataName = substr($sName,$pos+1) ;
 			}
 			else 
@@ -499,7 +499,7 @@ class Prototype
 			// 转换字段别名
 			// todo
 			
-			$sName = '`'.$this->name().".{$sPrototypeName}`.`{$sDataName}`" ;
+			$sName = '`'.$this->name()."{$sPrototypeName}`.`{$sDataName}`" ;
 		}
 		
 		return array($sName) ;

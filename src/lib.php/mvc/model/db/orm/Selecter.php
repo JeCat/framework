@@ -10,10 +10,11 @@ use jc\db\DB;
 use jc\mvc\model\db\IModel ;
 use jc\db\sql\StatementFactory ;
 use jc\lang\Exception;
+use jc\db\sql\Criteria;
 
 class Selecter extends OperationStrategy
 {
-	public function execute(DB $aDB, IModel $aModel,Select $aSelect=null)
+	public function execute(DB $aDB, IModel $aModel,Select $aSelect=null,Criteria $aCriteria=null)
 	{
 		if( !$aPrototype = $aModel->prototype() )
 		{
@@ -27,6 +28,9 @@ class Selecter extends OperationStrategy
 			$aSelect = $this->buildSelect($aPrototype) ;
 		}
 		
+		if($aCriteria){
+			$aSelect ->setCriteria($aCriteria);
+		}
 		
 		// -----------------
 		// step 2. query for all one to one association tables 
