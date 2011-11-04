@@ -404,7 +404,7 @@ class Model extends AbstractModel implements IModel , IPaginal
 			}
 		}
 		
-		parent::setData($sRealName,$sValue) ;
+		parent::setData($sName,$sValue) ;
 	}
 	
 	public function setChanged($sName,$bChanged=true)
