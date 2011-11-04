@@ -55,7 +55,7 @@ class FormWidget extends Widget implements IViewFormWidget
 		// -------------------
 		// verifiers
     	$aBeanFactory = BeanFactory::singleton() ;
-    	foreach($aBeanFactory->createBeanArray($arrConfig,'verifier.',null,null) as $aVerifier)
+    	foreach($aBeanFactory->createBeanArray($arrConfig,'verifier:',null,'class') as $aVerifier)
 		{
 			$arrConfig = $aVerifier->beanConfig() ;
 			

@@ -7,7 +7,15 @@ use jc\lang\Exception;
 use jc\lang\Object;
 
 class Email extends Object implements IVerifier {
-	public function __construct() {
+	
+	public function __construct() {}
+
+	public function build(array & $arrConfig)
+	{
+	}
+	
+	public function beanConfig()
+	{
 	}
 	
 	public function verify($data, $bThrowException) {

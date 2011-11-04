@@ -45,11 +45,22 @@ class Controller extends NamableComposite implements IController, IBean
 		
 		$this->buildParams($params) ;
 		
+		// auto build bean config
+    	if( $arrConfig = $this->createBeanConfig() )
+    	{
+    		$this->build($arrConfig) ;
+    	}
+    	
 		$this->init() ;
     }
     
     protected function init()
     {}
+    
+    public function createBeanConfig()
+    {
+    	return null ;
+    }
     
     /**
      * properties:
@@ -78,21 +89,21 @@ class Controller extends NamableComposite implements IController, IBean
     	// -------------------------------
     	// models
     	$aModelContainer = $this->modelContainer() ;
-		foreach($aBeanFactory->createBeanArray($arrConfig,'model.','jc\\mvc\\model\\db\\Model') as $aModel)
+		foreach($aBeanFactory->createBeanArray($arrConfig,'model:','jc\\mvc\\model\\db\\Model') as $aModel)
 		{				
 			$aModelContainer->add( $aModel ) ;
 		}
     
     	// -------------------------------
     	// views
-    	foreach($aBeanFactory->createBeanArray($arrConfig,'view.','jc\\mvc\\view\\View') as $aView)
+    	foreach($aBeanFactory->createBeanArray($arrConfig,'view:','jc\\mvc\\view\\View') as $aView)
 		{				
 			$this->addView( $aView ) ;
 		}
     	
     	// -------------------------------
     	// controllers
-		foreach($aBeanFactory->createBeanArray($arrConfig,'controller.','jc\\mvc\\controller\\Controller') as $aController)
+		foreach($aBeanFactory->createBeanArray($arrConfig,'controller:','jc\\mvc\\controller\\Controller') as $aController)
 		{				
 			$this->add( $aController ) ;
 		}

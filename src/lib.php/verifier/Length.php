@@ -1,12 +1,12 @@
 <?php
 namespace jc\verifier ;
 
+use jc\bean\IBean;
 use jc\message\Message;
-
 use jc\lang\Exception;
 use jc\lang\Object;
 
-class Length extends Object implements IVerifier
+class Length extends Object implements IVerifier, IBean
 {
 	public function __construct($nMinLen=-1,$nMaxLen=-1)
 	{
@@ -14,6 +14,16 @@ class Length extends Object implements IVerifier
 		$this->nMaxLen = $nMaxLen ;
 	}
 
+	public function build(array & $arrConfig)
+	{
+		
+	}
+	
+	public function beanConfig()
+	{
+		
+	}
+	
 	public function verify($data,$bThrowException)
 	{
 		if( is_array($data) )

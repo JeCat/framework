@@ -19,22 +19,22 @@ class BeanFactory extends Object
 			$aSingleton = new self() ;
 			
 			// mvc
-			$aSingleton->registerBeanClass("controller","jc\\mvc\\controller\\Controller") ;
-			$aSingleton->registerBeanClass("view","jc\\mvc\\view\\View") ;
-			$aSingleton->registerBeanClass("mode","jc\\mvc\\model\\db\\Model") ;
+			$aSingleton->registerBeanClass("jc\\mvc\\controller\\Controller","controller") ;
+			$aSingleton->registerBeanClass("jc\\mvc\\view\\View",'view') ;
+			$aSingleton->registerBeanClass("jc\\mvc\\model\\db\\Model",'mode') ;
 			
 			// jecat widgets
-			$aSingleton->registerBeanClass("text","jc\\mvc\\view\\widget\\Text") ;
-			$aSingleton->registerBeanClass("select","jc\\mvc\\view\\widget\\Select") ;
-			$aSingleton->registerBeanClass("list","jc\\mvc\\view\\widget\\SelectList") ;
-			$aSingleton->registerBeanClass("checkbox","jc\\mvc\\view\\widget\\CheckBtn") ;
-			$aSingleton->registerBeanClass("file","jc\\mvc\\view\\widget\\File") ;
-			$aSingleton->registerBeanClass("paginator","jc\\mvc\\view\\widget\\Paginator") ;
+			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\Text",'text') ;
+			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\Select",'select') ;
+			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\SelectList",'list') ;
+			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\CheckBtn",'checkbox') ;
+			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\File",'file') ;
+			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\Paginator",'paginator') ;
 			
 			// verifyers
-			$aSingleton->registerBeanClass("verifier.email","jc\\verifier\\Email") ;
-			$aSingleton->registerBeanClass("verifier.length","jc\\verifier\\Length") ;
-			$aSingleton->registerBeanClass("verifier.number","jc\\verifier\\Number") ;
+			$aSingleton->registerBeanClass("jc\\verifier\\Email",'email') ;
+			$aSingleton->registerBeanClass("jc\\verifier\\Length",'length') ;
+			$aSingleton->registerBeanClass("jc\\verifier\\Number",'number') ;
 			
 			self::setSingleton($aSingleton,__CLASS__) ;
 		}
@@ -83,7 +83,7 @@ class BeanFactory extends Object
 	
 	/**
 	 * 通过传入的对象配置数组列表，创建一系列 IBean 对象
-	 * @return jc\bean\IBean
+	 * @return array
 	 */
 	public function createBeanArray(array &$arrConfigArray,$sKeyPrefix,$sDefaultClass=null,$sKeyAs='name') 
 	{
@@ -111,25 +111,15 @@ class BeanFactory extends Object
 			{
 				if( empty($arrConfig['class']) or empty($arrConfig['instance']) or empty($arrConfig['config']) )
 				{
-					$arrModelConfig['class'] = $sDefaultClass ;
+					$arrConfig['class'] = $sDefaultClass ;
 				}
 			}
 			
-			$arrBeans[] = $this->createBean($arrModelConfig) ;
+			$arrBeans[] = $this->createBean($arrConfig) ;
 		}
 		
 		return $arrBeans ;
 	}
-	
-	/**
-	 * 通过传入的对象配置数组列表，创建一系列 IBean 对象
-	 * @return jc\bean\IBean
-	 */
-	public function createBeanArray(array &$arrConfigArray,$sKeyPrefix) 
-	{
-		
-	}
-	
 	
 	public function registerBeanClass($sClassName,$sAlias=null)
 	{

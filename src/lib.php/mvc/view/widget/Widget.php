@@ -17,7 +17,7 @@ use jc\lang\Object ;
 
 class Widget extends Object implements IViewWidget, IBean
 {	
-	public function __construct($sId=null,$sTemplateName,$sTitle=null,IView $aView=null)
+	public function __construct($sId=null,$sTemplateName=null,$sTitle=null,IView $aView=null)
 	{
 		parent::__construct() ;
 		

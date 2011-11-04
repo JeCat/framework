@@ -79,14 +79,14 @@ class View extends NamableComposite implements IView, IBean
     	
     	// -------------------------------
     	// views
-    	foreach($aBeanFactory->createBeanArray($arrConfig,'view.','jc\\mvc\\view\\View') as $aView)
+    	foreach($aBeanFactory->createBeanArray($arrConfig,'view:','jc\\mvc\\view\\View') as $aView)
 		{				
 			$this->add( $aView ) ;
 		}
     
     	// -------------------------------
     	// widgets
-    	foreach($aBeanFactory->createBeanArray($arrConfig,'widget.',null,'id') as $aWidget)
+    	foreach($aBeanFactory->createBeanArray($arrConfig,'widget:',null,'id') as $aWidget)
 		{
 			$arrConfig = $aWidget->beanConfig() ;
 			$this->addWidget( $aWidget, isset($arrConfig['exchange'])?$arrConfig['exchange']:null ) ;
