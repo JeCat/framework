@@ -37,7 +37,7 @@ class Inserter extends OperationStrategy
 		
 		// -----------------------------------
 		// insert 当前model
-		foreach($aPrototype->columnIterator() as $sClmName)
+		foreach($aModel->dataNameIterator() as $sClmName)
 		{
 			$aInsert->setData('`'.$sClmName.'`',$aModel->data($sClmName)) ;
 		}
@@ -146,12 +146,12 @@ class Inserter extends OperationStrategy
 				$value = $aModel->data($arrFromKeys[$nIdx]) ;
 				foreach ($aChildModel->childIterator() as $aChildChildModel)
 				{
-					$aChildChildModel->setData( $sKey, $value ) ;
+					$aChildChildModel->setData( $sKey, $value ,false) ;
 				}
 			}
 			else 
 			{
-				$aChildModel->setData( $sKey, $aModel->data($arrFromKeys[$nIdx]) ) ;			
+				$aChildModel->setData( $sKey, $aModel->data($arrFromKeys[$nIdx]) ,false) ;
 			}
 		}
 	}

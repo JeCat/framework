@@ -112,7 +112,8 @@ class Model extends AbstractModel implements IModel , IPaginal
 		// 通过 prototype 加载各字段数据
 		if( $aPrototype=$this->prototype() )
 		{
-			foreach( $aPrototype->columns() as $sClm )
+			$arrColumns = array_merge($aPrototype->columns(),$aPrototype->keys());
+			foreach( $arrColumns as $sClm )
 			{
 				$this->setData( $sClm, $aRecordSet->field($aPrototype->sqlColumnAlias($sClm)) ,false) ;
 			}
@@ -200,30 +201,14 @@ class Model extends AbstractModel implements IModel , IPaginal
 	
 	public function delete()
 	{
-		if($this->isAggregation())
+		if( $this->hasSerialized() )
 		{
-			foreach($this->childIterator() as $aChildModel)
-			{
-				if( !$aChildModel->delete() )
-				{
-					return false ;
-				}
-			}
-			
-			return true ;
+			return Deleter::singleton()->execute($this->db(), $this) ;	
 		}
 		
 		else 
 		{
-			if( $this->hasSerialized() )
-			{
-				return Deleter::singleton()->delete($this->db(), $this) ;	
-			}
-			
-			else 
-			{
-				return true ;
-			}
+			return true ;
 		}
 	}
 	
@@ -378,6 +363,12 @@ class Model extends AbstractModel implements IModel , IPaginal
 		return DB::singleton() ;
 	}
 	
+	/**
+	 * @notice 不会发生级连操作。
+	 * 既，如果$sName是外键，这个函数不会修改关联表中相应外键的值。
+	 * 需要开发者手动保持外键的同步问题。
+	 * 或者调用save()方法来保持同步。
+	 */
 	public function setData($sName,$sValue, $bStrikeChange=true)
 	{
 		// 原型中的别名

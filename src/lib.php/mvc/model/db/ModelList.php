@@ -32,6 +32,14 @@ class ModelList extends Model implements IModelList
 		}
 	}
 	
+	public function delete(){
+		foreach($this->childIterator() as $aChildModel){
+			if( !$aChildModel->delete() ){
+				return false ;
+			}
+		}
+		return true ;
+	}
 }
 
 ?>

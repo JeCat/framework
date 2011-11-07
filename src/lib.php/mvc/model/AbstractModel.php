@@ -100,9 +100,11 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 			{
 				$this->arrDatas = array ();
 			}
-			$this->arrDatas [$sName] = $sValue;
-			if($bStrikeChange){
-				$this->setChanged($sName);
+			if( $this->hasData($sName)===false or $this->data($sName) !== $sValue ){
+				$this->arrDatas [$sName] = $sValue;
+				if($bStrikeChange){
+					$this->setChanged($sName);
+				}
 			}
 		}
 	}

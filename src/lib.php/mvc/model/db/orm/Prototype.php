@@ -478,28 +478,34 @@ class Prototype
 			return $this->aStatementFactory ;
 		}
 	}
-	public function statementColumnNameHandle($sName)
+	public function statementColumnNameHandle($sName,\jc\db\sql\Statement $aStatement)
 	{
+		
 		// 自由输入的字段名，省略关系片段中第一个prototype的名字
 		if( substr($sName,0,1)!='`' )
 		{
-			// 切分 原型名称 和 字段名称
-			$pos = strrpos($sName,'.') ;
-			if($pos!==false)
-			{
-				$sPrototypeName = '.'.substr($sName,0,$pos) ;
-				$sDataName = substr($sName,$pos+1) ;
-			}
-			else 
-			{
-				$sPrototypeName = null ;
-				$sDataName = $sName ;
-			}
+			if($aStatement instanceof \jc\db\sql\Delete or $aStatement instanceof \jc\db\sql\Update){
+				// delete和Update不支持别名，不做名称转换
+				$sName = '`'.$sName.'`';
+			}else{
+				// 切分 原型名称 和 字段名称
+				$pos = strrpos($sName,'.') ;
+				if($pos!==false)
+				{
+					$sPrototypeName = '.'.substr($sName,0,$pos) ;
+					$sDataName = substr($sName,$pos+1) ;
+				}
+				else 
+				{
+					$sPrototypeName = null ;
+					$sDataName = $sName ;
+				}
 			
-			// 转换字段别名
-			// todo
+				// 转换字段别名
+				// todo
 			
-			$sName = '`'.$this->name()."{$sPrototypeName}`.`{$sDataName}`" ;
+				$sName = '`'.$this->name()."{$sPrototypeName}`.`{$sDataName}`" ;
+			}
 		}
 		
 		return array($sName) ;

@@ -1,15 +1,16 @@
 <?php
 namespace jc\db\sql\name ;
 
+use jc\db\sql\Statement;
 use jc\util\FilterMangeger;
 
 class NameTransfer 
 {
-	public function transColumn($sName)
+	public function transColumn($sName,Statement $aStatement)
 	{
 		if( $this->aColumnNameFilter )
 		{
-			list($sName) = $this->aColumnNameFilter->handle($sName) ;
+			list($sName) = $this->aColumnNameFilter->handle($sName,$aStatement) ;
 		}
 		
 		return $sName ;

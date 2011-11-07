@@ -55,7 +55,7 @@ class Selecter extends OperationStrategy
 		{
 			return ;
 		}
-		$aModel->loadData($aRecordset) ;
+		$aModel->loadData($aRecordset,true) ;
 		
 		
 		// -----------------
@@ -246,7 +246,8 @@ class Selecter extends OperationStrategy
 	private function addColumnsForOneToOne(Select $aSelect,Prototype $aPrototype,& $arrMultitermAssociations)
 	{
 		// add columns for pass in prototype
-		foreach($aPrototype->columns() as $sColumnName)
+		$arrColumns = array_merge($aPrototype->columns() , $aPrototype->keys());
+		foreach($arrColumns as $sColumnName)
 		{
 			$aSelect->addColumn(
 				'`'.$aPrototype->sqlTableAlias().'`.`'.$sColumnName.'`'
