@@ -40,6 +40,16 @@ class ModelList extends Model implements IModelList
 		}
 		return true ;
 	}
+	
+	public function save()
+	{
+		foreach($this->childIterator() as $aChildModel){
+			if( !$aChildModel->save() ){
+				return false ;
+			}
+		}
+		return true ;
+	}
 }
 
 ?>

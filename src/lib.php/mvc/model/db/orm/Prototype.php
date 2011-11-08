@@ -385,7 +385,7 @@ class Prototype
 		
 		if(!$bFull)
 		{
-			array_pop($bFull) ;
+			array_pop($arrPath) ;
 		}
 				
 		return implode('.',array_reverse($arrPath)) ;

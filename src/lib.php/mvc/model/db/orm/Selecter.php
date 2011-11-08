@@ -100,8 +100,8 @@ class Selecter extends OperationStrategy
 		{
 			$aRestraction = $this->makeResrictionForAsscotion(
 					$aFromModel
-					, $aToPrototype->fromKeys()
-					, $aToPrototype->full(false)
+					, $aMultitermAssoc->fromKeys()
+					, $aToPrototype->sqlTableAlias()
 					, $aMultitermAssoc->toKeys()
 					, $aFromPrototype->statementFactory()
 			) ;

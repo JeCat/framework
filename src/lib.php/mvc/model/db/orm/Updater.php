@@ -5,6 +5,7 @@ namespace jc\mvc\model\db\orm;
 use jc\lang\Object;
 use jc\db\DB;
 use jc\mvc\model\db\IModel ;
+use jc\mvc\model\IModelList;
 use jc\db\sql\StatementFactory ;
 use jc\lang\Exception;
 
