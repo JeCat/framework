@@ -151,7 +151,7 @@ class Model extends AbstractModel implements IModel , IPaginal
 		$selectCriteria = null;//一个临时的Criteria对象，仅在此次load中有效。load结束后立即销毁。
 		if($values){
 			if(!$keys){
-				$keys = $this->prototype()->primaryKeys() ;
+				$keys = $this->prototype()->keys() ;
 			}else{
 				$keys = (array)$keys;
 			}

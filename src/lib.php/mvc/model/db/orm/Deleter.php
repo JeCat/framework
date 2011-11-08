@@ -72,7 +72,7 @@ class Deleter extends Object{
     
     protected function deleteBridge(DB $aDB,Association $aAssociation,IModel $aFromModel,IModel $aToModel){
     	$aStatementFactory = $aAssociation->fromPrototype()->statementFactory() ;
-    	$aDeleteForBridge = $aStatementFactory->createDelect($aAssociation->bridgeTableName());
+    	$aDeleteForBridge = $aStatementFactory->createDelete($aAssociation->bridgeTableName());
     	$aDeleteForBridge->criteria()->restriction()->add(
     		$this->makeRestrictionForAssocotion($aFromModel,$aAssociation->fromKeys(),null,$aAssociation->toBridgeKeys(),$aStatementFactory)
     	);
