@@ -32,6 +32,41 @@ class ModelList extends Model implements IModelList
 		}
 	}
 	
+	public function delete(){
+		foreach($this->childIterator() as $aChildModel){
+			if( !$aChildModel->delete() ){
+				return false ;
+			}
+		}
+		return true ;
+	}
+	
+	public function save()
+	{
+		foreach($this->childIterator() as $aChildModel){
+			if( !$aChildModel->save() ){
+				return false ;
+			}
+		}
+		return true ;
+	}
+	
+	public function createChild($bAdd=true)
+	{
+		if( !$this->prototype() )
+		{
+			throw new Exception("模型没有缺少对应的原型，无法为其创建子模型") ;
+		}
+		
+		$aChild = $this->prototype()->createModel(false) ;
+		
+		if($bAdd)
+		{
+			$this->addChild($aChild) ;
+		}
+		
+		return $aChild ;
+	}
 }
 
 ?>

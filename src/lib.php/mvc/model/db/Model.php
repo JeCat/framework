@@ -112,9 +112,10 @@ class Model extends AbstractModel implements IModel , IPaginal
 		// 通过 prototype 加载各字段数据
 		if( $aPrototype=$this->prototype() )
 		{
-			foreach( $aPrototype->columns() as $sClm )
+			$arrColumns = array_merge($aPrototype->columns(),$aPrototype->keys());
+			foreach( $arrColumns as $sClm )
 			{
-				$this->setData( $sClm, $aRecordSet->field($aPrototype->sqlColumnAlias($sClm)) ) ;
+				$this->setData( $sClm, $aRecordSet->field($aPrototype->sqlColumnAlias($sClm)) ,false) ;
 			}
 			
 			// 加载所有单属关系的子模型
@@ -133,7 +134,7 @@ class Model extends AbstractModel implements IModel , IPaginal
 			$arrRow = $aRecordSet->current() ;
 			foreach ($arrRow as $sClmName=>&$sValue)
 			{
-				$this->setData($sClmName,$sValue) ;
+				$this->setData($sClmName,$sValue,false) ;
 			}
 		}
 		
@@ -147,121 +148,68 @@ class Model extends AbstractModel implements IModel , IPaginal
 	
 	public function load($values=null,$keys=null)
 	{
+		$selectCriteria = null;//一个临时的Criteria对象，仅在此次load中有效。load结束后立即销毁。
 		if($values){
 			if(!$keys){
-				$keys = $this->prototype()->primaryKeys() ;
+				$keys = $this->prototype()->keys() ;
 			}else{
 				$keys = (array)$keys;
 			}
 			if($values instanceof Criteria){
-				$this->aCriteria = $values;
+				$selectCriteria = $values;
 			}else if($values instanceof Restriction){
-				$aCriteria = $this->criteria() ;
-				$aCriteria->restriction()->add($values);
+				$selectCriteria = clone $this->criteria() ;
+				$selectCriteria->restriction()->add($values);
 			}else{
 				$values = array_values((array) $values) ;
-				$aCriteria = $this->criteria() ;
+				$selectCriteria = clone $this->criteria();
 				foreach($keys as $nIdx=>$sKey)
 				{
-					$aCriteria->restriction()->eq( $sKey, $values[$nIdx] ) ;
+					$selectCriteria->restriction()->eq( $sKey, $values[$nIdx] ) ;
 				}
 			}
 		}
-		
-		return Selecter::singleton()->execute( $this->db(), $this, $this->aCriteria ) ;
+		$this->setSerialized(true);
+		$this->clearChanged();
+		return Selecter::singleton()->execute( $this->db(), $this, null,$selectCriteria ) ;
 	}
 	
 	public function save()
 	{
-		if($this->isAggregation())
+		// update
+		if( $this->hasSerialized() )
 		{
-			foreach($this->childIterator() as $aChildModel)
-			{
-				if( !$aChildModel->save() )
-				{
-					return false ;
-				}
-			}
-			
-			return true ;
+			return $this->update() ;
 		}
 		
+		// insert
 		else 
 		{
-			// update
-			if( $this->hasSerialized() )
-			{
-				return $this->update() ;
-			}
-			
-			// insert
-			else 
-			{
-				return $this->insert() ;
-			}
+			return $this->insert() ;
 		}
 	}
 
-	public function insert()
+	protected function insert()
 	{
-		return Inserter::singleton()->insert($this->db(), $this) ;
+		return Inserter::singleton()->execute($this->db(), $this) ;
 	}
 	
-	public function update()
+	protected function update()
 	{
-		return Updater::singleton()->update($this->db(), $this) ;
+		return Updater::singleton()->execute($this->db(), $this) ;
 	}
 	
 	public function delete()
 	{
-		if($this->isAggregation())
+		if( $this->hasSerialized() )
 		{
-			foreach($this->childIterator() as $aChildModel)
-			{
-				if( !$aChildModel->delete() )
-				{
-					return false ;
-				}
-			}
-			
-			return true ;
+			return Deleter::singleton()->execute($this->db(), $this) ;	
 		}
 		
 		else 
 		{
-			if( $this->hasSerialized() )
-			{
-				return Deleter::singleton()->delete($this->db(), $this) ;	
-			}
-			
-			else 
-			{
-				return true ;
-			}
+			return true ;
 		}
-	}
-	
-	
-	
-	public function createChild($bAdd=true,$bTearoutPrototype=true)
-	{
-		if( !$this->aPrototype )
-		{
-			throw new Exception("模型没有缺少对应的原型，无法为其创建子模型") ;
-		}
-		if( !$this->isAggregation() )
-		{
-			throw new Exception("模型(%s)不是一个聚合模型，无法为其创建子模型",$this->aPrototype->name()) ;
-		}
-		
-		$aChild = $this->aPrototype->createModel($bTearoutPrototype) ;
-		
-		if($bAdd)
-		{
-			$this->addChild($aChild) ;
-		}
-		
-		return $aChild ;
 	}
 	
 	public function loadChild($values=null,$keys=null)
@@ -392,7 +340,13 @@ class Model extends AbstractModel implements IModel , IPaginal
 		return DB::singleton() ;
 	}
 	
-	public function setData($sName,$sValue)
+	/**
+	 * @notice 不会发生级连操作。
+	 * 既，如果$sName是外键，这个函数不会修改关联表中相应外键的值。
+	 * 需要开发者手动保持外键的同步问题。
+	 * 或者调用save()方法来保持同步。
+	 */
+	public function setData($sName,$sValue, $bStrikeChange=true)
 	{
 		// 原型中的别名
 		if( $this->aPrototype )
@@ -404,7 +358,7 @@ class Model extends AbstractModel implements IModel , IPaginal
 			}
 		}
 		
-		parent::setData($sName,$sValue) ;
+		parent::setData($sName,$sValue, $bStrikeChange) ;
 	}
 	
 	public function setChanged($sName,$bChanged=true)
