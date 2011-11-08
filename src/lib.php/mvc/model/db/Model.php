@@ -15,7 +15,6 @@ use jc\mvc\model\db\orm\Association;
 use jc\mvc\model\AbstractModel ;
 use jc\mvc\model\IPaginal;
 use jc\mvc\model\db\orm\Prototype;
-use jc\mvc\model\IModelList ;
 
 class Model extends AbstractModel implements IModel , IPaginal
 {
@@ -211,29 +210,6 @@ class Model extends AbstractModel implements IModel , IPaginal
 		{
 			return true ;
 		}
-	}
-	
-	
-	
-	public function createChild($bAdd=true,$bTearoutPrototype=true)
-	{
-		if( !$this->aPrototype )
-		{
-			throw new Exception("模型没有缺少对应的原型，无法为其创建子模型") ;
-		}
-		if( ! ($this instanceof IModelList ) )
-		{
-			throw new Exception("模型(%s)不是一个聚合模型，无法为其创建子模型",$this->aPrototype->name()) ;
-		}
-		
-		$aChild = $this->aPrototype->createModel($bTearoutPrototype) ;
-		
-		if($bAdd)
-		{
-			$this->addChild($aChild) ;
-		}
-		
-		return $aChild ;
 	}
 	
 	public function loadChild($values=null,$keys=null)

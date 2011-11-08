@@ -3,7 +3,7 @@ namespace jc\mvc\model ;
 
 interface IModelList
 {
-	// nothing here
+	public function createChild($bAdd=true);
 }
 
 ?>

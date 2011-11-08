@@ -50,6 +50,23 @@ class ModelList extends Model implements IModelList
 		}
 		return true ;
 	}
+	
+	public function createChild($bAdd=true)
+	{
+		if( !$this->prototype() )
+		{
+			throw new Exception("模型没有缺少对应的原型，无法为其创建子模型") ;
+		}
+		
+		$aChild = $this->prototype()->createModel(false) ;
+		
+		if($bAdd)
+		{
+			$this->addChild($aChild) ;
+		}
+		
+		return $aChild ;
+	}
 }
 
 ?>
