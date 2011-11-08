@@ -4,68 +4,103 @@ namespace jc\mvc\view\widget;
 use jc\mvc\view\IView;
 use jc\lang\Exception;
 
-class CheckBtn extends FormWidget {
+class CheckBtn extends FormWidget
+{
 	const radio = 0;
 	const checkbox = 1;
 	
 	private static $nTypeMin = 0;
 	private static $nTypeMax = 1;
 	
-	public function __construct($sId, $sTitle, $sValue, $nType = self::checkbox, $bChecked = false, IView $aView = null) {
-		if (! is_int ( $nType ) || $nType < self::$nTypeMin || $nType > self::$nTypeMax) {
+	public function __construct($sId = null, $sTitle = null, $sValue = null, $nType = self::checkbox, $bChecked = false, IView $aView = null)
+	{
+		if (! is_int ( $nType ) || $nType < self::$nTypeMin || $nType > self::$nTypeMax)
+		{
 			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的type参数(得到的type是:%s)", array ($nType ) );
 		}
 		
 		$this->checkedValue = $sValue;
 		
-		if ($bChecked) {
-			$this->setChecked (true) ;
+		if ($bChecked)
+		{
+			$this->setChecked ( true );
 		}
 		
 		$this->nType = $nType;
 		parent::__construct ( $sId, 'jc:WidgetCheckBtn.template.html', $sTitle, $aView );
 	}
 	
-	public function setType($nType) {
-		if (! is_int ( $nType ) || $nType < self::$nTypeMin || $nType > self::$nTypeMax) {
+	public function build(array & $arrConfig)
+	{
+		parent::build ( $arrConfig );
+		
+		if (array_key_exists ( 'type', $arrConfig ))
+		{
+			switch ($arrConfig ['type'])
+			{
+				case "checkbox" :
+					$this->setType ( self::checkbox );
+					break;
+				case "radio" :
+					$this->setType ( self::radio );
+					break;
+			}
+		}
+	}
+	
+	public function setType($nType)
+	{
+		if (! is_int ( $nType ) || $nType < self::$nTypeMin || $nType > self::$nTypeMax)
+		{
 			throw new Exception ( "调用" . __CLASS__ . "的" . __METHOD__ . "方法时使用了非法的type参数(得到的type是:%s)", array ($nType ) );
 		}
 		$this->nType = $nType;
 	}
 	
-	public function type() {
+	public function type()
+	{
 		return $this->nType;
 	}
 	
-	public function setChecked($bChecked=true) {
-		if ($bChecked) {
+	public function setChecked($bChecked = true)
+	{
+		if ($bChecked)
+		{
 			$this->setValue ( $this->checkedValue );
-		} else {
+		}
+		else
+		{
 			$this->setValue ( '' );
 		}
 	}
 	
-	public function checkedValue() {
+	public function checkedValue()
+	{
 		return $this->checkedValue;
 	}
 	
-	public function setCheckedValue($sValue) {
+	public function setCheckedValue($sValue)
+	{
 		$sValue = ( string ) $sValue;
-		if (empty ( $sValue )) {
+		if (empty ( $sValue ))
+		{
 			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的checked参数(得到的checked是:%s)", array ($sValue ) );
 		}
 		$this->checkedValue = $sValue;
 	}
 	
-	public function isChecked() {
+	public function isChecked()
+	{
 		return $this->value () !== null and $this->value () == $this->checkedValue;
 	}
 	
-	public function isRadio() {
+	public function isRadio()
+	{
 		return $this->nType == self::radio;
 	}
 	
-	public function isCheckBox() {
+	public function isCheckBox()
+	{
 		return $this->nType == self::checkbox;
 	}
 	

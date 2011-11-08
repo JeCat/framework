@@ -1,6 +1,7 @@
 <?php
 namespace jc\mvc\view\widget;
 
+use jc\bean\BeanFactory;
 use jc\mvc\view\IView;
 use jc\lang\Assert;
 use jc\lang\Type;
@@ -11,14 +12,27 @@ use jc\util\IHashTable;
 use jc\ui\UI;
 
 class Group extends FormWidget {
-	public function __construct($sId, $sTitle = null, IView $aView = null) {
+	public function __construct($sId=null, $sTitle = null, IView $aView = null) {
 		$this->setSerializMethod ( array (__CLASS__, 'serialize' ), array (',', '=' ) );
 		$this->setUnSerializMethod ( array (__CLASS__, 'unserialize' ), array (',', '=' ) );
 		parent::__construct ( $sId, null, $sTitle, $aView );
 	}
 	
+	public function build(array & $arrConfig)
+	{
+		parent::build ( $arrConfig );
+		
+		// widgets
+    	foreach(BeanFactory::singleton()->createBeanArray($arrConfig,'widget:',null,'id') as $aWidget)
+		{
+			$arrConfig = $aWidget->beanConfig() ;
+			$this->addWidget( $aWidget, isset($arrConfig['exchange'])?$arrConfig['exchange']:null ) ;
+		}
+	}
+	
 	//添加控件
 	public function addWidget(IViewWidget $aWidget) {
+		$aWidget->setFormName ( $this->formName () );
 		$this->arrWidgets [] = $aWidget;
 	}
 	
@@ -26,6 +40,15 @@ class Group extends FormWidget {
 	public function removeWidget(IView $aWidget) {
 		if (($nKey = array_search ( $aWidget, $this->arrWidgets, true )) !== false) {
 			unset ( $this->arrWidgets [$nKey] );
+		}
+	}
+	
+	//当把当前的group对象添加到view中时,同时把group的子对象也添加到view中去,这样无论group什么时候添加子widget,view对象都可以准确的添加group的子控件
+	public function setView(IView $aView)
+	{
+		parent::setView($aView);
+		foreach ( $this->widgetIterator() as $aWidget ) {
+			$aView->addWidget($aWidget);
 		}
 	}
 	

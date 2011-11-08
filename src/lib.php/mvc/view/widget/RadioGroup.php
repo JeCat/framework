@@ -11,8 +11,13 @@ use jc\ui\UI;
 use jc\mvc\view\widget\CheckBtn;
 
 class RadioGroup extends Group {
-	public function __construct($sId, $sTitle = null, IView $aView = null) {
+	public function __construct($sId=null, $sTitle = null, IView $aView = null) {
 		parent::__construct ( $sId, $sTitle, $aView );
+	}
+	
+	public function build(array & $arrConfig)
+	{
+		parent::build ( $arrConfig );
 	}
 	
 	public function createRadio( $sId = null ,$sTitle, $sValue, $bChecked = false, IView $aView = null) {
@@ -50,15 +55,6 @@ class RadioGroup extends Group {
 		}
 		if (($nKey = array_search ( $aWidget, $this->arrWidgets, true )) !== false) {
 			unset ( $this->arrWidgets [$nKey] );
-		}
-	}
-	
-	//当把当前的radiogroup对象添加到view中时,同时把radiogroup的子对象也添加到view中去,这样无论radiogroup什么时候creatradio,view对象都可以准确的添加radiogroup的子控件
-	public function setView(IView $aView)
-	{
-		parent::setView($aView);
-		foreach ( $this->widgetIterator() as $aWidget ) {
-			$aView->addWidget($aWidget);
 		}
 	}
 	

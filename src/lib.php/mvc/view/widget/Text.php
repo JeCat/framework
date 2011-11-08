@@ -15,7 +15,7 @@ class Text extends FormWidget
 	private static $nTypeMin = 0;
 	private static $nTypeMax = 3;
 	
-	public function __construct($sId=null, $sTitle = null, $sValue=null, $nType = self::single, IView $aView = null)
+	public function __construct($sId = null, $sTitle = null, $sValue = null, $nType = self::single, IView $aView = null)
 	{
 		$this->setType ( $nType );
 		$this->setValue ( $sValue );
@@ -24,67 +24,96 @@ class Text extends FormWidget
 	
 	public function build(array & $arrConfig)
 	{
-		parent::build($arrConfig) ;
+		parent::build ( $arrConfig );
 		
-		// todo ... 
-		
+		if (array_key_exists ( 'type', $arrConfig ))
+		{
+			switch ($arrConfig ['type'])
+			{
+				case "single" :
+					$this->setType ( self::single );
+					break;
+				case "password" :
+					$this->setType ( self::password );
+					break;
+				case "multiple" :
+					$this->setType ( self::multiple );
+					break;
+				case "hidden" :
+					$this->setType ( self::hidden );
+					break;
+			}
+		}
 	}
 	
-	public function type() {
+	public function type()
+	{
 		return $this->nType;
 	}
 	
-	public function typeForHtml() {
-		switch ($this->nType) {
-		    case self::single :
-		        return "text";
-		        break;
-		    case self::password :
-		        return "password";
-		        break;
-		    case self::hidden :
-		        return "hidden";
-		        break;
+	public function typeForHtml()
+	{
+		switch ($this->nType)
+		{
+			case self::single :
+				return "text";
+				break;
+			case self::password :
+				return "password";
+				break;
+			case self::hidden :
+				return "hidden";
+				break;
 		}
 		return $this->nType;
 	}
 	
-	public function setType($nType) {
-		if (! is_int ( $nType ) || $nType < self::$nTypeMin || $nType > self::$nTypeMax) {
+	public function setType($nType)
+	{
+		if (! is_int ( $nType ) || $nType < self::$nTypeMin || $nType > self::$nTypeMax)
+		{
 			throw new Exception ( "调用" . __CLASS__ . "对象的" . __METHOD__ . "方法时使用了非法的nType参数(得到的nType是:%s)", array ($nType ) );
 		}
 		$this->nType = $nType;
 	}
 	
-	public function setSingle($bSingle = true) {
+	public function setSingle($bSingle = true)
+	{
 		$this->nType = $bSingle ? self::single : self::multiple;
 	}
 	
-	public function isSingle() {
+	public function isSingle()
+	{
 		return $this->nType == self::single;
 	}
 	
-	public function isMultiple() {
+	public function isMultiple()
+	{
 		return $this->nType == self::multiple;
 	}
 	
-	public function setMultiple($bMul = true) {
+	public function setMultiple($bMul = true)
+	{
 		$this->nType = $bMul ? self::multiple : self::single;
 	}
 	
-	public function isPassword() {
+	public function isPassword()
+	{
 		return $this->nType == self::password;
 	}
 	
-	public function setPassword() {
+	public function setPassword()
+	{
 		$this->nType = self::password;
 	}
 	
-	public function isHidden() {
+	public function isHidden()
+	{
 		return $this->nType == self::hidden;
 	}
 	
-	public function setHidden() {
+	public function setHidden()
+	{
 		$this->nType = self::hidden;
 	}
 	

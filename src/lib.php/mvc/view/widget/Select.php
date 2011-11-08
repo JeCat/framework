@@ -1,12 +1,30 @@
 <?php
 namespace jc\mvc\view\widget;
 
+use jc\verifier\Length;
+
 use jc\lang\Exception;
 use jc\mvc\view\IView;
 
 class Select extends FormWidget {
-	public function __construct($sId, $sTitle = null, IView $aView = null) {
+	public function __construct($sId=null, $sTitle = null, IView $aView = null) {
 		parent::__construct ( $sId, 'jc:WidgetSelect.template.html', $sTitle, $aView );
+	}
+	
+	public function build(array & $arrConfig)
+	{
+		parent::build ( $arrConfig );
+		
+		if (array_key_exists ( 'options', $arrConfig ))
+		{
+			foreach((array)$arrConfig['options'] as $arrOption){
+				if(count($arrOption) > 2){
+					$this->addOption($arrOption[0],$arrOption[1],$arrOption[2]);
+				}else{
+					$this->addOption($arrOption[0],$arrOption[1]);
+				}
+			}
+		}
 	}
 	
 	//增加option条目 

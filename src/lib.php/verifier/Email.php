@@ -12,10 +12,12 @@ class Email extends Object implements IVerifier {
 
 	public function build(array & $arrConfig)
 	{
+		$this->arrBeanConfig = $arrConfig;
 	}
 	
 	public function beanConfig()
 	{
+		return $this->arrBeanConfig;
 	}
 	
 	public function verify($data, $bThrowException) {
@@ -31,6 +33,8 @@ class Email extends Object implements IVerifier {
 		}
 		return true;
 	}
+	
+	private $arrBeanConfig;
 }
 
 ?>

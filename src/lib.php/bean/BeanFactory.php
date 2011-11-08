@@ -27,8 +27,10 @@ class BeanFactory extends Object
 			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\Text",'text') ;
 			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\Select",'select') ;
 			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\SelectList",'list') ;
-			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\CheckBtn",'checkbox') ;
+			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\CheckBtn",'checkbtn') ;
 			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\File",'file') ;
+			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\Group",'group') ;
+			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\RadioGroup",'radiogroup') ;
 			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\Paginator",'paginator') ;
 			
 			// verifyers

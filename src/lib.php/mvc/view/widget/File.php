@@ -14,82 +14,112 @@ use jc\fs\archive\DateAchiveStrategy;
 use jc\fs\IFile;
 use jc\fs\IFolder;
 
-class File extends FormWidget{
+class File extends FormWidget
+{
 	
-	public function __construct($sId, $sTitle = null , IFolder $aFolder , IAchiveStrategy $aAchiveStrategy = null ,  IView $aView = null) {
-		if (empty($aFolder)) {
-			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的aFolder参数(得到的aFolder是:%s类型)", array (Type::detectType($aFolder) ) );
-		}
-		
+	public function __construct($sId = null, $sTitle = null, IFolder $aFolder = null, IAchiveStrategy $aAchiveStrategy = null, IView $aView = null)
+	{
 		$this->aStoreFolder = $aFolder;
-		if($aAchiveStrategy == null){
-			$this->aAchiveStrategy = DateAchiveStrategy::flyweight(Array(true,true,true));
-		}else{
+		if ($aAchiveStrategy == null)
+		{
+			$this->aAchiveStrategy = DateAchiveStrategy::flyweight ( Array (true, true, true ) );
+		}
+		else
+		{
 			$this->aAchiveStrategy = $aAchiveStrategy;
 		}
 		parent::__construct ( $sId, 'jc:WidgetFileUpdate.template.html', $sTitle, $aView );
 	}
-
-	public function hasFile(){
-		if($this->value() != null){
+	
+	public function build(array & $arrConfig)
+	{
+		parent::build ( $arrConfig );
+		
+		if (array_key_exists ( 'folder', $arrConfig ))
+		{
+			$this->aStoreFolder = $this->application()->fileSystem()->findFolder($arrConfig['folder']);
+		}
+	}
+	
+	public function hasFile()
+	{
+		if ($this->value () != null)
+		{
 			return true;
-		}else{
+		}
+		else
+		{
 			return false;
 		}
 	}
 	
-	public function getFileName(){
-		if($this->value() == null){
+	public function getFileName()
+	{
+		if ($this->value () == null)
+		{
 			return '';
 		}
-		return $this->aAchiveStrategy->restoreOriginalFilename($this->value());
+		return $this->aAchiveStrategy->restoreOriginalFilename ( $this->value () );
 	}
 	
-	public function getFileUrl(){
-		if($this->value() instanceof IFile){
-			return $this->value()->httpURL();
-		}else{
+	public function getFileUrl()
+	{
+		if ($this->value () instanceof IFile)
+		{
+			return $this->value ()->httpURL ();
+		}
+		else
+		{
 			return '#';
 		}
 	}
 	
-	public function getFileSize(){
-		if($this->value() == null){
+	public function getFileSize()
+	{
+		if ($this->value () == null)
+		{
 			return '0字节';
 		}
-		return $this->value()->length().'字节';
-	}
-
-	public function setValue($data = null) {
-		Type::check("jc\\fs\\IFile", $data);
-		parent::setValue($data);
+		return $this->value ()->length () . '字节';
 	}
 	
-	public function valueToString() {
+	public function setValue($data = null)
+	{
+		Type::check ( "jc\\fs\\IFile", $data );
+		parent::setValue ( $data );
+	}
+	
+	public function valueToString()
+	{
 		
-		$aFile = $this->value() ;
-		if( !$aFile )
+		$aFile = $this->value ();
+		if (! $aFile)
 		{
-			return null ;
+			return null;
 		}
 		
-		if(!$this->aStoreFolder->exists())
+		if (empty ( $this->aStoreFolder ))
 		{
-			$this->aStoreFolder = $this->aStoreFolder->create();
+			throw new Exception ( "非法的路径属性,无法依赖此路径属性创建对应的文件夹对象" );
 		}
 		
-		$sStorePath = $this->aStoreFolder->path() ;
-		$nStorePathLen = strlen($sStorePath) ;
-		$sFilePath = $aFile->path() ;
+		if (! $this->aStoreFolder->exists ())
+		{
+			$this->aStoreFolder = $this->aStoreFolder->create ();
+		}
+		
+		$sStorePath = $this->aStoreFolder->path ();
+		$nStorePathLen = strlen ( $sStorePath );
+		$sFilePath = $aFile->path ();
 		
 		// 文件在存储目录内
-		if( substr($sFilePath,0,$nStorePathLen)==$sStorePath )
+		if (substr ( $sFilePath, 0, $nStorePathLen ) == $sStorePath)
 		{
-			return substr($sFilePath,$nStorePathLen + 1) ;
+			return substr ( $sFilePath, $nStorePathLen + 1 );
 		}
-		else 
+		else
 		{
-			return 	$sFilePath ;
+			return $sFilePath;
 		}
 	}
 	
@@ -97,99 +127,110 @@ class File extends FormWidget{
 	 * File::value() 的别名
 	 * 他不是File类的构造函数!!
 	 */
-	public function file(){
-		return $this->value() ;
+	public function file()
+	{
+		return $this->value ();
 	}
 	
 	public function moveToStoreFolder()
 	{
-		if(!$this->aStoreFolder->exists())
+		if (empty ( $this->aStoreFolder ))
 		{
-			$this->aStoreFolder = $this->aStoreFolder->create();
+			throw new Exception ( "非法的路径属性,无法依赖此路径属性创建对应的文件夹对象" );
+		}
+		
+		if (! $this->aStoreFolder->exists ())
+		{
+			$this->aStoreFolder = $this->aStoreFolder->create ();
 		}
 		
 		// 保存文件
-		$aSavedFile = $this->aAchiveStrategy->makeFilePath($this->aUploadedFile,$this->aStoreFolder);
+		$aSavedFile = $this->aAchiveStrategy->makeFilePath ( $this->aUploadedFile, $this->aStoreFolder );
 		
 		// 创建保存目录
-		if(!$aFolderOfSavedFile = $this->application()->fileSystem()->findFolder($aSavedFile)){
-			if(! $this->application()->fileSystem()->createFolder($aSavedFile)){
-				throw new Exception ( __CLASS__ . "的" . __METHOD__ . "在创建路径\"%s\"时出错" ,array($this->aStoreFolder->path()));
+		if (! $aFolderOfSavedFile = $this->application ()->fileSystem ()->findFolder ( $aSavedFile ))
+		{
+			if (! $this->application ()->fileSystem ()->createFolder ( $aSavedFile ))
+			{
+				throw new Exception ( __CLASS__ . "的" . __METHOD__ . "在创建路径\"%s\"时出错", array ($this->aStoreFolder->path () ) );
 			}
 		}
 		
-		$aSavedFile = $this->aUploadedFile->move($aSavedFile . $this->aAchiveStrategy->makeFilename($this->aUploadedFile)) ;
-		$this->setValue($aSavedFile) ;
+		$aSavedFile = $this->aUploadedFile->move ( $aSavedFile . $this->aAchiveStrategy->makeFilename ( $this->aUploadedFile ) );
+		$this->setValue ( $aSavedFile );
 		
-		return $aSavedFile ;
+		return $aSavedFile;
 	}
 	
 	public function setValueFromString($sData)
 	{
-		if(!$this->aStoreFolder->exists())
+		if (empty ( $this->aStoreFolder ))
 		{
-			$this->aStoreFolder = $this->aStoreFolder->create();
+			throw new Exception ( "非法的路径属性,无法依赖此路径属性创建对应的文件夹对象" );
+		}
+		if (! $this->aStoreFolder->exists ())
+		{
+			$this->aStoreFolder = $this->aStoreFolder->create ();
 		}
 		
-		$aFile = $this->aStoreFolder->findFile($sData);
-		if($aFile)
+		$aFile = $this->aStoreFolder->findFile ( $sData );
+		if ($aFile)
 		{
-			$this->setValue($aFile);
+			$this->setValue ( $aFile );
 		}
 		else
 		{
-			new Message(Message::error,'文件已丢失:%s',array($sData));
+			new Message ( Message::error, '文件已丢失:%s', array ($sData ) );
 		}
 	}
 	
 	public function setDataFromSubmit(IDataSrc $aDataSrc)
 	{
-		if( $this->aUploadedFile = $aDataSrc->get($this->formName()) )
+		if ($this->aUploadedFile = $aDataSrc->get ( $this->formName () ))
 		{
-			if(!$this->aUploadedFile instanceof IFile)
+			if (! $this->aUploadedFile instanceof IFile)
 			{
-				throw new Exception (
-						__METHOD__."() 请求中的%s数据必须是一个 jc\\fs\\IFile 对象，提供的是%s类型"
-						, array($this->formName(),Type::detectType($this->aUploadedFile))
-				);
+				throw new Exception ( __METHOD__ . "() 请求中的%s数据必须是一个 jc\\fs\\IFile 对象，提供的是%s类型", array ($this->formName (), Type::detectType ( $this->aUploadedFile ) ) );
 			}
 		}
 		
 		// 删除文件
-		if( $aOriginFile=$this->value() and ($this->aUploadedFile or $aDataSrc->get ($this->id().'_delete')) )
+		if ($aOriginFile = $this->value () and ($this->aUploadedFile or $aDataSrc->get ( $this->id () . '_delete' )))
 		{
-			if($aOriginFile->delete())
+			if ($aOriginFile->delete ())
 			{
-				parent::setValue(null);
-				new Message(Message::notice,'删除文件:%s',array($this->aAchiveStrategy->restoreOriginalFilename($aOriginFile)));
-			}else{
-				new Message(Message::error,'删除文件失败:%s',array($this->aAchiveStrategy->restoreOriginalFilename($aOriginFile)));
+				parent::setValue ( null );
+				new Message ( Message::notice, '删除文件:%s', array ($this->aAchiveStrategy->restoreOriginalFilename ( $aOriginFile ) ) );
+			}
+			else
+			{
+				new Message ( Message::error, '删除文件失败:%s', array ($this->aAchiveStrategy->restoreOriginalFilename ( $aOriginFile ) ) );
 			}
 		}
 		
 		// move file, and setValue
-		if( $this->aUploadedFile && $this->aUploadedFile->exists())
+		if ($this->aUploadedFile && $this->aUploadedFile->exists ())
 		{
-			$this->setValue($this->moveToStoreFolder()) ;
+			$this->setValue ( $this->moveToStoreFolder () );
 		}
 	}
-
+	
 	public function verifyData()
 	{
-		if( !parent::verifyData() )
+		if (! parent::verifyData ())
 		{
 			// 删除widget中的文件
-			if( $aFile = $this->value() )
+			if ($aFile = $this->value ())
 			{
-				$aFile->delete() ;
-				$this->setValue(null) ;
+				$aFile->delete ();
+				$this->setValue ( null );
 			}
 			
-			return false ;
+			return false;
 		}
-		else 
+		else
 		{
-			return true ;
+			return true;
 		}
 	}
 	
@@ -203,7 +244,7 @@ class File extends FormWidget{
 	/**
 	 * @var	jc\fs\IFile
 	 */
-	private $aUploadedFile ;
+	private $aUploadedFile;
 }
 
 ?>

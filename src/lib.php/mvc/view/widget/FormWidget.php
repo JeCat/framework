@@ -62,11 +62,12 @@ class FormWidget extends Widget implements IViewFormWidget
 			$this->addVerifier(
 				$aVerifier
 				, isset($arrConfig['word'])? $arrConfig['word']: null
-				
 				, isset($arrConfig['callback'])? $arrConfig['callback']: null
 				, isset($arrConfig['callback.argvs'])? $arrConfig['callback.argvs']: null
 			) ;
 		}
+		
+//		$this->arrBeanConfig = $arrConfig ;
 	}
 	
 	public function value()

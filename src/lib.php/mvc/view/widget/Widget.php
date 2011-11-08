@@ -1,6 +1,7 @@
 <?php
 namespace jc\mvc\view\widget ;
 
+use jc\bean\BeanFactory;
 use jc\bean\IBean;
 use jc\resrc\HtmlResourcePool;
 use jc\util\StopFilterSignal;

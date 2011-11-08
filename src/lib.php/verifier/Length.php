@@ -16,12 +16,12 @@ class Length extends Object implements IVerifier, IBean
 
 	public function build(array & $arrConfig)
 	{
-		
+		$this->arrConfig = $arrConfig;
 	}
 	
 	public function beanConfig()
 	{
-		
+		return $this->arrConfig;
 	}
 	
 	public function verify($data,$bThrowException)
@@ -64,6 +64,7 @@ class Length extends Object implements IVerifier, IBean
 		return true ;
 	}
 
+	private $arrConfig = array();
 	private $bAllowEmpty = true ;
 	private $nMaxLen = -1 ;
 	private $nMinLen = -1 ;
