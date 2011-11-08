@@ -4,7 +4,7 @@ namespace jc\resrc ;
 use jc\fs\IFolder;
 use jc\lang\Object;
 
-class ResourceManager extends Object implements IResourceManager
+class ResourceManager extends Object
 {
 	public function addFolder(IFolder $aFolder,$sNamespace='*')
 	{

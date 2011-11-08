@@ -1,6 +1,9 @@
 <?php
 namespace jc\system ;
 
+use jc\lang\Exception;
+
+use jc\setting\imp\FsSetting;
 use jc\fs\imp\LocalFileSystem;
 use jc\fs\FileSystem;
 
@@ -62,6 +65,28 @@ class Application extends CoreApplication implements \Serializable
 			'/framework', LocalFileSystem::flyweight(\jc\PATH)
 		) ;
 	}
+
+    /**
+     * @return use jc\setting\Setting;
+     */
+    public function setting()
+    {
+    	if(!$this->aSetting)
+    	{ 
+    		if( !$aSettingFolder=$this->fileSystem()->findFolder("/settings") and !$aSettingFolder=$this->fileSystem()->createFolder("/settings") )
+    		{
+    			throw new Exception("无法在目录 /setting 中建立系统配置") ;
+    		}
+    		
+    		$this->aSetting = new FsSetting( $aSettingFolder ) ;
+    	}
+    	return $this->aSetting ;
+    }
+	
+    public function setSetting(Setting $aSetting)
+    {
+    	$this->aSetting = $aSetting ;
+    }
 	
 	public function applicationDir()
 	{
@@ -112,6 +137,8 @@ class Application extends CoreApplication implements \Serializable
 	private $sEntrance = '' ; 
 	
 	private $aFileSystem ;
+	
+	private $aSetting ;
 	
 	static private $aGlobalSingeltonInstance ; 
 }

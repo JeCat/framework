@@ -14,6 +14,8 @@ error_reporting(E_ALL & ~E_DEPRECATED) ;
 // 默认的时区
 date_default_timezone_set('Asia/Shanghai') ;
 
+// 编码
+header("Content-Type: text/html; charset=UTF-8") ;
 
 // 预加载类(Before Class Loader)
 require_once __DIR__."/src/lib.php/lang/IObject.php" ;

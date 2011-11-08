@@ -137,7 +137,10 @@ class UI extends JcObject
 		{
 			if(!$aCompiledFile)
 			{
-				$aCompiledFile = $this->sourceFileManager()->createCompiled($aSourceFile) ;
+				if( !$aCompiledFile = $this->sourceFileManager()->createCompiled($aSourceFile) )
+				{
+					throw new Exception("UI引擎在编译模板文件时遇到了错误，无法创建编译文件：%s",$aSourceFile->url()) ;
+				}
 			}
 			
 			$aObjectContainer = new ObjectContainer($sSourceFile,$sNamespace) ;

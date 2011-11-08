@@ -309,7 +309,7 @@ class Version
 	{
 		if(!self::VerifyFormat($sVersion))
 		{
-			throw new Exception('输入的字串'.$sVersion.'不是合法的版本号格式。');
+			throw new VersionExcetion('无效的版本号格式：%s',$sVersion);
 		}
 		
 		//@list($sVersion,$sCode) = explode(' ',$sVersion) ;

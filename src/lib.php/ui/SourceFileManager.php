@@ -4,6 +4,7 @@ namespace jc\ui ;
 
 use jc\fs\FileSystem;
 use jc\fs\IFile;
+use jc\fs\IFolder;
 use jc\resrc\ResourceManager;
 
 class SourceFileManager extends ResourceManager
@@ -51,7 +52,7 @@ class SourceFileManager extends ResourceManager
 		
 		if( $aCompiledFolder = $aFolder->property('compiled') )
 		{
-			$aCompiledFolder->createFile($this->compiledSubFolderName().'/'.$aSourceFile->name().'.php') ;
+			return $aCompiledFolder->createFile($this->compiledSubFolderName().'/'.$aSourceFile->name().'.php') ;
 		}
 		else
 		{
