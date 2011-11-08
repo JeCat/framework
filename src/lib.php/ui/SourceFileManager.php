@@ -8,6 +8,13 @@ use jc\resrc\ResourceManager;
 
 class SourceFileManager extends ResourceManager
 {
+	public function addFolder(IFolder $aFolder,IFolder $aCompiled=null,$sExtensionName=null)
+	{		
+		$aFolder->setProperty('compiled',$aCompiled) ;
+		
+		parent::addFolder($aFolder,$sExtensionName) ;
+	}
+	
 	public function isCompiledValid(IFile $aSourceFile,IFile $aCompiledFile)
 	{
 		if($this->bForceCompile)
@@ -23,7 +30,16 @@ class SourceFileManager extends ResourceManager
 	 */
 	public function findCompiled(IFile $aSourceFile)
 	{
-		return $aSourceFile->directory()->findFile('compileds/'.$this->compiledSubFolderName().'/'.$aSourceFile->name().'.php') ;	
+		$aFolder = $aSourceFile->directory() ;
+		
+		if( $aCompiledFolder = $aFolder->property('compiled') )
+		{
+			$aCompiledFolder->findFile($this->compiledSubFolderName().'/'.$aSourceFile->name().'.php') ;
+		}
+		else
+		{
+			return $aSourceFile->directory()->findFile('compileds/'.$this->compiledSubFolderName().'/'.$aSourceFile->name().'.php') ;	
+		}
 	}
 	
 	/**
@@ -31,7 +47,16 @@ class SourceFileManager extends ResourceManager
 	 */
 	public function createCompiled(IFile $aSourceFile)
 	{
-		return $aSourceFile->directory()->createFile('compileds/'.$this->compiledSubFolderName().'/'.$aSourceFile->name().'.php') ;		
+		$aFolder = $aSourceFile->directory() ;
+		
+		if( $aCompiledFolder = $aFolder->property('compiled') )
+		{
+			$aCompiledFolder->createFile($this->compiledSubFolderName().'/'.$aSourceFile->name().'.php') ;
+		}
+		else
+		{
+			return $aSourceFile->directory()->createFile('compileds/'.$this->compiledSubFolderName().'/'.$aSourceFile->name().'.php') ;		
+		}
 	}
 	
 	/**
