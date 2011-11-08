@@ -56,7 +56,7 @@ abstract class Statement extends Object
 	protected function transColumn($sColumn) {
 		if( $aNamer = $this->nameTransfer() )
 		{
-			$sColumn = $aNamer->transColumn($sColumn) ;
+			$sColumn = $aNamer->transColumn($sColumn,$this) ;
 		}
 		return NameTransfer::makeSureBackQuote ( strval($sColumn) );
 	}
