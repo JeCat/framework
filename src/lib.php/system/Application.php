@@ -1,8 +1,8 @@
 <?php
 namespace jc\system ;
 
+use jc\resrc\ResourceManager;
 use jc\lang\Exception;
-
 use jc\setting\imp\FsSetting;
 use jc\fs\imp\LocalFileSystem;
 use jc\fs\FileSystem;
@@ -97,6 +97,23 @@ class Application extends CoreApplication implements \Serializable
 	{
 		$this->sApplicationDir = FileSystem::formatPath($sFolder) ;
 	}
+	
+	/**
+	 * @return jc\resrc\ResourceManager
+	 */
+	public function publicFolders()
+	{
+		if( !$this->aPublicFolders )
+		{
+			$this->aPublicFolders = new ResourceManager() ;
+			if( !$aFolder=$this->fileSystem()->find('/framework/src/style') )
+			{
+				throw new Exception("目录 /framework/src/style 丢失，无法提供该目录下的文件") ;
+			}
+			$this->aPublicFolders->addFolder($aFolder,'jc') ;
+		}
+		return $this->aPublicFolders ;
+	}
 
 	/**
 	 * @return Application
@@ -139,6 +156,8 @@ class Application extends CoreApplication implements \Serializable
 	private $aFileSystem ;
 	
 	private $aSetting ;
+	
+	private $aPublicFolders ;
 	
 	static private $aGlobalSingeltonInstance ; 
 }

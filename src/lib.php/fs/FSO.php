@@ -144,7 +144,18 @@ abstract class FSO extends Object implements IFSO
 			return null ;
 		}
 		
-		return $sDirHttpUrl.'/'.basename($this->sInnerPath) ;
+		if( !$sName = $this->name() )
+		{
+			return $sDirHttpUrl ;
+		}
+		else 
+		{
+			if(substr($sDirHttpUrl,strlen($sDirHttpUrl)-1,1)!='/')
+			{
+				$sDirHttpUrl.= '/' ;
+			}
+			return $sDirHttpUrl. $sName ;
+		}
 	}
 	
 	public function setHttpUrl($sHttpUrl)
