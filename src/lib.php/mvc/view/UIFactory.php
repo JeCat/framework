@@ -57,7 +57,7 @@ class UIFactory extends UIFactoryBase
 	public function newSourceFileManager()
 	{
 		$aSrcMgr = parent::newSourceFileManager() ;
-		$aSrcMgr->addFolder($this->application()->fileSystem()->findFolder('/framework/src/template/'),'jc') ;
+		$aSrcMgr->addFolder($this->application()->fileSystem()->findFolder('/framework/src/template/'),null,'jc') ;
 		
 		return $aSrcMgr ;
 	}
