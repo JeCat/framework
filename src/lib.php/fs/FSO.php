@@ -209,6 +209,17 @@ abstract class FSO extends Object implements IFSO
 		return $ret;
 	}
 	
+	
+	public function property($sName)
+	{
+		return ($this->arrProperties and isset($this->arrProperties[$sName]))? $this->arrProperties[$sName]: null ; 
+	}
+	
+	public function setProperty($sName,$value)
+	{
+		$this->arrProperties[$sName] = $value ;
+	}
+	
 	private $sInnerPath = "" ;
 	private $aFileSystem ;
 	private $sName = "" ;
@@ -216,5 +227,7 @@ abstract class FSO extends Object implements IFSO
 	private $sExtname = "" ;
 	
 	private $sHttpUrl ;
+	
+	private $arrProperties ;
 }
 ?>

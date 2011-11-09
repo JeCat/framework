@@ -83,6 +83,12 @@ interface IFSO
 	public function httpUrl() ;
 	
 	public function setHttpUrl($sHttpUrl) ;
+	
+	
+	public function property($sName) ;
+	
+	public function setProperty($sName,$value) ;
+	
 }
 
 ?>
