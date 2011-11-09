@@ -71,7 +71,7 @@ abstract class ApplicationFactory extends Object
 		return $aApp ;
 	}
 
-	public function createClassLoader(CoreApplication $aApp)
+	public function createClassLoader(Application $aApp)
 	{
 		$aClassLoader = new ClassLoader(
 			$aApp->application()->fileSystem()->findFile("/classpath.php") 
@@ -81,24 +81,24 @@ abstract class ApplicationFactory extends Object
 		return $aClassLoader ;
 	}
 
-	public function createAccessRouter(CoreApplication $aApp)
+	public function createAccessRouter(Application $aApp)
 	{
 		$aAccessRouter = new AccessRouter('cn') ;
 		$aAccessRouter->setApplication($aApp) ;
 		return $aAccessRouter ;
 	}
 	
-	public function createLocaleManager(CoreApplication $aApp)
+	public function createLocaleManager(Application $aApp)
 	{
 		$aLocal = new \jc\locale\LocaleManager('cn') ;
 		$aLocal->setApplication($aApp) ;
 		return $aLocal ;
 	}
 	
-	abstract public function createRequest(CoreApplication $aApp) ;
+	abstract public function createRequest(Application $aApp) ;
 
 	
-	public function createResponse(CoreApplication $aApp,PrintStream $aPrinter)
+	public function createResponse(Application $aApp,PrintStream $aPrinter)
 	{
 		$aFilter = StdOutputFilterMgr::singleton() ;
 		$aFilter->setApplication($aApp) ;
