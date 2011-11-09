@@ -9,11 +9,11 @@ use jc\resrc\ResourceManager;
 
 class SourceFileManager extends ResourceManager
 {
-	public function addFolder(IFolder $aFolder,IFolder $aCompiled=null,$sExtensionName=null)
+	public function addFolder(IFolder $aFolder,IFolder $aCompiled=null,$sNamespace='*')
 	{		
 		$aFolder->setProperty('compiled',$aCompiled) ;
 		
-		parent::addFolder($aFolder,$sExtensionName) ;
+		parent::addFolder($aFolder,$sNamespace) ;
 	}
 	
 	public function isCompiledValid(IFile $aSourceFile,IFile $aCompiledFile)
