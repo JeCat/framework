@@ -67,7 +67,6 @@ class BeanFactory extends Object
 			{
 				throw new Exception("Bean对象配置数组中的 class 属性无效：%s，不存在该名称的类和别名",$arrConfig['class']) ;
 			}
-			var_dump($sClass);
 			if( !is_a($sClass,'jc\\bean\\IBean') )
 			{
 				throw new Exception("Bean对象配置数组中的 class 属性无效：%s，必须是一个实现 jc\\bean\\IBean 接口的类",$arrConfig['class']) ;

@@ -16,6 +16,14 @@ class Length extends Object implements IVerifier, IBean
 
 	public function build(array & $arrConfig)
 	{
+		if( !empty($arrConfig['nMinLen']) )
+		{
+			$this->nMinLen = (int)$arrConfig['nMinLen'] ;
+		}
+		if( !empty($arrConfig['nMaxLen']) )
+		{
+			$this->nMaxLen = (int)$arrConfig['nMaxLen'] ;
+		}
 		$this->arrConfig = $arrConfig;
 	}
 	

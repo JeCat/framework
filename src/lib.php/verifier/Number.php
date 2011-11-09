@@ -1,14 +1,30 @@
 <?php
 namespace jc\verifier;
 
+use jc\bean\IBean;
+
 use jc\message\Message;
 
 use jc\lang\Exception;
 use jc\lang\Object;
 
-class Number extends Object implements IVerifier {
+class Number extends Object implements IVerifier,IBean {
 	public function __construct($bInt = true) {
 		$this->bInt = (bool)$bInt;
+	}
+	
+	public function build(array & $arrConfig)
+	{
+		if( !empty($arrConfig['int']) )
+		{
+			$this->bInt = (bool)$arrConfig['integer'] ;
+		}
+		$this->arrBeanConfig = $arrConfig;
+	}
+	
+	public function beanConfig()
+	{
+		return $this->arrBeanConfig;
 	}
 	
 	public function verify($data, $bThrowException) {
@@ -33,6 +49,8 @@ class Number extends Object implements IVerifier {
 		return true;
 	}
 	private $bInt;
+	
+	private $arrBeanConfig = array();
 }
 
 ?>
