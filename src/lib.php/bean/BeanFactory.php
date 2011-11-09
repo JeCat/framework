@@ -21,6 +21,7 @@ class BeanFactory extends Object
 			// mvc
 			$aSingleton->registerBeanClass("jc\\mvc\\controller\\Controller","controller") ;
 			$aSingleton->registerBeanClass("jc\\mvc\\view\\View",'view') ;
+			$aSingleton->registerBeanClass("jc\\mvc\\view\\FormView",'form') ;
 			$aSingleton->registerBeanClass("jc\\mvc\\model\\db\\Model",'mode') ;
 			
 			// jecat widgets
@@ -66,7 +67,8 @@ class BeanFactory extends Object
 			{
 				throw new Exception("Bean对象配置数组中的 class 属性无效：%s，不存在该名称的类和别名",$arrConfig['class']) ;
 			}
-			if( is_a($sClass,'jc\\bean\\IBean') )
+			var_dump($sClass);
+			if( !is_a($sClass,'jc\\bean\\IBean') )
 			{
 				throw new Exception("Bean对象配置数组中的 class 属性无效：%s，必须是一个实现 jc\\bean\\IBean 接口的类",$arrConfig['class']) ;
 			}
@@ -111,7 +113,7 @@ class BeanFactory extends Object
 			// 默认的 model class
 			if($sDefaultClass)
 			{
-				if( empty($arrConfig['class']) or empty($arrConfig['instance']) or empty($arrConfig['config']) )
+				if( empty($arrConfig['class']) and empty($arrConfig['instance']) and empty($arrConfig['config']) )
 				{
 					$arrConfig['class'] = $sDefaultClass ;
 				}

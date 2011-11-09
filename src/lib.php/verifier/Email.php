@@ -1,12 +1,12 @@
 <?php
 namespace jc\verifier;
 
+use jc\bean\IBean;
 use jc\message\Message;
-
 use jc\lang\Exception;
 use jc\lang\Object;
 
-class Email extends Object implements IVerifier {
+class Email extends Object implements IVerifier ,IBean{
 	
 	public function __construct() {}
 
@@ -34,7 +34,7 @@ class Email extends Object implements IVerifier {
 		return true;
 	}
 	
-	private $arrBeanConfig;
+	private $arrBeanConfig = array();
 }
 
 ?>

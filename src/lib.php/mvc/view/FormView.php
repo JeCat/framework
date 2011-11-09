@@ -8,7 +8,7 @@ use jc\system\Request;
 
 class FormView extends View implements IFormView
 {
-	public function __construct($sName,$sSourceFilename=null,UI $aUI=null)
+	public function __construct($sName=null,$sSourceFilename=null,UI $aUI=null)
 	{
 		parent::__construct($sName,$sSourceFilename,$aUI) ;
 	}
@@ -63,7 +63,7 @@ class FormView extends View implements IFormView
 	{
 		if(!$this->sHtmlFormSignature)
 		{
-			$this->calculateHtmlFormFignature() ;			
+			$this->calculateHtmlFormFignature() ;
 		}
 		
 		return $this->sHtmlFormSignature ;
