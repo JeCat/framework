@@ -62,7 +62,7 @@ class View extends NamableComposite implements IView, IBean
      * 
      * @see jc\bean\IBean::build()
      */
-    public function build(array & $arrConfig)
+    public function build(array & $arrConfig,$sNamespace='*')
     {
     	if( empty($arrConfig['name']) )
     	{
@@ -72,6 +72,12 @@ class View extends NamableComposite implements IView, IBean
     	
     	if( !empty($arrConfig['template']) )
     	{
+    		// 在文件名前 加上命名空间
+    		if( $sNamespace!=='*' and strstr($arrConfig['template'],':')===false )
+    		{
+    			$arrConfig['template'] = $sNamespace.':'.$arrConfig['template'] ;
+    		}
+    		
     		$this->setSourceFilename($arrConfig['template']) ;
     	}
     	
@@ -79,14 +85,14 @@ class View extends NamableComposite implements IView, IBean
     	
     	// -------------------------------
     	// views
-    	foreach($aBeanFactory->createBeanArray($arrConfig,'view:','jc\\mvc\\view\\View') as $aView)
+    	foreach($aBeanFactory->createBeanArray($arrConfig,'view:','jc\\mvc\\view\\View','name',$sNamespace) as $aView)
 		{				
 			$this->add( $aView ) ;
 		}
     
     	// -------------------------------
     	// widgets
-    	foreach($aBeanFactory->createBeanArray($arrConfig,'widget:',null,'id') as $aWidget)
+    	foreach($aBeanFactory->createBeanArray($arrConfig,'widget:',null,'id',$sNamespace) as $aWidget)
 		{
 			$arrConfig = $aWidget->beanConfig() ;
 			$this->addWidget( $aWidget, isset($arrConfig['exchange'])?$arrConfig['exchange']:null ) ;

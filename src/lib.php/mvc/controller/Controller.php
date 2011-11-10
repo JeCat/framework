@@ -72,7 +72,7 @@ class Controller extends NamableComposite implements IController, IBean
      * 
      * @see jc\bean\IBean::build()
      */
-    public function build(array & $arrConfig)
+    public function build(array & $arrConfig,$sNamespace='*')
     {
     	if( isset($arrConfig['name']) )
     	{
@@ -89,21 +89,21 @@ class Controller extends NamableComposite implements IController, IBean
     	// -------------------------------
     	// models
     	$aModelContainer = $this->modelContainer() ;
-		foreach($aBeanFactory->createBeanArray($arrConfig,'model:','jc\\mvc\\model\\db\\Model') as $aModel)
+		foreach($aBeanFactory->createBeanArray($arrConfig,'model:','jc\\mvc\\model\\db\\Model','name',$sNamespace) as $aModel)
 		{				
 			$aModelContainer->add( $aModel ) ;
 		}
     
     	// -------------------------------
     	// views
-    	foreach($aBeanFactory->createBeanArray($arrConfig,'view:','jc\\mvc\\view\\View') as $aView)
+    	foreach($aBeanFactory->createBeanArray($arrConfig,'view:','jc\\mvc\\view\\View','name',$sNamespace) as $aView)
 		{				
 			$this->addView( $aView ) ;
 		}
     	
     	// -------------------------------
     	// controllers
-		foreach($aBeanFactory->createBeanArray($arrConfig,'controller:','jc\\mvc\\controller\\Controller') as $aController)
+		foreach($aBeanFactory->createBeanArray($arrConfig,'controller:','jc\\mvc\\controller\\Controller','name',$sNamespace) as $aController)
 		{				
 			$this->add( $aController ) ;
 		}

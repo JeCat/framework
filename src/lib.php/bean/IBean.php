@@ -9,7 +9,7 @@ interface IBean
 	 */
 	public function __construct() ;
 	
-	public function build(array & $arrConfig) ;
+	public function build(array & $arrConfig,$sNamespace='*') ;
 	
 	public function beanConfig() ;
 }

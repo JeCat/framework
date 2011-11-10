@@ -64,7 +64,7 @@ class Widget extends Object implements IViewWidget, IBean
      *   
      * @see jc\bean\IBean::build()
      */
-	public function build(array & $arrConfig)
+	public function build(array & $arrConfig,$sNamespace='*')
 	{
 		if( !empty($arrConfig['id']) )
 		{

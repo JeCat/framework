@@ -18,12 +18,12 @@ class Group extends FormWidget {
 		parent::__construct ( $sId, null, $sTitle, $aView );
 	}
 	
-	public function build(array & $arrConfig)
+	public function build(array & $arrConfig,$sNamespace='*')
 	{
-		parent::build ( $arrConfig );
+		parent::build ( $arrConfig, $sNamespace );
 		
 		// widgets
-    	foreach(BeanFactory::singleton()->createBeanArray($arrConfig,'widget:',null,'id') as $aWidget)
+    	foreach(BeanFactory::singleton()->createBeanArray($arrConfig,'widget:',null,'id',$sNamespace) as $aWidget)
 		{
 			$arrConfig = $aWidget->beanConfig() ;
 			$this->addWidget( $aWidget, isset($arrConfig['exchange'])?$arrConfig['exchange']:null ) ;

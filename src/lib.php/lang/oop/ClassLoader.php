@@ -14,7 +14,7 @@ use jc\lang\Assert;
 
 class ClassLoader extends Object
 {
-	const SEARCH_COMPILED = 1 ;			// 在编译文件中搜索类
+	const SEARCH_COMPILED = 1 ;		// 在编译文件中搜索类
 	const SEARCH_SOURCE = 2 ;			// 在源文件中搜索类
 	
 	const AUTO_COMPILE = 7 ;			// 搜索时自动编译	

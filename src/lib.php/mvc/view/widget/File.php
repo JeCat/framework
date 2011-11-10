@@ -31,9 +31,9 @@ class File extends FormWidget
 		parent::__construct ( $sId, 'jc:WidgetFileUpdate.template.html', $sTitle, $aView );
 	}
 	
-	public function build(array & $arrConfig)
+	public function build(array & $arrConfig,$sNamespace='*')
 	{
-		parent::build ( $arrConfig );
+		parent::build ( $arrConfig, $sNamespace );
 		
 		if (array_key_exists ( 'folder', $arrConfig ))
 		{

@@ -1,6 +1,7 @@
 <?php
 namespace jc\bean ;
 
+use jc\resrc\ResourceManager;
 use jc\lang\Type;
 use jc\lang\Exception;
 use jc\lang\Object;
@@ -49,17 +50,43 @@ class BeanFactory extends Object
 	 * 通过传入的对象配置数组，创建一个 IBean 对象
 	 * @return jc\bean\IBean
 	 */
-	public function createBean(array &$arrConfig) 
+	public function createBean(array &$arrConfig,$sNamespace='*') 
 	{
+		// instance 
 		if( !empty($arrConfig['instance']) )
-		{
-			
+		{			
+			if( !$aFile = $this->beanFolders()->find($arrConfig['instance'].'.instance.php') )
+			{
+				throw new Exception("Bean对象配置数组中的 instance 属性无效: %s，找不到指定的实例文件",$arrConfig['instance']) ;
+			}
+			return $aFile->includeFile(false,false) ;
 		}
+		
 		else if( !empty($arrConfig['config']) )
 		{
-			
+			$sConfigName = $arrConfig['config'] ;
+						
+			if( !$aFile = $this->beanFolders()->find($sConfigName.'.config.php') )
+			{
+				throw new Exception("Bean对象配置数组中的 config 属性无效: %s，找不到指定的配置文件",$sConfigName) ;
+			}
+			$arrConfigFile = $aFile->includeFile(false,false) ;
+			if( !is_array($arrConfigFile) )
+			{
+				throw new Exception("Bean对象配置文件内容无效: %s，文件必须返回一个 bean config 数组",$aFile->url()) ;
+			}
+
+			// 合并数组
+			$arrConfig = array_merge($arrConfigFile,$arrConfig) ;
+		
+			// 设置 namespace 
+			if( strstr($sConfigName,':')!==false )
+			{
+				list($sNamespace,) = explode(':', $sConfigName, 2) ;
+			}
 		}
-		else if( !empty($arrConfig['class']) )
+		
+		if( !empty($arrConfig['class']) )
 		{
 			$sClass = $this->beanClassNameByAlias($arrConfig['class']) ?: $arrConfig['class'];
 		
@@ -74,7 +101,7 @@ class BeanFactory extends Object
 			}
 			
 			$aBean = new $sClass ;
-			$aBean->build($arrConfig) ;
+			$aBean->build($arrConfig,$sNamespace) ;
 		}
 		
 		else 
@@ -89,8 +116,8 @@ class BeanFactory extends Object
 	 * 通过传入的对象配置数组列表，创建一系列 IBean 对象
 	 * @return array
 	 */
-	public function createBeanArray(array &$arrConfigArray,$sKeyPrefix,$sDefaultClass=null,$sKeyAs='name') 
-	{
+	public function createBeanArray(array &$arrConfigArray,$sKeyPrefix,$sDefaultClass=null,$sKeyAs='name',$sNamespace='*') 
+	{		
 		$arrBeans = array() ;
 		$nKeyPrefixLen = strlen($sKeyPrefix) ;
 		
@@ -119,7 +146,7 @@ class BeanFactory extends Object
 				}
 			}
 			
-			$arrBeans[] = $this->createBean($arrConfig) ;
+			$arrBeans[] = $this->createBean($arrConfig,$sNamespace) ;
 		}
 		
 		return $arrBeans ;
@@ -135,7 +162,21 @@ class BeanFactory extends Object
 		return isset($this->arrBeanClassAlias[$sAlias])? $this->arrBeanClassAlias[$sAlias]: null ;
 	}
 	
+	/**
+	 * @return jc\resrc\ResourceManager
+	 */
+	public function beanFolders()
+	{
+		if( !$this->aBeanFolders )
+		{
+			$this->aBeanFolders = new ResourceManager() ;
+		}
+		return $this->aBeanFolders ;
+	}
+	
 	private $arrBeanClassAlias = array() ;
+	
+	private $aBeanFolders ;
 }
 
 ?>

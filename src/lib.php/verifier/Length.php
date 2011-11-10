@@ -14,7 +14,7 @@ class Length extends Object implements IVerifier, IBean
 		$this->nMaxLen = $nMaxLen ;
 	}
 
-	public function build(array & $arrConfig)
+	public function build(array & $arrConfig,$sNamespace='*')
 	{
 		$this->arrConfig = $arrConfig;
 	}

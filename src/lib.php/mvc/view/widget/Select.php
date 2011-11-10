@@ -11,9 +11,9 @@ class Select extends FormWidget {
 		parent::__construct ( $sId, 'jc:WidgetSelect.template.html', $sTitle, $aView );
 	}
 	
-	public function build(array & $arrConfig)
+	public function build(array & $arrConfig,$sNamespace='*')
 	{
-		parent::build ( $arrConfig );
+		parent::build ( $arrConfig,$sNamespace );
 		
 		if (array_key_exists ( 'options', $arrConfig ))
 		{

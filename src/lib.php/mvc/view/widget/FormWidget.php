@@ -27,9 +27,9 @@ class FormWidget extends Widget implements IViewFormWidget
      *   
      * @see jc\bean\IBean::build()
      */
-	public function build(array & $arrConfig)
+	public function build(array & $arrConfig,$sNamespace='*')
 	{
-		parent::build($arrConfig) ;
+		parent::build($arrConfig,$sNamespace) ;
 	
 		if( array_key_exists('value',$arrConfig) )
 		{
@@ -55,7 +55,7 @@ class FormWidget extends Widget implements IViewFormWidget
 		// -------------------
 		// verifiers
     	$aBeanFactory = BeanFactory::singleton() ;
-    	foreach($aBeanFactory->createBeanArray($arrConfig,'verifier:',null,'class') as $aVerifier)
+    	foreach($aBeanFactory->createBeanArray($arrConfig,'verifier:',null,'class',$sNamespace) as $aVerifier)
 		{
 			$arrConfig = $aVerifier->beanConfig() ;
 			

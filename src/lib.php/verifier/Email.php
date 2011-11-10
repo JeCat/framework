@@ -10,7 +10,7 @@ class Email extends Object implements IVerifier ,IBean{
 	
 	public function __construct() {}
 
-	public function build(array & $arrConfig)
+	public function build(array & $arrConfig,$sNamespace='*')
 	{
 		$this->arrBeanConfig = $arrConfig;
 	}

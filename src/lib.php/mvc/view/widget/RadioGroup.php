@@ -15,9 +15,9 @@ class RadioGroup extends Group {
 		parent::__construct ( $sId, $sTitle, $aView );
 	}
 	
-	public function build(array & $arrConfig)
+	public function build(array & $arrConfig,$sNamespace='*')
 	{
-		parent::build ( $arrConfig );
+		parent::build ( $arrConfig, $sNamespace );
 	}
 	
 	public function createRadio( $sId = null ,$sTitle, $sValue, $bChecked = false, IView $aView = null) {

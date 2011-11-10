@@ -43,7 +43,7 @@ class ResourceManager extends Object
 	 */
 	public function find($sFilename,$sNamespace='*')
 	{
-		if( $sNamespace=='*' and strstr($sFilename,':')!==false )
+		if( strstr($sFilename,':')!==false )
 		{
 			list($sNamespace,$sFilename) = explode(':', $sFilename, 2) ;
 		}
