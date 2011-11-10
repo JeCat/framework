@@ -52,28 +52,28 @@ class BeanFactory extends Object
 	 */
 	public function createBean(array &$arrConfig,$sNamespace='*') 
 	{
-		// instance 
-		if( !empty($arrConfig['instance']) )
+		// ins 
+		if( !empty($arrConfig['ins']) )
 		{			
-			if( !$aFile = $this->beanFolders()->find($arrConfig['instance'].'.instance.php') )
+			if( !$aFile = $this->beanFolders()->find($arrConfig['ins'].'.ins.php') )
 			{
-				throw new Exception("Bean对象配置数组中的 instance 属性无效: %s，找不到指定的实例文件",$arrConfig['instance']) ;
+				throw new Exception("Bean对象配置数组中的 ins 属性无效: %s，找不到指定的实例文件",$arrConfig['ins']) ;
 			}
 			return $aFile->includeFile(false,false) ;
 		}
 		
-		else if( !empty($arrConfig['config']) )
+		else if( !empty($arrConfig['conf']) )
 		{
-			$sConfigName = $arrConfig['config'] ;
+			$sConfigName = $arrConfig['conf'] ;
 						
-			if( !$aFile = $this->beanFolders()->find($sConfigName.'.config.php') )
+			if( !$aFile = $this->beanFolders()->find($sConfigName.'.conf.php') )
 			{
-				throw new Exception("Bean对象配置数组中的 config 属性无效: %s，找不到指定的配置文件",$sConfigName) ;
+				throw new Exception("Bean对象配置数组中的 conf 属性无效: %s，找不到指定的配置文件",$sConfigName) ;
 			}
 			$arrConfigFile = $aFile->includeFile(false,false) ;
 			if( !is_array($arrConfigFile) )
 			{
-				throw new Exception("Bean对象配置文件内容无效: %s，文件必须返回一个 bean config 数组",$aFile->url()) ;
+				throw new Exception("Bean对象配置文件内容无效: %s，文件必须返回一个 bean 配置数组",$aFile->url()) ;
 			}
 
 			// 合并数组
@@ -106,7 +106,7 @@ class BeanFactory extends Object
 		
 		else 
 		{
-			throw new Exception("无法根据配置数组创建 Bean 对象，缺少必须的 instance, config 或 class 属性: %s。",var_export($arrConfig,true)) ;
+			throw new Exception("无法根据配置数组创建 Bean 对象，缺少必须的 ins, config 或 class 属性: %s。",var_export($arrConfig,true)) ;
 		}
 		
 		return $aBean ;
@@ -137,10 +137,10 @@ class BeanFactory extends Object
 				}
 			}
 			
-			// 默认的 model class
+			// 默认的 class
 			if($sDefaultClass)
 			{
-				if( empty($arrConfig['class']) and empty($arrConfig['instance']) and empty($arrConfig['config']) )
+				if( empty($arrConfig['class']) and empty($arrConfig['ins']) and empty($arrConfig['conf']) )
 				{
 					$arrConfig['class'] = $sDefaultClass ;
 				}
