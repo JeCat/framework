@@ -19,7 +19,7 @@ abstract class AbStractTableReflecter extends DBStructReflecter
 	 * Enter description here ...
 	 * @return \Iterator
 	 */
-	abstract public function columnNameIterator();
+	abstract public function columns();
 	
 	/**
 	 * 表是否存在(有效)

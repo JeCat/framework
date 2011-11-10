@@ -38,7 +38,7 @@ class Order extends SubStatement
 	 * @param string $sColumn 列名
 	 * @param boolen $bOrderType 排序方式,true代表ASC , false代表DESC ，默认为true
 	 */
-	public function add($sColumn , $bOrderType=true) {
+	public function add($sColumn , $bAsc=true) {
 		if($sColumn === null){
 			return;
 		}

@@ -1,25 +1,27 @@
 <?php
-namespace jc\mvc\model\db\orm\operators ;
 
+namespace jc\mvc\model\db\orm;
+
+use jc\mvc\model\IModelList;
+
+use jc\lang\Object;
 use jc\db\DB;
-use jc\mvc\model\db\IModel;
-use jc\mvc\model\db\orm\Association;
-use jc\db\sql\Insert;
+use jc\mvc\model\db\IModel ;
+use jc\db\sql\StatementFactory ;
 
 class Inserter extends OperationStrategy
 {
-	public function insert(DB $aDB, IModel $aModel) 
+    public function execute(DB $aDB, IModel $aModel)
 	{
 		$aPrototype = $aModel->prototype() ;
-		$aInsert = new Insert($aPrototype->tableName()) ;
+		$aInsert = $aPrototype->statementFactory()->createInsert($aPrototype->tableName()) ;
 		
 		// 从 belongs to model 中设置外键值
 		foreach($aPrototype->associations() as $aAssociation)
 		{				
-			if( $aAssociation->type()==Association::belongsTo )
+			if( $aAssociation->isType(Association::belongsTo) )
 			{
-				$aAssocModel = $aModel->child( $aAssociation->modelProperty() ) ;
-				if(!$aAssocModel)
+				if( !$aAssocModel=$aModel->child($aAssociation->name()) )
 				{
 					continue ;
 				}
@@ -35,7 +37,7 @@ class Inserter extends OperationStrategy
 		
 		// -----------------------------------
 		// insert 当前model
-		foreach($aPrototype->columnIterator() as $sClmName)
+		foreach($aModel->dataNameIterator() as $sClmName)
 		{
 			$aInsert->setData('`'.$sClmName.'`',$aModel->data($sClmName)) ;
 		}
@@ -43,13 +45,11 @@ class Inserter extends OperationStrategy
 		$aDB->execute( $aInsert->makeStatement() ) ;
 		
 		// 自增形主键
-		if( $aModel->data( $aPrototype->devicePrimaryKey() )===null )
+		if( $sDevicePrimaryKey=$aPrototype->devicePrimaryKey() and $aModel->data($sDevicePrimaryKey)===null )
 		{
-			$aModel->setData(
-				$aPrototype->devicePrimaryKey()
-				, $aDB->lastInsertId()
-			) ;
+			$aModel->setData( $sDevicePrimaryKey, $aDB->lastInsertId() ) ;
 		}
+		
 		
 		$aModel->setSerialized(true) ;
 		
@@ -57,7 +57,7 @@ class Inserter extends OperationStrategy
 		// insert 关联model
 		foreach($aPrototype->associations() as $aAssociation)
 		{
-			$aAssocModel = $aModel->child( $aAssociation->modelProperty() ) ;
+			$aAssocModel = $aModel->child( $aAssociation->name() ) ;
 			if(!$aAssocModel)
 			{
 				continue ;
@@ -90,7 +90,7 @@ class Inserter extends OperationStrategy
 			
 				break ;
 				
-			case Association::hasAndBelongsToMany :
+			case Association::hasAndBelongsTo :
 				
 				if( !$aAssocModel->save() )
 				{
@@ -110,22 +110,48 @@ class Inserter extends OperationStrategy
 		
 		return true ;
 	}
-	
+		
+	protected function buildBridge(DB $aDB,Association $aAssociation,IModel $aFromModel,IModel $aToModel)
+	{
+		$aStatementFactory = $aAssociation->fromPrototype()->statementFactory() ;
+		$aSelect = $aStatementFactory->createSelect($aAssociation->bridgeTableName()) ;
+		$aSelect->criteria()->restriction()->add(
+			$this->makeResrictionForAsscotion($aFromModel,$aAssociation->fromKeys(),null,$aAssociation->toBridgeKeys(),$aStatementFactory)
+		) ;
+		$aSelect->criteria()->restriction()->add(
+			$this->makeResrictionForAsscotion($aToModel,$aAssociation->toKeys(),null,$aAssociation->fromBridgeKeys(),$aStatementFactory)
+		) ;
+		
+		// 检查对应的桥接表记录是否存在
+		if( !$aDB->queryCount($aSelect) )
+		{
+			$aInsertForBridge = $aStatementFactory->createInsert($aAssociation->bridgeTableName()) ;
+			
+			// from table key vale
+			$this->setValue($aInsertForBridge,$aAssociation->toBridgeKeys(),$aAssociation->fromKeys(),$aFromModel) ;
+			
+			// to table key vale
+			$this->setValue($aInsertForBridge,$aAssociation->fromBridgeKeys(),$aAssociation->toKeys(),$aToModel) ;
+			
+			$aDB->execute($aInsertForBridge) ;
+		}
+	}
+
 	private function setAssocModelData(IModel $aModel,IModel $aChildModel,array $arrFromKeys,array $arrToKeys)
 	{
 		foreach($arrToKeys as $nIdx=>$sKey)
 		{
-			if( $aChildModel->isAggregation() )
+			if( $aChildModel instanceof IModelList )
 			{
 				$value = $aModel->data($arrFromKeys[$nIdx]) ;
 				foreach ($aChildModel->childIterator() as $aChildChildModel)
 				{
-					$aChildChildModel->setData( $sKey, $value ) ;
+					$aChildChildModel->setData( $sKey, $value ,false) ;
 				}
 			}
 			else 
 			{
-				$aChildModel->setData( $sKey, $aModel->data($arrFromKeys[$nIdx]) ) ;			
+				$aChildModel->setData( $sKey, $aModel->data($arrFromKeys[$nIdx]) ,false) ;
 			}
 		}
 	}

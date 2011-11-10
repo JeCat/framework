@@ -16,24 +16,39 @@ class Restriction extends SubStatement
 	 * @param $bFormat 是否添加换行以便阅读
 	 * @return string
 	 */
-	public function makeStatement($bFormat = false) {
+	public function makeStatement($bFormat = false)
+	{
 		//TODO format换行和缩进,增加可读性
 		$arrExpressions = array ();
-		foreach ( $this->arrExpressions as $express ) {
-			if ($express instanceof Restriction) {
+		foreach ( $this->arrExpressions as $express )
+		{
+			if ($express instanceof Restriction)
+			{
 				$sExpress = $express->makeStatement ($bFormat) ;
 				if($sExpress!='1')
 				{
 					$arrExpressions[] = $sExpress ;
 				}
-			} else {
+			}
+			else
+			{
 				$arrExpressions [] = $express;
 			}
 		}
-		return empty($arrExpressions)? '1': ('('.implode($this->sLogic,$arrExpressions).')');
+		
+		switch (count($arrExpressions))
+		{
+			case 0 :
+				return '1' ;
+			case 1 :
+				return $arrExpressions[0] ;
+			default :
+				return '('.implode($this->sLogic,$arrExpressions).')' ;
+		}
 	}
 	
-	public function checkValid($bThrowException = true) {
+	public function checkValid($bThrowException = true)
+	{
 		return true;
 	}
 	
@@ -278,6 +293,19 @@ class Restriction extends SubStatement
 	}
 	
 	/**
+	 * 把一个 Restriction 实例添加到条件集合中去.
+	 * @param self 被添加的Restriction对象
+	 * @return self 
+	 */
+	public function remove(self $aOtherRestriction) {
+		$nIdx = array_search($aOtherRestriction,$this->arrExpressions,true) ;
+		if($nIdx!==false)
+		{
+			unset($this->arrExpressions[$nIdx]) ;
+		}
+	}
+	
+	/**
 	 * 
 	 * 创建一个新的Restriction对象并把它作为条件语句的一部分添加到方法调用者中
 	 * @return self 被创建的Restriction对象
@@ -304,6 +332,17 @@ class Restriction extends SubStatement
 //		return "'" . $sStr . "'";
 //	}
 
+    function __clone(){
+        $arrTemp = $this->arrExpressions;
+        $this->arrExpressions = array();
+        foreach( $arrTemp as $tmp){
+            if(is_object($tmp)){
+                $this->arrExpressions [] = clone $tmp;
+            }else{
+                $this->arrExpressions [] = $tmp;
+            }
+        }
+    }
 	private $sLogic = ' AND ';
 	
 	private $arrExpressions = array ();

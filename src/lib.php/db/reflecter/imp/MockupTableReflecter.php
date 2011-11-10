@@ -29,9 +29,9 @@ class MockupTableReflecter extends AbStractTableReflecter
 	/**
 	 * @return \Iterator
 	 */
-	public function columnNameIterator()
+	public function columns()
 	{
-		return new \ArrayIterator ( array_keys($this->arrMetainfo['columns']) );
+		return isset($this->arrMetainfo['columns'])? array_keys($this->arrMetainfo['columns']): array() ;
 	}
 	
 	public function name()

@@ -60,12 +60,9 @@ class MySQLTableReflecter extends AbStractTableReflecter
 		return $this->sComment;
 	}
 	
-	/**
-	 * @return \Iterator
-	 */
-	public function columnNameIterator()
+	public function columns()
 	{
-		return new \ArrayIterator ( $this->arrColumnNames );
+		return $this->arrColumnNames ;
 	}
 	
 	public function name()

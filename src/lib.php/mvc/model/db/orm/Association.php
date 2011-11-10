@@ -1,281 +1,251 @@
 <?php
-namespace jc\mvc\model\db\orm ;
 
-use jc\io\IOutputStream;
+namespace jc\mvc\model\db\orm;
+
+use jc\db\sql\TablesJoin;
+
+use jc\db\DB;
 use jc\lang\Exception;
-use jc\lang\Object;
+use jc\mvc\model\db\orm\Prototype;
 
-class Association extends Object implements \Serializable
+class Association
 {
-	const hasOne = 'hasOne' ;
-	const belongsTo = 'belongsTo' ;
-	const hasMany = 'hasMany' ;
-	const hasAndBelongsToMany = 'hasAndBelongsToMany' ;
+	const youKnow = null ;
+	
+	const hasOne = 1;
+	const belongsTo = 2;
+	const hasMany = 4;
+	const hasAndBelongsTo = 8;
+	
+	const oneToOne = 3 ;		// 一对一关联
 
-	public function __construct($sType,$sModelProperty,Prototype $aFromPrototype,Prototype $aToPrototype,$fromKeys,$toKeys)
+	const pair = 7 ;			// 两表关联		
+	const triplet = 8 ;		// 三表关联
+	
+	const total = 15 ;		// 所有
+	
+	// public function
+	public function __construct(DB $aDB,$nType,$aFromPrototype,$aToPrototype,$fromKeys=self::youKnow,$toKeys=self::youKnow,$sBridgeTable=self::youKnow,$toBridgeKeys=self::youKnow,$fromBridgeKeys=self::youKnow)
 	{
-		if( !in_array($sType,self::$arrAssociationTypes) )
+		$this->aDB = $aDB ;
+		$this->nType=$nType;
+		$this->aFromPrototype = $aFromPrototype;
+		$this->aToPrototype = $aToPrototype;
+		
+		$this->setFromKeys($fromKeys);
+		$this->setToKeys($toKeys);
+		
+		if( $nType===self::hasAndBelongsTo )
 		{
-			throw new Exception(__METHOD__."()参数\$sType只能接受以下值：hasOne, belongsTo, hasMany, hasAndBelongsToMany; 传入值为：%s",$sType) ;
+			$this->setBridge($sBridgeTable,$toBridgeKeys,$fromBridgeKeys);
+		}
+	}
+	
+	public function fromKeys()
+	{
+		if( !$this->arrFromKeys )
+		{
+			$this->arrFromKeys = $this->fromPrototype()->keys() ;
 		}
 		
-		$this->sType = $sType ;
-		$this->sModelProperty = $sModelProperty ;
-		$this->aFromPrototype = $aFromPrototype ;
-		$this->aToPrototype = $aToPrototype ;
-		$this->arrFromKeys = (array)$fromKeys ;
-		$this->arrToKeys = (array)$toKeys ;
+		return $this->arrFromKeys ;
+	}
+	public function setFromKeys($fromKeys)
+	{
+		$this->arrFromKeys = $fromKeys? (array) $fromKeys: array() ;
+	}
+	
+	public function toKeys()
+	{
+		if( !$this->arrToKeys )
+		{
+			$this->arrToKeys = $this->toPrototype()->keys() ;
+		}
+		
+		return $this->arrToKeys ;
+	}
+	public function setToKeys($toKeys)
+	{
+		$this->arrToKeys = $toKeys? (array) $toKeys: array() ;
 	}
 	
 	/**
-	 * @return Association
+	 *  设置连桥表的原型、左连键和右连键
+	 *
+	 *  $BridgeTable，连桥表。接受字符串或Prototype对象，表示表名或原型。
+	 *  $toBridgeKeys 和 $fromBridgeKeys 接受字符串或数组。
+	 *
+	 *  setToBridgeKeys() , setFromBridgeKeys() 
 	 */
-	static function createFromCnf(array $arrCnf,Prototype $aFromPrototype,$sType,$bCheckValid=true,$bInFragment=false)
+	public function setBridge($sBridgeTable,$toBridgeKeys,$fromBridgeKeys)
 	{
-		if( $bCheckValid )
+		if($this->nType != self::hasAndBelongsTo)
 		{
-			$arrCnf = self::assertCnfValid($arrCnf,$sType,true) ;
+			throw new Exception('函数 Association::setBridge() 只有在 nType 是 hasAndBelongsTo时才可以被调用');
 		}
 		
-		$aToPrototype = Prototype::createFromCnf($arrCnf['prototype'],true,true,$bInFragment) ;
-		
-		$aAsso = new self(
-			$sType
-			, $arrCnf['prop']
-			, $aFromPrototype
-			, $aToPrototype
-			, $arrCnf['fromk'], $arrCnf['tok']
-		) ;
-		
-		if($bInFragment)
-		{
-			$aToPrototype->setAssociateBy($aAsso) ;
-		}
-		
-		if( $sType==self::hasAndBelongsToMany )
-		{
-			$aAsso->setBridge($arrCnf['bridge'],$arrCnf['bfromk'],$arrCnf['btok']) ;			
-		}
-		
-		return $aAsso ;
-	}
-
-	public function setBridge($sBridgeTable,$bridgeFromKeys=null,$bridgeToKeys=null)
-	{
 		$this->sBridgeTable = $sBridgeTable ;
-		$this->arrBridgeFromKeys = (array)$bridgeFromKeys ;
-		$this->arrBridgeToKeys = (array)$bridgeToKeys ;
-	}
-	
-	public function type()
-	{
-		return $this->sType ;
-	}
-	
-	public function count()
-	{
-		return $this->isOneToOne()? 1: 30 ;
-	}
-
-	public function modelProperty()
-	{
-		return $this->sModelProperty ;
-	}
-
-	public function fromPrototype()
-	{
-		return $this->aFromPrototype ;
-	}
-	public function toPrototype()
-	{
-		return $this->aToPrototype ;
-	}
-	public function fromKeys()
-	{
-		return $this->arrFromKeys ;
-	}
-	public function toKeys()
-	{
-		return $this->arrToKeys ;
+		
+		$this->setToBridgeKeys($toBridgeKeys) ;
+		$this->setFromBridgeKeys($fromBridgeKeys) ;
 	}
 
 	public function bridgeTableName()
 	{
 		return $this->sBridgeTable ;
 	}
-	public function bridgeFromKeys()
-	{
-		return $this->arrBridgeFromKeys ;
-	}
-	public function bridgeToKeys()
-	{
-		return $this->arrBridgeToKeys ;
-	}
-	
-	public function isOneToOne()
-	{
-		return $this->sType==self::hasOne or $this->sType==self::belongsTo ;
-	}
-	
-	static public function allAssociationTypes()
-	{
-		return self::$arrAssociationTypes ;
-	}
-	
-	static private $arrAssociationTypes = array(
-			self::hasOne
-			, self::belongsTo
-			, self::hasMany
-			, self::hasAndBelongsToMany
-	) ;
 
-	static public function assertCnfValid(array $arrAsso,$sType,$bNestingPrototype)
+	public function bridgeSqlTableAlias()
 	{
-		if( !in_array($sType, Association::allAssociationTypes()) )
+		return $this->toPrototype()->sqlTableAlias().'#bridge' ;
+	}
+
+	public function toBridgeKeys()
+	{
+		if(!$this->arrToBridgeKeys)
 		{
-			throw new Exception("遇到无效的orm关联类型：%s；orm关联类型必须为：%s",array($sType,implode(", ", Association::allAssociationTypes()))) ;
-		}
-		
-		// 必须属性
-		if( empty($arrAsso['prototype']) )
-		{
-			if( !empty($arrAsso['model']) )
+			$arrFromKeys = $this->fromKeys() ;
+			$arrBridgeColumns = $this->aDB->reflecterFactory()->tableReflecter($this->sBridgeTable)->columns() ;
+
+			if( array_intersect($arrFromKeys,$arrBridgeColumns)==$arrFromKeys )
 			{
-				$arrAsso['prototype'] = $arrAsso['model'] ;
-			}
-			else
-			{
-				throw new Exception("orm %s 关联缺少 prototype 属性",$sType) ;
+				$this->arrToBridgeKeys = $arrFromKeys ;
 			}
 		}
 		
-		// 递归检查  prototype 值
-		if( $bNestingPrototype )
+		return $this->arrToBridgeKeys ;
+	}
+	public function setToBridgeKeys($toBridgeKeys)
+	{
+		$this->arrToBridgeKeys = $toBridgeKeys? (array) $toBridgeKeys: array() ;
+	}
+	
+	public function fromBridgeKeys()
+	{
+		if(!$this->arrFromBridgeKeys)
 		{
-			if( !is_array($arrAsso['prototype']) )
+			$arrToKeys = $this->toKeys() ;
+			$arrBridgeColumns = $this->aDB->reflecterFactory()->tableReflecter($this->sBridgeTable)->columns() ;
+
+			if( array_intersect($arrToKeys,$arrBridgeColumns)==$arrToKeys )
 			{
-				throw new Exception("orm %s 关联的 prototype属性要求是一个完整的 orm config",$sType) ;			
+				$this->arrFromBridgeKeys = $arrToKeys ;
+			}
+		}
+		
+		return $this->arrFromBridgeKeys;
+	}
+	public function setFromBridgeKeys($fromBridgeKeys)
+	{
+		$this->arrFromBridgeKeys = $fromBridgeKeys? (array) $fromBridgeKeys: array() ;
+	}
+
+	public function isType($nType)
+	{		
+		return ($nType & $this->nType) ? true: false ;
+	}
+	
+	/**
+	 * @return Prototype
+	 */
+	public function fromPrototype()
+	{
+		return $this->aFromPrototype;
+	}
+	/**
+	 * @return Prototype
+	 */
+	public function toPrototype()
+	{
+		return $this->aToPrototype;
+	}
+	
+	public function type()
+	{
+		return $this->nType;
+	}
+		
+	public function done()
+	{
+		// 
+		if( $this->nType==self::hasAndBelongsTo )
+		{
+			if(!$this->toBridgeKeys())
+			{
+				throw new Exception('无法确定 ORM 关联(%s)的桥接表上的外键 toBridgeKeys ：没有指定作为外键的字段，桥接表上也没有和另一端外键相同的字段',$this->path()) ;
+			}
+			if(!$this->fromBridgeKeys())
+			{
+				throw new Exception('无法确定 ORM 关联(%s)的桥接表上的外键 fromBridgeKeys ：没有指定作为外键的字段，桥接表上也没有和另一端外键相同的字段',$this->path()) ;
+			}
+		
+			if( count($this->fromKeys())!==count($this->toBridgeKeys()) )
+			{
+				throw new Exception( "ORM关联(%s)两端的外键无效，字段数量必须对等; fromKeys:%s <-> toBridgeKeys:%s", array(
+							$this->path()
+							, implode(',',$this->fromKeys())
+							, implode(',',$this->toKeys())
+						) ) ;
+			}
+		
+			if( count($this->fromBridgeKeys())!==count($this->toKeys()) )
+			{
+				throw new Exception( "ORM关联(%s)两端的外键无效，字段数量必须对等; fromBridgeKeys:%s <-> toKeys:%s", array(
+							$this->path()
+							, implode(',',$this->fromKeys())
+							, implode(',',$this->toKeys())
+						) ) ;
 			}
 			
-			Prototype::assertCnfValid($arrAsso['prototype']) ;
 		}
 		
-		if($sType==Association::hasAndBelongsToMany)
+		// 
+		else 
 		{
-			if( empty($arrAsso['bridge']) )
+			if( count($this->fromKeys())!==count($this->toKeys()) )
 			{
-				throw new Exception("orm %s(%s) 缺少 bridge 属性",array($sType,$arrAsso['prototype'])) ;
-			}
-			if( empty($arrAsso['bfromk']) )
-			{
-				throw new Exception("orm %s(%s) 缺少 bfromk 属性",array($sType,$arrAsso['prototype'])) ;
-			}
-			if( empty($arrAsso['btok']) )
-			{
-				throw new Exception("orm %s(%s) 缺少 btok 属性",array($sType,$arrAsso['prototype'])) ;
-			}
-		}
-		
-		// 可选属性
-		if( empty($arrAsso['prop']) )
-		{
-			$arrAsso['prop'] = $arrAsso['prototype'] ;
-		}
-
-		// 统一格式
-		foreach( array('fromk','tok','bfromk','btok') as $sName )
-		{
-			if(!empty($arrAsso[$sName]))
-			{
-				$arrAsso[$sName] = (array) $arrAsso[$sName] ;
-			}
-		}
-		
-		return $arrAsso ;
-	}
-
-	public function setFromPrototype($aFromPrototype)
-	{
-		$this->aFromPrototype = $aFromPrototype ;
-	}
-	public function setToPrototype($aToPrototype)
-	{
-		$this->aToPrototype = $aToPrototype ;
-	}
-
-	public function serialize ()
-	{
-		foreach(array(
-				'sType',
-				'sModelProperty',
-				'aFromPrototype',
-				'aToPrototype',
-				'arrFromKeys',
-				'arrToKeys',
-				'sBridgeTable',
-				'arrBridgeFromKeys',
-				'arrBridgeToKeys',
-		) as $sPropName)
-		{
-			$arrData[$sPropName] =& $this->$sPropName ;
-		}
-		return serialize( $arrData ) ;
-	}
-
-	public function unserialize ($sSerialized)
-	{
-		$arrData = unserialize($sSerialized) ;
-				
-		foreach(array(
-				'sType',
-				'sModelProperty',
-				'aFromPrototype',
-				'aToPrototype',
-				'arrFromKeys',
-				'arrToKeys',
-				'sBridgeTable',
-				'arrBridgeFromKeys',
-				'arrBridgeToKeys',
-		) as $sPropName)
-		{
-			if( array_key_exists($sPropName, $arrData) )
-			{
-				$this->$sPropName =& $arrData[$sPropName] ;
+				throw new Exception( "ORM关联(%s)两端的外键无效，字段数量必须对等; fromKeys:%s <-> toKeys:%s", array(
+							$this->path()
+							, implode(',',$this->fromKeys())
+							, implode(',',$this->toKeys())
+						) ) ;
 			}
 		}
 	}
 	
-	// misc
-	public function printStruct(IOutputStream $aOutput=null,$nDepth=0)
+	public function name()
 	{
-		if(!$aOutput)
-		{
-			$aOutput = $this->application()->response()->printer() ;
-		}
-		
-		$aOutput->write( "<pre>\r\n" ) ;
-		
-		$aOutput->write( str_repeat("\t", $nDepth)."[" ) ;
-		$aOutput->write( $this->type()."] " ) ;
-		$aOutput->write( $this->modelProperty()."\r\n" ) ;
-		
-		$this->toPrototype()->printStruct($aOutput,$nDepth) ;
-		
-		$aOutput->write( "</pre>" ) ;
+		return $this->aToPrototype->name() ;
 	}
 	
-	private $sType ;
-	private $sModelProperty ;
-	private $aFromPrototype ;
-	private $aToPrototype ;
+	public function path($bFull=true)
+	{
+		return $this->aToPrototype->path($bFull) ;
+	}
+
+	/**
+	 * @return jc\db\sql\TablesJoin
+	 */
+	public function sqlTablesJoin()
+	{
+		return $this->aTablesJoin ;
+	}
+	public function setSqlTablesJoin(TablesJoin $aTablesJoin)
+	{
+		$this->aTablesJoin = $aTablesJoin ;
+	}
 	
-	private $arrFromKeys ;
-	private $arrToKeys ;
-	
-	private $sBridgeTable ;
-	private $arrBridgeFromKeys ;
-	private $arrBridgeToKeys ;
+	// private data
+	private $aDB = null ;
+	private $aFromPrototype = null ;
+	private $aToPrototype = null ;
+	private $nType = 0 ;
+	private $arrFromKeys = array();
+	private $arrToKeys = array();
+	private $sBridgeTable;
+	private $arrToBridgeKeys = array();
+	private $arrFromBridgeKeys = array();
+	private $aTablesJoin = null ;
 	
 }
-
 ?>

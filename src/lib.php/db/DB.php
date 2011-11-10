@@ -1,5 +1,4 @@
 <?php 
-
 namespace jc\db ;
 
 use jc\db\driver\IDriver;
@@ -9,6 +8,11 @@ use jc\db\sql\Statement;
 
 class DB extends Object
 {
+	public function __construct(IDriver $aDriver=null)
+	{
+		$this->aDriver = $aDriver ;
+	}
+	
 	/**
 	 * @return IDriver
 	 */
@@ -61,9 +65,12 @@ class DB extends Object
 		return $this->driver()->lastInsertId() ;
 	}
 	
-	public function reflectFactory()
+	/**
+	 * @return jc\db\sql\reflecter\AbstractReflecterFactory 
+	 */
+	public function reflecterFactory()
 	{
-		$this->aDriver->reflecterFactory($this);
+		return $this->aDriver->reflecterFactory($this);
 	}
 	
 	private $aDriver ;

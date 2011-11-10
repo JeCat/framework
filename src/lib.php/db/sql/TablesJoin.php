@@ -50,6 +50,11 @@ class TablesJoin extends SubStatement
 		}
 	}
 	
+	public function tables()
+	{
+		return $this->arrTables ;
+	}
+	
 	public function checkValid($bThrowException=true)
 	{
 		if( empty($this->arrTables) )
@@ -76,11 +81,11 @@ class TablesJoin extends SubStatement
 			$arrTables[] = ($table instanceof Table)? $table->makeStatement($bFormat): "`{$table}`" ;
 		}
 		
-		$sSql = $this->sType . "( " . implode(", ",$arrTables) . " )" ;
+		$sSql = ' ' . $this->sType . " ( " . implode(", ",$arrTables) . " )" ;
 		
 		if( $this->aRestriction )
 		{
-			$sSql.= " ON " . $this->aRestriction->makeStatement($bFormat) ;
+			$sSql.= " ON (" . $this->aRestriction->makeStatement($bFormat) . ')' ;
 		}
 		
 		return $sSql ;

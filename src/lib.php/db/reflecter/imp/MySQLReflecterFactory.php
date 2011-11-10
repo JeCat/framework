@@ -1,5 +1,5 @@
 <?php
-namespace jc\db\reflecter;
+namespace jc\db\reflecter\imp;
 
 use jc\db\reflecter\AbstractReflecterFactory;
 use jc\db\reflecter\imp\MySQLColumnReflecter;
