@@ -3,7 +3,7 @@ namespace jc\system ;
 
 class CLAppFactory extends ApplicationFactory
 {
-	public function createRequest(CoreApplication $aApp)
+	public function createRequest(Application $aApp)
 	{
 		require_once \jc\PATH."/src/lib.php/util/IHashTable.php" ;
 		require_once \jc\PATH."/src/lib.php/util/IDataSrc.php" ;
