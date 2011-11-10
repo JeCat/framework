@@ -1,6 +1,9 @@
 <?php
 namespace jc\mvc\model\db\orm;
 
+use jc\mvc\model\db\orm\Association;
+use jc\bean\BeanFactory;
+use jc\bean\IBean;
 use jc\db\sql\name\NameTransfer;
 use jc\mvc\model\db\ModelList;
 use jc\mvc\model\db\Model;
@@ -9,7 +12,7 @@ use jc\lang\Exception;
 use jc\db\DB;
 use jc\db\sql\StatementFactory;
 
-class Prototype
+class Prototype implements IBean
 {
 	const youKnow = null ;
 	
@@ -176,9 +179,17 @@ class Prototype
 	/**
 	 * @return Prototype
 	 */
-	public function addColumnAlias($sColumn,$sAlias)
+	public function addColumnAlias($column,$sAlias=null)
 	{
-		$this->arrColumnAliases[$sAlias] = $sColumn;
+		if( is_array($column) )
+		{
+			$this->arrColumnAliases = array_merge($this->arrColumnAliases,$column) ;
+		}
+		else
+		{
+			$this->arrColumnAliases[$sAlias] = $column;
+		}
+		
 		return $this;
 	}
 	
@@ -510,9 +521,147 @@ class Prototype
 		
 		return array($sName) ;
 	}
+
+	/**
+	 * @return Association
+	 */
+	public function associationBy()
+	{
+		return $this->aAssociationBy ;
+	}
+	public function setAssociationBy(Association $aAssociationBy)
+	{
+		return $this->aAssociationBy = $aAssociationBy ;
+	}
 	
-	// private constructor
-	private function __construct(){}
+	// implements IBean
+	public function build(array & $arrConfig,$sNamespace='*')
+	{
+		// table
+		if( !empty($arrConfig['table']) )
+		{
+			$this->setTableName($arrConfig['table']) ;
+		}
+		// name
+		if( !empty($arrConfig['name']) )
+		{
+			$this->setName($arrConfig['name']) ;
+		}
+		// columns
+		if( !empty($arrConfig['columns']) )
+		{
+			call_user_func_array(array($this,'addColumns'),$arrConfig['columns']) ;
+		}
+		// keys
+		if( !empty($arrConfig['keys']) )
+		{
+			$this->setKeys($arrConfig['keys']) ;
+		}
+		// alias
+		if( !empty($arrConfig['alias']) )
+		{
+			$this->addColumnAlias($arrConfig['alias']) ;
+		}
+		// limit
+		if( !empty($arrConfig['limit']) )
+		{
+			$this->criteria()->setLimitLen($arrConfig['limit']) ;
+		}
+		// limitLen
+		if( !empty($arrConfig['limitLen']) )
+		{
+			$this->criteria()->setLimitLen($arrConfig['limitLen']) ;
+		}
+		// limitFrom
+		if( !empty($arrConfig['limitFrom']) )
+		{
+			$this->criteria()->setLimitFrom($arrConfig['limitFrom']) ;
+		}
+		// order
+		if( !empty($arrConfig['order']) )
+		{
+			foreach((array)$arrConfig['order'] as $sColumn)
+			{
+				$this->criteria()->orders()->add($sColumn,false) ;
+			}
+		}
+		// orderDesc
+		if( !empty($arrConfig['orderDesc']) )
+		{
+			foreach((array)$arrConfig['orderDesc'] as $sColumn)
+			{
+				$this->criteria()->orders()->add($sColumn,false) ;
+			}
+		}
+		// orderAsc
+		if( !empty($arrConfig['orderAsc']) )
+		{
+			foreach((array)$arrConfig['orderAsc'] as $sColumn)
+			{
+				$this->criteria()->orders()->add($sColumn,true) ;
+			}
+		}
+		// restrication
+		// foreach(array('eq'))
+		
+		// associations
+		$aBeanFactory = BeanFactory::singleton() ;
+		foreach($arrConfig as $sConfigKey=>&$item)
+		{
+			if( strstr($sConfigKey,'hasOne:')===0 )
+			{
+				$item['type'] = Association::hasOne ;
+				$item['to']['name'] = substr($sConfigKey,7) ;
+			}
+			else if( strstr($sConfigKey,'belongsTo:')===0 )
+			{
+				$item['type'] = Association::belongsTo ;
+				$item['to']['name'] = substr($sConfigKey,10) ;
+			}
+			else if( strstr($sConfigKey,'hasMany:')===0 )
+			{
+				$item['type'] = Association::hasMany ;
+				$item['to']['name'] = substr($sConfigKey,8) ;
+			}
+			else if( strstr($sConfigKey,'hasAndBelongsTo:')===0 )
+			{
+				$item['type'] = Association::hasAndBelongsTo ;
+				$item['to']['name'] = substr($sConfigKey,16) ;
+			}
+			else
+			{
+				continue ;
+			}
+			
+			if(empty($item['class']))
+			{
+				$item['class'] = 'jc\\mvc\\model\\db\\orm\\Association' ;
+			}
+			
+			$this->arrAssociations[] = $aBeanFactory->createBean($item) ;
+		}
+		// $aBeanFactory->createBeanArray($arrConfig,'hasOne:','jc\\mvc\\model\\db\\orm\\Association','name',) ;
+		
+		
+		/*if( $aPrototype = BeanFactory::singleton()->createBean($arrConfig['orm'],$sNamespace) )
+		{
+			$this->setPrototype($aPrototype) ;
+		}*/
+		
+		$this->done() ;
+		
+		$this->arrBeanConfig = $arrConfig ;
+	}
+	
+	public function beanConfig()
+	{
+		$this->arrBeanConfig ;
+	}
+	
+	
+	
+	// constructor
+	public function __construct(){}
 	
 	
 	// private data
@@ -532,5 +681,7 @@ class Prototype
 	private $aStatementFactory ;
 	
 	private $aDB ;
+	
+	private $arrBeanConfig ;
 }
 ?>

@@ -2,8 +2,9 @@
 
 namespace jc\mvc\model\db\orm;
 
-use jc\db\sql\TablesJoin;
+use jc\bean\BeanFactory;
 
+use jc\db\sql\TablesJoin;
 use jc\db\DB;
 use jc\lang\Exception;
 use jc\mvc\model\db\orm\Prototype;
@@ -25,7 +26,7 @@ class Association
 	const total = 15 ;		// 所有
 	
 	// public function
-	public function __construct(DB $aDB,$nType,$aFromPrototype,$aToPrototype,$fromKeys=self::youKnow,$toKeys=self::youKnow,$sBridgeTable=self::youKnow,$toBridgeKeys=self::youKnow,$fromBridgeKeys=self::youKnow)
+	public function __construct(DB $aDB,$nType,$aFromPrototype=null,$aToPrototype=null,$fromKeys=self::youKnow,$toKeys=self::youKnow,$sBridgeTable=self::youKnow,$toBridgeKeys=self::youKnow,$fromBridgeKeys=self::youKnow)
 	{
 		$this->aDB = $aDB ;
 		$this->nType=$nType;
@@ -235,6 +236,50 @@ class Association
 		$this->aTablesJoin = $aTablesJoin ;
 	}
 	
+	// implements IBean
+	
+	public function build(array & $arrConfig,$sNamespace='*')
+	{
+		if( empty($arrConfig['to']) )
+		{
+			throw new Exception("Bean配置数组缺少属性 to") ;
+		}
+		
+		$this->aToPrototype = BeanFactory::singleton()->createBean($arrConfig['to']) ;
+		$this->aToPrototype->setAssociationBy($this) ;
+		
+		if(!empty($arrConfig['fromkeys']))
+		{
+			$this->setFromKeys($arrConfig['fromkeys']) ;
+		}
+		if(!empty($arrConfig['tokeys']))
+		{
+			$this->setToKeys($arrConfig['tokeys']) ;
+		}
+		if(!empty($arrConfig['tobridgekeys']))
+		{
+			$this->setToBridgeKeys($arrConfig['tobridgekeys']) ;
+		}
+		if(!empty($arrConfig['frombridgekeys']))
+		{
+			$this->setFromBridgeKeys($arrConfig['frombridgekeys']) ;
+		}
+		if(!empty($arrConfig['bridge']))
+		{
+			$this->sBridgeTable = $arrConfig['bridge'] ;
+		}
+		
+		$this->done() ;
+			
+		$this->arrBeanConfig = $arrConfig ;
+	}
+	
+	public function beanConfig()
+	{
+		$this->arrBeanConfig ;
+	}
+	
+	
 	// private data
 	private $aDB = null ;
 	private $aFromPrototype = null ;
@@ -246,6 +291,8 @@ class Association
 	private $arrToBridgeKeys = array();
 	private $arrFromBridgeKeys = array();
 	private $aTablesJoin = null ;
+	
+	private $arrBeanConfig ;
 	
 }
 ?>

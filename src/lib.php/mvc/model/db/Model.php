@@ -1,8 +1,11 @@
 <?php
 namespace jc\mvc\model\db ;
 
+use jc\bean\BeanFactory;
+
+use jc\bean\IBean;
 use jc\db\sql\Restriction;
-use jc\mvc\model\db\orm\operators\SelectForAssocQuery;
+use jc\mvc\model\db\orm\SelectForAssocQuery;
 use jc\lang\Exception;
 use jc\mvc\model\db\orm\Deleter;
 use jc\mvc\model\db\orm\Selecter;
@@ -16,7 +19,7 @@ use jc\mvc\model\AbstractModel ;
 use jc\mvc\model\IPaginal;
 use jc\mvc\model\db\orm\Prototype;
 
-class Model extends AbstractModel implements IModel , IPaginal
+class Model extends AbstractModel implements IModel , IPaginal, IBean
 {
 	public function __construct(Prototype $aPrototype=null)
 	{
@@ -401,11 +404,38 @@ class Model extends AbstractModel implements IModel , IPaginal
 		return $data ;
 	}
 	
+	// implements IBean
+	
+	public function build(array & $arrConfig,$sNamespace='*')
+	{
+		if( !empty($arrConfig['orm']) )
+		{
+			if(empty($arrConfig['orm']['class']))
+			{
+				$arrConfig['orm']['class'] = 'jc\\mvc\\model\\db\\orm\\Prototype' ;
+			}
+			if( $aPrototype = BeanFactory::singleton()->createBean($arrConfig['orm'],$sNamespace) )
+			{
+				$this->setPrototype($aPrototype) ;
+			}
+		}
+		
+		$this->arrBeanConfig = $arrConfig ;
+	}
+	
+	public function beanConfig()
+	{
+		$this->arrBeanConfig ;
+	}
+	
+	
 	/**
 	 * @var jc\mvc\model\db\orm\Prototype
 	 */
 	private $aPrototype ;
 	private $aCriteria ;
+	
+	private $arrBeanConfig ;
 }
 
 ?>
