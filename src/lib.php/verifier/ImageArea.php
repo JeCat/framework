@@ -17,13 +17,13 @@ class ImageArea extends Object implements IVerifier, IBean
 	}
 	public function build(array & $arrConfig)
 	{
-		if (! empty ( $arrConfig ['nMaxArea'] ))
+		if (! empty ( $arrConfig ['max'] ))
 		{
-			$this->nMaxArea = ( int ) $arrConfig ['nMaxArea'];
+			$this->nMaxArea = ( int ) $arrConfig ['max'];
 		}
-		if (! empty ( $arrConfig ['nMinArea'] ))
+		if (! empty ( $arrConfig ['min'] ))
 		{
-			$this->nMinArea = ( int ) $arrConfig ['nMinArea'];
+			$this->nMinArea = ( int ) $arrConfig ['min'];
 		}
 		$this->arrBeanConfig = $arrConfig;
 	}

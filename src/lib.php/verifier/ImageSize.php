@@ -20,21 +20,21 @@ class ImageSize extends Object implements IVerifier, IBean
 	
 	public function build(array & $arrConfig)
 	{
-		if (! empty ( $arrConfig ['nMaxWidth'] ))
+		if (! empty ( $arrConfig ['maxWidth'] ))
 		{
-			$this->nMaxWidth = ( int ) $arrConfig ['nMaxWidth'];
+			$this->nMaxWidth = ( int ) $arrConfig ['maxWidth'];
 		}
-		if (! empty ( $arrConfig ['nMaxHeight'] ))
+		if (! empty ( $arrConfig ['maxHeight'] ))
 		{
-			$this->nMaxHeight = ( int ) $arrConfig ['nMaxHeight'];
+			$this->nMaxHeight = ( int ) $arrConfig ['maxHeight'];
 		}
-		if (! empty ( $arrConfig ['nMinWidth'] ))
+		if (! empty ( $arrConfig ['minWidth'] ))
 		{
-			$this->nMinWidth = ( int ) $arrConfig ['nMinWidth'];
+			$this->nMinWidth = ( int ) $arrConfig ['minWidth'];
 		}
-		if (! empty ( $arrConfig ['nMinHeight'] ))
+		if (! empty ( $arrConfig ['minHeight'] ))
 		{
-			$this->nMinHeight = ( int ) $arrConfig ['nMinHeight'];
+			$this->nMinHeight = ( int ) $arrConfig ['minHeight'];
 		}
 		$this->arrBeanConfig = $arrConfig;
 	}
