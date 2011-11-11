@@ -537,16 +537,31 @@ class Prototype implements IBean
 	// implements IBean
 	public function build(array & $arrConfig,$sNamespace='*')
 	{
+		if( !$this->aDB )
+		{
+			$this->aDB = DB::singleton() ;
+		}
+		
 		// table
 		if( !empty($arrConfig['table']) )
 		{
 			$this->setTableName($arrConfig['table']) ;
 		}
+		else if( !empty($arrConfig['name']) )
+		{
+			$this->setTableName($arrConfig['name']) ;
+		}
+		
 		// name
 		if( !empty($arrConfig['name']) )
 		{
 			$this->setName($arrConfig['name']) ;
 		}
+		else if( !empty($arrConfig['table']) )
+		{
+			$this->setName($arrConfig['table']) ;
+		}
+		
 		// columns
 		if( !empty($arrConfig['columns']) )
 		{
@@ -611,22 +626,22 @@ class Prototype implements IBean
 			if( strstr($sConfigKey,'hasOne:')===0 )
 			{
 				$item['type'] = Association::hasOne ;
-				$item['to']['name'] = substr($sConfigKey,7) ;
+				$item['name'] = substr($sConfigKey,7) ;
 			}
 			else if( strstr($sConfigKey,'belongsTo:')===0 )
 			{
 				$item['type'] = Association::belongsTo ;
-				$item['to']['name'] = substr($sConfigKey,10) ;
+				$item['name'] = substr($sConfigKey,10) ;
 			}
 			else if( strstr($sConfigKey,'hasMany:')===0 )
 			{
 				$item['type'] = Association::hasMany ;
-				$item['to']['name'] = substr($sConfigKey,8) ;
+				$item['name'] = substr($sConfigKey,8) ;
 			}
 			else if( strstr($sConfigKey,'hasAndBelongsTo:')===0 )
 			{
 				$item['type'] = Association::hasAndBelongsTo ;
-				$item['to']['name'] = substr($sConfigKey,16) ;
+				$item['name'] = substr($sConfigKey,16) ;
 			}
 			else
 			{
@@ -635,18 +650,11 @@ class Prototype implements IBean
 			
 			if(empty($item['class']))
 			{
-				$item['class'] = 'jc\\mvc\\model\\db\\orm\\Association' ;
+				$item['class'] = 'association' ;
 			}
 			
 			$this->arrAssociations[] = $aBeanFactory->createBean($item) ;
 		}
-		// $aBeanFactory->createBeanArray($arrConfig,'hasOne:','jc\\mvc\\model\\db\\orm\\Association','name',) ;
-		
-		
-		/*if( $aPrototype = BeanFactory::singleton()->createBean($arrConfig['orm'],$sNamespace) )
-		{
-			$this->setPrototype($aPrototype) ;
-		}*/
 		
 		$this->done() ;
 		
@@ -669,7 +677,7 @@ class Prototype implements IBean
 	private $sTableName='';
 	private $arrColumns ;
 	private $arrColumnAliases = array();
-	private $arrKeys = array();
+	private $arrKeys ;
 	private $sDevicePrimaryKey = null ;
 	private $aCriteria = null;
 	private $arrAssociations =  array();

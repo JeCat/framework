@@ -412,7 +412,7 @@ class Model extends AbstractModel implements IModel , IPaginal, IBean
 		{
 			if(empty($arrConfig['orm']['class']))
 			{
-				$arrConfig['orm']['class'] = 'jc\\mvc\\model\\db\\orm\\Prototype' ;
+				$arrConfig['orm']['class'] = 'prototype' ;
 			}
 			if( $aPrototype = BeanFactory::singleton()->createBean($arrConfig['orm'],$sNamespace) )
 			{

@@ -23,7 +23,9 @@ class BeanFactory extends Object
 			$aSingleton->registerBeanClass("jc\\mvc\\controller\\Controller","controller") ;
 			$aSingleton->registerBeanClass("jc\\mvc\\view\\View",'view') ;
 			$aSingleton->registerBeanClass("jc\\mvc\\view\\FormView",'form') ;
-			$aSingleton->registerBeanClass("jc\\mvc\\model\\db\\Model",'mode') ;
+			$aSingleton->registerBeanClass("jc\\mvc\\model\\db\\Model",'model') ;
+			$aSingleton->registerBeanClass("jc\\mvc\\model\\db\\orm\\Prototype",'prototype') ;
+			$aSingleton->registerBeanClass("jc\\mvc\\model\\db\\orm\\Association",'association') ;
 			
 			// jecat widgets
 			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\Text",'text') ;
@@ -55,7 +57,7 @@ class BeanFactory extends Object
 		// ins 
 		if( !empty($arrConfig['ins']) )
 		{			
-			if( !$aFile = $this->beanFolders()->find($arrConfig['ins'].'.ins.php') )
+			if( !$aFile = $this->beanFolders()->find($arrConfig['ins'].'.ins.php',$sNamespace) )
 			{
 				throw new Exception("Bean对象配置数组中的 ins 属性无效: %s，找不到指定的实例文件",$arrConfig['ins']) ;
 			}
@@ -66,9 +68,9 @@ class BeanFactory extends Object
 		{
 			$sConfigName = $arrConfig['conf'] ;
 						
-			if( !$aFile = $this->beanFolders()->find($sConfigName.'.conf.php') )
+			if( !$aFile = $this->beanFolders()->find($sConfigName.'.conf.php',$sNamespace) )
 			{
-				throw new Exception("Bean对象配置数组中的 conf 属性无效: %s，找不到指定的配置文件",$sConfigName) ;
+				throw new Exception("Bean对象配置数组中的 conf 属性无效，找不到指定的配置文件: %s",$sConfigName) ;
 			}
 			$arrConfigFile = $aFile->includeFile(false,false) ;
 			if( !is_array($arrConfigFile) )

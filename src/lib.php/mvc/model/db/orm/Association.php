@@ -240,12 +240,15 @@ class Association
 	
 	public function build(array & $arrConfig,$sNamespace='*')
 	{
-		if( empty($arrConfig['to']) )
+		if( !$this->aDB )
 		{
-			throw new Exception("Bean配置数组缺少属性 to") ;
+			$this->aDB = DB::singleton() ;
 		}
 		
-		$this->aToPrototype = BeanFactory::singleton()->createBean($arrConfig['to']) ;
+		$arrConfigForToPrototype = $arrConfig ;
+		$arrConfigForToPrototype['class'] = 'prototype' ;
+		
+		$this->aToPrototype = BeanFactory::singleton()->createBean($arrConfigForToPrototype) ;
 		$this->aToPrototype->setAssociationBy($this) ;
 		
 		if(!empty($arrConfig['fromkeys']))
