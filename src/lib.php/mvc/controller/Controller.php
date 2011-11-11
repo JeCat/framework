@@ -2,6 +2,8 @@
 
 namespace jc\mvc\controller ;
 
+use jc\bean\BeanConfException;
+
 use jc\bean\BeanFactory;
 
 use jc\bean\IBean ;
@@ -85,35 +87,89 @@ class Controller extends NamableComposite implements IController, IBean
     	}
     	
     	$aBeanFactory = BeanFactory::singleton() ;
-    	
-    	// -------------------------------
-    	// models
     	$aModelContainer = $this->modelContainer() ;
-		foreach($aBeanFactory->createBeanArray($arrConfig,'model:','jc\\mvc\\model\\db\\Model','name',$sNamespace) as $aModel)
-		{				
-			$aModelContainer->add( $aModel ) ;
-		}
-    
-    	// -------------------------------
-    	// views
-    	foreach($aBeanFactory->createBeanArray($arrConfig,'view:','jc\\mvc\\view\\View','name',$sNamespace) as $aView)
-		{				
-			$this->addView( $aView ) ;
-		}
+    	$arrViewModels = array() ;
     	
-    	// -------------------------------
-    	// controllers
-		foreach($aBeanFactory->createBeanArray($arrConfig,'controller:','jc\\mvc\\controller\\Controller','name',$sNamespace) as $aController)
-		{				
-			$this->add( $aController ) ;
-		}
+    	foreach($arrConfig as $sPropertyName=>&$item)
+    	{
+    		// models
+    		if($sPropertyName=='models')
+    		{
+    			foreach($aBeanFactory->createBeanArray($item,'model','name',$sNamespace) as $aBean)
+				{
+					$aModelContainer->add( $aBean, isset($item['name'])?$item['name']:null ) ;
+				}
+    		}
+    		// model:ooxxx
+    		else if( strpos($sPropertyName,'model:')===0 )
+    		{
+    			$item['name'] = substr($sPropertyName,6) ;
+    			if(empty($item['class']) and empty($item['ins']) and empty($item['conf']))
+    			{
+    				$item['class'] = 'model' ;
+    			}
+				$aModelContainer->add( $aBeanFactory->createBean($item,$sNamespace), isset($item['name'])?$item['name']:null ) ;
+    		}
+    		
+    		// views
+    		else if($sPropertyName=='views')
+    		{
+    			foreach($aBeanFactory->createBeanArray($item,'name',$sNamespace) as $aBean)
+				{
+					$this->add( $aBean ) ;
+					if(!empty($item['model']))
+					{
+						$arrViewModels[] = array($aBean,$item['model']) ;
+					}
+				}
+    		}
+    		
+    		// view:ooxxx
+    		else if( strpos($sPropertyName,'view:')===0 )
+    		{
+    			$item['name'] = substr($sPropertyName,5) ;
+    			if(empty($item['class']) and empty($item['ins']) and empty($item['conf']))
+    			{
+    				$item['class'] = 'view' ;
+    			}
+    			$aBean = $aBeanFactory->createBean($item,$sNamespace) ;
+				$this->addView( $aBean ) ;
+				if(!empty($item['model']))
+				{
+					$arrViewModels[] = array($aBean,$item['model']) ;
+				}
+    		}
+    		
+    		// controllers
+    		else if($sPropertyName=='controllers')
+    		{
+    			foreach($aBeanFactory->createBeanArray($item,'controller','name',$sNamespace) as $aBean)
+				{				
+					$this->add( $aBean ) ;
+				}
+    		}
+    		// controller:ooxxx
+    		else if( strpos($sPropertyName,'controller:')===0 )
+    		{
+    			$item['name'] = substr($sPropertyName,11) ;
+    			if(empty($item['class']) and empty($item['ins']) and empty($item['conf']))
+    			{
+    				$item['class'] = 'controller' ;
+    			}
+				$this->add( $aBeanFactory->createBean($item,$sNamespace) ) ;
+    		}
+    	}
     	
-    	// -------------------------------
-    	// actions
-    	
-    	// -------------------------------
-    	// process
-    	
+    	// view's model
+    	foreach($arrViewModels as $viewModel)
+    	{
+    		list($aView,$sModelName) = $viewModel ;
+    		if( !$aModel=$aModelContainer->getByName($sModelName) )
+    		{
+    			throw new BeanConfException("视图(%s)的Bean配置属性 model 无效，没有指定的模型：%s",array($aView->name(),$sModelName)) ;
+    		}
+    		$aView->setModel($aModel) ;
+    	}
     	
     	$this->arrBeanConfig = $arrConfig ;
     }

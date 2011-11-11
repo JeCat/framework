@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\view ;
 
+use jc\bean\BeanConfException;
+
 use jc\bean\BeanFactory;
 
 use jc\lang\Exception;
@@ -66,7 +68,7 @@ class View extends NamableComposite implements IView, IBean
     {
     	if( empty($arrConfig['name']) )
     	{
-    		throw new Exception("View bean对象的配置数组缺少必要的属性 name") ;
+    		throw new BeanConfException("View bean对象的配置数组缺少必要的属性 name") ;
     	}
     	$this->setName($arrConfig['name']) ;
     	
@@ -83,21 +85,58 @@ class View extends NamableComposite implements IView, IBean
     	
     	$aBeanFactory = BeanFactory::singleton() ;
     	
-    	// -------------------------------
+    	foreach($arrConfig as $sPropertyName=>&$item)
+    	{    		
+    		// view:ooxxx
+    		if( strpos($sPropertyName,'view:')===0 )
+    		{
+    			$item['name'] = substr($sPropertyName,5) ;
+    			if(empty($item['class']) and empty($item['ins']) and empty($item['conf']))
+    			{
+    				$item['class'] = 'view' ;
+    			}
+    			$arrConfig['views'][$item['name']] &= $item ;
+    		}
+    		
+    		// widget:ooxx
+    		else if( strpos($sPropertyName,'widget:')===0 )
+    		{
+    			$item['id'] = substr($sPropertyName,7) ;
+    			if(empty($item['class']) and empty($item['ins']) and empty($item['conf']))
+    			{
+    				$item['class'] = 'text' ;
+    			}
+    			$arrConfig['widgets'][$item['id']] &= $item ;
+    			
+    		}
+    	}
+    	
     	// views
-    	foreach($aBeanFactory->createBeanArray($arrConfig,'view:','jc\\mvc\\view\\View','name',$sNamespace) as $aView)
-		{				
-			$this->add( $aView ) ;
-		}
-    
-    	// -------------------------------
+    	if(!empty($arrConfig['views']))
+    	{
+    		if( !is_array($arrConfig['views']) )
+    		{
+    			throw new BeanConfException("视图Bean配置的 views 必须是一个数组") ;
+    		}
+    		foreach($aBeanFactory->createBeanArray($arrConfig['views'],'view','name',$sNamespace) as $aBean)
+			{
+				$this->add( $aBean ) ;
+			}
+    	}
+    		
     	// widgets
-    	foreach($aBeanFactory->createBeanArray($arrConfig,'widget:',null,'id',$sNamespace) as $aWidget)
-		{
-			$arrConfig = $aWidget->beanConfig() ;
-			$this->addWidget( $aWidget, isset($arrConfig['exchange'])?$arrConfig['exchange']:null ) ;
-		}
-    
+    	if(!empty($arrConfig['widgets']))
+    	{
+    		if( !is_array($arrConfig['widgets']) )
+    		{
+    			throw new BeanConfException("视图Bean配置的 widgets 必须是一个数组") ;
+    		}
+    		foreach($aBeanFactory->createBeanArray($arrConfig['widgets'],'text','id',$sNamespace,false) as $nIdx=>$aWidget)
+			{
+				$aWidget->build($arrConfig['widgets'][$nIdx],$sNamespace) ;
+				$this->addWidget( $aWidget ) ;
+			}
+    	}
     	$this->arrBeanConfig = $arrConfig ;
     }
     

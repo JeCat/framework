@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\view\widget;
 
+use jc\bean\BeanConfException;
+
 use jc\bean\BeanFactory;
 use jc\mvc\view\IView;
 use jc\lang\Assert;
@@ -21,18 +23,33 @@ class Group extends FormWidget {
 	public function build(array & $arrConfig,$sNamespace='*')
 	{
 		parent::build ( $arrConfig, $sNamespace );
-		
-		// widgets
-    	foreach(BeanFactory::singleton()->createBeanArray($arrConfig,'widget:',null,'id',$sNamespace) as $aWidget)
-		{
-			$arrConfig = $aWidget->beanConfig() ;
-			$this->addWidget( $aWidget, isset($arrConfig['exchange'])?$arrConfig['exchange']:null ) ;
-		}
+			
+    	// widgets
+    	if( !empty($arrConfig['widgets']) )
+    	{
+    		if( !$aView = $this->view() )
+    		{
+    			throw new BeanConfException("Group Widget 尚未设置 View 对象，无法完成 Bean::build()操作") ;
+    		}
+    		if( !is_array($arrConfig['widgets']) )
+    		{
+    			throw new BeanConfException("Group Bean配置的 widgets 必须是一个数组") ;
+    		}
+    		
+    		foreach($arrConfig['widgets'] as $sId)
+    		{
+				if( !$aWidget=$aView->widget($sId) )
+				{
+    				throw new BeanConfException("Group Bean配置指定的 widget 无效：%s",$sId) ;
+				}
+				$this->addWidget($aWidget) ;
+    		}
+    	}
 	}
 	
 	//添加控件
 	public function addWidget(IViewWidget $aWidget) {
-		$aWidget->setFormName ( $this->formName () );
+		// $aWidget->setFormName ( $this->formName () );
 		$this->arrWidgets [] = $aWidget;
 	}
 	

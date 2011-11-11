@@ -1,8 +1,8 @@
 <?php
 namespace jc\mvc\model\db ;
 
+use jc\pattern\composite\INamable;
 use jc\bean\BeanFactory;
-
 use jc\bean\IBean;
 use jc\db\sql\Restriction;
 use jc\mvc\model\db\orm\SelectForAssocQuery;
@@ -59,6 +59,11 @@ class Model extends AbstractModel implements IModel , IPaginal, IBean
 		return $object;
 	}
 
+	public function name()
+	{
+		return $this->aPrototype? $this->aPrototype->name(): null ; 
+	}
+	
 	public function serialize ()
 	{
 		return serialize( array(
@@ -410,6 +415,11 @@ class Model extends AbstractModel implements IModel , IPaginal, IBean
 	{
 		if( !empty($arrConfig['orm']) )
 		{
+			if( !empty($arrConfig['name']) )
+			{
+				$arrConfig['orm']['name'] = $arrConfig['name'] ;
+			}
+			
 			if(empty($arrConfig['orm']['class']))
 			{
 				$arrConfig['orm']['class'] = 'prototype' ;

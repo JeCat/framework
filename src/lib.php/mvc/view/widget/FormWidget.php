@@ -55,19 +55,37 @@ class FormWidget extends Widget implements IViewFormWidget
 		// -------------------
 		// verifiers
     	$aBeanFactory = BeanFactory::singleton() ;
-    	foreach($aBeanFactory->createBeanArray($arrConfig,'verifier:',null,'class',$sNamespace) as $aVerifier)
-		{
-			$arrConfig = $aVerifier->beanConfig() ;
-			
-			$this->addVerifier(
-				$aVerifier
-				, isset($arrConfig['word'])? $arrConfig['word']: null
-				, isset($arrConfig['callback'])? $arrConfig['callback']: null
-				, isset($arrConfig['callback.argvs'])? $arrConfig['callback.argvs']: null
-			) ;
-		}
-		
-//		$this->arrBeanConfig = $arrConfig ;
+    	foreach($arrConfig as $sPropertyName=>&$item)
+    	{
+    		// verifiers
+    		if($sPropertyName=='verifier')
+    		{
+    			foreach($aBeanFactory->createBeanArray($item,'length','class',$sNamespace) as $aBean)
+				{
+					$this->addVerifier(
+						$aBean
+						, isset($arrConfig['message'])? $arrConfig['message']: null
+						, isset($arrConfig['callback'])? $arrConfig['callback']: null
+						, isset($arrConfig['callback.argvs'])? $arrConfig['callback.argvs']: null
+					) ;
+				}
+    		}
+    		
+    		// verifier:ooxxx
+    		else if( strpos($sPropertyName,'verifier:')===0 )
+    		{
+    			if(empty($item['class']) and empty($item['ins']) and empty($item['conf']))
+    			{
+    				$item['class'] = substr($sPropertyName,9) ;
+    			}
+				$this->addVerifier(
+					$aBeanFactory->createBean($item,$sNamespace)
+					, isset($arrConfig['message'])? $arrConfig['message']: null
+					, isset($arrConfig['callback'])? $arrConfig['callback']: null
+					, isset($arrConfig['callback.argvs'])? $arrConfig['callback.argvs']: null
+				) ;
+    		}
+    	}
 	}
 	
 	public function value()

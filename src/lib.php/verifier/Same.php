@@ -11,14 +11,12 @@ class Same extends Object implements IVerifier ,IBean{
 	public function __construct() {
 	}
 	
-	public function build(array & $arrConfig)
-	{
-		$this->arrBeanConfig = $arrConfig;
-	}
+	public function build(array & $arrConfig,$sNamespace='*')
+	{}
 	
 	public function beanConfig()
 	{
-		return $this->arrBeanConfig;
+		return array() ;
 	}
 	
 	public function verify($data, $bThrowException) {
@@ -34,8 +32,6 @@ class Same extends Object implements IVerifier ,IBean{
 		}
 		return true;
 	}
-	
-	private $arrBeanConfig = array();
 }
 
 ?>

@@ -3,7 +3,6 @@ namespace jc\bean ;
 
 use jc\resrc\ResourceManager;
 use jc\lang\Type;
-use jc\lang\Exception;
 use jc\lang\Object;
 
 class BeanFactory extends Object
@@ -41,6 +40,8 @@ class BeanFactory extends Object
 			$aSingleton->registerBeanClass("jc\\verifier\\Email",'email') ;
 			$aSingleton->registerBeanClass("jc\\verifier\\Length",'length') ;
 			$aSingleton->registerBeanClass("jc\\verifier\\Number",'number') ;
+			$aSingleton->registerBeanClass("jc\\verifier\\Same",'same') ;
+			$aSingleton->registerBeanClass("jc\\verifier\\NotEmpty",'notEmpty') ;
 			
 			self::setSingleton($aSingleton,__CLASS__) ;
 		}
@@ -52,14 +53,14 @@ class BeanFactory extends Object
 	 * 通过传入的对象配置数组，创建一个 IBean 对象
 	 * @return jc\bean\IBean
 	 */
-	public function createBean(array &$arrConfig,$sNamespace='*') 
+	public function createBean(array &$arrConfig,$sNamespace='*',$bAutoBuild=true) 
 	{
 		// ins 
 		if( !empty($arrConfig['ins']) )
 		{			
 			if( !$aFile = $this->beanFolders()->find($arrConfig['ins'].'.ins.php',$sNamespace) )
 			{
-				throw new Exception("Bean对象配置数组中的 ins 属性无效: %s，找不到指定的实例文件",$arrConfig['ins']) ;
+				throw new BeanConfException("Bean对象配置数组中的 ins 属性无效: %s，找不到指定的实例文件",$arrConfig['ins']) ;
 			}
 			return $aFile->includeFile(false,false) ;
 		}
@@ -70,12 +71,12 @@ class BeanFactory extends Object
 						
 			if( !$aFile = $this->beanFolders()->find($sConfigName.'.conf.php',$sNamespace) )
 			{
-				throw new Exception("Bean对象配置数组中的 conf 属性无效，找不到指定的配置文件: %s",$sConfigName) ;
+				throw new BeanConfException("Bean对象配置数组中的 conf 属性无效，找不到指定的配置文件: %s",$sConfigName) ;
 			}
 			$arrConfigFile = $aFile->includeFile(false,false) ;
 			if( !is_array($arrConfigFile) )
 			{
-				throw new Exception("Bean对象配置文件内容无效: %s，文件必须返回一个 bean 配置数组",$aFile->url()) ;
+				throw new BeanConfException("Bean对象配置文件内容无效: %s，文件必须返回一个 bean 配置数组",$aFile->url()) ;
 			}
 
 			// 合并数组
@@ -94,21 +95,25 @@ class BeanFactory extends Object
 		
 			if( !class_exists($sClass) )
 			{
-				throw new Exception("Bean对象配置数组中的 class 属性无效：%s，不存在该名称的类和别名",$arrConfig['class']) ;
+				throw new BeanConfException("Bean对象配置数组中的 class 属性无效：%s，不存在该名称的类和别名",$arrConfig['class']) ;
 			}
 			
 			if( !Type::hasImplements($sClass,'jc\\bean\\IBean') )
 			{
-				throw new Exception("Bean对象配置数组中的 class 属性无效：%s，必须是一个实现 jc\\bean\\IBean 接口的类",$arrConfig['class']) ;
+				throw new BeanConfException("Bean对象配置数组中的 class 属性无效：%s，必须是一个实现 jc\\bean\\IBean 接口的类",$arrConfig['class']) ;
 			}
 			
 			$aBean = new $sClass ;
-			$aBean->build($arrConfig,$sNamespace) ;
+			
+			if($bAutoBuild)
+			{
+				$aBean->build($arrConfig,$sNamespace) ;
+			}
 		}
 		
 		else 
 		{
-			throw new Exception("无法根据配置数组创建 Bean 对象，缺少必须的 ins, config 或 class 属性: %s。",var_export($arrConfig,true)) ;
+			throw new BeanConfException("无法根据配置数组创建 Bean 对象，缺少必须的 ins, config 或 class 属性: %s。",var_export($arrConfig,true)) ;
 		}
 		
 		return $aBean ;
@@ -118,25 +123,16 @@ class BeanFactory extends Object
 	 * 通过传入的对象配置数组列表，创建一系列 IBean 对象
 	 * @return array
 	 */
-	public function createBeanArray(array &$arrConfigArray,$sKeyPrefix,$sDefaultClass=null,$sKeyAs='name',$sNamespace='*') 
-	{		
+	public function createBeanArray(array &$arrConfigArray,$sDefaultClass=null,$sKeyAs='name',$sNamespace='*',$bAutoBuild=true) 
+	{
 		$arrBeans = array() ;
-		$nKeyPrefixLen = strlen($sKeyPrefix) ;
 		
 		foreach($arrConfigArray as $key=>&$arrConfig)
 		{
-			if( substr($key,0,$nKeyPrefixLen)!=$sKeyPrefix )
-			{
-				continue ;
-			}
-			
 			// 以数组的 key 作为 name,id 等属性
-			if( $sKeyAs and $key=substr($key,$nKeyPrefixLen) )
+			if( $sKeyAs and !isset($arrConfig[$sKeyAs]) and !is_int($key) )
 			{
-				if(!isset($arrConfig[$sKeyAs]))
-				{
-					$arrConfig[$sKeyAs] = strval($key) ;
-				}
+				$arrConfig[$sKeyAs] = strval($key) ;
 			}
 			
 			// 默认的 class
@@ -148,7 +144,7 @@ class BeanFactory extends Object
 				}
 			}
 			
-			$arrBeans[] = $this->createBean($arrConfig,$sNamespace) ;
+			$arrBeans[] = $this->createBean($arrConfig,$sNamespace,$bAutoBuild) ;
 		}
 		
 		return $arrBeans ;
