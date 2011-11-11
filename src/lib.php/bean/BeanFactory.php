@@ -30,10 +30,10 @@ class BeanFactory extends Object
 			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\Text",'text') ;
 			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\Select",'select') ;
 			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\SelectList",'list') ;
-			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\CheckBtn",'checkbtn') ;
+			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\CheckBtn",'checkbox') ;
 			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\File",'file') ;
 			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\Group",'group') ;
-			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\RadioGroup",'radiogroup') ;
+			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\RadioGroup",'radios') ;
 			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\Paginator",'paginator') ;
 			
 			// verifyers
@@ -41,7 +41,11 @@ class BeanFactory extends Object
 			$aSingleton->registerBeanClass("jc\\verifier\\Length",'length') ;
 			$aSingleton->registerBeanClass("jc\\verifier\\Number",'number') ;
 			$aSingleton->registerBeanClass("jc\\verifier\\Same",'same') ;
-			$aSingleton->registerBeanClass("jc\\verifier\\NotEmpty",'notEmpty') ;
+			$aSingleton->registerBeanClass("jc\\verifier\\FileExt",'extname') ;
+			$aSingleton->registerBeanClass("jc\\verifier\\FileSize",'filesize') ;
+			$aSingleton->registerBeanClass("jc\\verifier\\ImageArea",'imagearea') ;
+			$aSingleton->registerBeanClass("jc\\verifier\\ImageSize",'imagesize') ;
+			$aSingleton->registerBeanClass("jc\\verifier\\NotEmpty",'notempty') ;
 			
 			self::setSingleton($aSingleton,__CLASS__) ;
 		}
