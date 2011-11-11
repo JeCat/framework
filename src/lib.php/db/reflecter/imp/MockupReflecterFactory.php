@@ -1,12 +1,14 @@
 <?php
 namespace jc\db\reflecter\imp;
 
+use jc\db\DB;
 use jc\db\reflecter\AbstractReflecterFactory;
 
 class MockupReflecterFactory extends AbstractReflecterFactory
 {
-	public function __construct(array $arrMockupStruct)
+	public function __construct(DB $aDB, array $arrMockupStruct)
 	{
+		parent::__construct($aDB) ;
 		$this->arrMockupStruct = $arrMockupStruct ;
 	}
 	

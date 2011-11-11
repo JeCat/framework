@@ -1,61 +1,31 @@
 <?php
 namespace jc\mvc\model\db ;
 
-use jc\db\sql\Statement;
-
+use jc\db\sql\Restriction;
 use jc\mvc\model\db\orm\operators\SelectForAssocQuery;
-use jc\db\sql\Select;
-use jc\mvc\model\db\orm\PrototypeAssociationMap;
 use jc\lang\Exception;
-use jc\mvc\model\db\orm\operators\Deleter;
-use jc\mvc\model\db\orm\operators\Selecter;
-use jc\mvc\model\db\orm\operators\Inserter;
-use jc\mvc\model\db\orm\operators\Updater;
+use jc\mvc\model\db\orm\Deleter;
+use jc\mvc\model\db\orm\Selecter;
+use jc\mvc\model\db\orm\Inserter;
+use jc\mvc\model\db\orm\Updater;
 use jc\db\DB;
 use jc\db\recordset\IRecordSet;
-use jc\db\sql\MultiTableStatement;
 use jc\db\sql\Criteria;
 use jc\mvc\model\db\orm\Association;
-use jc\mvc\model\db\orm\PrototypeInFragment ;
 use jc\mvc\model\AbstractModel ;
-use jc\db\sql\IDriver ;
-use jc\lang\Object;
 use jc\mvc\model\IPaginal;
-use jc\mvc\view\widget\Paginator;
+use jc\mvc\model\db\orm\Prototype;
 
 class Model extends AbstractModel implements IModel , IPaginal
 {
-	/**
-	 * 
-	 * @param string $sPrototypeName
-	 * @param array $arrAssocFragment
-	 * @param boolen $bAggregation
-	 * @param PrototypeAssociationMap $aAssocMap
-	 * @throws Exception
-	 * @return IModel
-	 */
-	static public function fromFragment($sPrototypeName,array $arrAssocFragment=array(),$bAggregation=false,PrototypeAssociationMap $aAssocMap=null)
+	public function __construct(Prototype $aPrototype=null)
 	{
-		if( !$aAssocMap )
-		{
-			$aAssocMap = PrototypeAssociationMap::singleton() ;
-		}
-		
-		$aPrototype = $aAssocMap->fragment($sPrototypeName,$arrAssocFragment) ;
-		if(!$aPrototype)
-		{
-			throw new Exception("制定的原型：%s 不存在",$sPrototypeName) ;
-		}
-		
-		$sClass = get_called_class() ;
-		
-		return new $sClass($aPrototype,$bAggregation) ;
+	    parent::__construct();
+	    $this->setPrototype($aPrototype);
 	}
 	
-	public function __construct($prototype=null,$bAggregation=false)
+	public static function create($prototype=null)
 	{
-		parent::__construct($bAggregation) ;
-		
 		// orm config
 		if( is_array($prototype) )
 		{
@@ -63,7 +33,7 @@ class Model extends AbstractModel implements IModel , IPaginal
 		}
 		
 		// Prototype
-		else if( $prototype instanceof PrototypeInFragment )
+		else if( $prototype instanceof Prototype )
 		{
 			$aPrototype = $prototype ;
 		}
@@ -81,10 +51,9 @@ class Model extends AbstractModel implements IModel , IPaginal
 			throw new Exception("创建模型时传入的模型原型类型无效") ;
 		}
 		
-		$this->setPrototype($aPrototype) ;
-		
-		
-		$this->criteria()->setLimitLen( $bAggregation? 30: 1 ) ;
+		$object = new self($aPrototype);
+		$object->criteria()->setLimitLen( 1 ) ;
+		return $object;
 	}
 
 	public function serialize ()
@@ -109,24 +78,16 @@ class Model extends AbstractModel implements IModel , IPaginal
 	/**
 	 * @return IModel
 	 */
-	public function child($sName)
+	public function child($sName,$bCreateByAssoc=true)
 	{
 		$aChild = parent::child($sName) ;
-		if(!$aChild)
+		if( !$aChild and $bCreateByAssoc )
 		{
 			// 根据 原型 自动创建子模型
-			if( $aAssocs=$this->prototype()->associations(false) and $aAssociation=$aAssocs->get($sName) )
+			if( $aAssoc=$this->prototype()->associationByName($sName) )
 			{
-				$aChild = $aAssociation->toPrototype()->createModel(false) ;
-				$this->addChild($aChild,$aAssociation->modelProperty()) ;
-				
-				// 多属关系
-				if( !$aAssociation->isOneToOne() )
-				{
-					$aChild->setAggregation(true) ;
-				}
-				
-				$aChild->criteria()->setLimit( $aAssociation->count() ) ;
+				$aChild = $aAssoc->toPrototype()->createModel( !$aAssoc->isType(Association::oneToOne) ) ;
+				$this->addChild($aChild,$sName) ;
 			}
 		}
 		
@@ -134,183 +95,121 @@ class Model extends AbstractModel implements IModel , IPaginal
 	}
 	
 	/**
-	 * @return jc\mvc\model\db\orm\PrototypeInFragment
+	 * @return jc\mvc\model\db\orm\Prototype
 	 */
 	public function prototype()
 	{
 		return $this->aPrototype ;
 	}
 
-	public function setPrototype(PrototypeInFragment $aPrototype=null)
+	public function setPrototype(Prototype $aPrototype=null)
 	{
 		$this->aPrototype = $aPrototype ;
 	}
 
 	public function loadData( IRecordSet $aRecordSet, $bSetSerialized=false )
 	{
-		// 聚合模型
-		if( $this->isAggregation() )
+		// 通过 prototype 加载各字段数据
+		if( $aPrototype=$this->prototype() )
 		{
-			$aPrototype = $this->prototype() ;
-			
-			while( $aRecordSet->valid() )
+			$arrColumns = array_merge($aPrototype->columns(),$aPrototype->keys());
+			foreach( $arrColumns as $sClm )
 			{
-				$aModel = $aPrototype? $aPrototype->createModel(false): new self() ;
-				$aModel->loadData($aRecordSet,$bSetSerialized) ;
-
-				$this->addChild($aModel) ;
-				
-				$aRecordSet->next() ;
+				$this->setData( $sClm, $aRecordSet->field($aPrototype->sqlColumnAlias($sClm)) ,false) ;
+			}
+			
+			// 加载所有单属关系的子模型
+			foreach($aPrototype->associations() as $aAssoc)
+			{
+				if( $aAssoc->isType(Association::oneToOne) )
+				{
+					$this->child($aAssoc->name())->loadData($aRecordSet,$bSetSerialized) ;					
+				}
 			}
 		}
 		
-		// 常规模型
+		// 通过 数据集 加载各字段数据
 		else 
 		{
-			// 通过 prototype 加载各字段数据
-			if( $aPrototype=$this->prototype() )
+			$arrRow = $aRecordSet->current() ;
+			foreach ($arrRow as $sClmName=>&$sValue)
 			{
-				foreach( $aPrototype->columns() as $sClm )
-				{
-					$this->setData( $sClm, $aRecordSet->field($aPrototype->columnAlias($sClm)) ) ;
-				}
+				$this->setData($sClmName,$sValue,false) ;
 			}
-			
-			// 通过 数据集 加载各字段数据
-			else 
-			{
-				$arrRow = $aRecordSet->current() ;
-				foreach ($arrRow as $sClmName=>&$sValue)
-				{
-					$this->setData($sClmName,$sValue) ;
-				}
-			}
-			
-			if($bSetSerialized)
-			{
-				$this->setSerialized(true) ;
-			}
+		}
+		
+		
+		if($bSetSerialized)
+		{
+			$this->setSerialized(true) ;
 		}
 	}
 	
 	
 	public function load($values=null,$keys=null)
 	{
+		$selectCriteria = null;//一个临时的Criteria对象，仅在此次load中有效。load结束后立即销毁。
 		if($values){
 			if(!$keys){
-				$keys = $this->prototype()->primaryKeys() ;
+				$keys = $this->prototype()->keys() ;
 			}else{
 				$keys = (array)$keys;
 			}
 			if($values instanceof Criteria){
-				$this->aCriteria = $values;
+				$selectCriteria = $values;
 			}else if($values instanceof Restriction){
-				$aCriteria = $this->criteria() ;
-				$aCriteria->restriction()->add($values);
+				$selectCriteria = clone $this->criteria() ;
+				$selectCriteria->restriction()->add($values);
 			}else{
 				$values = array_values((array) $values) ;
-				$aCriteria = $this->criteria() ;
+				$selectCriteria = clone $this->criteria();
 				foreach($keys as $nIdx=>$sKey)
 				{
-					$aCriteria->restriction()->eq( $sKey, $values[$nIdx] ) ;
+					$selectCriteria->restriction()->eq( $sKey, $values[$nIdx] ) ;
 				}
 			}
 		}
-		
-		return Selecter::singleton()->select( $this->db(), $this, $this->aCriteria ) ;
+		$this->setSerialized(true);
+		$this->clearChanged();
+		return Selecter::singleton()->execute( $this->db(), $this, null,$selectCriteria ) ;
 	}
 	
 	public function save()
 	{
-		if($this->isAggregation())
+		// update
+		if( $this->hasSerialized() )
 		{
-			foreach($this->childIterator() as $aChildModel)
-			{
-				if( !$aChildModel->save() )
-				{
-					return false ;
-				}
-			}
-			
-			return true ;
+			return $this->update() ;
 		}
 		
+		// insert
 		else 
 		{
-			// update
-			if( $this->hasSerialized() )
-			{
-				return $this->update() ;
-			}
-			
-			// insert
-			else 
-			{
-				return $this->insert() ;
-			}
+			return $this->insert() ;
 		}
 	}
 
-	public function insert()
+	protected function insert()
 	{
-		return Inserter::singleton()->insert($this->db(), $this) ;
+		return Inserter::singleton()->execute($this->db(), $this) ;
 	}
 	
-	public function update()
+	protected function update()
 	{
-		return Updater::singleton()->update($this->db(), $this) ;
+		return Updater::singleton()->execute($this->db(), $this) ;
 	}
 	
 	public function delete()
 	{
-		if($this->isAggregation())
+		if( $this->hasSerialized() )
 		{
-			foreach($this->childIterator() as $aChildModel)
-			{
-				if( !$aChildModel->delete() )
-				{
-					return false ;
-				}
-			}
-			
-			return true ;
+			return Deleter::singleton()->execute($this->db(), $this) ;	
 		}
 		
 		else 
 		{
-			if( $this->hasSerialized() )
-			{
-				return Deleter::singleton()->delete($this->db(), $this) ;	
-			}
-			
-			else 
-			{
-				return true ;
-			}
+			return true ;
 		}
-	}
-	
-	
-	
-	public function createChild($bAdd=true,$bTearoutPrototype=true)
-	{
-		if( !$this->aPrototype )
-		{
-			throw new Exception("模型没有缺少对应的原型，无法为其创建子模型") ;
-		}
-		if( !$this->isAggregation() )
-		{
-			throw new Exception("模型(%s)不是一个聚合模型，无法为其创建子模型",$this->aPrototype->name()) ;
-		}
-		
-		$aChild = $this->aPrototype->createModel($bTearoutPrototype) ;
-		
-		if($bAdd)
-		{
-			$this->addChild($aChild) ;
-		}
-		
-		return $aChild ;
 	}
 	
 	public function loadChild($values=null,$keys=null)
@@ -343,7 +242,7 @@ class Model extends AbstractModel implements IModel , IPaginal
 				throw new Exception("无效的db\\Model,缺少原型对象") ;
 			}
 			
-			$this->aCriteria = $this->aPrototype->sqlFactory()->createCriteria() ;
+			$this->aCriteria = $this->aPrototype->criteria() ;
 		}
 		
 		return $this->aCriteria ;
@@ -442,7 +341,68 @@ class Model extends AbstractModel implements IModel , IPaginal
 	}
 	
 	/**
-	 * @var jc\mvc\model\db\orm\PrototypeInFragment
+	 * @notice 不会发生级连操作。
+	 * 既，如果$sName是外键，这个函数不会修改关联表中相应外键的值。
+	 * 需要开发者手动保持外键的同步问题。
+	 * 或者调用save()方法来保持同步。
+	 */
+	public function setData($sName,$sValue, $bStrikeChange=true)
+	{
+		// 原型中的别名
+		if( $this->aPrototype )
+		{
+			$sRealName = $this->aPrototype->getColumnByAlias($sName) ;
+			if( $sRealName!==null )
+			{
+				$sName = $sRealName ;
+			}
+		}
+		
+		parent::setData($sName,$sValue, $bStrikeChange) ;
+	}
+	
+	public function setChanged($sName,$bChanged=true)
+	{
+		// 原型中的别名
+		if( $this->aPrototype && $sRealName=$this->aPrototype->getColumnByAlias($sName) )
+		{
+			$sName = $sRealName ;
+		}
+		parent::setChanged($sName,$bChanged) ;
+	}
+	
+	/**
+	 * @param string $sName	$sName=null返回一个数组，或返回指定数据项的“是否变化”状态
+	 */
+	public function changed($sName=null)
+	{
+		// 原型中的别名
+		if( $this->aPrototype && $sRealName=$this->aPrototype->getColumnByAlias($sName) )
+		{
+			$sName = $sRealName ;
+		}
+		return parent::changed($sName) ;
+	}
+	
+	protected function _data(&$sName)
+	{
+		$data = parent::_data($sName) ;
+		
+		// 原型中的别名
+		if( $data===null and $this->aPrototype )
+		{
+			$sName = $this->aPrototype->getColumnByAlias($sName) ;
+			if( $sName!==null )
+			{
+				return parent::_data($sName) ;
+			}
+		}
+		
+		return $data ;
+	}
+	
+	/**
+	 * @var jc\mvc\model\db\orm\Prototype
 	 */
 	private $aPrototype ;
 	private $aCriteria ;

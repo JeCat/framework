@@ -5,10 +5,6 @@ use jc\pattern\composite\IContainer;
 
 interface IModel extends \ArrayAccess, \Iterator
 {
-	public function isAggregation() ;
-	
-	public function setAggregation($bAggregation=true) ;
-	
 	public function hasSerialized() ;
 	
 	public function setSerialized($bSerialized=true) ;

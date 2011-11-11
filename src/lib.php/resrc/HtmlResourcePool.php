@@ -1,6 +1,7 @@
 <?php
 namespace jc\resrc ;
 
+use jc\system\Application;
 use jc\lang\Exception;
 use jc\lang\Object;
 
@@ -9,15 +10,13 @@ class HtmlResourcePool extends Object
 	const 	RESRC_JS = 1 ;
 	const 	RESRC_CSS = 2 ;
 	
-	public function __construct(ResourceManager $aJsManager=null, ResourceManager $aCssManager=null)
+	public function __construct(ResourceManager $aResourceManager=null)
 	{
 		parent::__construct() ;
 		
-		$this->aJsManager = $aJsManager? $aJsManager: new ResourceManager() ;
-		$this->aCssManager = $aCssManager? $aCssManager: new ResourceManager() ;
-		
+		$this->aResourceManager = $aResourceManager? $aResourceManager: Application::singleton()->publicFolders() ;
+
 		$this->addRequire('jc:style.css',self::RESRC_CSS) ;
-		
 	}
 
 	public function addRequire($sResrcFileName,$nType)
@@ -56,26 +55,15 @@ class HtmlResourcePool extends Object
 	}
 	
 	/**
-	 * @return UrlResourceManager
+	 * @return ResourceManager
 	 */
-	public function javaScriptFileManager()
+	public function resourceManager()
 	{
-		return $this->aJsManager ;
+		return $this->aResourceManager ;
 	}
-	public function setJavaScriptFileManager(UrlResourceManager $aJsManager)
+	public function setResourceManager(ResourceManager $aResourceManager)
 	{
-		$this->aJsManager = $aJsManager ;
-	}
-	/**
-	 * @return UrlResourceManager
-	 */
-	public function cssFileManager()
-	{
-		return $this->aCssManager ;
-	}
-	public function setCssFileManager(UrlResourceManager $aCssManager)
-	{
-		$this->aCssManager = $aCssManager ;
+		$this->aResourceManager = $aResourceManager ;
 	}
 	
 	/**
@@ -84,19 +72,7 @@ class HtmlResourcePool extends Object
 	public function iterator($nType,$bUrl=true)
 	{		
 		$sFilePath = '' ;
-		if( $nType==self::RESRC_JS )
-		{
-			$aResrcMgr = $this->aJsManager ;
-		}
-		else if( $nType==self::RESRC_CSS )
-		{
-			$aResrcMgr = $this->aCssManager ;
-		}
-		else 
-		{
-			throw new Exception("遇到以外的资源类型:%s",$nType) ;
-		}
-		
+				
 		$arrResrcUrls = array() ;
 		foreach( $this->arrResrcs[$nType] as $sFileName=>$nBeRequiredCount )
 		{
@@ -107,7 +83,7 @@ class HtmlResourcePool extends Object
 			
 			if( $bUrl )
 			{
-				$sResrcUrl = $aResrcMgr->find($sFileName) ;
+				$sResrcUrl = $this->aResourceManager->find($sFileName) ;
 				if(!$sResrcUrl)
 				{
 					throw new Exception("正在请求一个未知的资源：%s",$sFileName) ;
@@ -131,7 +107,7 @@ class HtmlResourcePool extends Object
 		try {
 			foreach($this->iterator(self::RESRC_JS,false) as $sFilename)
 			{
-				if( $aFile = $this->aJsManager->find($sFilename) )
+				if( $aFile = $this->aResourceManager->find($sFilename) )
 				{
 					$sUrl = $aFile->httpUrl() ;
 					$sRet.= "<script type=\"text/javascript\" src=\"{$sUrl}\"></script>\r\n" ;
@@ -143,7 +119,7 @@ class HtmlResourcePool extends Object
 			}
 			foreach($this->iterator(self::RESRC_CSS,false) as $sFilename)
 			{
-				if( $aFile = $this->aCssManager->find($sFilename) )
+				if( $aFile = $this->aResourceManager->find($sFilename) )
 				{
 					$sUrl = $aFile->httpUrl() ;
 					$sRet.= "<link rel=\"stylesheet\" type=\"text/css\" href=\"{$sUrl}\" />\r\n" ;
@@ -170,6 +146,8 @@ class HtmlResourcePool extends Object
 				self::RESRC_JS => array() ,
 				self::RESRC_CSS => array() ,
 	) ;
+	
+	private $aResourceManager ;
 	
 	private $aJsManager ;
 	

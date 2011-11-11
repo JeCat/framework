@@ -3,6 +3,9 @@ namespace jc\db\reflecter\imp;
 
 use jc\db\reflecter\AbStractColumnReflecter;
 
+
+use jc\db\reflecter\AbStractColumnReflecter;
+
 class MySQLColumnReflecter extends AbStractColumnReflecter
 {
 	function __construct($aDBReflecterFactory, $sTable, $sColumn, $sDBName = null)

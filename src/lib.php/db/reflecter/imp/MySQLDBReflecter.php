@@ -3,6 +3,8 @@ namespace jc\db\reflecter\imp;
 
 use jc\db\reflecter\AbStractDBReflecter;
 
+use jc\db\reflecter\AbStractDBReflecter;
+
 class MySQLDBReflecter extends AbStractDBReflecter
 {
 	function __construct($aDBReflecterFactory, $sDBName)

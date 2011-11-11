@@ -2,7 +2,6 @@
 namespace jc\db\recordset ;
 
 use jc\lang\Exception;
-
 use jc\lang\Object;
 
 class PDORecordSet extends Object implements IRecordSet

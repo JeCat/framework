@@ -55,6 +55,16 @@ class Table extends SubStatement
 		$this->arrJoinSubStatements[] = $aJoin ;
 	}
 	
+	public function clearJoins()
+	{
+		$this->arrJoinSubStatements = array() ;
+	}
+	
+	public function joins()
+	{
+		return $this->arrJoinSubStatements ;
+	}
+	
 	private $sTableName = '' ;
 	private $sAlias = '' ;
 	private $arrJoinSubStatements = array() ;

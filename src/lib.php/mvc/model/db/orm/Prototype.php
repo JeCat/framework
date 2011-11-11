@@ -1,403 +1,536 @@
 <?php
-namespace jc\mvc\model\db\orm ;
+namespace jc\mvc\model\db\orm;
 
-use jc\io\IOutputStream;
-use jc\lang\Assert;
-use jc\db\DB;
-use jc\lang\Type;
+use jc\db\sql\name\NameTransfer;
+use jc\mvc\model\db\ModelList;
+use jc\mvc\model\db\Model;
+use jc\db\reflecter\AbstractReflecterFactory;
 use jc\lang\Exception;
-use jc\util\HashTable;
-use jc\pattern\composite\Container;
-use jc\lang\Object;
+use jc\db\DB;
+use jc\db\sql\StatementFactory;
 
-class Prototype extends Object implements \Serializable
+class Prototype
 {
-	public function __construct($sName,$sTable,$primaryKeys=null,array $arrClms=null)
+	const youKnow = null ;
+	
+	// static creator
+	/**
+	 * @return Prototype
+	 */
+	static public function create( $sTableName, $keys=self::youKnow, $columns=self::youKnow , $aDB = self::youKnow )
 	{
-		$this->sName = $sName ;
+		$aPrototype = new Prototype ;
 		
-		$arr = explode('.', $sTable) ;
-		if(count($arr)==2)
+		$aPrototype->setTableName($sTableName) ;
+		$aPrototype->setName($sTableName) ;
+		$aPrototype->arrColumns = $columns ;
+		$aPrototype->arrKeys = self::youKnow ;
+		
+		$aPrototype->aDB = $aDB===self::youKnow? DB::singleton(): $aDB ;
+		
+		return $aPrototype;
+	}
+	
+	// getter and setter
+	
+	public function name()
+	{
+		return $this->sName;
+	}
+	/**
+	 * @return Prototype
+	 */
+	public function setName($sName)
+	{
+		$this->sName = $sName;
+		return $this;
+	}
+	
+	public function keys()
+	{
+		if( $this->arrKeys===self::youKnow )
 		{
-			$this->sDatabaseName = $arr[0] ;
+			$this->arrKeys = $this->tableReflecter()->primaryName() ;
+			if( $this->arrKeys )
+			{
+				$this->arrKeys = (array) $this->arrKeys ;
+			}
+		}
+		return $this->arrKeys;
+	}
+	
+	/**
+	 *   键可以为多个。本函数接受一个数组（多个键）或一个字符串（一个键）。
+	 * @return Prototype
+	 */
+	public function setKeys( $keys )
+	{
+		$this->arrKeys = (array)$keys ;
+		return $this;
+	}
+	
+	/**
+	 *   数据表定义的主键
+	 */
+	public function devicePrimaryKey()
+	{
+		if( $this->sDevicePrimaryKey===self::youKnow )
+		{
+			if( !$this->sDevicePrimaryKey = $this->tableReflecter()->primaryName() )
+			{
+				$this->sDevicePrimaryKey = '' ;
+			}
 		}
 		
-		$this->sTableName = $sTable ;
+		return $this->sDevicePrimaryKey ?: null ;
+	}
+	
+	public function tableName()
+	{
+		return $this->sTableName;
+	}
+	/**
+	 * @return Prototype
+	 */
+	public function setTableName($sTableName)
+	{
+		$this->sTableName = $sTableName;
+		return $this;
+	}
+	
+	/**
+	 * @return jc\db\sql\Criteria
+	 */
+	public function criteria($bCreate=true)
+	{
+		if( !$this->aCriteria and $bCreate )
+		{
+			$this->aCriteria = $this->statementFactory()->createCriteria() ;
+		}
 		
-		$this->arrPrimaryKeys = (array)$primaryKeys ;
+		return $this->aCriteria;
+	}
+	
+	public function associatedBy()
+	{
+		return $this->aAssociationBy;
+	}
+	
+	// columns
+	public function columns()
+	{
+		if( $this->arrColumns===self::youKnow or $this->arrColumns=='*' )
+		{
+			$this->arrColumns = $this->tableReflecter()->columns() ;
+		}
+		return $this->arrColumns;
+	}
+	
+	/**
+	 *  本函数接受一个数组（多个列）或一个字符串（一个列）。
+	 * @return Prototype
+	 */
+	public function addColumns($sColumnName,$_=self::youKnow)
+	{
+		if( $this->arrColumns===self::youKnow or $this->arrColumns=='*' )
+		{
+			$this->arrColumns = array() ;
+		}
 		
-		$this->arrClms = (array)$arrClms ;
-
-		parent::__construct() ;
+		$this->arrColumns = array_merge($this->arrColumns,func_get_args()) ;
+		return $this;
+	}
+	
+	public function removeColumn($sColumn)
+	{
+		$key = array_search($sColumn,$this->arrColumns) ;
+		
+		if($key!==false)
+		{
+			unset($this->arrColumns[$key]);
+		}
+		
+		return $this;
+	}
+	
+	public function clearColumns()
+	{
+		$this->arrColumns=array() ;
+		return $this ;
+	}
+	
+	public function columnIterator()
+	{
+		return new \ArrayIterator($this->arrColumns) ;
+	}
+	
+	public function columnAliases()
+	{
+		return $this->arrColumnAliases ;
+	}
+	public function getColumnByAlias($sAlias)
+	{
+		return isset($this->arrColumnAliases[$sAlias])? 
+					$this->arrColumnAliases[$sAlias]: null ;
+	}
+	/**
+	 * @return Prototype
+	 */
+	public function addColumnAlias($sColumn,$sAlias)
+	{
+		$this->arrColumnAliases[$sAlias] = $sColumn;
+		return $this;
 	}
 	
 	/**
 	 * @return Prototype
 	 */
-	static function createFromCnf(array $arrCnf,$bCheckValid=true,$bCreateAssoc=true,$bInFragment=false)
+	public function removeColumnAlias($sAlias)
 	{
-		if( $bCheckValid )
-		{
-			$arrCnf = self::assertCnfValid($arrCnf) ;
-		}
-		
-		$sClass = $bInFragment? __NAMESPACE__.'\\PrototypeInFragment': __CLASS__ ;
-		
-		$aPrototype = new $sClass($arrCnf['name'],$arrCnf['table'],$arrCnf['keys'],$arrCnf['clms']) ;
-		$aPrototype->sModelClass = $arrCnf['class'] ;
-		
-		// 通过反射设置model prototype
-		if( empty($aPrototype->arrClms) or empty($aPrototype->arrPrimaryKeys) or empty($aPrototype->sDevicePrimaryKey) )
-		{
-			$aPrototype->reflectTableInfo(DB::singleton()) ;
-		}
-	
-		// 为模型原型 创建关联原型
-		if($bCreateAssoc)
-		{
-			foreach(Association::allAssociationTypes() as $sAssoType)
-			{
-				if( !empty($arrCnf[$sAssoType]) )
-				{
-					foreach($arrCnf[$sAssoType] as $arrAsso)
-					{
-						$aAssociation = Association::createFromCnf(
-								$arrAsso, $aPrototype, $sAssoType, $bCheckValid, true
-						) ;
-						$aPrototype->addAssociation($aAssociation) ;
-					}
-				}
-			}
-		}
-		
-		return $aPrototype ;
-	}
-
-	public function serialize ()
-	{
-		foreach(array(
-				'sName',
-				'sTableName',
-				'sDatabaseName',
-				'sModelClass',
-				'arrPrimaryKeys',
-				'sDevicePrimaryKey',
-				'arrClms',
-				'aAssociations'
-		) as $sPropName)
-		{
-			$arrData[$sPropName] =& $this->$sPropName ;
-		}
-		return serialize( $arrData ) ;
-	}
-
-	public function unserialize ($sSerialized)
-	{
-		$arrData = unserialize($sSerialized) ;
-				
-		foreach(array(
-				'sName',
-				'sTableName',
-				'sDatabaseName',
-				'sModelClass',
-				'arrPrimaryKeys',
-				'sDevicePrimaryKey',
-				'arrClms',
-				'aAssociations'
-		) as $sPropName)
-		{
-			if( array_key_exists($sPropName, $arrData) )
-			{
-				$this->$sPropName =& $arrData[$sPropName] ;
-			}
-		}
-	}
-	
-	public function name()
-	{
-		return $this->sName ;
-	}
-	
-	public function tableName() 
-	{
-		return $this->sTableName ;
-	}
-	public function setTableName($sTable) 
-	{
-		$this->sTableName = $sTable ;
-	}
-	
-	public function databaseName() 
-	{
-		return $this->sDatabaseName ;
-	}
-	public function setDatabaseName($sDatabase) 
-	{
-		$this->sDatabaseName = $sDatabase ;
-	}
-	
-	public function modelClass() 
-	{
-		return $this->sModelClass ;
-	}
-	public function setModelClass($sModelClass) 
-	{
-		$this->sModelClass = $sModelClass ;
-	}
-	
-	public function devicePrimaryKey()
-	{
-		return $this->sDevicePrimaryKey ;
-	}
-	
-	public function setDevicePrimaryKey($sDevicePrimaryKey)
-	{
-		$this->sDevicePrimaryKey = $sDevicePrimaryKey ;
-	}
-	
-	public function primaryKeys()
-	{
-		return $this->arrPrimaryKeys ;
-	}
-	
-	public function setPrimayKeys($keys)
-	{
-		$this->arrPrimaryKeys = (array)$keys ;
-	}
-	
-	public function addColumn($sName)
-	{
-		if( !in_array($sName,$this->arrClms) )
-		{
-			$this->arrClms[] = $sName ;
-		}
-	}
-	public function clearColumn()
-	{
-		$this->arrClms = array() ;
-	}
-	public function columns()
-	{
-		return $this->arrClms ;
-	}
-	/**
-	 * @return jc\pattern\iterate\INonlinearIterator
-	 */
-	public function columnIterator()
-	{
-		return new \jc\pattern\iterate\ArrayIterator($this->arrClms) ;
+		unset($this->arrColumnAliases[$sAlias]);
+		return $this;
 	}
 	
 	/**
-	 * @return jc\util\HashTable
+	 * @return Prototype
 	 */
-	public function associations($bCreate=true)
-	{
-		if( !$this->aAssociations and $bCreate )
-		{
-			$this->aAssociations = new HashTable() ;
-		}
-		return $this->aAssociations ;
-	}
-
-	public function addAssociation(Association $aAssociation)
-	{
-		$aAssociations = $this->associations(true) ;
-		$aAssociations->set($aAssociation->modelProperty(), $aAssociation) ;
-	}
-
-	/** 
-	 * array(
-	 * 	'name' => 'xxxx' ,
-	 * 	'table' => 'xxxx' ,
-	 * 	'keys' => array('xxx') ,
-	 * 	'columns' => array('xxx') ,
-	 * 	'hasOne' => array(
-	 * 		array(
-	 * 			'model' => 'oooo',
-	 * 			'prop' => 'oooo' ,
-	 * 			'fromk' => array('xxx') ,
-	 * 			'tok' => array('xxx') ,
-	 * 		) ,
-	 * 	) ,
-	 * 	'hasAndBelongsToMany' => array(
-	 * 		array(
-	 * 			'model' => 'oooo',
-	 * 			'fromk' => array('xxx') ,
-	 * 			'tok' => array('xxx') ,
-	 * 			'bridge' => 'xxx' ,
-	 * 			'bfromk' => array('xxx') ,
-	 * 			'btok' => array('xxx') ,
-	 * 		) ,
-	 * 	) ,
-	 * 
-	 * 
-	 * )
-	 */
-	static public function assertCnfValid(array $arrOrm,$bNestingModel=false)
-	{
-		// 必须属性
-		if( empty($arrOrm['table']) )
-		{
-			throw new Exception("orm(%s) 缺少 table 属性",$arrOrm['name']) ;
-		}
-		
-		// 可选属性
-		if( empty($arrOrm['name']) )
-		{
-			$arrOrm['name'] = $arrOrm['table'] ;
-		}
-		if( empty($arrOrm['keys']) )
-		{
-			$arrOrm['keys'] = array() ;
-		}
-		if( empty($arrOrm['clms']) )
-		{
-			$arrOrm['clms'] = array() ;
-		}
-		if( empty($arrOrm['class']) )
-		{
-			$arrOrm['class'] = 'jc\\mvc\\model\\db\\Model' ;
-		}
-	
-		// 统一格式
-		$arrOrm['columns'] = (array) $arrOrm['clms'] ;
-		
-		// 关联
-		foreach(Association::allAssociationTypes() as $sAssoType)
-		{
-			if( empty($arrOrm[$sAssoType]) )
-			{
-				continue ;
-			}
-
-			if( !is_array($arrOrm[$sAssoType]) )
-			{
-				throw new Exception("orm(%s) 的 %s 属性是多项关联的聚合，必须为 array 结构；当前值的类型是：%s",array($arrOrm['name'],$sAssoType,Type::reflectType($arrOrm[$sAssoType]))) ;
-			}
-			foreach($arrOrm[$sAssoType] as &$arrAsso)
-			{
-				if( !is_array($arrAsso) )
-				{
-					throw new Exception("orm(%s)%s属性的成员必须是 array 结构，用以表示一个模型关联；当前值的类型是：%s。",array($arrOrm['name'],$sAssoType,Type::reflectType($arrAsso))) ;
-				}				
-				
-				$arrAsso = Association::assertCnfValid($arrAsso,$sAssoType,$bNestingModel) ;
-			}
-		}
-		
-		return $arrOrm ;
+	public function clearColumnAliases(){
+		$this->arrColumnAliases=array();
+		return $this;
 	}
 	
-	public function reflectTableInfo(DB $aDB)
+	public function aliasColumnMapIterator(){
+		return new \ArrayIterator($this->arrColumnAliases);
+	}
+	
+	// association
+	public function associations(){
+		return $this->arrAssociations;
+	}
+	
+	/**
+	 * @return Association
+	 */
+	public function hasOne($toTable,$fromKeys=self::youKnow,$toKeys=self::youKnow){
+		return $this->createAssociation(Association::hasOne,$toTable,$fromKeys,$toKeys);
+	}
+	/**
+	 * @return Association
+	 */
+	public function hasMany($toTable,$fromKeys=self::youKnow,$toKeys=self::youKnow){
+		return $this->createAssociation(Association::hasMany,$toTable,$fromKeys,$toKeys);
+	}
+	/**
+	 * @return Association
+	 */
+	public function belongsTo($toTable,$fromKeys=self::youKnow,$toKeys=self::youKnow){
+		return $this->createAssociation(Association::belongsTo,$toTable,$fromKeys,$toKeys);
+	}
+	/**
+	 * @return Association
+	 */
+	public function hasAndBelongsToMany($toTable,$sBridgeTableName,$fromKeys=self::youKnow,$toBridgeKeys=self::youKnow,$fromBridgeKeys=self::youKnow,$toKeys=self::youKnow){
+		return $this->createAssociation(Association::hasAndBelongsTo,$toTable,$fromKeys,$toKeys,$sBridgeTableName,$toBridgeKeys,$fromBridgeKeys);
+	}
+	
+	/**
+	 * $toTable 可以是一个字符串，也可以是一个Prototype对象，表示关联的表。
+	 * @return Association
+	 */
+	public function createAssociation($nType,$to,$fromKeys=self::youKnow,$toKeys=self::youKnow,$sBridgeTable=null,$toBridgeKeys=self::youKnow,$fromBridgeKeys=self::youKnow)
 	{
-		// 反射字段表 和 主键值
-		$aRes = $aDB->query("show columns from ".$this->tableName()) ;
-		if(!$aRes)
+		if(is_string($to))
 		{
-			return false ;
+			$aToPrototype = self::create($to,self::youKnow,'*',$this->aDB) ;
 		}
-		
-		$arrClms = array() ;
-		foreach($aRes as $arrRow)
+		else if( $to instanceof Prototype)
 		{
-			$arrClms[] = $arrRow['Field'] ;
+			$aToPrototype = $to ;
 			
-			if( $arrRow['Key']=='PRI' )
+			if($aToPrototype -> aAssociationBy !== null)
 			{
-				if(empty($this->arrPrimaryKeys))
+				throw new Exception('函数 Prototype::createAssociation() 的参数 $to 已经被关联，不能再关联到其他原型');
+			}
+		}
+		else
+		{
+			throw new Exception('函数 Prototype::createAssociation() 的参数 $to 必须是数据表名称或Prototype对象');
+		}
+		
+		$aAsso = new Association(
+				$this->aDB
+				, $nType
+				, $this 
+				, $aToPrototype
+				, $fromKeys
+				, $toKeys
+				, $sBridgeTable
+				, $toBridgeKeys
+				, $fromBridgeKeys
+		) ;
+
+		$this->arrAssociations[] = $aAsso;
+		$aToPrototype->aAssociationBy = $aAsso;
+		
+		return $aAsso->toPrototype();
+	}
+	
+	/**
+	 * @return Association
+	 */
+	public function associationByName($sName)
+	{
+		foreach($this->arrAssociations as $aAssoc)
+		{
+			if($aAssoc->name()==$sName)
+			{
+				return $aAssoc ;
+			}
+		}
+	}
+	
+	/**
+	 * @return Prototype
+	 */
+	public function removeAssociation($aAssociation)
+	{
+		$key=array_search($aAssociation,$this->arrAssociations,true);
+		if($key!==false)
+		{
+			unset($this->arrAssociations[$key]);
+		}
+		return $this;
+	}
+	/**
+	 * @return Prototype
+	 */
+	public function clearAssociations()
+	{
+		$this->arrAssociations=array();
+		return $this;
+	}
+	public function associationIterator($nType=Association::total)
+	{
+		$arrAssocs = array();
+		foreach($this->arrAssociations as $ass)
+		{
+			if($ass->isType($nType))
+			{
+				$arrAssocs[] = $ass;
+			}
+		}
+		return new \ArrayIterator($arrAssocs);
+	}
+	
+	// done and check
+	/**
+	 * @return Prototype
+	 */
+	public function done()
+	{
+		$this->isValid() ;
+		
+		// 
+		if( $aAssociatedBy=$this->associatedBy() )
+		{
+			$aAssociatedBy->done() ;
+		}
+		
+		return $aAssociatedBy? $this->associatedBy()->fromPrototype(): $this ;
+	}
+	
+	public function isValid()
+	{
+		// 检查主键
+		if(!$this->keys())
+		{
+			throw new Exception('ORM原型(%s)的主键不能为空',$this->path());
+		}
+		
+		// 检查同名的关联原型
+		$arrPrototypeNames = array() ;
+		foreach($this->associationIterator() as $aAssoc)
+		{
+			$sPrototypeName = $aAssoc->toPrototype()->name() ;
+			if( array_key_exists($sPrototypeName,$arrPrototypeNames) )
+			{
+				throw new Exception("ORM原型(%s)中配置了同名的关联原型：%s;",array($this->path(),$sPrototypeName)) ;
+			}
+			$arrPrototypeNames[] = $sPrototypeName ;
+		}
+	}
+	
+	/**
+	 * 
+	 * @param bool 	$bFull		是否省略关系片段中的第一个原型的名称
+	 */
+	public function path($bFull=true)
+	{
+		$arrPath = array() ;
+		$aPrototype = $this ;
+		
+		while( $aPrototype )
+		{
+			$arrPath[] = $aPrototype->name() ;
+			
+			if($aAssoc=$aPrototype->associatedBy())
+			{
+				$aPrototype = $aAssoc->fromPrototype() ;
+			}
+			else
+			{
+				break ;
+			}
+		}
+		
+		if(!$bFull)
+		{
+			array_pop($arrPath) ;
+		}
+				
+		return implode('.',array_reverse($arrPath)) ;
+	}
+	
+	/**
+	 * @return jc\db\reflecter\AbstractReflecterFactory
+	 */
+	public function tableReflecter()
+	{
+		$aTableReflecter = $this->aDB->reflecterFactory()->tableReflecter($this->sTableName) ;
+		
+		if( !$aTableReflecter->isExist() )
+		{
+			throw new Exception('ORM原型(%s)的数据表表名无效：%s',array($this->path(),$this->tableName())) ;
+		}
+		
+		return $aTableReflecter ;
+	}
+	
+	// for sql statement
+	public function sqlTableAlias()
+	{
+		if( !$this->sSqlTableAliasCache )
+		{
+			$this->sSqlTableAliasCache = ($this->aAssociationBy? ($this->aAssociationBy->fromPrototype()->sqlTableAlias().'.'): '') . $this->name() ;
+		}
+		
+		return $this->sSqlTableAliasCache ;
+	}
+	public function sqlColumnAlias($sColumnName)
+	{
+		if( !isset($this->arrSqlColumnAliasCaches[$sColumnName]) )
+		{
+			$this->arrSqlColumnAliasCaches[$sColumnName] = $this->sqlTableAlias() . '.' . $sColumnName ;
+		}
+		
+		return $this->arrSqlColumnAliasCaches[$sColumnName] ;
+	}
+	
+	/**
+	 * @return jc\mvc\model\db\IModel
+	 */
+	public function createModel($bList=false)
+	{
+		return $bList? new ModelList($this): new Model($this) ;
+	}
+	
+	// criteria setter
+	/**
+	 * @return Prototype
+	 */
+	public function setLimit($nLen,$nFrom=0)
+	{
+		$this->criteria(true)->setLimit($nLen,$nFrom) ;
+		return $this ;
+	}
+	
+	/**
+	 * @return Prototype
+	 */
+	public function addOrderBy($sColumnName,$bAsc=true)
+	{
+		$this->criteria(true)->orders(true)->add($sColumnName,$bAsc) ;
+		return $this ;
+	}
+	
+	/**
+	 * @return jc\db\sql\StatementFactory ;
+	 */
+	public function statementFactory()
+	{
+		if($this->aAssociationBy)
+		{
+			return $this->aAssociationBy->fromPrototype()->statementFactory() ;
+		}
+		
+		else 
+		{
+			if( !$this->aStatementFactory )
+			{
+				$this->aStatementFactory = new StatementFactory() ;
+				
+				$aNameTransfer = new NameTransfer() ;
+				$aNameTransfer->addColumnNameHandle(array($this,'statementColumnNameHandle')) ;
+				
+				$this->aStatementFactory->setNameTransfer($aNameTransfer) ;
+			}
+			
+			return $this->aStatementFactory ;
+		}
+	}
+	public function statementColumnNameHandle($sName,\jc\db\sql\Statement $aStatement)
+	{
+		
+		// 自由输入的字段名，省略关系片段中第一个prototype的名字
+		if( substr($sName,0,1)!='`' )
+		{
+			if($aStatement instanceof \jc\db\sql\Delete or $aStatement instanceof \jc\db\sql\Update){
+				// delete和Update不支持别名，不做名称转换
+				$sName = '`'.$sName.'`';
+			}else{
+				// 切分 原型名称 和 字段名称
+				$pos = strrpos($sName,'.') ;
+				if($pos!==false)
 				{
-					$this->arrPrimaryKeys = array($arrRow['Field']) ;
+					$sPrototypeName = '.'.substr($sName,0,$pos) ;
+					$sDataName = substr($sName,$pos+1) ;
 				}
-				
-				$this->sDevicePrimaryKey = $arrRow['Field'] ;
+				else 
+				{
+					$sPrototypeName = null ;
+					$sDataName = $sName ;
+				}
+			
+				// 转换字段别名
+				// todo
+			
+				$sName = '`'.$this->name()."{$sPrototypeName}`.`{$sDataName}`" ;
 			}
 		}
 		
-		if( empty($this->arrClms) )
-		{
-			$this->arrClms = $arrClms ;
-		}
+		return array($sName) ;
 	}
 	
-	public function cloneObject(array $arrAssocs=array())
-	{
-		$aNewIns = clone $this ;
-		
-		foreach($arrAssocs as $sAssocName=>$assoc)
-		{
-			if( is_string($assoc) )
-			{
-				$sAssocName = $assoc ;
-				$assoc = array() ;
-			}
-			
-			Assert::type('array',$assoc) ;
-			
-			$aAssoc = $this->associations()->get($sAssocName) ;
-			if( !$aAssoc )
-			{
-				throw new Exception("模型原型(%s)中缺少指定的关系：%s",array($this->name(),$sAssocName)) ;
-			}
-			$aNewAssoc = clone $aAssoc ;
-			
-			$aNewAssoc->setFromPrototype($aNewIns) ;
-			$aNewAssoc->setToPrototype(
-				$aAssoc->toPrototype()->cloneObject($assoc)		// 递归 clone 一个 model prototype
-			) ;
-			
-			$aNewIns->addAssociation($aNewAssoc) ;
-		}
-		
-		return $aNewIns ;
-	}
+	// private constructor
+	private function __construct(){}
 	
-	public function __clone()
-	{
-		$this->aAssociations = null ;
-	}
 	
-	// misc
-	public function printStruct(IOutputStream $aOutput=null,$nDepth=0)
-	{
-		if(!$aOutput)
-		{
-			$aOutput = $this->application()->response()->printer() ;
-		}
-		
-		$aOutput->write( "<pre>\r\n" ) ;
-		
-		$aOutput->write( str_repeat("\t", $nDepth)."Prototype: " ) ;
-		$aOutput->write( $this->name() ) ;
-		$aOutput->write( ":\r\n" ) ;
-		
-		$aOutput->write( str_repeat("\t", $nDepth)."table: " ) ;
-		$aOutput->write( $this->tableName()."\r\n" ) ;
-						
-		foreach ($this->associations() as $aAssoc) 
-		{
-			$aAssoc->printStruct($aOutput,$nDepth+1) ;
-		}
-		
-		$aOutput->write( "</pre>" ) ;
-	}
-
-	private $sName ;
+	// private data
+	private $sName;// 如果不提供，用表名作名字。
+	private $sTableName='';
+	private $arrColumns ;
+	private $arrColumnAliases = array();
+	private $arrKeys = array();
+	private $sDevicePrimaryKey = null ;
+	private $aCriteria = null;
+	private $arrAssociations =  array();
+	private $aAssociationBy = null;
 	
-	private $sTableName ;
+	private $sSqlTableAliasCache ;
+	private $arrSqlColumnAliasCaches = array() ;
 	
-	private $sDatabaseName ;
+	private $aStatementFactory ;
 	
-	private $sModelClass = "jc\\mvc\\model\\db\\Model" ;
-	
-	private $arrPrimaryKeys = array() ;
-	
-	private $sDevicePrimaryKey ;
-	
-	private $arrClms = array() ;
-	
-	private $aAssociations ;
-	
+	private $aDB ;
 }
-
 ?>
