@@ -9,8 +9,15 @@ use jc\lang\Exception;
 use jc\lang\Object;
 
 class Number extends Object implements IVerifier,IBean {
-	public function __construct($bInt = true) {
-		$this->bInt = (bool)$bInt;
+	const number = 0;
+	const float = 1;
+	const int = 2;
+	
+	private static $nTypeMin = 0;
+	private static $nTypeMax = 2;
+	
+	public function __construct($nNumberType = self::number) {
+		$this->setType($nNumberType);
 	}
 	
 	public function build(array & $arrConfig)
@@ -20,6 +27,14 @@ class Number extends Object implements IVerifier,IBean {
 			$this->bInt = (bool)$arrConfig['integer'] ;
 		}
 		$this->arrBeanConfig = $arrConfig;
+	}
+	
+	public function setType($nNumberType){
+		$nNumberType = (int)$nNumberType;
+		if($nNumberType > self::$nTypeMax || $nNumberType < self::$nTypeMin){
+			throw new Exception ( "调用" . __CLASS__ . "对象的" . __METHOD__ . "方法时使用了非法的nNumberType参数(得到的nNumberType是:%s)", array ($nNumberType ) );
+		}
+		$this->nNumberType = $nNumberType;
 	}
 	
 	public function beanConfig()
@@ -34,13 +49,13 @@ class Number extends Object implements IVerifier,IBean {
 			}
 			return false;
 		}
-		if ( $this->bInt and (bool)stripos( (string)$data ,'.' ) ) {
+		if ( $this->nNumberType === self::int and (bool)stripos( (string)$data ,'.' ) ) {
 			if($bThrowException){
 				throw new VerifyFailed ( "不是整数" );
 			}
 			return false;
 		}
-		if( ! $this->bInt and ! (bool)stripos( (string)$data ,'.' )){
+		if( $this->nNumberType === self::float and ! (bool)stripos( (string)$data ,'.' )){
 			if($bThrowException){
 				throw new VerifyFailed ( "不是小数" );
 			}
@@ -48,7 +63,7 @@ class Number extends Object implements IVerifier,IBean {
 		}
 		return true;
 	}
-	private $bInt;
+	private $nNumberType = self::number;
 	
 	private $arrBeanConfig = array();
 }
