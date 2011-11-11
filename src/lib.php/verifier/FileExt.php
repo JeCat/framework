@@ -1,6 +1,8 @@
 <?php
 namespace jc\verifier;
 
+use jc\bean\IBean;
+
 use jc\lang\Type;
 
 use jc\message\Message;
@@ -9,7 +11,7 @@ use jc\lang\Exception;
 use jc\lang\Object;
 use jc\fs\IFile;
 
-class FileExt extends Object implements IVerifier {
+class FileExt extends Object implements IVerifier,IBean {
 	/**
 	 * $arrExt 扩展名列表
 	 * $bAllow 为true时arrExt意为允许上传的扩展名列表,false时arrExt意为不允许上传的扩展名列表
@@ -17,11 +19,37 @@ class FileExt extends Object implements IVerifier {
 	 * @param boolean $bAllow
 	 */
 	public function __construct($arrExt,$bAllow = true) {
+		$this->setExt($arrExt);
+		$this->setAllow($bAllow);
+	}
+	
+	public function build(array & $arrConfig)
+	{
+		if (! empty ( $arrConfig ['exts'] ))
+		{
+			$this->setExt ( ( array ) $arrConfig ['exts'] );
+		}
+		if (! empty ( $arrConfig ['allow'] ))
+		{
+			$this->setAllow ( $arrConfig ['allow'] );
+		}
+		$this->arrBeanConfig = $arrConfig;
+	}
+	
+	public function beanConfig()
+	{
+		return $this->arrBeanConfig;
+	}
+	
+	public function setExt($arrExt){
 		if( !is_array($arrExt)){
 			array_push($this->arrExt , $arrExt);
 		}else{
 			$this->arrExt = $arrExt;
 		}
+	}
+	
+	public function setAllow($bAllow){
 		$this->bAllow = (boolean)$bAllow;
 	}
 	
@@ -42,7 +70,7 @@ class FileExt extends Object implements IVerifier {
 		}
 		return true;
 	}
-	
+	private $arrBeanConfig = array();
 	private $arrExt = array();
 	private $bAllow = true;
 }
