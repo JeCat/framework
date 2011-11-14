@@ -9,20 +9,22 @@ class LocalFolder extends LocalFSO implements IFolder
 	/**
 	 * @return \IFile
 	 */
-	public function findFile($sPath)
+	public function findFile($sPath,$nFlag=0)
 	{
 		return $this->fileSystem()->rootFileSystem()->findFile(
 				(substr($sPath,0,1)=='/')? $sPath: ($this->path().'/'.$sPath)
+				, $nFlag
 		) ;
 	}
 
 	/**
 	 * @return \IFolder
 	 */
-	public function findFolder($sPath)
+	public function findFolder($sPath,$nFlag=0)
 	{
 		return $this->fileSystem()->rootFileSystem()->findFolder(
 				(substr($sPath,0,1)=='/')? $sPath: ($this->path().'/'.$sPath)
+				, $nFlag
 		) ;	
 	}
 

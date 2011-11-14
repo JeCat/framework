@@ -6,12 +6,12 @@ interface IFolder extends IFSO
 	/**
 	 * @return IFile
 	 */
-	public function findFile($sPath) ;
+	public function findFile($sPath,$nFlag=0) ;
 	
 	/**
 	 * @return IFolder
 	 */
-	public function findFolder($sPath) ;
+	public function findFolder($sPath,$nFlag=0) ;
 	
 	/**
 	 * @return IFile
