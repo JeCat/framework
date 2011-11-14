@@ -83,7 +83,8 @@ class Locale implements ILocale
 			}
 		}
 		
-		return call_user_func_array('sprintf', array_merge(array($sOri),$arrArgvs)) ;
+		$sWord = call_user_func_array('sprintf', array_merge(array($sOri),$arrArgvs)) ;
+		return $sWord?: $sOri ;
 	}
 
 	/**
