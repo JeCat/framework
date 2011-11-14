@@ -46,13 +46,13 @@ abstract class Setting extends Object implements ISetting
 		return $aKey->itemIterator ();
 	}
 	
-	public function item($sPath, $sName = '*', $defaultValue = null)
+	public function item($sPath,$sName='*',$defaultValue=null)
 	{
-		if (! $aKey = $this->key ( $sPath ))
+		if (!$aKey=$this->key($sPath,$defaultValue!==null))
 		{
 			return null;
 		}
-		return $aKey->item ( $sName, $defaultValue );
+		return $aKey->item($sName,$defaultValue) ;
 	}
 	
 	public function setItem($sPath, $sName, $value)
