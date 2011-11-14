@@ -131,9 +131,9 @@ class View extends NamableComposite implements IView, IBean
     		{
     			throw new BeanConfException("视图Bean配置的 widgets 必须是一个数组") ;
     		}
-    		foreach($aBeanFactory->createBeanArray($arrConfig['widgets'],'text','id',$sNamespace,false) as $nIdx=>$aWidget)
+    		foreach($aBeanFactory->createBeanArray($arrConfig['widgets'],'text','id',$sNamespace,false) as $key=>$aWidget)
 			{
-				$aWidget->build($arrConfig['widgets'][$nIdx],$sNamespace) ;
+				$aWidget->build($arrConfig['widgets'][$key],$sNamespace) ;
 				$this->addWidget( $aWidget ) ;
 			}
     	}

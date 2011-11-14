@@ -148,7 +148,7 @@ class BeanFactory extends Object
 				}
 			}
 			
-			$arrBeans[] = $this->createBean($arrConfig,$sNamespace,$bAutoBuild) ;
+			$arrBeans[$key] = $this->createBean($arrConfig,$sNamespace,$bAutoBuild) ;
 		}
 		
 		return $arrBeans ;
