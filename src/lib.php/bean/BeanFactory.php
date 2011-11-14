@@ -46,6 +46,7 @@ class BeanFactory extends Object
 			$aSingleton->registerBeanClass("jc\\verifier\\ImageArea",'imagearea') ;
 			$aSingleton->registerBeanClass("jc\\verifier\\ImageSize",'imagesize') ;
 			$aSingleton->registerBeanClass("jc\\verifier\\NotEmpty",'notempty') ;
+			$aSingleton->registerBeanClass("jc\\verifier\\Version",'version') ;
 			
 			self::setSingleton($aSingleton,__CLASS__) ;
 		}
