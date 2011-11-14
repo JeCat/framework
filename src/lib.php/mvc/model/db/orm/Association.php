@@ -2,14 +2,14 @@
 
 namespace jc\mvc\model\db\orm;
 
+use jc\bean\IBean;
 use jc\bean\BeanFactory;
-
 use jc\db\sql\TablesJoin;
 use jc\db\DB;
 use jc\lang\Exception;
 use jc\mvc\model\db\orm\Prototype;
 
-class Association
+class Association implements IBean
 {
 	const youKnow = null ;
 	
@@ -26,7 +26,7 @@ class Association
 	const total = 15 ;		// 所有
 	
 	// public function
-	public function __construct(DB $aDB,$nType,$aFromPrototype=null,$aToPrototype=null,$fromKeys=self::youKnow,$toKeys=self::youKnow,$sBridgeTable=self::youKnow,$toBridgeKeys=self::youKnow,$fromBridgeKeys=self::youKnow)
+	public function __construct(DB $aDB=null,$nType=null,$aFromPrototype=null,$aToPrototype=null,$fromKeys=self::youKnow,$toKeys=self::youKnow,$sBridgeTable=self::youKnow,$toBridgeKeys=self::youKnow,$fromBridgeKeys=self::youKnow)
 	{
 		$this->aDB = $aDB ;
 		$this->nType=$nType;
@@ -165,9 +165,18 @@ class Association
 	{
 		return $this->nType;
 	}
-		
+
 	public function done()
 	{
+		if(!$this->nType)
+		{
+			throw new Exception('尚未指定 ORM 关联(%s)的类型',$this->path()) ;
+		}
+		if(!$this->aFromPrototype)
+		{
+			throw new Exception('尚未指定 ORM 关联(%s)的 fromPrototype',$this->path()) ;
+		}
+		
 		// 
 		if( $this->nType==self::hasAndBelongsTo )
 		{
@@ -248,9 +257,13 @@ class Association
 		$arrConfigForToPrototype = $arrConfig ;
 		$arrConfigForToPrototype['class'] = 'prototype' ;
 		
-		$this->aToPrototype = BeanFactory::singleton()->createBean($arrConfigForToPrototype) ;
+		$this->aToPrototype = BeanFactory::singleton()->createBean($arrConfigForToPrototype,$sNamespace) ;
 		$this->aToPrototype->setAssociationBy($this) ;
-		
+	
+		if(!empty($arrConfig['type']))
+		{
+			$this->nType = $arrConfig['type'] ;
+		}
 		if(!empty($arrConfig['fromkeys']))
 		{
 			$this->setFromKeys($arrConfig['fromkeys']) ;
@@ -271,6 +284,10 @@ class Association
 		{
 			$this->sBridgeTable = $arrConfig['bridge'] ;
 		}
+		if(!empty($arrConfig['fromPrototype']))
+		{
+			$this->aFromPrototype = $arrConfig['fromPrototype'] ;
+		}
 		
 		$this->done() ;
 			
@@ -280,6 +297,11 @@ class Association
 	public function beanConfig()
 	{
 		$this->arrBeanConfig ;
+	}
+	
+	public function setDB(DB $aDB)
+	{
+		$this->aDB = $aDB ;
 	}
 	
 	
