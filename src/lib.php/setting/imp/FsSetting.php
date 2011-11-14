@@ -1,11 +1,12 @@
 <?php
 namespace jc\setting\imp;
 
+use jc\lang\Exception;
+use jc\fs\FileSystem;
 use jc\pattern\iterate\ReverseIterator;
 use jc\fs\FSIterator;
 use jc\fs\IFolder;
 use jc\setting\IKey;
-use jc\setting\imp\FsKey;
 use jc\setting\Setting;
 
 class FsSetting extends Setting
@@ -18,62 +19,44 @@ class FsSetting extends Setting
 	{
 		$this->aRootFolder = $aRootFolder;
 	}
+
+	/**
+	 * @return IKey 
+	 */
+	public function key($sPath,$bCreate=false)
+	{
+		if( !isset($this->arrKeys[$sPath]) )
+		{
+			$sItemsPath = self::transPath($sPath) ;
+			if( !$aFile=$this->aRootFolder->findFile($sItemsPath,$bCreate?FileSystem::FIND_AUTO_CREATE:0) )
+			{
+				return null ;
+			}
+			
+			$this->arrKeys[$sPath] = new FsKey($aFile) ;
+		}
+		
+		return $this->arrKeys[$sPath] ;
+	}
 	
 	public function createKey($sPath)
 	{
-		$sPath = self::trimRootSlash ( $sPath );
-		
-		if ($aFolder = $this->aRootFolder->findFolder ( $sPath ))
-		{
-			return new FsKey ( $aFolder );
-		}
-		else
-		{
-			$aNewFolder = $this->aRootFolder->createFolder ( $sPath );
-			return new FsKey ( $aNewFolder );
-		}
+		return $this->key($sPath,true) ;
 	}
 	
 	public function hasKey($sPath)
 	{
-		$sPath = self::trimRootSlash ( $sPath );
-		
-		if (! $this->aRootFolder->findFolder ( $sPath ))
-		{
-			return false;
-		}
-		else
-		{
-			return true;
-		}
+		return $this->aRootFolder->findFile(self::transPath($sPath))? true: false ;
 	}
 	
 	public function deleteKey($sPath)
 	{
-		$sPath = self::trimRootSlash ( $sPath );
+		$sFolderPath = self::transPath($sPath,false) ;
 		
-		if ($aFolderToDel = $this->aRootFolder->findFolder ( $sPath ))
+		if ($aFolderToDel=$this->aRootFolder->findFolder($sFolderPath)) 
 		{
-//			$bDelWell = 1;
-			$aFileIter = $aFolderToDel->iterator ( FSIterator::RECURSIVE_SEARCH | FSIterator::RETURN_FSO | FSIterator::FILE);
-			foreach($aFileIter as $aFile)
-			{
-				$aFile->delete();
-//				$bDelWell *= (int)$aFile->delete();
-			}
 			
-			//将文件迭代器反向遍历，前提是迭代器内部机制是浅层文件夹在前，深层文件夹在后
-			$aFolderIter = $aFolderToDel->iterator (  FSIterator::RECURSIVE_SEARCH | FSIterator::RETURN_FSO | FSIterator::FOLDER); //
-			foreach($aFolderIter as $aFolder)
-			{
-				$aFolder->delete();
-//				$bDelWell *= (int)$aFolder->delete();
-			}
-			
-//			$bDelWell *= (int)$aFolderToDel->delete();
-			return true;
 		}
-		return (bool)$bDelWell;
 	}
 	
 	
@@ -82,28 +65,41 @@ class FsSetting extends Setting
 	 */
 	public function keyIterator($sPath)
 	{
-		$sPath = self::trimRootSlash ( $sPath );
-		
-		if (! $aKey = $this->key ( $sPath ))
+		if ( !$aKey=$this->key($sPath) )
 		{
 			return new \EmptyIterator ();
 		}
 		return $aKey->keyIterator ();
 	}
 	
-	static public function trimRootSlash(&$sPath)
+	static public function transPath($sPath,$bItemsPath=true)
 	{
-		if (substr ( $sPath, 0, 1 ) == '/' and strlen ( $sPath ) > 1)
+		// 去掉开头的 '/'
+		if ( substr($sPath,0,1)=='/' )
 		{
-			$sPath = substr ( $sPath, 1 );
+			$sPath = strlen($sPath)>1? substr($sPath,1): '' ;
 		}
-		return $sPath;
+		
+		// items.php
+		if($bItemsPath)
+		{
+			if($sPath)
+			{
+				$sPath.= '/' ;
+			}
+			
+			$sPath.= 'items.php' ;
+		}
+		
+		return $sPath ;
 	}
 	
 	/**
 	 * @var jc\fs\IFolder
 	 */
 	private $aRootFolder;
+	
+	private $arrKeys = array() ;
 }
 
 ?>

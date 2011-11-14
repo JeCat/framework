@@ -39,6 +39,7 @@ abstract class Key extends Object implements IKey
 	public function deleteItem($sName)
 	{
 		unset($this->arrItems[$sName]) ;
+		$this->bDataChanged = true ;
 	}
 	
 	/**

@@ -2,48 +2,39 @@
 namespace jc\setting\imp ;
 
 use jc\fs\FSIterator;
-use jc\fs\IFolder;
+use jc\fs\IFile;
 use jc\setting\Key;
 
 class FsKey extends Key
 {
-	public function __construct(IFolder $aFolder)
+	public function __construct(IFile $aFile)
 	{
-		$this->aKeyFolder = $aFolder ;
+		$this->aItemFile = $aFile ;
 		
-		if( !$this->aItemFile = $this->aKeyFolder->findFile('items.php') )
+		$this->arrItems = $this->aItemFile->includeFile(false,false) ;
+		
+		if(!is_array($this->arrItems))
 		{
-			$this->aItemFile = $this->aKeyFolder->createFile('items.php') ;
 			$this->arrItems = array() ;
-		}
-		else 
-		{
-			
-			$this->arrItems = $this->aItemFile->includeFile(false,false) ;
-			if(!is_array($this->arrItems))
-			{
-				$this->arrItems = array() ;
-			}
+			$this->bDataChanged = true ;
 		}
 	}
 	
 	public function keyIterator()
 	{
-		return $this->aKeyFolder->iterator(FSIterator::FOLDER | FSIterator::RETURN_FSO);
 	}
 	
 	public function save()
 	{
-		$this->aItemFile->openWriter()->write(
-			"<?php\r\nreturn ".var_export($this->arrItems,true)."\r\n?>"
+		$aWriter = $this->aItemFile->openWriter() ;
+		$aWriter->write(
+			"<?php\r\nreturn ".var_export($this->arrItems,true)." ;"
 		) ;
+		$aWriter->close() ;
+		
+		$this->bDataChanged = false ;
 	}
-	
-	/**
-	 * @var jc\fs\IFolder
-	 */
-	private $aKeyFolder ;
-	
+
 	/**
 	 * @var jc\fs\IFile
 	 */
