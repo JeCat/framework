@@ -137,6 +137,18 @@ class View extends NamableComposite implements IView, IBean
 				$this->addWidget( $aWidget, empty($arrConfig['widgets'][$key]['exchange'])?null:$arrConfig['widgets'][$key]['exchange'] ) ;
 			}
     	}
+    	
+    	// vars
+    	if(!empty($arrConfig['vars']))
+    	{
+    		$aVariables = $this->variables() ;
+    		foreach($arrConfig['vars'] as $sName=>&$variable)
+    		{
+    			$aVariables->set($sName,$variable) ;
+    		}
+    	}
+    	
+    	
     	$this->arrBeanConfig = $arrConfig ;
     }
     
