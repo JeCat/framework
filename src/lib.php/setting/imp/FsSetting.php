@@ -19,10 +19,7 @@ class FsSetting extends Setting
 		$this->aRootFolder = $aRootFolder;
 	}
 	
-	/**
-	 * @return IKey 
-	 */
-	public function key($sPath)
+	public function createKey($sPath)
 	{
 		$sPath = self::trimRootSlash ( $sPath );
 		
@@ -30,16 +27,7 @@ class FsSetting extends Setting
 		{
 			return new FsKey ( $aFolder );
 		}
-		return null;
-	}
-	
-	public function createKey($sPath)
-	{
-		$sPath = self::trimRootSlash ( $sPath );
-		if ($aFolder = $this->aRootFolder->findFolder ( $sPath ))
-		{
-			return new FsKey ( $aFolder );
-		} else
+		else
 		{
 			$aNewFolder = $this->aRootFolder->createFolder ( $sPath );
 			return new FsKey ( $aNewFolder );
@@ -53,7 +41,8 @@ class FsSetting extends Setting
 		if (! $this->aRootFolder->findFolder ( $sPath ))
 		{
 			return false;
-		} else
+		}
+		else
 		{
 			return true;
 		}
@@ -104,7 +93,7 @@ class FsSetting extends Setting
 	
 	static public function trimRootSlash(&$sPath)
 	{
-		if (substr ( $sPath, 0, 1 ) == '/' and strlen ( $sPath ) > 0)
+		if (substr ( $sPath, 0, 1 ) == '/' and strlen ( $sPath ) > 1)
 		{
 			$sPath = substr ( $sPath, 1 );
 		}

@@ -6,6 +6,28 @@ use jc\lang\Object;
 abstract class Setting extends Object implements ISetting
 {
 	/**
+	 * @return IKey 
+	 */
+	public function key($sPath)
+	{
+		if( !isset($this->arrKeys[$sPath]) )
+		{
+			$this->arrKeys[$sPath] = $this->createKey($sPath) ;
+		}
+		
+		return $this->arrKeys[$sPath] ;
+	}
+	
+	public function saveKey($sPath)
+	{
+		if (! $aKey = $this->key ( $sPath ))
+		{
+			return;
+		}
+		$aKey->save ();
+	}
+	
+	/**
 	 * @return \Iterator 
 	 */
 	public function keyIterator($sPath)
@@ -70,5 +92,7 @@ abstract class Setting extends Object implements ISetting
 		}
 		$aKey->deleteItem ( $sName );
 	}
+	
+	private $arrKeys = array() ;
 }
 ?>
