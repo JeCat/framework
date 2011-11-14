@@ -134,7 +134,7 @@ class View extends NamableComposite implements IView, IBean
     		foreach($aBeanFactory->createBeanArray($arrConfig['widgets'],'text','id',$sNamespace,false) as $key=>$aWidget)
 			{
 				$aWidget->build($arrConfig['widgets'][$key],$sNamespace) ;
-				$this->addWidget( $aWidget ) ;
+				$this->addWidget( $aWidget, empty($arrConfig['widgets'][$key]['exchange'])?null:$arrConfig['widgets'][$key]['exchange'] ) ;
 			}
     	}
     	$this->arrBeanConfig = $arrConfig ;
@@ -381,6 +381,9 @@ class View extends NamableComposite implements IView, IBean
 		return $this->widgits()->valueIterator() ;
 	}
 	
+	/**
+	 * @return DataExchanger
+	 */
 	public function dataExchanger()
 	{
 		if(!$this->aDataExchanger)
