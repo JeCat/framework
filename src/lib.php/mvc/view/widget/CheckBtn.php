@@ -12,14 +12,14 @@ class CheckBtn extends FormWidget
 	private static $nTypeMin = 0;
 	private static $nTypeMax = 1;
 	
-	public function __construct($sId = null, $sTitle = null, $sValue = null, $nType = self::checkbox, $bChecked = false, IView $aView = null)
+	public function __construct($sId = null, $sTitle = null, $checkedValue = '1', $nType = self::checkbox, $bChecked = false, IView $aView = null)
 	{
 		if (! is_int ( $nType ) || $nType < self::$nTypeMin || $nType > self::$nTypeMax)
 		{
 			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的type参数(得到的type是:%s)", array ($nType ) );
 		}
 		
-		$this->checkedValue = $sValue;
+		$this->checkedValue = $checkedValue;
 		
 		if ($bChecked)
 		{
@@ -30,8 +30,7 @@ class CheckBtn extends FormWidget
 		parent::__construct ( $sId, 'jc:WidgetCheckBtn.template.html', $sTitle, $aView );
 	}
 	
-	public function build(array & $arrConfig)
-	{
+	public function build(array & $arrConfig,$sNamespace='*'){
 		parent::build ( $arrConfig );
 		
 		if (array_key_exists ( 'type', $arrConfig ))
@@ -46,6 +45,8 @@ class CheckBtn extends FormWidget
 					break;
 			}
 		}
+		
+		$this->setChecked( !empty($arrConfig['checked']) ) ;
 	}
 	
 	public function setType($nType)
@@ -70,7 +71,7 @@ class CheckBtn extends FormWidget
 		}
 		else
 		{
-			$this->setValue ( '' );
+			$this->setValue ( null );
 		}
 	}
 	
@@ -79,14 +80,9 @@ class CheckBtn extends FormWidget
 		return $this->checkedValue;
 	}
 	
-	public function setCheckedValue($sValue)
+	public function setCheckedValue($value)
 	{
-		$sValue = ( string ) $sValue;
-		if (empty ( $sValue ))
-		{
-			throw new Exception ( "构建" . __CLASS__ . "对象时使用了非法的checked参数(得到的checked是:%s)", array ($sValue ) );
-		}
-		$this->checkedValue = $sValue;
+		$this->checkedValue = $value;
 	}
 	
 	public function isChecked()
