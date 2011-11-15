@@ -35,19 +35,6 @@ class Widget extends Object implements IViewWidget, IBean
 			
 			return array($aMsg) ;
 		},$this) ;
-				
-		// “恐龙妈妈”模式
-		if(!$aView)
-		{
-			foreach(debug_backtrace() as $arrCall)
-			{
-				if( !empty($arrCall['object']) and $arrCall['object'] instanceof IView )
-				{
-					$aView = $arrCall['object'] ;
-					break ;
-				}
-			}
-		}
 		
 		if($aView)
 		{
