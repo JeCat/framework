@@ -17,6 +17,9 @@ date_default_timezone_set('Asia/Shanghai') ;
 // 编码
 header("Content-Type: text/html; charset=UTF-8") ;
 
+// 关闭魔术引用
+set_magic_quotes_runtime(false) ;
+
 // 预加载类(Before Class Loader)
 require_once __DIR__."/src/lib.php/lang/IObject.php" ;
 require_once __DIR__."/src/lib.php/lang/Object.php" ;
