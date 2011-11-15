@@ -63,26 +63,7 @@ class Model extends AbstractModel implements IModel , IPaginal, IBean
 	{
 		return $this->aPrototype? $this->aPrototype->name(): null ; 
 	}
-	
-	public function serialize ()
-	{
-		return serialize( array(
 		
-				'__parent' => parent::serialize() ,
-		
-				'aPrototype' => &$this->aPrototype ,
-		) ) ;
-	}
-
-	public function unserialize ($sSerialized)
-	{
-		$arrData = unserialize($sSerialized) ;
-		
-		parent::unserialize($arrData['__parent']) ;
-		
-		$this->aPrototype =& $arrData['aPrototype'] ;
-	}
-	
 	/**
 	 * @return IModel
 	 */

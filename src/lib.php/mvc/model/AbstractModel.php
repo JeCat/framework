@@ -390,8 +390,26 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	{
 		$this->bSerialized = $bSerialized? true: false ;
 	}
-	
-	
+
+	public function serialize ()
+	{
+		return serialize( array(
+				'arrDatas' => &$this->arrDatas ,
+				'arrChildren' => &$this->arrChildren ,
+				'arrChanged' => &$this->arrChanged ,
+				'bSerialized' => &$this->bSerialized ,
+		) ) ;
+	}
+
+	public function unserialize ($sSerialized)
+	{
+		$arrData = unserialize($sSerialized) ;
+		
+		$this->arrDatas =& $arrData['arrDatas'] ;
+		$this->arrChildren =& $arrData['arrChildren'] ;
+		$this->arrChanged =& $arrData['arrChanged'] ;
+		$this->bSerialized =& $arrData['bSerialized'] ;
+	}
 	protected function _data(&$sName)
 	{
 		return isset($this->arrDatas[$sName])?  $this->arrDatas[$sName]: null ;
