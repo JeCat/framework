@@ -89,7 +89,7 @@ class IdManager extends Object implements \Serializable
 			return ;
 		}
 		
-		if( empty($this->arrIds) )
+		if( !$this->aCurrentId )
 		{
 			$this->aCurrentId = $aId ;
 		}
