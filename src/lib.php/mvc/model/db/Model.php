@@ -160,7 +160,9 @@ class Model extends AbstractModel implements IModel , IPaginal, IBean
 		}
 		$this->setSerialized(true);
 		$this->clearChanged();
-		return Selecter::singleton()->execute( $this->db(), $this, null,$selectCriteria ) ;
+		Selecter::singleton()->execute( $this->db(), $this, null,$selectCriteria ) ;
+		
+		return !$this->isEmpty() ;
 	}
 	
 	public function save()
@@ -380,10 +382,10 @@ class Model extends AbstractModel implements IModel , IPaginal, IBean
 		// 原型中的别名
 		if( $data===null and $this->aPrototype )
 		{
-			$sName = $this->aPrototype->getColumnByAlias($sName) ;
-			if( $sName!==null )
+			$sAlias = $this->aPrototype->getColumnByAlias($sName) ;
+			if( $sAlias!==null )
 			{
-				return parent::_data($sName) ;
+				return parent::_data($sAlias) ;
 			}
 		}
 		
