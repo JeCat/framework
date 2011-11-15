@@ -13,6 +13,12 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	}
 	
 	// for child model ///////////////////////////////
+	
+	public function isEmpty()
+	{
+		return empty($this->arrDatas) and empty($this->arrChildren) ;
+	}
+	
 	public function addChild(IModel $aModel, $sName = null)
 	{
 		if ($sName)
@@ -341,11 +347,6 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 		{
 			$aChild->setData ( $sName, $aChild );
 		}
-	}
-	
-	public function isEmpty()
-	{
-		return $this->arrDatas === null;
 	}
 	
 	/**
