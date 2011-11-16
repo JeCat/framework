@@ -2,11 +2,8 @@
 namespace jc\mvc\view ;
 
 use jc\bean\BeanConfException;
-
 use jc\bean\BeanFactory;
-
 use jc\lang\Exception;
-
 use jc\bean\IBean;
 use jc\resrc\HtmlResourcePool;
 use jc\util\CombinedIterator;
@@ -131,10 +128,23 @@ class View extends NamableComposite implements IView, IBean
     		{
     			throw new BeanConfException("视图Bean配置的 widgets 必须是一个数组") ;
     		}
-    		foreach($aBeanFactory->createBeanArray($arrConfig['widgets'],'text','id',$sNamespace,false) as $key=>$aWidget)
+    		foreach($arrConfig['widgets'] as $key=>&$arrWidgetConf)
 			{
-				$aWidget->build($arrConfig['widgets'][$key],$sNamespace) ;
+				if( !is_int($key) and !isset($arrWidgetConf['id']) )
+				{
+					$arrWidgetConf['id'] = strval($key) ;
+				}
+			
+				// 默认的 class
+				if( empty($arrWidgetConf['class']) and empty($arrWidgetConf['ins']) and empty($arrWidgetConf['conf']) )
+				{
+					$arrWidgetConf['class'] = 'text' ;
+				}
+				$aWidget = $aBeanFactory->createBean($arrWidgetConf,$sNamespace,false) ;
+				
 				$this->addWidget( $aWidget, empty($arrConfig['widgets'][$key]['exchange'])?null:$arrConfig['widgets'][$key]['exchange'] ) ;
+				
+				$aWidget->build($arrConfig['widgets'][$key],$sNamespace) ;				
 			}
     	}
     	
