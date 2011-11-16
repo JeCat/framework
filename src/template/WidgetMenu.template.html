@@ -1,0 +1,8 @@
+<ul style='border:solid 1px'>
+菜单{=$theWidget->id()}开始
+<if "$theWidget->parentItem() != null">父项目：{=$theWidget->parentItem()->title();}</if>
+<foreach for='$theWidget->itemIterator()' item='item'>
+	<widget instance='$item'/>
+</foreach>
+菜单{=$theWidget->id()}结束
+</ul>
