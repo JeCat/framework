@@ -23,6 +23,7 @@ class BeanFactory extends Object
 			$aSingleton->registerBeanClass("jc\\mvc\\view\\View",'view') ;
 			$aSingleton->registerBeanClass("jc\\mvc\\view\\FormView",'form') ;
 			$aSingleton->registerBeanClass("jc\\mvc\\model\\db\\Model",'model') ;
+			$aSingleton->registerBeanClass("jc\\mvc\\model\\db\\Category",'category') ;
 			$aSingleton->registerBeanClass("jc\\mvc\\model\\db\\orm\\Prototype",'prototype') ;
 			$aSingleton->registerBeanClass("jc\\mvc\\model\\db\\orm\\Association",'association') ;
 			

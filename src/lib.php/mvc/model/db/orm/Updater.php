@@ -12,7 +12,7 @@ use jc\lang\Exception;
 class Updater extends Object{
     public function execute(DB $aDB, IModel $aModel){
         $aPrototype = $aModel->prototype();
-        $aUpdate = StatementFactory::singleton()->createUpdate($aPrototype ->tableName());
+        $aUpdate = $aPrototype->statementUpdate() ;
         
         // 从 belongs to model 中设置外键值
         foreach($aPrototype->associations() as $aAssociation){
@@ -28,9 +28,11 @@ class Updater extends Object{
         }
         
         // 产生一个criteria并设置给$aUpdate
-        $aUpdate->setCriteria(StatementFactory::singleton()->createCriteria());
+        $aCriteria = StatementFactory::singleton()->createCriteria() ;
+        $aUpdate->setCriteria($aCriteria);
         
 		// update当前model
+        $aUpdate->clearData() ;
 		$bFlagChanged = false;//当前表是否有修改
 		foreach($aModel->dataNameIterator() as $sClmName)
 		{
@@ -38,7 +40,7 @@ class Updater extends Object{
 				if($aModel->changed($sClmName)){//主键发生修改
 					throw new Exception('jc\mvc\model\db\orm\Updater : Key 有修改，无法进行Update操作');
 				}else{//用主键作为查询条件
-					$aUpdate->criteria()->restriction()->eq($sClmName,$aModel->data($sClmName));
+					$aCriteria->restriction()->eq($sClmName,$aModel->data($sClmName));
 				}
 			}else{//主键以外的项
 				if($aModel->changed($sClmName)){//只update发生修改的项

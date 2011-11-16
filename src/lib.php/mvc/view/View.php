@@ -95,7 +95,7 @@ class View extends NamableComposite implements IView, IBean
     			{
     				$item['class'] = 'view' ;
     			}
-    			$arrConfig['views'][$item['name']] &= $item ;
+    			$arrConfig['views'][$item['name']] = $item ;
     		}
     		
     		// widget:ooxx
@@ -106,7 +106,7 @@ class View extends NamableComposite implements IView, IBean
     			{
     				$item['class'] = 'text' ;
     			}
-    			$arrConfig['widgets'][$item['id']] &= $item ;
+    			$arrConfig['widgets'][$item['id']] = $item ;
     			
     		}
     	}
