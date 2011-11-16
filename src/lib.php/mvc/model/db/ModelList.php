@@ -67,6 +67,33 @@ class ModelList extends Model implements IModelList
 		
 		return $aChild ;
 	}
+	
+	public function totalCount()
+	{
+		return $this->childrenCount();
+		$aSelect = new SelectForAssocQuery($this->prototype()) ;
+
+		if( $this->aCriteria )
+		{
+		    $ilimitLen = $this->aCriteria->limitLen();
+		    $ilimitFrom = $this->aCriteria->limitFrom();
+		    $this->aCriteria->setLimit(1000);
+			$aSelect->setCriteria($this->aCriteria) ;
+		}
+		
+		$aSelect->setOnlyCount('_cnt',true) ;
+	
+		$aRecordSet = $this->db()->query($aSelect) ;
+		if( !$aRecordSet or !$aRecordSet->rowCount() )
+		{
+			return 0 ;
+		}
+		
+		if( $this->aCriteria ){
+		    $this->aCriteria->setLimit($ilimitLen,$ilimitFrom);
+		}
+		return intval($aRecordSet->field('_cnt')) ;		
+	}
 }
 
 ?>
