@@ -27,7 +27,7 @@ class Update extends MultiTableStatement implements IDataSettableStatement
 		$arrValues = array() ;
 		foreach($this->mapData as $sClm=>$Data)
 		{
-			$arrValues[] = $sClm."='".addslashes($Data)."'" ;
+			$arrValues[] = $this->transColumn($sClm)."=".$Data ;
 		}
 		
 		$sStatement.= implode(", ", $arrValues) ;
@@ -44,10 +44,14 @@ class Update extends MultiTableStatement implements IDataSettableStatement
 	{
 		parent::checkValid($bThrowException) ;
 	}*/
-
+	
+	public function set($sColumnName,$statement)
+	{
+		$this->mapData[$sColumnName] = $statement ;
+	}
 	public function setData($sColumnName,$sData=null)
 	{
-		$this->mapData[$sColumnName] = $sData ;
+		$this->mapData[$sColumnName] = "'".addslashes($sData)."'" ;
 	}
 	
 	public function removeData($sColumnName)

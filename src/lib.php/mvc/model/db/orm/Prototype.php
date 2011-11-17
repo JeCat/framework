@@ -498,6 +498,10 @@ class Prototype implements IBean
 			if($aStatement instanceof \jc\db\sql\Delete or $aStatement instanceof \jc\db\sql\Update){
 				// delete和Update不支持别名，不做名称转换
 				$sName = '`'.$sName.'`';
+				
+				// 转换字段别名
+				// todo
+				
 			}else{
 				// 切分 原型名称 和 字段名称
 				$pos = strrpos($sName,'.') ;
@@ -670,7 +674,31 @@ class Prototype implements IBean
 		$this->arrBeanConfig ;
 	}
 	
-	
+	// statement
+	public function statementInsert()
+	{
+		$this->aStatementInsert ;
+	}
+	public function statementDelete()
+	{
+		$this->aStatementDelete ;
+	}
+	public function statementSelect()
+	{
+		$this->aStatementSelect ;
+	}
+	/**
+	 * return jc\db\sql\Update
+	 */
+	public function statementUpdate()
+	{
+		if( !$this->aStatementUpdate )
+		{
+			$this->aStatementUpdate = $this->statementFactory()->createUpdate($this ->tableName()) ;
+		}
+
+		return $this->aStatementUpdate ;
+	}
 	
 	// constructor
 	public function __construct(){}
@@ -690,9 +718,14 @@ class Prototype implements IBean
 	private $sSqlTableAliasCache ;
 	private $arrSqlColumnAliasCaches = array() ;
 	
+	private $aDB ;
+		
 	private $aStatementFactory ;
 	
-	private $aDB ;
+	private $aStatementInsert ;
+	private $aStatementDelete ;
+	private $aStatementSelect ;
+	private $aStatementUpdate ;
 	
 	private $arrBeanConfig ;
 }
