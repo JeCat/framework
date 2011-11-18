@@ -82,7 +82,7 @@ class ForeachCompiler extends NodeCompiler {
 			$aDev->write ( " \$aVariables->set({$sIdxUserName},{$sIdxAutoName} ); ");
 		}
 					
-		$aDev->write("");
+// 		$aDev->write("");
 		
 		//是否是单行标签?
 		if(!$aObject->headTag()->isSingle()){

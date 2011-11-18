@@ -35,24 +35,32 @@ class LoopCompiler extends NodeCompiler
 		Assert::type ( "jc\\ui\\xhtml\\Node", $aObject, 'aObject' );
 		
 		$aAttrs = $aObject->attributes ();
-		$sStart = $aAttrs->has ( "start" ) ? $aAttrs->expression ( "start" ) : '0';
+		$sStartValue = $aAttrs->has ( "start" ) ? $aAttrs->expression ( "start" ) : '0';
 		$sEndValue = $aAttrs->expression ( "end" );
 		$sStepValue = $aAttrs->has ( "step" ) ? $aAttrs->expression ( "step" ) : '1';
 		
-		$sVarAutoName = NodeCompiler::assignVariableName ( '$__loop_idx_' );
+		$sVarAutoName = NodeCompiler::assignVariableName ( '$__loop_var_' );
+		$sIdxAutoName = NodeCompiler::assignVariableName ( '$__loop_idx_' );
 		$sEndName = NodeCompiler::assignVariableName ( '$__loop_end_' );
 		$sStepName = NodeCompiler::assignVariableName ( '$__loop_step_' );
 		
 		$aDev->write ( "		{$sEndName}  = {$sEndValue} ; 
 								{$sStepName}  = {$sStepValue}  ;
-								for( {$sVarAutoName} = {$sStart} ; {$sVarAutoName} <= {$sEndName} ; {$sVarAutoName} += {$sStepName} ){  
+								{$sIdxAutoName} = 0;
+								for( {$sVarAutoName} = {$sStartValue} ; {$sVarAutoName} <= {$sEndName} ; {$sVarAutoName} += {$sStepName} ){  
 						" );
 		if ($aAttrs->has ( "var" ))
 		{
 			$sVarUserName = $aAttrs->get ( "var" );
 			$aDev->write ( "			\$aVariables->set( {$sVarUserName}, {$sVarAutoName} ) ;" );
 		}
-		$aDev->write ( '' );
+		if ($aAttrs->has ( "idx" ))
+		{
+			$sIdxUserName = $aAttrs->get ( "idx" );
+			$aDev->write ( "			\$aVariables->set( {$sIdxUserName}, {$sIdxAutoName} ) ;
+										{$sIdxAutoName}++;" );
+		}
+// 		$aDev->write ( '' );
 		
 		if(!$aObject->headTag()->isSingle()){
 			$this->compileChildren ( $aObject, $aDev, $aCompilerManager );
