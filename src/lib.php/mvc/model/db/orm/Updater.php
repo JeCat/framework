@@ -12,7 +12,7 @@ use jc\lang\Exception;
 class Updater extends Object{
     public function execute(DB $aDB, IModel $aModel){
         $aPrototype = $aModel->prototype();
-        $aUpdate = $aPrototype->statementUpdate() ;
+        $aUpdate = StatementFactory::singleton()->createUpdate($aPrototype->tableName()) ;
         
         // 从 belongs to model 中设置外键值
         foreach($aPrototype->associations() as $aAssociation){

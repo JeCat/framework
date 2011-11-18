@@ -47,9 +47,8 @@ class Inserter extends OperationStrategy
 		// 自增形主键
 		if( $sDevicePrimaryKey=$aPrototype->devicePrimaryKey() and $aModel->data($sDevicePrimaryKey)===null )
 		{
-			$aModel->setData( $sDevicePrimaryKey, $aDB->lastInsertId() ) ;
+			$aModel->setData( $sDevicePrimaryKey, $aDB->lastInsertId(), false ) ;
 		}
-		
 		
 		$aModel->setSerialized(true) ;
 		

@@ -62,19 +62,22 @@ class BeanFactory extends Object
 	public function createBean(array &$arrConfig,$sNamespace='*',$bAutoBuild=true) 
 	{
 		// ins 
-		if( !empty($arrConfig['ins']) )
-		{			
-			if( !$aFile = $this->beanFolders()->find($arrConfig['ins'].'.ins.php',$sNamespace) )
+		if( !empty($arrConfig['ins']) or !empty($arrConfig['instance']) )
+		{
+			$sInstance = isset($arrConfig['ins'])?$arrConfig['ins']:$arrConfig['instance'] ;
+			if( !$aFile = $this->beanFolders()->find($sInstance.'.ins.php',$sNamespace) )
 			{
 				throw new BeanConfException("Bean对象配置数组中的 ins 属性无效: %s，找不到指定的实例文件",$arrConfig['ins']) ;
 			}
 			return $aFile->includeFile(false,false) ;
 		}
 		
-		else if( !empty($arrConfig['conf']) )
+		else if( !empty($arrConfig['conf']) or !empty($arrConfig['config']) )
 		{
-			$arrConfigFile = $this->findConfig($arrConfig['conf'],$sNamespace) ;
-
+			$arrConfigFile = $this->findConfig(
+						isset($arrConfig['conf'])?$arrConfig['conf']:$arrConfig['config']
+						, $sNamespace
+			) ;
 			// 合并数组
 			$arrConfig = array_merge($arrConfigFile,$arrConfig) ;
 		}
@@ -113,7 +116,7 @@ class BeanFactory extends Object
 	{
 		$arrConfig = $this->findConfig($sConfName,$sNamespace) ;
 		return $this->createBean($arrConfig,$sNamespace,$aAutoBuild) ;
-	} 
+	}
 	
 	public function findConfig($sConfName,&$sNamespace='*') 
 	{
@@ -146,25 +149,53 @@ class BeanFactory extends Object
 		
 		foreach($arrConfigArray as $key=>&$arrConfig)
 		{
-			// 以数组的 key 作为 name,id 等属性
-			if( $sKeyAs and !isset($arrConfig[$sKeyAs]) and !is_int($key) )
-			{
-				$arrConfig[$sKeyAs] = strval($key) ;
-			}
-			
-			// 默认的 class
-			if($sDefaultClass)
-			{
-				if( empty($arrConfig['class']) and empty($arrConfig['ins']) and empty($arrConfig['conf']) )
-				{
-					$arrConfig['class'] = $sDefaultClass ;
-				}
-			}
-			
+			$this->_typeProperties($arrConfigArray,$sDefaultClass,is_int($key)?null:$key,$sKeyAs) ;			
 			$arrBeans[$key] = $this->createBean($arrConfig,$sNamespace,$bAutoBuild) ;
 		}
 		
 		return $arrBeans ;
+	}
+	
+	/**
+	 * 将config数组中的 model:xxx 转换为 models[] 结构
+	 */
+	public function _typeKeyStruct(&$arrConfig,$arrKeys)
+	{
+		foreach($arrConfig as $sKey=>&$item)
+		{    		
+			foreach($arrKeys as $sKeyPrefix=>$sContainerName)
+			{
+				if( strpos($sKey,$sKeyPrefix)===0 )
+				{
+					$sName = substr($sKey,strlen($sKeyPrefix)) ;
+					
+					if( !is_array($item) )
+					{
+						throw new BeanConfException("视图Bean配置的 %s 必须是一个数组",$sKey) ;
+					}
+					
+					$arrConfig[$sContainerName][$sName] = &$item ;
+				}
+			}
+		}
+	}
+	
+	public function _typeProperties(&$arrConfig,$sDefaultClass=null,$sKey=null,$sKeyProperty='name')
+	{
+		// 以数组的 key 作为 name,id 等属性
+		if( $sKey and !isset($arrConfig[$sKeyProperty]) )
+		{
+			$arrConfig[$sKeyProperty] = $sKey ;
+		}
+		
+		// 默认的 class
+		if($sDefaultClass)
+		{
+			if( empty($arrConfig['class']) and empty($arrConfig['ins']) and empty($arrConfig['instance']) and empty($arrConfig['conf']) and empty($arrConfig['config']) )
+			{
+				$arrConfig['class'] = $sDefaultClass ;
+			}
+		}
 	}
 	
 	public function registerBeanClass($sClassName,$sAlias=null)

@@ -1,11 +1,11 @@
 <?php
 namespace jc\mvc\model\db ;
 
+use jc\mvc\model\IModelList;
 use jc\pattern\composite\INamable;
 use jc\bean\BeanFactory;
 use jc\bean\IBean;
 use jc\db\sql\Restriction;
-use jc\mvc\model\db\orm\SelectForAssocQuery;
 use jc\lang\Exception;
 use jc\mvc\model\db\orm\Deleter;
 use jc\mvc\model\db\orm\Selecter;
@@ -16,10 +16,9 @@ use jc\db\recordset\IRecordSet;
 use jc\db\sql\Criteria;
 use jc\mvc\model\db\orm\Association;
 use jc\mvc\model\AbstractModel ;
-use jc\mvc\model\IPaginal;
 use jc\mvc\model\db\orm\Prototype;
 
-class Model extends AbstractModel implements IModel , IPaginal, IBean
+class Model extends AbstractModel implements IModel, IBean
 {
 	public function __construct(Prototype $aPrototype=null)
 	{
@@ -27,38 +26,6 @@ class Model extends AbstractModel implements IModel , IPaginal, IBean
 	    $this->setPrototype($aPrototype);
 	}
 	
-	public static function create($prototype=null)
-	{
-		// orm config
-		if( is_array($prototype) )
-		{
-			$aPrototype = PrototypeInFragment::createFromCnf($prototype,true,true,true) ;
-		}
-		
-		// Prototype
-		else if( $prototype instanceof Prototype )
-		{
-			$aPrototype = $prototype ;
-		}
-		
-		// 字符串做为数据表的表名
-		else if( is_string($prototype) )
-		{
-			$aPrototype = PrototypeInFragment::createFromCnf(
-				array('table'=>$prototype),true,true,true
-			) ;
-		}
-		
-		else 
-		{
-			throw new Exception("创建模型时传入的模型原型类型无效") ;
-		}
-		
-		$object = new self($aPrototype);
-		$object->criteria()->setLimitLen( 1 ) ;
-		return $object;
-	}
-
 	public function name()
 	{
 		return $this->aPrototype? $this->aPrototype->name(): null ; 
@@ -158,11 +125,17 @@ class Model extends AbstractModel implements IModel , IPaginal, IBean
 				}
 			}
 		}
-		$this->setSerialized(true);
-		$this->clearChanged();
-		Selecter::singleton()->execute( $this->db(), $this, null,$selectCriteria ) ;
 		
-		return !$this->isEmpty() ;
+		if( Selecter::singleton()->execute( $this->db(), $this, null, $selectCriteria, ($this instanceof IModelList) ) ) 
+		{
+			$this->setSerialized(true);
+			$this->clearChanged();
+			return true ;
+		}
+		else
+		{
+			return false ;
+		}
 	}
 	
 	public function save()
@@ -291,32 +264,6 @@ class Model extends AbstractModel implements IModel , IPaginal, IBean
 		}
 		
 		return $aChildModel ;
-	}
-	
-	public function totalCount()
-	{
-		$aSelect = new SelectForAssocQuery($this->prototype()) ;
-
-		if( $this->aCriteria )
-		{
-		    $ilimitLen = $this->aCriteria->limitLen();
-		    $ilimitFrom = $this->aCriteria->limitFrom();
-		    $this->aCriteria->setLimit(1000);
-			$aSelect->setCriteria($this->aCriteria) ;
-		}
-		
-		$aSelect->setOnlyCount('_cnt',true) ;
-	
-		$aRecordSet = $this->db()->query($aSelect) ;
-		if( !$aRecordSet or !$aRecordSet->rowCount() )
-		{
-			return 0 ;
-		}
-		
-		if( $this->aCriteria ){
-		    $this->aCriteria->setLimit($ilimitLen,$ilimitFrom);
-		}
-		return intval($aRecordSet->field('_cnt')) ;		
 	}
 	
 	public function setPagination($iPerPage,$iPageNum){

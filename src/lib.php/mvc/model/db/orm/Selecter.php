@@ -14,7 +14,7 @@ use jc\db\sql\Criteria;
 
 class Selecter extends OperationStrategy
 {
-	public function execute(DB $aDB, IModel $aModel,Select $aSelect=null,Criteria $aCriteria=null)
+	public function execute(DB $aDB, IModel $aModel,Select $aSelect=null,Criteria $aCriteria=null,$bList=false)
 	{
 		if( !$aPrototype = $aModel->prototype() )
 		{
@@ -38,7 +38,7 @@ class Selecter extends OperationStrategy
 		$this->addColumnsForOneToOne($aSelect,$aPrototype,$arrMultitermAssociations) ;
 		
 		// set limit
-		if( !($aModel instanceof IModelList) )
+		if( !$bList )
 		{
 			$aSelect->criteria()->setLimitLen(1) ;
 		}
@@ -53,14 +53,14 @@ class Selecter extends OperationStrategy
 		// query
 		if( !$aRecordset=$aDB->query($aSelect) or !$aRecordset->rowCount() )
 		{
-			return ;
+			return false ;
 		}
 		$aModel->loadData($aRecordset,true) ;
 		
 		
 		// -----------------
 		// step 2. query alonely for multiterm associated prototype 
-		if($aModel instanceof IModelList)
+		if($bList)
 		{
 			$modelIter = $aModel->childIterator() ;
 		}
@@ -75,6 +75,8 @@ class Selecter extends OperationStrategy
 				$this->queryForMultitermAssoc($aDB,$aMultitermAssoc,$aModel,$aSelect) ;
 			}
 		}
+			
+		return true ;
 	}
 	
 	private function queryForMultitermAssoc(DB $aDB,Association $aMultitermAssoc,IModel $aModel,Select $aSelect)
@@ -131,7 +133,7 @@ class Selecter extends OperationStrategy
 		// 
 		$aChildModel = $aToPrototype->createModel(true) ;
 		$aModel->addChild($aChildModel,$aToPrototype->name()) ;
-		$this->execute($aDB,$aChildModel,$aSelect) ;
+		$this->execute($aDB,$aChildModel,$aSelect,null,true) ;
 		
 		// 清理条件
 		$aSelect->criteria()->restriction()->remove($aRestraction) ;

@@ -9,10 +9,10 @@ class Order extends SubStatement
 	 * @param string $sColumn 列名
 	 * @param boolean $bOrderType true代表ASC , false代表DESC ，默认为true
 	 */
-	public function __construct($sColumn=null , $bOrderType=true){
+	public function __construct($sColumn=null , $bDesc=true){
 		if($sColumn)
 		{
-			$this->add($sColumn,$bOrderType) ;
+			$this->add($sColumn,$bDesc) ;
 		}
 	}
 	
@@ -22,7 +22,7 @@ class Order extends SubStatement
 	 * @return self 
 	 */
 	static public function asc($sColumn){
-		return new self($sColumn);
+		return new self($sColumn,false);
 	}
 	/**
 	 * 获得一个order实例,按照所给参数生成OrderBy语句,降序
@@ -30,7 +30,7 @@ class Order extends SubStatement
 	 * @return self 
 	 */
 	static public function decs($sColumn){
-		return new self($sColumn,false);
+		return new self($sColumn,true);
 	}
 	
 	/**
@@ -38,16 +38,12 @@ class Order extends SubStatement
 	 * @param string $sColumn 列名
 	 * @param boolen $bOrderType 排序方式,true代表ASC , false代表DESC ，默认为true
 	 */
-	public function add($sColumn , $bAsc=true) {
+	public function add($sColumn , $bDesc=true) {
 		if($sColumn === null){
 			return;
 		}
-		
-		$sOrderType = 'ASC';
-		if(!$bOrderType){
-			$sOrderType = 'DESC';
-		}
-		$this->arrOrderBys[$sColumn] = array($this->transColumn($sColumn) , $sOrderType);
+		$this->arrOrderBys[$sColumn] = array($this->transColumn($sColumn),$bDesc?'DESC':'ASC');
+		return $this ;
 	}
 	
 	/**
@@ -56,10 +52,12 @@ class Order extends SubStatement
 	 */	
 	public function removeColumn($sColumn) {
 		reset($this->arrOrderBys[$sColumn]) ;
+		return $this ;
 	}
 	
 	public function clearColumns() {
 		$this->arrOrderBys = array();
+		return $this ;
 	}
 	
 	public function iterator() {

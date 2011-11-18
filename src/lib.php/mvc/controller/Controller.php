@@ -87,88 +87,62 @@ class Controller extends NamableComposite implements IController, IBean
     	}
     	
     	$aBeanFactory = BeanFactory::singleton() ;
-    	$aModelContainer = $this->modelContainer() ;
-    	$arrViewModels = array() ;
     	
-    	foreach($arrConfig as $sPropertyName=>&$item)
+    	// 将 model:xxxx 转换成 models[] 结构
+    	$aBeanFactory->_typeKeyStruct($arrConfig,array(
+    				'model:'=>'models' ,
+    				'view:'=>'views' ,
+    				'controller:'=>'controllers' ,
+    	)) ;
+    	
+    	// models --------------------
+    	$aModelContainer = $this->modelContainer() ;
+    	if( !empty($arrConfig['models']) )
     	{
-    		// models
-    		if($sPropertyName=='models')
+    		foreach($arrConfig['models'] as $key=>&$arrBeanConf)
     		{
-    			foreach($aBeanFactory->createBeanArray($item,'model','name',$sNamespace) as $aBean)
-				{
-					$aModelContainer->add( $aBean, isset($item['name'])?$item['name']:null ) ;
-				}
-    		}
-    		// model:ooxxx
-    		else if( strpos($sPropertyName,'model:')===0 )
-    		{
-    			$item['name'] = substr($sPropertyName,6) ;
-    			if(empty($item['class']) and empty($item['ins']) and empty($item['conf']))
-    			{
-    				$item['class'] = 'model' ;
-    			}
-				$aModelContainer->add( $aBeanFactory->createBean($item,$sNamespace), isset($item['name'])?$item['name']:null ) ;
-    		}
-    		
-    		// views
-    		else if($sPropertyName=='views')
-    		{
-    			foreach($aBeanFactory->createBeanArray($item,'name',$sNamespace) as $aBean)
-				{
-					$this->add( $aBean ) ;
-					if(!empty($item['model']))
-					{
-						$arrViewModels[] = array($aBean,$item['model']) ;
-					}
-				}
-    		}
-    		
-    		// view:ooxxx
-    		else if( strpos($sPropertyName,'view:')===0 )
-    		{
-    			$item['name'] = substr($sPropertyName,5) ;
-    			if(empty($item['class']) and empty($item['ins']) and empty($item['conf']))
-    			{
-    				$item['class'] = 'view' ;
-    			}
-    			$aBean = $aBeanFactory->createBean($item,$sNamespace) ;
-				$this->addView( $aBean ) ;
-				if(!empty($item['model']))
-				{
-					$arrViewModels[] = array($aBean,$item['model']) ;
-				}
-    		}
-    		
-    		// controllers
-    		else if($sPropertyName=='controllers')
-    		{
-    			foreach($aBeanFactory->createBeanArray($item,'controller','name',$sNamespace) as $aBean)
-				{				
-					$this->add( $aBean ) ;
-				}
-    		}
-    		// controller:ooxxx
-    		else if( strpos($sPropertyName,'controller:')===0 )
-    		{
-    			$item['name'] = substr($sPropertyName,11) ;
-    			if(empty($item['class']) and empty($item['ins']) and empty($item['conf']))
-    			{
-    				$item['class'] = 'controller' ;
-    			}
-				$this->add( $aBeanFactory->createBean($item,$sNamespace) ) ;
+    			// 自动配置缺少的 class, name 属性
+    			$aBeanFactory->_typeProperties( $arrBeanConf, 'model', is_int($key)?null:$key, 'name' ) ;
+    			
+    			$aBean = $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ;
+    			$aModelContainer->add( $aBean, $aBean->name() ) ;
     		}
     	}
     	
-    	// view's model
-    	foreach($arrViewModels as $viewModel)
+    	// views --------------------
+    	if( !empty($arrConfig['views']) )
     	{
-    		list($aView,$sModelName) = $viewModel ;
-    		if( !$aModel=$aModelContainer->getByName($sModelName) )
+    		foreach($arrConfig['views'] as $key=>&$arrBeanConf)
     		{
-    			throw new BeanConfException("视图(%s)的Bean配置属性 model 无效，没有指定的模型：%s",array($aView->name(),$sModelName)) ;
+    			// 自动配置缺少的 class, name 属性
+    			$aBeanFactory->_typeProperties( $arrBeanConf, 'view', is_int($key)?null:$key, 'name' ) ;
+    			
+    			// 创建对象
+				$aBean = $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ;
+				
+				$this->addView( $aBean ) ;
+				
+				if(!empty($arrBeanConf['model']))
+				{
+					if( !$aModel=$aModelContainer->getByName($arrBeanConf['model']) )
+		    		{
+		    			throw new BeanConfException("视图(%s)的Bean配置属性 model 无效，没有指定的模型：%s",array($aBean->name(),$arrBeanConf['model'])) ;
+		    		}
+		    		$aBean->setModel($aModel) ;
+				}
     		}
-    		$aView->setModel($aModel) ;
+    	}
+    	
+    	// controllers --------------------
+    	if( !empty($arrConfig['controllers']) )
+    	{
+    		foreach($arrConfig['controllers'] as $key=>&$arrBeanConf)
+    		{
+    			// 自动配置缺少的 class, name 属性
+    			$aBeanFactory->_typeProperties( $arrBeanConf, 'controller', is_int($key)?null:$key, 'name' ) ;
+    			
+    			$this->add( $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ) ;
+    		}
     	}
     	
     	$this->arrBeanConfig = $arrConfig ;

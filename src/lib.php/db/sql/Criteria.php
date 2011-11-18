@@ -51,6 +51,7 @@ class Criteria extends SubStatement
 	public function setLimit($nLimitLen , $nLimitFrom = 0){
 		$this->setLimitLen($nLimitLen);
 		$this->setLimitFrom($nLimitFrom);
+		return $this ;
 	}
 	
 	public function makeStatementLimit($bFormat = false,$bEnableLimitStart=false){
@@ -69,6 +70,7 @@ class Criteria extends SubStatement
 	
 	public function setLimitFrom($nLimitFrom) {
 		$this->nLimitFrom = (int)$nLimitFrom;
+		return $this ;
 	}
 	public function limitFrom()
 	{
@@ -77,6 +79,7 @@ class Criteria extends SubStatement
 	
 	public function setLimitLen($nLimitLen){
 		$this->nLimitLen = $nLimitLen;
+		return $this ;
 	}
 	
 	public function limitLen()
@@ -86,6 +89,7 @@ class Criteria extends SubStatement
 	
 	public function setRestriction(Restriction $aRestriction){
 		$this->aRestriction = $aRestriction;
+		return $this ;
 	}
 	
 	/**
@@ -99,8 +103,15 @@ class Criteria extends SubStatement
 		return $this->aRestriction ;
 	}
 	
-	public function setOrder(Order $aOrder){
+	public function addOrderBy($sColumn,$bDesc=true)
+	{
+		$this->orders()->add($sColumn,$bDesc) ;
+		return $this ;
+	}
+	
+	public function setOrders(Order $aOrder){
 		$this->aOrder = $aOrder;
+		return $this ;
 	}
 	
 	/**
@@ -137,6 +148,7 @@ class Criteria extends SubStatement
 				$sColumn = $this->transColumn($sColumn) ;
 			}
 		}
+		return $this ;
 	}
 	
 	public function groupBy()
@@ -147,6 +159,7 @@ class Criteria extends SubStatement
 	public function clearGroupBy()
 	{
 		$this->arrGroupByClms = array() ;
+		return $this ;
 	}
 	
 	private $aRestriction = null;

@@ -1,10 +1,11 @@
 <?php
 namespace jc\mvc\model\db ;
 
+use jc\mvc\model\IPaginal;
 use jc\db\recordset\IRecordSet;
 use jc\mvc\model\IModelList ;
 
-class ModelList extends Model implements IModelList
+class ModelList extends Model implements IModelList, IPaginal
 {
 	public function loadData( IRecordSet $aRecordSet, $bSetSerialized=false )
 	{
@@ -66,6 +67,32 @@ class ModelList extends Model implements IModelList
 		}
 		
 		return $aChild ;
+	}
+	
+	public function totalCount()
+	{
+		/*$aSelect = new SelectForAssocQuery($this->prototype()) ;
+	
+		if( $this->aCriteria )
+		{
+			$ilimitLen = $this->aCriteria->limitLen();
+			$ilimitFrom = $this->aCriteria->limitFrom();
+			$this->aCriteria->setLimit(1000);
+			$aSelect->setCriteria($this->aCriteria) ;
+		}
+	
+		$aSelect->setOnlyCount('_cnt',true) ;
+	
+		$aRecordSet = $this->db()->query($aSelect) ;
+		if( !$aRecordSet or !$aRecordSet->rowCount() )
+		{
+			return 0 ;
+		}
+	
+		if( $this->aCriteria ){
+			$this->aCriteria->setLimit($ilimitLen,$ilimitFrom);
+		}
+		return intval($aRecordSet->field('_cnt')) ;*/
 	}
 }
 

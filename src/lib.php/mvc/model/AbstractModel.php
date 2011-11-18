@@ -93,12 +93,12 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 		return null;
 	}
 	
-	public function setData($sName, $sValue, $bStrikeChange=true)
+	public function setData($sName, $sValue, $bChanged=true)
 	{
 		list ( $aModel, $sChildName ) = $this->findDataByPath ( $sName );
 		if ($aModel)
 		{
-			$aModel->setData ( $sChildName, $sValue ,$bStrikeChange);
+			$aModel->setData ( $sChildName, $sValue ,$bChanged);
 		}
 		else
 		{
@@ -108,7 +108,7 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 			}
 			if( $this->hasData($sName)===false or $this->data($sName) !== $sValue ){
 				$this->arrDatas [$sName] = $sValue;
-				if($bStrikeChange){
+				if($bChanged){
 					$this->setChanged($sName);
 				}
 			}
