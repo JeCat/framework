@@ -52,40 +52,29 @@ class FormWidget extends Widget implements IViewFormWidget
 			$this->setDisabled($arrConfig['disabled']?true:false) ;
 		}
 		
-		// -------------------
-		// verifiers
     	$aBeanFactory = BeanFactory::singleton() ;
-    	foreach($arrConfig as $sPropertyName=>&$item)
-    	{
-    		// verifiers
-    		if($sPropertyName=='verifier')
-    		{
-    			foreach($aBeanFactory->createBeanArray($item,'length','class',$sNamespace) as $aBean)
-				{
-					$this->addVerifier(
-						$aBean
-						, isset($arrConfig['message'])? $arrConfig['message']: null
-						, isset($arrConfig['callback'])? $arrConfig['callback']: null
-						, isset($arrConfig['callback.argvs'])? $arrConfig['callback.argvs']: null
-					) ;
-				}
-    		}
-    		
-    		// verifier:ooxxx
-    		else if( strpos($sPropertyName,'verifier:')===0 )
-    		{
-    			if(empty($item['class']) and empty($item['ins']) and empty($item['conf']))
-    			{
-    				$item['class'] = substr($sPropertyName,9) ;
-    			}
+		
+		// 将 verifier:xxxx 转换成 verifiers[] 结构
+		$aBeanFactory->_typeKeyStruct($arrConfig,array(
+				'verifier:'=>'verifiers' ,
+		)) ;
+		
+		// verifiers
+		if(!empty($arrConfig['verifiers']))
+		{
+			foreach($arrConfig['verifiers'] as $key=>&$arrVerifierConf)
+			{
+    			// 自动配置缺少的 class 属性
+    			$aBeanFactory->_typeProperties( $arrVerifierConf, 'length', is_int($key)?null:$key, 'class' ) ;
+    			
 				$this->addVerifier(
-					$aBeanFactory->createBean($item,$sNamespace)
-					, isset($arrConfig['message'])? $arrConfig['message']: null
-					, isset($arrConfig['callback'])? $arrConfig['callback']: null
-					, isset($arrConfig['callback.argvs'])? $arrConfig['callback.argvs']: null
+						$aBeanFactory->createBean($arrVerifierConf,$sNamespace,true)
+						, isset($arrVerifierConf['message'])? $arrVerifierConf['message']: null
+						, isset($arrVerifierConf['callback'])? $arrVerifierConf['callback']: null
+						, isset($arrVerifierConf['callback.argvs'])? $arrVerifierConf['callback.argvs']: null
 				) ;
-    		}
-    	}
+			}
+		}
 	}
 	
 	public function value()
