@@ -14,7 +14,14 @@ jc.mvc.view.widget.menu.base.getStyle=function(o,styleName){
 	return y;
 }
 jc.mvc.view.widget.menu.base.show=function(o){
-	o.style.display="block";
+	console.log(o.parentNode);
+	console.log(this.getStyle(o.parentNode,'width'));
+	o.parentNode.style.position="relative";
+	o.style.position="absolute";
+	o.style.left = this.getStyle(o.parentNode,'width');
+	console.log(o.style.left);
+	o.style.top = 0;
+	o.style.display="block";	
 }
 jc.mvc.view.widget.menu.base.hide=function(o){
 	o.style.display="none";
