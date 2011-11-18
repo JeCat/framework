@@ -84,19 +84,19 @@ class BeanFactory extends Object
 		
 		if( !empty($arrConfig['class']) )
 		{
-			$sClass = $this->beanClassNameByAlias($arrConfig['class']) ?: $arrConfig['class'];
+			$arrConfig['class'] = $this->beanClassNameByAlias($arrConfig['class']) ?: $arrConfig['class'];
 		
-			if( !class_exists($sClass) )
+			if( !class_exists($arrConfig['class']) )
 			{
 				throw new BeanConfException("Bean对象配置数组中的 class 属性无效：%s，不存在该名称的类和别名",$arrConfig['class']) ;
 			}
 			
-			if( !Type::hasImplements($sClass,'jc\\bean\\IBean') )
+			if( !Type::hasImplements($arrConfig['class'],'jc\\bean\\IBean') )
 			{
 				throw new BeanConfException("Bean对象配置数组中的 class 属性无效：%s，必须是一个实现 jc\\bean\\IBean 接口的类",$arrConfig['class']) ;
 			}
 			
-			$aBean = new $sClass ;
+			$aBean = new $arrConfig['class'] ;
 			
 			if($bAutoBuild)
 			{

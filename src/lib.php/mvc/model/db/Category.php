@@ -19,7 +19,7 @@ use jc\lang\Exception;
 class Category extends Model 
 {	
 	const top = 1 ;
-	const end = -1 ;
+	const end = null ;
 	
 	public function leftPoint()
 	{
@@ -53,7 +53,7 @@ class Category extends Model
 	public function insertBefore(Category $aCategory=null)
 	{
 		$this->insertCategoryToPoint(
-			$aCategory? $aCategory->rightPoint()+1: self::end
+			$aCategory===self::end?  self::end: $aCategory->rightPoint()+1
 		) ;
 	}
 	
@@ -80,7 +80,7 @@ class Category extends Model
 		
 		$aSqlFactory = StatementFactory::singleton() ;
 		
-		if($nTarget==self::end)
+		if($nTarget===self::end)
 		{
 			$nTarget = $this->endRightFoot($aOrmPrototype,$sRgtClm) + 1 ;
 		}
@@ -155,6 +155,76 @@ class Category extends Model
 	}
 	
 	/**
+	 * 建立分类所属关系的树形结构
+	 * $aCategories 中的分类必须按照 lft 排序
+	 */
+	static public function buildTree(\Iterator $aCategories,self $aRoot=null)
+	{
+		$aParentStack = new Stack() ;
+		if($aRoot)
+		{
+			$aParentStack->put($aRoot) ;
+		}
+		$arrTopCategories = null ;
+		
+		foreach($aCategories as $aCategory)
+		{
+			for(; $aParent=$aParentStack->get(); $aParentStack->out() )
+			{
+				if( $aParent->lft < $aCategory->lft and $aParent->rgt > $aCategory->rgt )
+				{
+					break ;
+				}
+			}
+			
+			if($aParent)
+			{
+				$aParent->addChildCategory($aCategory) ;
+			}
+			
+			if($aRoot===$aParent)
+			{
+				$arrTopCategories[] = $aCategory ;
+			}
+			
+			$aParentStack->put($aCategory) ;
+		}
+		
+		return $arrTopCategories ;
+	}
+	
+	/**
+	 * 加载原型中的所有分类
+	 * @return \Iterator
+	 */
+	static public function loadTotalCategory(Prototype $aPrototype,$bBuildTree=true,$bReturnTop=false)
+	{
+		$aCategoryList = new ModelList($aPrototype) ;
+		
+		$aCriteria = clone $aPrototype->criteria() ;
+		$aCriteria->addOrderBy('lft',false) ;
+		
+		if( !$aCategoryList->load($aCriteria) )
+		{
+			return ;
+		}
+		
+		if($bBuildTree)
+		{
+			if($bReturnTop)
+			{
+				return self::buildTree($aCategoryList->childIterator()) ;
+			}
+			else
+			{
+				self::buildTree($aCategoryList->childIterator()) ;
+			}
+		}
+		
+		return $aCategoryList->childIterator() ;
+	}
+	
+	/**
 	 * 加载所有属于自己的下级分类，并建立树形结构
 	 */
 	public function loadTree()
@@ -177,25 +247,7 @@ class Category extends Model
 			return ;
 		}
 		
-		$aParentStack = new Stack() ;
-		$aParentStack->put($this) ;
-		
-		foreach($aCategoryList->childIterator() as $aCategory)
-		{
-			for(; $aParent=$aParentStack->get(); $aParentStack->out() )
-			{
-				if( $aParent->lft < $aCategory->lft() and $aParent->rgt > $aCategory->rgt )
-				{
-					break ;
-				}
-			}
-			if(!$aParent)
-			{
-				throw new CategoryPointException("临接表操作遇到数据错误，数据表%s中的数据可能已经遭到损坏",$aOrmPrototype->tableName()) ;
-			}
-			
-			$aParent->addChildCategory($aCategory) ;
-		}
+		self::buildTree($aCategoryList->childIterator(),$this) ;
 	}
 	
 	public function childCategoryIterator()

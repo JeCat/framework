@@ -442,7 +442,7 @@ class Prototype implements IBean
 	 */
 	public function createModel($bList=false)
 	{
-		return $bList? new ModelList($this): new Model($this) ;
+		return $bList? new ModelList($this): new $this->sModelClass($this) ;
 	}
 	
 	// criteria setter
@@ -544,6 +544,11 @@ class Prototype implements IBean
 		if( !$this->aDB )
 		{
 			$this->aDB = DB::singleton() ;
+		}
+		
+		if(!empty($arrConfig['model-class']))
+		{
+			$this->sModelClass = $arrConfig['model-class'] ;
 		}
 		
 		// table
@@ -719,6 +724,8 @@ class Prototype implements IBean
 	private $arrSqlColumnAliasCaches = array() ;
 	
 	private $aDB ;
+	
+	private $sModelClass = 'jc\\mvc\\model\\db\\Model' ;
 		
 	private $aStatementFactory ;
 	

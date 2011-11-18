@@ -110,6 +110,10 @@ class View extends NamableComposite implements IView, IBean
     			
     			// 创建对象
     			$aWidget = $aBeanFactory->createBean($arrBeanConf,$sNamespace,false) ;
+    			if(!empty($arrBeanConf['id']))
+    			{
+    				$aWidget->setId($arrBeanConf['id']) ;
+    			}
     			
     			// 添加到视图
     			$this->addWidget( $aWidget, empty($arrConfig['widgets'][$key]['exchange'])?null:$arrConfig['widgets'][$key]['exchange'] ) ;
@@ -439,12 +443,32 @@ class View extends NamableComposite implements IView, IBean
 
     public function __get($sName)
     {
+    	// widget
+    	if($aWidget=$this->widgits()->get($sName))
+    	{
+    		return $aWidget ;
+    	}
+    	
+    	// view
+    	if($aView=$this->getByName($sName))
+    	{
+    		return $aView ;
+    	}
+    	
     	$nNameLen = strlen($sName) ;
     	
-    	if( $nNameLen>4 and substr($sName,0,4)=='view' )
+    	// viewXXXX
+    	if( $nNameLen>4 and strpos($sName,'view')===0 )
     	{
     		$sViewName = substr($sName,4) ;
-    		return $this->getByName($sViewName) ;
+    		return $this->getByName($sViewName)?: $this->getByName(lcfirst($sViewName)) ;
+    	}
+    	
+    	// widgetXXXX
+    	else if( $nNameLen>6 and strpos($sName,'widget')===0 )
+    	{
+    		$sWidgetName = substr($sName,6) ;
+    		return $this->widgits()->get($sWidgetName)?: $this->widgits()->get(lcfirst($sWidgetName)) ;
     	}
     	
 		throw new Exception("正在访问视图 %s 中不存在的属性: %s",array($this->name(),$sName)) ;

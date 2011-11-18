@@ -476,6 +476,25 @@ class Controller extends NamableComposite implements IController, IBean
     
     public function __get($sName)
     {
+    	// view
+    	if($child=$this->mainView()->getByName($sName))
+    	{
+    		return $child ;
+    	}
+    	
+    	// model
+    	else if($child=$this->modelContainer()->getByName($sName))
+    	{
+    		return $child ;
+    	}
+    	
+    	// controller
+    	else if($child=$this->getByName($sName))
+    	{
+    		return $child ;
+    	}
+    	
+    	// ----------------
     	$nNameLen = strlen($sName) ;
     	
     	if( $nNameLen>4 and substr($sName,0,4)=='view' )
