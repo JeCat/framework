@@ -12,6 +12,14 @@
  * 	[<foreach:else/>]
  * <foreach/>
  * 
+ * 
+ * for   exp 循环目标
+ * key   text/exp 迭代元素的键名/下标,相当于php中foreach语法中的key
+ * item  text/exp 迭代元素的变量名,相当于php中foreach语法中的value
+ * Item.ref bool  是否按引用取得元素值,默认false
+ * idx text/exp 迭代计数变量名,该变量记录当前循环次数
+ * 
+ * 
  * @author anubis
  *
  */
@@ -74,7 +82,7 @@ class ForeachCompiler extends NodeCompiler {
 			$aDev->write ( " \$aVariables->set({$sIdxUserName},{$sIdxAutoName} ); ");
 		}
 					
-		$aDev->write("");
+// 		$aDev->write("");
 		
 		//是否是单行标签?
 		if(!$aObject->headTag()->isSingle()){
