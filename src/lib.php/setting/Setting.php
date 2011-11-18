@@ -1,10 +1,21 @@
 <?php
 namespace jc\setting;
 
+use jc\lang\Exception;
+
 use jc\lang\Object;
 
 abstract class Setting extends Object implements ISetting
-{
+{	
+	public function saveKey($sPath)
+	{
+		if (! $aKey = $this->key ( $sPath ))
+		{
+			return;
+		}
+		$aKey->save ();
+	}
+	
 	/**
 	 * @return \Iterator 
 	 */
@@ -35,20 +46,23 @@ abstract class Setting extends Object implements ISetting
 		return $aKey->itemIterator ();
 	}
 	
-	public function item($sPath, $sName = '*', $defaultValue = null)
+	public function item($sPath,$sName='*',$defaultValue=null)
 	{
-		if (! $aKey = $this->key ( $sPath ))
+		if (!$aKey=$this->key($sPath,$defaultValue!==null))
 		{
 			return null;
 		}
-		return $aKey->item ( $sName, $defaultValue );
+		return $aKey->item($sName,$defaultValue) ;
 	}
 	
 	public function setItem($sPath, $sName, $value)
 	{
 		if (! $aKey = $this->key ( $sPath ))
 		{
-			$aKey = $this->createKey ( $sPath );
+			if( !$aKey=$this->createKey($sPath) )
+			{
+				throw new Exception("无法保存配置建：%s",$sPath) ;
+			}
 		}
 		$aKey->setItem ( $sName, $value );
 	}

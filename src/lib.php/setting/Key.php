@@ -15,7 +15,8 @@ abstract class Key extends Object implements IKey
 			}
 			else 
 			{
-				return $this->arrItems[$sName] = $sDefault ;
+				$this->arrItems[$sName] = $sDefault ;
+				$this->bDataChanged = true ;
 			}
 		}
 		
@@ -39,6 +40,7 @@ abstract class Key extends Object implements IKey
 	public function deleteItem($sName)
 	{
 		unset($this->arrItems[$sName]) ;
+		$this->bDataChanged = true ;
 	}
 	
 	/**

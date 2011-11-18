@@ -507,20 +507,19 @@ class Controller extends NamableComposite implements IController, IBean
     	if( $nNameLen>4 and substr($sName,0,4)=='view' )
     	{
     		$sViewName = substr($sName,4) ;
-    		return $this->mainView()->getByName($sViewName) ;
+    		return $this->mainView()->getByName($sViewName)?: $this->mainView()->getByName(lcfirst($sViewName)) ;
     	}
 
     	else if( $nNameLen>5 and substr($sName,0,5)=='model' )
     	{
     		$sModelName = substr($sName,5) ;
-    		$sModelName = strtolower($sModelName) ;
-    		return $this->modelContainer()->getByName($sModelName) ;
+    		return $this->modelContainer()->getByName($sModelName)?: $this->modelContainer()->getByName(lcfirst($sModelName)) ;
     	}
     	
     	else if( $nNameLen>10 and substr($sName,0,10)=='controller' )
     	{
     		$sControllerName = substr($sName,10) ;
-    		return $this->getByName($sControllerName) ;
+    		return $this->getByName($sControllerName)?: $this->getByName(lcfirst($sControllerName)) ;
     	}
     	
 		throw new Exception("正在访问控制器 %s 中不存在的属性:%s",array($this->name(),$sName)) ;

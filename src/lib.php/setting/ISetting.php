@@ -32,6 +32,12 @@ interface ISetting
 	public function deleteKey($sPath) ;
 	
 	/**
+	 * 保存键
+	 * @param string $sPath 键路径
+	 */
+	public function saveKey($sPath) ;
+	
+	/**
 	 * 获得子键的键名迭代器
 	 * @param string $sPath 键路径
 	 * @return \Iterator 

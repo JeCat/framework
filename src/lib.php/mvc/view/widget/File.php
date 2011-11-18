@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\view\widget;
 
+use jc\fs\FileSystem;
+
 use jc\message\Message;
 use jc\mvc\view\DataExchanger;
 use jc\lang\Type;
@@ -37,7 +39,7 @@ class File extends FormWidget
 		
 		if (array_key_exists ( 'folder', $arrConfig ))
 		{
-			$this->aStoreFolder = $this->application()->fileSystem()->findFolder($arrConfig['folder']);
+			$this->aStoreFolder = $this->application()->fileSystem()->findFolder($arrConfig['folder'],FileSystem::FIND_AUTO_CREATE);
 		}
 	}
 	
@@ -164,6 +166,10 @@ class File extends FormWidget
 	
 	public function setValueFromString($sData)
 	{
+		if(!$sData)
+		{
+			return ;
+		}
 		if (empty ( $this->aStoreFolder ))
 		{
 			throw new Exception ( "非法的路径属性,无法依赖此路径属性创建对应的文件夹对象" );
@@ -190,7 +196,7 @@ class File extends FormWidget
 		{
 			if (! $this->aUploadedFile instanceof IFile)
 			{
-				throw new Exception ( __METHOD__ . "() 请求中的%s数据必须是一个 jc\\fs\\IFile 对象，提供的是%s类型", array ($this->formName (), Type::detectType ( $this->aUploadedFile ) ) );
+				throw new Exception ( __METHOD__ . "() %s数据必须是一个 jc\\fs\\IFile 对象，提供的是%s类型", array ($this->formName (), Type::detectType ( $this->aUploadedFile ) ) );
 			}
 		}
 		

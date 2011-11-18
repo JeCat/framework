@@ -7,65 +7,37 @@ use jc\lang\Object;
 
 class Id extends Object implements IIdentity, \Serializable
 {
-	public function __construct( IModel $aModel, array $arrPropConf )
+	public function __construct( IModel $aModel )
 	{
 		parent::__construct() ;
 		
 		$this->aModel = $aModel ;
-		
-		foreach( $arrPropConf as $sPropName=>$sProp )
-		{
-			$sPropName = strtolower($sPropName) ;
-			if( !in_array($sPropName,self::$arrPropNames) )
-			{
-				continue ;
-			}
-			$this->arrProps[$sPropName] = $sProp ;
-		}
 	}
 	
-	static private $arrPropNames = array(
-			'id', 'username', 'nickname', 'lastlogintime', 'lastloginip', 'activetime', 'activeip'
-	) ; 
-
-
+	public function hasPurview($sNamespace,$sPurviewName,$target=null,$nBit=1)
+	{
+		return PurviewManager::singleton()->hasPurview($this->userId(),$sNamespace,$sPurviewName,$target,$nBit,false) ;
+	}
+	
 	public function serialize ()
 	{
-		foreach(array(
-				'arrPurviews',
-				'arrProps',
-				'aModel',
-		) as $sPropName)
-		{
-			$arrData[$sPropName] =& $this->$sPropName ;
-		}
+		$arrData['model'] =& $this->aModel ;
 		return serialize( $arrData ) ;
 	}
 
 	public function unserialize ($sSerialized)
 	{
 		$arrData = unserialize($sSerialized) ;
-				
-		foreach(array(
-				'arrPurviews',
-				'arrProps',
-				'aModel',
-		) as $sPropName)
-		{
-			if( array_key_exists($sPropName, $arrData) )
-			{
-				$this->$sPropName =& $arrData[$sPropName] ;
-			}
-		}
+		$this->aModel =& $arrData['model'] ;
 	}
 	
 	public function userId()
 	{
-		return (string)$this->getDataFromModel('id') ;
+		return (string)$this->getDataFromModel('uid') ;
 	}
 	public function setUserId($id)
 	{
-		$this->setDataFromModel('id',$id) ;
+		$this->setDataFromModel('uid',$id) ;
 	}
 	
 	public function username()
@@ -79,79 +51,67 @@ class Id extends Object implements IIdentity, \Serializable
 	
 	public function nickname()
 	{
-		return (string)$this->getDataFromModel('nickname') ;
+		return (string)$this->getDataFromModel('info.nickname') ;
 	}
 	public function setNickname($sNickname)
 	{
-		$this->setDataFromModel('nickname',$sNickname) ;
+		$this->setDataFromModel('info.nickname',$sNickname) ;
 	}
 	
 	public function lastLoginTime()
 	{
-		return (int)intval($this->getDataFromModel('lastlogintime')) ;
+		return (int)intval($this->getDataFromModel('lastLoginTime')) ;
 	}
 	public function setLastLoginTime($nUnixTimestamp)
 	{
-		$this->setDataFromModel('lastlogintime',$nUnixTimestamp) ;
+		$this->setDataFromModel('lastLoginTime',$nUnixTimestamp) ;
 	}
 	
 	public function lastLoginIp()
 	{
-		return (string)$this->getDataFromModel('lastloginip') ;
+		return (string)$this->getDataFromModel('lastLoginIp') ;
 	}
 	public function setLastLoginIp($sIp)
 	{
-		$this->setDataFromModel('lastloginip',$sIp) ;
+		$this->setDataFromModel('lastLoginIp',$sIp) ;
+	}
+	
+	public function registerTime()
+	{
+		return (int)intval($this->getDataFromModel('registerTime')) ;
+	}
+	public function setRegisterTime($nUnixTimestamp)
+	{
+		$this->setDataFromModel('registerTime',$nUnixTimestamp) ;
+	}
+	
+	public function registerIp()
+	{
+		return (string)$this->getDataFromModel('registerIp') ;
+	}
+	public function setRegisterIp($sIp)
+	{
+		$this->setDataFromModel('registerIp',$sIp) ;
 	}
 	
 	public function activeTime()
 	{
-		return (int)intval($this->getDataFromModel('activetime')) ;
+		return (int)intval($this->getDataFromModel('activeTime')) ;
 	}
 	public function setActiveTime($nUnixTimestamp)
 	{
-		$this->setDataFromModel('activetime',$nUnixTimestamp) ;
+		$this->setDataFromModel('activeTime',$nUnixTimestamp) ;
 	}
 	
 	public function activeIp()
 	{
-		return (string)$this->getDataFromModel('activeip') ;
+		return (string)$this->getDataFromModel('activeIp') ;
 	}
 	public function setActiveIp($sIp)
 	{
-		$this->setDataFromModel('activeip',$sIp) ;
+		$this->setDataFromModel('activeIp',$sIp) ;
 	}
 
-	public function addPurview($sPurviewName)
-	{
-		if( in_array($sPurviewName,$this->arrPurviews) )
-		{
-			$this->arrPurviews[ strval($sPurviewName) ] = $sPurviewName ;
-		}
-	}
-	
-	public function removePurview($sPurviewName)
-	{
-		unset( $this->arrPurviews[strval($sPurviewName)] ) ;
-	}
-	
-	public function hasPurview($sPurviewName)
-	{
-		return array_key_exists($sPurviewName,$this->arrPurviews) ;
-	}
-	
-	public function clearPurview($sPurviewName)
-	{
-		$this->arrPurviews = array() ;
-	}
-	
-	/**
-	 * @return \IIterator
-	 */
-	public function purviewIterator()
-	{
-		return new ArrayIterator($this->arrPurviews) ;
-	}
 	
 	/**
 	 * @return jc\mvc\model\IModel
@@ -166,32 +126,20 @@ class Id extends Object implements IIdentity, \Serializable
 		$this->aModel = $aModel ;
 	}
 	
-
 	
 	private function getDataFromModel($sProp)
 	{
-		if(!$this->aModel)
-		{
-			return null ;
-		}
-		
-		return isset($this->arrProps[$sProp])? $this->aModel->data($this->arrProps[$sProp]): null ;
+		return $this->aModel? $this->aModel->data($sProp): null ;
 	}
 	
 	private function setDataFromModel($sProp,&$data)
 	{
-		if( $this->aModel and $this->$sProp )
+		if( $this->aModel )
 		{
-			$this->aModel->setData($this->$sProp,$data) ;
+			$this->aModel->setData($sProp,$data) ;
 		}
-		
-		return $this->$sProp? $this->aModel->data($this->$sProp): null ;
 	}
-	
-	private $arrProps = array() ;
-	
-	private $arrPurviews = array() ;
-	
+		
 	private $aModel ;
 }
 

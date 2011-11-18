@@ -16,7 +16,7 @@ class HtmlResourcePool extends Object
 		
 		$this->aResourceManager = $aResourceManager? $aResourceManager: Application::singleton()->publicFolders() ;
 
-		$this->addRequire('jc:style.css',self::RESRC_CSS) ;
+		$this->addRequire('jc:style/style.css',self::RESRC_CSS) ;
 	}
 
 	public function addRequire($sResrcFileName,$nType)

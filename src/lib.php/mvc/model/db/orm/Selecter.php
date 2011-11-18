@@ -51,7 +51,7 @@ class Selecter extends OperationStrategy
 		$this->setGroupBy($aSelect,$aPrototype) ;
 		
 		// query
-		if( !$aRecordset = $aDB->query($aSelect) )
+		if( !$aRecordset=$aDB->query($aSelect) or !$aRecordset->rowCount() )
 		{
 			return ;
 		}

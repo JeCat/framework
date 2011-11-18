@@ -13,6 +13,12 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	}
 	
 	// for child model ///////////////////////////////
+	
+	public function isEmpty()
+	{
+		return empty($this->arrDatas) and empty($this->arrChildren) ;
+	}
+	
 	public function addChild(IModel $aModel, $sName = null)
 	{
 		if ($sName)
@@ -343,11 +349,6 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 		}
 	}
 	
-	public function isEmpty()
-	{
-		return $this->arrDatas === null;
-	}
-	
 	/**
 	 * @param string $sName	$sName=null返回一个数组，或返回指定数据项的“是否变化”状态
 	 */
@@ -389,8 +390,26 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	{
 		$this->bSerialized = $bSerialized? true: false ;
 	}
-	
-	
+
+	public function serialize ()
+	{
+		return serialize( array(
+				'arrDatas' => &$this->arrDatas ,
+				'arrChildren' => &$this->arrChildren ,
+				'arrChanged' => &$this->arrChanged ,
+				'bSerialized' => &$this->bSerialized ,
+		) ) ;
+	}
+
+	public function unserialize ($sSerialized)
+	{
+		$arrData = unserialize($sSerialized) ;
+		
+		$this->arrDatas =& $arrData['arrDatas'] ;
+		$this->arrChildren =& $arrData['arrChildren'] ;
+		$this->arrChanged =& $arrData['arrChanged'] ;
+		$this->bSerialized =& $arrData['bSerialized'] ;
+	}
 	protected function _data(&$sName)
 	{
 		return isset($this->arrDatas[$sName])?  $this->arrDatas[$sName]: null ;

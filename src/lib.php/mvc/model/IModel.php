@@ -5,6 +5,8 @@ use jc\pattern\composite\IContainer;
 
 interface IModel extends \ArrayAccess, \Iterator
 {
+	public function isEmpty() ;
+	
 	public function hasSerialized() ;
 	
 	public function setSerialized($bSerialized=true) ;

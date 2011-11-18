@@ -498,6 +498,10 @@ class Prototype implements IBean
 			if($aStatement instanceof \jc\db\sql\Delete or $aStatement instanceof \jc\db\sql\Update){
 				// delete和Update不支持别名，不做名称转换
 				$sName = '`'.$sName.'`';
+				
+				// 转换字段别名
+				// todo
+				
 			}else{
 				// 切分 原型名称 和 字段名称
 				$pos = strrpos($sName,'.') ;
@@ -623,22 +627,22 @@ class Prototype implements IBean
 		$aBeanFactory = BeanFactory::singleton() ;
 		foreach($arrConfig as $sConfigKey=>&$item)
 		{
-			if( strstr($sConfigKey,'hasOne:')===0 )
+			if( strpos($sConfigKey,'hasOne:')===0 )
 			{
 				$item['type'] = Association::hasOne ;
 				$item['name'] = substr($sConfigKey,7) ;
 			}
-			else if( strstr($sConfigKey,'belongsTo:')===0 )
+			else if( strpos($sConfigKey,'belongsTo:')===0 )
 			{
 				$item['type'] = Association::belongsTo ;
 				$item['name'] = substr($sConfigKey,10) ;
 			}
-			else if( strstr($sConfigKey,'hasMany:')===0 )
+			else if( strpos($sConfigKey,'hasMany:')===0 )
 			{
 				$item['type'] = Association::hasMany ;
 				$item['name'] = substr($sConfigKey,8) ;
 			}
-			else if( strstr($sConfigKey,'hasAndBelongsTo:')===0 )
+			else if( strpos($sConfigKey,'hasAndBelongsTo:')===0 )
 			{
 				$item['type'] = Association::hasAndBelongsTo ;
 				$item['name'] = substr($sConfigKey,16) ;
@@ -652,8 +656,12 @@ class Prototype implements IBean
 			{
 				$item['class'] = 'association' ;
 			}
+			$item['fromPrototype'] = $this ;
 			
-			$this->arrAssociations[] = $aBeanFactory->createBean($item) ;
+			$aAssociation = $aBeanFactory->createBean($item,$sNamespace) ;
+			$aAssociation->setDB($this->aDB) ;
+			
+			$this->arrAssociations[] = $aAssociation ;
 		}
 		
 		$this->done() ;
@@ -666,7 +674,31 @@ class Prototype implements IBean
 		$this->arrBeanConfig ;
 	}
 	
-	
+	// statement
+	public function statementInsert()
+	{
+		$this->aStatementInsert ;
+	}
+	public function statementDelete()
+	{
+		$this->aStatementDelete ;
+	}
+	public function statementSelect()
+	{
+		$this->aStatementSelect ;
+	}
+	/**
+	 * return jc\db\sql\Update
+	 */
+	public function statementUpdate()
+	{
+		if( !$this->aStatementUpdate )
+		{
+			$this->aStatementUpdate = $this->statementFactory()->createUpdate($this ->tableName()) ;
+		}
+
+		return $this->aStatementUpdate ;
+	}
 	
 	// constructor
 	public function __construct(){}
@@ -686,9 +718,14 @@ class Prototype implements IBean
 	private $sSqlTableAliasCache ;
 	private $arrSqlColumnAliasCaches = array() ;
 	
+	private $aDB ;
+		
 	private $aStatementFactory ;
 	
-	private $aDB ;
+	private $aStatementInsert ;
+	private $aStatementDelete ;
+	private $aStatementSelect ;
+	private $aStatementUpdate ;
 	
 	private $arrBeanConfig ;
 }

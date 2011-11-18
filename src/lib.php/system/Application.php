@@ -106,9 +106,9 @@ class Application extends CoreApplication implements \Serializable
 		if( !$this->aPublicFolders )
 		{
 			$this->aPublicFolders = new ResourceManager() ;
-			if( !$aFolder=$this->fileSystem()->find('/framework/src/style') )
+			if( !$aFolder=$this->fileSystem()->find('/framework/src/public') )
 			{
-				throw new Exception("目录 /framework/src/style 丢失，无法提供该目录下的文件") ;
+				throw new Exception("目录 /framework/src/public 丢失，无法提供该目录下的文件") ;
 			}
 			$this->aPublicFolders->addFolder($aFolder,'jc') ;
 		}

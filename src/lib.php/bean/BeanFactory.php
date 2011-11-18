@@ -23,6 +23,7 @@ class BeanFactory extends Object
 			$aSingleton->registerBeanClass("jc\\mvc\\view\\View",'view') ;
 			$aSingleton->registerBeanClass("jc\\mvc\\view\\FormView",'form') ;
 			$aSingleton->registerBeanClass("jc\\mvc\\model\\db\\Model",'model') ;
+			$aSingleton->registerBeanClass("jc\\mvc\\model\\db\\Category",'category') ;
 			$aSingleton->registerBeanClass("jc\\mvc\\model\\db\\orm\\Prototype",'prototype') ;
 			$aSingleton->registerBeanClass("jc\\mvc\\model\\db\\orm\\Association",'association') ;
 			
@@ -46,6 +47,7 @@ class BeanFactory extends Object
 			$aSingleton->registerBeanClass("jc\\verifier\\ImageArea",'imagearea') ;
 			$aSingleton->registerBeanClass("jc\\verifier\\ImageSize",'imagesize') ;
 			$aSingleton->registerBeanClass("jc\\verifier\\NotEmpty",'notempty') ;
+			$aSingleton->registerBeanClass("jc\\verifier\\Version",'version') ;
 			
 			self::setSingleton($aSingleton,__CLASS__) ;
 		}
@@ -71,26 +73,10 @@ class BeanFactory extends Object
 		
 		else if( !empty($arrConfig['conf']) )
 		{
-			$sConfigName = $arrConfig['conf'] ;
-						
-			if( !$aFile = $this->beanFolders()->find($sConfigName.'.conf.php',$sNamespace) )
-			{
-				throw new BeanConfException("Bean对象配置数组中的 conf 属性无效，找不到指定的配置文件: %s",$sConfigName) ;
-			}
-			$arrConfigFile = $aFile->includeFile(false,false) ;
-			if( !is_array($arrConfigFile) )
-			{
-				throw new BeanConfException("Bean对象配置文件内容无效: %s，文件必须返回一个 bean 配置数组",$aFile->url()) ;
-			}
+			$arrConfigFile = $this->findConfig($arrConfig['conf'],$sNamespace) ;
 
 			// 合并数组
 			$arrConfig = array_merge($arrConfigFile,$arrConfig) ;
-		
-			// 设置 namespace 
-			if( strstr($sConfigName,':')!==false )
-			{
-				list($sNamespace,) = explode(':', $sConfigName, 2) ;
-			}
 		}
 		
 		if( !empty($arrConfig['class']) )
@@ -123,6 +109,33 @@ class BeanFactory extends Object
 		return $aBean ;
 	}
 	
+	public function createBeanByConfig($sConfName,$sNamespace='*',$aAutoBuild=true)
+	{
+		$arrConfig = $this->findConfig($sConfName,$sNamespace) ;
+		return $this->createBean($arrConfig,$sNamespace,$aAutoBuild) ;
+	} 
+	
+	public function findConfig($sConfName,&$sNamespace='*') 
+	{
+		if( !$aFile = $this->beanFolders()->find($sConfName.'.conf.php',$sNamespace) )
+		{
+			throw new BeanConfException("Bean对象配置数组中的 conf 属性无效，找不到指定的配置文件: %s",$sConfName) ;
+		}
+		$arrConfigFile = $aFile->includeFile(false,false) ;
+		if( !is_array($arrConfigFile) )
+		{
+			throw new BeanConfException("Bean对象配置文件内容无效: %s，文件必须返回一个 bean 配置数组",$aFile->url()) ;
+		}
+	
+		// 设置 namespace 
+		if( strstr($sConfName,':')!==false )
+		{
+			list($sNamespace,) = explode(':', $sConfName, 2) ;
+		}
+			
+		return $arrConfigFile ;
+	}
+	
 	/**
 	 * 通过传入的对象配置数组列表，创建一系列 IBean 对象
 	 * @return array
@@ -148,7 +161,7 @@ class BeanFactory extends Object
 				}
 			}
 			
-			$arrBeans[] = $this->createBean($arrConfig,$sNamespace,$bAutoBuild) ;
+			$arrBeans[$key] = $this->createBean($arrConfig,$sNamespace,$bAutoBuild) ;
 		}
 		
 		return $arrBeans ;

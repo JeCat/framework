@@ -19,6 +19,9 @@ abstract class FileSystem extends Object
 	const CREATE_FOLDER_DEFAULT = 020775 ; 	// CREATE_RECURSE_DIR | 0775
 	const CREATE_PERM_BITS = 0777 ;
 	
+	const FIND_AUTO_CREATE = 1 ;			// 如果找不到文件，自动创建文件
+	const FIND_AUTO_CREATE_OBJECT = 2 ;		// 如果找不到文件，自动创建一个文件对象（没有实际创建文件）
+	
 	/**
 	 * @return IFSO
 	 * @retval $type参数		不存在	存在为File	存在为Folder
@@ -63,18 +66,44 @@ abstract class FileSystem extends Object
 	 * @return IFile
 	 * @see find()
 	 */
-	public function findFile($sPath)
+	public function findFile($sPath,$nFlag=0)
 	{
-		return $this->find($sPath,self::file) ;
+		$aFile =  $this->find($sPath,self::file) ;
+		
+		if( !$aFile and ($nFlag&self::FIND_AUTO_CREATE) == self::FIND_AUTO_CREATE )
+		{
+			return $this->createFile($sPath) ;
+		}
+		else if( !$aFile and ($nFlag&self::FIND_AUTO_CREATE_OBJECT) == self::FIND_AUTO_CREATE_OBJECT )
+		{
+			return $this->createFile($sPath,self::CREATE_FILE_DEFAULT|self::CREATE_ONLY_OBJECT) ;
+		}
+		else
+		{
+			return $aFile ;
+		}
 	}
 
 	/**
 	 * @return IFolder
 	 * @see find()
 	 */
-	public function findFolder($sPath)
+	public function findFolder($sPath,$nFlag=0)
 	{
-		return $this->find($sPath,self::folder) ;
+		$aFolder =  $this->find($sPath,self::folder) ;
+		
+		if( !$aFolder and ($nFlag&self::FIND_AUTO_CREATE) == self::FIND_AUTO_CREATE )
+		{
+			return $this->createFolder($sPath) ;
+		}
+		else if( !$aFolder and ($nFlag&self::FIND_AUTO_CREATE_OBJECT) == self::FIND_AUTO_CREATE_OBJECT )
+		{
+			return $this->createFolder($sPath,self::CREATE_FILE_DEFAULT|self::CREATE_ONLY_OBJECT) ;
+		}
+		else
+		{
+			return $aFolder ;
+		}
 	}
 	
 	/**
