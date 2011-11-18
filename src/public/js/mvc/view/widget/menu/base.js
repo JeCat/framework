@@ -20,7 +20,7 @@ jc.mvc.view.widget.menu.base.hide=function(o){
 	o.style.display="none";
 }
 jc.mvc.view.widget.menu.base.isShow=function(o){
-	return jc.mvc.view.widget.menu.base.getStyle(o,'display')== "block";
+	return this.getStyle(o,'display')== "block";
 }
 jc.mvc.view.widget.menu.base.expand=function(o){
 	console.log(o);
@@ -29,17 +29,17 @@ jc.mvc.view.widget.menu.base.expand=function(o){
 		console.log("className="+childlist[i].className);
 		if(childlist[i].className && childlist[i].className.match('jc-mvc-view-widget-menu-menu-alone')){
 			var o = childlist[i];
-			if(jc.mvc.view.widget.menu.base.isShow(o)){
-				jc.mvc.view.widget.menu.base.hide(o);
+			if(this.isShow(o)){
+				this.hide(o);
 			}else{
-				jc.mvc.view.widget.menu.base.show(o);
+				this.show(o);
 			}
 		}
 	}
 }
 jc.mvc.view.widget.menu.base.item_onActive=function(item){
-	jc.mvc.view.widget.menu.base.expand(item);
-	jc.mvc.view.widget.menu.base.stopBubble(event);
+	this.expand(item);
+	this.stopBubble(event);
 }
 jc.mvc.view.widget.menu.base.stopBubble=function(e) {  
     var e = e ? e : window.event;

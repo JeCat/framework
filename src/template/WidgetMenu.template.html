@@ -1,9 +1,9 @@
 <js src="jc:js/mvc/view/widget/menu/base.js" />
-<ul id='{=$theWidget->id()}' style='border:solid 1px' {=$theWidget->getStyleString()} {=$theWidget->getCssClassString()}>
-菜单{=$theWidget->id()}开始
+<ul id='{=$theWidget->showId(true)}' style='border:solid 1px' {=$theWidget->getStyleString()} {=$theWidget->getCssClassString()}>
+菜单{=$theWidget->showId()}开始
 <if "$theWidget->parentItem() != null">父项目：{=$theWidget->parentItem()->title();}</if>
 <foreach for='$theWidget->itemIterator()' item='item'>
 	<widget instance='$item'/>
 </foreach>
-菜单{=$theWidget->id()}结束
+菜单{=$theWidget->showId()}结束
 </ul>

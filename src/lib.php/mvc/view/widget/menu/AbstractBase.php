@@ -12,4 +12,12 @@ abstract class AbstractBase extends FormWidget
 	protected function cssClassBase(){
 		return 'jc-mvc-view-widget-menu-';
 	}
+	public function showId($bIncrease=false){
+		if($bIncrease){
+			$this->sShowId =$this->id().'.'.self::$nAutoIncreaseId++;
+		}
+		return $this->sShowId;
+	}
+	private $sShowId='';
+	static private $nAutoIncreaseId=0;
 }

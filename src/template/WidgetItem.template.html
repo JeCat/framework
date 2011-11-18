@@ -1,10 +1,10 @@
 <li
-	id='{=$theWidget->id()}'
+	id='{=$theWidget->showId(true)}'
 	{=$theWidget->getCssClassString()}
 	onclick="{#? if($theWidget->subMenu() != null){ #}jc.mvc.view.widget.menu.base.item_onActive(this);{#? } #}";
 	
 >
-	id:{=$theWidget->id()},title:{=$theWidget->title()}}
+	id:{=$theWidget->showId()},title:{=$theWidget->title()}}
 	<if "$theWidget->parentMenu() !== null">父菜单：{=$theWidget->parentMenu()->id()}</if>
 	<if "$theWidget->isShowContinue()" >
 		<widget instance="$theWidget->subMenu()" />
