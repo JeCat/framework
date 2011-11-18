@@ -85,6 +85,17 @@ class Item extends AbstractBase
 		}
 	}
 	
+	public function getCssClassString(){
+		$arrClass=array(
+			$this->cssClassBase().'item-depth'.$this->depth(),
+		);
+		if($this->parent() !== null){
+			$arrClass[] = $this->cssClassBase().'direction-'.$this->parent()->getDirection();
+		}
+		return 'class ="'.implode(' ',$arrClass).'"';
+		return 'class ="'.$this->cssClassBase().'item-depth'.$this->depth().'"';
+	}
+	
     private $parentMenu = null;
     private $subMenu = null;
 }

@@ -87,6 +87,15 @@ class Menu extends AbstractBase
 				$this->buildItems($item,$key);
 			}
 		}
+		if(!empty($arrConfig['top'])){
+			$this->setPosTop($arrConfig['top']);
+		}
+		if(!empty($arrConfig['left'])){
+			$this->setPosLeft($arrConfig['left']);
+		}
+		if(!empty($arrConfig['alone'])){
+			$this->setIndependence($arrConfig['alone']);
+		}
 	}
 	
 	private function buildItems($configItems,$id=null){
@@ -104,6 +113,63 @@ class Menu extends AbstractBase
 			}
 			$this->addItem( BeanFactory::singleton()->createBean($configItems));
 		}
+	}
+	
+	public function setPos($left,$top){
+		$this->setAttribute('left',$left);
+		$this->setAttribute('top',$top);
+	}
+	
+	public function setPosTop($top){
+		$this->setAttribute('top',$top);
+	}
+	
+	public function setPosLeft($left){
+		$this->setAttribute('left',$left);
+	}
+	
+	public function getPosTop(){
+		return $this->attribute('top',null);
+	}
+	
+	public function getPosLeft(){
+		return $this->attribute('left',null);
+	}
+	
+	public function setIndependence($bIndependence){
+		$this->setAttribute('alone',$bIndependence);
+	}
+	
+	public function getIndependence(){
+		return $this->attribute('alone',false);
+	}
+	
+	/// v-vertical h-horizontal
+	public function setDirection($sD){
+		$this->setAttribute('dire',$sD);
+	}
+	
+	public function getDirection(){
+		return $this->attribute('dire','v');
+	}
+	
+	public function getStyleString(){
+		if($this->getPosTop() === null or $this->getPosLeft() === null){
+			return '';
+		}else{
+			return "style='position: absolute;left:".$this->getPosLeft()."px;top:".$this->getPosTop()."px;'";
+		}
+	}
+	
+	public function getCssClassString(){
+		$arrClass=array(
+			$this->cssClassBase().'menu-depth'.$this->depth(),
+		);
+		if($this->getIndependence()){
+			$arrClass[] = $this->cssClassBase().'menu-alone';
+		}
+		$arrClass[] = $this->cssClassBase().'direction-'.$this->getDirection();
+		return 'class ="'.implode(' ',$arrClass).'"';
 	}
 	
 	private $arrItems = array();

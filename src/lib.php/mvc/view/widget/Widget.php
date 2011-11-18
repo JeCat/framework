@@ -100,7 +100,7 @@ class Widget extends Object implements IViewWidget, IBean
 	public function id($bAutoId=true)
 	{
 	    if( $this -> sId === null and $bAutoId){
-	        $this -> sId = get_class($this).self::$nAutoIncreaseId++;
+	        $this -> sId = strtr(get_class($this),'\\','.').self::$nAutoIncreaseId++;
 	    }
 		return $this->sId ;
 	}
