@@ -150,8 +150,38 @@ class Category extends Model
 	/**
 	 * 删除分类
 	 */
-	public function deleteCategory()
+	public function delete()
 	{
+		if( !$aOrmPrototype = $this->prototype() )
+		{
+			throw new CategoryPointException("尚未为临接表模型设置原型，无法完成操作") ;
+		}
+		
+		$nOriLft = $this->leftPoint() ;
+		$nOriRgt = $this->rightPoint() ;
+		$sLftClm = $this->leftColumn() ;
+		$sRgtClm = $this->rightColumn() ;
+		
+		DB::singleton()->execute("delete from ".$aOrmPrototype->tableName()." where {$sLftClm}>={$nOriLft} and {$sRgtClm}<={$nOriRgt}") ;
+		
+		$nMove = $nOriRgt-$nOriLft+1 ;
+		$aUpdate = StatementFactory::singleton()->createUpdate($aOrmPrototype->tableName()) ;
+		
+		$this->moveFeet($aUpdate,$sLftClm,-$nMove,$nOriLft) ;
+		$this->moveFeet($aUpdate,$sRgtClm,-$nMove,$nOriLft) ;
+		
+		
+		// Unserialize
+		$fnSetUnserialize = function(Category $aCategory,$fnSetUnserialize)
+		{
+			$aCategory->setSerialized(false) ;
+			foreach($aCategory->childCategoryIterator() as $aChildCategory)
+			{
+				$fnSetUnserialize($aChildCategory,$fnSetUnserialize) ;
+			}
+		} ;
+		
+		$fnSetUnserialize($this,$fnSetUnserialize) ;
 	}
 	
 	/**
@@ -210,7 +240,7 @@ class Category extends Model
 		
 		if( !$aCategoryList->load($aCriteria) )
 		{
-			return ;
+			return new \EmptyIterator();
 		}
 		
 		if($bBuildTree)
@@ -368,5 +398,3 @@ class Category extends Model
 	
 	private $arrChildCategories = array() ;
 }
-
-?>
