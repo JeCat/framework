@@ -133,7 +133,10 @@ class Widget extends Object implements IViewWidget, IBean
 			$aVariables = new HashTable() ;
 		}
 
+		$oldWidget=$aVariables->get('theWidget');
+		$aVariables->set('theWidget',$this);
 		$aUI->display($sTemplateName,$aVariables,$aDevice) ;	
+		$aVariables->set('theWidget',$oldWidget);
 	}
 
 	/**
