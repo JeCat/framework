@@ -1,6 +1,7 @@
 <?php
 namespace jc\mvc\view ;
 
+use jc\mvc\controller\IController;
 use jc\bean\BeanConfException;
 use jc\bean\BeanFactory;
 use jc\lang\Exception;
@@ -178,6 +179,19 @@ class View extends NamableComposite implements IView, IBean
 	}
 	
 	/**
+	 * @return jc\mvc\controller\IContainer
+	 */
+	public function controller()
+	{
+		return $this->aController ;
+	}
+	
+	public function setController(IController $aController=null)
+	{
+		$this->aController = $aController ;
+	}
+	
+	/**
 	 * @return jc\ui\UI
 	 */
 	public function ui()
@@ -262,10 +276,10 @@ class View extends NamableComposite implements IView, IBean
 			$aVars = $this->variables() ;
 			$aVars->set('theView',$this) ;
 			$aVars->set('theModel',$this->model()) ;
-		
-			if( $aVars->has('theController') and $aParams=$aVars->get('theController')->params() )
+			$aVars->set('theController',$this->aController) ;
+			if( $this->aController )
 			{
-				$aVars->set('theParams',$aParams) ;
+				$aVars->set('theParams',$this->aController->params()) ;
 			}
 		
 			$this->ui()->display($sSourceFilename,$aVars,$this->OutputStream()) ;
@@ -498,6 +512,7 @@ class View extends NamableComposite implements IView, IBean
 	private $bEnable = true ;
 	private $arrObserver = array();
     private $arrBeanConfig ;
+    private $aController ;
 }
 
 ?>

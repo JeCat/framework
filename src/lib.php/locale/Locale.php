@@ -68,8 +68,10 @@ class Locale implements ILocale
 		return null ;
 	}
 	
-	public function trans($sOri,array $arrArgvs=array(),$sSavePackageName=null)
+	public function trans($sOri,$argvs=null,$sSavePackageName=null)
 	{
+		$arrArgvs = $argvs===null? array(): (array)$argvs ;
+		
 		$sSentence = $this->findSentence($sOri) ;
 		
 		if($sSentence===null)

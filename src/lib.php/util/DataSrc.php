@@ -65,6 +65,12 @@ class DataSrc extends HashTable implements IDataSrc, \ArrayAccess, \Iterator
 	// implement IHashTable
 	public function get($sName)
 	{
+		// disable data
+		if( $this->arrDisables and array_key_exists($sName, $this->arrDisables) )
+		{
+			return null ;
+		} 
+		
 		if(isset($this->arrDatas[ $sName ]))
 		{
 			return $this->arrDatas[ $sName ] ;
@@ -85,6 +91,12 @@ class DataSrc extends HashTable implements IDataSrc, \ArrayAccess, \Iterator
 
 	public function has($sName)
 	{
+		// disable data
+		if( $this->arrDisables and array_key_exists($sName, $this->arrDisables) )
+		{
+			return false ;
+		} 
+		
 		if( parent::has($sName) )
 		{
 			return true ;
@@ -101,7 +113,33 @@ class DataSrc extends HashTable implements IDataSrc, \ArrayAccess, \Iterator
 		
 		return false ;
 	}
-
+	
+	public function &getRef($sName)
+	{
+		// disable data
+		if( $this->arrDisables and array_key_exists($sName, $this->arrDisables) )
+		{
+			return null ;
+		} 
+		
+		if(isset($this->arrDatas[ $sName ]))
+		{
+			return $this->arrDatas[ $sName ] ;
+		}
+		
+		// 从 Childs 中找数据
+		foreach($this->arrChildren as $aChild)
+		{
+			$Data = &$aChild->getRef($sName) ;
+			if( $Data!==null )
+			{
+				return $Data ;
+			}
+		}
+		
+		return null ;
+	}
+	
 
 	public function int($sName)
 	{
@@ -128,7 +166,7 @@ class DataSrc extends HashTable implements IDataSrc, \ArrayAccess, \Iterator
 	 * 
 	 * @return void
 	 */
-	public function addChild(IDataSrc $aParams)
+	public function addChild(IHashTable $aParams)
 	{
 		if( !in_array($aParams,$this->arrChildren,true) )
 		{
@@ -140,7 +178,7 @@ class DataSrc extends HashTable implements IDataSrc, \ArrayAccess, \Iterator
 	 * 
 	 * @return void
 	 */
-	public function removeChild(IDataSrc $aParams)
+	public function removeChild(IHashTable $aParams)
 	{
 		$nIdx = array_search($this->arrChildren, $aParams) ;
 		if($nIdx!==false)
@@ -178,8 +216,23 @@ class DataSrc extends HashTable implements IDataSrc, \ArrayAccess, \Iterator
 		
 		return $arrRet ;
 	}
-
+	
+	public function disableData($sName)
+	{		
+		$this->arrDisables[$sName] = $sName ;
+	}
+	public function enableData($sName)
+	{
+		unset($this->arrDisables[$sName]) ;
+	}
+	public function clearDisabled()
+	{
+		$this->arrDisables = null ;
+	}
+	
 	protected $arrChildren = array() ;
+	
+	private $arrDisables ;
 }
 
 ?>

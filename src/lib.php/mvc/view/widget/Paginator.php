@@ -30,7 +30,7 @@ use jc\system\HttpRequest;
     class TryPaginatorController extends Controller {
         protected function init() {
             $this->createFormView( "TryPaginator" );
-            $aPaginator = new Paginator( 'paginator' ,$this->aParams);
+            $aPaginator = new Paginator( 'paginator' ,$this->params);
             $this->viewTryPaginator->addWidget( $aPaginator );
             $aModel = new Model('electronicnewspaper_newspaper',true);
             $aPaginator -> setPerPageCount(2);

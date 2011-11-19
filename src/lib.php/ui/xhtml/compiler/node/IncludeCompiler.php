@@ -41,7 +41,8 @@ class IncludeCompiler extends NodeCompiler
 		// variables
 		if(!$bExtendParentVars)
 		{
-			$aDev->write("\$__include_aVariables = new \\jc\\util\\HashTable() ; \r\n");
+			$aDev->write("\$__include_aVariables = new \\jc\\util\\DataSrc() ; \r\n");
+			$aDev->write("\$__include_aVariables->addChild(\$aVariables) ;");
 		}
 		else
 		{

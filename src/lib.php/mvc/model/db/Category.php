@@ -157,15 +157,13 @@ class Category extends Model
 	/**
 	 * 建立分类所属关系的树形结构
 	 * $aCategories 中的分类必须按照 lft 排序
+	 * 
+	 * 如果提供 $aRoot 参数，则返回将所有第一层分类add给 $aRoot分类，并返回 
+	 * 如果 $aRoot=null，则返回一个包含所有 第一层分类的数组
 	 */
 	static public function buildTree(\Iterator $aCategories,self $aRoot=null)
 	{
 		$aParentStack = new Stack() ;
-		if($aRoot)
-		{
-			$aParentStack->put($aRoot) ;
-		}
-		$arrTopCategories = null ;
 		
 		foreach($aCategories as $aCategory)
 		{
@@ -181,23 +179,29 @@ class Category extends Model
 			{
 				$aParent->addChildCategory($aCategory) ;
 			}
-			
-			if($aRoot===$aParent)
+			else
 			{
-				$arrTopCategories[] = $aCategory ;
+				if($aRoot)
+				{
+					$aRoot->addChildCategory($aCategory) ;
+				}
+				else
+				{
+					$arrTopCategories[] = $aCategory ;
+				}
 			}
 			
 			$aParentStack->put($aCategory) ;
 		}
 		
-		return $arrTopCategories ;
+		return $aRoot?: (isset($arrTopCategories)?$arrTopCategories:array()) ;
 	}
 	
 	/**
 	 * 加载原型中的所有分类
 	 * @return \Iterator
 	 */
-	static public function loadTotalCategory(Prototype $aPrototype,$bBuildTree=true,$bReturnTop=false)
+	static public function loadTotalCategory(Prototype $aPrototype,$bBuildTree=true,$bReturnTop=false,self $aRoot=null)
 	{
 		$aCategoryList = new ModelList($aPrototype) ;
 		
@@ -213,11 +217,11 @@ class Category extends Model
 		{
 			if($bReturnTop)
 			{
-				return self::buildTree($aCategoryList->childIterator()) ;
+				return self::buildTree($aCategoryList->childIterator(),$aRoot) ;
 			}
 			else
 			{
-				self::buildTree($aCategoryList->childIterator()) ;
+				self::buildTree($aCategoryList->childIterator(),$aRoot) ;
 			}
 		}
 		

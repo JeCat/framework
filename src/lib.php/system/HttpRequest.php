@@ -84,9 +84,23 @@ class HttpRequest extends Request
 	{
 		return $this->urlInfo('path') ;
 	}
-	public function urlQuery()
+	public function urlQuery($excludes=null)
 	{
-		return $this->urlInfo('query') ;
+		if(!$excludes)
+		{
+			return $this->urlInfo('query') ;
+		}
+		else
+		{
+			parse_str($this->urlInfo('query'),$arrQuerys) ;
+	
+			foreach((array) $excludes as $sKey)
+			{
+				unset($arrQuerys[$sKey]) ;
+			}
+			
+			return http_build_query($arrQuerys) ;
+		}
 	}
 	public function urlAnchor()
 	{

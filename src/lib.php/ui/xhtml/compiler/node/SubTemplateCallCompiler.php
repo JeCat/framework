@@ -47,7 +47,8 @@ class SubTemplateCallCompiler extends NodeCompiler
 		// variables
 		if(!$bExtendParentVars)
 		{
-			$aDev->write("\$__subtemplate_aVariables = new \\jc\\util\\HashTable() ;");
+			$aDev->write("\$__subtemplate_aVariables = new \\jc\\util\\DataSrc() ;");
+			$aDev->write("\$__subtemplate_aVariables->addChild(\$aVariables) ;");
 		}
 		else
 		{

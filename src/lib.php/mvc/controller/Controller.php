@@ -2,6 +2,8 @@
 
 namespace jc\mvc\controller ;
 
+use jc\locale\Locale;
+
 use jc\bean\BeanConfException;
 
 use jc\bean\BeanFactory;
@@ -244,7 +246,7 @@ class Controller extends NamableComposite implements IController, IBean
      */
     public function mainRun ()
     {
-    	if( !$this->aParams->bool('noframe') )
+    	if( !$this->params->bool('noframe') )
     	{
     		$aFrame = $this->frame() ;
 			
@@ -257,28 +259,62 @@ class Controller extends NamableComposite implements IController, IBean
     	{
 			$this->processChildren() ;
 			
-			$this->process() ;
+			try{
+				$this->process() ;
+			}
+			catch(_ExceptionRelocation $e)
+			{}
 			
-			if( !$this->aParams->bool('noview') )
+			if( !$this->params->bool('noview') )
 			{
 				$this->mainView()->show() ;
 			}
     	}
     }
     
+    public function location($sUrl,$sMessage,$messageArgvs=null,$sLinkText=null,$linkArgvs=null,$nWaitingSec=3,Locale $aLocale=null)
+    {
+		// 禁用所有视图
+		foreach( $this->mainView()->iterator() as $aView )
+		{
+			$aView->disable() ;
+		}
+
+		if(!$aLocale)
+		{
+			$aLocale = $this->application()->localeManager()->locale() ;
+		}
+		
+		if($sLinkText===null)
+		{
+			$sLinkText = '正在重定向网页...' ;
+		}
+		
+		// 建立 relocation 视图
+		$aViewRelocater = new View("Relocater", "jc:Relocater.html") ;
+		$this->addView($aViewRelocater) ;
+		
+		$aViewRelocater->variables()->set('message' ,$aLocale->trans($sMessage,$messageArgvs) ) ;
+		$aViewRelocater->variables()->set('linkText',$aLocale->trans($sLinkText,$messageArgvs)) ;
+		$aViewRelocater->variables()->set('waitingSec',$nWaitingSec) ;
+		$aViewRelocater->variables()->set('url',$sUrl) ;
+		
+		throw new _ExceptionRelocation ;
+    }
+    
     public function buildParams($Params)
     {
     	if(empty($Params))
     	{
-    		$this->aParams = new DataSrc() ;
+    		$this->params = new DataSrc() ;
     	}
     	else if( $Params instanceof IDataSrc )
     	{
-    		$this->aParams = $Params ;
+    		$this->params = $Params ;
     	}
    		else if( is_array($Params) )
     	{
-    		$this->aParams = new DataSrc($Params) ;
+    		$this->params = new DataSrc($Params) ;
     	}
     	else
     	{
@@ -288,7 +324,7 @@ class Controller extends NamableComposite implements IController, IBean
     	// 为子控制器设置执行参数
 		foreach($this->iterator() as $aChild)
 		{
-			$aChild->buildParams($this->aParams) ;
+			$aChild->buildParams($this->params) ;
 		}
     }
     
@@ -301,7 +337,11 @@ class Controller extends NamableComposite implements IController, IBean
 		{
 			$aChild->processChildren() ;
 			
-			$aChild->process() ;
+			try{
+				$aChild->process() ;
+			}
+			catch(_ExceptionRelocation $e)
+			{}
 		}
     }
 
@@ -410,7 +450,7 @@ class Controller extends NamableComposite implements IController, IBean
      */
     public function params()
     {
-    	return $this->aParams ;
+    	return $this->params ;
     }
     
     /**
@@ -425,7 +465,7 @@ class Controller extends NamableComposite implements IController, IBean
     public function preprocessForm(IFormView $aView)
     {    	
     	// 加载视图控件数据
-    	$aView->loadWidgets($this->aParams) ;
+    	$aView->loadWidgets($this->params) ;
     	
     	// 校验数据
     	if( !$aView->verifyWidgets() )
@@ -445,12 +485,12 @@ class Controller extends NamableComposite implements IController, IBean
     		$sActParamName = 'act' ;
     	}
     	
-    	if( !$this->aParams->has($sActParamName) )
+    	if( !$this->params->has($sActParamName) )
     	{
     		return false ;
     	}
     	
-    	$sAct = $this->aParams[$sActParamName] ;
+    	$sAct = $this->params[$sActParamName] ;
     	$sMethod = 'action' . $sAct ;
     	
     	if( !method_exists($this,$sMethod) )
@@ -560,12 +600,17 @@ class Controller extends NamableComposite implements IController, IBean
     
     public function addView(IView $aView,$sName=null)
     {
-    	$aView->variables()->set("theController", $this) ;
+    	if( $aOriController = $aView->controller() )
+    	{
+    		$aOriController->removeView($aView) ;
+    	}
+    	
+    	$aView->setController($this) ;
     	return $this->mainView()->add( $aView, $sName, true ) ;
     }
     public function removeView(IView $aView)
     {
-    	$aView->variables()->set("theController",null) ;
+    	$aView->setController(null) ;
     	$this->mainView()->remove($aView) ;
     }
     /**
@@ -615,7 +660,7 @@ class Controller extends NamableComposite implements IController, IBean
      * 
      * @var jc\util\IDataSrc
      */
-    protected $aParams = null ;
+    protected $params = null ;
     
     private $aMainView = null ;
     
@@ -629,4 +674,6 @@ class Controller extends NamableComposite implements IController, IBean
     
     private $arrBeanConfig ;
 }
-?>
+
+class _ExceptionRelocation extends \Exception
+{}
