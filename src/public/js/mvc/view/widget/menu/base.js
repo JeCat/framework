@@ -101,3 +101,39 @@ jc.mvc.view.widget.menu.base.stopBubble=function(e) {
         e.stopPropagation();
     }
 }
+//jsobject
+jc.mvc.view.widget.menu.base.jsobject=function(id){
+	this.id = id;
+	this.attribute={};
+	this.setAttribute=function(key,value){
+		this.attribute[key]=value;
+	};
+	this.getAttribute=function(key,defaultValue){
+		console.log("getAttribute:"+typeof(this.attribute[key]));
+		if(typeof(this.attribute[key]) == 'undefined'){
+			return defaultValue;
+		}else{
+			return this.attribute[key];
+		}
+	};
+	this.childList=[];
+	this.addChild=function(id){
+		this.childList.push(id);
+	};
+	this.parentId=-1;
+	this.setParentId=function(id){
+		this.parentId = id;
+		var p = this.__proto__.constructor.getObjectById(id);
+		if(typeof(p)!='undefined'){
+			p.addChild(this.id);
+		}
+	};
+	this.registerObject=function(){
+		this.__proto__.constructor.objectlist[this.id]=this;
+	};
+	this.registerObject();
+}
+jc.mvc.view.widget.menu.base.jsobject.objectlist={};
+jc.mvc.view.widget.menu.base.jsobject.getObjectById=function(id){
+	return this.objectlist[id];
+}
