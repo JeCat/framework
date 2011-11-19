@@ -1,4 +1,4 @@
- <?php
+<?php
 namespace jc\ui\xhtml\compiler\node;
 
 use jc\lang\Exception;
@@ -20,7 +20,7 @@ class SubTemplateDefineCompiler extends NodeCompiler
 		$aAttributes = $aObject->attributes() ;	
 		if( $aAttributes->has("name") )
 		{
-			$sSubTemplateName = $aAttributes->get("name") ;		
+			$sSubTemplateName = $aAttributes->string("name") ;		
 		}
 		else 
 		{
@@ -28,15 +28,20 @@ class SubTemplateDefineCompiler extends NodeCompiler
 			{
 				throw new Exception("subtemplate:define 节点缺少name属性(line:%d)",$aObject->line()) ;
 			}
-			$sSubTemplateName = '"' . addslashes($aNameVal->source()) . '"' ;
+			$sSubTemplateName = $aNameVal->source() ;
 		}
 		
-		$aDev->write("  \r\n") ;
-		$aDev->write("\$aVariables->set('__subtemplate_'.{$sSubTemplateName},function(\$aVariables,\$aDevice){ \r\n") ;
+		if( !is_callable($sSubTemplateName,true) )
+		{
+			throw new Exception("subtemplate:define 节点的name属性使用了无效的字符：%d",$sSubTemplateName) ;
+		}
+		
+		$aDev->write("\r\n\r\n// -- subtemplate start ----------------------") ;
+		$aDev->write("function __subtemplate_{$sSubTemplateName}(\$aVariables,\$aDevice){ ") ;
 		
 		$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
 		
-		$aDev->write("  }) ") ;
+		$aDev->write("}// -- subtemplate end ----------------------\r\n\r\n") ;
 	}
 
 }

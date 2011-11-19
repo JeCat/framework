@@ -56,42 +56,35 @@ class ForeachCompiler extends NodeCompiler {
 		$sItemAutoName = NodeCompiler::assignVariableName ( '$__foreach_item_' ) ;
 		$sKeyAutoName = NodeCompiler::assignVariableName ( '$__foreach_key_' ) ;
 		$sIdxAutoName = NodeCompiler::assignVariableName ( '$__foreach_idx_' ) ;
+		$sItemRef = $bItemRef? '&': '' ;
 		
-		$aDev->write ( "
-				{$sForAutoName} = {$sForUserExp};
-				if(!empty({$sForAutoName})){ 
-					{$sIdxAutoName} = -1;
-					foreach({$sForAutoName} as {$sKeyAutoName} => " );
-		if($bItemRef){ 
-			$aDev->write ( "&{$sItemAutoName}){
-						" );
-		}else{
-			$aDev->write ( "{$sItemAutoName}){
-						" );
-		}
-		$aDev->write ( "{$sIdxAutoName}++;
-						" );
 		
-		if( !empty($sKeyUserName) ){
-			$aDev->write ( " \$aVariables->set({$sKeyUserName},{$sKeyAutoName}); ");
-		}
-		if( !empty($sItemUserName) ){
-			$aDev->write ( " \$aVariables->set({$sItemUserName},{$sItemAutoName} ); ");
-		}
-		if( !empty($sIdxUserName) ){
-			$aDev->write ( " \$aVariables->set({$sIdxUserName},{$sIdxAutoName} ); ");
-		}
-					
-// 		$aDev->write("");
+		$aDev->write ( "\r\n// foreach start ") ;
+		$aDev->write ( "{$sForAutoName} = {$sForUserExp};
+if(!empty({$sForAutoName})){
+	{$sIdxAutoName} = -1;
+	foreach({$sForAutoName} as {$sKeyAutoName}=>{$sItemRef}{$sItemAutoName}){");
+
+		$aDev->write ( "		{$sIdxAutoName}++;" );
 		
+		if( !empty($sKeyUserName) )
+		{
+			$aDev->write ( "		\$aVariables->set({$sKeyUserName},{$sKeyAutoName}); ");
+		}
+		if( !empty($sItemUserName) )
+		{
+			$aDev->write ( "		\$aVariables->set({$sItemUserName},{$sItemAutoName} ); ");
+		}
+		if( !empty($sIdxUserName) )
+		{
+			$aDev->write ( "		\$aVariables->set({$sIdxUserName},{$sIdxAutoName} ); ");
+		}
+							
 		//是否是单行标签?
 		if(!$aObject->headTag()->isSingle()){
 			//循环体，可能会包含foreach:else标签
 			$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
-			$aDev->write(" 
-					}
-				}
-			 		") ; // end if   (如果foreach的内容包含foreach:else标签,则此处为foreach:else的end)
+			$aDev->write("\t}\r\n}\r\n") ; // end if   (如果foreach的内容包含foreach:else标签,则此处为foreach:else的end)
 		}
 	}
 }
