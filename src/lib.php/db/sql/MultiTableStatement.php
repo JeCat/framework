@@ -49,34 +49,34 @@ abstract class MultiTableStatement extends Statement
 		$this->aCriteria = $aCriteria ;
 	}
 
-	public function makeStatement($bFormat=false)
+	public function makeStatement(StatementState $aState)
 	{
 		$sStatement = '' ;
 		
-		$sStatement.= " FROM" . $this->makeStatementTableList($bFormat) ;
+		$sStatement.= " FROM" . $this->makeStatementTableList($aState) ;
 	
-		$sStatement.= $this->makeStatementCriteria($bFormat) ;
+		$sStatement.= $this->makeStatementCriteria($aState) ;
 		
 		return $sStatement ;
 	}
 	
-	protected function makeStatementTableList($bFormat=false)
+	protected function makeStatementTableList(StatementState $aState)
 	{
 		foreach($this->arrTables as $table)
 		{
 			$arrTables = array() ;
 			foreach( $this->arrTables as $table )
 			{
-				$arrTables[] = ($table instanceof Table)? $table->makeStatement($bFormat): "`{$table}`" ;
+				$arrTables[] = ($table instanceof Table)? $table->makeStatement($aState): "`{$table}`" ;
 			}
 			
 			return ' ' . implode(", ",$arrTables) ;
 		}
 	}
 	
-	protected function makeStatementCriteria($bFormat=false)
+	protected function makeStatementCriteria(StatementState $aState)
 	{
-		return $this->aCriteria? $this->aCriteria->makeStatement($bFormat,false): '' ;
+		return $this->aCriteria? $this->aCriteria->makeStatement($aState): '' ;
 	}
 	
 	public function checkValid($bThrowException=true)

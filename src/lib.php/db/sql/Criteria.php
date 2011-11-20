@@ -17,24 +17,32 @@ class Criteria extends SubStatement
 	 * @param $bFormat 是否添加换行以便阅读
 	 * @return string
 	 */
-	public function makeStatement($bFormat = false,$bEnableLimitStart=false) {
+	public function makeStatement(StatementState $aState) {
 		
 		$sStatement = '' ;
 		
 		if($this->aRestriction)
 		{
-			$sStatement = ' WHERE ' . $this->aRestriction->makeStatement($bFormat);
+			$sStatement = ' WHERE ' . $this->aRestriction->makeStatement($aState);
 		}
 		if( $this->arrGroupByClms )
 		{
-			$sStatement.= ' GROUP BY ' . implode(', ',$this->arrGroupByClms) ;
+			$sStatement.= ' GROUP BY ' ;
+			foreach($this->arrGroupByClms as $i=>$sColumn)
+			{
+				if($i>0)
+				{
+					$sStatement.= ', ' ;
+				}
+				$sStatement.= $this->transColumn($sColumn,$aState) ;
+			}
 		}
 		if( $this->aOrder )
 		{
-			$sStatement .= ' ' . $this->aOrder->makeStatement($bFormat);
+			$sStatement .= ' ' . $this->aOrder->makeStatement($aState);
 		}
 		
-		$sStatement .= ' ' . $this->makeStatementLimit($bFormat,$bEnableLimitStart) ;
+		$sStatement .= ' ' . $this->makeStatementLimit($aState) ;
 		
 		return $sStatement;
 	}
@@ -46,35 +54,35 @@ class Criteria extends SubStatement
 	/**
 	 *  设置limit条件
 	 * @param int $nLimitLen limit 长度
-	 * @param int $nLimitFrom limit 开始
+	 * @param int $sLimitFrom limit 开始
 	 */
-	public function setLimit($nLimitLen , $nLimitFrom = 0){
+	public function setLimit($nLimitLen , $sLimitFrom = 0){
 		$this->setLimitLen($nLimitLen);
-		$this->setLimitFrom($nLimitFrom);
+		$this->setLimitFrom($sLimitFrom);
 		return $this ;
 	}
 	
-	public function makeStatementLimit($bFormat = false,$bEnableLimitStart=false){
-		$nLimitLen = $this->limitLen();
-		$nLimitFrom = $this->limitFrom();
-		if($nLimitLen === -1){
+	public function makeStatementLimit(StatementState $aState){
+		if($this->nLimitLen===-1)
+		{
 			return '';
-		}
+		}		
 		$sLimit = ' LIMIT ';
-		if($bEnableLimitStart and $nLimitFrom != 0){
-			$sLimit .= $nLimitFrom . ',';
+		if($aState->supportLimitStart() and $this->sLimitFrom != 0)
+		{
+			$sLimit .= $this->transColumn($this->sLimitFrom,$aState) . ', ';
 		}
-		$sLimit .= $nLimitLen;
+		$sLimit .= $this->nLimitLen ;
 		return $sLimit;
 	}
 	
-	public function setLimitFrom($nLimitFrom) {
-		$this->nLimitFrom = (int)$nLimitFrom;
+	public function setLimitFrom($sLimitFrom) {
+		$this->sLimitFrom = (int)$sLimitFrom;
 		return $this ;
 	}
 	public function limitFrom()
 	{
-		return $this->nLimitFrom;
+		return $this->sLimitFrom;
 	}
 	
 	public function setLimitLen($nLimitLen){
@@ -127,11 +135,13 @@ class Criteria extends SubStatement
 		return $this->aOrder;
 	}
 
-	function __clone(){
+	function __clone()
+	{
 	    if($this->aOrder !== null) $this->aOrder = clone $this->aOrder;
 	    if($this->aRestriction !== null) $this->aRestriction = clone $this->aRestriction;
 	}
 	
+	// -- group by --
 	public function addGroupBy($columns=null)
 	{
 		if( empty($columns) )
@@ -143,29 +153,26 @@ class Criteria extends SubStatement
 		else
 		{
 			$this->arrGroupByClms = (array) $columns ;
-			foreach($this->arrGroupByClms as &$sColumn)
-			{
-				$sColumn = $this->transColumn($sColumn) ;
-			}
 		}
 		return $this ;
 	}
 	
 	public function groupBy()
 	{
-		return $this->arrGroupByClms ;
+		return $this->arrGroupByClms?: array() ;
 	}
 	
 	public function clearGroupBy()
 	{
-		$this->arrGroupByClms = array() ;
+		$this->arrGroupByClms = null ;
 		return $this ;
 	}
+
 	
 	private $aRestriction = null;
 	private $aOrder = null;
-	private $nLimitFrom = 0;
+	private $sLimitFrom = 0;
 	private $nLimitLen = 30;
-	private $arrGroupByClms = array() ;
+	private $arrGroupByClms ;
 }
 ?>

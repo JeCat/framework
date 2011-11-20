@@ -2,9 +2,7 @@
 namespace jc\db\sql ;
 
 use jc\db\sql\name\NameTransferFactory;
-
 use jc\db\sql\name\NameTransfer;
-
 use jc\lang\Object;
 
 class StatementFactory extends Object

@@ -16,19 +16,27 @@ class Restriction extends SubStatement
 	 * @param $bFormat 是否添加换行以便阅读
 	 * @return string
 	 */
-	public function makeStatement($bFormat = false)
+	public function makeStatement(StatementState $aState)
 	{
-		//TODO format换行和缩进,增加可读性
+		if(!$this->arrExpressions)
+		{
+			return '1' ;
+		}
+		
 		$arrExpressions = array ();
 		foreach ( $this->arrExpressions as $express )
 		{
 			if ($express instanceof Restriction)
 			{
-				$sExpress = $express->makeStatement ($bFormat) ;
+				$sExpress = $express->makeStatement ($aState) ;
 				if($sExpress!='1')
 				{
 					$arrExpressions[] = $sExpress ;
 				}
+			}
+			else if(is_array($express))
+			{
+				$arrExpressions [] = call_user_func_array('sprintf',$express) ;
 			}
 			else
 			{
@@ -36,7 +44,7 @@ class Restriction extends SubStatement
 			}
 		}
 		
-		switch (count($arrExpressions))
+		switch (count($arrExpressions)==1)
 		{
 			case 0 :
 				return '1' ;
@@ -74,8 +82,9 @@ class Restriction extends SubStatement
 	/**
 	 * 清空所有已添加的条件语句.
 	 */
-	public function clear() {
-		$this->arrExpressions = array ();
+	public function clear()
+	{
+		$this->arrExpressions = null ;
 		return $this ;
 	}
 	
@@ -85,8 +94,9 @@ class Restriction extends SubStatement
 	 * @param mix $value 期望值
 	 * @return self
 	 */
-	public function eq($sClmName, $value) {
-		$this->arrExpressions [] = $this->transColumn ( $sClmName ) . ' = ' . $this->tranValue ( $value );
+	public function eq($sClmName, $value)
+	{
+		$this->arrExpressions[] = array("%s = ".$this->tranValue($value),array($sClmName)) ;
 		return $this;
 	}
 	
@@ -96,8 +106,9 @@ class Restriction extends SubStatement
 	 * @param string $sOtherClmName 另外一个需检验的字段名
 	 * @return self 
 	 */
-	public function eqColumn($sClmName, $sOtherClmName) {
-		$this->arrExpressions [] = $this->transColumn ( $sClmName ) . ' = ' . $this->transColumn ( $sOtherClmName );
+	public function eqColumn($sClmName,$sOtherClmName)
+	{
+		$this->arrExpressions[] = array("%s = %s",array($sClmName,$sOtherClmName)) ;
 		return $this;
 	}
 	
@@ -107,8 +118,9 @@ class Restriction extends SubStatement
 	 * @param mix $value 期望值
 	 * @return self
 	 */
-	public function ne($sClmName, $value) {
-		$this->arrExpressions [] = $this->transColumn ( $sClmName ) . ' <> ' . $this->tranValue ( $value );
+	public function ne($sClmName, $value)
+	{
+		$this->arrExpressions[] = array("%s <> ".$this->tranValue($value),array($sClmName)) ;
 		return $this;
 	}
 	
@@ -118,8 +130,9 @@ class Restriction extends SubStatement
 	 * @param string $sOtherClmName 另外一个需检验的字段名
 	 * @return self 
 	 */
-	public function neColumn($sClmName, $sOtherClmName) {
-		$this->arrExpressions [] = $this->transColumn ( $sClmName ) . ' <> ' . $this->transColumn ( $sOtherClmName );
+	public function neColumn($sClmName, $sOtherClmName)
+	{
+		$this->arrExpressions[] = array("%s <> %s",array($sClmName,$sOtherClmName)) ;
 		return $this;
 	}
 	
@@ -129,8 +142,9 @@ class Restriction extends SubStatement
 	 * @param mix $value 期望值
 	 * @return self 
 	 */
-	public function gt($sClmName, $value) {
-		$this->arrExpressions [] = $this->transColumn ( $sClmName ) . ' > ' . $this->tranValue ( $value );
+	public function gt($sClmName, $value)
+	{
+		$this->arrExpressions[] = array("%s > ".$this->tranValue($value),array($sClmName)) ;
 		return $this;
 	}
 	
@@ -140,8 +154,9 @@ class Restriction extends SubStatement
 	 * @param string $sOtherClmName 大于号右边的字段名
 	 * @return self 
 	 */
-	public function gtColumn($sClmName, $sOtherClmName) {
-		$this->arrExpressions [] = $this->transColumn ( $sClmName ) . ' > ' . $this->transColumn ( $sOtherClmName );
+	public function gtColumn($sClmName, $sOtherClmName)
+	{
+		$this->arrExpressions[] = array("%s > %s",array($sClmName,$sOtherClmName)) ;
 		return $this;
 	}
 	
@@ -151,8 +166,9 @@ class Restriction extends SubStatement
 	 * @param mix $value 期望值
 	 * @return self 
 	 */
-	public function ge($sClmName, $value) {
-		$this->arrExpressions [] = $this->transColumn ( $sClmName ) . ' >= ' . $this->tranValue ( $value );
+	public function ge($sClmName, $value)
+	{
+		$this->arrExpressions[] = array("%s >= ".$this->tranValue($value),array($sClmName)) ;
 		return $this;
 	}
 	
@@ -162,8 +178,9 @@ class Restriction extends SubStatement
 	 * @param string $sOtherClmName 大于等于号右边的字段名
 	 * @return self 
 	 */
-	public function geColumn($sClmName, $sOtherClmName) {
-		$this->arrExpressions [] = $this->transColumn ( $sClmName ) . ' >= ' . $this->transColumn ( $sOtherClmName );
+	public function geColumn($sClmName, $sOtherClmName)
+	{
+		$this->arrExpressions[] = array("%s >= %s",array($sClmName,$sOtherClmName)) ;
 		return $this;
 	}
 	
@@ -173,8 +190,9 @@ class Restriction extends SubStatement
 	 * @param mix $value 期望值
 	 * @return self 
 	 */
-	public function lt($sClmName, $value) {
-		$this->arrExpressions [] = $this->transColumn ( $sClmName ) . ' < ' . $this->tranValue ( $value );
+	public function lt($sClmName, $value)
+	{
+		$this->arrExpressions[] = array("%s < ".$this->tranValue($value),array($sClmName)) ;
 		return $this;
 	}
 	
@@ -184,8 +202,9 @@ class Restriction extends SubStatement
 	 * @param string $sOtherClmName 小于号右边的字段名
 	 * @return self 
 	 */
-	public function ltColumn($sClmName, $sOtherClmName) {
-		$this->arrExpressions [] = $this->transColumn ( $sClmName ) . ' < ' . $this->transColumn ( $sOtherClmName );
+	public function ltColumn($sClmName, $sOtherClmName)
+	{
+		$this->arrExpressions[] = array("%s < %s",array($sClmName,$sOtherClmName)) ;
 		return $this;
 	}
 	
@@ -195,8 +214,9 @@ class Restriction extends SubStatement
 	 * @param mix $value 期望值
 	 * @return self 
 	 */
-	public function le($sClmName, $value) {
-		$this->arrExpressions [] = $this->transColumn ( $sClmName ) . ' <= ' . $this->tranValue ( $value );
+	public function le($sClmName, $value)
+	{
+		$this->arrExpressions[] = array("%s <= ".$this->tranValue($value),array($sClmName)) ;
 		return $this;
 	}
 	
@@ -206,8 +226,9 @@ class Restriction extends SubStatement
 	 * @param string $sOtherClmName 小于等于号右边的字段名
 	 * @return self 
 	 */
-	public function leColumn($sClmName, $sOtherClmName) {
-		$this->arrExpressions [] = $this->transColumn ( $sClmName ) . ' <= ' . $this->transColumn ( $sOtherClmName );
+	public function leColumn($sClmName, $sOtherClmName)
+	{
+		$this->arrExpressions[] = array("%s <= %s",array($sClmName,$sOtherClmName)) ;
 		return $this;
 	}
 	
@@ -217,8 +238,9 @@ class Restriction extends SubStatement
 	 * @param mix $value 期望值
 	 * @return self 
 	 */
-	public function like($sClmName, $value) {
-		$this->arrExpressions [] = $this->transColumn ( $sClmName ) . ' LIKE ' . $this->tranValue ( $value );
+	public function like($sClmName, $value)
+	{
+		$this->arrExpressions[] = array("%s LIKE ".$this->tranValue($value),array($sClmName)) ;
 		return $this;
 	}
 	
@@ -228,12 +250,13 @@ class Restriction extends SubStatement
 	 * @param array $arrValues 比照数组
 	 * @return self 
 	 */
-	public function in($sClmName, array $arrValues ) {
-		foreach($arrValues as $v){
+	public function in($sClmName, array $arrValues )
+	{
+		foreach($arrValues as $v)
+		{
 			$v = $this->tranValue($v);
 		}
-		$sValue ="('" . implode("','" , $arrValues) . "')";
-		$this->arrExpressions [] = $this->transColumn ( $sClmName ) . ' IN ' . $sValue ;
+		$this->arrExpressions[] = array("%s IN (".implode(",",$arrValues).")",array($sClmName)) ;
 		return $this;
 	}
 	
@@ -244,11 +267,14 @@ class Restriction extends SubStatement
 	 * @param mix $otherValue
 	 * @return self
 	 */
-	public function between($sClmName, $value, $otherValue) {
-		$this->arrExpressions [] = $this->transColumn ( $sClmName ) . ' BETWEEN ' 
-									. $this->tranValue ( $value ) 
+	public function between($sClmName, $value, $otherValue)
+	{
+		$this->arrExpressions[] = array("%s BETWEEN "
+									. $this->tranValue($value) 
 									. ' AND '
-									. $this->tranValue ( $otherValue );
+									. $this->tranValue($otherValue)
+								,array($sClmName)
+		) ;
 		return $this;
 	}
 	
@@ -257,8 +283,9 @@ class Restriction extends SubStatement
 	 * @param string $sClmName
 	 * @return self
 	 */
-	public function isNull($sClmName) {
-		$this->arrExpressions [] = $this->transColumn ( $sClmName ) . ' IS NULL';
+	public function isNull($sClmName)
+	{
+		$this->arrExpressions[] = array("%s IS NULL ",array($sClmName)) ;
 		return $this;
 	}
 	
@@ -267,8 +294,9 @@ class Restriction extends SubStatement
 	 * @param string $sClmName
 	 * @return self
 	 */
-	public function isNotNull($sClmName) {
-		$this->arrExpressions [] = $this->transColumn ( $sClmName ) . ' IS NOT NULL';
+	public function isNotNull($sClmName)
+	{
+		$this->arrExpressions[] = array("%s IS NOT NULL ",array($sClmName)) ;
 		return $this;
 	}
 	
@@ -277,7 +305,8 @@ class Restriction extends SubStatement
 	 * @param string sql条件语句
 	 * @return self 调用方法的实例自身
 	 */
-	public function expression($sExpression) {
+	public function expression($sExpression)
+	{
 		$this->arrExpressions [] = $sExpression;
 		return $this;
 	}
@@ -287,7 +316,8 @@ class Restriction extends SubStatement
 	 * @param self 被添加的Restriction对象
 	 * @return self 
 	 */
-	public function add(self $aOtherRestriction) {
+	public function add(self $aOtherRestriction)
+	{
 		$this->arrExpressions [] = $aOtherRestriction;
 		return $this;
 	}
@@ -297,7 +327,8 @@ class Restriction extends SubStatement
 	 * @param self 被添加的Restriction对象
 	 * @return self 
 	 */
-	public function remove(self $aOtherRestriction) {
+	public function remove(self $aOtherRestriction)
+	{
 		$nIdx = array_search($aOtherRestriction,$this->arrExpressions,true) ;
 		if($nIdx!==false)
 		{
@@ -310,29 +341,15 @@ class Restriction extends SubStatement
 	 * 创建一个新的Restriction对象并把它作为条件语句的一部分添加到方法调用者中
 	 * @return self 被创建的Restriction对象
 	 */
-	public function createRestriction($bLogic=true) {
+	public function createRestriction($bLogic=true)
+	{
 		$aRestriction = $this->statementFactory()->createRestriction($bLogic) ;
 		$this->add($aRestriction);
 		return $aRestriction;
 	}
 	
-	
-//	/**
-//	 * 确保字符串被单引号包围 (如果字符串没有单引号包围 , 用单引号包围字符串)
-//	 * @param string 需要加上单引号的字符串
-//	 * @return string 加上单引号后的字符串
-//	 */
-//	private function makeSQ($sStr) {
-//		if (substr ( $sStr, 0, 1 ) == "'") {
-//			$sStr = substr ( $sStr, 1 );
-//		}
-//		if (substr ( $sStr, - 1, 1 ) == "'") {
-//			$sStr = substr ( $sStr, 0, strlen ( $sStr ) - 1 );
-//		}
-//		return "'" . $sStr . "'";
-//	}
-
-    function __clone(){
+    function __clone()
+    {
         $arrTemp = $this->arrExpressions;
         $this->arrExpressions = array();
         foreach( $arrTemp as $tmp){
@@ -343,9 +360,10 @@ class Restriction extends SubStatement
             }
         }
     }
+    
 	private $sLogic = ' AND ';
 	
-	private $arrExpressions = array ();
+	private $arrExpressions = null ;
 	
 }
 ?>

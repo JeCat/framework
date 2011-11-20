@@ -22,29 +22,32 @@ class Select extends MultiTableStatement
 		$this->criteria()->setLimit(30) ;
 	}
 	
-	public function makeStatementForCount($sCntClmName='rowCount',$bFormat=false)
+	public function makeStatementForCount($sCntClmName='rowCount',StatementState $aState)
 	{
 		$this->checkValid(true) ;
 		
 		return "SELECT"
-			. $this->makeStatementPredicate($bFormat)
+			. $this->makeStatementPredicate($aState)
 			. " count(*) AS {$sCntClmName} "
-			. parent::makeStatement($bFormat)
+			. parent::makeStatement($aState)
 			. ' ;' ;
 	}
 	
-	public function makeStatement($bFormat=false)
+	public function makeStatement(StatementState $aState)
 	{
+		$aState->setSupportLimitStart(true)
+				->setSupportTableAlias(true) ;
+	
 		$this->checkValid(true) ;
 		
 		return "SELECT"
-			. $this->makeStatementPredicate($bFormat)
+			. $this->makeStatementPredicate($aState)
 			. ' ' . ($this->arrColumns? implode(',', $this->arrColumns): '*')
-			. parent::makeStatement($bFormat)
+			. parent::makeStatement($aState)
 			. ' ;' ;
 	}
 
-	public function makeStatementPredicate($bFormat=false)
+	public function makeStatementPredicate(StatementState $aState)
 	{
 		return ' ' . $this->sPredicate . (
 				$this->sPredicate==self::PREDICATE_TOP?
@@ -53,11 +56,6 @@ class Select extends MultiTableStatement
 								' PERCENT': ''
 					): ''
 		) ;
-	}
-
-	protected function makeStatementCriteria($bFormat=false)
-	{
-		return ($aCriteria=$this->criteria(false))? $aCriteria->makeStatement($bFormat,true): '' ;
 	}
 	
 	public function checkValid($bThrowException=true)
@@ -79,11 +77,12 @@ class Select extends MultiTableStatement
 		$this->arrColumns[] = $sClmName ;
 	}
 	
-	public function clearColumns(){
-	    $this->arrColumns=array();
+	public function clearColumns()
+	{
+	    $this->arrColumns = null;
 	}
 	
-	private $arrColumns = array() ;
+	private $arrColumns = null ;
 	
 	
 	/**

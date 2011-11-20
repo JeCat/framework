@@ -9,20 +9,23 @@ class Delete extends MultiTableStatement
 		parent::__construct($sTableName,null) ;
 	}
 	
-	public function makeStatement($bFormat=false)
+	public function makeStatement(StatementState $aState)
 	{
+		$aState->setSupportLimitStart(false)
+				->setSupportTableAlias(false) ;
+				
 		$this->checkValid(true) ;
 		
 		$aCriteria = $this->criteria() ;
 		
-		$sStatement = "DELETE FROM " . $this->makeStatementTableList($bFormat) ;
+		$sStatement = "DELETE FROM " . $this->makeStatementTableList($aState) ;
 	
 		if($aaCriteria=$this->criteria(false))
 		{
-			$sStatement.= $aaCriteria->makeStatement($bFormat) ;
+			$sStatement.= $aaCriteria->makeStatement($aState) ;
 		}
 		// limit
-//		$sStatement.= $this->makeStatementLimit($bFormat) ;
+//		$sStatement.= $this->makeStatementLimit($aState) ;
 		
 		return $sStatement ;
 	}

@@ -94,7 +94,6 @@ class Model extends AbstractModel implements IModel, IBean
 			}
 		}
 		
-		
 		if($bSetSerialized)
 		{
 			$this->setSerialized(true) ;
@@ -104,37 +103,44 @@ class Model extends AbstractModel implements IModel, IBean
 	
 	public function load($values=null,$keys=null)
 	{
-		$selectCriteria = null;//一个临时的Criteria对象，仅在此次load中有效。load结束后立即销毁。
-		if($values){
-			if(!$keys){
-				$keys = $this->prototype()->keys() ;
-			}else{
-				$keys = (array)$keys;
-			}
-			if($values instanceof Criteria){
-				$selectCriteria = $values;
-			}else if($values instanceof Restriction){
-				$selectCriteria = clone $this->criteria() ;
-				$selectCriteria->restriction()->add($values);
-			}else{
-				$values = array_values((array) $values) ;
-				$selectCriteria = clone $this->criteria();
-				foreach($keys as $nIdx=>$sKey)
-				{
-					$selectCriteria->restriction()->eq( $sKey, $values[$nIdx] ) ;
-				}
-			}
+		return Selecter::singleton()->execute(
+						$this
+						, null
+						, parent::buildCriteria($this->prototype(),$values,$keys)
+						, true
+		) ;
+	}
+	
+	static public function buildCriteria(Prototype $aPrototype,$values=null,$keys=null)
+	{
+		if($values===null)
+		{
+			return $aPrototype->criteria() ;
 		}
 		
-		if( Selecter::singleton()->execute( $this->db(), $this, null, $selectCriteria, ($this instanceof IModelList) ) ) 
+		$keys = !$keys? $this->prototype()->keys(): (array)$keys ;
+		
+		if($values instanceof Criteria)
 		{
-			$this->setSerialized(true);
-			$this->clearChanged();
-			return true ;
+			return $values;
+		}
+		else if($values instanceof Restriction)
+		{
+			$aSelectCriteria = clone $aPrototype->criteria() ;
+			
+			$aSelectCriteria->restriction()->add($values) ;
+			return $aSelectCriteria ;
 		}
 		else
 		{
-			return false ;
+			$aSelectCriteria = clone $aPrototype->criteria() ;
+			
+			$values = array_values((array) $values) ;
+			foreach($keys as $nIdx=>$sKey)
+			{
+				$aSelectCriteria->restriction()->eq( $sKey, $values[$nIdx] ) ;
+			}
+			return $aSelectCriteria ;
 		}
 	}
 	
@@ -194,32 +200,6 @@ class Model extends AbstractModel implements IModel, IBean
 		}
 	}
 	
-	/**
-	 * @return jc\db\sql\Criteria
-	 */
-	public function criteria($bAutoCreate=true)
-	{
-		if( !$this->aCriteria and $bAutoCreate )
-		{
-			if(!$this->aPrototype)
-			{
-				throw new Exception("无效的db\\Model,缺少原型对象") ;
-			}
-			
-			$this->aCriteria = $this->aPrototype->criteria() ;
-		}
-		
-		return $this->aCriteria ;
-	}
-	
-	/**
-	 * @return jc\db\sql\Restriction
-	 */
-	public function createRestriction($bLogic=true)
-	{
-		return $this->criteria(true)->restriction(true)->createRestriction($bLogic) ;
-	}
-	
 	public function findChildBy($values,$keys=null)
 	{
 		if(!$keys)
@@ -269,15 +249,7 @@ class Model extends AbstractModel implements IModel, IBean
 	public function setPagination($iPerPage,$iPageNum){
 	    $this->criteria()->setLimit( $iPerPage, $iPerPage*($iPageNum-1) ) ;
 	}
-	
-	/**
-	 * @return jc\db\DB
-	 */
-	public function db()
-	{
-		return DB::singleton() ;
-	}
-	
+
 	/**
 	 * @notice 不会发生级连操作。
 	 * 既，如果$sName是外键，这个函数不会修改关联表中相应外键的值。

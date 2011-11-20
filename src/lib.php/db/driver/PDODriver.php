@@ -2,6 +2,7 @@
 
 namespace jc\db\driver ;
 
+use jc\db\sql\StatementState;
 use jc\db\reflecter\imp\MySQLReflecterFactory;
 use jc\db\DB;
 use jc\db\recordset\PDORecordSet;
@@ -43,6 +44,18 @@ class PDODriver extends \PDO implements IDriver
 	{
 		return \PDO::lastInsertId($sName) ;
 	}
+	
+	/**
+	 * @return jc\db\sql\StatementState
+	 */
+	public function sharedStatementState()
+	{
+		if(!$this->aSharedStatementState)
+		{
+			$this->aSharedStatementState = new StatementState() ;
+		}
+		return $this->aSharedStatementState ;
+	}
 
 	/**
 	 * @return jc\db\recordset\IRecordSet
@@ -50,7 +63,7 @@ class PDODriver extends \PDO implements IDriver
 	public function query($sql)
 	{
 		$arrLog['sql'] = ($sql instanceof Statement)?
-					$sql->makeStatement(): strval($sql) ;
+					$sql->makeStatement($this->sharedStatementState()): strval($sql) ;
 
 		$fBefore = microtime(true) ;
 		$result = \PDO::query($arrLog['sql'],\PDO::FETCH_ASSOC) ;
@@ -133,6 +146,8 @@ class PDODriver extends \PDO implements IDriver
 	private $sCurrentDBName ; 
 	
 	private $sDsn ; 
+	
+	private $aSharedStatementState ;
 }
 
 ?>

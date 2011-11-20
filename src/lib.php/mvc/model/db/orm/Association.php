@@ -2,6 +2,10 @@
 
 namespace jc\mvc\model\db\orm;
 
+use jc\db\sql\Restriction;
+
+use jc\db\sql\name\NameTransferFactory;
+
 use jc\bean\IBean;
 use jc\bean\BeanFactory;
 use jc\db\sql\TablesJoin;
@@ -288,6 +292,24 @@ class Association implements IBean
 		{
 			$this->aFromPrototype = $arrConfig['fromPrototype'] ;
 		}
+		if(!empty($arrConfig['on']))
+		{
+			$arrConfig['on'] = (array)$arrConfig['on'] ;
+			foreach($arrConfig['on'] as &$items)
+			{
+				// 桥接表区分是否 Bridge 上的条件
+				if( $this->isType(self::hasAndBelongsTo) and strpos($items[1],'to.')===0 )
+				{
+					$aRestriction = $this->otherBridgeTableJoinOn() ;
+				}
+				else
+				{
+					$aRestriction = $this->otherTableJoinOn() ;
+				}
+				$sMethod = array_shift($items) ;
+				call_user_func_array(array($aRestriction,$sMethod),$items) ;
+			}
+		}
 		
 		$this->done() ;
 			
@@ -304,6 +326,62 @@ class Association implements IBean
 		$this->aDB = $aDB ;
 	}
 	
+	public function restriction()
+	{
+		return $this->aTablesJoin? $this->aTablesJoin->restriction(): null ;
+	}
+	
+	
+	// --------------
+	public function otherTableJoinOn($bAutoCreate=true)
+	{
+		if( !$this->aOtherTableJoinOn and $bAutoCreate )
+		{
+			$this->aOtherTableJoinOn = $this->createJoinOn() ;
+		}
+		return $this->aOtherTableJoinOn ;
+	}
+	public function otherBridgeTableJoinOn($bAutoCreate=true)
+	{
+		if( !$this->aOtherTableJoinOn and $bAutoCreate )
+		{
+			$this->aOtherTableJoinOn = $this->createJoinOn() ;
+		}
+		return $this->aOtherTableJoinOn ;
+	}
+	private function createJoinOn()
+	{
+		$aTableJoinOn = new Restriction() ;
+		
+		$aStatementNameTransfer = NameTransferFactory::singleton()->create() ;
+		$aStatementNameTransfer->addColumnNameHandle(array($this,'statementColumnNameHandle')) ;
+		
+		$aTableJoinOn->setNameTransfer($aStatementNameTransfer) ;
+	}
+	public function statementColumnNameHandle($sName,Statement $aStatement,StatementState $sState)
+	{
+		// delete和Update不支持别名，不做表别名转换
+		if( !$sState->supportTableAlias() )
+		{
+			return array($this->getColumnByAlias($sName),$aStatement,$sState) ;
+		}
+		
+		// 切分 原型名称 和 字段名称
+		$nPos = strrpos($sName,'.') ;
+		if($nPos!==false)
+		{
+			$sTableName = '.'.substr($sName,0,$nPos) ;
+			$sColumn = substr($sName,$nPos+1) ;
+		}
+		else 
+		{
+			$sTableName = null ;
+			$sColumn = $sName ;
+		}
+		$sColumn = $this->getColumnByAlias($sColumn)?: $sColumn ;
+
+		$sName = '`'.$this->path()."{$sTableName}`.`{$sColumn}`" ;
+	}
 	
 	// private data
 	private $aDB = null ;
@@ -318,6 +396,8 @@ class Association implements IBean
 	private $aTablesJoin = null ;
 	
 	private $arrBeanConfig ;
+	
+	private $aOtherTableJoinOn ;
 	
 }
 ?>

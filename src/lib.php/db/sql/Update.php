@@ -14,8 +14,11 @@ class Update extends MultiTableStatement implements IDataSettableStatement
 		return $this->bReplace ;
 	}
 	
-	public function makeStatement($bFormat=false)
+	public function makeStatement(StatementState $aState)
 	{
+		$aState->setSupportLimitStart(false)
+				->setSupportTableAlias(false) ;
+				
 		$this->checkValid(true) ;
 		
 		$sStatement = ($this->isReplace()? "REPLACE ": "UPDATE ")
@@ -23,9 +26,9 @@ class Update extends MultiTableStatement implements IDataSettableStatement
 				. " SET " ;
 
 		$arrValues = array() ;
-		foreach($this->mapData as $sClm=>$Data)
+		foreach($this->mapData as $sClm=>&$sData)
 		{
-			$arrValues[] = $this->transColumn($sClm)."=".$Data ;
+			$arrValues[] = $this->transColumn($sClm)." = ".$sData ;
 		}
 		
 		$sStatement.= implode(", ", $arrValues) ;
@@ -38,18 +41,13 @@ class Update extends MultiTableStatement implements IDataSettableStatement
 		return $sStatement ;
 	}
 	
-	/*public function checkValid($bThrowException=true)
-	{
-		parent::checkValid($bThrowException) ;
-	}*/
-	
 	public function set($sColumnName,$statement)
 	{
 		$this->mapData[$sColumnName] = $statement ;
 	}
 	public function setData($sColumnName,$sData=null)
 	{
-		$this->mapData[$sColumnName] = "'".addslashes($sData)."'" ;
+		$this->mapData[$sColumnName] = $this->tranValue($sData) ;
 	}
 	
 	public function removeData($sColumnName)

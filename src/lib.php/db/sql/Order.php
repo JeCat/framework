@@ -42,7 +42,7 @@ class Order extends SubStatement
 		if($sColumn === null){
 			return;
 		}
-		$this->arrOrderBys[$sColumn] = array($this->transColumn($sColumn),$bDesc?'DESC':'ASC');
+		$this->arrOrderBys[$sColumn] = $bDesc?'DESC':'ASC';
 		return $this ;
 	}
 	
@@ -56,7 +56,7 @@ class Order extends SubStatement
 	}
 	
 	public function clearColumns() {
-		$this->arrOrderBys = array();
+		$this->arrOrderBys = null ;
 		return $this ;
 	}
 	
@@ -67,24 +67,24 @@ class Order extends SubStatement
 	/**
 	 * @see jc\db\sql\Statement::makeStatement()
 	 */
-	public function makeStatement($bFormat=false){
-		$sOrderBy = ' ORDER BY ';
-		$arrOrderBys = array();
+	public function makeStatement(StatementState $aState)
+	{
 		//如果arrOrderBys中什么也没有,就返回空字符串 , 以此满足空Order对象的稳定(即什么也不做的Order,sql语句没有Order部分的情况)
-		if( count($this->arrOrderBys) <= 0 ){
+		if( empty($this->arrOrderBys) )
+		{
 			return '';
 		}
 		//sql中有Order部分的情况
-		foreach ($this->arrOrderBys as $key=>$arrOrder){
-			$arrOrderBys[] = implode(' ', $arrOrder);
+		foreach ($this->arrOrderBys as $sColumn=>&$sOrder){
+			$arrOrderBys[] = $this->transColumn($sColumn,$aState) . ' ' . $sOrder ;
 		}
-		$sOrderBy .= implode(',' , $arrOrderBys);
-		return $sOrderBy;
+		return ' ORDER BY ' . implode(', ' , $arrOrderBys) ;
 	}
 	
-	public function checkValid($bThrowException=true){
+	public function checkValid($bThrowException=true)
+	{
 		return true;
 	}
 
-	private $arrOrderBys = array();
+	private $arrOrderBys ;
 }

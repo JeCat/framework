@@ -39,10 +39,8 @@ class DB extends Object
 	}
 	
 	public function queryCount(Select $aSelect)
-	{
-		$aRecords = $this->query(
-			$aSelect->makeStatementForCount('rowCount')
-		) ;
+	{		
+		$aRecords = $this->query( $aSelect->makeStatementForCount('rowCount') ) ;
 		
 		if( $aRecords )
 		{

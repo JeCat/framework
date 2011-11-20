@@ -50,8 +50,11 @@ class Insert extends Statement implements IDataSettableStatement
 		return new \jc\pattern\iterate\ArrayIterator( array_keys($this->mapData) ) ;
 	}
 
-	public function makeStatement($bFormat=false)
+	public function makeStatement(StatementState $aState)
 	{
+		$aState->setSupportLimitStart(false)
+				->setSupportTableAlias(false) ;
+				
 		$this->checkValid(true) ;
 		
 		$sStatement = 'INSERT INTO ' . $this->sTableName ;
@@ -61,8 +64,8 @@ class Insert extends Statement implements IDataSettableStatement
 		
 		foreach($this->mapData as $sClm=>$Value)
 		{
-			$arrClms[] = $sClm ;
-			$arrValues[] = "'".addslashes($Value)."'" ;
+			$arrClms[] = $this->transColumn($sClm, $aState) ;
+			$arrValues[] = $this->tranValue($Value) ;
 		}
 		
 		$sStatement.= " ( " . implode(", ", $arrClms) . " ) VALUES ( " . implode(", ", $arrValues) . " ) ;" ;

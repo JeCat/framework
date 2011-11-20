@@ -26,30 +26,6 @@ abstract class OperationStrategy extends Object
 		return $aRestriction ;
 	}
 
-	protected function makeResrictionForForeignKey($sFromTableName=null,$sToTableName=null,$arrFromKeys,$arrToKeys, StatementFactory $aSqlFactory)
-	{
-		if($sToTableName)
-		{
-			$sToTableName = "`{$sToTableName}`." ;
-		}
-		if($sFromTableName)
-		{
-			$sFromTableName = "`{$sFromTableName}`." ;
-		}
-		
-		$aRestriction = $aSqlFactory->createRestriction() ;
-		
-		foreach ($arrFromKeys as $nIdx=>$sFromKey)
-		{
-			$aRestriction->eqColumn(
-				"{$sFromTableName}`{$sFromKey}`"
-				, "{$sToTableName}`{$arrToKeys[$nIdx]}`"
-			) ;
-		}
-		
-		return $aRestriction ;
-	}
-
 	protected function setValue(IDataSettableStatement $aStatement,$keys,$names=null,IModel $aDataSource,$sTableName=null)
 	{
 		$keys = array_values((array)$keys) ;

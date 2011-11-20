@@ -14,22 +14,28 @@ use jc\db\sql\Criteria;
 
 class Selecter extends OperationStrategy
 {
-	public function execute(DB $aDB, IModel $aModel,Select $aSelect=null,Criteria $aCriteria=null,$bList=false)
+	public function execute(IModel $aModel,Select $aSelect=null,Criteria $aCriteria=null,$bList=false,DB $aDB=null)
 	{
 		if( !$aPrototype = $aModel->prototype() )
 		{
 			throw new Exception("传入了无效的 IModel 对象，\$aModel的 prototype() 方法返回null") ;	
 		}
 		
+		if(!$aDB)
+		{
+			$aDB = DB::singleton() ;
+		}
+		
 		// -----------------
 		// step 1. 组装用于查询的 Select 对象
 		if(!$aSelect)
 		{
-			$aSelect = $this->buildSelect($aPrototype) ;
+			$aSelect = $aPrototype->sharedStatementSelect() ;
 		}
 		
-		if($aCriteria){
-			$aSelect ->setCriteria($aCriteria);
+		if($aCriteria)
+		{
+			$aSelect->setCriteria($aCriteria);
 		}
 		
 		// -----------------
@@ -57,7 +63,9 @@ class Selecter extends OperationStrategy
 		}
 		$aModel->loadData($aRecordset,true) ;
 		
-		
+		$aModel->setSerialized(true) ;
+		$aModel->clearChanged() ;
+
 		// -----------------
 		// step 2. query alonely for multiterm associated prototype 
 		if($bList)
@@ -75,8 +83,27 @@ class Selecter extends OperationStrategy
 				$this->queryForMultitermAssoc($aDB,$aMultitermAssoc,$aModel,$aSelect) ;
 			}
 		}
-			
+
 		return true ;
+	}
+	
+	public function totalCount(DB $aDB,Prototype $aPrototype,Criteria $aCriteria=null)
+	{
+		$aSelect = $aPrototype->sharedStatementSelect() ;
+		if($aCriteria)
+		{
+			$aSelect->setCriteria($aCriteria);
+		}
+		
+		$aCriteria = $aSelect->criteria() ;
+		$aCriteria->setLimit(-1) ;
+		$aCriteria->clearGroupBy() ;
+		foreach($aPrototype->keys() as $sClmName)
+		{
+			$aCriteria->addGroupBy('`'.$aPrototype->sqlTableAlias().'`.`'.$sClmName.'`') ;
+		}
+		
+		return $aDB->queryCount($aSelect) ;
 	}
 	
 	private function queryForMultitermAssoc(DB $aDB,Association $aMultitermAssoc,IModel $aModel,Select $aSelect)
@@ -133,107 +160,12 @@ class Selecter extends OperationStrategy
 		// 
 		$aChildModel = $aToPrototype->createModel(true) ;
 		$aModel->addChild($aChildModel,$aToPrototype->name()) ;
-		$this->execute($aDB,$aChildModel,$aSelect,null,true) ;
+		$this->execute($aChildModel,$aSelect,null,true,$aDB) ;
 		
 		// 清理条件
 		$aSelect->criteria()->restriction()->remove($aRestraction) ;
 	}
-	
-	private function buildSelect(Prototype $aPrototype)
-	{
-		$aSqlFactory = $aPrototype->statementFactory() ;
-		$aSelect = $aSqlFactory->createSelect() ;
-		
-		// 主表的名称
-		$aTable = $aSqlFactory->createTable( $aPrototype->tableName(), $aPrototype->name() ) ;
-		$aSelect->addTable($aTable) ;
-		
-		// criteria
-		$aCriteria = clone $aPrototype->criteria() ;
-		$aSelect->setCriteria( $aCriteria ) ;
-		
-		// 递归连接所有关联原型的 table
-		$this->joinTables( $aTable, $aPrototype, $aSqlFactory ) ;
-		
-		return $aSelect ;
-	}
-	
-	private function joinTables(Table $aFromTable,Prototype $aForPrototype, StatementFactory $aSqlFactory)
-	{
-		$sFromTableAlias = $aFromTable->alias() ;
-			
-		foreach( $aForPrototype->associationIterator() as $aAssoc )
-		{
-			$aPrototype = $aAssoc->toPrototype() ;
-			$sToTableAlias = $aPrototype->sqlTableAlias() ;
-			
-			// 两表关联
-			if( $aAssoc->isType(Association::pair) )
-			{
-				// create table for toPrototype
-				$aTable = $aSqlFactory->createTable( $aPrototype->tableName(), $sToTableAlias ) ;
-		
-				 $aTablesJoin = $this->joinTwoTables(
-						$aFromTable
-						, $aTable
-						, $aAssoc->fromKeys()
-						, $aAssoc->toKeys()
-						, $aSqlFactory
-				) ;
-				
-				// 记录 TablesJoin 对象
-				$aAssoc->setSqlTablesJoin($aTablesJoin) ;
-			}
-			
-			// 三表关联
-			else if( $aAssoc->isType(Association::triplet) )
-			{
-				// 从左表连接到中间表
-				$aBridgeTable = $aSqlFactory->createTable( $aAssoc->bridgeTableName(), $aAssoc->bridgeSqlTableAlias() ) ;
-				$aTablesJoin = $this->joinTwoTables(
-						$aFromTable
-						, $aBridgeTable
-						, $aAssoc->fromKeys()
-						, $aAssoc->toBridgeKeys()
-						, $aSqlFactory
-				) ;
-				
-				// 记录中间表的 TablesJoin 对象
-				$aAssoc->setSqlTablesJoin($aTablesJoin) ;
-				
-				// 从中间表连接到右表
-				$aTable = $aSqlFactory->createTable( $aPrototype->tableName(), $sToTableAlias ) ;
-				$this->joinTwoTables(
-						$aBridgeTable
-						, $aTable
-						, $aAssoc->fromBridgeKeys()
-						, $aAssoc->toKeys()
-						, $aSqlFactory
-				) ;
-			}
-			
-			else 
-			{
-				throw new Exception("what's this?") ;
-			}
 
-			// 递归
-			$this->joinTables( $aTable, $aPrototype, $aSqlFactory ) ;
-		}
-	}
-	
-	private function joinTwoTables( $aFromTable,Table $aTable,array $arrFromKeys,$arrToKeys,StatementFactory $aSqlFactory)
-	{
-		// create table join
-		$aTablesJoin = $aSqlFactory->createTablesJoin() ;
-		$aTablesJoin->addTable(
-				$aTable, $this->makeResrictionForForeignKey($aFromTable->alias(),$aTable->alias(),$arrFromKeys,$arrToKeys,$aSqlFactory)
-		) ;
-		$aFromTable->addJoin($aTablesJoin) ;
-		
-		return $aTablesJoin ;
-	}
-	
 	private function setGroupBy(Select $aSelect,Prototype $aPrototype)
 	{
 		$aCriteria = $aSelect->criteria() ;
@@ -275,5 +207,138 @@ class Selecter extends OperationStrategy
 		}
 	}
 
+	
+
+	// -- Select for Prototype ------------------------------------------------------
+	/**
+	 * @return jc\db\sql\Select
+	 */
+	static public function buildSelect(Prototype $aPrototype)
+	{
+		$aSelect = $aPrototype->statementFactory()->createSelect() ;
+		
+		// 主表的名称
+		$aTable = $aPrototype->createTable() ;
+		$aSelect->addTable($aTable) ;
+		
+		// criteria
+		$aCriteria = clone $aPrototype->criteria() ;
+		$aSelect->setCriteria( $aCriteria ) ;
+		
+		// 递归连接所有关联原型的 table
+		self::joinTables( $aTable, $aPrototype ) ;
+		
+		return $aSelect ;
+	}
+	
+	static private function joinTables(Table $aFromTable,Prototype $aForPrototype)
+	{
+		$sFromTableAlias = $aFromTable->alias() ;
+			
+		foreach( $aForPrototype->associationIterator() as $aAssoc )
+		{
+			$aPrototype = $aAssoc->toPrototype() ;
+			$sToTableAlias = $aPrototype->sqlTableAlias() ;
+			
+			// 两表关联
+			if( $aAssoc->isType(Association::pair) )
+			{
+				// create table for toPrototype
+				$aTable = $aPrototype->createTable() ;
+		
+				$aTablesJoin = self::joinTwoTables(
+						$aFromTable
+						, $aTable
+						, $aAssoc->fromKeys()
+						, $aAssoc->toKeys()
+						, $aPrototype->statementFactory()
+				) ;
+				
+				// 记录 TablesJoin 对象
+				$aAssoc->setSqlTablesJoin($aTablesJoin) ;
+			}
+			
+			// 三表关联
+			else if( $aAssoc->isType(Association::triplet) )
+			{
+				// 从左表连接到中间表
+				$aBridgeTable = $aPrototype->statementFactory()->createTable( $aAssoc->bridgeTableName(), $aAssoc->bridgeSqlTableAlias() ) ;
+				$aTablesJoin = self::joinTwoTables(
+						$aFromTable
+						, $aBridgeTable
+						, $aAssoc->fromKeys()
+						, $aAssoc->toBridgeKeys()
+						, $aPrototype->statementFactory()
+				) ;
+				
+				// 记录中间表的 TablesJoin 对象
+				$aAssoc->setSqlTablesJoin($aTablesJoin) ;
+				
+				// 从中间表连接到右表
+				$aTable = $aPrototype->createTable() ;
+				$aBridgeTablesJoin = self::joinTwoTables(
+						$aBridgeTable
+						, $aTable
+						, $aAssoc->fromBridgeKeys()
+						, $aAssoc->toKeys()
+						, $aPrototype->statementFactory()
+				) ;
+			
+				// 在桥接表上加入自定义的 join on 条件
+				if( $aTablesJoinOn = $aAssoc->otherBridgeTableJoinOn(false) )
+				{
+					$aBridgeTablesJoin->restriction()->add($aTablesJoinOn) ;
+				}
+			}
+			
+			else 
+			{
+				throw new Exception("what's this?") ;
+			}
+		
+			// 加入自定义的 join on 条件
+			if( $aOtherTablesJoinOn = $aAssoc->otherTableJoinOn(false) )
+			{
+				$aTablesJoin->on()->add($aOtherTablesJoinOn) ;
+			}
+				
+			// 递归
+			self::joinTables( $aTable, $aPrototype ) ;
+		}
+	}
+	
+	static private function joinTwoTables( $aFromTable,Table $aTable,array $arrFromKeys,$arrToKeys,StatementFactory $aSqlFactory)
+	{
+		// create table join
+		$aTablesJoin = $aSqlFactory->createTablesJoin() ;
+		
+		$aTablesJoinOn = $aSqlFactory->createRestriction() ;
+		self::makeResrictionForForeignKey($aFromTable->alias(),$aTable->alias(),$arrFromKeys,$arrToKeys,$aTablesJoinOn) ;
+		
+		$aTablesJoin->addTable( $aTable, $aTablesJoinOn ) ;
+		$aFromTable->addJoin($aTablesJoin) ;
+		
+		return $aTablesJoin ;
+	}
+
+	static private function makeResrictionForForeignKey($sFromTableName=null,$sToTableName=null,$arrFromKeys,$arrToKeys,Restriction $aRestriction)
+	{
+		if($sToTableName)
+		{
+			$sToTableName = "`{$sToTableName}`." ;
+		}
+		if($sFromTableName)
+		{
+			$sFromTableName = "`{$sFromTableName}`." ;
+		}
+		
+		foreach ($arrFromKeys as $nIdx=>$sFromKey)
+		{
+			$aRestriction->eqColumn(
+				"{$sFromTableName}`{$sFromKey}`"
+				, "{$sToTableName}`{$arrToKeys[$nIdx]}`"
+			) ;
+		}
+	}
 }
 ?>

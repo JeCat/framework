@@ -73,19 +73,19 @@ class TablesJoin extends SubStatement
 		}
 	}
 	
-	public function makeStatement($bFormat=false)
+	public function makeStatement(StatementState $aState)
 	{
 		$arrTables = array() ;
 		foreach( $this->arrTables as $table )
 		{
-			$arrTables[] = ($table instanceof Table)? $table->makeStatement($bFormat): "`{$table}`" ;
+			$arrTables[] = ($table instanceof Table)? $table->makeStatement($aState): "`{$table}`" ;
 		}
 		
 		$sSql = ' ' . $this->sType . " ( " . implode(", ",$arrTables) . " )" ;
 		
 		if( $this->aRestriction )
 		{
-			$sSql.= " ON (" . $this->aRestriction->makeStatement($bFormat) . ')' ;
+			$sSql.= " ON (" . $this->aRestriction->makeStatement($aState) . ')' ;
 		}
 		
 		return $sSql ;
@@ -94,7 +94,7 @@ class TablesJoin extends SubStatement
 	/**
 	 * @return Restriction
 	 */
-	public function restriction()
+	public function on()
 	{
 		if(!$this->aRestriction)
 		{

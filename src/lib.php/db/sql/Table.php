@@ -9,10 +9,10 @@ class Table extends SubStatement
 		$this->sAlias = $sAlias?:$sTableName ;
 	}
 	
-	public function makeStatement($bFormat=false)
+	public function makeStatement(StatementState $aState)
 	{
 		$sSql = "`$this->sTableName`" ;
-		if( $this->sAlias and $this->sAlias!=$this->sTableName )
+		if( $this->sAlias and $aState->supportTableAlias() and $this->sAlias!=$this->sTableName )
 		{
 			$sSql.= " AS `{$this->sAlias}`" ;
 		}

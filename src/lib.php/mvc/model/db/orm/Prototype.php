@@ -1,6 +1,12 @@
 <?php
 namespace jc\mvc\model\db\orm;
 
+use jc\db\sql\Statement;
+
+use jc\db\sql\StatementState;
+
+use jc\db\sql\name\NameTransferFactory;
+
 use jc\mvc\model\db\orm\Association;
 use jc\bean\BeanFactory;
 use jc\bean\IBean;
@@ -12,7 +18,7 @@ use jc\lang\Exception;
 use jc\db\DB;
 use jc\db\sql\StatementFactory;
 
-class Prototype implements IBean
+class Prototype extends StatementFactory implements IBean
 {
 	const youKnow = null ;
 	
@@ -377,29 +383,26 @@ class Prototype implements IBean
 	 */
 	public function path($bFull=true)
 	{
-		$arrPath = array() ;
-		$aPrototype = $this ;
-		
-		while( $aPrototype )
+		if( !$this->sPathCache )
 		{
-			$arrPath[] = $aPrototype->name() ;
+			$this->sPathCache = '' ;
 			
 			if($aAssoc=$aPrototype->associatedBy())
 			{
-				$aPrototype = $aAssoc->fromPrototype() ;
+				$this->sPathCache = $aAssoc->fromPrototype()->path() ;
 			}
-			else
+			
+			if($bFull)
 			{
-				break ;
+				if($this->sPathCache)
+				{
+					$this->sPathCache.= '.' ;
+				}
+				$this->sPathCache.= $this->name() ;
 			}
-		}
-		
-		if(!$bFull)
-		{
-			array_pop($arrPath) ;
 		}
 				
-		return implode('.',array_reverse($arrPath)) ;
+		return $this->sPathCache ;
 	}
 	
 	/**
@@ -420,21 +423,12 @@ class Prototype implements IBean
 	// for sql statement
 	public function sqlTableAlias()
 	{
-		if( !$this->sSqlTableAliasCache )
-		{
-			$this->sSqlTableAliasCache = ($this->aAssociationBy? ($this->aAssociationBy->fromPrototype()->sqlTableAlias().'.'): '') . $this->name() ;
-		}
-		
-		return $this->sSqlTableAliasCache ;
+		return $this->path() ;
 	}
 	public function sqlColumnAlias($sColumnName)
 	{
-		if( !isset($this->arrSqlColumnAliasCaches[$sColumnName]) )
-		{
-			$this->arrSqlColumnAliasCaches[$sColumnName] = $this->sqlTableAlias() . '.' . $sColumnName ;
-		}
-		
-		return $this->arrSqlColumnAliasCaches[$sColumnName] ;
+		$sTableAlias = $this->sqlTableAlias() ;
+		return ($sTableAlias?$sTableAlias.'.':'').$sColumnName ;
 	}
 	
 	/**
@@ -464,68 +458,6 @@ class Prototype implements IBean
 		return $this ;
 	}
 	
-	/**
-	 * @return jc\db\sql\StatementFactory ;
-	 */
-	public function statementFactory()
-	{
-		if($this->aAssociationBy)
-		{
-			return $this->aAssociationBy->fromPrototype()->statementFactory() ;
-		}
-		
-		else 
-		{
-			if( !$this->aStatementFactory )
-			{
-				$this->aStatementFactory = new StatementFactory() ;
-				
-				$aNameTransfer = new NameTransfer() ;
-				$aNameTransfer->addColumnNameHandle(array($this,'statementColumnNameHandle')) ;
-				
-				$this->aStatementFactory->setNameTransfer($aNameTransfer) ;
-			}
-			
-			return $this->aStatementFactory ;
-		}
-	}
-	public function statementColumnNameHandle($sName,\jc\db\sql\Statement $aStatement)
-	{
-		
-		// 自由输入的字段名，省略关系片段中第一个prototype的名字
-		if( substr($sName,0,1)!='`' )
-		{
-			if($aStatement instanceof \jc\db\sql\Delete or $aStatement instanceof \jc\db\sql\Update){
-				// delete和Update不支持别名，不做名称转换
-				$sName = '`'.$sName.'`';
-				
-				// 转换字段别名
-				// todo
-				
-			}else{
-				// 切分 原型名称 和 字段名称
-				$pos = strrpos($sName,'.') ;
-				if($pos!==false)
-				{
-					$sPrototypeName = '.'.substr($sName,0,$pos) ;
-					$sDataName = substr($sName,$pos+1) ;
-				}
-				else 
-				{
-					$sPrototypeName = null ;
-					$sDataName = $sName ;
-				}
-			
-				// 转换字段别名
-				// todo
-			
-				$sName = '`'.$this->name()."{$sPrototypeName}`.`{$sDataName}`" ;
-			}
-		}
-		
-		return array($sName) ;
-	}
-
 	/**
 	 * @return Association
 	 */
@@ -688,9 +620,13 @@ class Prototype implements IBean
 	{
 		$this->aStatementDelete ;
 	}
-	public function statementSelect()
+	public function sharedStatementSelect()
 	{
-		$this->aStatementSelect ;
+		if(!$this->aStatementSelect)
+		{
+			$this->aStatementSelect = Selecter::buildSelect($this) ;
+		}
+		return $this->aStatementSelect ;
 	}
 	/**
 	 * return jc\db\sql\Update
@@ -705,11 +641,81 @@ class Prototype implements IBean
 		return $this->aStatementUpdate ;
 	}
 	
+	/**
+	 * override parent class StatementFactory
+	 */
+	protected function initStatement(Statement $aStatement)
+	{
+		$aStatement->setNameTransfer($this->nameTransfer()) ;
+		$aStatement->setStatementFactory($this) ;
+		return $aStatement ;
+	}
+
+	/**
+	 * @return jc\db\sql\name\NameTransfer
+	 */
+	public function nameTransfer()
+	{
+		if(!$this->aStatementNameTransfer)
+		{
+			$this->aStatementNameTransfer = NameTransferFactory::singleton()->create() ;
+			$this->aStatementNameTransfer->addColumnNameHandle(array($this,'statementColumnNameHandle')) ;
+		}
+		return $this->aStatementNameTransfer ;
+	}
+
+	/**
+	 * @return jc\db\sql\StatementFactory ;
+	 */
+	public function statementFactory()
+	{
+		return $this ;
+	}
+	/**
+	 * @return jc\db\sql\Table ;
+	 */
+	public function createTable()
+	{
+		return $this->createTable($this->tableName(),$this->sqlTableAlias()) ;
+	}
+	public function statementColumnNameHandle($sName,Statement $aStatement,StatementState $sState)
+	{
+		// delete和Update不支持别名，不做表别名转换
+		if( !$sState->supportTableAlias() )
+		{
+			return array($this->getColumnByAlias($sName),$aStatement,$sState) ;
+		}
+		
+		// 切分 原型名称 和 字段名称
+		$nPos = strrpos($sName,'.') ;
+		if($nPos!==false)
+		{
+			$sTableName = '.'.substr($sName,0,$nPos) ;
+			$sColumn = substr($sName,$nPos+1) ;
+		}
+		else 
+		{
+			$sTableName = null ;
+			$sColumn = $sName ;
+		}
+		$sColumn = $this->getColumnByAlias($sColumn)?: $sColumn ;
+
+		$sName = '`'.$this->path()."{$sTableName}`.`{$sColumn}`" ;
+	}
+	
 	// constructor
 	public function __construct(){}
+
+	private function __clone()
+	{
+		$this->this->sPathCache = null ;
+		$this->aStatementInsert = null ;
+		$this->aStatementDelete = null ;
+		$this->aStatementSelect = null ;
+		$this->aStatementUpdate = null ;
+	}
 	
-	
-	// private data
+	// 固有属性 ----------------------------
 	private $sName;// 如果不提供，用表名作名字。
 	private $sTableName='';
 	private $arrColumns ;
@@ -719,21 +725,19 @@ class Prototype implements IBean
 	private $aCriteria = null;
 	private $arrAssociations =  array();
 	private $aAssociationBy = null;
-	
-	private $sSqlTableAliasCache ;
-	private $arrSqlColumnAliasCaches = array() ;
-	
-	private $aDB ;
-	
 	private $sModelClass = 'jc\\mvc\\model\\db\\Model' ;
-		
-	private $aStatementFactory ;
+	private $arrBeanConfig ;
 	
+	// 共享状态
+	private $aDB ;
+	private $aStatementNameTransfer ;
+	
+	// 临时状态(clone时重置) ----------------------------
+	private $sPathCache ;
 	private $aStatementInsert ;
 	private $aStatementDelete ;
 	private $aStatementSelect ;
 	private $aStatementUpdate ;
 	
-	private $arrBeanConfig ;
 }
 ?>
