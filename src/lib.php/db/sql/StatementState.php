@@ -5,11 +5,11 @@ class StatementState
 {
 	public function supportTableAlias()
 	{
-		$this->bSupportTableAlias = true ;
+		return $this->bSupportTableAlias ;
 	}
 	public function supportLimitStart()
 	{
-		$this->bSupportLimitStart = true ;
+		return $this->bSupportLimitStart ;
 	}
 	
 

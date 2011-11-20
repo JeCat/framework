@@ -387,7 +387,7 @@ class Prototype extends StatementFactory implements IBean
 		{
 			$this->sPathCache = '' ;
 			
-			if($aAssoc=$aPrototype->associatedBy())
+			if($aAssoc=$this->associatedBy())
 			{
 				$this->sPathCache = $aAssoc->fromPrototype()->path() ;
 			}
@@ -676,7 +676,7 @@ class Prototype extends StatementFactory implements IBean
 	 */
 	public function createTable()
 	{
-		return $this->createTable($this->tableName(),$this->sqlTableAlias()) ;
+		return parent::createTable($this->tableName(),$this->sqlTableAlias()) ;
 	}
 	public function statementColumnNameHandle($sName,Statement $aStatement,StatementState $sState)
 	{

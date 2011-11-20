@@ -5,7 +5,7 @@ use jc\db\sql\name\NameTransferFactory;
 use jc\db\sql\name\NameTransfer;
 use jc\lang\Object;
 
-abstract class Statement extends Object implements IStatement
+abstract class Statement extends Object
 {
 	abstract public function makeStatement(StatementState $aState) ;
 	
@@ -62,7 +62,7 @@ abstract class Statement extends Object implements IStatement
 		}
 		else 
 		{
-			return $aNamer=$this->nameTransfer()?
+			return ($aNamer=$this->nameTransfer())?
 						$aNamer->transTable($sColumn):
 						'`'.$sColumn.'`' ;
 		}

@@ -104,10 +104,7 @@ class Model extends AbstractModel implements IModel, IBean
 	public function load($values=null,$keys=null)
 	{
 		return Selecter::singleton()->execute(
-						$this
-						, null
-						, parent::buildCriteria($this->prototype(),$values,$keys)
-						, true
+					$this , null , self::buildCriteria($this->prototype(),$values,$keys), false
 		) ;
 	}
 	
@@ -118,7 +115,7 @@ class Model extends AbstractModel implements IModel, IBean
 			return $aPrototype->criteria() ;
 		}
 		
-		$keys = !$keys? $this->prototype()->keys(): (array)$keys ;
+		$keys = $keys? $aPrototype->keys(): (array)$keys ;
 		
 		if($values instanceof Criteria)
 		{
