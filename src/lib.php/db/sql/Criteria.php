@@ -5,9 +5,9 @@ use jc\lang\Exception;
 
 class Criteria extends SubStatement
 {
-	public function __construct(Restriction $aRestriction = null){
-		if($aRestriction !== null){
-			$this->setRestriction($aRestriction);
+	public function __construct(Restriction $aWhere = null){
+		if($aWhere !== null){
+			$this->setRestriction($aWhere);
 		}
 	}
 	
@@ -21,9 +21,9 @@ class Criteria extends SubStatement
 		
 		$sStatement = '' ;
 		
-		if($this->aRestriction)
+		if($this->aWhere)
 		{
-			$sStatement = ' WHERE ' . $this->aRestriction->makeStatement($aState);
+			$sStatement = ' WHERE ' . $this->aWhere->makeStatement($aState);
 		}
 		if( $this->arrGroupByClms )
 		{
@@ -95,20 +95,20 @@ class Criteria extends SubStatement
 		return $this->nLimitLen;
 	}
 	
-	public function setRestriction(Restriction $aRestriction){
-		$this->aRestriction = $aRestriction;
+	public function setWhere(Restriction $aWhere){
+		$this->aWhere = $aWhere;
 		return $this ;
 	}
 	
 	/**
 	 * @return Restriction
 	 */
-	public function restriction($bAutoCreate=true){
-		if( !$this->aRestriction and $bAutoCreate )
+	public function where($bAutoCreate=true){
+		if( !$this->aWhere and $bAutoCreate )
 		{
-			$this->aRestriction = $this->statementFactory()->createRestriction();
+			$this->aWhere = $this->statementFactory()->createRestriction();
 		}
-		return $this->aRestriction ;
+		return $this->aWhere ;
 	}
 	
 	public function addOrderBy($sColumn,$bDesc=true)
@@ -138,7 +138,7 @@ class Criteria extends SubStatement
 	function __clone()
 	{
 	    if($this->aOrder !== null) $this->aOrder = clone $this->aOrder;
-	    if($this->aRestriction !== null) $this->aRestriction = clone $this->aRestriction;
+	    if($this->aWhere !== null) $this->aWhere = clone $this->aWhere;
 	}
 	
 	// -- group by --
@@ -169,7 +169,7 @@ class Criteria extends SubStatement
 	}
 
 	
-	private $aRestriction = null;
+	private $aWhere = null;
 	private $aOrder = null;
 	private $sLimitFrom = 0;
 	private $nLimitLen = 30;

@@ -114,10 +114,10 @@ class Inserter extends OperationStrategy
 	{
 		$aStatementFactory = $aAssociation->fromPrototype()->statementFactory() ;
 		$aSelect = $aStatementFactory->createSelect($aAssociation->bridgeTableName()) ;
-		$aSelect->criteria()->restriction()->add(
+		$aSelect->criteria()->where()->add(
 			$this->makeResrictionForAsscotion($aFromModel,$aAssociation->fromKeys(),null,$aAssociation->toBridgeKeys(),$aStatementFactory)
 		) ;
-		$aSelect->criteria()->restriction()->add(
+		$aSelect->criteria()->where()->add(
 			$this->makeResrictionForAsscotion($aToModel,$aAssociation->toKeys(),null,$aAssociation->fromBridgeKeys(),$aStatementFactory)
 		) ;
 		

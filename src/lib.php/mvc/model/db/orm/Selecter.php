@@ -18,7 +18,7 @@ class Selecter extends OperationStrategy
 	{
 		if( !$aPrototype = $aModel->prototype() )
 		{
-			throw new Exception("传入了无效的 IModel 对象，\$aModel的 prototype() 方法返回null") ;	
+			throw new ORMException("传入了无效的 IModel 对象，\$aModel的 prototype() 方法返回null") ;	
 		}
 		
 		if(!$aDB)
@@ -147,15 +147,15 @@ class Selecter extends OperationStrategy
 		}
 		else
 		{
-			throw new Exception("what's this?") ;
+			throw new ORMException("what's this?") ;
 		}
 	
 		if( !$aTablesJoin=$aMultitermAssoc->sqlTablesJoin() )
 		{
-			throw new Exception("关联对象没有TablesJoin对象") ;
+			throw new ORMException("关联对象没有TablesJoin对象") ;
 		}
 		
-		$aSelect->criteria()->restriction()->add($aRestraction) ;
+		$aSelect->criteria()->where()->add($aRestraction) ;
 			
 		// 
 		$aChildModel = $aToPrototype->createModel(true) ;
@@ -163,7 +163,7 @@ class Selecter extends OperationStrategy
 		$this->execute($aChildModel,$aSelect,null,true,$aDB) ;
 		
 		// 清理条件
-		$aSelect->criteria()->restriction()->remove($aRestraction) ;
+		$aSelect->criteria()->where()->remove($aRestraction) ;
 	}
 
 	private function setGroupBy(Select $aSelect,Prototype $aPrototype)
@@ -287,7 +287,7 @@ class Selecter extends OperationStrategy
 				// 在桥接表上加入自定义的 join on 条件
 				if( $aTablesJoinOn = $aAssoc->otherBridgeTableJoinOn(false) )
 				{
-					$aBridgeTablesJoin->restriction()->add($aTablesJoinOn) ;
+					$aBridgeTablesJoin->where()->add($aTablesJoinOn) ;
 				}
 			}
 			

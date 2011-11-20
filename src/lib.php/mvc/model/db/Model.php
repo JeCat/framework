@@ -128,7 +128,7 @@ class Model extends AbstractModel implements IModel, IBean
 		{
 			$aSelectCriteria = clone $aPrototype->criteria() ;
 			
-			$aSelectCriteria->restriction()->add($values) ;
+			$aSelectCriteria->where()->add($values) ;
 			return $aSelectCriteria ;
 		}
 		else
@@ -138,7 +138,7 @@ class Model extends AbstractModel implements IModel, IBean
 			$values = array_values((array) $values) ;
 			foreach($keys as $nIdx=>$sKey)
 			{
-				$aSelectCriteria->restriction()->eq( $sKey, $values[$nIdx] ) ;
+				$aSelectCriteria->where()->eq( $sKey, $values[$nIdx] ) ;
 			}
 			return $aSelectCriteria ;
 		}

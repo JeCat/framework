@@ -2,11 +2,12 @@
 
 namespace jc\mvc\model\db\orm;
 
+use jc\mvc\model\IModelList;
+
 use jc\lang\Object;
 use jc\db\DB;
 use jc\mvc\model\db\IModel ;
 use jc\db\sql\StatementFactory ;
-use jc\lang\Exception;
 
 class Deleter extends Object{
     public function execute(DB $aDB, IModel $aModel){
@@ -23,9 +24,9 @@ class Deleter extends Object{
         foreach($aModel->dataNameIterator() as $sClmName){
         	if(in_array($sClmName,$aPrototype->keys())){//是主键
 				if($aModel->changed($sClmName)){//主键发生修改
-					throw new Exception('jc\mvc\model\db\orm\Updater : Key 有修改，无法进行Delete操作');
+					throw new ORMException('jc\mvc\model\db\orm\Updater : Key 有修改，无法进行Delete操作');
 				}else{//用主键作为查询条件
-					$aDelete->criteria()->restriction()->eq($sClmName,$aModel->data($sClmName));
+					$aDelete->criteria()->where()->eq($sClmName,$aModel->data($sClmName));
 				}
 			}
         }
@@ -73,7 +74,7 @@ class Deleter extends Object{
     protected function deleteBridge(DB $aDB,Association $aAssociation,IModel $aFromModel,IModel $aToModel){
     	$aStatementFactory = $aAssociation->fromPrototype()->statementFactory() ;
     	$aDeleteForBridge = $aStatementFactory->createDelete($aAssociation->bridgeTableName());
-    	$aDeleteForBridge->criteria()->restriction()->add(
+    	$aDeleteForBridge->criteria()->where()->add(
     		$this->makeRestrictionForAssocotion($aFromModel,$aAssociation->fromKeys(),null,$aAssociation->toBridgeKeys(),$aStatementFactory)
     	);
     	$aDB->execute($aDeleteForBridge);

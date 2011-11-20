@@ -3,14 +3,11 @@
 namespace jc\mvc\model\db\orm;
 
 use jc\db\sql\Restriction;
-
 use jc\db\sql\name\NameTransferFactory;
-
 use jc\bean\IBean;
 use jc\bean\BeanFactory;
 use jc\db\sql\TablesJoin;
 use jc\db\DB;
-use jc\lang\Exception;
 use jc\mvc\model\db\orm\Prototype;
 
 class Association implements IBean
@@ -86,7 +83,7 @@ class Association implements IBean
 	{
 		if($this->nType != self::hasAndBelongsTo)
 		{
-			throw new Exception('函数 Association::setBridge() 只有在 nType 是 hasAndBelongsTo时才可以被调用');
+			throw new ORMException('函数 Association::setBridge() 只有在 nType 是 hasAndBelongsTo时才可以被调用');
 		}
 		
 		$this->sBridgeTable = $sBridgeTable ;
@@ -174,11 +171,11 @@ class Association implements IBean
 	{
 		if(!$this->nType)
 		{
-			throw new Exception('尚未指定 ORM 关联(%s)的类型',$this->path()) ;
+			throw new ORMException('尚未指定 ORM 关联(%s)的类型',$this->path()) ;
 		}
 		if(!$this->aFromPrototype)
 		{
-			throw new Exception('尚未指定 ORM 关联(%s)的 fromPrototype',$this->path()) ;
+			throw new ORMException('尚未指定 ORM 关联(%s)的 fromPrototype',$this->path()) ;
 		}
 		
 		// 
@@ -186,16 +183,16 @@ class Association implements IBean
 		{
 			if(!$this->toBridgeKeys())
 			{
-				throw new Exception('无法确定 ORM 关联(%s)的桥接表上的外键 toBridgeKeys ：没有指定作为外键的字段，桥接表上也没有和另一端外键相同的字段',$this->path()) ;
+				throw new ORMException('无法确定 ORM 关联(%s)的桥接表上的外键 toBridgeKeys ：没有指定作为外键的字段，桥接表上也没有和另一端外键相同的字段',$this->path()) ;
 			}
 			if(!$this->fromBridgeKeys())
 			{
-				throw new Exception('无法确定 ORM 关联(%s)的桥接表上的外键 fromBridgeKeys ：没有指定作为外键的字段，桥接表上也没有和另一端外键相同的字段',$this->path()) ;
+				throw new ORMException('无法确定 ORM 关联(%s)的桥接表上的外键 fromBridgeKeys ：没有指定作为外键的字段，桥接表上也没有和另一端外键相同的字段',$this->path()) ;
 			}
 		
 			if( count($this->fromKeys())!==count($this->toBridgeKeys()) )
 			{
-				throw new Exception( "ORM关联(%s)两端的外键无效，字段数量必须对等; fromKeys:%s <-> toBridgeKeys:%s", array(
+				throw new ORMException( "ORM关联(%s)两端的外键无效，字段数量必须对等; fromKeys:%s <-> toBridgeKeys:%s", array(
 							$this->path()
 							, implode(',',$this->fromKeys())
 							, implode(',',$this->toKeys())
@@ -204,7 +201,7 @@ class Association implements IBean
 		
 			if( count($this->fromBridgeKeys())!==count($this->toKeys()) )
 			{
-				throw new Exception( "ORM关联(%s)两端的外键无效，字段数量必须对等; fromBridgeKeys:%s <-> toKeys:%s", array(
+				throw new ORMException( "ORM关联(%s)两端的外键无效，字段数量必须对等; fromBridgeKeys:%s <-> toKeys:%s", array(
 							$this->path()
 							, implode(',',$this->fromKeys())
 							, implode(',',$this->toKeys())
@@ -218,7 +215,7 @@ class Association implements IBean
 		{
 			if( count($this->fromKeys())!==count($this->toKeys()) )
 			{
-				throw new Exception( "ORM关联(%s)两端的外键无效，字段数量必须对等; fromKeys:%s <-> toKeys:%s", array(
+				throw new ORMException( "ORM关联(%s)两端的外键无效，字段数量必须对等; fromKeys:%s <-> toKeys:%s", array(
 							$this->path()
 							, implode(',',$this->fromKeys())
 							, implode(',',$this->toKeys())
@@ -326,9 +323,9 @@ class Association implements IBean
 		$this->aDB = $aDB ;
 	}
 	
-	public function restriction()
+	public function on()
 	{
-		return $this->aTablesJoin? $this->aTablesJoin->restriction(): null ;
+		return $this->aTablesJoin? $this->aTablesJoin->on(): null ;
 	}
 	
 	
@@ -360,27 +357,34 @@ class Association implements IBean
 	}
 	public function statementColumnNameHandle($sName,Statement $aStatement,StatementState $sState)
 	{
-		// delete和Update不支持别名，不做表别名转换
-		if( !$sState->supportTableAlias() )
-		{
-			return array($this->getColumnByAlias($sName),$aStatement,$sState) ;
-		}
-		
 		// 切分 原型名称 和 字段名称
 		$nPos = strrpos($sName,'.') ;
-		if($nPos!==false)
+		if($nPos===false)
 		{
-			$sTableName = '.'.substr($sName,0,$nPos) ;
-			$sColumn = substr($sName,$nPos+1) ;
+			throw new ORMException("ORM 关联的Join On条件，必须指出字段所属的表(from,to,bridge)") ;	
 		}
-		else 
+		
+		$sTableName = '.'.substr($sName,0,$nPos) ;
+		$sColumnName = substr($sName,$nPos+1) ;
+		
+		switch($sTableName)
 		{
-			$sTableName = null ;
-			$sColumn = $sName ;
+			case 'from' :
+				$aPrototype = $this->fromPrototype() ;
+				break ;
+			case 'to' :
+				$aPrototype = $this->toPrototype() ;
+				break ;
+			case 'bridge' :
+				return '`'.$this->bridgeSqlTableAlias()."`.`{$sColumnName}`" ;
+			default :
+				throw new ORMException("ORM 关联的Join On条件，必须使用：from,to,bridge 表示对应的表名") ;	
 		}
-		$sColumn = $this->getColumnByAlias($sColumn)?: $sColumn ;
-
-		$sName = '`'.$this->path()."{$sTableName}`.`{$sColumn}`" ;
+		
+		return array(
+			'`'.$aPrototype->sqlTableAlias().'`.`'.($aPrototype->getColumnByAlias($sColumnName)?:$sColumnName).'`'
+			, $aStatement, $sState
+		) ;
 	}
 	
 	// private data

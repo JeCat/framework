@@ -271,10 +271,10 @@ class Category extends Model
 		$aCategoryList = new ModelList($aOrmPrototype) ;
 		
 		$aCriteria = clone $aOrmPrototype->criteria() ;
-		$aCriteria	->addOrderBy('lft',false)
-					->restriction()
-						->gt('lft',$aRootCategory->lft)
-						->lt('rgt',$aRootCategory->rgt) ;
+		$aCriteria->addOrderBy('lft',false)
+				->where()
+					->gt('lft',$aRootCategory->lft)
+					->lt('rgt',$aRootCategory->rgt) ;
 			
 		if( !$aCategoryList->load($aCriteria) )
 		{
@@ -327,14 +327,14 @@ class Category extends Model
 	private function moveFeet(Update $aUpdate,$sColumn,$nMove,$gtLft=null,$ltRgt=null)
 	{
 		$aCriateria = $aUpdate->criteria() ;
-		$aCriateria->restriction()->clear() ;
+		$aCriateria->where()->clear() ;
 		if($gtLft!==null)
 		{
-			$aCriateria->restriction()->gt($sColumn,$gtLft) ;
+			$aCriateria->where()->gt($sColumn,$gtLft) ;
 		}
 		if($ltRgt!==null)
 		{
-			$aCriateria->restriction()->lt($sColumn,$ltRgt) ;
+			$aCriateria->where()->lt($sColumn,$ltRgt) ;
 		}
 		
 		$aUpdate->clearData() ;
@@ -346,15 +346,15 @@ class Category extends Model
 	private function moveCategory(Update $aUpdate,$nMove,$gtLft,$ltRgt,$sLftClm,$sRgtClm)
 	{
 		$aCriateria = $aUpdate->criteria() ;
-		$aCriateria->restriction()->clear() ;
+		$aCriateria->where()->clear() ;
 		
 		if($gtLft!==null)
 		{
-			$aCriateria->restriction()->gt('lft',$gtLft) ;
+			$aCriateria->where()->gt('lft',$gtLft) ;
 		}
 		if($ltRgt!==null)
 		{
-			$aCriateria->restriction()->lt('rgt',$ltRgt) ;
+			$aCriateria->where()->lt('rgt',$ltRgt) ;
 		}
 		
 		$aUpdate->clearData() ;

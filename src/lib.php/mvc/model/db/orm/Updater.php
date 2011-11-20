@@ -7,7 +7,6 @@ use jc\db\DB;
 use jc\mvc\model\db\IModel ;
 use jc\mvc\model\IModelList;
 use jc\db\sql\StatementFactory ;
-use jc\lang\Exception;
 
 class Updater extends Object{
     public function execute(DB $aDB, IModel $aModel){
@@ -38,9 +37,9 @@ class Updater extends Object{
 		{
 			if(in_array($sClmName,$aPrototype->keys())){//是主键
 				if($aModel->changed($sClmName)){//主键发生修改
-					throw new Exception('jc\mvc\model\db\orm\Updater : Key 有修改，无法进行Update操作');
+					throw new ORMException('jc\mvc\model\db\orm\Updater : Key 有修改，无法进行Update操作');
 				}else{//用主键作为查询条件
-					$aCriteria->restriction()->eq($sClmName,$aModel->data($sClmName));
+					$aCriteria->where()->eq($sClmName,$aModel->data($sClmName));
 				}
 			}else{//主键以外的项
 				if($aModel->changed($sClmName)){//只update发生修改的项
