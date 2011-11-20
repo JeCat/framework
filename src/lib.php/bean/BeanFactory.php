@@ -74,9 +74,14 @@ class BeanFactory extends Object
 		
 		else if( !empty($arrConfig['conf']) or !empty($arrConfig['config']) )
 		{
-			$arrConfigFile = $this->findConfig(
-						isset($arrConfig['conf'])?$arrConfig['conf']:$arrConfig['config']
-						, $sNamespace
+			$sConfName = isset($arrConfig['conf'])?$arrConfig['conf']:$arrConfig['config'] ;
+			
+			// 设置 namespace 
+			if( strstr($sConfName,':')!==false )
+			{
+				list($sNamespace,) = explode(':', $sConfName, 2) ;
+			}
+			$arrConfigFile = $this->findConfig( $sConfName, $sNamespace 
 			) ;
 			// 合并数组
 			$arrConfig = array_merge($arrConfigFile,$arrConfig) ;
@@ -118,7 +123,7 @@ class BeanFactory extends Object
 		return $this->createBean($arrConfig,$sNamespace,$aAutoBuild) ;
 	}
 	
-	public function findConfig($sConfName,&$sNamespace='*') 
+	public function findConfig($sConfName,$sNamespace='*') 
 	{
 		if( !$aFile = $this->beanFolders()->find($sConfName.'.conf.php',$sNamespace) )
 		{
@@ -128,12 +133,6 @@ class BeanFactory extends Object
 		if( !is_array($arrConfigFile) )
 		{
 			throw new BeanConfException("Bean对象配置文件内容无效: %s，文件必须返回一个 bean 配置数组",$aFile->url()) ;
-		}
-	
-		// 设置 namespace 
-		if( strstr($sConfName,':')!==false )
-		{
-			list($sNamespace,) = explode(':', $sConfName, 2) ;
 		}
 			
 		return $arrConfigFile ;
