@@ -39,7 +39,7 @@ interface IModel extends \ArrayAccess, \Iterator
 	// for data ///////////////////////////////
 	public function data($sName) ;
 	
-	public function setData($sName,$sValue) ;
+	public function setData($sName,$sValue,$bChanged=true) ;
 	
 	public function hasData($sName) ;
 	

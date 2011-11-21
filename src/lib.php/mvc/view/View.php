@@ -1,6 +1,7 @@
 <?php
 namespace jc\mvc\view ;
 
+use jc\mvc\controller\IController;
 use jc\bean\BeanConfException;
 use jc\bean\BeanFactory;
 use jc\lang\Exception;
@@ -82,70 +83,45 @@ class View extends NamableComposite implements IView, IBean
     	
     	$aBeanFactory = BeanFactory::singleton() ;
     	
-    	foreach($arrConfig as $sPropertyName=>&$item)
-    	{    		
-    		// view:ooxxx
-    		if( strpos($sPropertyName,'view:')===0 )
-    		{
-    			$item['name'] = substr($sPropertyName,5) ;
-    			if(empty($item['class']) and empty($item['ins']) and empty($item['conf']))
-    			{
-    				$item['class'] = 'view' ;
-    			}
-    			$arrConfig['views'][$item['name']] = $item ;
-    		}
-    		
-    		// widget:ooxx
-    		else if( strpos($sPropertyName,'widget:')===0 )
-    		{
-    			$item['id'] = substr($sPropertyName,7) ;
-    			if(empty($item['class']) and empty($item['ins']) and empty($item['conf']))
-    			{
-    				$item['class'] = 'text' ;
-    			}
-    			$arrConfig['widgets'][$item['id']] = $item ;
-    			
-    		}
-    	}
+    	// 将 widget:xxxx 转换成 widgets[] 结构
+    	$aBeanFactory->_typeKeyStruct($arrConfig,array(
+    			'view:'=>'views' ,
+    			'widget:'=>'widgets' ,
+    	)) ;
     	
     	// views
     	if(!empty($arrConfig['views']))
     	{
-    		if( !is_array($arrConfig['views']) )
+    		foreach($arrConfig['views'] as $key=>&$arrBeanConf)
     		{
-    			throw new BeanConfException("视图Bean配置的 views 必须是一个数组") ;
+    			// 自动配置缺少的 class, name 属性
+    			$aBeanFactory->_typeProperties( $arrBeanConf, 'view', is_int($key)?null:$key, 'name' ) ;
+    		
+    			$this->addView( $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ) ;
     		}
-    		foreach($aBeanFactory->createBeanArray($arrConfig['views'],'view','name',$sNamespace) as $aBean)
-			{
-				$this->add( $aBean ) ;
-			}
     	}
     		
     	// widgets
     	if(!empty($arrConfig['widgets']))
     	{
-    		if( !is_array($arrConfig['widgets']) )
+    		foreach($arrConfig['widgets'] as $key=>&$arrBeanConf)
     		{
-    			throw new BeanConfException("视图Bean配置的 widgets 必须是一个数组") ;
+    			// 自动配置缺少的 class, name 属性
+    			$aBeanFactory->_typeProperties( $arrBeanConf, 'text', is_int($key)?null:$key, 'id' ) ;
+    			
+    			// 创建对象
+    			$aWidget = $aBeanFactory->createBean($arrBeanConf,$sNamespace,false) ;
+    			if(!empty($arrBeanConf['id']))
+    			{
+    				$aWidget->setId($arrBeanConf['id']) ;
+    			}
+    			
+    			// 添加到视图
+    			$this->addWidget( $aWidget, empty($arrConfig['widgets'][$key]['exchange'])?null:$arrConfig['widgets'][$key]['exchange'] ) ;
+    			
+    			// 完成初始化
+    			$aWidget->build($arrConfig['widgets'][$key],$sNamespace) ;
     		}
-    		foreach($arrConfig['widgets'] as $key=>&$arrWidgetConf)
-			{
-				if( !is_int($key) and !isset($arrWidgetConf['id']) )
-				{
-					$arrWidgetConf['id'] = strval($key) ;
-				}
-			
-				// 默认的 class
-				if( empty($arrWidgetConf['class']) and empty($arrWidgetConf['ins']) and empty($arrWidgetConf['conf']) )
-				{
-					$arrWidgetConf['class'] = 'text' ;
-				}
-				$aWidget = $aBeanFactory->createBean($arrWidgetConf,$sNamespace,false) ;
-				
-				$this->addWidget( $aWidget, empty($arrConfig['widgets'][$key]['exchange'])?null:$arrConfig['widgets'][$key]['exchange'] ) ;
-				
-				$aWidget->build($arrConfig['widgets'][$key],$sNamespace) ;				
-			}
     	}
     	
     	// vars
@@ -200,6 +176,19 @@ class View extends NamableComposite implements IView, IBean
 		    $aObserver->onModelChanging($this);
 		}
 		return $this ;
+	}
+	
+	/**
+	 * @return jc\mvc\controller\IContainer
+	 */
+	public function controller()
+	{
+		return $this->aController ;
+	}
+	
+	public function setController(IController $aController=null)
+	{
+		$this->aController = $aController ;
 	}
 	
 	/**
@@ -287,10 +276,10 @@ class View extends NamableComposite implements IView, IBean
 			$aVars = $this->variables() ;
 			$aVars->set('theView',$this) ;
 			$aVars->set('theModel',$this->model()) ;
-		
-			if( $aVars->has('theController') and $aParams=$aVars->get('theController')->params() )
+			$aVars->set('theController',$this->aController) ;
+			if( $this->aController )
 			{
-				$aVars->set('theParams',$aParams) ;
+				$aVars->set('theParams',$this->aController->params()) ;
 			}
 		
 			$this->ui()->display($sSourceFilename,$aVars,$this->OutputStream()) ;
@@ -468,12 +457,32 @@ class View extends NamableComposite implements IView, IBean
 
     public function __get($sName)
     {
+    	// widget
+    	if($aWidget=$this->widgits()->get($sName))
+    	{
+    		return $aWidget ;
+    	}
+    	
+    	// view
+    	if($aView=$this->getByName($sName))
+    	{
+    		return $aView ;
+    	}
+    	
     	$nNameLen = strlen($sName) ;
     	
-    	if( $nNameLen>4 and substr($sName,0,4)=='view' )
+    	// viewXXXX
+    	if( $nNameLen>4 and strpos($sName,'view')===0 )
     	{
     		$sViewName = substr($sName,4) ;
-    		return $this->getByName($sViewName) ;
+    		return $this->getByName($sViewName)?: $this->getByName(lcfirst($sViewName)) ;
+    	}
+    	
+    	// widgetXXXX
+    	else if( $nNameLen>6 and strpos($sName,'widget')===0 )
+    	{
+    		$sWidgetName = substr($sName,6) ;
+    		return $this->widgits()->get($sWidgetName)?: $this->widgits()->get(lcfirst($sWidgetName)) ;
     	}
     	
 		throw new Exception("正在访问视图 %s 中不存在的属性: %s",array($this->name(),$sName)) ;
@@ -503,6 +512,7 @@ class View extends NamableComposite implements IView, IBean
 	private $bEnable = true ;
 	private $arrObserver = array();
     private $arrBeanConfig ;
+    private $aController ;
 }
 
 ?>

@@ -2,6 +2,8 @@
 
 namespace jc\mvc\controller ;
 
+use jc\locale\Locale;
+
 use jc\bean\BeanConfException;
 
 use jc\bean\BeanFactory;
@@ -87,88 +89,62 @@ class Controller extends NamableComposite implements IController, IBean
     	}
     	
     	$aBeanFactory = BeanFactory::singleton() ;
-    	$aModelContainer = $this->modelContainer() ;
-    	$arrViewModels = array() ;
     	
-    	foreach($arrConfig as $sPropertyName=>&$item)
+    	// 将 model:xxxx 转换成 models[] 结构
+    	$aBeanFactory->_typeKeyStruct($arrConfig,array(
+    				'model:'=>'models' ,
+    				'view:'=>'views' ,
+    				'controller:'=>'controllers' ,
+    	)) ;
+    	
+    	// models --------------------
+    	$aModelContainer = $this->modelContainer() ;
+    	if( !empty($arrConfig['models']) )
     	{
-    		// models
-    		if($sPropertyName=='models')
+    		foreach($arrConfig['models'] as $key=>&$arrBeanConf)
     		{
-    			foreach($aBeanFactory->createBeanArray($item,'model','name',$sNamespace) as $aBean)
-				{
-					$aModelContainer->add( $aBean, isset($item['name'])?$item['name']:null ) ;
-				}
-    		}
-    		// model:ooxxx
-    		else if( strpos($sPropertyName,'model:')===0 )
-    		{
-    			$item['name'] = substr($sPropertyName,6) ;
-    			if(empty($item['class']) and empty($item['ins']) and empty($item['conf']))
-    			{
-    				$item['class'] = 'model' ;
-    			}
-				$aModelContainer->add( $aBeanFactory->createBean($item,$sNamespace), isset($item['name'])?$item['name']:null ) ;
-    		}
-    		
-    		// views
-    		else if($sPropertyName=='views')
-    		{
-    			foreach($aBeanFactory->createBeanArray($item,'name',$sNamespace) as $aBean)
-				{
-					$this->add( $aBean ) ;
-					if(!empty($item['model']))
-					{
-						$arrViewModels[] = array($aBean,$item['model']) ;
-					}
-				}
-    		}
-    		
-    		// view:ooxxx
-    		else if( strpos($sPropertyName,'view:')===0 )
-    		{
-    			$item['name'] = substr($sPropertyName,5) ;
-    			if(empty($item['class']) and empty($item['ins']) and empty($item['conf']))
-    			{
-    				$item['class'] = 'view' ;
-    			}
-    			$aBean = $aBeanFactory->createBean($item,$sNamespace) ;
-				$this->addView( $aBean ) ;
-				if(!empty($item['model']))
-				{
-					$arrViewModels[] = array($aBean,$item['model']) ;
-				}
-    		}
-    		
-    		// controllers
-    		else if($sPropertyName=='controllers')
-    		{
-    			foreach($aBeanFactory->createBeanArray($item,'controller','name',$sNamespace) as $aBean)
-				{				
-					$this->add( $aBean ) ;
-				}
-    		}
-    		// controller:ooxxx
-    		else if( strpos($sPropertyName,'controller:')===0 )
-    		{
-    			$item['name'] = substr($sPropertyName,11) ;
-    			if(empty($item['class']) and empty($item['ins']) and empty($item['conf']))
-    			{
-    				$item['class'] = 'controller' ;
-    			}
-				$this->add( $aBeanFactory->createBean($item,$sNamespace) ) ;
+    			// 自动配置缺少的 class, name 属性
+    			$aBeanFactory->_typeProperties( $arrBeanConf, 'model', is_int($key)?null:$key, 'name' ) ;
+    			
+    			$aBean = $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ;
+    			$aModelContainer->add( $aBean, $aBean->name() ) ;
     		}
     	}
     	
-    	// view's model
-    	foreach($arrViewModels as $viewModel)
+    	// views --------------------
+    	if( !empty($arrConfig['views']) )
     	{
-    		list($aView,$sModelName) = $viewModel ;
-    		if( !$aModel=$aModelContainer->getByName($sModelName) )
+    		foreach($arrConfig['views'] as $key=>&$arrBeanConf)
     		{
-    			throw new BeanConfException("视图(%s)的Bean配置属性 model 无效，没有指定的模型：%s",array($aView->name(),$sModelName)) ;
+    			// 自动配置缺少的 class, name 属性
+    			$aBeanFactory->_typeProperties( $arrBeanConf, 'view', is_int($key)?null:$key, 'name' ) ;
+    			
+    			// 创建对象
+				$aBean = $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ;
+				
+				$this->addView( $aBean ) ;
+				
+				if(!empty($arrBeanConf['model']))
+				{
+					if( !$aModel=$aModelContainer->getByName($arrBeanConf['model']) )
+		    		{
+		    			throw new BeanConfException("视图(%s)的Bean配置属性 model 无效，没有指定的模型：%s",array($aBean->name(),$arrBeanConf['model'])) ;
+		    		}
+		    		$aBean->setModel($aModel) ;
+				}
     		}
-    		$aView->setModel($aModel) ;
+    	}
+    	
+    	// controllers --------------------
+    	if( !empty($arrConfig['controllers']) )
+    	{
+    		foreach($arrConfig['controllers'] as $key=>&$arrBeanConf)
+    		{
+    			// 自动配置缺少的 class, name 属性
+    			$aBeanFactory->_typeProperties( $arrBeanConf, 'controller', is_int($key)?null:$key, 'name' ) ;
+    			
+    			$this->add( $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ) ;
+    		}
     	}
     	
     	$this->arrBeanConfig = $arrConfig ;
@@ -270,7 +246,7 @@ class Controller extends NamableComposite implements IController, IBean
      */
     public function mainRun ()
     {
-    	if( !$this->aParams->bool('noframe') )
+    	if( !$this->params->bool('noframe') )
     	{
     		$aFrame = $this->frame() ;
 			
@@ -283,28 +259,62 @@ class Controller extends NamableComposite implements IController, IBean
     	{
 			$this->processChildren() ;
 			
-			$this->process() ;
+			try{
+				$this->process() ;
+			}
+			catch(_ExceptionRelocation $e)
+			{}
 			
-			if( !$this->aParams->bool('noview') )
+			if( !$this->params->bool('noview') )
 			{
 				$this->mainView()->show() ;
 			}
     	}
     }
     
+    public function location($sUrl,$sMessage,$messageArgvs=null,$sLinkText=null,$linkArgvs=null,$nWaitingSec=3,Locale $aLocale=null)
+    {
+		// 禁用所有视图
+		foreach( $this->mainView()->iterator() as $aView )
+		{
+			$aView->disable() ;
+		}
+
+		if(!$aLocale)
+		{
+			$aLocale = $this->application()->localeManager()->locale() ;
+		}
+		
+		if($sLinkText===null)
+		{
+			$sLinkText = '正在重定向网页...' ;
+		}
+		
+		// 建立 relocation 视图
+		$aViewRelocater = new View("Relocater", "jc:Relocater.html") ;
+		$this->addView($aViewRelocater) ;
+		
+		$aViewRelocater->variables()->set('message' ,$aLocale->trans($sMessage,$messageArgvs) ) ;
+		$aViewRelocater->variables()->set('linkText',$aLocale->trans($sLinkText,$messageArgvs)) ;
+		$aViewRelocater->variables()->set('waitingSec',$nWaitingSec) ;
+		$aViewRelocater->variables()->set('url',$sUrl) ;
+		
+		throw new _ExceptionRelocation ;
+    }
+    
     public function buildParams($Params)
     {
     	if(empty($Params))
     	{
-    		$this->aParams = new DataSrc() ;
+    		$this->params = new DataSrc() ;
     	}
     	else if( $Params instanceof IDataSrc )
     	{
-    		$this->aParams = $Params ;
+    		$this->params = $Params ;
     	}
    		else if( is_array($Params) )
     	{
-    		$this->aParams = new DataSrc($Params) ;
+    		$this->params = new DataSrc($Params) ;
     	}
     	else
     	{
@@ -314,7 +324,7 @@ class Controller extends NamableComposite implements IController, IBean
     	// 为子控制器设置执行参数
 		foreach($this->iterator() as $aChild)
 		{
-			$aChild->buildParams($this->aParams) ;
+			$aChild->buildParams($this->params) ;
 		}
     }
     
@@ -327,7 +337,11 @@ class Controller extends NamableComposite implements IController, IBean
 		{
 			$aChild->processChildren() ;
 			
-			$aChild->process() ;
+			try{
+				$aChild->process() ;
+			}
+			catch(_ExceptionRelocation $e)
+			{}
 		}
     }
 
@@ -436,7 +450,7 @@ class Controller extends NamableComposite implements IController, IBean
      */
     public function params()
     {
-    	return $this->aParams ;
+    	return $this->params ;
     }
     
     /**
@@ -451,7 +465,7 @@ class Controller extends NamableComposite implements IController, IBean
     public function preprocessForm(IFormView $aView)
     {    	
     	// 加载视图控件数据
-    	$aView->loadWidgets($this->aParams) ;
+    	$aView->loadWidgets($this->params) ;
     	
     	// 校验数据
     	if( !$aView->verifyWidgets() )
@@ -471,12 +485,12 @@ class Controller extends NamableComposite implements IController, IBean
     		$sActParamName = 'act' ;
     	}
     	
-    	if( !$this->aParams->has($sActParamName) )
+    	if( !$this->params->has($sActParamName) )
     	{
     		return false ;
     	}
     	
-    	$sAct = $this->aParams[$sActParamName] ;
+    	$sAct = $this->params[$sActParamName] ;
     	$sMethod = 'action' . $sAct ;
     	
     	if( !method_exists($this,$sMethod) )
@@ -502,6 +516,25 @@ class Controller extends NamableComposite implements IController, IBean
     
     public function __get($sName)
     {
+    	// view
+    	if($child=$this->mainView()->getByName($sName))
+    	{
+    		return $child ;
+    	}
+    	
+    	// model
+    	else if($child=$this->modelContainer()->getByName($sName))
+    	{
+    		return $child ;
+    	}
+    	
+    	// controller
+    	else if($child=$this->getByName($sName))
+    	{
+    		return $child ;
+    	}
+    	
+    	// ----------------
     	$nNameLen = strlen($sName) ;
     	
     	if( $nNameLen>4 and substr($sName,0,4)=='view' )
@@ -567,12 +600,17 @@ class Controller extends NamableComposite implements IController, IBean
     
     public function addView(IView $aView,$sName=null)
     {
-    	$aView->variables()->set("theController", $this) ;
+    	if( $aOriController = $aView->controller() )
+    	{
+    		$aOriController->removeView($aView) ;
+    	}
+    	
+    	$aView->setController($this) ;
     	return $this->mainView()->add( $aView, $sName, true ) ;
     }
     public function removeView(IView $aView)
     {
-    	$aView->variables()->set("theController",null) ;
+    	$aView->setController(null) ;
     	$this->mainView()->remove($aView) ;
     }
     /**
@@ -622,7 +660,7 @@ class Controller extends NamableComposite implements IController, IBean
      * 
      * @var jc\util\IDataSrc
      */
-    protected $aParams = null ;
+    protected $params = null ;
     
     private $aMainView = null ;
     
@@ -636,4 +674,6 @@ class Controller extends NamableComposite implements IController, IBean
     
     private $arrBeanConfig ;
 }
-?>
+
+class _ExceptionRelocation extends \Exception
+{}

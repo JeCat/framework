@@ -107,7 +107,8 @@ class WidgetCompiler extends NodeCompiler
 		else
 		{
 			$aDev->write("	if(empty(\$__aVariablesForWidgets)){	// 创建一个被所有 widget 共享的 Variables 对象") ;
-			$aDev->write("		\$__aVariablesForWidgets = new \\jc\\util\\HashTable() ;") ;
+			$aDev->write("		\$__aVariablesForWidgets = new \\jc\\util\\DataSrc() ;") ;
+			$aDev->write("		\$__aVariablesForWidgets->addChild(\$aVariables) ;");
 			$aDev->write("	}") ;
 			$aDev->write("	{$sOldWidgetVarVarName} = \$__aVariablesForWidgets->get('theWidget') ;") ;
 			$aDev->write("	\$__aVariablesForWidgets->set('theWidget',{$sWidgetVarName}) ;") ;

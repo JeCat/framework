@@ -2,6 +2,12 @@
 namespace jc\mvc\model\db ;
 
 
+use jc\util\Stack;
+
+use jc\mvc\model\db\orm\Selecter;
+
+use jc\mvc\model\db\orm\Prototype;
+
 use jc\db\sql\StatementFactory;
 
 use jc\db\sql\Update;
@@ -12,8 +18,8 @@ use jc\lang\Exception;
 
 class Category extends Model 
 {	
-	const top = 0 ;
-	const end = -1 ;
+	const top = 1 ;
+	const end = null ;
 	
 	public function leftPoint()
 	{
@@ -41,14 +47,25 @@ class Category extends Model
 		return '`'.($aOrmPrototype->getColumnByAlias('rgt')?:'rgt').'`' ;
 	}
 	
-	public function insertCategory(Category $aRightOf=null)
+	/**
+	 * 将自己插入到 $aCategory 后面，与 $aCategory 同等层级
+	 */
+	public function insertBefore(Category $aCategory=null)
 	{
 		$this->insertCategoryToPoint(
-			$aRightOf? $aRightOf->rightPoint(): self::top
+			$aCategory===self::end?  self::end: $aCategory->rightPoint()+1
 		) ;
 	}
 	
-	public function insertCategoryToPoint($nRightOf=self::end)
+	/**
+	 * 将自己做为 $aCategory 的下级分类，插入到 $aCategory 的末尾
+	 */
+	public function insertEndOf(Category $aCategory)
+	{
+		$this->insertCategoryToPoint( $aCategory->rightPoint() ) ;
+	}
+	
+	public function insertCategoryToPoint($nTarget=self::end)
 	{
 		if( !$aOrmPrototype = $this->prototype() )
 		{
@@ -57,27 +74,32 @@ class Category extends Model
 		
 		$nOriLft = $this->leftPoint() ;
 		$nOriRgt = $this->rightPoint() ;
+				
+		$sLftClm = $this->leftColumn() ;
+		$sRgtClm = $this->rightColumn() ;
 		
-		$aSqlFactory = $aOrmPrototype->statementFactory() ;
+		$aSqlFactory = StatementFactory::singleton() ;
 		
-		if($nRightOf==self::end)
+		if($nTarget===self::end)
 		{
-			$nRightOf = $this->endRightFoot($aOrmPrototype) ;
+			$nTarget = $this->endRightFoot($aOrmPrototype,$sRgtClm) + 1 ;
+		}
+		if($nTarget<1)
+		{
+			throw new CategoryPointException("插入临接表时，目标位置不得小于1，传入的值为：%d",$nTarget) ;
 		}
 		
 		// 检查是否交叉
-		if( $nRightOf>=$nOriLft and $nRightOf<=$nOriRgt )
+		if( $nTarget!=0 and $nTarget>=$nOriLft and $nTarget<=$nOriRgt )
 		{
-			throw new CategoryPointException("无法将临接记录(%d-%d)移动到位置%d的右侧",array($nOriLft,$nOriRgt,$nRightOf)) ;
+			throw new CategoryPointException("无法将临接记录(%d-%d)移动到位置%d的右侧",array($nOriLft,$nOriRgt,$nTarget)) ;
 		}
 		
 		// 检查当前分类的左右点是否有效
 		$this->checkPoints($nOriLft,$nOriRgt) ;
 
-		$aUpdate = $aOrmPrototype->statementUpdate() ;
-		
-		$sLftClm = $this->leftColumn() ;
-		$sRgtClm = $this->rightColumn() ;'`'.$aOrmPrototype->getColumnByAlias('rgt').'`' ;
+		$aUpdate = $aSqlFactory->createUpdate($aOrmPrototype->tableName()) ;
+		$aUpdate->criteria()->setLimit(-1) ;
 			
 		// 移动已经存在的记录
 		if( $nOriRgt )
@@ -89,21 +111,24 @@ class Category extends Model
 			
 			// 移动 源位置 和 目标位置 之间的记录
 			// --------------------
-			$nMove = $nOriRgt<$nRightOf? ($nOriLft-$nOriRgt-1): ($nOriRgt+1-$nOriLft) ;
+			$nMove = $nOriRgt<$nTarget? ($nOriLft-$nOriRgt-1): ($nOriRgt+1-$nOriLft) ;
 			
-			// 移动 lft
-			$this->moveFeet($aUpdate,'lft',nMove,$nOriRgt,$nRightOf,$sLftClm) ;
-			
-			// 移动 rgt
-			$this->moveFeet( $aUpdate,'rgt',nMove,$nOriRgt
-						, $nRightOf + ( $nOriRgt<$nRightOf? 0: 1 )		// << 从右向左移动时，目标位置上的记录不变 
-																		// >> 当从左向右移动时，目标位置上的记录也需要左移 以便空出空间
-						, $sRgtClm ) ;
-			
+			// 从左向右移动
+			if($nOriRgt<$nTarget)
+			{
+				$this->moveFeet($aUpdate,$sLftClm,nMove,$nOriRgt,$nTarget) ;	// 移动 lft
+				$this->moveFeet($aUpdate,$sRgtClm,nMove,$nOriRgt,$nTarget) ;	// 移动 rgt
+			}
+			// 从右向左移动
+			else
+			{
+				$this->moveFeet($aUpdate,$sLftClm,nMove,$nTarget-1,$nOriLft) ;	// 移动 lft
+				$this->moveFeet($aUpdate,$sRgtClm,nMove,$nTarget-1,$nOriLft) ;	// 移动 rgt
+			}
+					
 			// 将 源记录 移动至 目标位置
 			// --------------------
-			$nMove = abs($nMove) + $nRightOf+1 ;
-			$this->moveCategory($aUpdate,$nMove,null,0,$sLftClm,$sRgtClm) ;
+			$this->moveCategory( $aUpdate, abs($nMove)+$nTarget, null, 0, $sLftClm, $sRgtClm ) ;
 		}
 		
 		// 插入新记录
@@ -112,19 +137,175 @@ class Category extends Model
 			// 腾出空间
 			// --------------------
 			// 移动 lft
-			$this->moveFeet($aUpdate,'lft',2,$nRightOf,null,$sLftClm) ;
+			$this->moveFeet($aUpdate,$sLftClm,2,$nTarget-1,null) ;	
 			// 移动 rgt
-			$this->moveFeet( $aUpdate,'rgt',2,null,$nRightOf,$sRgtClm ) ;
+			$this->moveFeet( $aUpdate,$sRgtClm,2,$nTarget-1,null) ;	
 			
-			$this->setData('lft', $nRightOf+1) ;
-			$this->setData('right', $nRightOf+2) ;
+			$this->setData('lft', $nTarget) ;
+			$this->setData('rgt', $nTarget+1) ;
 			$this->save() ;
 		}
 	}
 	
-	public function deleteCategory()
+	/**
+	 * 删除分类
+	 */
+	public function delete()
 	{
+		if( !$aOrmPrototype = $this->prototype() )
+		{
+			throw new CategoryPointException("尚未为临接表模型设置原型，无法完成操作") ;
+		}
 		
+		$nOriLft = $this->leftPoint() ;
+		$nOriRgt = $this->rightPoint() ;
+		$sLftClm = $this->leftColumn() ;
+		$sRgtClm = $this->rightColumn() ;
+		
+		DB::singleton()->execute("delete from ".$aOrmPrototype->tableName()." where {$sLftClm}>={$nOriLft} and {$sRgtClm}<={$nOriRgt}") ;
+		
+		$nMove = $nOriRgt-$nOriLft+1 ;
+		$aUpdate = StatementFactory::singleton()->createUpdate($aOrmPrototype->tableName()) ;
+		
+		$this->moveFeet($aUpdate,$sLftClm,-$nMove,$nOriLft) ;
+		$this->moveFeet($aUpdate,$sRgtClm,-$nMove,$nOriLft) ;
+		
+		
+		// Unserialize
+		$fnSetUnserialize = function(Category $aCategory,$fnSetUnserialize)
+		{
+			$aCategory->setSerialized(false) ;
+			foreach($aCategory->childCategoryIterator() as $aChildCategory)
+			{
+				$fnSetUnserialize($aChildCategory,$fnSetUnserialize) ;
+			}
+		} ;
+		
+		$fnSetUnserialize($this,$fnSetUnserialize) ;
+	}
+	
+	/**
+	 * 建立分类所属关系的树形结构
+	 * $aCategories 中的分类必须按照 lft 排序
+	 * 
+	 * 如果提供 $aRoot 参数，则返回将所有第一层分类add给 $aRoot分类，并返回 
+	 * 如果 $aRoot=null，则返回一个包含所有 第一层分类的数组
+	 */
+	static public function buildTree(\Iterator $aCategories,self $aRoot=null)
+	{
+		$aParentStack = new Stack() ;
+		
+		foreach($aCategories as $aCategory)
+		{
+			for(; $aParent=$aParentStack->get(); $aParentStack->out() )
+			{
+				if( $aParent->lft < $aCategory->lft and $aParent->rgt > $aCategory->rgt )
+				{
+					break ;
+				}
+			}
+			
+			if($aParent)
+			{
+				$aParent->addChildCategory($aCategory) ;
+			}
+			else
+			{
+				if($aRoot)
+				{
+					$aRoot->addChildCategory($aCategory) ;
+				}
+				else
+				{
+					$arrTopCategories[] = $aCategory ;
+				}
+			}
+			
+			$aParentStack->put($aCategory) ;
+		}
+		
+		return $aRoot?: (isset($arrTopCategories)?$arrTopCategories:array()) ;
+	}
+	
+	/**
+	 * 加载原型中的所有分类
+	 * @return \Iterator
+	 */
+	static public function loadTotalCategory(Prototype $aPrototype,$bBuildTree=true,$bReturnTop=false,self $aRoot=null)
+	{
+		$aCategoryList = new ModelList($aPrototype) ;
+		
+		$aCriteria = clone $aPrototype->criteria() ;
+		$aCriteria->addOrderBy('lft',false) ;
+		
+		if( !$aCategoryList->load($aCriteria) )
+		{
+			return new \EmptyIterator();
+		}
+		
+		if($bBuildTree)
+		{
+			if($bReturnTop)
+			{
+				return self::buildTree($aCategoryList->childIterator(),$aRoot) ;
+			}
+			else
+			{
+				self::buildTree($aCategoryList->childIterator(),$aRoot) ;
+			}
+		}
+		
+		return $aCategoryList->childIterator() ;
+	}
+	
+	/**
+	 * 加载所有属于自己的下级分类，并建立树形结构
+	 */
+	public function loadTree()
+	{
+		if( !$aOrmPrototype = $this->prototype() )
+		{
+			throw new CategoryPointException("尚未为临接表模型设置原型，无法完成操作") ;
+		}
+		
+		$aCategoryList = new ModelList($aOrmPrototype) ;
+		
+		$aCriteria = clone $aOrmPrototype->criteria() ;
+		$aCriteria	->addOrderBy('lft',false)
+					->restriction()
+						->gt('lft',$aRootCategory->lft)
+						->lt('rgt',$aRootCategory->rgt) ;
+			
+		if( !$aCategoryList->load($aCriteria) )
+		{
+			return ;
+		}
+		
+		self::buildTree($aCategoryList->childIterator(),$this) ;
+	}
+	
+	public function childCategoryIterator()
+	{
+		return new \ArrayIterator($this->arrChildCategories) ;
+	}
+	
+	public function depth()
+	{
+		return (int) $this->__category_depth ;
+	}
+	public function setDepth($nDepth)
+	{
+		return $this->__category_depth = $nDepth ;
+	}
+	
+	private function addChildCategory(Category $aCategory)
+	{
+		if( !in_array($aCategory,$this->arrChildCategories,true) )
+		{
+			$this->arrChildCategories[] = $aCategory ;
+		}
+		
+		$aCategory->setDepth($this->depth()+1) ;
 	}
 	
 	private function endRightFoot(Prototype $aPrototype,$sRightColumn=null)
@@ -143,21 +324,21 @@ class Category extends Model
 		return (int)$aRecords->field('rgt') ;
 	}
 	
-	private function moveFeet(Update $aUpdate,$foot,$nMove,$gtLft,$ltRgt,$sColumn)
+	private function moveFeet(Update $aUpdate,$sColumn,$nMove,$gtLft=null,$ltRgt=null)
 	{
 		$aCriateria = $aUpdate->criteria() ;
 		$aCriateria->restriction()->clear() ;
 		if($gtLft!==null)
 		{
-			$aCriateria->restriction()->gt($foot,$gtLft) ;
+			$aCriateria->restriction()->gt($sColumn,$gtLft) ;
 		}
 		if($ltRgt!==null)
 		{
-			$aCriateria->restriction()->lt($foot,$ltRgt) ;
+			$aCriateria->restriction()->lt($sColumn,$ltRgt) ;
 		}
 		
 		$aUpdate->clearData() ;
-		$aUpdate->set($foot,"{$sColumn}+${nMove}") ;
+		$aUpdate->set($sColumn,"{$sColumn}+${nMove}") ;
 		
 		DB::singleton()->execute($aUpdate) ;
 	}
@@ -214,6 +395,6 @@ class Category extends Model
 			}
 		}
 	}
+	
+	private $arrChildCategories = array() ;
 }
-
-?>

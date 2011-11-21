@@ -79,7 +79,7 @@ class ExpressionCompiler extends BaseCompiler
 		}
 		
 		// 
-		$sCompiled = implode(";\r\n", $arrLines) ;
+		$sCompiled = implode(";", $arrLines) ;
 		if( $bEval )
 		{
 			$sCompiled = addcslashes($sCompiled,'"\\') ;	

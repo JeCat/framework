@@ -18,8 +18,6 @@ class Update extends MultiTableStatement implements IDataSettableStatement
 	{
 		$this->checkValid(true) ;
 		
-		$aCriteria = $this->criteria() ;
-		
 		$sStatement = ($this->isReplace()? "REPLACE ": "UPDATE ")
 				. $this->makeStatementTableList($bFormat)
 				. " SET " ;

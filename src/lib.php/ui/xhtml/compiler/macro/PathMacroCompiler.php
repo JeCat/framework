@@ -14,33 +14,33 @@ class PathMacroCompiler extends MacroCompiler
 		
 		if( $sContents=='*.uri' )
 		{
-			$aDev->write( "echo \$aVariables->get('theRequest')->uri() ;" ) ;
+			$aDev->write( "\$aDevice->write(\$aVariables->get('theRequest')->uri()) ;" ) ;
 		}
 		else if( substr($sContents,0,5)=='*.url' )
 		{
-			$sPart = strlen($sContents)>6?
-				substr($sContents,6): '' ;
+			$sPart = strlen($sContents)>5?
+				substr($sContents,5): '' ;
 				
 			switch($sPart)
 			{
 			case '' :
-				$aDev->write( "echo \$aVariables->get('theRequest')->url() ;" ) ;
+				$aDev->write( "\$aDevice->write(\$aVariables->get('theRequest')->url()) ;" ) ;
 				break ;
 				
-			case 'scheme' :
-				$aDev->write( "echo \$aVariables->get('theRequest')->urlScheme() ;" ) ;
+			case '.scheme' :
+				$aDev->write( "\$aDevice->write(\$aVariables->get('theRequest')->urlScheme()) ;" ) ;
 				break ;
 				
-			case 'host' :
-				$aDev->write( "echo \$aVariables->get('theRequest')->urlHost() ;" ) ;
+			case '.host' :
+				$aDev->write( "\$aDevice->write(\$aVariables->get('theRequest')->urlHost()) ;" ) ;
 				break ;
 				
-			case 'path' :
-				$aDev->write( "echo \$aVariables->get('theRequest')->urlPath() ;" ) ;
+			case '.path' :
+				$aDev->write( "\$aDevice->write(\$aVariables->get('theRequest')->urlPath()) ;" ) ;
 				break ;
 				
-			case 'query' :
-				$aDev->write( "echo \$aVariables->get('theRequest')->urlQuery() ;" ) ;
+			case '.query' :
+				$aDev->write( "\$aDevice->write(\$aVariables->get('theRequest')->urlQuery()) ;" ) ;
 				break ;
 				
 			default :

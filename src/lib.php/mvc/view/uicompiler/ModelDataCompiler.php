@@ -33,7 +33,7 @@ class ModelDataCompiler extends NodeCompiler
 		}
 		
 		$aDev->write("if(\$theModel=\$aVariables->get('theModel')){\r\n") ;
-		$aDev->write("\techo \$theModel->data({$sName}) ;\r\n") ;
+		$aDev->write("\t\$aDevice->write(\$theModel->data({$sName})) ;\r\n") ;
 		$aDev->write("}\r\n") ;
 	}
 }

@@ -7,7 +7,7 @@ use jc\lang\Exception;
 use jc\mvc\view\IView;
 
 class Select extends FormWidget {
-	public function __construct($sId=null, $sTitle = null, IView $aView = null) {
+	public function __construct( $sId=null, $sTitle=null, IView $aView=null) {
 		parent::__construct ( $sId, 'jc:WidgetSelect.template.html', $sTitle, $aView );
 	}
 	
@@ -29,7 +29,8 @@ class Select extends FormWidget {
 	
 	//增加option条目 
 	//selected 该选项是否默认选中	
-	public function addOption($sText, $sValue, $bSelected = false) {
+	public function addOption($sText, $sValue=null, $bSelected=false )
+	{
 		$this->arrOptions [] = Array ($sValue, $sText, $bSelected );
 		return $this ;
 	}
@@ -112,21 +113,17 @@ class Select extends FormWidget {
 		return new \jc\pattern\iterate\ArrayIterator ( $this->arrOptions );
 	}
 	
-	public function value() {
-		$value = ''; // 数组中可能会有多个被选中的值(手误),依照html的解决方式,取最后一个选中作为值
-		foreach ( $this->arrOptions as $key => $option ) {
-			if ($option [2] == true) {
-				$value = $option [0]; //option[0]是option 的value
-			}
-		}
-		return $value;
-	}
-	
-	public function setValue($data = null) {
-		foreach($this->arrOptions as $key => $option){
+	public function setValue($data = null)
+	{		
+		parent::setValue($data) ;
+		
+		foreach($this->arrOptions as $key => $option)
+		{
 			$this->arrOptions[$key][2] = false;
-			if((string)$option[0] == $data){
+			if((string)$option[0] == $data)
+			{
 				$this->arrOptions[$key][2] = true;
+				return ;
 			}
 		}
 	}

@@ -67,9 +67,16 @@ class HttpRequest extends Request
 		}
 	}
 	
-	public function url()
+	public function url($excludeQueryArgvs=null)
 	{
-		return $this->get('REQUEST_URL') ;
+		if(!$excludeQueryArgvs)
+		{
+			return $this->get('REQUEST_URL') ;
+		}
+		else
+		{
+			return $this->urlInfo('scheme') . '://' . $this->urlInfo('host') . $this->urlInfo('path') . $this->urlQuery(true,$excludeQueryArgvs) ;
+		}
 	}
 
 	public function urlScheme()
@@ -84,9 +91,23 @@ class HttpRequest extends Request
 	{
 		return $this->urlInfo('path') ;
 	}
-	public function urlQuery()
+	public function urlQuery($bQuestionMark=false,$excludes=null)
 	{
-		return $this->urlInfo('query') ;
+		if(!$excludes)
+		{
+			return ($bQuestionMark?'?':'').$this->urlInfo('query') ;
+		}
+		else
+		{
+			parse_str($this->urlInfo('query'),$arrQuerys) ;
+	
+			foreach((array) $excludes as $sKey)
+			{
+				unset($arrQuerys[$sKey]) ;
+			}
+			
+			return ($bQuestionMark?'?':'').http_build_query($arrQuerys) ;
+		}
 	}
 	public function urlAnchor()
 	{
@@ -101,15 +122,21 @@ class HttpRequest extends Request
 		return $this->urlInfo('pass') ;
 	}
 	
-	public function uri()
+	public function uri($excludeQueryArgvs=null)
 	{
-		if(!$this->sUri)
+		if(!$excludeQueryArgvs)
 		{
-			$sQuery = $this->urlQuery() ;
-			$this->sUri = $this->urlPath() . ($sQuery?('?'.$sQuery):"") ;
+			if(!$this->sUri)
+			{
+				$this->sUri = $this->urlPath() . $this->urlQuery(true) ;
+			}
+			
+			return $this->sUri ;
 		}
-		
-		return $this->sUri ;
+		else
+		{
+			return $this->urlPath() . $this->urlQuery(true,$excludeQueryArgvs) ;
+		}
 	}
 
 	public function quoteString($sName)

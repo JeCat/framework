@@ -61,7 +61,20 @@ class TargetCodeOutputStream implements IOutputStream
 		$this->sOutputContents = addcslashes($this->sOutputContents, '\\') ;
 		$this->sOutputContents = str_replace('$','\\$',$this->sOutputContents) ;
 		
-		$this->aCompiledWriter->write("\$aDevice->write(<<<OUTPUT\r\n{$this->sOutputContents}\r\nOUTPUT\r\n) ;\r\n") ;
+		// 收拢纯空白字符串
+		if( !trim($this->sOutputContents) )
+		{
+			$this->sOutputContents = str_replace("\n","\\n",$this->sOutputContents) ;
+			$this->sOutputContents = str_replace("\r","\\r",$this->sOutputContents) ;
+			$this->sOutputContents = str_replace("\t","\\t",$this->sOutputContents) ;
+			
+			$this->aCompiledWriter->write("\$aDevice->write(\"{$this->sOutputContents}\") ;\r\n") ;
+		}
+		
+		else
+		{
+			$this->aCompiledWriter->write("\$aDevice->write(<<<OUTPUT\r\n{$this->sOutputContents}\r\nOUTPUT\r\n) ;\r\n") ;
+		}
 		$this->sOutputContents = '' ;
 	}
 	

@@ -1,10 +1,11 @@
 <?php
 namespace jc\mvc\model\db ;
 
+use jc\mvc\model\IPaginal;
 use jc\db\recordset\IRecordSet;
 use jc\mvc\model\IModelList ;
 
-class ModelList extends Model implements IModelList
+class ModelList extends Model implements IModelList, IPaginal
 {
 	public function loadData( IRecordSet $aRecordSet, $bSetSerialized=false )
 	{

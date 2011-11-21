@@ -8,7 +8,6 @@ use jc\fs\IFile;
 use jc\pattern\composite\Container;
 use jc\util\String;
 use jc\ui\Object as UIObject;
-use jc\util\HashTable;
 
 class InterpreterManager extends Container
 {

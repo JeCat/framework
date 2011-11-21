@@ -1,6 +1,7 @@
 <?php
 namespace jc\mvc\view ;
 
+use jc\mvc\controller\IController;
 use jc\resrc\HtmlResourcePool;
 use jc\message\IMessageQueueHolder;
 use jc\io\IOutputStream;
@@ -13,12 +14,6 @@ use jc\pattern\composite\Container;
 
 interface IView extends IContainer, IMessageQueueHolder, IWidgetContainer
 {
-	/**
-	 * @return IModel
-	 */
-	public function model() ;
-	
-	public function setModel(IModel $aModel) ;
 	
 	/**
 	 * @return jc\util\IHashTable
@@ -45,6 +40,20 @@ interface IView extends IContainer, IMessageQueueHolder, IWidgetContainer
 	public function isEnable() ;
 	
 	public function exchangeData($nWay=DataExchanger::MODEL_TO_WIDGET) ;
+	
+	/**
+	 * @return jc\mvc\model\IModel
+	 */
+	public function model() ;
+	
+	public function setModel(IModel $aModel) ;
+	
+	/**
+	 * @return jc\mvc\controller\IContainer
+	 */
+	public function controller() ;
+	
+	public function setController(IController $aController=null) ;
 }
 
 ?>

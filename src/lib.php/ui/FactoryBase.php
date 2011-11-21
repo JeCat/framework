@@ -1,7 +1,6 @@
 <?php
 namespace jc\ui ;
 
-use jc\util\HashTable;
 use jc\util\DataSrc;
 use jc\lang\Object as JcObject;
 

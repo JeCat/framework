@@ -21,7 +21,7 @@ class SubTemplateCallCompiler extends NodeCompiler
 	
 		if( $aAttributes->has("name") )
 		{
-			$sSubTemplateName = $aAttributes->get("name") ;		
+			$sSubTemplateName = $aAttributes->string("name") ;		
 		}
 		else 
 		{
@@ -29,10 +29,17 @@ class SubTemplateCallCompiler extends NodeCompiler
 			{
 				throw new Exception("subtemplate:define 节点缺少name属性(line:%d)",$aObject->line()) ;
 			}
-			$sSubTemplateName = '"' . addslashes($aSubTemplateNameVal->source()) . '"' ;
+			$sSubTemplateName = $aSubTemplateNameVal->source() ;
 		}
 		
-		$aDev->write(" \r\n") ;
+		if( !is_callable($sSubTemplateName,true) )
+		{
+			throw new Exception("subtemplate:define 节点的name属性使用了无效的字符：%d",$sSubTemplateName) ;
+		}
+		
+		$sSubTemplateFuncName = '__subtemplate_' . $sSubTemplateName ;
+		
+		$aDev->write("\r\n// -- call subtemplate:{$sSubTemplateName} start---------------------") ;
 		
 		// 是否继承父模板中的变量
 		$bExtendParentVars = $aAttributes->has("vars")? $aAttributes->bool('vars'): false ;
@@ -40,15 +47,12 @@ class SubTemplateCallCompiler extends NodeCompiler
 		// variables
 		if(!$bExtendParentVars)
 		{
-			$aDev->write("\$__subtemplate_aVariables = new \\jc\\util\\HashTable() ; \r\n");
-			
-			// 设置子模版用于递归
-			$aDev->write("\$__subtemplate_aVariables->set('__subtemplate_'.{$sSubTemplateName},\$aVariables->get('__subtemplate_'.{$sSubTemplateName})) ; \r\n");
-			
+			$aDev->write("\$__subtemplate_aVariables = new \\jc\\util\\DataSrc() ;");
+			$aDev->write("\$__subtemplate_aVariables->addChild(\$aVariables) ;");
 		}
 		else
 		{
-			$aDev->write("\$__subtemplate_aVariables = \$aVariables ; \r\n");
+			$aDev->write("\$__subtemplate_aVariables = \$aVariables ;");
 		}
 		
 		// other variables
@@ -58,11 +62,19 @@ class SubTemplateCallCompiler extends NodeCompiler
 			{
 				$sVarName = '"'. addslashes($sVarName) . '"' ;
 				$sValue = ExpressionCompiler::compileExpression($aValue->source()) ;
-				$aDev->write("\$__subtemplate_aVariables->set({$sVarName},{$sValue}) ; \r\n");
+				$aDev->write("\$__subtemplate_aVariables->set({$sVarName},{$sValue}) ;");
 			}
 		}
 		
-		$aDev->write("call_user_func_array(\$aVariables->get('__subtemplate_'.{$sSubTemplateName}),array(\$__subtemplate_aVariables,\$aDevice)) ;\r\n") ;
+		
+		
+		$aDev->write("if( !function_exists('{$sSubTemplateFuncName}') ){") ;
+		$aDev->write("\t\$aDevice->write(\"正在调用无效的子模板：{$sSubTemplateName}\") ;") ;
+		$aDev->write("} else {") ;
+		$aDev->write("\tcall_user_func_array('{$sSubTemplateFuncName}',array(\$__subtemplate_aVariables,\$aDevice)) ;") ;
+		$aDev->write("}") ;
+		
+		$aDev->write("// -- call subtemplate:{$sSubTemplateName} end ---------------------\r\n\r\n") ;
 	}
 
 }
