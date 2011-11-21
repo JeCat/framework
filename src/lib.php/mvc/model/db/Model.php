@@ -266,6 +266,14 @@ class Model extends AbstractModel implements IModel, IBean
 		return $aChildModel ;
 	}
 	
+<<<<<<< HEAD
+	public function totalCount()
+	{
+		return 1;
+	}
+	
+=======
+>>>>>>> 263711aa2566c2c96c443471d70ebd49f7121463
 	public function setPagination($iPerPage,$iPageNum){
 	    $this->criteria()->setLimit( $iPerPage, $iPerPage*($iPageNum-1) ) ;
 	}

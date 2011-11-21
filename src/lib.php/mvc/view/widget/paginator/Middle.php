@@ -1,5 +1,5 @@
 <?php
-namespace jc\mvc\view\widget\paginatorstrategy;
+namespace jc\mvc\view\widget\paginator;
 
 class Middle extends AbstractStrategy{
     public function pageNumList($iWidth,$iCurrent,$iTotal){

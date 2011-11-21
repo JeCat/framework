@@ -71,16 +71,17 @@ class ModelList extends Model implements IModelList, IPaginal
 	
 	public function totalCount()
 	{
-		/*$aSelect = new SelectForAssocQuery($this->prototype()) ;
-	
+		return $this->childrenCount();
+		$aSelect = new SelectForAssocQuery($this->prototype()) ;
+
 		if( $this->aCriteria )
 		{
-			$ilimitLen = $this->aCriteria->limitLen();
-			$ilimitFrom = $this->aCriteria->limitFrom();
-			$this->aCriteria->setLimit(1000);
+		    $ilimitLen = $this->aCriteria->limitLen();
+		    $ilimitFrom = $this->aCriteria->limitFrom();
+		    $this->aCriteria->setLimit(1000);
 			$aSelect->setCriteria($this->aCriteria) ;
 		}
-	
+		
 		$aSelect->setOnlyCount('_cnt',true) ;
 	
 		$aRecordSet = $this->db()->query($aSelect) ;
@@ -88,11 +89,11 @@ class ModelList extends Model implements IModelList, IPaginal
 		{
 			return 0 ;
 		}
-	
+		
 		if( $this->aCriteria ){
-			$this->aCriteria->setLimit($ilimitLen,$ilimitFrom);
+		    $this->aCriteria->setLimit($ilimitLen,$ilimitFrom);
 		}
-		return intval($aRecordSet->field('_cnt')) ;*/
+		return intval($aRecordSet->field('_cnt')) ;		
 	}
 }
 

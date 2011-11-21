@@ -1,12 +1,12 @@
 <?php
-namespace jc\mvc\view\widget;
+namespace jc\mvc\view\widget\paginator;
 
 use jc\mvc\view\widget\FormWidget;
 use jc\mvc\view\IModelChangeObserver;
 use jc\mvc\model\db\Model;
 use jc\mvc\view\View;
 use jc\mvc\view\IView;
-use jc\mvc\view\widget\paginatorstrategy\AbstractStrategy;
+use jc\mvc\view\widget\paginator\AbstractStrategy;
 use jc\mvc\model\IPaginal;
 use jc\util\IDataSrc;
 use jc\system\Application;
@@ -84,8 +84,8 @@ class Paginator extends FormWidget implements IModelChangeObserver{
     
     public function currentPageNum(){
         $iNum=(int)$this->value();
-        if( $iNum < 1) $iNum =1 ;
         if( $iNum > $this->totalPageCount() ) $iNum = $this->totalPageCount();
+        if( $iNum < 1) $iNum =1 ;
         return $iNum;
     }
     
