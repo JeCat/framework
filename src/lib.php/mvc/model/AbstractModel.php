@@ -113,6 +113,8 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 				}
 			}
 		}
+		
+		return $this ;
 	}
 	
 	public function hasData($sName)
@@ -347,6 +349,7 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 		{
 			$aChild->setData ( $sName, $aChild );
 		}
+		return $this ;
 	}
 	
 	/**
@@ -389,6 +392,7 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	public function setSerialized($bSerialized=true)
 	{
 		$this->bSerialized = $bSerialized? true: false ;
+		return $this ;
 	}
 
 	public function serialize ()
