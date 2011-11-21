@@ -30,7 +30,7 @@ class Deleter extends Object{
 				}
 			}
         }
-        $aDB->execute($aDelete->makeStatement());
+        $aDB->execute($aDelete);
         
         $aModel->setSerialized(true);
         

@@ -42,7 +42,7 @@ class Inserter extends OperationStrategy
 			$aInsert->setData('`'.$sClmName.'`',$aModel->data($sClmName)) ;
 		}
 		
-		$aDB->execute( $aInsert->makeStatement() ) ;
+		$aDB->execute( $aInsert ) ;
 		
 		// 自增形主键
 		if( $sDevicePrimaryKey=$aPrototype->devicePrimaryKey() and $aModel->data($sDevicePrimaryKey)===null )
