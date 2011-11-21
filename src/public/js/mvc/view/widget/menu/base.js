@@ -123,13 +123,13 @@ jc.mvc.view.widget.menu.base.jsobject=function(id){
 	this.parentId=-1;
 	this.setParentId=function(id){
 		this.parentId = id;
-		var p = this.__proto__.constructor.getObjectById(id);
+		var p = this.constructor.getObjectById(id);
 		if(typeof(p)!='undefined'){
 			p.addChild(this.id);
 		}
 	};
 	this.registerObject=function(){
-		this.__proto__.constructor.objectlist[this.id]=this;
+		this.constructor.objectlist[this.id]=this;
 	};
 	this.registerObject();
 }

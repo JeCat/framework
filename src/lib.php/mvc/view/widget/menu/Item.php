@@ -56,6 +56,10 @@ class Item extends AbstractBase
 		}
     }
     
+    public function isActive(){
+    	return $this->attribute('active',false);
+    }
+    
     protected function showdepth(){
     	$maxdepth_attr = $this->attribute('depth',-1);
     	if($maxdepth_attr >=0 ){
@@ -71,6 +75,9 @@ class Item extends AbstractBase
 		parent::build($arrConfig,$sNamespace);
 		if( !empty($arrConfig['menu'])){
 			$this->buildSubMenu($arrConfig['menu']);
+		}
+		if( !empty( $arrConfig['active'])){
+			$this->setAttribute('active',$arrConfig);
 		}
 	}
 	
