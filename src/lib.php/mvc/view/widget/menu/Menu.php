@@ -112,6 +112,9 @@ class Menu extends AbstractBase
 				$this->buildItems($item,$key);
 			}
 		}
+		if(!empty($arrConfig['direction'])){
+			$this->setDirection($arrConfig['direction']);
+		}
 		if(!empty($arrConfig['top'])){
 			$this->setPosTop($arrConfig['top']);
 		}

@@ -35,7 +35,9 @@ class BeanFactory extends Object
 			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\File",'file') ;
 			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\Group",'group') ;
 			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\RadioGroup",'radios') ;
-			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\Paginator",'paginator') ;
+			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\paginator\\Paginator",'paginator') ;
+			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\menu\\Menu",'menu') ;
+			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\menu\\Item",'menuItem') ;
 			
 			// verifyers
 			$aSingleton->registerBeanClass("jc\\verifier\\Email",'email') ;
