@@ -1,7 +1,7 @@
 <?php
-namespace jc\mvc\view\widget\paginatorstrategy;
+namespace jc\mvc\view\widget\paginator;
 
-use jc\mvc\view\widget\paginatorstrategy\Middle;
+use jc\mvc\view\widget\paginator\Middle;
 use jc\lang\Exception;
 
 abstract class AbstractStrategy{
