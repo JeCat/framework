@@ -1,7 +1,8 @@
 <?php
-
 namespace jc\mvc\model\db\orm;
 
+use jc\db\sql\StatementState;
+use jc\db\sql\Statement;
 use jc\db\sql\Restriction;
 use jc\db\sql\name\NameTransferFactory;
 use jc\bean\IBean;
@@ -17,7 +18,7 @@ class Association implements IBean
 	const hasOne = 1;
 	const belongsTo = 2;
 	const hasMany = 4;
-	const hasAndBelongsTo = 8;
+	const hasAndBelongsToMany = 8;
 	
 	const oneToOne = 3 ;		// 一对一关联
 
@@ -37,7 +38,7 @@ class Association implements IBean
 		$this->setFromKeys($fromKeys);
 		$this->setToKeys($toKeys);
 		
-		if( $nType===self::hasAndBelongsTo )
+		if( $nType===self::hasAndBelongsToMany )
 		{
 			$this->setBridge($sBridgeTable,$toBridgeKeys,$fromBridgeKeys);
 		}
@@ -81,9 +82,9 @@ class Association implements IBean
 	 */
 	public function setBridge($sBridgeTable,$toBridgeKeys,$fromBridgeKeys)
 	{
-		if($this->nType != self::hasAndBelongsTo)
+		if($this->nType != self::hasAndBelongsToMany)
 		{
-			throw new ORMException('函数 Association::setBridge() 只有在 nType 是 hasAndBelongsTo时才可以被调用');
+			throw new ORMException('函数 Association::setBridge() 只有在 nType 是 hasAndBelongsToMany时才可以被调用');
 		}
 		
 		$this->sBridgeTable = $sBridgeTable ;
@@ -179,7 +180,7 @@ class Association implements IBean
 		}
 		
 		// 
-		if( $this->nType==self::hasAndBelongsTo )
+		if( $this->nType==self::hasAndBelongsToMany )
 		{
 			if(!$this->toBridgeKeys())
 			{
@@ -295,7 +296,7 @@ class Association implements IBean
 			foreach($arrConfig['on'] as &$items)
 			{
 				// 桥接表区分是否 Bridge 上的条件
-				if( $this->isType(self::hasAndBelongsTo) and strpos($items[1],'to.')===0 )
+				if( $this->isType(self::hasAndBelongsToMany) and strpos($items[1],'to.')===0 )
 				{
 					$aRestriction = $this->otherBridgeTableJoinOn() ;
 				}
@@ -354,6 +355,8 @@ class Association implements IBean
 		$aStatementNameTransfer->addColumnNameHandle(array($this,'statementColumnNameHandle')) ;
 		
 		$aTableJoinOn->setNameTransfer($aStatementNameTransfer) ;
+		
+		return $aTableJoinOn ;
 	}
 	public function statementColumnNameHandle($sName,Statement $aStatement,StatementState $sState)
 	{
@@ -364,10 +367,9 @@ class Association implements IBean
 			throw new ORMException("ORM 关联的Join On条件，必须指出字段所属的表(from,to,bridge)") ;	
 		}
 		
-		$sTableName = '.'.substr($sName,0,$nPos) ;
 		$sColumnName = substr($sName,$nPos+1) ;
 		
-		switch($sTableName)
+		switch(substr($sName,0,$nPos))
 		{
 			case 'from' :
 				$aPrototype = $this->fromPrototype() ;
@@ -378,7 +380,7 @@ class Association implements IBean
 			case 'bridge' :
 				return '`'.$this->bridgeSqlTableAlias()."`.`{$sColumnName}`" ;
 			default :
-				throw new ORMException("ORM 关联的Join On条件，必须使用：from,to,bridge 表示对应的表名") ;	
+				throw new ORMException("ORM 关联的Join On条件，必须使用：from,to,bridge 表示对应的表名; 传入的字段名为：%s",$sName) ;	
 		}
 		
 		return array(

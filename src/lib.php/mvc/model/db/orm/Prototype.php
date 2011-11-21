@@ -247,7 +247,7 @@ class Prototype extends StatementFactory implements IBean
 	 * @return Association
 	 */
 	public function hasAndBelongsToMany($toTable,$sBridgeTableName,$fromKeys=self::youKnow,$toBridgeKeys=self::youKnow,$fromBridgeKeys=self::youKnow,$toKeys=self::youKnow){
-		return $this->createAssociation(Association::hasAndBelongsTo,$toTable,$fromKeys,$toKeys,$sBridgeTableName,$toBridgeKeys,$fromBridgeKeys);
+		return $this->createAssociation(Association::hasAndBelongsToMany,$toTable,$fromKeys,$toKeys,$sBridgeTableName,$toBridgeKeys,$fromBridgeKeys);
 	}
 	
 	/**
@@ -361,7 +361,7 @@ class Prototype extends StatementFactory implements IBean
 		// 检查主键
 		if(!$this->keys())
 		{
-			throw new Exception('ORM原型(%s)的主键不能为空',$this->path());
+			throw new Exception('ORM原型 %s (db table:%s)的主键不能为空; ORM原型既没有设置主键，也无法通过数据表反射到主键。',array($this->path(),$this->tableName()));
 		}
 		
 		// 检查同名的关联原型
@@ -579,10 +579,10 @@ class Prototype extends StatementFactory implements IBean
 				$item['type'] = Association::hasMany ;
 				$item['name'] = substr($sConfigKey,8) ;
 			}
-			else if( strpos($sConfigKey,'hasAndBelongsTo:')===0 )
+			else if( strpos($sConfigKey,'hasAndBelongsToMany:')===0 )
 			{
-				$item['type'] = Association::hasAndBelongsTo ;
-				$item['name'] = substr($sConfigKey,16) ;
+				$item['type'] = Association::hasAndBelongsToMany ;
+				$item['name'] = substr($sConfigKey,20) ;
 			}
 			else
 			{
@@ -674,9 +674,9 @@ class Prototype extends StatementFactory implements IBean
 	/**
 	 * @return jc\db\sql\Table ;
 	 */
-	public function createTable()
+	public function createSqlTable()
 	{
-		return parent::createTable($this->tableName(),$this->sqlTableAlias()) ;
+		return $this->createTable($this->tableName(),$this->sqlTableAlias()) ;
 	}
 	public function statementColumnNameHandle($sName,Statement $aStatement,StatementState $sState)
 	{
@@ -700,7 +700,7 @@ class Prototype extends StatementFactory implements IBean
 		}
 		$sColumn = $this->getColumnByAlias($sColumn)?: $sColumn ;
 
-		$sName = '`'.$this->path()."{$sTableName}`.`{$sColumn}`" ;
+		return '`'.$this->path()."{$sTableName}`.`{$sColumn}`" ;
 	}
 	
 	// constructor

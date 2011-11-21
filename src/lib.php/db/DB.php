@@ -1,6 +1,8 @@
 <?php 
 namespace jc\db ;
 
+use jc\system\Application;
+
 use jc\db\driver\IDriver;
 use jc\db\sql\Select;
 use jc\lang\Object;
@@ -53,9 +55,18 @@ class DB extends Object
 		}
 	}
 	
-	public function executeLog()
+	public function executeLog($bPrint=true)
 	{
-		return $this->driver()->executeLog() ;
+		if($bPrint)
+		{
+			Application::singleton()->response()->printer()->write(
+				"<pre>\r\n".print_r($this->driver()->executeLog(),true)."\r\n</pre>"
+			) ;
+		}
+		else
+		{
+			return $this->driver()->executeLog() ;
+		}
 	}
 	
 	public function lastInsertId()

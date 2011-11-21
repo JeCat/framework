@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\model\db\orm;
 
+use jc\db\sql\Restriction;
+
 use jc\mvc\model\db\Model;
 use jc\mvc\model\IModelList;
 use jc\db\sql\Table;
@@ -135,7 +137,7 @@ class Selecter extends OperationStrategy
 					, $aFromPrototype->statementFactory()
 			) ;
 		}
-		else if( $aMultitermAssoc->isType(Association::hasAndBelongsTo) )	// hasAndBelongsTo
+		else if( $aMultitermAssoc->isType(Association::hasAndBelongsToMany) )	// hasAndBelongsTo
 		{
 			$aRestraction = $this->makeResrictionForAsscotion(
 					$aFromModel
@@ -218,7 +220,7 @@ class Selecter extends OperationStrategy
 		$aSelect = $aPrototype->statementFactory()->createSelect() ;
 		
 		// 主表的名称
-		$aTable = $aPrototype->createTable() ;
+		$aTable = $aPrototype->createSqlTable() ;
 		$aSelect->addTable($aTable) ;
 		
 		// criteria
@@ -244,7 +246,7 @@ class Selecter extends OperationStrategy
 			if( $aAssoc->isType(Association::pair) )
 			{
 				// create table for toPrototype
-				$aTable = $aPrototype->createTable() ;
+				$aTable = $aPrototype->createSqlTable() ;
 		
 				$aTablesJoin = self::joinTwoTables(
 						$aFromTable
@@ -275,7 +277,7 @@ class Selecter extends OperationStrategy
 				$aAssoc->setSqlTablesJoin($aTablesJoin) ;
 				
 				// 从中间表连接到右表
-				$aTable = $aPrototype->createTable() ;
+				$aTable = $aPrototype->createSqlTable() ;
 				$aBridgeTablesJoin = self::joinTwoTables(
 						$aBridgeTable
 						, $aTable
@@ -287,7 +289,7 @@ class Selecter extends OperationStrategy
 				// 在桥接表上加入自定义的 join on 条件
 				if( $aTablesJoinOn = $aAssoc->otherBridgeTableJoinOn(false) )
 				{
-					$aBridgeTablesJoin->where()->add($aTablesJoinOn) ;
+					$aBridgeTablesJoin->on()->add($aTablesJoinOn) ;
 				}
 			}
 			

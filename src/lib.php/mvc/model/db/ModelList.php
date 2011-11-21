@@ -21,11 +21,6 @@ class ModelList extends Model implements IModelList, IPaginal
 						, true
 		) ;
 	}
-	public function load($values=null,$keys=null)
-	{
-		
-		return parent::load($values,$keys) ;
-	}
 	public function loadData( IRecordSet $aRecordSet, $bSetSerialized=false )
 	{
 		$aPrototype = $this->prototype() ;

@@ -56,14 +56,14 @@ abstract class Statement extends Object
 	protected function transColumn($sColumn,StatementState $aState)
 	{
 		// 自由输入的字段名，省略关系片段中第一个prototype的名字
-		if( substr($sColumn,0,1)!='`' )
+		if( substr($sColumn,0,1)=='`' )
 		{
 			return $sColumn ;
 		}
 		else 
 		{
 			return ($aNamer=$this->nameTransfer())?
-						$aNamer->transTable($sColumn):
+						$aNamer->transColumn($sColumn,$this,$aState):
 						'`'.$sColumn.'`' ;
 		}
 	}
@@ -74,7 +74,7 @@ abstract class Statement extends Object
 	 * @param mix $value 条件语句中的直接量
 	 * @return string 
 	 */
-	protected function tranValue($value)
+	protected function transValue($value)
 	{
 		if (is_string ( $value ))
 		{

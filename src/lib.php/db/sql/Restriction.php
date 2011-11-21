@@ -13,7 +13,7 @@ class Restriction extends SubStatement
 	/**
 	 * 把所有条件拼接成字符串,相当于把这个对象字符串化
 	 * 
-	 * @param $bFormat 是否添加换行以便阅读
+	 * @param $aState
 	 * @return string
 	 */
 	public function makeStatement(StatementState $aState)
@@ -36,6 +36,12 @@ class Restriction extends SubStatement
 			}
 			else if(is_array($express))
 			{
+				// 字段名
+				$n = count($express) ;
+				for($i=1;$i<$n;$i++)
+				{
+					$express[$i] = $this->transColumn($express[$i],$aState) ;
+				}
 				$arrExpressions [] = call_user_func_array('sprintf',$express) ;
 			}
 			else
@@ -44,7 +50,7 @@ class Restriction extends SubStatement
 			}
 		}
 		
-		switch (count($arrExpressions)==1)
+		switch (count($arrExpressions))
 		{
 			case 0 :
 				return '1' ;
@@ -96,7 +102,7 @@ class Restriction extends SubStatement
 	 */
 	public function eq($sClmName, $value)
 	{
-		$this->arrExpressions[] = array("%s = ".$this->tranValue($value),array($sClmName)) ;
+		$this->arrExpressions[] = array("%s = ".$this->transValue($value),$sClmName) ;
 		return $this;
 	}
 	
@@ -108,7 +114,7 @@ class Restriction extends SubStatement
 	 */
 	public function eqColumn($sClmName,$sOtherClmName)
 	{
-		$this->arrExpressions[] = array("%s = %s",array($sClmName,$sOtherClmName)) ;
+		$this->arrExpressions[] = array("%s = %s",$sClmName,$sOtherClmName) ;
 		return $this;
 	}
 	
@@ -120,7 +126,7 @@ class Restriction extends SubStatement
 	 */
 	public function ne($sClmName, $value)
 	{
-		$this->arrExpressions[] = array("%s <> ".$this->tranValue($value),array($sClmName)) ;
+		$this->arrExpressions[] = array("%s <> ".$this->transValue($value),$sClmName) ;
 		return $this;
 	}
 	
@@ -132,7 +138,7 @@ class Restriction extends SubStatement
 	 */
 	public function neColumn($sClmName, $sOtherClmName)
 	{
-		$this->arrExpressions[] = array("%s <> %s",array($sClmName,$sOtherClmName)) ;
+		$this->arrExpressions[] = array("%s <> %s",$sClmName,$sOtherClmName) ;
 		return $this;
 	}
 	
@@ -144,7 +150,7 @@ class Restriction extends SubStatement
 	 */
 	public function gt($sClmName, $value)
 	{
-		$this->arrExpressions[] = array("%s > ".$this->tranValue($value),array($sClmName)) ;
+		$this->arrExpressions[] = array("%s > ".$this->transValue($value),$sClmName) ;
 		return $this;
 	}
 	
@@ -156,7 +162,7 @@ class Restriction extends SubStatement
 	 */
 	public function gtColumn($sClmName, $sOtherClmName)
 	{
-		$this->arrExpressions[] = array("%s > %s",array($sClmName,$sOtherClmName)) ;
+		$this->arrExpressions[] = array("%s > %s",$sClmName,$sOtherClmName) ;
 		return $this;
 	}
 	
@@ -168,7 +174,7 @@ class Restriction extends SubStatement
 	 */
 	public function ge($sClmName, $value)
 	{
-		$this->arrExpressions[] = array("%s >= ".$this->tranValue($value),array($sClmName)) ;
+		$this->arrExpressions[] = array("%s >= ".$this->transValue($value),$sClmName) ;
 		return $this;
 	}
 	
@@ -180,7 +186,7 @@ class Restriction extends SubStatement
 	 */
 	public function geColumn($sClmName, $sOtherClmName)
 	{
-		$this->arrExpressions[] = array("%s >= %s",array($sClmName,$sOtherClmName)) ;
+		$this->arrExpressions[] = array("%s >= %s",$sClmName,$sOtherClmName) ;
 		return $this;
 	}
 	
@@ -192,7 +198,7 @@ class Restriction extends SubStatement
 	 */
 	public function lt($sClmName, $value)
 	{
-		$this->arrExpressions[] = array("%s < ".$this->tranValue($value),array($sClmName)) ;
+		$this->arrExpressions[] = array("%s < ".$this->transValue($value),$sClmName) ;
 		return $this;
 	}
 	
@@ -204,7 +210,7 @@ class Restriction extends SubStatement
 	 */
 	public function ltColumn($sClmName, $sOtherClmName)
 	{
-		$this->arrExpressions[] = array("%s < %s",array($sClmName,$sOtherClmName)) ;
+		$this->arrExpressions[] = array("%s < %s",$sClmName,$sOtherClmName) ;
 		return $this;
 	}
 	
@@ -216,7 +222,7 @@ class Restriction extends SubStatement
 	 */
 	public function le($sClmName, $value)
 	{
-		$this->arrExpressions[] = array("%s <= ".$this->tranValue($value),array($sClmName)) ;
+		$this->arrExpressions[] = array("%s <= ".$this->transValue($value),$sClmName) ;
 		return $this;
 	}
 	
@@ -228,7 +234,7 @@ class Restriction extends SubStatement
 	 */
 	public function leColumn($sClmName, $sOtherClmName)
 	{
-		$this->arrExpressions[] = array("%s <= %s",array($sClmName,$sOtherClmName)) ;
+		$this->arrExpressions[] = array("%s <= %s",$sClmName,$sOtherClmName) ;
 		return $this;
 	}
 	
@@ -240,7 +246,7 @@ class Restriction extends SubStatement
 	 */
 	public function like($sClmName, $value)
 	{
-		$this->arrExpressions[] = array("%s LIKE ".$this->tranValue($value),array($sClmName)) ;
+		$this->arrExpressions[] = array("%s LIKE ".$this->transValue($value),$sClmName) ;
 		return $this;
 	}
 	
@@ -254,9 +260,9 @@ class Restriction extends SubStatement
 	{
 		foreach($arrValues as $v)
 		{
-			$v = $this->tranValue($v);
+			$v = $this->transValue($v);
 		}
-		$this->arrExpressions[] = array("%s IN (".implode(",",$arrValues).")",array($sClmName)) ;
+		$this->arrExpressions[] = array("%s IN (".implode(",",$arrValues).")",$sClmName) ;
 		return $this;
 	}
 	
@@ -270,10 +276,10 @@ class Restriction extends SubStatement
 	public function between($sClmName, $value, $otherValue)
 	{
 		$this->arrExpressions[] = array("%s BETWEEN "
-									. $this->tranValue($value) 
+									. $this->transValue($value) 
 									. ' AND '
-									. $this->tranValue($otherValue)
-								,array($sClmName)
+									. $this->transValue($otherValue)
+								,$sClmName
 		) ;
 		return $this;
 	}
@@ -285,7 +291,7 @@ class Restriction extends SubStatement
 	 */
 	public function isNull($sClmName)
 	{
-		$this->arrExpressions[] = array("%s IS NULL ",array($sClmName)) ;
+		$this->arrExpressions[] = array("%s IS NULL ",$sClmName) ;
 		return $this;
 	}
 	
@@ -296,7 +302,7 @@ class Restriction extends SubStatement
 	 */
 	public function isNotNull($sClmName)
 	{
-		$this->arrExpressions[] = array("%s IS NOT NULL ",array($sClmName)) ;
+		$this->arrExpressions[] = array("%s IS NOT NULL ",$sClmName) ;
 		return $this;
 	}
 	

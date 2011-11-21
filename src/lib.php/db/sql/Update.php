@@ -22,20 +22,20 @@ class Update extends MultiTableStatement implements IDataSettableStatement
 		$this->checkValid(true) ;
 		
 		$sStatement = ($this->isReplace()? "REPLACE ": "UPDATE ")
-				. $this->makeStatementTableList($bFormat)
+				. $this->makeStatementTableList($aState)
 				. " SET " ;
 
 		$arrValues = array() ;
 		foreach($this->mapData as $sClm=>&$sData)
 		{
-			$arrValues[] = $this->transColumn($sClm)." = ".$sData ;
+			$arrValues[] = $this->transColumn($sClm,$aState)." = ".$sData ;
 		}
 		
 		$sStatement.= implode(", ", $arrValues) ;
 		
 		if( $aCriteria=$this->criteria(false) )
 		{
-			$sStatement.= ' ' . $aCriteria->makeStatement($bFormat) ;
+			$sStatement.= ' ' . $aCriteria->makeStatement($aState) ;
 		}
 			
 		return $sStatement ;
@@ -47,7 +47,7 @@ class Update extends MultiTableStatement implements IDataSettableStatement
 	}
 	public function setData($sColumnName,$sData=null)
 	{
-		$this->mapData[$sColumnName] = $this->tranValue($sData) ;
+		$this->mapData[$sColumnName] = $this->transValue($sData) ;
 	}
 	
 	public function removeData($sColumnName)

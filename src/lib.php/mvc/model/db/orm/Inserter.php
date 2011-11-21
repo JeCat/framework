@@ -89,7 +89,7 @@ class Inserter extends OperationStrategy
 			
 				break ;
 				
-			case Association::hasAndBelongsTo :
+			case Association::hasAndBelongsToMany :
 				
 				if( !$aAssocModel->save() )
 				{

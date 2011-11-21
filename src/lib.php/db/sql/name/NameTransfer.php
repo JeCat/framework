@@ -1,26 +1,27 @@
 <?php
 namespace jc\db\sql\name ;
 
+use jc\db\sql\StatementState;
 use jc\db\sql\Statement;
 use jc\util\FilterMangeger;
 
 class NameTransfer 
 {
-	public function transColumn($sName,Statement $aStatement)
+	public function transColumn($sName,Statement $aStatement,StatementState $aState)
 	{
 		if( $this->aColumnNameFilter )
 		{
-			list($sName) = $this->aColumnNameFilter->handle($sName,$aStatement) ;
+			list($sName) = $this->aColumnNameFilter->handle($sName,$aStatement,$aState) ;
 		}
 		
 		return $sName ;
 	}
 	
-	public function transTable($sName)
+	public function transTable($sName,Statement $aStatement,StatementState $aState)
 	{
 		if( $this->aTableNameFilter )
 		{
-			list($sName) = $this->aTableNameFilter->handle($sName) ;
+			list($sName) = $this->aTableNameFilter->handle($sName,$aStatement,$aState) ;
 		}
 		
 		return $sName ;

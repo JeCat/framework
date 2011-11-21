@@ -14,7 +14,7 @@ class Criteria extends SubStatement
 	/**
 	 * 把所有条件拼接成字符串,相当于把这个对象字符串化
 	 * 
-	 * @param $bFormat 是否添加换行以便阅读
+	 * @param $aState 
 	 * @return string
 	 */
 	public function makeStatement(StatementState $aState) {

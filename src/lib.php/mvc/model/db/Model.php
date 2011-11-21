@@ -104,7 +104,7 @@ class Model extends AbstractModel implements IModel, IBean
 	public function load($values=null,$keys=null)
 	{
 		return Selecter::singleton()->execute(
-					$this , null , self::buildCriteria($this->prototype(),$values,$keys), false
+					$this , null , self::buildCriteria($this->prototype(),$values,$keys), false, $this->db()
 		) ;
 	}
 	
@@ -115,7 +115,7 @@ class Model extends AbstractModel implements IModel, IBean
 			return $aPrototype->criteria() ;
 		}
 		
-		$keys = $keys? $aPrototype->keys(): (array)$keys ;
+		$keys = $keys? (array)$keys: $aPrototype->keys() ;
 		
 		if($values instanceof Criteria)
 		{
@@ -341,6 +341,10 @@ class Model extends AbstractModel implements IModel, IBean
 		$this->arrBeanConfig ;
 	}
 	
+	public function db()
+	{
+		return DB::singleton() ;
+	}
 	
 	/**
 	 * @var jc\mvc\model\db\orm\Prototype

@@ -19,7 +19,7 @@ class Table extends SubStatement
 		
 		foreach($this->arrJoinSubStatements as $aJoin)
 		{
-			$sSql.= $aJoin->makeStatement() ;
+			$sSql.= $aJoin->makeStatement($aState) ;
 		}
 		
 		return $sSql ;

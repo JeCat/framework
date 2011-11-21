@@ -49,7 +49,7 @@ class Updater extends Object{
 			}
 		}
 		if($bFlagChanged){//只有当有修改的时候才发生更新
-			$aDB->execute($aUpdate->makeStatement());
+			$aDB->execute($aUpdate);
 		}
 		
 		$aModel->setSerialized(true);
@@ -80,7 +80,7 @@ class Updater extends Object{
 				}
 				break;
 				
-			case Association::hasAndBelongsTo :
+			case Association::hasAndBelongsToMany :
 				if(!$aAssociatedModel->save()){
 					return false;
 				}

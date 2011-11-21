@@ -87,7 +87,7 @@ class PDODriver extends \PDO implements IDriver
 	public function execute($sql)
 	{		
 		$arrLog['sql'] = ($sql instanceof Statement)?
-					$sql->makeStatement(): strval($sql) ;
+					$sql->makeStatement($this->sharedStatementState()): strval($sql) ;
 
 		$fBefore = microtime(true) ;
 		$ret = \PDO::exec($arrLog['sql']) ;

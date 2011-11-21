@@ -65,7 +65,7 @@ class Insert extends Statement implements IDataSettableStatement
 		foreach($this->mapData as $sClm=>$Value)
 		{
 			$arrClms[] = $this->transColumn($sClm, $aState) ;
-			$arrValues[] = $this->tranValue($Value) ;
+			$arrValues[] = $this->transValue($Value) ;
 		}
 		
 		$sStatement.= " ( " . implode(", ", $arrClms) . " ) VALUES ( " . implode(", ", $arrValues) . " ) ;" ;

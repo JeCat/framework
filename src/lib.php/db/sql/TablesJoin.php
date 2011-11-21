@@ -41,11 +41,11 @@ class TablesJoin extends SubStatement
 		{
 			if( is_string($restriction) )
 			{
-				$this->restriction()->expression($restriction) ;
+				$this->on()->expression($restriction) ;
 			}
 			else if( $restriction instanceof Restriction )
 			{
-				$this->restriction()->add($restriction) ;
+				$this->on()->add($restriction) ;
 			}
 		}
 	}

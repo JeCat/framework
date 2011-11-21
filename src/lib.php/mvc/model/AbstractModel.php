@@ -324,7 +324,7 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 		$aOutput->write ( (($this instanceof IModelList)? "[Model List]" : "[Model]") );
 		$aOutput->write ( "\r\n" );
 		
-		if (! $this->isEmpty ())
+		if (!empty($this->arrDatas))
 		{
 			foreach ( $this->arrDatas as $sName => $value )
 			{

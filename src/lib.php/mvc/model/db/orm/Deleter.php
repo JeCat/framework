@@ -60,7 +60,7 @@ class Deleter extends Object{
 				}
 				break;
 				
-			case Association::hasAndBelongsTo :
+			case Association::hasAndBelongsToMany :
 				// delete bridge table
 				foreach($aAssociatedModel->childIterator() as $aOneChildModel){
 					$this->deleteBridge($aDB,$aAssociation,$aModel,$aOneChildModel);

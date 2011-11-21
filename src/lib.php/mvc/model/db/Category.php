@@ -300,6 +300,8 @@ class Category extends Model
 	
 	private function addChildCategory(Category $aCategory)
 	{
+		$this->addChild($aCategory) ;
+		
 		if( !in_array($aCategory,$this->arrChildCategories,true) )
 		{
 			$this->arrChildCategories[] = $aCategory ;
