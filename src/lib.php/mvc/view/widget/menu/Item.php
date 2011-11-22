@@ -79,6 +79,15 @@ class Item extends AbstractBase
 		if( !empty( $arrConfig['active'])){
 			$this->setAttribute('active',$arrConfig);
 		}
+		if( !empty( $arrConfig['link'])){
+			$this->setLink($arrConfig['link']);
+		}
+		if( !empty( $arrConfig['onclick'])){
+			$this->setEventOnClick($arrConfig['onclick']);
+		}
+		if( !empty( $arrConfig['html'])){
+			$this->setHtml($arrConfig['html']);
+		}
 	}
 	
 	private function buildSubMenu($subMenu){
@@ -103,6 +112,60 @@ class Item extends AbstractBase
 		return 'class ="'.$this->cssClassBase().'item-depth'.$this->depth().'"';
 	}
 	
+	public function link()
+	{
+		return $this->sLink ;
+	}
+	public function setLink($sLink)
+	{
+		$this->sLink = $sLink ;
+	}
+	public function eventOnClick($sOnClick)
+	{
+		return $this->sOnClick ;
+	}
+	public function setEventOnClick($sOnClick)
+	{
+		$this->sOnClick = $sOnClick ;
+	}
+	public function html()
+	{
+		if(!$this->sHtml)
+		{
+			$sTitle = $this->title() ;
+			
+			if( $this->sLink or $this->sOnClick )
+			{
+				$this->sHtml = "<a" ;
+				
+				if($this->sLink)
+				{
+					$this->sHtml.= " href='{$this->sLink}'" ;
+				}
+				if($this->sOnClick)
+				{
+					$sOnClick = addslashes($this->sOnClick) ;
+					$this->sHtml.= " onclick=\"{$sOnClick}\"" ;
+				}
+				$this->sHtml.= ">{$sTitle}</a>" ;
+			}
+			else
+			{
+				$this->sHtml = $sTitle ;
+			}
+		}
+		
+		return $this->sHtml ;
+	}
+	public function setHtml($sHtml)
+	{
+		$this->sHtml = $sHtml ;
+	}
+	
     private $parentMenu = null;
     private $subMenu = null;
+    
+    private $sLink ;
+    private $sOnClick ;
+    private $sHtml ;
 }

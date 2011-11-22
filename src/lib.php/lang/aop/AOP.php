@@ -1,6 +1,8 @@
 <?php
 namespace jc\lang\aop ;
 
+use jc\fs\IFSO;
+
 use jc\lang\Exception;
 use jc\lang\oop\Package;
 use jc\lang\compile\CompilerFactory;
@@ -19,7 +21,7 @@ class AOP extends Object
 		{
 			return ;
 		}
-		$this->arrAspectClasses[$sAspectClass] = $sAspectClass ;
+		$this->arrAspectClasses[$sAspectClass] = null ;
 		$this->arrUnparseAspectClasses[] = $sAspectClass ;
 	}
 	
@@ -119,6 +121,22 @@ class AOP extends Object
 		}
 	}
 	
+	/**
+	 * apects库 的指纹签名
+	 */
+	public function aspectLibSignature()
+	{
+		// 根据所有 apect 类的最后修改时间生成签名
+		$arrBox = null ;
+		foreach($this->arrAspectClasses as $sAspectClass=>$aClassFile)
+		{
+			$aClassFile = $this->aspectClassFile($sAspectClass) ;
+			$arrBox[$aClassFile] = $aClassFile->modifyTime() ;
+		}
+		
+		return md5( serialize($arrBox) ) ;
+	}
+	
 	public function createClassCompiler()
 	{
 		$aCompiler = CompilerFactory::createInstance()->create() ;
@@ -163,10 +181,7 @@ class AOP extends Object
 	
 	private function parseAspectClass($sAspectClass)
 	{
-		if( !$aClassFile = $this->classLoader()->searchClass($sAspectClass) )
-		{
-			throw new Exception("注册到AOP中的Aspace(%s)不存在; Aspace必须是一个有效的类",$sAspectClass) ;
-		}
+		$aClassFile = $this->aspectClassFile($sAspectClass) ;
 	
 		$aClassCompiler = CompilerFactory::singleton()->create() ;
 		$aTokenPool = $aClassCompiler->scan($aClassFile->openReader()) ;
@@ -180,6 +195,19 @@ class AOP extends Object
 		}
 	
 		$this->aspects()->add(Aspect::createFromToken($aClassToken,$aTokenPool)) ;
+	}
+	
+	private function aspectClassFile($sAspectClass)
+	{
+		if( empty($this->arrAspectClasses[$sAspectClass]) )
+		{
+			if( !$this->arrAspectClasses[$sAspectClass] = $this->classLoader()->searchClass($sAspectClass) )
+			{
+				throw new Exception("注册到AOP中的Aspace(%s)不存在; Aspace必须是一个有效的类",$sAspectClass) ;
+			}
+		}
+		
+		return $this->arrAspectClasses[$sAspectClass] ;
 	}
 	
 	

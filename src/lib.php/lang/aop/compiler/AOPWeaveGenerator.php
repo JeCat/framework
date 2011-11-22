@@ -2,9 +2,7 @@
 namespace jc\lang\aop\compiler ;
 
 use jc\lang\compile\object\ClosureToken;
-
 use jc\util\Stack;
-
 use jc\lang\Exception;
 use jc\lang\Assert;
 use jc\lang\aop\jointpoint\JointPoint;

@@ -121,8 +121,8 @@ class Menu extends AbstractBase
 		if(!empty($arrConfig['left'])){
 			$this->setPosLeft($arrConfig['left']);
 		}
-		if(!empty($arrConfig['alone'])){
-			$this->setIndependence($arrConfig['alone']);
+		if(!empty($arrConfig['independence'])){
+			$this->setIndependence($arrConfig['independence']);
 		}
 	}
 	
