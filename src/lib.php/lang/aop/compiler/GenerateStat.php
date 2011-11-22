@@ -42,8 +42,13 @@ class GenerateStat
 	 */
 	public $aAdvicesDispatchFunc ;
 	
-	
+	/**
+	 * advice 函数定义 的参数表
+	 */
 	public $sAdviceDefineArgvsLit = '' ;
+	/**
+	 * advice 函数调用 的参数表
+	 */
 	public $sAdviceCallArgvsLit = '' ;
 	
 	public $sOriginJointCode = '' ;

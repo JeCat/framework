@@ -15,6 +15,9 @@ use jc\lang\Exception;
 
 class FunctionDefineGenerator extends AOPWeaveGenerator
 {
+	/**
+	 * 创建并织入一个用于集中调用各个advice的函数
+	 */
 	protected function generateAdviceDispatchFunction(GenerateStat $aStat)
 	{
 		Assert::type("jc\\lang\\compile\\object\\FunctionDefine", $aStat->aExecutePoint) ;
@@ -47,7 +50,7 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		// private, protected, public
 		$aOriAccess = $aStat->aExecutePoint->accessToken() ;
 		$aNewAccess = $aOriAccess?
-				new Token($aOriAccess->tokenType(),$aOriAccess->source(),0) :
+				new Token($aOriAccess->tokenType(),$aOriAccess->sourceCode(),0) :
 				new Token(T_PUBLIC,'public',0) ;
 		$aStat->aAdvicesDispatchFunc->setAccessToken($aNewAccess) ;
 		$aStat->aTokenPool->insertBefore($aOriFuncStart,$aNewAccess) ;
@@ -88,6 +91,20 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		// 换行
 		$aStat->aTokenPool->insertBefore($aOriFuncStart,new Token(T_WHITESPACE,"\r\n\r\n\t")) ;
 	}
+	
+	protected function weaveAdvices(GenerateStat $aStat)
+	{
+		parent::weaveAdvices($aStat) ;
+		
+		// 添加函数的返回值
+		$aStat->aTokenPool->insertBefore($aStat->aAdvicesDispatchFunc->endToken(),new Token(T_WHITESPACE,"\r\n\t\treturn \$__function_return_of_around_advices__ ;\r\n\t")) ;
+	}
+	
+	protected function weaveAroundAdviceCall(GenerateStat $aStat,$sAdviceCallCode)
+	{
+		$aBodyEnd = $aStat->aAdvicesDispatchFunc->endToken() ;
+		$aStat->aTokenPool->insertBefore($aBodyEnd,new Token(T_STRING,"\r\n\r\n\t\t\$__function_return_of_around_advices__ =& {$sAdviceCallCode} ;\r\n")) ;
+	}
 
 	protected function replaceOriginExecutePoint(GenerateStat $aStat)
 	{
@@ -97,6 +114,9 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		$aStat->aExecutePoint->nameToken()->setTargetCode($sNewMethodName) ;
 	}
 
+	/**
+	 * 创建调用原始链接点的代码
+	 */
 	protected function generateOriginJointCode(GenerateStat $aStat)
 	{
 		Assert::type("jc\\lang\\compile\\object\\FunctionDefine", $aStat->aExecutePoint) ;
@@ -104,7 +124,7 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		$aStat->sOriginJointCode = '' ;
 		
 		$aStat->sOriginJointCode.= $aStat->aExecutePoint->staticToken()? 'self::': '$this->' ;
-		$aStat->sOriginJointCode.= $aStat->aExecutePoint->nameToken()->targetCode() ;
+		$aStat->sOriginJointCode.= '__aop_jointpoint_'.$aStat->aExecutePoint->nameToken()->targetCode() ;
 	}
 	
 	private function cloneFunctionArgvLst(TokenPool $aTokenPool,FunctionDefine $aOriFunctionDefine)

@@ -16,14 +16,7 @@ abstract class JointPoint extends Object
 	 */
 	static public function createDefineMethod($sClassName,$sMethodNamePattern='*')
 	{
-		$aJointPoint = new self() ;
-		
-		$aJointPoint->setExecutionPattern("{$sClassName}::{$sMethodNamePattern}()") ;
-		
-		$aJointPoint->setWeaveClass($sClassName) ;
-		$aJointPoint->setWeaveFunctionNamePattern($sMethodNamePattern) ;
-		
-		return $aJointPoint ;
+		return new JointPointMethodDefine($sClassName,$sMethodNamePattern) ;
 	}
 	
 	/**
@@ -31,11 +24,7 @@ abstract class JointPoint extends Object
 	 */
 	static public function createCallFunction($sCallFunctionNamePattern,$sWeaveClass,$sWeaveMethodNamePattern='*')
 	{
-		$aJointPoint = new self() ;
-		$aJointPoint->setExecutionPattern("{$sCallFunctionNamePattern}()") ;
-		$aJointPoint->setWeaveClass($sWeaveClass) ;
-		$aJointPoint->setWeaveFunctionNamePattern($sWeaveMethodNamePattern) ;
-		return $aJointPoint ;
+		return new JointPointCallFunction($sCallFunctionNamePattern,$sWeaveClass,$sWeaveMethodNamePattern) ;
 	}
 	
 	/**
@@ -72,11 +61,7 @@ abstract class JointPoint extends Object
 	 */
 	static public function createNewObject($sNewClassNamePattern,$sWeaveClass,$sWeaveMethodNamePattern='*')
 	{
-		$aJointPoint = new self() ;
-		$aJointPoint->setExecutionPattern("new {$sNewClassNamePattern}") ;
-		$aJointPoint->setWeaveClass($sWeaveClass) ;
-		$aJointPoint->setWeaveFunctionNamePattern($sWeaveMethodNamePattern) ;
-		return $aJointPoint ;
+		return new JointPointNewObject($sNewClassNamePattern,$sWeaveClass,$sWeaveMethodNamePattern) ;
 	}
 	
 	

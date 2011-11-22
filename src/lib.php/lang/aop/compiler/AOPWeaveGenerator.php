@@ -34,19 +34,19 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 	}
 
 	protected function weave(GenerateStat $aStat)
-	{		
+	{
 		if( $aStat->aExecutePoint and !$aStat->aExecutePoint->belongsClass() )
 		{
 			throw new Exception("AOP织入遇到错误：正在对一段全局代码进行织入操作，只能对类方法进行织入。") ;
 		}
 		
-		// advice 参数
+		// 为 advice函数 生成 定义和调用的参数
 		$this->generateAdviceArgvs($aStat) ;
 		
 		// generate and weave AdviceDispatchFunction
 		$this->generateAdviceDispatchFunction($aStat) ;
 		
-		// 
+		// 生成调用原始执行点的代码
 		$this->generateOriginJointCode($aStat) ;
 		
 		// weave AdviceDispatchFunction
@@ -83,13 +83,13 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 		}
 		
 		// 织入执行点上的置换代码：before	
-		$this->weaveAdviceDefines($aStat,$arrAdviceStacks[Advice::before]) ;
+		$this->generateAndWeaveAdviceDefines($aStat,$arrAdviceStacks[Advice::before]) ;
 				
 		// 织入执行点上的置换代码：around
-		$this->weaveAroundAdviceDefines($aStat,$arrAdviceStacks[Advice::around]) ;
+		$this->generateAndWeaveAroundAdviceDefines($aStat,$arrAdviceStacks[Advice::around]) ;
 		
 		// 织入执行点上的置换代码：after
-		$this->weaveAdviceDefines($aStat,$arrAdviceStacks[Advice::after]) ;
+		$this->generateAndWeaveAdviceDefines($aStat,$arrAdviceStacks[Advice::after]) ;
 		
 		
 		$aStat->aTokenPool->insertBefore($aStat->aAdvicesDispatchFunc->endToken(),new Token(T_WHITESPACE,"\r\n\t")) ;
@@ -150,8 +150,13 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 		$aStat->aTokenPool->insertBefore($aBodyStart,new Token(T_WHITESPACE, "\r\n\t")) ;
 	}
 
-	private function weaveAdviceDefines(GenerateStat $aStat,$aAdvices)
+	private function generateAndWeaveAdviceDefines(GenerateStat $aStat,$aAdvices)
 	{
+		if($aAdvices->isEmpty())
+		{
+			return ;
+		}
+		
 		$aBodyEnd = $aStat->aAdvicesDispatchFunc->endToken() ;
 				
 		while($aAdvice=$aAdvices->out())
@@ -166,54 +171,42 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 		}
 	}
 	
-	private function weaveAroundAdviceDefines(GenerateStat $aStat,$aAdvices)
-	{
+	private function generateAndWeaveAroundAdviceDefines(GenerateStat $aStat,Stack $aAdvices)
+	{		
 		$aBodyEnd = $aStat->aAdvicesDispatchFunc->endToken() ;
-
+		
 		// 织入advice调用代码
 		if( $aFirstAdvice=$aAdvices->get() )
 		{
-			$sAdviceFuncName = $this->generateAdviceWeavedFunctionName($aStat,$aFirstAdvice) ;
-			$aStat->aTokenPool->insertBefore(
-				$aBodyEnd
-				, new Token(T_STRING, "\r\n\t\t" . ($aFirstAdvice->isStatic()? 'self::': '$this->') . "{$sAdviceFuncName}({$aStat->sAdviceCallArgvsLit}) ;\r\n")
-			) ;
+			$aStat->aTokenPool->insertBefore($aBodyEnd,new Token(T_STRING,"\r\n\t\t// around advices ----\r\n")) ;
 		
+			$sAdviceFuncName = $this->generateAdviceWeavedFunctionName($aStat,$aFirstAdvice) ;
+			
+			// 在 AdviceDispatchFunction 中设置一个 around 类型 advice 的调用代码
+			$this->weaveAroundAdviceCall($aStat,($aFirstAdvice->isStatic()? 'self::': '$this->') . "{$sAdviceFuncName}({$aStat->sAdviceCallArgvsLit})") ;
+		
+			// 陆续植入各个 around 类型 advice
 			while($aAdvice=$aAdvices->out())
 			{	
 				// 生成advice定义代码
-				// -----		
-				$aAdviceDefineCode = $this->generateAdviceDefine($aAdvice,$aStat) ;
-				
-				// 调用下一个advice
-				if( $aNextAdvice=$aAdvices->get() )
-				{
-					$aAdviceDefineCode = str_ireplace(
-						'aop_call_origin_method'
-						, ($aNextAdvice->isStatic()?
-								'self::'. $this->generateAdviceWeavedFunctionName($aStat,$aNextAdvice):
-								'$this->'. $this->generateAdviceWeavedFunctionName($aStat,$aNextAdvice))
-						, $aAdviceDefineCode) ;
-				}
-				
-				// 调用原始函数
-				else 
-				{
-					$aAdviceDefineCode = str_ireplace('aop_call_origin_method',$aStat->sOriginJointCode,$aAdviceDefineCode) ;
-				}
+				$aAdviceDefine = $this->generateAdviceDefine($aAdvice,$aStat,$aAdvices->get()) ;
 				
 				// 织入advice定义代码
-				// -----		
-				$aStat->aTokenPool->insertAfter($aBodyEnd,new Token(T_STRING,"\r\n\r\n\t\t".$aAdviceDefineCode)) ;
+				$aStat->aTokenPool->insertAfter($aBodyEnd,$aAdviceDefine) ;
 			}
-		
 		}
 		
 		// 没有 around advice， 直接调用原始函数
 		else 
 		{
-			$aStat->aTokenPool->insertBefore($aBodyEnd,new Token(T_STRING,"\r\n\r\n\t\t".$aStat->sOriginJointCode."({$aStat->sAdviceCallArgvsLit}) ;\r\n")) ;
+			$this->weaveAroundAdviceCall($aStat,$aStat->sOriginJointCode."({$aStat->sAdviceCallArgvsLit})") ;
 		}
+	}
+	
+	protected function weaveAroundAdviceCall(GenerateStat $aStat,$sAdviceCallCode)
+	{
+		$aBodyEnd = $aStat->aAdvicesDispatchFunc->endToken() ;
+		$aStat->aTokenPool->insertBefore($aBodyEnd,new Token(T_STRING,"\t\t{$sAdviceCallCode}) ;\r\n")) ;
 	}
 
 	private function generateAdviceWeavedFunctionName(GenerateStat $aStat,Advice $aAdvice)
@@ -228,7 +221,7 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 	/**
 	 * 生成织入代码
 	 */
-	protected function generateAdviceDefine(Advice $aAdvice,GenerateStat $aStat)
+	protected function generateAdviceDefine(Advice $aAdvice,GenerateStat $aStat,$aNextAroundAdvice=null)
 	{
 		$sCode = '' ;
 		
@@ -246,7 +239,32 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 		
 		// body
 		$sCode.= "\t{\r\n" ;
-		$sCode.= $aAdvice->source() ;
+		
+		$sSource = $aAdvice->source() ;
+		
+		// 针对 around 位置的 advice 的特殊处理
+		if( $aAdvice->position()==Advice::around )
+		{
+			// 调用下一个advice
+			if( $aNextAroundAdvice )
+			{
+				$sSource = str_ireplace(
+						'aop_call_origin'
+						, ($aNextAroundAdvice->isStatic()?
+								'self::'. $this->generateAdviceWeavedFunctionName($aStat,$aNextAroundAdvice):
+								'$this->'. $this->generateAdviceWeavedFunctionName($aStat,$aNextAroundAdvice))
+						, $sSource) ;
+			}
+			
+			// 调用原始函数
+			else
+			{
+				$sSource = str_ireplace('aop_call_origin',$aStat->sOriginJointCode,$sSource) ;
+			}
+		}
+		
+		$sCode.= $sSource ;
+		
 		$sCode.= "\r\n\t}" ;
 		
 		return new Token(T_STRING,"\r\n\r\n\t".$sCode) ;

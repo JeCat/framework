@@ -74,7 +74,7 @@ class FunctionDefine extends StructDefine
 	{
 		if( $aDocToken=$this->docToken() )
 		{
-			return $aDocToken ;	
+			return $aDocToken ;
 		}
 		
 		$arrTokens = array() ;
