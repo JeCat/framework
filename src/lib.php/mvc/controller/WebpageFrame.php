@@ -1,6 +1,10 @@
 <?php
 namespace jc\mvc\controller ;
 
+use jc\bean\BeanConfException;
+
+use jc\bean\BeanFactory;
+
 use jc\lang\Assert;
 use jc\mvc\view\IView;
 use jc\lang\Exception;
@@ -16,6 +20,41 @@ class WebpageFrame extends Controller
 		parent::__construct() ;
 		
 		$this->setMainView(WebpageFactory::singleton()->create()) ;
+	}
+	
+	public function build(array & $arrConfig,$sNamespace='*')
+	{
+		parent::build($arrConfig,$sNamespace) ;
+		
+		$aBeanFactory = BeanFactory::singleton() ;
+    	$aModelContainer = $this->modelContainer() ;
+		
+		// 将 frameView:xxxx 转换成 frameViews[] 结构
+		$aBeanFactory->_typeKeyStruct($arrConfig,array('frameview:'=>'frameviews')) ;
+		
+		// frameViews --------------------
+		if( !empty($arrConfig['frameviews']) )
+		{
+			foreach($arrConfig['frameviews'] as $key=>&$arrBeanConf)
+			{
+				// 自动配置缺少的 class, name 属性
+				$aBeanFactory->_typeProperties( $arrBeanConf, 'view', is_int($key)?null:$key, 'name' ) ;
+		
+				// 创建对象
+				$aBean = $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ;
+		
+				$this->addFrameView( $aBean ) ;
+		
+				if(!empty($arrBeanConf['model']))
+				{
+					if( !$aModel=$aModelContainer->getByName($arrBeanConf['model']) )
+					{
+						throw new BeanConfException("视图(%s)的Bean配置属性 model 无效，没有指定的模型：%s",array($aBean->name(),$arrBeanConf['model'])) ;
+					}
+					$aBean->setModel($aModel) ;
+				}
+			}
+		}
 	}
 
     public function mainRun ()
@@ -51,8 +90,6 @@ class WebpageFrame extends Controller
 		}
 	}
     
-	
-	
     public function setMainView(IView $aView)
     {    	
     	parent::setMainView($aView) ;
@@ -60,6 +97,10 @@ class WebpageFrame extends Controller
     	if( !$this->aViewContainer )
     	{
     		$this->aViewContainer = $aView ;
+    	}
+    	else
+    	{
+    		$aView->add($this->aViewContainer) ;
     	}
     }
     
@@ -76,11 +117,6 @@ class WebpageFrame extends Controller
     public function setViewContainer(IView $aViewContainer)
     {    	
     	$this->aViewContainer = $aViewContainer ;
-    
-    	if( !$this->mainView() )
-    	{
-    		$this->setMainView($aViewContainer) ;
-    	}
     }
     
     private $aViewContainer = null ;
