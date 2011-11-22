@@ -11,16 +11,26 @@ use jc\lang\Object;
 class AOP extends Object
 {	
 	/**
-	 * @return jc\pattern\composite\IContainer
+	 * 注册一个 Aspect 类
 	 */
-	public function aspects()
+	public function register($sAspectClass)
 	{
-		if( !$this->aAspects )
+		if( isset($this->arrAspectClasses[$sAspectClass]) )
 		{
-			$this->aAspects = new Container('jc\\lang\\aop\\Aspect') ;
+			return ;
 		}
+		$this->arrAspectClasses[$sAspectClass] = $sAspectClass ;
+		$this->arrUnparseAspectClasses[] = $sAspectClass ;
+	}
+	
+	/**
+	 * @return \Iterator
+	 */
+	public function aspectIterator() 
+	{
+		$this->parseRegisteredAspectClass() ;
 		
-		return $this->aAspects ;
+		return $this->aAspects? $this->aspects()->iterator(): new \EmptyIterator() ;
 	}
 	
 	/**
@@ -28,6 +38,8 @@ class AOP extends Object
 	 */
 	public function jointPointIterator() 
 	{
+		$this->parseRegisteredAspectClass() ;
+		
 		if( !$this->aAspects )
 		{
 			return new \EmptyIterator() ;
@@ -50,6 +62,8 @@ class AOP extends Object
 	 */
 	public function pointcutIterator() 
 	{
+		$this->parseRegisteredAspectClass() ;
+		
 		if( !$this->aAspects )
 		{
 			return new \EmptyIterator() ;
@@ -62,28 +76,7 @@ class AOP extends Object
 		}
 		return $aIterator;
 	}
-	
-	public function register($sAspectName)
-	{
-		if( !$aClassFile = $this->classLoader()->searchClass($sAspectName) )
-		{
-			throw new Exception("指定的class(%s)不存在",$sAspectName) ;
-		}
 		
-		$aClassCompiler = CompilerFactory::singleton()->create() ;
-		$aTokenPool = $aClassCompiler->scan($aClassFile->openReader()) ;
-		$aClassCompiler->interpret($aTokenPool) ;
-
-		if( !$aClassToken=$aTokenPool->findClass($sAspectName) )
-		{
-			throw new Exception("根据 class path 搜索到class的定义文件：%s，但是该文件中没有定义：%s",
-				array($sAspectName,$aClassFile->path(),$sAspectName)
-			) ;
-		}
-		
-		$this->aspects()->add(Aspect::createFromToken($aClassToken,$aTokenPool)) ;
-	}
-	
 	public function weave()
 	{
 		$aClassLoader = $this->classLoader() ;
@@ -152,9 +145,62 @@ class AOP extends Object
 		$this->aClassLoader = $aClassLoader ;
 	}
 	
+	private function parseRegisteredAspectClass()
+	{
+		if(empty($this->arrUnparseAspectClasses))
+		{
+			return ;
+		}
+		
+		foreach($this->arrUnparseAspectClasses as $idx=>&$sAspectClass)
+		{
+			$this->parseAspectClass($sAspectClass) ;
+			unset($this->arrUnparseAspectClasses[$idx]) ;
+		}
+		
+		$this->arrUnparseAspectClasses = null ;
+	}
+	
+	private function parseAspectClass($sAspectClass)
+	{
+		if( !$aClassFile = $this->classLoader()->searchClass($sAspectClass) )
+		{
+			throw new Exception("注册到AOP中的Aspace(%s)不存在; Aspace必须是一个有效的类",$sAspectClass) ;
+		}
+	
+		$aClassCompiler = CompilerFactory::singleton()->create() ;
+		$aTokenPool = $aClassCompiler->scan($aClassFile->openReader()) ;
+		$aClassCompiler->interpret($aTokenPool) ;
+	
+		if( !$aClassToken=$aTokenPool->findClass($sAspectClass) )
+		{
+			throw new Exception("根据 class path 搜索到class的定义文件：%s，但是该文件中没有定义：%s",
+					array($sAspectClass,$aClassFile->path(),$sAspectClass)
+			) ;
+		}
+	
+		$this->aspects()->add(Aspect::createFromToken($aClassToken,$aTokenPool)) ;
+	}
+	
+	
+	/**
+	 * @return jc\pattern\composite\IContainer
+	 */
+	protected function aspects()
+	{
+		if( !$this->aAspects )
+		{
+			$this->aAspects = new Container('jc\\lang\\aop\\Aspect') ;
+		}
+	
+		return $this->aAspects ;
+	}
+	
+	
+	private $arrAspectClasses ;
+	private $arrUnparseAspectClasses ;
+	
 	private $aAspects ;
 	
 	private $aClassLoader ;
 }
-
-?>
