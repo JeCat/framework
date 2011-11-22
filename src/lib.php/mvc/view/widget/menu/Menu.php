@@ -206,6 +206,7 @@ class Menu extends AbstractBase
 			$arrClass[] = $this->cssClassBase().'menu-alone';
 		}
 		$arrClass[] = $this->cssClassBase().'direction-'.$this->getDirection();
+		$arrClass[] = 'jc-mvc-view-widget-menu-menu';
 		return 'class ="'.implode(' ',$arrClass).'"';
 	}
 	

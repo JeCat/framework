@@ -158,9 +158,14 @@ class Container extends Object implements IContainer
 		return in_array($object,$this->arrObjects,is_object($object)) ;
 	}
 	
+	public function search($object)
+	{
+		return array_search( $object, $this->arrObjects, is_object($object) ) ;
+	}
+	
 	public function replace($object,$newObject,$sName=null)
 	{
-		$nPos = array_search( $object, $this->arrObjects, is_object($object) ) ;
+		$nPos = $this->search($object) ;
 		if($nPos===false)
 		{
 			return ;
@@ -177,7 +182,7 @@ class Container extends Object implements IContainer
 	
 	public function insertBefore($object,$_)
 	{
-		$nPos = array_search($object, $this->arrObjects,is_object($object)) ;
+		$nPos = $this->search($object) ;
 		if($nPos===false)
 		{
 			return ;
@@ -209,7 +214,7 @@ class Container extends Object implements IContainer
 
 	public function insertAfter($object,$_)
 	{	
-		$nPos = array_search($object, $this->arrObjects,is_object($object)) ;
+		$nPos = $this->search($object) ;
 		if($nPos===false)
 		{
 			return ;
