@@ -2,6 +2,9 @@
 
 namespace jc\lang\compile ;
 
+use jc\lang\oop\Package;
+use jc\fs\FileSystem;
+use jc\system\Application;
 use jc\lang\compile\object\TokenPool;
 use jc\lang\oop\ClassLoader;
 use jc\lang\Exception;
@@ -18,6 +21,31 @@ use jc\lang\Object as JcObject ;
 
 class Compiler extends JcObject 
 {
+	/**
+	 * @return jc\lang\oop\Package
+	 */
+	public function compiledPackage()
+	{
+		if(!$this->aCompiledPackage)
+		{
+			$sFolderPath = $this->sCompiledFolderPath.'/'.$this->strategySignature() ;
+			$aFolder = Application::singleton()->fileSystem()->findFolder($sFolderPath,FileSystem::FIND_AUTO_CREATE) ;
+			$this->aCompiledPackage = new Package('',$aFolder) ;
+		}
+		
+		return $this->aCompiledPackage ;
+	}
+	
+	public function setCompiledFolderPath($sFolderPath)
+	{
+		if($this->sCompiledFolderPath!=$sFolderPath)
+		{
+			$this->aCompiledPackage = null ;
+		}
+		
+		$this->sCompiledFolderPath = $sFolderPath ;
+	}
+	
 	public function compile(IInputStream $aSourceStream,IOutputStream $aCompiledStream)
 	{
 		// 扫描 tokens
@@ -180,9 +208,9 @@ class Compiler extends JcObject
 	/**
 	 * 根据编译器的编译规则生成一段"策略签名"，当编译规则更改后，用于识别失效的编译文件
 	 */
-	public function strategySignature()
+	public function strategySignature($bRegenerate=false)
 	{
-		if( !$this->sStrategySignature )
+		if( !$this->sStrategySignature or $bRegenerate )
 		{
 			$sStrategySummaries = '' ;
 			foreach($this->arrStrategySummaries as &$summay)
@@ -190,17 +218,23 @@ class Compiler extends JcObject
 				$sStrategySummaries.= ($summay instanceof IStrategySummary)? $summay->strategySummary(): $summay ;
 			}
 			
-			$this->sStrategySignature = md5( $sStrategySummaries ) ;
+			$this->setStrategySignature( md5($sStrategySummaries) ) ;
 		}
 		
 		return $this->sStrategySignature ;
 	}
 	
-	public function invalidStrategySignature()
+	public function setStrategySignature($sStrategySignature)
 	{
-		$this->sStrategySignature = '' ;
+		// 重新提供 compiled folder
+		if($sStrategySignature!=$this->sStrategySignature)
+		{
+			$this->aCompiledPackage = null ;
+		}
+		
+		$this->sStrategySignature = $sStrategySignature ;
 	}
-	
+		
 	/**
 	 * 提供一个策略概要，用于生成策路签名
 	 */
@@ -229,5 +263,9 @@ class Compiler extends JcObject
 	private $arrGenerators = array() ;
 	
 	private $arrStrategySummaries = array() ;
+	
+	private $aCompiledPackage ;
+	
+	private $sCompiledFolderPath = '/data/compiled/class' ;
 }
 ?>

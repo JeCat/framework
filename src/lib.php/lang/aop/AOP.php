@@ -1,8 +1,8 @@
 <?php
 namespace jc\lang\aop ;
 
+use jc\lang\compile\IStrategySummary;
 use jc\fs\IFSO;
-
 use jc\lang\Exception;
 use jc\lang\oop\Package;
 use jc\lang\compile\CompilerFactory;
@@ -10,8 +10,8 @@ use jc\lang\oop\ClassLoader;
 use jc\pattern\composite\Container;
 use jc\lang\Object;
 
-class AOP extends Object
-{	
+class AOP extends Object implements IStrategySummary
+{
 	/**
 	 * 注册一个 Aspect 类
 	 */
@@ -21,17 +21,15 @@ class AOP extends Object
 		{
 			return ;
 		}
-		$this->arrAspectClasses[$sAspectClass] = null ;
-		$this->arrUnparseAspectClasses[] = $sAspectClass ;
+		$this->arrAspectClasses[$sAspectClass] = $sAspectClass ;
+		$this->parseAspectClass($sAspectClass) ;
 	}
 	
 	/**
 	 * @return \Iterator
 	 */
 	public function aspectIterator() 
-	{
-		$this->parseRegisteredAspectClass() ;
-		
+	{		
 		return $this->aAspects? $this->aspects()->iterator(): new \EmptyIterator() ;
 	}
 	
@@ -39,9 +37,7 @@ class AOP extends Object
 	 * @return \Iterator
 	 */
 	public function jointPointIterator() 
-	{
-		$this->parseRegisteredAspectClass() ;
-		
+	{		
 		if( !$this->aAspects )
 		{
 			return new \EmptyIterator() ;
@@ -64,8 +60,6 @@ class AOP extends Object
 	 */
 	public function pointcutIterator() 
 	{
-		$this->parseRegisteredAspectClass() ;
-		
 		if( !$this->aAspects )
 		{
 			return new \EmptyIterator() ;
@@ -122,16 +116,24 @@ class AOP extends Object
 	}
 	
 	/**
-	 * apects库 的指纹签名
+	 * aspects库 的指纹签名
 	 */
-	public function aspectLibSignature()
+	public function strategySummary()
 	{
+		if(!$this->arrAspectClasses)
+		{
+			return '' ;
+		}
+		
 		// 根据所有 apect 类的最后修改时间生成签名
 		$arrBox = null ;
-		foreach($this->arrAspectClasses as $sAspectClass=>$aClassFile)
+		$aClassLoader = $this->classLoader() ;
+		foreach($this->arrAspectClasses as $sAspectClass)
 		{
-			$aClassFile = $this->aspectClassFile($sAspectClass) ;
-			$arrBox[$aClassFile] = $aClassFile->modifyTime() ;
+			if( $aClassFile = $aClassLoader->searchClass($sAspectClass,ClassLoader::SEARCH_SOURCE) )
+			{
+				$arrBox[$sAspectClass] = $aClassFile->modifyTime() ;
+			}
 		}
 		
 		return md5( serialize($arrBox) ) ;
@@ -163,25 +165,13 @@ class AOP extends Object
 		$this->aClassLoader = $aClassLoader ;
 	}
 	
-	private function parseRegisteredAspectClass()
-	{
-		if(empty($this->arrUnparseAspectClasses))
-		{
-			return ;
-		}
-		
-		foreach($this->arrUnparseAspectClasses as $idx=>&$sAspectClass)
-		{
-			$this->parseAspectClass($sAspectClass) ;
-			unset($this->arrUnparseAspectClasses[$idx]) ;
-		}
-		
-		$this->arrUnparseAspectClasses = null ;
-	}
 	
 	private function parseAspectClass($sAspectClass)
 	{
-		$aClassFile = $this->aspectClassFile($sAspectClass) ;
+		if( !$aClassFile = $this->classLoader()->searchClass($sAspectClass) )
+		{
+			throw new Exception("注册到AOP中的Aspace(%s)不存在; Aspace必须是一个有效的类",$sAspectClass) ;
+		}
 	
 		$aClassCompiler = CompilerFactory::singleton()->create() ;
 		$aTokenPool = $aClassCompiler->scan($aClassFile->openReader()) ;
@@ -196,20 +186,6 @@ class AOP extends Object
 	
 		$this->aspects()->add(Aspect::createFromToken($aClassToken,$aTokenPool)) ;
 	}
-	
-	private function aspectClassFile($sAspectClass)
-	{
-		if( empty($this->arrAspectClasses[$sAspectClass]) )
-		{
-			if( !$this->arrAspectClasses[$sAspectClass] = $this->classLoader()->searchClass($sAspectClass) )
-			{
-				throw new Exception("注册到AOP中的Aspace(%s)不存在; Aspace必须是一个有效的类",$sAspectClass) ;
-			}
-		}
-		
-		return $this->arrAspectClasses[$sAspectClass] ;
-	}
-	
 	
 	/**
 	 * @return jc\pattern\composite\IContainer
@@ -226,7 +202,6 @@ class AOP extends Object
 	
 	
 	private $arrAspectClasses ;
-	private $arrUnparseAspectClasses ;
 	
 	private $aAspects ;
 	

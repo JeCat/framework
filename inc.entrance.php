@@ -41,6 +41,8 @@ require_once __DIR__."/src/lib.php/fs/imp/LocalFile.php" ;
 require_once __DIR__."/src/lib.php/fs/imp/LocalFolder.php" ;
 require_once __DIR__."/src/lib.php/fs/imp/LocalFileSystem.php" ;
 
+require_once __DIR__."/src/lib.php/lang//compile/IStrategySummary.php" ;
+require_once __DIR__."/src/lib.php/lang/aop/AOP.php" ;
 require_once __DIR__."/src/lib.php/lang/compile/Compiler.php" ;
 require_once __DIR__."/src/lib.php/lang/compile/CompilerFactory.php" ;
 

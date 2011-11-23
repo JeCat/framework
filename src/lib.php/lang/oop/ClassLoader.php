@@ -40,11 +40,11 @@ class ClassLoader extends Object
 		spl_autoload_register( array($this,"load") ) ;
 	}
 
-	public function addPackage($sNamespace,$sSourceFolder=null,$sCompiledFolder=null) 
+	public function addPackage($sNamespace,$sSourceFolder=null) 
 	{
 		$aFs = $this->application()->fileSystem() ;
 		
-		$aCompiledFolder = null ;
+		/*$aCompiledFolder = null ;
 		if( $sCompiledFolder )
 		{
 			$sCompiledFolder.= '/' . $this->compiler()->strategySignature() ;
@@ -56,7 +56,7 @@ class ClassLoader extends Object
 						, array($sNamespace,$sCompiledFolder)
 				) ;
 			}
-		}
+		}*/
 		
 		$aSourceFolder = null ;
 		if( $sSourceFolder and !$aSourceFolder=$aFs->findFolder($sSourceFolder) )
@@ -67,19 +67,15 @@ class ClassLoader extends Object
 			) ;
 		}
 		
-		$this->arrPackages[$sNamespace] = array(
-			new Package($sNamespace,$aSourceFolder) , 
-			new Package($sNamespace,$aCompiledFolder) ,
-		) ;
+		$this->arrPackages[$sNamespace] = new Package($sNamespace,$aSourceFolder) ;
 	}
-	
+		
 	/**
 	 * 自动加载类文件
 	 */
 	public function load($sClassName)
 	{
-		$fTime = microtime(true) ;
-		
+			$fTime = microtime(true) ;
 		// 从缓存的 classpath 中加载类
 		/*if( isset($this->arrClassPathCache[$sClassName]) and is_file($this->arrClassPathCache[$sClassName]) )
 		{
@@ -112,7 +108,6 @@ class ClassLoader extends Object
 			exit() ;
 		}
 		
-		
 		$this->fLoadTime+= microtime(true) - $fTime ;
 	}
 	
@@ -127,7 +122,10 @@ class ClassLoader extends Object
 			}
 		}
 		
-		for( end($this->arrPackages); list($aSrcPackage,$aCmpdPackage)=current($this->arrPackages); prev($this->arrPackages) )
+		$aCmpdPackage = $this->compiler()->compiledPackage() ;
+		$sFullInnerPath = dirname( str_replace('\\','/',$sClassName) ) ;
+		
+		for( end($this->arrPackages); $aSrcPackage=current($this->arrPackages); prev($this->arrPackages) )
 		{
 			if( !list($sInnerPath,$sShortClassName)=$aSrcPackage->parsePath($sClassName) )
 			{
@@ -137,7 +135,7 @@ class ClassLoader extends Object
 			// 只搜索编译文件
 			if( ($nSearchFlag&self::SEARCH_ALL)==self::SEARCH_COMPILED )
 			{
-				if( $aCmpdClassFile=$aCmpdPackage->searchClassEx($sInnerPath,$sShortClassName) )
+				if( $aCmpdClassFile=$aCmpdPackage->searchClassEx($sFullInnerPath,$sShortClassName) )
 				{
 					return $aCmpdClassFile ;
 				}
@@ -156,7 +154,7 @@ class ClassLoader extends Object
 			else if( ($nSearchFlag&self::SEARCH_COMPILED_FIRST)==self::SEARCH_COMPILED_FIRST )
 			{
 				// 编译后的文件
-				$aCmpdClassFile = $aCmpdPackage->searchClassEx($sInnerPath,$sShortClassName) ;
+				$aCmpdClassFile = $aCmpdPackage->searchClassEx($sFullInnerPath,$sShortClassName) ;
 			
 				// 找到编译后的文件，且不要求自动编译，则直接返回
 				if( $aCmpdClassFile and ($nSearchFlag&self::AUTO_COMPILE)!=self::AUTO_COMPILE )
@@ -180,7 +178,7 @@ class ClassLoader extends Object
 						// 创建编译文件
 						if( !$aCmpdClassFile )
 						{
-							$aCmpdClassFile = $aCmpdPackage->createClassFile($sInnerPath,$sShortClassName) ;
+							$aCmpdClassFile = $aCmpdPackage->createClassFile($sFullInnerPath,$sShortClassName) ;
 						}
 						
 						// 编译文件
