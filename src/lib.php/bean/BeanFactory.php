@@ -86,7 +86,7 @@ class BeanFactory extends Object
 			$arrConfigFile = $this->findConfig( $sConfName, $sNamespace 
 			) ;
 			// 合并数组
-			self::MergeConfig($arrConfigFile,$arrConfig) ;
+			self::mergeConfig($arrConfigFile,$arrConfig) ;
 			$arrConfig = $arrConfigFile ;
 		}
 		
@@ -120,7 +120,7 @@ class BeanFactory extends Object
 		return $aBean ;
 	}
 	
-	static public function MergeConfig(&$arrConfigA,&$arrConfigB)
+	static public function mergeConfig(&$arrConfigA,&$arrConfigB)
 	{
 		foreach($arrConfigB as $key=>&$item)
 		{
@@ -133,7 +133,7 @@ class BeanFactory extends Object
 			// 在两个config中都是数组元素
 			if( is_array($item) and is_array($arrConfigA[$key]) )
 			{
-				self::MergeConfig($arrConfigA[$key],$item) ;
+				self::mergeConfig($arrConfigA[$key],$item) ;
 			}
 			
 			// 否则 b元素覆盖a的
