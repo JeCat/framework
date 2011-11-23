@@ -231,7 +231,7 @@ class Category extends Model
 	 * 加载原型中的所有分类
 	 * @return \Iterator
 	 */
-	static public function loadTotalCategory(Prototype $aPrototype,$bBuildTree=true,$bReturnTop=false,self $aRoot=null)
+	static public function loadTotalCategory(Prototype $aPrototype)
 	{
 		$aCategoryList = new ModelList($aPrototype) ;
 		
@@ -241,18 +241,6 @@ class Category extends Model
 		if( !$aCategoryList->load($aCriteria) )
 		{
 			return new \EmptyIterator();
-		}
-		
-		if($bBuildTree)
-		{
-			if($bReturnTop)
-			{
-				return self::buildTree($aCategoryList->childIterator(),$aRoot) ;
-			}
-			else
-			{
-				self::buildTree($aCategoryList->childIterator(),$aRoot) ;
-			}
 		}
 		
 		return $aCategoryList->childIterator() ;
