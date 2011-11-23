@@ -20,6 +20,16 @@ class SelectList extends Select {
 		parent::__construct ( $sId, $sTitle , $aView );
 	}
 	
+	public function build(array & $arrConfig,$sNamespace='*')
+	{
+		parent::build ( $arrConfig,$sNamespace );
+	
+		if (array_key_exists ( 'size', $arrConfig ))
+		{
+			$this->setSize((int)$arrConfig['size']);
+		}
+	}
+	
 	public function getSelected(){
 		$arrSelected = array();
 		foreach($this->optionIterator() as $value){
