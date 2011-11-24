@@ -12,7 +12,7 @@ use org\jecat\framework\lang\compile\CompilerFactory;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\Assert;
 
-class ClassLoader extends Object
+class ClassLoader extends Object implements \Serializable
 {
 	const SEARCH_COMPILED = 1 ;		// 在编译文件中搜索类
 	const SEARCH_SOURCE = 2 ;			// 在源文件中搜索类
@@ -261,6 +261,35 @@ class ClassLoader extends Object
 	public function totalLoadTime()
 	{
 		return $this->fLoadTime ;
+	}
+
+	public function serialize()
+	{
+		$arrData = array(
+			'arrPackages' => array() ,
+			'bEnableClassCompile' => &$this->bEnableClassCompile ,
+		) ;
+		
+		foreach($this->arrPackages as $aPackage)
+		{
+			$arrData['arrPackages'][] = array(
+				$aPackage->ns(), $aPackage->folder()->path()
+			) ;
+		}
+		
+		return serialize($arrData) ;
+	}
+
+	public function unserialize($serialized)
+	{
+		$this->__construct() ;
+		
+		$arrData = unserialize($serialized) ;
+		$this->bEnableClassCompile =& $arrData['bEnableClassCompile'] ;
+		foreach($arrData['arrPackages'] as $arrPackage)
+		{
+			$this->addPackage($arrPackage[0],$arrPackage[1]) ;
+		}
 	}
 	
 	private $arrPackages = array() ;
