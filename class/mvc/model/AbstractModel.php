@@ -425,7 +425,7 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	}
 	public function setList($bList=true)
 	{
-		$this->bList = $bList ;
+		$this->bList = $bList? true: false ;
 		return $this ;
 	}
 	
