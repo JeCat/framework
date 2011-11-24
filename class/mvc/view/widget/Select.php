@@ -119,7 +119,7 @@ class Select extends FormWidget {
 	 * 
 	 * 取得option列表的迭代器
 	 *
-	 * @return \jc\pattern\iterate\ArrayIterator
+	 * @return \org\jecat\framework\pattern\iterate\ArrayIterator
 	 */
 	public function optionIterator() {
 		return new \org\jecat\framework\pattern\iterate\ArrayIterator ( $this->arrOptions );
