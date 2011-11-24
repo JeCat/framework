@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\model;
 
+use org\jecat\framework\system\Response;
+
 use org\jecat\framework\io\IOutputStream;
 
 use org\jecat\framework\lang\Object;
@@ -317,7 +319,7 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	{
 		if (! $aOutput)
 		{
-			$aOutput = $this->application ()->response ()->printer ();
+			$aOutput = Response::singleton()->printer();
 		}
 		
 		$aOutput->write ( "<pre>\r\n" );
