@@ -21,29 +21,29 @@ header("Content-Type: text/html; charset=UTF-8") ;
 set_magic_quotes_runtime(false) ;
 
 // 预加载类(Before Class Loader)
-require_once __DIR__."/src/lib.php/lang/IObject.php" ;
-require_once __DIR__."/src/lib.php/lang/Object.php" ;
-require_once __DIR__."/src/lib.php/lang/IException.php" ;
-require_once __DIR__."/src/lib.php/lang/Exception.php" ;
-require_once __DIR__."/src/lib.php/lang/oop/Package.php" ;
-require_once __DIR__."/src/lib.php/lang/oop/ClassLoader.php" ;
-require_once __DIR__."/src/lib.php/system/Application.php" ;
-require_once __DIR__."/src/lib.php/system/ApplicationFactory.php" ;
+require_once __DIR__."/class/lang/IObject.php" ;
+require_once __DIR__."/class/lang/Object.php" ;
+require_once __DIR__."/class/lang/IException.php" ;
+require_once __DIR__."/class/lang/Exception.php" ;
+require_once __DIR__."/class/lang/oop/Package.php" ;
+require_once __DIR__."/class/lang/oop/ClassLoader.php" ;
+require_once __DIR__."/class/system/Application.php" ;
+require_once __DIR__."/class/system/ApplicationFactory.php" ;
 
-require_once __DIR__."/src/lib.php/fs/FileSystem.php" ;
-require_once __DIR__."/src/lib.php/fs/IFSO.php" ;
-require_once __DIR__."/src/lib.php/fs/IFile.php" ;
-require_once __DIR__."/src/lib.php/fs/IFolder.php" ;
-require_once __DIR__."/src/lib.php/fs/FSO.php" ;
-require_once __DIR__."/src/lib.php/fs/imp/LocalFSO.php" ;
-require_once __DIR__."/src/lib.php/fs/imp/LocalFile.php" ;
-require_once __DIR__."/src/lib.php/fs/imp/LocalFolder.php" ;
-require_once __DIR__."/src/lib.php/fs/imp/LocalFileSystem.php" ;
+require_once __DIR__."/class/fs/FileSystem.php" ;
+require_once __DIR__."/class/fs/IFSO.php" ;
+require_once __DIR__."/class/fs/IFile.php" ;
+require_once __DIR__."/class/fs/IFolder.php" ;
+require_once __DIR__."/class/fs/FSO.php" ;
+require_once __DIR__."/class/fs/imp/LocalFSO.php" ;
+require_once __DIR__."/class/fs/imp/LocalFile.php" ;
+require_once __DIR__."/class/fs/imp/LocalFolder.php" ;
+require_once __DIR__."/class/fs/imp/LocalFileSystem.php" ;
 
-require_once __DIR__."/src/lib.php/lang//compile/IStrategySummary.php" ;
-require_once __DIR__."/src/lib.php/lang/aop/AOP.php" ;
-require_once __DIR__."/src/lib.php/lang/compile/Compiler.php" ;
-require_once __DIR__."/src/lib.php/lang/compile/CompilerFactory.php" ;
+require_once __DIR__."/class/lang//compile/IStrategySummary.php" ;
+require_once __DIR__."/class/lang/aop/AOP.php" ;
+require_once __DIR__."/class/lang/compile/Compiler.php" ;
+require_once __DIR__."/class/lang/compile/CompilerFactory.php" ;
 
 
 define( __NAMESPACE__."\\VERSION", '0.6.1' ) ;

@@ -101,7 +101,7 @@ abstract class ApplicationFactory extends Object
 	public function createClassLoader()
 	{		
 		$aClassLoader = new ClassLoader( FileSystem::singleton()->findFile("/classpath.php") ) ;
-		$aClassLoader->addPackage( 'jc', '/framework/src/lib.php', '/framework/bin/lib.php' ) ; // 将 jecat 加入到 class loader 中
+		$aClassLoader->addPackage( 'jc', '/framework/class' ) ; // 将 jecat 加入到 class loader 中
 			
 		return $aClassLoader ;
 	}
