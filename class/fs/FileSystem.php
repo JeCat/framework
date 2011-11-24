@@ -310,7 +310,7 @@ abstract class FileSystem extends Object
 		{
 			if( $this->isFolder($sPath) )
 			{
-				throw new Exception('试图创建File，但由于存在同名Folder无法创建');
+				throw new Exception('试图创建File，但由于存在同名Folder无法创建: %s',$sPath);
 			}
 			else
 			{
