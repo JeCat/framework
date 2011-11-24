@@ -2,16 +2,12 @@
 namespace org\jecat\framework\mvc\model\db\orm;
 
 use org\jecat\framework\db\sql\Statement;
-
 use org\jecat\framework\db\sql\StatementState;
-
 use org\jecat\framework\db\sql\name\NameTransferFactory;
-
 use org\jecat\framework\mvc\model\db\orm\Association;
 use org\jecat\framework\bean\BeanFactory;
 use org\jecat\framework\bean\IBean;
 use org\jecat\framework\db\sql\name\NameTransfer;
-use org\jecat\framework\mvc\model\db\ModelList;
 use org\jecat\framework\mvc\model\db\Model;
 use org\jecat\framework\db\reflecter\AbstractReflecterFactory;
 use org\jecat\framework\lang\Exception;
@@ -436,7 +432,7 @@ class Prototype extends StatementFactory implements IBean
 	 */
 	public function createModel($bList=false)
 	{
-		return $bList? new ModelList($this): new $this->sModelClass($this) ;
+		return new $this->sModelClass($this,$bList) ;
 	}
 	
 	// criteria setter

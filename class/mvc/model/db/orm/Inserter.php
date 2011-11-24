@@ -2,8 +2,6 @@
 
 namespace org\jecat\framework\mvc\model\db\orm;
 
-use org\jecat\framework\mvc\model\IModelList;
-
 use org\jecat\framework\lang\Object;
 use org\jecat\framework\db\DB;
 use org\jecat\framework\mvc\model\db\IModel ;
@@ -140,7 +138,7 @@ class Inserter extends OperationStrategy
 	{
 		foreach($arrToKeys as $nIdx=>$sKey)
 		{
-			if( $aChildModel instanceof IModelList )
+			if( $aChildModel->isList() )
 			{
 				$value = $aModel->data($arrFromKeys[$nIdx]) ;
 				foreach ($aChildModel->childIterator() as $aChildChildModel)

@@ -7,9 +7,9 @@ use org\jecat\framework\lang\Object;
 
 abstract class AbstractModel extends Object implements IModel, \Serializable
 {
-	public function __construct()
+	public function __construct($bList)
 	{
-		parent::__construct ();
+		$this->setList($bList) ;
 	}
 	
 	// for child model ///////////////////////////////
@@ -323,7 +323,7 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 		$aOutput->write ( "<pre>\r\n" );
 		
 		$aOutput->write ( str_repeat ( "\t", $nDepth ) );
-		$aOutput->write ( (($this instanceof IModelList)? "[Model List]" : "[Model]") );
+		$aOutput->write ( ($this->isList()? "[Model List]" : "[Model]") );
 		$aOutput->write ( "\r\n" );
 		
 		if (!empty($this->arrDatas))
@@ -418,6 +418,18 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	{
 		return isset($this->arrDatas[$sName])?  $this->arrDatas[$sName]: null ;
 	}
+	
+	public function isList()
+	{
+		return $this->bList ;
+	}
+	public function setList($bList=true)
+	{
+		$this->bList = $bList ;
+		return $this ;
+	}
+	
+	private $bList = false ;
 	
 	private $arrDatas = null;
 	
