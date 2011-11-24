@@ -188,7 +188,8 @@ class Category extends Model
 	 * 建立分类所属关系的树形结构
 	 * $aCategories 中的分类必须按照 lft 排序
 	 * 
-	 * 如果提供 $aRoot 参数，则返回将所有第一层分类add给 $aRoot分类，并返回 
+	 * 改造参数$aCategories中的元素,将元素间的关系保存在元素的属性中,$aCategories的迭代顺序依然不变
+	 * 如果提供 $aRoot 参数，则将所有第一层分类add给 $aRoot分类，并将add后的$aRoot作为函数返回值返回,
 	 * 如果 $aRoot=null，则返回一个包含所有 第一层分类的数组
 	 */
 	static public function buildTree(\Iterator $aCategories,self $aRoot=null)
@@ -228,7 +229,8 @@ class Category extends Model
 	}
 	
 	/**
-	 * 加载原型中的所有分类
+	 * 加载原型中的所有分类,作为迭代器返回
+	 * 返回的迭代器的元素中不包含他们之间的关系,如果需要分类间的关系,使用本类的buildTree方法
 	 * @return \Iterator
 	 */
 	static public function loadTotalCategory(Prototype $aPrototype)

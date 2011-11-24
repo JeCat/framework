@@ -27,8 +27,15 @@ class Select extends FormWidget {
 		}
 	}
 	
-	//增加option条目 
-	//selected 该选项是否默认选中	
+	
+	/**
+	 * 增加option条目 
+	 * selected 该选项是否默认选中
+	 * @param string $sText option显示的文字
+	 * @param mixed $sValue  option的值
+	 * @param bool $bSelected 是否被选中,默认false
+	 * @return Select
+	 */
 	public function addOption($sText, $sValue=null, $bSelected=false )
 	{
 		$this->arrOptions [] = Array ($sValue, $sText, $bSelected );
@@ -51,14 +58,14 @@ class Select extends FormWidget {
 	}
 	
 	public function unsetSelected(){
-		foreach($this->arrOptions as $value){
+		foreach($this->arrOptions as &$value){
 			$value[2] = false;
 		}
 	}
 	
 	public function getSelected(){
 		$arrSelected = array();
-		foreach($this->arrOptions as $value){
+		foreach($this->arrOptions as &$value){
 			if($value[2] == true){
 				$arrSelected = $value;
 			}
@@ -108,7 +115,12 @@ class Select extends FormWidget {
 		}
 		return $this->arrOptions[$nIndex][0];
 	}
-	//取得option列表
+	/**
+	 * 
+	 * 取得option列表的迭代器
+	 *
+	 * @return \org\jecat\framework\pattern\iterate\ArrayIterator
+	 */
 	public function optionIterator() {
 		return new \org\jecat\framework\pattern\iterate\ArrayIterator ( $this->arrOptions );
 	}

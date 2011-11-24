@@ -4,6 +4,7 @@ namespace org\jecat\framework\mvc\view\widget;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\util\IDataSrc;
 use org\jecat\framework\mvc\view\IView;
+use org\jecat\framework\mvc\view\widget\Select;
 
 class SelectList extends Select {
 	public function __construct($sId=null, $sTitle = null, $nSize = 4, $bMultiple = false, IView $aView = null) {
@@ -18,6 +19,16 @@ class SelectList extends Select {
 		$this->setSerializMethod ( array (__CLASS__, 'serialize' ), array (',' ) );
 		$this->setUnSerializMethod ( array (__CLASS__, 'unserialize' ), array (',' ) );
 		parent::__construct ( $sId, $sTitle , $aView );
+	}
+	
+	public function build(array & $arrConfig,$sNamespace='*')
+	{
+		parent::build ( $arrConfig,$sNamespace );
+	
+		if (array_key_exists ( 'size', $arrConfig ))
+		{
+			$this->setSize((int)$arrConfig['size']);
+		}
 	}
 	
 	public function getSelected(){
