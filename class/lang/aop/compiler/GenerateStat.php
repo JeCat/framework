@@ -9,12 +9,11 @@ use org\jecat\framework\lang\aop\Pointcut;
 
 class GenerateStat 
 {
-	public function __construct(TokenPool $aTokenPool,Token $aToken,Pointcut $aPointcut,JointPoint $aJointPoint)
+	public function __construct(TokenPool $aTokenPool,Token $aToken,array &$arrAdvices)
 	{
 		$this->aTokenPool = $aTokenPool ;
 		$this->aExecutePoint = $aToken ;
-		$this->aPointcut = $aPointcut ;
-		$this->aJointPoint = $aJointPoint ;
+		$this->arrAdvices =& $arrAdvices ;
 	}
 	
 	/**
@@ -22,15 +21,7 @@ class GenerateStat
 	 */
 	public $aExecutePoint ;
 	
-	/**
-	 * @var	org\jecat\framework\lang\aop\Pointcut
-	 */
-	public $aPointcut ;
-	
-	/**
-	 * @var	org\jecat\framework\lang\aop\JointPoint
-	 */
-	public $aJointPoint ;
+	public $arrAdvices ;
 	
 	/**
 	 * @var	org\jecat\framework\lang\compile\object\TokenPool

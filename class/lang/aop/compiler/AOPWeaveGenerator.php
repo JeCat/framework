@@ -19,15 +19,32 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 {
 	public function generateTargetCode(TokenPool $aTokenPool, Token $aObject)
 	{
+		$arrAdvices = null ;
+		
 		foreach($this->aop()->pointcutIterator() as $aPointcut)
 		{
+			$bBingo = false ;
 			foreach($aPointcut->jointPoints()->iterator() as $aJointPoint)
 			{
 				if( $aJointPoint->matchExecutionPoint($aObject) )
 				{
-					$this->weave(new GenerateStat($aTokenPool,$aObject,$aPointcut,$aJointPoint)) ;
+					$bBingo = true ;
+					break ;
 				}
 			}
+			
+			if($bBingo)
+			{
+				foreach($aPointcut->advices()->iterator() as $aAdvice)
+				{
+					$arrAdvices[] = $aAdvice ;
+				}
+			}
+		}
+		
+		if($arrAdvices)
+		{
+			$this->weave(new GenerateStat($aTokenPool,$aObject,$arrAdvices)) ;
 		}
 	}
 
@@ -75,7 +92,7 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 		) ;
 		
 		// 分拣
-		foreach($aStat->aPointcut->advices()->iterator() as $aAdvice)
+		foreach($aStat->arrAdvices as $aAdvice)
 		{
 			$arrAdviceStacks[ $aAdvice->position() ]->put($aAdvice) ;
 		}
