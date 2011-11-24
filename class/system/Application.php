@@ -97,10 +97,6 @@ class Application extends Object implements \Serializable
 		return ;
 	}
 	
-	public function cache(){
-	    return null;
-	}
-	
 	private $arrGlobalSingeltonInstance ;
 	
 	private $sEntrance = '' ; 

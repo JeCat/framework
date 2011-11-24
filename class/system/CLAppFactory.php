@@ -18,7 +18,7 @@ class CLAppFactory extends ApplicationFactory
 		return $aReq ;
 	}
 	
-	public function createResponse(CoreApplication $aApp)
+	public function createResponse(Application $aApp)
 	{
 		$aPrinter = new \org\jecat\framework\io\ShellPrintStream() ;
 		$aPrinter->setApplication($aApp) ;

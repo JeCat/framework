@@ -1,18 +1,20 @@
 <?php
 namespace org\jecat\framework\cache ;
 
-use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\fs\IFolder;
 
 class FSCache implements ICache
 {
-	public function __construct(FileSystem $aCacheFilesystem)
+	public function __construct(IFolder $aFolder)
 	{
-		$this->aCacheFilesystem = $aCacheFilesystem ;
+		$this->aFolder = $aFolder ;
 	}
 	
 	function item($sDataPath)
 	{
-		if( !$aFile = $this->aCacheFilesystem->findFile($sDataPath) )
+		self::trimPath($sDataPath) ;
+		
+		if( !$aFile = $this->aFolder->findFile($sDataPath) )
 		{
 			return ;
 		}
@@ -23,14 +25,16 @@ class FSCache implements ICache
 	
 	function setItem($sDataPath,$data,$fCreateTimeMicroSec=-1)
 	{
-		if( !$aFile=$this->aCacheFilesystem->findFile($sDataPath) and !$aFile=$this->aCacheFilesystem->createFile($sDataPath) )
+		self::trimPath($sDataPath) ;
+		
+		if( !$aFile=$this->aFolder->findFile($sDataPath) and !$aFile=$this->aFolder->createFile($sDataPath) )
 		{
 			return false ;
 		}
 		
 		if( is_object($data) )
 		{
-			$sSerialize = 'unserialize("'.addslahes(serialize($data)).'")' ;
+			$sSerialize = 'unserialize("'.addslashes(serialize($data)).'")' ;
 		}
 		else 
 		{
@@ -54,7 +58,9 @@ class FSCache implements ICache
 	 */
 	function delete($sDataPath)
 	{
-		$this->aCacheFilesystem->delete($sDataPath) ;
+		self::trimPath($sDataPath) ;
+		
+		$this->aFolder->delete($sDataPath) ;
 	}
 	
 	/**
@@ -64,7 +70,9 @@ class FSCache implements ICache
 	 */
 	function isExpire($sDataPath,$fValidSec)
 	{
-		if( !$aFile = $this->aCacheFilesystem->findFile($sDataPath) )
+		self::trimPath($sDataPath) ;
+		
+		if( !$aFile = $this->aFolder->findFile($sDataPath) )
 		{
 			return ;
 		}
@@ -80,7 +88,9 @@ class FSCache implements ICache
 	 */
 	function createTime($sDataPath)
 	{
-		if( !$aFile = $this->aCacheFilesystem->findFile($sDataPath) )
+		self::trimPath($sDataPath) ;
+		
+		if( !$aFile = $this->aFolder->findFile($sDataPath) )
 		{
 			return ;
 		}
@@ -89,9 +99,17 @@ class FSCache implements ICache
 		return $fTime ;
 	}
 	
+	static public function trimPath(&$sPath)
+	{
+		if( strlen($sPath)>0 and substr($sPath,0,1)=='/' )
+		{
+			$sPath = substr($sPath,1) ;
+		}
+	}
+	
 	/**
 	 * @var org\jecat\framework\fs\FileSystem
 	 */
-	private $aCacheFilesystem ;
+	private $aFolder ;
 }
 ?>

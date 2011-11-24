@@ -59,28 +59,25 @@ abstract class ApplicationFactory extends Object
 		$aOriApp = Application::switchSingleton($aApp) ;		
 		
 		// filesystem
-		FileSystem::setSingleton($this->createFileSystem($sApplicationRootPath)) ;
+		FileSystem::setSingleton($this->createFileSystem($aApp,$sApplicationRootPath)) ;
 		
 		// 初始化 class loader
-		ClassLoader::setSingleton($this->createClassLoader()) ;
+		ClassLoader::setSingleton($this->createClassLoader($aApp)) ;
 		
 		// AccessRouter
-		AccessRouter::setSingleton($this->createAccessRouter()) ;
+		AccessRouter::setSingleton($this->createAccessRouter($aApp)) ;
 		
 		// LocalManager
-		LocaleManager::setSingleton($this->createLocaleManager()) ;
+		LocaleManager::setSingleton($this->createLocaleManager($aApp)) ;
 		
 		// Request
-		Request::setSingleton( $this->createRequest() ) ;
+		Request::setSingleton( $this->createRequest($aApp) ) ;
 		
 		// Response
-		Response::setSingleton( $this->createResponse() ) ;
+		Response::setSingleton( $this->createResponse($aApp) ) ;
 		
 		// setting
-		Setting::setSingleton($this->createSetting()) ;
-		
-		// setting
-		Setting::setSingleton($this->createSetting()) ;
+		Setting::setSingleton($this->createSetting($aApp)) ;
 		
 		if($aOriApp)
 		{
@@ -88,7 +85,7 @@ abstract class ApplicationFactory extends Object
 		}
 	}
 	
-	public function createFileSystem($sRootPath)
+	public function createFileSystem(Application $aApp,$sRootPath)
 	{
 		$aFileSystem = new LocalFileSystem($sRootPath) ;
 		
@@ -98,7 +95,7 @@ abstract class ApplicationFactory extends Object
 		return $aFileSystem ;
 	}
 
-	public function createClassLoader()
+	public function createClassLoader(Application $aApp)
 	{		
 		$aClassLoader = new ClassLoader( FileSystem::singleton()->findFile("/classpath.php") ) ;
 		$aClassLoader->addPackage( 'org\\jecat\\framework', '/framework/class' ) ; // 将 jecat 加入到 class loader 中
@@ -106,20 +103,20 @@ abstract class ApplicationFactory extends Object
 		return $aClassLoader ;
 	}
 	
-	public function createAccessRouter()
+	public function createAccessRouter(Application $aApp)
 	{
 		return new AccessRouter() ;
 	}
 	
-	public function createLocaleManager()
+	public function createLocaleManager(Application $aApp)
 	{
 		return new LocaleManager('cn') ;
 	}
 	
-	abstract public function createRequest() ;
+	abstract public function createRequest(Application $aApp) ;
 
 	
-	public function createResponse(PrintStream $aPrinter)
+	public function createResponse(Application $aApp,PrintStream $aPrinter)
 	{
 		$aRespn = new Response($aPrinter) ;
 		$aRespn->setFilters(StdOutputFilterMgr::singleton()) ;

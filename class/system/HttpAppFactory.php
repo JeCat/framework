@@ -5,7 +5,7 @@ use org\jecat\framework\fs\FileSystem;
 
 class HttpAppFactory extends ApplicationFactory
 {
-	public function createRequest()
+	public function createRequest(Application $aApp)
 	{
 		require_once \org\jecat\framework\PATH."/class/util/IHashTable.php" ;
 		require_once \org\jecat\framework\PATH."/class/util/IDataSrc.php" ;
@@ -22,11 +22,11 @@ class HttpAppFactory extends ApplicationFactory
 		return $aReq ;
 	}
 	
-	public function createResponse()
+	public function createResponse(Application $aApp)
 	{
 		// 向客户端发送有效的编码
 		header("Content-type: text/html; charset=UTF-8");
-		$aRespn = parent::createResponse(new \org\jecat\framework\io\HtmlPrintStream()) ;
+		$aRespn = parent::createResponse($aApp,new \org\jecat\framework\io\HtmlPrintStream()) ;
 		
 		return $aRespn ;
 	}
