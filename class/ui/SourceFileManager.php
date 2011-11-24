@@ -35,7 +35,7 @@ class SourceFileManager extends ResourceManager
 		
 		if( $aCompiledFolder = $aFolder->property('compiled') )
 		{
-			$aCompiledFolder->findFile($this->compiledSubFolderName().'/'.$aSourceFile->name().'.php') ;
+			return $aCompiledFolder->findFile($this->compiledSubFolderName().'/'.$aSourceFile->name().'.php') ;
 		}
 		else
 		{
