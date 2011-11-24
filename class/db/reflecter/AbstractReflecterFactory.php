@@ -162,22 +162,22 @@ abstract class AbstractReflecterFactory
 	
 	static public function dbCachePath($sDBName)
 	{
-		return $sDBName;
+		return "/db/reflection/{$sDBName}/database-struct";
 	}
 	
 	static public function tableCachePath($sTable,$sDBName)
 	{
-		return $sDBName . '/' . $sTable;
+		return "/db/reflection/{$sDBName}/{$sTable}/table-struct";
 	}
 	
 	static public function columnCachePath($sTable,$sDBName,$sColumn)
 	{
-		return $sDBName . '/' . $sTable . '/column_' .$sColumn;
+		return "/db/reflection/{$sDBName}/{$sTable}/columns/{$sColumn}";
 	}
 	
 	static public function indexCachePath($sTable,$sDBName,$sIndex)
 	{
-		return $sDBName . '/' . $sTable . '/index_' .$sIndex;
+		return "/db/reflection/{$sDBName}/{$sTable}/indexies/{$sIndex}";
 	}
 	
 	/**
