@@ -1,17 +1,17 @@
 <?php
-namespace jc\mvc\view\widget\menu;
+namespace org\jecat\framework\mvc\view\widget\menu;
 
-use jc\lang\Exception;
-use jc\util\IDataSrc;
-use jc\bean\BeanFactory ;
-use jc\ui\UI;
-use jc\io\IOutputStream;
-use jc\util\IHashTable;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\util\IDataSrc;
+use org\jecat\framework\bean\BeanFactory ;
+use org\jecat\framework\ui\UI;
+use org\jecat\framework\io\IOutputStream;
+use org\jecat\framework\util\IHashTable;
 
 class Menu extends AbstractBase
 {
 	public function __construct($sId =null , IView $aView = null) {
-        parent::__construct ( $sId , 'jc:WidgetMenu.template.html', null , $aView );
+        parent::__construct ( $sId , 'org.jecat.framework:WidgetMenu.template.html', null , $aView );
     }
     
 	/**
@@ -63,7 +63,7 @@ class Menu extends AbstractBase
 	}
 	
 	public function itemIterator(){
-		return new \jc\pattern\iterate\ArrayIterator ( $this->arrItems );
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator ( $this->arrItems );
 	}
 	
 	private function addItemPrivate(Item $aItem){

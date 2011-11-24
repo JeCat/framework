@@ -1,20 +1,20 @@
 <?php
-namespace jc\mvc\view\widget ;
+namespace org\jecat\framework\mvc\view\widget ;
 
-use jc\bean\BeanFactory;
-use jc\bean\IBean;
-use jc\resrc\HtmlResourcePool;
-use jc\util\StopFilterSignal;
-use jc\message\Message;
-use jc\message\IMessageQueue;
-use jc\message\MessageQueue;
-use jc\util\HashTable;
-use jc\ui\UI;
-use jc\io\IOutputStream;
-use jc\mvc\view\IView;
-use jc\lang\Exception;
-use jc\util\IHashTable;
-use jc\lang\Object ;
+use org\jecat\framework\bean\BeanFactory;
+use org\jecat\framework\bean\IBean;
+use org\jecat\framework\resrc\HtmlResourcePool;
+use org\jecat\framework\util\StopFilterSignal;
+use org\jecat\framework\message\Message;
+use org\jecat\framework\message\IMessageQueue;
+use org\jecat\framework\message\MessageQueue;
+use org\jecat\framework\util\HashTable;
+use org\jecat\framework\ui\UI;
+use org\jecat\framework\io\IOutputStream;
+use org\jecat\framework\mvc\view\IView;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\util\IHashTable;
+use org\jecat\framework\lang\Object ;
 
 class Widget extends Object implements IViewWidget, IBean
 {	
@@ -49,7 +49,7 @@ class Widget extends Object implements IViewWidget, IBean
      *  title			string
      *  template		string
      *   
-     * @see jc\bean\IBean::build()
+     * @see org\jecat\framework\bean\IBean::build()
      */
 	public function build(array & $arrConfig,$sNamespace='*')
 	{
@@ -172,7 +172,7 @@ class Widget extends Object implements IViewWidget, IBean
 	}
 	public function attributeNameIterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator(array_keys($this->arrAttributes)) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator(array_keys($this->arrAttributes)) ;
 	}
 	public function removeAttribute($sName)
 	{

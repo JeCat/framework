@@ -1,7 +1,7 @@
 <?php
-namespace jc\util\match ;
+namespace org\jecat\framework\util\match ;
 
-use jc\lang\Object;
+use org\jecat\framework\lang\Object;
 
 class Result extends Object
 {

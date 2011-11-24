@@ -1,10 +1,10 @@
 <?php
 
-namespace jc\mvc\view\widget ;
+namespace org\jecat\framework\mvc\view\widget ;
 
 
-use jc\verifier\IVerifier;
-use jc\util\IDataSrc;
+use org\jecat\framework\verifier\IVerifier;
+use org\jecat\framework\util\IDataSrc;
 
 interface IViewFormWidget extends IViewWidget
 {	
@@ -19,14 +19,14 @@ interface IViewFormWidget extends IViewWidget
 	public function setDataFromSubmit(IDataSrc $aDataSrc) ;
 	
 	/**
-	 * @return jc\verifier\VerifierManager
+	 * @return org\jecat\framework\verifier\VerifierManager
 	 */
 	public function dataVerifiers() ;
 
 	public function verifyData() ;
 	
 	/**
-	 * @return jc\verifier\VerifierManager
+	 * @return org\jecat\framework\verifier\VerifierManager
 	 */
 	public function addVerifier(IVerifier $aVerifier, $sExceptionWords=null, $callback=null, $arrCallbackArgvs=array()) ;
 	

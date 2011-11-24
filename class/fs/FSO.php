@@ -1,8 +1,8 @@
 <?php
-namespace jc\fs ;
+namespace org\jecat\framework\fs ;
 
-use jc\fs\FileSystem;
-use jc\lang\Object;
+use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\lang\Object;
 
 abstract class FSO extends Object implements IFSO
 {
@@ -125,7 +125,7 @@ abstract class FSO extends Object implements IFSO
 	
 	/**
 	 * (non-PHPdoc)
-	 * @see jc\fs.IFSO::httpUrl()
+	 * @see org\jecat\framework\fs.IFSO::httpUrl()
 	 */
 	public function httpUrl()
 	{
@@ -173,7 +173,7 @@ abstract class FSO extends Object implements IFSO
 	{
 		if ( ( is_string($to) and $this->fileSystem()->rootFileSystem()->exists($to) ) 
 				or ( ( $to instanceof IFile or $to instanceof IFolder) and $to->exists() ) ){
-			throw new \jc\lang\Exception('复制目标已存在，无法复制');
+			throw new \org\jecat\framework\lang\Exception('复制目标已存在，无法复制');
 		}
 		if ( is_string($to) ){
 			if( $this instanceof IFile ){
@@ -181,7 +181,7 @@ abstract class FSO extends Object implements IFSO
 			}else if( $this instanceof IFolder ){
 				$to = $this->fileSystem()->rootFileSystem()->createFolder($to) ;
 			}else{
-				throw new \jc\lang\Exception('this即不是IFile也不是IFolder');
+				throw new \org\jecat\framework\lang\Exception('this即不是IFile也不是IFolder');
 			}
 		}
 		if( $this instanceof IFile ){
@@ -195,16 +195,16 @@ abstract class FSO extends Object implements IFSO
 				}
 				return $to;
 			}else{
-				throw new \jc\lang\Exception('this是IFile而to不是IFile，无法将一个文件复制成其它类型');
+				throw new \org\jecat\framework\lang\Exception('this是IFile而to不是IFile，无法将一个文件复制成其它类型');
 			}
 		}else if ( $this instanceof IFolder ){
 			if( $to instanceof IFolder ){
-				throw new \jc\lang\Exception('暂时还没实现将一个目录递归复制到另一个位置');
+				throw new \org\jecat\framework\lang\Exception('暂时还没实现将一个目录递归复制到另一个位置');
 			}else{
-				throw new \jc\lang\Exception('this是IFolder而to不是IFolder，无法将一个目录复制成其它类型');
+				throw new \org\jecat\framework\lang\Exception('this是IFolder而to不是IFolder，无法将一个目录复制成其它类型');
 			}
 		}else{
-				throw new \jc\lang\Exception('this即不是IFile也不是IFolder');
+				throw new \org\jecat\framework\lang\Exception('this即不是IFile也不是IFolder');
 		}
 	}
 	

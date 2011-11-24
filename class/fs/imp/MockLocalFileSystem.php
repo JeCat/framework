@@ -1,7 +1,7 @@
 <?php
-namespace jc\fs\imp ;
+namespace org\jecat\framework\fs\imp ;
 
-use jc\fs\imp\Local\FileSystem;
+use org\jecat\framework\fs\imp\Local\FileSystem;
 
 class MockLocalFileSystem extends LocalFileSystem
 {

@@ -1,10 +1,10 @@
 <?php
-namespace jc\io ;
+namespace org\jecat\framework\io ;
 
-use jc\util\String;
-use jc\lang\Object;
-use jc\io\IClosable;
-use jc\io\IInputStream;
+use org\jecat\framework\util\String;
+use org\jecat\framework\lang\Object;
+use org\jecat\framework\io\IClosable;
+use org\jecat\framework\io\IInputStream;
 
 class ShellInputStream extends InputStream
 {

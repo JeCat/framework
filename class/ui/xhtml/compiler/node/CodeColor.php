@@ -1,7 +1,7 @@
 <?php
-namespace jc\ui\xhtml\compiler\node ;
+namespace org\jecat\framework\ui\xhtml\compiler\node ;
 
-use jc\ui\TargetCodeOutputStream;
+use org\jecat\framework\ui\TargetCodeOutputStream;
 
 class CodeColor
 {

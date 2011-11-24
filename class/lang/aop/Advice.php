@@ -1,9 +1,9 @@
 <?php
-namespace jc\lang\aop ;
+namespace org\jecat\framework\lang\aop ;
 
-use jc\lang\Exception;
-use jc\lang\compile\object\FunctionDefine;
-use jc\pattern\composite\NamedObject;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\compile\object\FunctionDefine;
+use org\jecat\framework\pattern\composite\NamedObject;
 
 class Advice extends NamedObject
 {
@@ -96,7 +96,7 @@ class Advice extends NamedObject
 	private $sPosition ;
 	
 	/**
-	 * @var jc\lang\compile\object\FunctionDefine
+	 * @var org\jecat\framework\lang\compile\object\FunctionDefine
 	 */
 	private $aToken ;
 }

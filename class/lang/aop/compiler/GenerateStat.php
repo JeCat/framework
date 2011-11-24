@@ -1,11 +1,11 @@
 <?php
 
-namespace jc\lang\aop\compiler ;
+namespace org\jecat\framework\lang\aop\compiler ;
 
-use jc\lang\aop\jointpoint\JointPoint;
-use jc\lang\compile\object\TokenPool;
-use jc\lang\compile\object\Token;
-use jc\lang\aop\Pointcut;
+use org\jecat\framework\lang\aop\jointpoint\JointPoint;
+use org\jecat\framework\lang\compile\object\TokenPool;
+use org\jecat\framework\lang\compile\object\Token;
+use org\jecat\framework\lang\aop\Pointcut;
 
 class GenerateStat 
 {
@@ -18,27 +18,27 @@ class GenerateStat
 	}
 	
 	/**
-	 * @var	jc\lang\compile\object\Token
+	 * @var	org\jecat\framework\lang\compile\object\Token
 	 */
 	public $aExecutePoint ;
 	
 	/**
-	 * @var	jc\lang\aop\Pointcut
+	 * @var	org\jecat\framework\lang\aop\Pointcut
 	 */
 	public $aPointcut ;
 	
 	/**
-	 * @var	jc\lang\aop\JointPoint
+	 * @var	org\jecat\framework\lang\aop\JointPoint
 	 */
 	public $aJointPoint ;
 	
 	/**
-	 * @var	jc\lang\compile\object\TokenPool
+	 * @var	org\jecat\framework\lang\compile\object\TokenPool
 	 */
 	public $aTokenPool ;
 	
 	/**
-	 * @var	jc\lang\compile\object\FunctionDefine
+	 * @var	org\jecat\framework\lang\compile\object\FunctionDefine
 	 */
 	public $aAdvicesDispatchFunc ;
 	

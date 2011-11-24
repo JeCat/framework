@@ -1,9 +1,9 @@
 <?php 
-namespace jc\db\sql ;
+namespace org\jecat\framework\db\sql ;
 
-use jc\lang\Type;
-use jc\util\HashTable;
-use jc\lang\Exception;
+use org\jecat\framework\lang\Type;
+use org\jecat\framework\util\HashTable;
+use org\jecat\framework\lang\Exception;
 
 abstract class MultiTableStatement extends Statement
 {
@@ -18,7 +18,7 @@ abstract class MultiTableStatement extends Statement
 	
 	public function addTable($table)
 	{
-		Type::check(array('string','jc\\db\\sql\\Table'),$table) ;
+		Type::check(array('string','org\\jecat\\framework\\db\\sql\\Table'),$table) ;
 		$this->arrTables[] = $table ;
 	}
 

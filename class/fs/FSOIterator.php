@@ -1,8 +1,8 @@
 <?php
-namespace jc\fs ;
+namespace org\jecat\framework\fs ;
 
-use jc\util\FilterMangeger;
-use jc\lang\Exception;
+use org\jecat\framework\util\FilterMangeger;
+use org\jecat\framework\lang\Exception;
 
 class FSOIterator extends \FilterIterator
 {

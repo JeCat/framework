@@ -1,7 +1,7 @@
 <?php
-namespace jc\auth ;
+namespace org\jecat\framework\auth ;
 
-use jc\mvc\model\IModel;
+use org\jecat\framework\mvc\model\IModel;
 
 interface IIdentity 
 {
@@ -36,7 +36,7 @@ interface IIdentity
 	
 	
 	/**
-	 * @return jc\mvc\model\IModel
+	 * @return org\jecat\framework\mvc\model\IModel
 	 */
 	public function userDataModel() ;
 	public function setUserDataModel(IModel $aModel) ;

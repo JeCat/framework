@@ -1,5 +1,5 @@
 <?php
-namespace jc\lang\compile\object ;
+namespace org\jecat\framework\lang\compile\object ;
 
 class ClassDefine extends StructDefine
 {

@@ -1,16 +1,16 @@
 <?php
-namespace jc\ui\xhtml\parsers ;
+namespace org\jecat\framework\ui\xhtml\parsers ;
 
-use jc\lang\Exception;
-use jc\ui\xhtml\ObjectBase;
-use jc\ui\xhtml\Node;
-use jc\ui\xhtml\Macro;
-use jc\ui\xhtml\AttributeValue;
-use jc\ui\xhtml\Tag;
-use jc\ui\xhtml\Text;
-use jc\ui\xhtml\IObject;
-use jc\lang\Object as JcObject;
-use jc\util\String;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\ui\xhtml\ObjectBase;
+use org\jecat\framework\ui\xhtml\Node;
+use org\jecat\framework\ui\xhtml\Macro;
+use org\jecat\framework\ui\xhtml\AttributeValue;
+use org\jecat\framework\ui\xhtml\Tag;
+use org\jecat\framework\ui\xhtml\Text;
+use org\jecat\framework\ui\xhtml\IObject;
+use org\jecat\framework\lang\Object as JcObject;
+use org\jecat\framework\util\String;
 
 abstract class ParserState extends JcObject
 {

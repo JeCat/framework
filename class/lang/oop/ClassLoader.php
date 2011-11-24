@@ -1,16 +1,16 @@
 <?php
-namespace jc\lang\oop ;
+namespace org\jecat\framework\lang\oop ;
 
-use jc\system\Application;
-use jc\fs\IFile;
-use jc\lang\Object;
-use jc\lang\compile\ClassCompileException;
-use jc\fs\FileSystem;
-use jc\io\OutputStream;
-use jc\io\InputStream;
-use jc\lang\compile\CompilerFactory;
-use jc\lang\Exception;
-use jc\lang\Assert;
+use org\jecat\framework\system\Application;
+use org\jecat\framework\fs\IFile;
+use org\jecat\framework\lang\Object;
+use org\jecat\framework\lang\compile\ClassCompileException;
+use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\io\OutputStream;
+use org\jecat\framework\io\InputStream;
+use org\jecat\framework\lang\compile\CompilerFactory;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\Assert;
 
 class ClassLoader extends Object
 {
@@ -223,7 +223,7 @@ class ClassLoader extends Object
 	 */
 	public function namespaceIterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator( array_keys($this->arrPackages) ) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator( array_keys($this->arrPackages) ) ;
 	}
 	
 	public function compiler()
@@ -269,7 +269,7 @@ class ClassLoader extends Object
 	
 	private $bEnableClassCompile = false ;
 	
-	private $sSkipClassesForCompile = '`^jc\\\\(util|io|system|lang|pattern)\\\\`' ;
+	private $sSkipClassesForCompile = '`^org\\\\jecat\\\\framework\\\\(util|io|system|lang|pattern)\\\\`' ;
 	
 	private $fLoadTime = 0 ;
 	

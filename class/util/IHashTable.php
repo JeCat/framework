@@ -1,6 +1,6 @@
 <?php
 
-namespace jc\util ;
+namespace org\jecat\framework\util ;
 
 interface IHashTable
 {

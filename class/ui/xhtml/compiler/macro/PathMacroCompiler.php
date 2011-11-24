@@ -1,10 +1,10 @@
 <?php
-namespace jc\ui\xhtml\compiler\macro ;
+namespace org\jecat\framework\ui\xhtml\compiler\macro ;
 
-use jc\ui\xhtml\compiler\MacroCompiler ;
-use jc\ui\TargetCodeOutputStream;
-use jc\ui\CompilerManager;
-use jc\ui\IObject;
+use org\jecat\framework\ui\xhtml\compiler\MacroCompiler ;
+use org\jecat\framework\ui\TargetCodeOutputStream;
+use org\jecat\framework\ui\CompilerManager;
+use org\jecat\framework\ui\IObject;
 
 class PathMacroCompiler extends MacroCompiler
 {

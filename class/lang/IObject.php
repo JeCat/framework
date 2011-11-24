@@ -1,22 +1,22 @@
 <?php
 
-namespace jc\lang ;
+namespace org\jecat\framework\lang ;
 
-use jc\system\Application ;
+use org\jecat\framework\system\Application ;
 
 interface IObject
 {
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return jc\system\Application
+	 * @return org\jecat\framework\system\Application
 	 */
 	public function application($bDefaultGlobal=true) ;
 	
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return jc\system\Application
+	 * @return org\jecat\framework\system\Application
 	 */
 	public function setApplication(Application $aApp) ;
 }

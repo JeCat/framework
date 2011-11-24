@@ -1,19 +1,19 @@
 <?php
-namespace jc\fs ;
+namespace org\jecat\framework\fs ;
 
 interface IFile extends IFSO
 {
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return jc\io\IOutputStream
+	 * @return org\jecat\framework\io\IOutputStream
 	 */
 	public function openWriter() ;
 	
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return jc\io\IInputStream
+	 * @return org\jecat\framework\io\IInputStream
 	 */
 	public function openReader() ;
 	

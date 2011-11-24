@@ -1,9 +1,9 @@
 <?php
-namespace jc\bean ;
+namespace org\jecat\framework\bean ;
 
-use jc\resrc\ResourceManager;
-use jc\lang\Type;
-use jc\lang\Object;
+use org\jecat\framework\resrc\ResourceManager;
+use org\jecat\framework\lang\Type;
+use org\jecat\framework\lang\Object;
 
 class BeanFactory extends Object
 {
@@ -19,37 +19,37 @@ class BeanFactory extends Object
 			$aSingleton = new self() ;
 			
 			// mvc
-			$aSingleton->registerBeanClass("jc\\mvc\\controller\\Controller","controller") ;
-			$aSingleton->registerBeanClass("jc\\mvc\\view\\View",'view') ;
-			$aSingleton->registerBeanClass("jc\\mvc\\view\\FormView",'form') ;
-			$aSingleton->registerBeanClass("jc\\mvc\\model\\db\\Model",'model') ;
-			$aSingleton->registerBeanClass("jc\\mvc\\model\\db\\Category",'category') ;
-			$aSingleton->registerBeanClass("jc\\mvc\\model\\db\\orm\\Prototype",'prototype') ;
-			$aSingleton->registerBeanClass("jc\\mvc\\model\\db\\orm\\Association",'association') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\controller\\Controller","controller") ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\view\\View",'view') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\view\\FormView",'form') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\model\\db\\Model",'model') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\model\\db\\Category",'category') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\model\\db\\orm\\Prototype",'prototype') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\model\\db\\orm\\Association",'association') ;
 			
 			// jecat widgets
-			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\Text",'text') ;
-			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\Select",'select') ;
-			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\SelectList",'list') ;
-			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\CheckBtn",'checkbox') ;
-			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\File",'file') ;
-			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\Group",'group') ;
-			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\RadioGroup",'radios') ;
-			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\paginator\\Paginator",'paginator') ;
-			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\menu\\Menu",'menu') ;
-			$aSingleton->registerBeanClass("jc\\mvc\\view\\widget\\menu\\Item",'menuItem') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\view\\widget\\Text",'text') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\view\\widget\\Select",'select') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\view\\widget\\SelectList",'list') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\view\\widget\\CheckBtn",'checkbox') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\view\\widget\\File",'file') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\view\\widget\\Group",'group') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\view\\widget\\RadioGroup",'radios') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\view\\widget\\paginator\\Paginator",'paginator') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\view\\widget\\menu\\Menu",'menu') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\view\\widget\\menu\\Item",'menuItem') ;
 			
 			// verifyers
-			$aSingleton->registerBeanClass("jc\\verifier\\Email",'email') ;
-			$aSingleton->registerBeanClass("jc\\verifier\\Length",'length') ;
-			$aSingleton->registerBeanClass("jc\\verifier\\Number",'number') ;
-			$aSingleton->registerBeanClass("jc\\verifier\\Same",'same') ;
-			$aSingleton->registerBeanClass("jc\\verifier\\FileExt",'extname') ;
-			$aSingleton->registerBeanClass("jc\\verifier\\FileSize",'filesize') ;
-			$aSingleton->registerBeanClass("jc\\verifier\\ImageArea",'imagearea') ;
-			$aSingleton->registerBeanClass("jc\\verifier\\ImageSize",'imagesize') ;
-			$aSingleton->registerBeanClass("jc\\verifier\\NotEmpty",'notempty') ;
-			$aSingleton->registerBeanClass("jc\\verifier\\Version",'version') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\verifier\\Email",'email') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\verifier\\Length",'length') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\verifier\\Number",'number') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\verifier\\Same",'same') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\verifier\\FileExt",'extname') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\verifier\\FileSize",'filesize') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\verifier\\ImageArea",'imagearea') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\verifier\\ImageSize",'imagesize') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\verifier\\NotEmpty",'notempty') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\verifier\\Version",'version') ;
 			
 			self::setSingleton($aSingleton,__CLASS__) ;
 		}
@@ -59,7 +59,7 @@ class BeanFactory extends Object
 	
 	/**
 	 * 通过传入的对象配置数组，创建一个 IBean 对象
-	 * @return jc\bean\IBean
+	 * @return org\jecat\framework\bean\IBean
 	 */
 	public function createBean(array &$arrConfig,$sNamespace='*',$bAutoBuild=true) 
 	{
@@ -99,9 +99,9 @@ class BeanFactory extends Object
 				throw new BeanConfException("Bean对象配置数组中的 class 属性无效：%s，不存在该名称的类和别名",$arrConfig['class']) ;
 			}
 			
-			if( !Type::hasImplements($arrConfig['class'],'jc\\bean\\IBean') )
+			if( !Type::hasImplements($arrConfig['class'],'org\\jecat\\framework\\bean\\IBean') )
 			{
-				throw new BeanConfException("Bean对象配置数组中的 class 属性无效：%s，必须是一个实现 jc\\bean\\IBean 接口的类",$arrConfig['class']) ;
+				throw new BeanConfException("Bean对象配置数组中的 class 属性无效：%s，必须是一个实现 org\\jecat\\framework\\bean\\IBean 接口的类",$arrConfig['class']) ;
 			}
 			
 			$aBean = new $arrConfig['class'] ;
@@ -235,7 +235,7 @@ class BeanFactory extends Object
 	}
 	
 	/**
-	 * @return jc\resrc\ResourceManager
+	 * @return org\jecat\framework\resrc\ResourceManager
 	 */
 	public function beanFolders()
 	{

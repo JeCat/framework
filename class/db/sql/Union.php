@@ -1,6 +1,6 @@
 <?php 
 
-namespace jc\db\sql ;
+namespace org\jecat\framework\db\sql ;
 
 
 class Union extends Select
@@ -80,11 +80,11 @@ class Union extends Select
 	
 	/**
 	 * 
-	 * @return jc\pattern\iterate\INonlinearIterator
+	 * @return org\jecat\framework\pattern\iterate\INonlinearIterator
 	 */
 	public function iterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator($this->arrSelectStatements) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator($this->arrSelectStatements) ;
 	}
 	
 	

@@ -1,13 +1,13 @@
 <?php
 
-namespace jc\fs\imp ;
+namespace org\jecat\framework\fs\imp ;
 
-use jc\fs\IFolder;
-use jc\fs\IFile;
-use jc\lang\Type;
-use jc\fs\FileSystem;
-use jc\lang\Exception;
-use jc\fs\FSO;
+use org\jecat\framework\fs\IFolder;
+use org\jecat\framework\fs\IFile;
+use org\jecat\framework\lang\Type;
+use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\fs\FSO;
 
 abstract class LocalFSO extends FSO
 {
@@ -113,7 +113,7 @@ abstract class LocalFSO extends FSO
 				return parent::copy($to);
 			}
 			if( $toFSO -> exists() ){
-				throw new \jc\lang\Exception('复制目标已存在，无法复制');
+				throw new \org\jecat\framework\lang\Exception('复制目标已存在，无法复制');
 			}
 			if($toFSO instanceof IFile and $toFSO instanceof LocalFSO ){
 				// php 原生copy函数：如果目标文件已存在，将会被覆盖。
@@ -139,7 +139,7 @@ abstract class LocalFSO extends FSO
 				return parent::copy($to);
 			}
 			if( $toFSO -> exists() ){
-				throw new \jc\lang\Exception('复制目标已存在，无法复制');
+				throw new \org\jecat\framework\lang\Exception('复制目标已存在，无法复制');
 			}
 			if($toFSO instanceof IFile and $toFSO instanceof LocalFSO ){
 				rename($this->localPath(),$toFSO->localPath());

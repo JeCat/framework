@@ -1,5 +1,5 @@
 <?php
-namespace jc\ui\xhtml ;
+namespace org\jecat\framework\ui\xhtml ;
 
 class Mark extends ObjectBase
 {

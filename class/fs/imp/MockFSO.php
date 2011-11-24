@@ -1,11 +1,11 @@
 <?php
-namespace jc\fs\imp ;
+namespace org\jecat\framework\fs\imp ;
 
-use jc\fs\FSO;
-use jc\lang\Object;
+use org\jecat\framework\fs\FSO;
+use org\jecat\framework\lang\Object;
 
 class MockFSO extends FSO{
-	public function __construct(\jc\fs\FileSystem $aFileSystem, $sInnerPath=''){
+	public function __construct(\org\jecat\framework\fs\FileSystem $aFileSystem, $sInnerPath=''){
 		parent::__construct($aFileSystem,$sInnerPath);
 	}
 	public function canRead(){}

@@ -1,8 +1,8 @@
 <?php
-namespace jc\ui\xhtml\weave ;
+namespace org\jecat\framework\ui\xhtml\weave ;
 
-use jc\ui\ObjectContainer;
-use jc\lang\Exception;
+use org\jecat\framework\ui\ObjectContainer;
+use org\jecat\framework\lang\Exception;
 
 class PatchSlot
 {

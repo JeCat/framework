@@ -1,6 +1,6 @@
 <?php
 
-namespace jc\fs ;
+namespace org\jecat\framework\fs ;
 
 abstract class FSIterator implements \Iterator{
 	const DOT = 0x01 ;
@@ -43,7 +43,7 @@ abstract class FSIterator implements \Iterator{
 	
 	public function next (){
 		if ( $this->isStackEmpty() ){
-			throw new \jc\lang\Exception('已经没有了，不能再next了');
+			throw new \org\jecat\framework\lang\Exception('已经没有了，不能再next了');
 			return ;
 		}
 		
@@ -137,7 +137,7 @@ abstract class FSIterator implements \Iterator{
 			}else if( $this->FSOcurrent() instanceof IFile ){
 				return ( $this->nFlags & self::FILE );
 			}else{
-				throw new \jc\lang\Exception($this->FSOcurrent()->path().'即不是IFile也不是IFolder');
+				throw new \org\jecat\framework\lang\Exception($this->FSOcurrent()->path().'即不是IFile也不是IFolder');
 			}
 		}else{
 			return $this->stackTop()->satisfyFlags();

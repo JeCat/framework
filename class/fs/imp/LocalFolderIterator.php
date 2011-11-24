@@ -1,7 +1,7 @@
 <?php
-namespace jc\fs\imp ;
+namespace org\jecat\framework\fs\imp ;
 
-use jc\fs\FSIterator;
+use org\jecat\framework\fs\FSIterator;
 
 class LocalFolderIterator extends FSIterator{
 	public function __construct (LocalFolder $aFolder,$nFlags = self::FLAG_DEFAULT){

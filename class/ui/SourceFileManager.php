@@ -1,11 +1,11 @@
 <?php
 
-namespace jc\ui ;
+namespace org\jecat\framework\ui ;
 
-use jc\fs\FileSystem;
-use jc\fs\IFile;
-use jc\fs\IFolder;
-use jc\resrc\ResourceManager;
+use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\fs\IFile;
+use org\jecat\framework\fs\IFolder;
+use org\jecat\framework\resrc\ResourceManager;
 
 class SourceFileManager extends ResourceManager
 {
@@ -27,7 +27,7 @@ class SourceFileManager extends ResourceManager
 	}
 
 	/**
-	 * @return jc\fs\IFile
+	 * @return org\jecat\framework\fs\IFile
 	 */
 	public function findCompiled(IFile $aSourceFile)
 	{
@@ -44,7 +44,7 @@ class SourceFileManager extends ResourceManager
 	}
 	
 	/**
-	 * @return jc\fs\IFile
+	 * @return org\jecat\framework\fs\IFile
 	 */
 	public function createCompiled(IFile $aSourceFile)
 	{

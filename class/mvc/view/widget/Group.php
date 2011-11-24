@@ -1,17 +1,17 @@
 <?php
-namespace jc\mvc\view\widget;
+namespace org\jecat\framework\mvc\view\widget;
 
-use jc\bean\BeanConfException;
+use org\jecat\framework\bean\BeanConfException;
 
-use jc\bean\BeanFactory;
-use jc\mvc\view\IView;
-use jc\lang\Assert;
-use jc\lang\Type;
-use jc\lang\Exception;
-use jc\util\IDataSrc;
-use jc\io\IOutputStream;
-use jc\util\IHashTable;
-use jc\ui\UI;
+use org\jecat\framework\bean\BeanFactory;
+use org\jecat\framework\mvc\view\IView;
+use org\jecat\framework\lang\Assert;
+use org\jecat\framework\lang\Type;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\util\IDataSrc;
+use org\jecat\framework\io\IOutputStream;
+use org\jecat\framework\util\IHashTable;
+use org\jecat\framework\ui\UI;
 
 class Group extends FormWidget {
 	public function __construct($sId=null, $sTitle = null, IView $aView = null) {
@@ -71,7 +71,7 @@ class Group extends FormWidget {
 	
 	//返回组件列表
 	public function widgetIterator() {
-		return new \jc\pattern\iterate\ArrayIterator ( $this->arrWidgets );
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator ( $this->arrWidgets );
 	}
 	
 	//清除所有子控件

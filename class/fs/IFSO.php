@@ -1,5 +1,5 @@
 <?php
-namespace jc\fs ;
+namespace org\jecat\framework\fs ;
 
 interface IFSO
 {

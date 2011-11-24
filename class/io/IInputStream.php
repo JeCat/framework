@@ -1,7 +1,7 @@
 <?php
-namespace jc\io ;
+namespace org\jecat\framework\io ;
 
-use jc\util\String;
+use org\jecat\framework\util\String;
 
 interface IInputStream
 {

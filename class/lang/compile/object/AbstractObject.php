@@ -1,7 +1,7 @@
 <?php
-namespace jc\lang\compile\object ;
+namespace org\jecat\framework\lang\compile\object ;
 
-use jc\pattern\composite\Composite;
+use org\jecat\framework\pattern\composite\Composite;
 
 class AbstractObject extends Composite
 {

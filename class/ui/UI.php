@@ -1,26 +1,26 @@
 <?php
 
-namespace jc\ui ;
+namespace org\jecat\framework\ui ;
 
-use jc\locale\LocaleManager;
+use org\jecat\framework\locale\LocaleManager;
 
-use jc\system\Response;
+use org\jecat\framework\system\Response;
 
-use jc\system\Request;
+use org\jecat\framework\system\Request;
 
-use jc\system\Application;
+use org\jecat\framework\system\Application;
 
-use jc\io\IInputStream;
+use org\jecat\framework\io\IInputStream;
 
-use jc\fs\IFile;
-use jc\resrc\ResourceManager;
-use jc\lang\Assert;
-use jc\lang\Exception;
-use jc\util\HashTable;
-use jc\io\IOutputStream;
-use jc\util\DataSrc;
-use jc\lang\Object as JcObject;
-use jc\util\IHashTable;
+use org\jecat\framework\fs\IFile;
+use org\jecat\framework\resrc\ResourceManager;
+use org\jecat\framework\lang\Assert;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\util\HashTable;
+use org\jecat\framework\io\IOutputStream;
+use org\jecat\framework\util\DataSrc;
+use org\jecat\framework\lang\Object as JcObject;
+use org\jecat\framework\util\IHashTable;
 
 class UI extends JcObject
 {
@@ -124,7 +124,7 @@ class UI extends JcObject
 	}
 	
 	/**
-	 * @return jc\fs\IFile
+	 * @return org\jecat\framework\fs\IFile
 	 */
 	public function compileSourceFile($sSourceFile)
 	{
@@ -204,7 +204,7 @@ class UI extends JcObject
 	
 	public function display($sSourceFile,$aVariables=null,IOutputStream $aDevice=null)
 	{
-		Assert::type( array('\\jc\\util\\IHashTable','array','null'), $aVariables ) ;
+		Assert::type( array('\\org\\jecat\\framework\\util\\IHashTable','array','null'), $aVariables ) ;
 		
 		if( is_array($aVariables) )
 		{
@@ -219,7 +219,7 @@ class UI extends JcObject
 	}
 	
 	/**
-	 * @return jc\locale\Locale
+	 * @return org\jecat\framework\locale\Locale
 	 */
 	public function locale()
 	{

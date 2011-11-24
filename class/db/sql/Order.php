@@ -1,5 +1,5 @@
 <?php
-namespace jc\db\sql;
+namespace org\jecat\framework\db\sql;
 
 
 class Order extends SubStatement
@@ -65,7 +65,7 @@ class Order extends SubStatement
 	}
 	
 	/**
-	 * @see jc\db\sql\Statement::makeStatement()
+	 * @see org\jecat\framework\db\sql\Statement::makeStatement()
 	 */
 	public function makeStatement(StatementState $aState)
 	{

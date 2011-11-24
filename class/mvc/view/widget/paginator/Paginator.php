@@ -1,18 +1,18 @@
 <?php
-namespace jc\mvc\view\widget\paginator;
+namespace org\jecat\framework\mvc\view\widget\paginator;
 
-use jc\system\Request;
+use org\jecat\framework\system\Request;
 
-use jc\mvc\view\widget\FormWidget;
-use jc\mvc\view\IModelChangeObserver;
-use jc\mvc\model\db\Model;
-use jc\mvc\view\View;
-use jc\mvc\view\IView;
-use jc\mvc\view\widget\paginator\AbstractStrategy;
-use jc\mvc\model\IPaginal;
-use jc\util\IDataSrc;
-use jc\system\Application;
-use jc\system\HttpRequest;
+use org\jecat\framework\mvc\view\widget\FormWidget;
+use org\jecat\framework\mvc\view\IModelChangeObserver;
+use org\jecat\framework\mvc\model\db\Model;
+use org\jecat\framework\mvc\view\View;
+use org\jecat\framework\mvc\view\IView;
+use org\jecat\framework\mvc\view\widget\paginator\AbstractStrategy;
+use org\jecat\framework\mvc\model\IPaginal;
+use org\jecat\framework\util\IDataSrc;
+use org\jecat\framework\system\Application;
+use org\jecat\framework\system\HttpRequest;
 
 /*!
     attr.nums : int 显示几页（即分页器的宽度） 5
@@ -21,7 +21,7 @@ use jc\system\HttpRequest;
     attr.showTotal : bool 是否显示“共*页” true
     attr.showPre
     attr.showNext : bool 是否显示“上一页”与“下一页” true
-    attr.strategy : PaginatorStrategy 显示策略（显示哪些页码），可以是一个字符串（表示类名）或者一个对象（需要设置type为expression） new \jc\mvc\view\widget\paginatorstrategy\Middle
+    attr.strategy : PaginatorStrategy 显示策略（显示哪些页码），可以是一个字符串（表示类名）或者一个对象（需要设置type为expression） new \org\jecat\framework\mvc\view\widget\paginatorstrategy\Middle
     attr.onclick : string js代码，onclick事件 null
     
     pageNumList() 由 PaginatorStrategy 对象控制。目前只提供一个Middle策略。
@@ -54,12 +54,12 @@ use jc\system\HttpRequest;
         </foreach>
     </table>
     <form id="theform" method='post'>
-	    <widget id='paginator' attr.nums='7' attr.strategy.type='expression' attr.strategy='new \jc\mvc\view\widget\paginatorstrategy\Middle' attr.onclick='alert(\"hello\")' />
+	    <widget id='paginator' attr.nums='7' attr.strategy.type='expression' attr.strategy='new \org\jecat\framework\mvc\view\widget\paginatorstrategy\Middle' attr.onclick='alert(\"hello\")' />
     </form>
 */
 class Paginator extends FormWidget implements IModelChangeObserver{
     public function __construct($sId =null ,IDataSrc $aDataSource = null , IView $aView = null) {
-        parent::__construct ( $sId , 'jc:WidgetPaginator.template.html', null , $aView );
+        parent::__construct ( $sId , 'org.jecat.framework:WidgetPaginator.template.html', null , $aView );
         $this->iCount=5;
         $this->iShowWidth=5;
         if( $aDataSource) $this->setDataFromSubmit($aDataSource);

@@ -1,8 +1,8 @@
 <?php
-namespace jc\mvc\view ;
+namespace org\jecat\framework\mvc\view ;
 
-use jc\pattern\composite\IContainer;
-use jc\pattern\composite\CompositeSearcher;
+use org\jecat\framework\pattern\composite\IContainer;
+use org\jecat\framework\pattern\composite\CompositeSearcher;
 
 class VagrantViewSearcher extends CompositeSearcher
 {

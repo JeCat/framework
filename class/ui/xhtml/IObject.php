@@ -1,9 +1,9 @@
 <?php
-namespace jc\ui\xhtml ;
+namespace org\jecat\framework\ui\xhtml ;
 
 
-use jc\pattern\composite\IContainer;
-use jc\ui\IObject as IUiObject ;
+use org\jecat\framework\pattern\composite\IContainer;
+use org\jecat\framework\ui\IObject as IUiObject ;
 
 interface IObject extends IUiObject
 {	

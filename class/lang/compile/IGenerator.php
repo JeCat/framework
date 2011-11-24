@@ -1,9 +1,9 @@
 <?php
 
-namespace jc\lang\compile ;
+namespace org\jecat\framework\lang\compile ;
 
-use jc\lang\compile\object\Token;
-use jc\lang\compile\object\TokenPool;
+use org\jecat\framework\lang\compile\object\Token;
+use org\jecat\framework\lang\compile\object\TokenPool;
 
 interface IGenerator
 {

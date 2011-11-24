@@ -1,9 +1,9 @@
 <?php
-namespace jc\lang ;
+namespace org\jecat\framework\lang ;
 
-use jc\system\AppFactory;
+use org\jecat\framework\system\AppFactory;
 
-use jc\system\Application ;
+use org\jecat\framework\system\Application ;
 
 /**
  * Object 是所有 JeCat 类的基类，它有以下作用：
@@ -30,7 +30,7 @@ class Object implements IObject
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return jc\system\Application
+	 * @return org\jecat\framework\system\Application
 	 */
 	public function application($bDefaultGlobal=true)
 	{
@@ -47,7 +47,7 @@ class Object implements IObject
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return jc\system\Application
+	 * @return org\jecat\framework\system\Application
 	 */
 	public function setApplication(Application $aApp)
 	{
@@ -65,8 +65,8 @@ class Object implements IObject
 	 *  3、实现动态创建对象, 例如:
 	 *  	$sClassName = 'ooxx' ;
 	 *  	$aObject = $sClassName::create() ;
-	 * 	如果 $sClassName 不是从 jc\lang\Object 继承的类，则可以
-	 * 		\jc\lang\Object::create(null,null,'ooxx') ;
+	 * 	如果 $sClassName 不是从 org\jecat\framework\lang\Object 继承的类，则可以
+	 * 		\org\jecat\framework\lang\Object::create(null,null,'ooxx') ;
 	 * 
 	 * @return Object
 	 */
@@ -112,7 +112,7 @@ class Object implements IObject
 	}
 	
 	/**
-	 * @return jc\lang\Object
+	 * @return org\jecat\framework\lang\Object
 	 */
 	static public function singleton ($bCreateNew=true,$createArgvs=null,$sClass=null)
 	{
@@ -158,7 +158,7 @@ class Object implements IObject
 	}
 	
 	/*
-	 * @return jc\lang\Object
+	 * @return org\jecat\framework\lang\Object
 	 */
 	static public function switchSingleton(self $aInstance=null,$sClass=null)
 	{

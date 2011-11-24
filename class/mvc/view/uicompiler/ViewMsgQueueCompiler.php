@@ -1,18 +1,18 @@
 <?php
-namespace jc\mvc\view\uicompiler ;
+namespace org\jecat\framework\mvc\view\uicompiler ;
 
-use jc\lang\Assert;
-use jc\lang\Exception;
-use jc\ui\IObject;
-use jc\ui\CompilerManager;
-use jc\ui\TargetCodeOutputStream;
-use jc\ui\xhtml\compiler\NodeCompiler;
+use org\jecat\framework\lang\Assert;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\ui\IObject;
+use org\jecat\framework\ui\CompilerManager;
+use org\jecat\framework\ui\TargetCodeOutputStream;
+use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 
 class ViewMsgQueueCompiler extends NodeCompiler
 {
 	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		Assert::type("jc\\ui\\xhtml\\Node",$aObject,'aObject') ;
+		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject,'aObject') ;
 		
 		// 使用 <msgqueue> 节点内部的模板内容
 		if( $aTemplate=$aObject->getChildNodeByTagName('template') )

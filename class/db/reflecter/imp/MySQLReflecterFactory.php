@@ -1,11 +1,11 @@
 <?php
-namespace jc\db\reflecter\imp;
+namespace org\jecat\framework\db\reflecter\imp;
 
-use jc\db\reflecter\AbstractReflecterFactory;
-use jc\db\reflecter\imp\MySQLColumnReflecter;
-use jc\db\reflecter\imp\MySQLDBReflecter;
-use jc\db\reflecter\imp\MySQLIndexReflecter;
-use jc\db\reflecter\imp\MySQLTableReflecter;
+use org\jecat\framework\db\reflecter\AbstractReflecterFactory;
+use org\jecat\framework\db\reflecter\imp\MySQLColumnReflecter;
+use org\jecat\framework\db\reflecter\imp\MySQLDBReflecter;
+use org\jecat\framework\db\reflecter\imp\MySQLIndexReflecter;
+use org\jecat\framework\db\reflecter\imp\MySQLTableReflecter;
 
 class MySQLReflecterFactory extends AbstractReflecterFactory
 {

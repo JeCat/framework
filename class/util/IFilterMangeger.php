@@ -1,6 +1,6 @@
 <?php
 
-namespace jc\util ;
+namespace org\jecat\framework\util ;
 
 interface IFilterMangeger
 {
@@ -25,7 +25,7 @@ interface IFilterMangeger
 	
 	/**
 	 * 
-	 * @return jc\pattern\iterate\INonlinearIterator
+	 * @return org\jecat\framework\pattern\iterate\INonlinearIterator
 	 */
 	public function iterator() ;
 	

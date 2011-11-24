@@ -1,5 +1,5 @@
 <?php
-namespace jc\lang\aop\compiler ;
+namespace org\jecat\framework\lang\aop\compiler ;
 
 class NewObjectGenerator {
 

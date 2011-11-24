@@ -1,20 +1,20 @@
 <?php
-namespace jc\mvc\model\db ;
+namespace org\jecat\framework\mvc\model\db ;
 
 
-use jc\util\Stack;
+use org\jecat\framework\util\Stack;
 
-use jc\mvc\model\db\orm\Selecter;
+use org\jecat\framework\mvc\model\db\orm\Selecter;
 
-use jc\mvc\model\db\orm\Prototype;
+use org\jecat\framework\mvc\model\db\orm\Prototype;
 
-use jc\db\sql\StatementFactory;
+use org\jecat\framework\db\sql\StatementFactory;
 
-use jc\db\sql\Update;
+use org\jecat\framework\db\sql\Update;
 
-use jc\db\DB;
+use org\jecat\framework\db\DB;
 
-use jc\lang\Exception;
+use org\jecat\framework\lang\Exception;
 
 class Category extends Model 
 {	

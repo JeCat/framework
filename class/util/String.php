@@ -1,10 +1,10 @@
 <?php
-namespace jc\util ;
+namespace org\jecat\framework\util ;
 
-use jc\fs\IFile ;
-use jc\lang\Exception;
-use jc\lang\Object;
-use jc\util\match\RegExp;
+use org\jecat\framework\fs\IFile ;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\Object;
+use org\jecat\framework\util\match\RegExp;
 
 class String extends Object
 {

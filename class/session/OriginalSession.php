@@ -1,8 +1,8 @@
 <?php
-namespace jc\session ;
+namespace org\jecat\framework\session ;
 
 
-use jc\lang\Exception;
+use org\jecat\framework\lang\Exception;
 
 class OriginalSession extends Session
 {
@@ -52,11 +52,11 @@ class OriginalSession extends Session
 	}
 	
 	/**
-	 * @return jc\pattern\iterate\INonlinearIterator
+	 * @return org\jecat\framework\pattern\iterate\INonlinearIterator
 	 */
 	public function variableNameIterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator( array_keys($_SESSION) ) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator( array_keys($_SESSION) ) ;
 	}
 	
 	/**

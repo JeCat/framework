@@ -1,9 +1,9 @@
 <?php
-namespace jc\mvc\view\widget;
+namespace org\jecat\framework\mvc\view\widget;
 
-use jc\lang\Exception;
-use jc\util\IDataSrc;
-use jc\mvc\view\IView;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\util\IDataSrc;
+use org\jecat\framework\mvc\view\IView;
 
 class SelectList extends Select {
 	public function __construct($sId=null, $sTitle = null, $nSize = 4, $bMultiple = false, IView $aView = null) {

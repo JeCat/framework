@@ -1,5 +1,5 @@
 <?php
-namespace jc\session ;
+namespace org\jecat\framework\session ;
 
 abstract class MemcachedSession extends Session
 {

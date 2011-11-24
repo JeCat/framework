@@ -1,7 +1,7 @@
 <?php
-namespace jc\ui\xhtml\compiler\macro;
+namespace org\jecat\framework\ui\xhtml\compiler\macro;
 
-use jc\io\IOutputStream;
+use org\jecat\framework\io\IOutputStream;
 
 class Cycle
 {

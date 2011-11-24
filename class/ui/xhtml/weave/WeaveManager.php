@@ -1,9 +1,9 @@
 <?php
-namespace jc\ui\xhtml\weave ;
+namespace org\jecat\framework\ui\xhtml\weave ;
 
-use jc\lang\Exception;
+use org\jecat\framework\lang\Exception;
 
-use jc\lang\Object;
+use org\jecat\framework\lang\Object;
 
 class WeaveManager extends Object
 {

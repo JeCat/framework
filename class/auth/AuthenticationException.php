@@ -1,8 +1,8 @@
 <?php
-namespace jc\auth ;
+namespace org\jecat\framework\auth ;
 
-use jc\mvc\controller\IController;
-use jc\lang\Exception;
+use org\jecat\framework\mvc\controller\IController;
+use org\jecat\framework\lang\Exception;
 
 class AuthenticationException extends Exception
 {

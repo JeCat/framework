@@ -1,13 +1,13 @@
 <?php
-namespace jc\mvc\model\db ;
+namespace org\jecat\framework\mvc\model\db ;
 
-use jc\mvc\model\IModel as IModelBase ;
-use jc\mvc\model\db\orm\Prototype;
+use org\jecat\framework\mvc\model\IModel as IModelBase ;
+use org\jecat\framework\mvc\model\db\orm\Prototype;
 
 interface IModel extends IModelBase
 {
 	/**
-	 * @return jc\mvc\model\db\orm\Prototype
+	 * @return org\jecat\framework\mvc\model\db\orm\Prototype
 	 */
 	public function prototype() ;
 

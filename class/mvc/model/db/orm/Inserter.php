@@ -1,13 +1,13 @@
 <?php
 
-namespace jc\mvc\model\db\orm;
+namespace org\jecat\framework\mvc\model\db\orm;
 
-use jc\mvc\model\IModelList;
+use org\jecat\framework\mvc\model\IModelList;
 
-use jc\lang\Object;
-use jc\db\DB;
-use jc\mvc\model\db\IModel ;
-use jc\db\sql\StatementFactory ;
+use org\jecat\framework\lang\Object;
+use org\jecat\framework\db\DB;
+use org\jecat\framework\mvc\model\db\IModel ;
+use org\jecat\framework\db\sql\StatementFactory ;
 
 class Inserter extends OperationStrategy
 {

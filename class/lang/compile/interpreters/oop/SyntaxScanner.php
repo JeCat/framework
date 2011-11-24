@@ -1,19 +1,19 @@
 <?php
 
-namespace jc\lang\compile\interpreters\oop ;
+namespace org\jecat\framework\lang\compile\interpreters\oop ;
 
-use jc\pattern\iterate\IReversableIterator;
+use org\jecat\framework\pattern\iterate\IReversableIterator;
 
-use jc\lang\compile\object\TokenPool;
-use jc\pattern\iterate\INonlinearIterator;
-use jc\lang\compile\object\NamespaceDeclare;
-use jc\lang\compile\object\ClassDefine;
-use jc\lang\compile\object\Token;
-use jc\lang\Exception;
-use jc\lang\compile\object\FunctionDefine;
-use jc\pattern\composite\IContainer;
-use jc\lang\compile\IInterpreter;
-use jc\lang\Object;
+use org\jecat\framework\lang\compile\object\TokenPool;
+use org\jecat\framework\pattern\iterate\INonlinearIterator;
+use org\jecat\framework\lang\compile\object\NamespaceDeclare;
+use org\jecat\framework\lang\compile\object\ClassDefine;
+use org\jecat\framework\lang\compile\object\Token;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\compile\object\FunctionDefine;
+use org\jecat\framework\pattern\composite\IContainer;
+use org\jecat\framework\lang\compile\IInterpreter;
+use org\jecat\framework\lang\Object;
 
 class SyntaxScanner extends Object implements IInterpreter
 {

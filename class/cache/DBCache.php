@@ -1,5 +1,5 @@
 <?php
-namespace jc\cache ;
+namespace org\jecat\framework\cache ;
 
 class DBCache implements ICache
 {

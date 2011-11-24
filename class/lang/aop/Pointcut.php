@@ -1,13 +1,13 @@
 <?php
-namespace jc\lang\aop ;
+namespace org\jecat\framework\lang\aop ;
 
-use jc\lang\Exception;
-use jc\lang\aop\jointpoint\JointPoint;
-use jc\lang\compile\object\FunctionDefine;
-use jc\pattern\composite\Container;
-use jc\pattern\composite\NamedObject;
-use jc\pattern\iterate\ArrayIterator;
-use jc\lang\Object;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\aop\jointpoint\JointPoint;
+use org\jecat\framework\lang\compile\object\FunctionDefine;
+use org\jecat\framework\pattern\composite\Container;
+use org\jecat\framework\pattern\composite\NamedObject;
+use org\jecat\framework\pattern\iterate\ArrayIterator;
+use org\jecat\framework\lang\Object;
 
 class Pointcut extends NamedObject
 {
@@ -112,26 +112,26 @@ class Pointcut extends NamedObject
 	}
 
 	/**
-	 * @return jc\pattern\composite\IContainer
+	 * @return org\jecat\framework\pattern\composite\IContainer
 	 */
 	public function jointPoints()
 	{
 		if( !$this->aJointPoints )
 		{
-			$this->aJointPoints = new Container('jc\\lang\\aop\\jointpoint\\JointPoint') ;
+			$this->aJointPoints = new Container('org\\jecat\\framework\\lang\\aop\\jointpoint\\JointPoint') ;
 		}
 		
 		return $this->aJointPoints ;
 	}
 	
 	/**
-	 * @return jc\pattern\composite\IContainer
+	 * @return org\jecat\framework\pattern\composite\IContainer
 	 */
 	public function advices()
 	{
 		if( !$this->aAdvices )
 		{
-			$this->aAdvices = new Container('jc\\lang\\aop\\Advice') ;
+			$this->aAdvices = new Container('org\\jecat\\framework\\lang\\aop\\Advice') ;
 		}
 		
 		return $this->aAdvices ;

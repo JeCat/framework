@@ -1,9 +1,9 @@
 <?php 
-namespace jc\db\sql ;
+namespace org\jecat\framework\db\sql ;
 
-use jc\db\sql\name\NameTransferFactory;
-use jc\db\sql\name\NameTransfer;
-use jc\lang\Object;
+use org\jecat\framework\db\sql\name\NameTransferFactory;
+use org\jecat\framework\db\sql\name\NameTransfer;
+use org\jecat\framework\lang\Object;
 
 abstract class Statement extends Object
 {
@@ -12,7 +12,7 @@ abstract class Statement extends Object
 	abstract public function checkValid($bThrowException=true) ;
 	
 	/**
-	 * @return jc\db\sql\name\NameTransfer
+	 * @return org\jecat\framework\db\sql\name\NameTransfer
 	 */
 	public function nameTransfer($bAutoCreate=true)
 	{
@@ -30,7 +30,7 @@ abstract class Statement extends Object
 	}
 	
 	/**
-	 * @return jc\db\sql\StatementFactory
+	 * @return org\jecat\framework\db\sql\StatementFactory
 	 */
 	public function statementFactory($bAutoCreate=true)
 	{

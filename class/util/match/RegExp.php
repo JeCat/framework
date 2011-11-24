@@ -1,10 +1,10 @@
 <?php
 
-namespace jc\util\match ;
+namespace org\jecat\framework\util\match ;
 
-use jc\util\String;
+use org\jecat\framework\util\String;
 
-use jc\lang\Object;
+use org\jecat\framework\lang\Object;
 
 class RegExp extends Object
 {

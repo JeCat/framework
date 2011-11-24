@@ -1,7 +1,7 @@
 <?php
-namespace jc\mvc\view ;
+namespace org\jecat\framework\mvc\view ;
 
-use jc\ui\UI;
+use org\jecat\framework\ui\UI;
 
 class Webpage extends View
 {
@@ -12,7 +12,7 @@ class Webpage extends View
 			$sName = 'theWebpage' ;
 		}
 		
-		parent::__construct($sName,'jc:Webpage.template.html',$aUI) ;
+		parent::__construct($sName,'org.jecat.framework:Webpage.template.html',$aUI) ;
 	}
 
 	public function title()

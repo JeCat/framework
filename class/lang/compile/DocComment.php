@@ -1,10 +1,10 @@
 <?php
-namespace jc\lang\compile ;
+namespace org\jecat\framework\lang\compile ;
 
-use jc\lang\Object;
+use org\jecat\framework\lang\Object;
 
-use jc\pattern\iterate\ArrayIterator;
-use jc\util\match\RegExp;
+use org\jecat\framework\pattern\iterate\ArrayIterator;
+use org\jecat\framework\util\match\RegExp;
 
 /**
  * 用于分析DocComment格式的类

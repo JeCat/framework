@@ -1,14 +1,14 @@
 <?php
-namespace jc\mvc\view\widget;
+namespace org\jecat\framework\mvc\view\widget;
 
-use jc\verifier\Length;
+use org\jecat\framework\verifier\Length;
 
-use jc\lang\Exception;
-use jc\mvc\view\IView;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\mvc\view\IView;
 
 class Select extends FormWidget {
 	public function __construct( $sId=null, $sTitle=null, IView $aView=null) {
-		parent::__construct ( $sId, 'jc:WidgetSelect.template.html', $sTitle, $aView );
+		parent::__construct ( $sId, 'org.jecat.framework:WidgetSelect.template.html', $sTitle, $aView );
 	}
 	
 	public function build(array & $arrConfig,$sNamespace='*')
@@ -110,7 +110,7 @@ class Select extends FormWidget {
 	}
 	//取得option列表
 	public function optionIterator() {
-		return new \jc\pattern\iterate\ArrayIterator ( $this->arrOptions );
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator ( $this->arrOptions );
 	}
 	
 	public function setValue($data = null)

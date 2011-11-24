@@ -1,8 +1,8 @@
 <?php
-namespace jc\db\recordset ;
+namespace org\jecat\framework\db\recordset ;
 
-use jc\lang\Exception;
-use jc\lang\Object;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\Object;
 
 class PDORecordSet extends Object implements IRecordSet
 {
@@ -92,13 +92,13 @@ class PDORecordSet extends Object implements IRecordSet
 	
 	public function iterator() 
 	{
-		return new \jc\pattern\iterate\ArrayIterator($this->arrRecordSet) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator($this->arrRecordSet) ;
 	}
 
 	public function fieldIterator()
 	{
 		$arrRow = $this->current() ;
-		return new \jc\pattern\iterate\ArrayIterator( $arrRow===null? array(): array_keys($arrRow) ) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator( $arrRow===null? array(): array_keys($arrRow) ) ;
 	}
 	
 	public function key ()

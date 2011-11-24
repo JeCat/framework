@@ -1,16 +1,16 @@
 <?php
-namespace jc\system ;
+namespace org\jecat\framework\system ;
 
-use jc\fs\FileSystem;
+use org\jecat\framework\fs\FileSystem;
 
 class HttpAppFactory extends ApplicationFactory
 {
 	public function createRequest()
 	{
-		require_once \jc\PATH."/class/util/IHashTable.php" ;
-		require_once \jc\PATH."/class/util/IDataSrc.php" ;
-		require_once \jc\PATH."/class/util/HashTable.php" ;
-		require_once \jc\PATH."/class/util/DataSrc.php" ;
+		require_once \org\jecat\framework\PATH."/class/util/IHashTable.php" ;
+		require_once \org\jecat\framework\PATH."/class/util/IDataSrc.php" ;
+		require_once \org\jecat\framework\PATH."/class/util/HashTable.php" ;
+		require_once \org\jecat\framework\PATH."/class/util/DataSrc.php" ;
 		require_once __DIR__.'/Request.php' ;
 		require_once __DIR__.'/HttpRequest.php' ;
 		
@@ -26,7 +26,7 @@ class HttpAppFactory extends ApplicationFactory
 	{
 		// 向客户端发送有效的编码
 		header("Content-type: text/html; charset=UTF-8");
-		$aRespn = parent::createResponse(new \jc\io\HtmlPrintStream()) ;
+		$aRespn = parent::createResponse(new \org\jecat\framework\io\HtmlPrintStream()) ;
 		
 		return $aRespn ;
 	}

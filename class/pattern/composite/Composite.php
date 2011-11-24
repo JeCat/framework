@@ -25,7 +25,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 /*-- Project Introduce --*/
 
-namespace jc\pattern\composite ;
+namespace org\jecat\framework\pattern\composite ;
 
 class Composite extends Container implements IContainedable
 {

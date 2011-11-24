@@ -1,7 +1,7 @@
 <?php
-namespace jc\system ;
+namespace org\jecat\framework\system ;
 
-use jc\util\DataSrc;
+use org\jecat\framework\util\DataSrc;
 
 class CLRequest extends Request
 {

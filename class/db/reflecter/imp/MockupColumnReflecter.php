@@ -1,7 +1,7 @@
 <?php
-namespace jc\db\reflecter\imp;
+namespace org\jecat\framework\db\reflecter\imp;
 
-use jc\db\reflecter\AbStractColumnReflecter;
+use org\jecat\framework\db\reflecter\AbStractColumnReflecter;
 
 class MockupColumnReflecter extends AbStractColumnReflecter
 {

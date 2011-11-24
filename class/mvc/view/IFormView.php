@@ -1,7 +1,7 @@
 <?php
-namespace jc\mvc\view ;
+namespace org\jecat\framework\mvc\view ;
 
-use jc\util\IDataSrc;
+use org\jecat\framework\util\IDataSrc;
 
 interface IFormView {
 	

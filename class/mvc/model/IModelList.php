@@ -1,5 +1,5 @@
 <?php
-namespace jc\mvc\model ;
+namespace org\jecat\framework\mvc\model ;
 
 interface IModelList
 {

@@ -1,8 +1,8 @@
 <?php
-namespace jc\ui ;
+namespace org\jecat\framework\ui ;
 
-use jc\util\DataSrc;
-use jc\lang\Object as JcObject;
+use org\jecat\framework\util\DataSrc;
+use org\jecat\framework\lang\Object as JcObject;
 
 abstract class FactoryBase extends JcObject implements IFactory 
 {

@@ -1,5 +1,5 @@
 <?php
-namespace jc\mvc\view ;
+namespace org\jecat\framework\mvc\view ;
 
 class ViewContainer extends View
 {
@@ -17,7 +17,7 @@ class ViewContainer extends View
 	
 	public function accept($object)
 	{
-		if( !$object instanceof jc\mvc\IView )
+		if( !$object instanceof org\jecat\framework\mvc\IView )
 		{
 			return false ;
 		}

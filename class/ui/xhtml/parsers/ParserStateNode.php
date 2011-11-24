@@ -1,11 +1,11 @@
 <?php
-namespace jc\ui\xhtml\parsers ;
+namespace org\jecat\framework\ui\xhtml\parsers ;
 
-use jc\ui\xhtml\ObjectBase;
-use jc\ui\xhtml\Node;
-use jc\ui\xhtml\Tag;
-use jc\ui\xhtml\IObject;
-use jc\util\String;
+use org\jecat\framework\ui\xhtml\ObjectBase;
+use org\jecat\framework\ui\xhtml\Node;
+use org\jecat\framework\ui\xhtml\Tag;
+use org\jecat\framework\ui\xhtml\IObject;
+use org\jecat\framework\util\String;
 
 class ParserStateNode extends ParserState
 {

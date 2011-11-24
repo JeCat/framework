@@ -1,34 +1,34 @@
 <?php
-namespace jc\mvc\view ;
+namespace org\jecat\framework\mvc\view ;
 
-use jc\system\Response;
+use org\jecat\framework\system\Response;
 
-use jc\mvc\controller\IController;
-use jc\bean\BeanConfException;
-use jc\bean\BeanFactory;
-use jc\lang\Exception;
-use jc\bean\IBean;
-use jc\resrc\HtmlResourcePool;
-use jc\util\CombinedIterator;
-use jc\util\StopFilterSignal;
-use jc\message\Message;
-use jc\message\MessageQueue;
-use jc\message\IMessageQueue;
-use jc\io\IOutputStream;
-use jc\mvc\model\IModel;
-use jc\mvc\view\widget\IViewWidget;
-use jc\pattern\composite\Container;
-use jc\util\HashTable;
-use jc\util\IHashTable;
-use jc\io\OutputStreamBuffer;
-use jc\pattern\composite\NamableComposite;
-use jc\ui\UI;
+use org\jecat\framework\mvc\controller\IController;
+use org\jecat\framework\bean\BeanConfException;
+use org\jecat\framework\bean\BeanFactory;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\bean\IBean;
+use org\jecat\framework\resrc\HtmlResourcePool;
+use org\jecat\framework\util\CombinedIterator;
+use org\jecat\framework\util\StopFilterSignal;
+use org\jecat\framework\message\Message;
+use org\jecat\framework\message\MessageQueue;
+use org\jecat\framework\message\IMessageQueue;
+use org\jecat\framework\io\IOutputStream;
+use org\jecat\framework\mvc\model\IModel;
+use org\jecat\framework\mvc\view\widget\IViewWidget;
+use org\jecat\framework\pattern\composite\Container;
+use org\jecat\framework\util\HashTable;
+use org\jecat\framework\util\IHashTable;
+use org\jecat\framework\io\OutputStreamBuffer;
+use org\jecat\framework\pattern\composite\NamableComposite;
+use org\jecat\framework\ui\UI;
 
 class View extends NamableComposite implements IView, IBean
 {
 	public function __construct($sName=null,$sSourceFilename=null,UI $aUI=null)
 	{
-		parent::__construct("jc\\mvc\\view\\IView") ;
+		parent::__construct("org\\jecat\\framework\\mvc\\view\\IView") ;
 		
 		$this->setName($sName) ;
 		$this->setSourceFilename($sSourceFilename) ;
@@ -62,7 +62,7 @@ class View extends NamableComposite implements IView, IBean
      *  widget.ooxx			config
      *  view.ooxx			config
      * 
-     * @see jc\bean\IBean::build()
+     * @see org\jecat\framework\bean\IBean::build()
      */
     public function build(array & $arrConfig,$sNamespace='*')
     {
@@ -176,7 +176,7 @@ class View extends NamableComposite implements IView, IBean
 	}
 	
 	/**
-	 * @return jc\mvc\controller\IContainer
+	 * @return org\jecat\framework\mvc\controller\IContainer
 	 */
 	public function controller()
 	{
@@ -189,7 +189,7 @@ class View extends NamableComposite implements IView, IBean
 	}
 	
 	/**
-	 * @return jc\ui\UI
+	 * @return org\jecat\framework\ui\UI
 	 */
 	public function ui()
 	{
@@ -382,7 +382,7 @@ class View extends NamableComposite implements IView, IBean
 	}
 	
 	/**
-	 * @return jc\pattern\iterate\INonlinearIterator
+	 * @return org\jecat\framework\pattern\iterate\INonlinearIterator
 	 */
 	public function widgitIterator()
 	{

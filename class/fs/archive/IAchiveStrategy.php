@@ -1,14 +1,14 @@
 <?php
-namespace jc\fs\archive ;
+namespace org\jecat\framework\fs\archive ;
 
-use jc\lang\Object;
-use jc\fs\IFolder;
-use jc\fs\IFile;
+use org\jecat\framework\lang\Object;
+use org\jecat\framework\fs\IFolder;
+use org\jecat\framework\fs\IFile;
 
 abstract class IAchiveStrategy extends Object
 {
 	/**
-	 * @return jc\fs\IFile
+	 * @return org\jecat\framework\fs\IFile
 	 */
 	abstract public function makeFilePath(IFile $aOriginalFile,IFolder $aToDir) ;
 

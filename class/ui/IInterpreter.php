@@ -1,8 +1,8 @@
 <?php
-namespace jc\ui ;
+namespace org\jecat\framework\ui ;
 
-use jc\fs\IFile;
-use jc\util\String;
+use org\jecat\framework\fs\IFile;
+use org\jecat\framework\util\String;
 
 interface IInterpreter
 {

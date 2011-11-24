@@ -1,7 +1,7 @@
 <?php
-namespace jc\db\sql;
+namespace org\jecat\framework\db\sql;
 
-use jc\db\sql\name\NameTransfer;
+use org\jecat\framework\db\sql\name\NameTransfer;
 
 class Restriction extends SubStatement
 {

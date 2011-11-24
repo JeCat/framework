@@ -1,8 +1,8 @@
 <?php
-namespace jc\util ;
+namespace org\jecat\framework\util ;
 
-use jc\lang\Factory;
-use jc\lang\Object;
+use org\jecat\framework\lang\Factory;
+use org\jecat\framework\lang\Object;
 
 class DataSrc extends HashTable implements IDataSrc, \ArrayAccess, \Iterator
 {
@@ -198,11 +198,11 @@ class DataSrc extends HashTable implements IDataSrc, \ArrayAccess, \Iterator
 	
 	/**
 	 * 
-	 * @return jc\pattern\iterate\INonlinearIterator
+	 * @return org\jecat\framework\pattern\iterate\INonlinearIterator
 	 */
 	public function childIterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator($this->arrChildren) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator($this->arrChildren) ;
 	}
 
 	

@@ -1,5 +1,5 @@
 <?php
-namespace jc\util ;
+namespace org\jecat\framework\util ;
 
 interface IDataSrc extends IHashTable
 {

@@ -1,11 +1,11 @@
 <?php
-namespace jc\db\driver ;
+namespace org\jecat\framework\db\driver ;
 
-use jc\db\reflecter\MySQLReflecterFactory;
-use jc\db\DB;
-use jc\db\recordset\PDORecordSet;
-use jc\db\ExecuteException;
-use jc\db\sql\Statement;
+use org\jecat\framework\db\reflecter\MySQLReflecterFactory;
+use org\jecat\framework\db\DB;
+use org\jecat\framework\db\recordset\PDORecordSet;
+use org\jecat\framework\db\ExecuteException;
+use org\jecat\framework\db\sql\Statement;
 
 class MockupDriver implements IDriver
 {

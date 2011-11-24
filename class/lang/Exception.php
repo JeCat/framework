@@ -1,9 +1,9 @@
 <?php
-namespace jc\lang ;
+namespace org\jecat\framework\lang ;
 
-use jc\locale\LocaleManager;
-use jc\locale\ILocale ;
-use jc\System\Application ;
+use org\jecat\framework\locale\LocaleManager;
+use org\jecat\framework\locale\ILocale ;
+use org\jecat\framework\System\Application ;
 
 class Exception extends \Exception implements IException, IObject
 {

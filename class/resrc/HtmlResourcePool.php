@@ -1,9 +1,9 @@
 <?php
-namespace jc\resrc ;
+namespace org\jecat\framework\resrc ;
 
-use jc\system\Application;
-use jc\lang\Exception;
-use jc\lang\Object;
+use org\jecat\framework\system\Application;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\Object;
 
 class HtmlResourcePool extends Object
 {
@@ -16,7 +16,7 @@ class HtmlResourcePool extends Object
 		
 		$this->aResourceManager = $aResourceManager? $aResourceManager: Application::singleton()->publicFolders() ;
 
-		$this->addRequire('jc:style/style.css',self::RESRC_CSS) ;
+		$this->addRequire('org.jecat.framework:style/style.css',self::RESRC_CSS) ;
 	}
 
 	public function addRequire($sResrcFileName,$nType)
@@ -67,7 +67,7 @@ class HtmlResourcePool extends Object
 	}
 	
 	/**
-	 * @return jc\pattern\iterate\INonlinearIterator
+	 * @return org\jecat\framework\pattern\iterate\INonlinearIterator
 	 */
 	public function iterator($nType,$bUrl=true)
 	{		
@@ -97,7 +97,7 @@ class HtmlResourcePool extends Object
 			}
 		}
 		
-		return new \jc\pattern\iterate\ArrayIterator($arrResrcUrls) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator($arrResrcUrls) ;
 	}
 	
 	public function __toString()

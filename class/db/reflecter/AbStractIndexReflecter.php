@@ -1,7 +1,7 @@
 <?php
-namespace jc\db\reflecter;
+namespace org\jecat\framework\db\reflecter;
 
-use jc\db\reflecter\DBStructReflecter;
+use org\jecat\framework\db\reflecter\DBStructReflecter;
 
 abstract class AbStractIndexReflecter extends DBStructReflecter
 {

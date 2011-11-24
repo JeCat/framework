@@ -1,7 +1,7 @@
 <?php
-namespace jc\bean ;
+namespace org\jecat\framework\bean ;
 
-use jc\lang\Exception;
+use org\jecat\framework\lang\Exception;
 
 class BeanConfException extends Exception
 {}

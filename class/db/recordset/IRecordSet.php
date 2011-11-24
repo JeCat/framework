@@ -1,5 +1,5 @@
 <?php
-namespace jc\db\recordset ;
+namespace org\jecat\framework\db\recordset ;
 
 interface IRecordSet extends \SeekableIterator
 {

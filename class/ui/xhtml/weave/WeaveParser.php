@@ -1,13 +1,13 @@
 <?php
-namespace jc\ui\xhtml\parsers ;
+namespace org\jecat\framework\ui\xhtml\parsers ;
 
-use jc\lang\Exception;
-use jc\ui\xhtml\UIFactory;
-use jc\ui\UI;
-use jc\util\String;
-use jc\ui\ObjectContainer ;
-use jc\lang\Object as JcObject ;
-use jc\ui\IInterpreter;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\ui\xhtml\UIFactory;
+use org\jecat\framework\ui\UI;
+use org\jecat\framework\util\String;
+use org\jecat\framework\ui\ObjectContainer ;
+use org\jecat\framework\lang\Object as JcObject ;
+use org\jecat\framework\ui\IInterpreter;
 
 class WeaveParser extends JcObjec implements IInterpreter
 {
@@ -36,7 +36,7 @@ class WeaveParser extends JcObjec implements IInterpreter
 	}
 
 	/**
-	 * @return jc\ui\xhtml\weave\WeaveManager
+	 * @return org\jecat\framework\ui\xhtml\weave\WeaveManager
 	 */
 	public function weaveManager()
 	{
@@ -54,7 +54,7 @@ class WeaveParser extends JcObjec implements IInterpreter
 	}
 	
 	/**
-	 * @return jc\ui\xhtml\weave\WeaveManager
+	 * @return org\jecat\framework\ui\xhtml\weave\WeaveManager
 	 */
 	public function ui()
 	{

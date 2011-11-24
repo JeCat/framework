@@ -1,10 +1,10 @@
 <?php
 
-namespace jc\ui\xhtml\compiler ;
+namespace org\jecat\framework\ui\xhtml\compiler ;
 
-use jc\ui\TargetCodeOutputStream;
-use jc\ui\CompilerManager;
-use jc\ui\IObject;
+use org\jecat\framework\ui\TargetCodeOutputStream;
+use org\jecat\framework\ui\CompilerManager;
+use org\jecat\framework\ui\IObject;
 
 class ExpressionCompiler extends BaseCompiler
 {

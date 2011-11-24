@@ -1,9 +1,9 @@
 <?php
-namespace jc\system ;
+namespace org\jecat\framework\system ;
 
-use jc\util\IFilterMangeger;
-use jc\io\PrintStream;
-use jc\lang\Object ;
+use org\jecat\framework\util\IFilterMangeger;
+use org\jecat\framework\io\PrintStream;
+use org\jecat\framework\lang\Object ;
 
 class Response extends Object
 {	
@@ -15,7 +15,7 @@ class Response extends Object
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return jc\io\PrintSteam
+	 * @return org\jecat\framework\io\PrintSteam
 	 */
 	public function printer()
 	{
@@ -53,7 +53,7 @@ class Response extends Object
 	/**
 	 * Enter description here ...
 	 * 
-	 * @var jc\io\PrintSteam
+	 * @var org\jecat\framework\io\PrintSteam
 	 */
 	private $aPrinter ;
 	

@@ -1,10 +1,10 @@
 <?php
 
-namespace jc\util ;
+namespace org\jecat\framework\util ;
 
-use jc\lang\Exception;
-use jc\lang\Assert;
-use jc\lang\Object;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\Assert;
+use org\jecat\framework\lang\Object;
 
 class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator, \Serializable 
 {
@@ -153,19 +153,19 @@ class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator, \
 	
 	/**
 	 * 
-	 * @return jc\pattern\iterate\INonlinearIterator
+	 * @return org\jecat\framework\pattern\iterate\INonlinearIterator
 	 */
 	public function nameIterator() {
-		return new \jc\pattern\iterate\ArrayIterator(array_keys($this->arrDatas)) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator(array_keys($this->arrDatas)) ;
 	}
 
 	/**
 	 * 
-	 * @return jc\pattern\iterate\INonlinearIterator
+	 * @return org\jecat\framework\pattern\iterate\INonlinearIterator
 	 */
 	public function valueIterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator(array_values($this->arrDatas)) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator(array_values($this->arrDatas)) ;
 	}
 	
 	public function add($Value)

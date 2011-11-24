@@ -1,9 +1,9 @@
 <?php
-namespace jc\ui\xhtml\weave ;
+namespace org\jecat\framework\ui\xhtml\weave ;
 
-use jc\lang\Exception;
+use org\jecat\framework\lang\Exception;
 
-use jc\ui\ObjectContainer;
+use org\jecat\framework\ui\ObjectContainer;
 
 class PatchSlotPath
 {
@@ -34,7 +34,7 @@ class PatchSlotPath
 	}
 	
 	/**
-	 * @return jc\ui\xhtml\ObjectBase
+	 * @return org\jecat\framework\ui\xhtml\ObjectBase
 	 */
 	public function localObject(ObjectContainer $aObjectContainer)
 	{

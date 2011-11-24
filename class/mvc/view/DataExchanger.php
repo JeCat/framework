@@ -1,8 +1,8 @@
 <?php
-namespace jc\mvc\view ;
+namespace org\jecat\framework\mvc\view ;
 
-use jc\lang\Exception;
-use jc\lang\Object;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\Object;
 
 class DataExchanger
 {

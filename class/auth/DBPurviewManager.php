@@ -1,9 +1,9 @@
 <?php
-namespace jc\auth ;
+namespace org\jecat\framework\auth ;
 
-use jc\db\sql\Insert;
-use jc\db\DB;
-use jc\lang\Object;
+use org\jecat\framework\db\sql\Insert;
+use org\jecat\framework\db\DB;
+use org\jecat\framework\lang\Object;
 
 class DBPurviewManager extends PurviewManager
 {

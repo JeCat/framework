@@ -1,7 +1,7 @@
 <?php
-namespace jc\util ;
+namespace org\jecat\framework\util ;
 
-use jc\lang\Object;
+use org\jecat\framework\lang\Object;
 
 class CombinedIterator extends Object implements \Iterator 
 {

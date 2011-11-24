@@ -1,9 +1,9 @@
 <?php
-namespace jc\lang\compile\interpreters\oop ;
+namespace org\jecat\framework\lang\compile\interpreters\oop ;
 
-use jc\lang\compile\object\NamespaceDeclare;
-use jc\lang\compile\object\ClassDefine;
-use jc\lang\compile\object\FunctionDefine;
+use org\jecat\framework\lang\compile\object\NamespaceDeclare;
+use org\jecat\framework\lang\compile\object\ClassDefine;
+use org\jecat\framework\lang\compile\object\FunctionDefine;
 
 class State 
 {

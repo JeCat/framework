@@ -1,15 +1,15 @@
 <?php
-namespace jc\mvc\model\db\orm;
+namespace org\jecat\framework\mvc\model\db\orm;
 
-use jc\db\sql\StatementState;
-use jc\db\sql\Statement;
-use jc\db\sql\Restriction;
-use jc\db\sql\name\NameTransferFactory;
-use jc\bean\IBean;
-use jc\bean\BeanFactory;
-use jc\db\sql\TablesJoin;
-use jc\db\DB;
-use jc\mvc\model\db\orm\Prototype;
+use org\jecat\framework\db\sql\StatementState;
+use org\jecat\framework\db\sql\Statement;
+use org\jecat\framework\db\sql\Restriction;
+use org\jecat\framework\db\sql\name\NameTransferFactory;
+use org\jecat\framework\bean\IBean;
+use org\jecat\framework\bean\BeanFactory;
+use org\jecat\framework\db\sql\TablesJoin;
+use org\jecat\framework\db\DB;
+use org\jecat\framework\mvc\model\db\orm\Prototype;
 
 class Association implements IBean
 {
@@ -236,7 +236,7 @@ class Association implements IBean
 	}
 
 	/**
-	 * @return jc\db\sql\TablesJoin
+	 * @return org\jecat\framework\db\sql\TablesJoin
 	 */
 	public function sqlTablesJoin()
 	{

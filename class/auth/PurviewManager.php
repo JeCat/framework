@@ -1,7 +1,7 @@
 <?php
-namespace jc\auth ;
+namespace org\jecat\framework\auth ;
 
-use jc\lang\Object;
+use org\jecat\framework\lang\Object;
 
 abstract class PurviewManager extends Object
 {

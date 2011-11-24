@@ -25,7 +25,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 /*-- Project Introduce --*/
 
-namespace jc\pattern\composite ;
+namespace org\jecat\framework\pattern\composite ;
 
 
 interface IContainer
@@ -43,12 +43,12 @@ interface IContainer
 	public function accept($object) ;
 	
 	/**
-	 * @return jc\pattern\iterate\INonlinearIterator
+	 * @return org\jecat\framework\pattern\iterate\INonlinearIterator
 	 */
 	public function iterator() ;
 	
 	/**
-	 * @return jc\pattern\iterate\INonlinearIterator
+	 * @return org\jecat\framework\pattern\iterate\INonlinearIterator
 	 */
 	public function nameIterator() ;
 	

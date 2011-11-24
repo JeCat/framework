@@ -1,8 +1,8 @@
 <?php
-namespace jc\mvc\view\widget;
+namespace org\jecat\framework\mvc\view\widget;
 
-use jc\mvc\view\IView;
-use jc\lang\Exception;
+use org\jecat\framework\mvc\view\IView;
+use org\jecat\framework\lang\Exception;
 
 class CheckBtn extends FormWidget
 {
@@ -27,7 +27,7 @@ class CheckBtn extends FormWidget
 		}
 		
 		$this->nType = $nType;
-		parent::__construct ( $sId, 'jc:WidgetCheckBtn.template.html', $sTitle, $aView );
+		parent::__construct ( $sId, 'org.jecat.framework:WidgetCheckBtn.template.html', $sTitle, $aView );
 	}
 	
 	public function build(array & $arrConfig,$sNamespace='*'){

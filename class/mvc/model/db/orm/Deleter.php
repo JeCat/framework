@@ -1,13 +1,13 @@
 <?php
 
-namespace jc\mvc\model\db\orm;
+namespace org\jecat\framework\mvc\model\db\orm;
 
-use jc\mvc\model\IModelList;
+use org\jecat\framework\mvc\model\IModelList;
 
-use jc\lang\Object;
-use jc\db\DB;
-use jc\mvc\model\db\IModel ;
-use jc\db\sql\StatementFactory ;
+use org\jecat\framework\lang\Object;
+use org\jecat\framework\db\DB;
+use org\jecat\framework\mvc\model\db\IModel ;
+use org\jecat\framework\db\sql\StatementFactory ;
 
 class Deleter extends Object{
     public function execute(DB $aDB, IModel $aModel){
@@ -24,7 +24,7 @@ class Deleter extends Object{
         foreach($aModel->dataNameIterator() as $sClmName){
         	if(in_array($sClmName,$aPrototype->keys())){//是主键
 				if($aModel->changed($sClmName)){//主键发生修改
-					throw new ORMException('jc\mvc\model\db\orm\Updater : Key 有修改，无法进行Delete操作');
+					throw new ORMException('org\jecat\framework\mvc\model\db\orm\Updater : Key 有修改，无法进行Delete操作');
 				}else{//用主键作为查询条件
 					$aDelete->criteria()->where()->eq($sClmName,$aModel->data($sClmName));
 				}

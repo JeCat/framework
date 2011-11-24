@@ -1,9 +1,9 @@
 <?php
-namespace jc\lang\oop ;
+namespace org\jecat\framework\lang\oop ;
 
-use jc\lang\Exception;
-use jc\fs\IFile;
-use jc\fs\IFolder;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\fs\IFile;
+use org\jecat\framework\fs\IFolder;
 
 class Package 
 {		
@@ -24,7 +24,7 @@ class Package
 	}
 
 	/**
-	 * @return jc\fs\IFolder
+	 * @return org\jecat\framework\fs\IFolder
 	 */
 	public function folder()
 	{

@@ -1,19 +1,19 @@
 <?php
-namespace jc\lang\aop\compiler ;
+namespace org\jecat\framework\lang\aop\compiler ;
 
-use jc\lang\compile\object\ClosureToken;
-use jc\util\Stack;
-use jc\lang\Exception;
-use jc\lang\Assert;
-use jc\lang\aop\jointpoint\JointPoint;
-use jc\lang\aop\Pointcut;
-use jc\lang\compile\object\FunctionDefine;
-use jc\lang\compile\IGenerator;
-use jc\lang\compile\object\TokenPool;
-use jc\lang\aop\Advice;
-use jc\lang\aop\AOP;
-use jc\lang\Object ;
-use jc\lang\compile\object\Token;
+use org\jecat\framework\lang\compile\object\ClosureToken;
+use org\jecat\framework\util\Stack;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\Assert;
+use org\jecat\framework\lang\aop\jointpoint\JointPoint;
+use org\jecat\framework\lang\aop\Pointcut;
+use org\jecat\framework\lang\compile\object\FunctionDefine;
+use org\jecat\framework\lang\compile\IGenerator;
+use org\jecat\framework\lang\compile\object\TokenPool;
+use org\jecat\framework\lang\aop\Advice;
+use org\jecat\framework\lang\aop\AOP;
+use org\jecat\framework\lang\Object ;
+use org\jecat\framework\lang\compile\object\Token;
 
 abstract class AOPWeaveGenerator extends Object implements IGenerator
 {
@@ -270,7 +270,7 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 	
 	
 	/**
-	 * @return jc\lang\aop\AOP 
+	 * @return org\jecat\framework\lang\aop\AOP 
 	 */
 	public function aop()
 	{

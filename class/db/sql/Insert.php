@@ -1,7 +1,7 @@
 <?php
-namespace jc\db\sql ;
+namespace org\jecat\framework\db\sql ;
 
-use jc\lang\Exception ;
+use org\jecat\framework\lang\Exception ;
 
 class Insert extends Statement implements IDataSettableStatement
 {
@@ -42,12 +42,12 @@ class Insert extends Statement implements IDataSettableStatement
 
 	public function dataIterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator($this->mapData) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator($this->mapData) ;
 	}
 
 	public function dataNameIterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator( array_keys($this->mapData) ) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator( array_keys($this->mapData) ) ;
 	}
 
 	public function makeStatement(StatementState $aState)

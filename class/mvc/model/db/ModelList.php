@@ -1,11 +1,11 @@
 <?php
-namespace jc\mvc\model\db ;
+namespace org\jecat\framework\mvc\model\db ;
 
-use jc\mvc\model\db\orm\Selecter;
+use org\jecat\framework\mvc\model\db\orm\Selecter;
 
-use jc\mvc\model\IPaginal;
-use jc\db\recordset\IRecordSet;
-use jc\mvc\model\IModelList ;
+use org\jecat\framework\mvc\model\IPaginal;
+use org\jecat\framework\db\recordset\IRecordSet;
+use org\jecat\framework\mvc\model\IModelList ;
 
 class ModelList extends Model implements IModelList, IPaginal
 {

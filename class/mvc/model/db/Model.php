@@ -1,22 +1,22 @@
 <?php
-namespace jc\mvc\model\db ;
+namespace org\jecat\framework\mvc\model\db ;
 
-use jc\mvc\model\IModelList;
-use jc\pattern\composite\INamable;
-use jc\bean\BeanFactory;
-use jc\bean\IBean;
-use jc\db\sql\Restriction;
-use jc\lang\Exception;
-use jc\mvc\model\db\orm\Deleter;
-use jc\mvc\model\db\orm\Selecter;
-use jc\mvc\model\db\orm\Inserter;
-use jc\mvc\model\db\orm\Updater;
-use jc\db\DB;
-use jc\db\recordset\IRecordSet;
-use jc\db\sql\Criteria;
-use jc\mvc\model\db\orm\Association;
-use jc\mvc\model\AbstractModel ;
-use jc\mvc\model\db\orm\Prototype;
+use org\jecat\framework\mvc\model\IModelList;
+use org\jecat\framework\pattern\composite\INamable;
+use org\jecat\framework\bean\BeanFactory;
+use org\jecat\framework\bean\IBean;
+use org\jecat\framework\db\sql\Restriction;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\mvc\model\db\orm\Deleter;
+use org\jecat\framework\mvc\model\db\orm\Selecter;
+use org\jecat\framework\mvc\model\db\orm\Inserter;
+use org\jecat\framework\mvc\model\db\orm\Updater;
+use org\jecat\framework\db\DB;
+use org\jecat\framework\db\recordset\IRecordSet;
+use org\jecat\framework\db\sql\Criteria;
+use org\jecat\framework\mvc\model\db\orm\Association;
+use org\jecat\framework\mvc\model\AbstractModel ;
+use org\jecat\framework\mvc\model\db\orm\Prototype;
 
 class Model extends AbstractModel implements IModel, IBean
 {
@@ -51,7 +51,7 @@ class Model extends AbstractModel implements IModel, IBean
 	}
 	
 	/**
-	 * @return jc\mvc\model\db\orm\Prototype
+	 * @return org\jecat\framework\mvc\model\db\orm\Prototype
 	 */
 	public function prototype()
 	{
@@ -347,7 +347,7 @@ class Model extends AbstractModel implements IModel, IBean
 	}
 	
 	/**
-	 * @var jc\mvc\model\db\orm\Prototype
+	 * @var org\jecat\framework\mvc\model\db\orm\Prototype
 	 */
 	private $aPrototype ;
 	private $aCriteria ;

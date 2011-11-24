@@ -1,5 +1,5 @@
 <?php
-namespace jc\io ;
+namespace org\jecat\framework\io ;
 
 
 class PrintStream extends OutputStream

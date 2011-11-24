@@ -1,13 +1,13 @@
 <?php
-namespace jc\lang\compile\generators ;
+namespace org\jecat\framework\lang\compile\generators ;
 
-use jc\lang\compile\ClassCompileException;
+use org\jecat\framework\lang\compile\ClassCompileException;
 
-use jc\lang\compile\object\FunctionDefine;
-use jc\lang\compile\object\TokenPool;
-use jc\lang\compile\object\Token;
-use jc\lang\compile\IGenerator;
-use jc\lang\Object;
+use org\jecat\framework\lang\compile\object\FunctionDefine;
+use org\jecat\framework\lang\compile\object\TokenPool;
+use org\jecat\framework\lang\compile\object\Token;
+use org\jecat\framework\lang\compile\IGenerator;
+use org\jecat\framework\lang\Object;
 
 class CompiledAlert extends Object implements IGenerator
 {

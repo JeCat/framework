@@ -1,7 +1,7 @@
 <?php
-namespace jc\pattern\composite ;
+namespace org\jecat\framework\pattern\composite ;
 
-use jc\lang\Object;
+use org\jecat\framework\lang\Object;
 
 abstract class NamedObject extends Object implements INamable
 {

@@ -1,13 +1,13 @@
 <?php
-namespace jc\setting\imp;
+namespace org\jecat\framework\setting\imp;
 
-use jc\lang\Exception;
-use jc\fs\FileSystem;
-use jc\pattern\iterate\ReverseIterator;
-use jc\fs\FSIterator;
-use jc\fs\IFolder;
-use jc\setting\IKey;
-use jc\setting\Setting;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\pattern\iterate\ReverseIterator;
+use org\jecat\framework\fs\FSIterator;
+use org\jecat\framework\fs\IFolder;
+use org\jecat\framework\setting\IKey;
+use org\jecat\framework\setting\Setting;
 
 class FsSetting extends Setting
 {
@@ -95,7 +95,7 @@ class FsSetting extends Setting
 	}
 	
 	/**
-	 * @var jc\fs\IFolder
+	 * @var org\jecat\framework\fs\IFolder
 	 */
 	private $aRootFolder;
 	

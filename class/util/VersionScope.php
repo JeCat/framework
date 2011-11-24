@@ -2,10 +2,10 @@
 /*
  * 孔源 10月12日 从jecat0.5合并到0.6
  */
-namespace jc\util;
+namespace org\jecat\framework\util;
 
-use jc\lang\Exception;
-use jc\lang\Object;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\Object;
 
 class VersionScope
 {

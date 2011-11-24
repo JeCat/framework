@@ -1,7 +1,7 @@
 <?php
-namespace jc\session ;
+namespace org\jecat\framework\session ;
 
-use jc\lang\Object;
+use org\jecat\framework\lang\Object;
 
 abstract class Session extends Object implements ISession
 {	

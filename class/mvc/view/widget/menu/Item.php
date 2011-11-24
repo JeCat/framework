@@ -1,12 +1,12 @@
 <?php
-namespace jc\mvc\view\widget\menu;
+namespace org\jecat\framework\mvc\view\widget\menu;
 
-use jc\bean\BeanFactory ;
+use org\jecat\framework\bean\BeanFactory ;
 
 class Item extends AbstractBase
 {
 	public function __construct($sTitle='',$sId =null , IView $aView = null) {
-        parent::__construct ( $sId , 'jc:WidgetItem.template.html', null , $aView );
+        parent::__construct ( $sId , 'org.jecat.framework:WidgetItem.template.html', null , $aView );
         $this->setTitle($sTitle);
     }
     

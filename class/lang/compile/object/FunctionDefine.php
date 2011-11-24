@@ -1,7 +1,7 @@
 <?php
-namespace jc\lang\compile\object ;
+namespace org\jecat\framework\lang\compile\object ;
 
-use jc\lang\compile\ClassCompileException;
+use org\jecat\framework\lang\compile\ClassCompileException;
 
 class FunctionDefine extends StructDefine
 {

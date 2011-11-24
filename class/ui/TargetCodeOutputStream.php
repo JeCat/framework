@@ -1,9 +1,9 @@
 <?php
-namespace jc\ui ;
+namespace org\jecat\framework\ui ;
 
-use jc\lang\Exception;
-use jc\fs\IFile;
-use jc\io\IOutputStream;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\fs\IFile;
+use org\jecat\framework\io\IOutputStream;
 
 class TargetCodeOutputStream implements IOutputStream
 {

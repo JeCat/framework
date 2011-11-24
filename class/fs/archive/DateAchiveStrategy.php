@@ -1,10 +1,10 @@
 <?php
-namespace jc\fs\archive ;
+namespace org\jecat\framework\fs\archive ;
 
-use jc\fs\FileSystem;
+use org\jecat\framework\fs\FileSystem;
 
-use jc\fs\IFolder;
-use jc\fs\IFile;
+use org\jecat\framework\fs\IFolder;
+use org\jecat\framework\fs\IFile;
 
 /**
  * 按照当前日期生成归档路径
@@ -24,7 +24,7 @@ class DateAchiveStrategy extends IAchiveStrategy
 	}
 	
 	/**
-	 * @return jc\fs\IFile
+	 * @return org\jecat\framework\fs\IFile
 	 */
 	public function makeFilePath(IFile $aOriginalFile,IFolder $aToDir) 
 	{

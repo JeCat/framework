@@ -1,7 +1,7 @@
 <?php
-namespace jc\mvc\model ;
+namespace org\jecat\framework\mvc\model ;
 
-use jc\pattern\composite\IContainer;
+use org\jecat\framework\pattern\composite\IContainer;
 
 interface IModel extends \ArrayAccess, \Iterator
 {

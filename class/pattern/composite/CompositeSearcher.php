@@ -1,8 +1,8 @@
 <?php
-namespace jc\pattern\composite ;
+namespace org\jecat\framework\pattern\composite ;
 
-use jc\lang\Type;
-use jc\lang\Exception;
+use org\jecat\framework\lang\Type;
+use org\jecat\framework\lang\Exception;
 
 class CompositeSearcher extends \ArrayIterator
 {

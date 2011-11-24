@@ -1,8 +1,8 @@
 <?php
-namespace jc\verifier ;
+namespace org\jecat\framework\verifier ;
 
 
-use jc\lang\Object;
+use org\jecat\framework\lang\Object;
 
 class VerifierManager extends Object
 {
@@ -63,7 +63,7 @@ class VerifierManager extends Object
 	
 	public function iterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator($this->arrVerifiers) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator($this->arrVerifiers) ;
 	}
 	
 	public function verifyData($value,$bThrowExcetion=false)

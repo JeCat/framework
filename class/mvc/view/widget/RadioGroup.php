@@ -1,14 +1,14 @@
 <?php
-namespace jc\mvc\view\widget;
+namespace org\jecat\framework\mvc\view\widget;
 
-use jc\lang\Assert;
-use jc\lang\Type;
-use jc\lang\Exception;
-use jc\io\IOutputStream;
-use jc\util\IHashTable;
-use jc\mvc\view\IView;
-use jc\ui\UI;
-use jc\mvc\view\widget\CheckBtn;
+use org\jecat\framework\lang\Assert;
+use org\jecat\framework\lang\Type;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\io\IOutputStream;
+use org\jecat\framework\util\IHashTable;
+use org\jecat\framework\mvc\view\IView;
+use org\jecat\framework\ui\UI;
+use org\jecat\framework\mvc\view\widget\CheckBtn;
 
 class RadioGroup extends Group {
 	public function __construct($sId=null, $sTitle = null, IView $aView = null) {

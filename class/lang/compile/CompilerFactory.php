@@ -1,8 +1,8 @@
 <?php
-namespace jc\lang\compile ;
+namespace org\jecat\framework\lang\compile ;
 
-use jc\lang\aop\AOP;
-use jc\lang\Object;
+use org\jecat\framework\lang\aop\AOP;
+use org\jecat\framework\lang\Object;
 
 class CompilerFactory extends Object
 {
@@ -15,24 +15,24 @@ class CompilerFactory extends Object
 
 		//--------------------
 		// interpreter
-		$aCompiler->registerInterpreter("jc\\lang\\compile\\interpreters\\ClosureObjectParser") ;
-		$aCompiler->registerInterpreter("jc\\lang\\compile\\interpreters\\oop\\SyntaxScanner") ;
+		$aCompiler->registerInterpreter("org\\jecat\\framework\\lang\\compile\\interpreters\\ClosureObjectParser") ;
+		$aCompiler->registerInterpreter("org\\jecat\\framework\\lang\\compile\\interpreters\\oop\\SyntaxScanner") ;
 
 		// generator
-		$aCompiler->registerGenerator("jc\\lang\\compile\\object\\FunctionDefine","jc\\lang\\compile\\generators\\CompiledAlert") ;
-		$aCompiler->registerGenerator("jc\\lang\\compile\\object\\FunctionDefine","jc\\lang\\aop\\compiler\\FunctionDefineGenerator") ;
-		$aCompiler->registerGenerator("jc\\lang\\compile\\object\\CallFunction","jc\\lang\\aop\\compiler\\CallFunctionGenerator") ;
+		$aCompiler->registerGenerator("org\\jecat\\framework\\lang\\compile\\object\\FunctionDefine","org\\jecat\\framework\\lang\\compile\\generators\\CompiledAlert") ;
+		$aCompiler->registerGenerator("org\\jecat\\framework\\lang\\compile\\object\\FunctionDefine","org\\jecat\\framework\\lang\\aop\\compiler\\FunctionDefineGenerator") ;
+		$aCompiler->registerGenerator("org\\jecat\\framework\\lang\\compile\\object\\CallFunction","org\\jecat\\framework\\lang\\aop\\compiler\\CallFunctionGenerator") ;
 		
 		//--------------------
 		// 添加编译策略概要，用于生成编译器的”策略签名“
-		$aCompiler->addStrategySummary("jc\\lang\\compile\\interpreters\\ClosureObjectParser") ;
-		$aCompiler->addStrategySummary("jc\\lang\\compile\\interpreters\\oop\\SyntaxScanner") ;
-		$aCompiler->addStrategySummary("jc\\lang\\compile\\interpreters\\oop\\PHPCodeParser") ;
-		$aCompiler->addStrategySummary("jc\\lang\\compile\\interpreters\\oop\\NamespaceDeclareParser") ;
-		$aCompiler->addStrategySummary("jc\\lang\\compile\\interpreters\\oop\\ClassDefineParser") ;
-		$aCompiler->addStrategySummary("jc\\lang\\compile\\interpreters\\oop\\FunctionDefineParser") ;
-		$aCompiler->addStrategySummary("jc\\lang\\compile\\interpreters\\oop\\CallFunctionParser") ;
-		$aCompiler->addStrategySummary("jc\\lang\\compile\\object\\FunctionDefine<jc\\lang\\compile\\generators\\CompiledAlert") ;
+		$aCompiler->addStrategySummary("org\\jecat\\framework\\lang\\compile\\interpreters\\ClosureObjectParser") ;
+		$aCompiler->addStrategySummary("org\\jecat\\framework\\lang\\compile\\interpreters\\oop\\SyntaxScanner") ;
+		$aCompiler->addStrategySummary("org\\jecat\\framework\\lang\\compile\\interpreters\\oop\\PHPCodeParser") ;
+		$aCompiler->addStrategySummary("org\\jecat\\framework\\lang\\compile\\interpreters\\oop\\NamespaceDeclareParser") ;
+		$aCompiler->addStrategySummary("org\\jecat\\framework\\lang\\compile\\interpreters\\oop\\ClassDefineParser") ;
+		$aCompiler->addStrategySummary("org\\jecat\\framework\\lang\\compile\\interpreters\\oop\\FunctionDefineParser") ;
+		$aCompiler->addStrategySummary("org\\jecat\\framework\\lang\\compile\\interpreters\\oop\\CallFunctionParser") ;
+		$aCompiler->addStrategySummary("org\\jecat\\framework\\lang\\compile\\object\\FunctionDefine<org\\jecat\\framework\\lang\\compile\\generators\\CompiledAlert") ;
 		
 		$aCompiler->addStrategySummary(AOP::singleton()) ;
 		

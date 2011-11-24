@@ -1,28 +1,28 @@
 <?php
 
-namespace jc\lang\compile ;
+namespace org\jecat\framework\lang\compile ;
 
-use jc\lang\oop\Package;
-use jc\fs\FileSystem;
-use jc\system\Application;
-use jc\lang\compile\object\TokenPool;
-use jc\lang\oop\ClassLoader;
-use jc\lang\Exception;
-use jc\lang\Type;
-use jc\lang\compile\object\Token;
-use jc\util\String;
-use jc\ui\TargetCodeOutputStream;
-use jc\io\IInputStream;
-use jc\io\IOutputStream;
-use jc\lang\compile\object\IObject;
-use jc\pattern\composite\IContainer;
-use jc\pattern\composite\Container;
-use jc\lang\Object as JcObject ;
+use org\jecat\framework\lang\oop\Package;
+use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\system\Application;
+use org\jecat\framework\lang\compile\object\TokenPool;
+use org\jecat\framework\lang\oop\ClassLoader;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\Type;
+use org\jecat\framework\lang\compile\object\Token;
+use org\jecat\framework\util\String;
+use org\jecat\framework\ui\TargetCodeOutputStream;
+use org\jecat\framework\io\IInputStream;
+use org\jecat\framework\io\IOutputStream;
+use org\jecat\framework\lang\compile\object\IObject;
+use org\jecat\framework\pattern\composite\IContainer;
+use org\jecat\framework\pattern\composite\Container;
+use org\jecat\framework\lang\Object as JcObject ;
 
 class Compiler extends JcObject 
 {
 	/**
-	 * @return jc\lang\oop\Package
+	 * @return org\jecat\framework\lang\oop\Package
 	 */
 	public function compiledPackage()
 	{
@@ -65,7 +65,7 @@ class Compiler extends JcObject
 	}
 
 	/**
-	 * @return jc\lang\compile\object\TokenPool
+	 * @return org\jecat\framework\lang\compile\object\TokenPool
 	 */
 	public function scan(IInputStream $aSourceStream)
 	{
@@ -250,7 +250,7 @@ class Compiler extends JcObject
 	
 	public function createTokenPool()
 	{
-		return new TokenPool('jc\\lang\\compile\\object\\AbstractObject') ;
+		return new TokenPool('org\\jecat\\framework\\lang\\compile\\object\\AbstractObject') ;
 	}
 	
 	

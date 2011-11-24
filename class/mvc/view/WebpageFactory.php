@@ -1,7 +1,7 @@
 <?php
-namespace jc\mvc\view ;
+namespace org\jecat\framework\mvc\view ;
 
-use jc\ui\Object;
+use org\jecat\framework\ui\Object;
 
 class WebpageFactory extends Object
 {

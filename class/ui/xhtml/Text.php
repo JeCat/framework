@@ -1,10 +1,10 @@
 <?php
 
-namespace jc\ui\xhtml ;
+namespace org\jecat\framework\ui\xhtml ;
 
-use jc\lang\Exception;
-use jc\lang\Assert;
-use jc\pattern\composite\IContainedable;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\Assert;
+use org\jecat\framework\pattern\composite\IContainedable;
 
 class Text extends ObjectBase
 {

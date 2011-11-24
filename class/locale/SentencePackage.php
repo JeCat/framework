@@ -1,6 +1,6 @@
 <?php
 
-namespace jc\lang ;
+namespace org\jecat\framework\lang ;
 
 class SentencePackage
 {

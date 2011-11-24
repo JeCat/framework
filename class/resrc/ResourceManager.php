@@ -1,8 +1,8 @@
 <?php
-namespace jc\resrc ;
+namespace org\jecat\framework\resrc ;
 
-use jc\fs\IFolder;
-use jc\lang\Object;
+use org\jecat\framework\fs\IFolder;
+use org\jecat\framework\lang\Object;
 
 class ResourceManager extends Object
 {
@@ -39,7 +39,7 @@ class ResourceManager extends Object
 	}
 	
 	/**
-	 * @return jc\fs\IFile
+	 * @return org\jecat\framework\fs\IFile
 	 */
 	public function find($sFilename,$sNamespace='*')
 	{
@@ -101,12 +101,12 @@ class ResourceManager extends Object
 
 	public function folderNamespacesIterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator(array_keys($this->arrFolders)) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator(array_keys($this->arrFolders)) ;
 	}
 	
 	public function foldersIterator($sNamespace='*')
 	{
-		return new \jc\pattern\iterate\ArrayIterator(
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator(
 			isset($this->arrFolders[$sNamespace])?
 				$this->arrFolders[$sNamespace]: array()
 		) ;

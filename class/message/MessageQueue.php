@@ -1,14 +1,14 @@
 <?php
-namespace jc\message ;
+namespace org\jecat\framework\message ;
 
-use jc\io\IOutputStream;
-use jc\ui\xhtml\UIFactory;
-use jc\io\OutputStream;
-use jc\ui\UI;
-use jc\util\FilterMangeger;
-use jc\util\IFilterMangeger;
-use jc\lang\Object;
-use jc\pattern\composite\Container;
+use org\jecat\framework\io\IOutputStream;
+use org\jecat\framework\ui\xhtml\UIFactory;
+use org\jecat\framework\io\OutputStream;
+use org\jecat\framework\ui\UI;
+use org\jecat\framework\util\FilterMangeger;
+use org\jecat\framework\util\IFilterMangeger;
+use org\jecat\framework\lang\Object;
+use org\jecat\framework\pattern\composite\Container;
 
 class MessageQueue extends Object implements IMessageQueue
 {
@@ -55,7 +55,7 @@ class MessageQueue extends Object implements IMessageQueue
 	
 	public function iterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator($this->arrMsgQueue) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator($this->arrMsgQueue) ;
 	}
 	
 	public function count()
@@ -64,7 +64,7 @@ class MessageQueue extends Object implements IMessageQueue
 	}
 	
 	/**
-	 * @return jc\util\IFilterMangeger
+	 * @return org\jecat\framework\util\IFilterMangeger
 	 */
 	public function filters()
 	{
@@ -85,7 +85,7 @@ class MessageQueue extends Object implements IMessageQueue
 	{
 		if( !$sTemplateFilename )
 		{
-			$sTemplateFilename = 'jc:MsgQueue.template.html' ;
+			$sTemplateFilename = 'org.jecat.framework:MsgQueue.template.html' ;
 		}
 		
 		if( !$aUI )

@@ -1,18 +1,18 @@
 <?php
-namespace jc\mvc\model\db\orm;
+namespace org\jecat\framework\mvc\model\db\orm;
 
-use jc\db\sql\Restriction;
+use org\jecat\framework\db\sql\Restriction;
 
-use jc\mvc\model\db\Model;
-use jc\mvc\model\IModelList;
-use jc\db\sql\Table;
-use jc\db\sql\Select;
-use jc\lang\Object;
-use jc\db\DB;
-use jc\mvc\model\db\IModel ;
-use jc\db\sql\StatementFactory ;
-use jc\lang\Exception;
-use jc\db\sql\Criteria;
+use org\jecat\framework\mvc\model\db\Model;
+use org\jecat\framework\mvc\model\IModelList;
+use org\jecat\framework\db\sql\Table;
+use org\jecat\framework\db\sql\Select;
+use org\jecat\framework\lang\Object;
+use org\jecat\framework\db\DB;
+use org\jecat\framework\mvc\model\db\IModel ;
+use org\jecat\framework\db\sql\StatementFactory ;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\db\sql\Criteria;
 
 class Selecter extends OperationStrategy
 {
@@ -213,7 +213,7 @@ class Selecter extends OperationStrategy
 
 	// -- Select for Prototype ------------------------------------------------------
 	/**
-	 * @return jc\db\sql\Select
+	 * @return org\jecat\framework\db\sql\Select
 	 */
 	static public function buildSelect(Prototype $aPrototype)
 	{

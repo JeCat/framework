@@ -1,5 +1,5 @@
 <?php
-namespace jc\fs\imp ;
+namespace org\jecat\framework\fs\imp ;
 
 class MockLocalFSO extends LocalFSO{
 	public function __construct(LocalFileSystem $aFileSystem,$sPath,$sLocalPath){

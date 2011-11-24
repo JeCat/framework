@@ -1,14 +1,14 @@
 <?php
-namespace jc\lang\compile\interpreters\oop ;
+namespace org\jecat\framework\lang\compile\interpreters\oop ;
 
-use jc\lang\compile\object\CallFunction;
-use jc\pattern\iterate\CallbackFilterIterator ;
-use jc\pattern\iterate\ReverseIterator ;
-use jc\lang\compile\object\NamespaceDeclare;
-use jc\pattern\iterate\IReversableIterator;
-use jc\pattern\iterate\INonlinearIterator;
-use jc\lang\compile\object\TokenPool;
-use jc\lang\compile\object\Token;
+use org\jecat\framework\lang\compile\object\CallFunction;
+use org\jecat\framework\pattern\iterate\CallbackFilterIterator ;
+use org\jecat\framework\pattern\iterate\ReverseIterator ;
+use org\jecat\framework\lang\compile\object\NamespaceDeclare;
+use org\jecat\framework\pattern\iterate\IReversableIterator;
+use org\jecat\framework\pattern\iterate\INonlinearIterator;
+use org\jecat\framework\lang\compile\object\TokenPool;
+use org\jecat\framework\lang\compile\object\Token;
 
 class CallFunctionParser implements ISyntaxParser
 {

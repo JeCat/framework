@@ -1,7 +1,7 @@
 <?php
-namespace jc\mvc\view\widget\menu;
+namespace org\jecat\framework\mvc\view\widget\menu;
 
-use jc\mvc\view\widget\FormWidget;
+use org\jecat\framework\mvc\view\widget\FormWidget;
 
 abstract class AbstractBase extends FormWidget
 {

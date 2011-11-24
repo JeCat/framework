@@ -1,17 +1,17 @@
 <?php
-namespace jc\ui\xhtml\parsers ;
+namespace org\jecat\framework\ui\xhtml\parsers ;
 
-use jc\ui\xhtml\Node;
-use jc\ui\xhtml\Attributes;
-use jc\ui\xhtml\Text;
-use jc\lang\Exception;
-use jc\lang\Assert;
-use jc\util\match\RegExp;
-use jc\ui\xhtml\ObjectBase;
-use jc\ui\xhtml\IObject;
-use jc\ui\xhtml\Tag;
-use jc\lang\Object;
-use jc\util\String;
+use org\jecat\framework\ui\xhtml\Node;
+use org\jecat\framework\ui\xhtml\Attributes;
+use org\jecat\framework\ui\xhtml\Text;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\Assert;
+use org\jecat\framework\util\match\RegExp;
+use org\jecat\framework\ui\xhtml\ObjectBase;
+use org\jecat\framework\ui\xhtml\IObject;
+use org\jecat\framework\ui\xhtml\Tag;
+use org\jecat\framework\lang\Object;
+use org\jecat\framework\util\String;
 
 class ParserStateTag extends ParserState 
 {
@@ -93,10 +93,10 @@ class ParserStateTag extends ParserState
 
 	public function complete(IObject $aObject,String $aSource,$nPosition)
 	{
-		Assert::type("jc\\ui\\xhtml\\Tag", $aObject, 'aObject') ;
+		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Tag", $aObject, 'aObject') ;
 
 		$aNode = $aObject->parent() ;
-		Assert::type("jc\\ui\\xhtml\\Node", $aNode) ;
+		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Node", $aNode) ;
 	
 		$sTagLen = $nPosition - $aObject->position() + 1 ;
 		$sTagSource = $aSource->substr($aObject->position(),$sTagLen) ;

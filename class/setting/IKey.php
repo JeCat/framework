@@ -1,5 +1,5 @@
 <?php
-namespace jc\setting ;
+namespace org\jecat\framework\setting ;
 
 interface IKey
 {

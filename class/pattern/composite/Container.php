@@ -1,12 +1,12 @@
 <?php
-namespace jc\pattern\composite ;
+namespace org\jecat\framework\pattern\composite ;
 
 
-use jc\util\FilterMangeger ;
-use jc\pattern\composite\IContainedable;
-use jc\lang\Type;
-use jc\lang\Exception;
-use jc\lang\Object;
+use org\jecat\framework\util\FilterMangeger ;
+use org\jecat\framework\pattern\composite\IContainedable;
+use org\jecat\framework\lang\Type;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\Object;
 
 class Container extends Object implements IContainer
 {
@@ -107,25 +107,25 @@ class Container extends Object implements IContainer
 		return count($this->arrObjects) ;
 	}
 	/**
-	 * @return jc\pattern\iterate\INonlinearIterator
+	 * @return org\jecat\framework\pattern\iterate\INonlinearIterator
 	 */
 	public function iterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator($this->arrObjects) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator($this->arrObjects) ;
 	}
 	/**
-	 * @return jc\pattern\iterate\INonlinearIterator
+	 * @return org\jecat\framework\pattern\iterate\INonlinearIterator
 	 */
 	public function nameIterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator( array_keys($this->arrNames) ) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator( array_keys($this->arrNames) ) ;
 	}
 	/**
 	 * @return \Iterate
 	 */
 	public function acceptClassIterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator($this->arrAcceptClasses) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator($this->arrAcceptClasses) ;
 	}
 	
 	public function addFilters()

@@ -1,17 +1,17 @@
 <?php
-namespace jc\lang\aop\compiler ;
+namespace org\jecat\framework\lang\aop\compiler ;
 
-use jc\lang\compile\object\Token;
+use org\jecat\framework\lang\compile\object\Token;
 
-use jc\lang\Assert;
-use jc\lang\Exception;
-use jc\lang\compile\object\CallFunction;
+use org\jecat\framework\lang\Assert;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\compile\object\CallFunction;
 
 class CallFunctionGenerator extends AOPWeaveGenerator
 {
 	protected function generateAdviceArgvs(GenerateStat $aStat)
 	{
-		Assert::type("jc\\lang\\compile\\object\\CallFunction", $aStat->aExecutePoint) ;
+		Assert::type("org\\jecat\\framework\\lang\\compile\\object\\CallFunction", $aStat->aExecutePoint) ;
 	
 		$aArgvs = $aStat->aExecutePoint->argvToken() ;
 		$aArgvsEnd = $aArgvs->theOther() ;
@@ -60,7 +60,7 @@ class CallFunctionGenerator extends AOPWeaveGenerator
 	
 	protected function generateOriginJointCode(GenerateStat $aStat)
 	{
-		Assert::type("jc\\lang\\compile\\object\\CallFunction", $aStat->aExecutePoint) ;
+		Assert::type("org\\jecat\\framework\\lang\\compile\\object\\CallFunction", $aStat->aExecutePoint) ;
 
 		$aStat->sOriginJointCode = '' ;
 		

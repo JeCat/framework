@@ -1,14 +1,14 @@
 <?php
-namespace jc\ui\xhtml\weave ;
+namespace org\jecat\framework\ui\xhtml\weave ;
 
 
-use jc\util\String;
-use jc\io\OutputStreamBuffer;
-use jc\io\InputStreamCache;
-use jc\ui\UI;
-use jc\ui\xhtml\IObject;
-use jc\ui\ObjectContainer;
-use jc\lang\Exception;
+use org\jecat\framework\util\String;
+use org\jecat\framework\io\OutputStreamBuffer;
+use org\jecat\framework\io\InputStreamCache;
+use org\jecat\framework\ui\UI;
+use org\jecat\framework\ui\xhtml\IObject;
+use org\jecat\framework\ui\ObjectContainer;
+use org\jecat\framework\lang\Exception;
 
 class Patch
 {

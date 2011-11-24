@@ -1,15 +1,15 @@
 <?php
-namespace jc\lang\aop ;
+namespace org\jecat\framework\lang\aop ;
 
-use jc\io\InputStreamCache;
+use org\jecat\framework\io\InputStreamCache;
 
-use jc\lang\compile\CompilerFactory;
+use org\jecat\framework\lang\compile\CompilerFactory;
 
-use jc\lang\compile\object\ClassDefine;
-use jc\lang\Exception;
-use jc\lang\compile\DocComment;
-use jc\pattern\composite\Container;
-use jc\pattern\composite\NamedObject;
+use org\jecat\framework\lang\compile\object\ClassDefine;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\compile\DocComment;
+use org\jecat\framework\pattern\composite\Container;
+use org\jecat\framework\pattern\composite\NamedObject;
 
 class Aspect extends NamedObject
 {	
@@ -101,13 +101,13 @@ class Aspect extends NamedObject
 	}
 		
 	/**
-	 * @return jc\pattern\composite\IContainer
+	 * @return org\jecat\framework\pattern\composite\IContainer
 	 */
 	public function pointcuts()
 	{
 		if( !$this->aPointcuts )
 		{
-			$this->aPointcuts = new Container('jc\\lang\\aop\\Pointcut') ;
+			$this->aPointcuts = new Container('org\\jecat\\framework\\lang\\aop\\Pointcut') ;
 		}
 		
 		return $this->aPointcuts ;

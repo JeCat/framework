@@ -1,8 +1,8 @@
 <?php
-namespace jc\db\reflecter\imp;
+namespace org\jecat\framework\db\reflecter\imp;
 
-use jc\db\DB;
-use jc\db\reflecter\AbstractReflecterFactory;
+use org\jecat\framework\db\DB;
+use org\jecat\framework\db\reflecter\AbstractReflecterFactory;
 
 class MockupReflecterFactory extends AbstractReflecterFactory
 {

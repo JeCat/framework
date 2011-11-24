@@ -1,10 +1,10 @@
 <?php
-namespace jc\db\reflecter;
+namespace org\jecat\framework\db\reflecter;
 
-use jc\system\Application;
-use jc\cache\ICache;
-use jc\cache\DBCache;
-use jc\db\DB;
+use org\jecat\framework\system\Application;
+use org\jecat\framework\cache\ICache;
+use org\jecat\framework\cache\DBCache;
+use org\jecat\framework\db\DB;
 
 abstract class AbstractReflecterFactory
 {
@@ -34,7 +34,7 @@ abstract class AbstractReflecterFactory
 		return $aCacheData;
 	}
 	/**
-	 * @return jc\db\sql\reflecter\AbStractDBReflecter
+	 * @return org\jecat\framework\db\sql\reflecter\AbStractDBReflecter
 	 */
 	abstract public function createDBReflecter($sDBName) ;
 	
@@ -42,7 +42,7 @@ abstract class AbstractReflecterFactory
 	 * 
 	 * @param string $sTable
 	 * @param string $sDBName
-	 * @return jc\db\sql\reflecter\AbStractTableReflecter
+	 * @return org\jecat\framework\db\sql\reflecter\AbStractTableReflecter
 	 */
 	public function tableReflecter($sTable, $sDBName = null)
 	{
@@ -73,7 +73,7 @@ abstract class AbstractReflecterFactory
 	}
 	
 	/**
-	 * @return jc\db\sql\reflecter\AbStractTableReflecter
+	 * @return org\jecat\framework\db\sql\reflecter\AbStractTableReflecter
 	 */
 	abstract public function createTableReflecter($sTable, $sDBName = null) ;
 	
@@ -103,7 +103,7 @@ abstract class AbstractReflecterFactory
 		return $aCacheData;
 	}
 	/**
-	 * @return jc\db\sql\reflecter\AbStractColumnReflecter
+	 * @return org\jecat\framework\db\sql\reflecter\AbStractColumnReflecter
 	 */
 	abstract public function createColumnReflecter($sTable, $sColumn, $sDBName = null) ;
 	
@@ -133,7 +133,7 @@ abstract class AbstractReflecterFactory
 		return $aCacheData;
 	}
 	/**
-	 * @return jc\db\sql\reflecter\AbStractIndexReflecter
+	 * @return org\jecat\framework\db\sql\reflecter\AbStractIndexReflecter
 	 */
 	abstract public function createIndexReflecter($sTable, $sIndexName, $sDBName = null) ;
 	
@@ -153,7 +153,7 @@ abstract class AbstractReflecterFactory
 	
 	/**
 	 * 
-	 * @return jc\db\DB
+	 * @return org\jecat\framework\db\DB
 	 */
 	public function db()
 	{
@@ -182,13 +182,13 @@ abstract class AbstractReflecterFactory
 	
 	/**
 	 * 
-	 * @var jc\db\DB
+	 * @var org\jecat\framework\db\DB
 	 */
 	private $aDB ;
 	
 	/**
 	 * 
-	 * @var jc\cache\ICache
+	 * @var org\jecat\framework\cache\ICache
 	 */
 	private $aCache;
 }

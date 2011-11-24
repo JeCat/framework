@@ -1,12 +1,12 @@
 <?php 
-namespace jc ;
+namespace org\jecat\framework ;
 
 
 //////////////////////////////
 // 错误处理
-use jc\mvc\view\Webpage;
-use jc\ui\xhtml\Factory;
-use jc\system\Application;
+use org\jecat\framework\mvc\view\Webpage;
+use org\jecat\framework\ui\xhtml\Factory;
+use org\jecat\framework\system\Application;
 
 // 报告所有错误
 error_reporting(E_ALL & ~E_DEPRECATED) ;
@@ -61,7 +61,7 @@ set_exception_handler(function(\Exception $aException)
 		
 		$sContents.= "无法处理的异常：".get_class($aException)."\r\n" ;
 			
-		if($aException instanceof \jc\lang\Exception)
+		if($aException instanceof \org\jecat\framework\lang\Exception)
 		{
 			$sContents.= $aException->message()."\r\n" ;
 		}

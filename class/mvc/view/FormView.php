@@ -1,10 +1,10 @@
 <?php
-namespace jc\mvc\view ;
+namespace org\jecat\framework\mvc\view ;
 
-use jc\ui\UI;
-use jc\mvc\view\widget\IViewFormWidget;
-use jc\util\IDataSrc;
-use jc\system\Request;
+use org\jecat\framework\ui\UI;
+use org\jecat\framework\mvc\view\widget\IViewFormWidget;
+use org\jecat\framework\util\IDataSrc;
+use org\jecat\framework\system\Request;
 
 class FormView extends View implements IFormView
 {

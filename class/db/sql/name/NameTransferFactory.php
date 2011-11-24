@@ -1,7 +1,7 @@
 <?php
-namespace jc\db\sql\name ;
+namespace org\jecat\framework\db\sql\name ;
 
-use jc\lang\Object;
+use org\jecat\framework\lang\Object;
 
 class NameTransferFactory extends Object
 {

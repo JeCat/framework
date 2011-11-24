@@ -1,16 +1,16 @@
 <?php
-namespace jc\mvc\controller ;
+namespace org\jecat\framework\mvc\controller ;
 
-use jc\bean\BeanConfException;
+use org\jecat\framework\bean\BeanConfException;
 
-use jc\bean\BeanFactory;
+use org\jecat\framework\bean\BeanFactory;
 
-use jc\lang\Assert;
-use jc\mvc\view\IView;
-use jc\lang\Exception;
-use jc\mvc\view\WebpageFactory;
-use jc\mvc\controller\Controller;
-use jc\pattern\composite\IContainer;
+use org\jecat\framework\lang\Assert;
+use org\jecat\framework\mvc\view\IView;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\mvc\view\WebpageFactory;
+use org\jecat\framework\mvc\controller\Controller;
+use org\jecat\framework\pattern\composite\IContainer;
 
 class WebpageFrame extends Controller
 {

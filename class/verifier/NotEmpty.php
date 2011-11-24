@@ -1,11 +1,11 @@
 <?php
-namespace jc\verifier;
+namespace org\jecat\framework\verifier;
 
-use jc\bean\IBean;
+use org\jecat\framework\bean\IBean;
 
-use jc\message\Message;
-use jc\lang\Exception;
-use jc\lang\Object;
+use org\jecat\framework\message\Message;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\Object;
 
 class NotEmpty extends Object implements IVerifier,IBean {
 	public function __construct() {

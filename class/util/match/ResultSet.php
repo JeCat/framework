@@ -1,7 +1,7 @@
 <?php
-namespace jc\util\match ;
+namespace org\jecat\framework\util\match ;
 
-use jc\util\HashTable;
+use org\jecat\framework\util\HashTable;
 
 class ResultSet extends HashTable
 {

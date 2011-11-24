@@ -1,16 +1,16 @@
 <?php
-namespace jc\mvc\view\widget;
+namespace org\jecat\framework\mvc\view\widget;
 
-use jc\bean\BeanFactory;
+use org\jecat\framework\bean\BeanFactory;
 
-use jc\lang\Exception;
+use org\jecat\framework\lang\Exception;
 
-use jc\verifier\IVerifier;
+use org\jecat\framework\verifier\IVerifier;
 
-use jc\verifier\VerifierManager;
-use jc\verifier\VerifyFailed;
-use jc\message\Message;
-use jc\util\IDataSrc;
+use org\jecat\framework\verifier\VerifierManager;
+use org\jecat\framework\verifier\VerifyFailed;
+use org\jecat\framework\message\Message;
+use org\jecat\framework\util\IDataSrc;
 
 class FormWidget extends Widget implements IViewFormWidget
 {	
@@ -25,7 +25,7 @@ class FormWidget extends Widget implements IViewFormWidget
      *  verifier.ooxx		array
      *  
      *   
-     * @see jc\bean\IBean::build()
+     * @see org\jecat\framework\bean\IBean::build()
      */
 	public function build(array & $arrConfig,$sNamespace='*')
 	{

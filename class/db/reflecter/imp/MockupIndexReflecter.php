@@ -1,7 +1,7 @@
 <?php
-namespace jc\db\reflecter\imp;
+namespace org\jecat\framework\db\reflecter\imp;
 
-use jc\db\reflecter\AbStractIndexReflecter;
+use org\jecat\framework\db\reflecter\AbStractIndexReflecter;
 
 class MockupIndexReflecter extends AbStractIndexReflecter
 {

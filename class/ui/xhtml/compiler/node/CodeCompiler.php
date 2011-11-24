@@ -1,19 +1,19 @@
 <?php 
-namespace jc\ui\xhtml\compiler\node;
+namespace org\jecat\framework\ui\xhtml\compiler\node;
 
-use jc\ui\xhtml\AttributeValue;
-use jc\ui\TargetCodeOutputStream;
-use jc\lang\Type;
-use jc\ui\xhtml\compiler\ExpressionCompiler;
-use jc\ui\CompilerManager;
-use jc\ui\IObject;
-use jc\ui\xhtml\compiler\NodeCompiler;
+use org\jecat\framework\ui\xhtml\AttributeValue;
+use org\jecat\framework\ui\TargetCodeOutputStream;
+use org\jecat\framework\lang\Type;
+use org\jecat\framework\ui\xhtml\compiler\ExpressionCompiler;
+use org\jecat\framework\ui\CompilerManager;
+use org\jecat\framework\ui\IObject;
+use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 
 class CodeCompiler extends NodeCompiler
 {
 	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		Type::check ( "jc\\ui\\xhtml\\Node", $aObject );
+		Type::check ( "org\\jecat\\framework\\ui\\xhtml\\Node", $aObject );
 
 		$sLang = strtolower($aObject->attributes()->string('lang')) ;
 	
@@ -28,8 +28,8 @@ class CodeCompiler extends NodeCompiler
 			$sVarName = parent::assignVariableName() ;
 			
 			$aDev->write("\r\n") ;
-			$aDev->write("\${$sVarName} = new \\jc\\ui\\xhtml\\compiler\\node\\CodeColor() ;\r\n") ;
-			$aDev->write("\\jc\\io\\StdOutputFilterMgr::singleton()->add(array(\${$sVarName},'outputFilter')) ;\r\n") ;
+			$aDev->write("\${$sVarName} = new \\org\\jecat\\framework\\ui\\xhtml\\compiler\\node\\CodeColor() ;\r\n") ;
+			$aDev->write("\\org\\jecat\\framework\\io\\StdOutputFilterMgr::singleton()->add(array(\${$sVarName},'outputFilter')) ;\r\n") ;
 			$aDev->write("") ;
 			
 			// 编译 node body
@@ -37,7 +37,7 @@ class CodeCompiler extends NodeCompiler
 			
 			// 输出代码
 			$aDev->write("\r\n") ;
-			$aDev->write("\\jc\\io\\StdOutputFilterMgr::singleton()->remove( array(\${$sVarName},'outputFilter') ) ;\r\n") ;
+			$aDev->write("\\org\\jecat\\framework\\io\\StdOutputFilterMgr::singleton()->remove( array(\${$sVarName},'outputFilter') ) ;\r\n") ;
 			$aDev->write("\${$sVarName}->output(\$aDevice) ;") ;
 			$aDev->write("") ;
 			

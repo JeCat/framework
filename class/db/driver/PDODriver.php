@@ -1,13 +1,13 @@
 <?php
 
-namespace jc\db\driver ;
+namespace org\jecat\framework\db\driver ;
 
-use jc\db\sql\StatementState;
-use jc\db\reflecter\imp\MySQLReflecterFactory;
-use jc\db\DB;
-use jc\db\recordset\PDORecordSet;
-use jc\db\ExecuteException;
-use jc\db\sql\Statement;
+use org\jecat\framework\db\sql\StatementState;
+use org\jecat\framework\db\reflecter\imp\MySQLReflecterFactory;
+use org\jecat\framework\db\DB;
+use org\jecat\framework\db\recordset\PDORecordSet;
+use org\jecat\framework\db\ExecuteException;
+use org\jecat\framework\db\sql\Statement;
 
 class PDODriver extends \PDO implements IDriver
 {
@@ -46,7 +46,7 @@ class PDODriver extends \PDO implements IDriver
 	}
 	
 	/**
-	 * @return jc\db\sql\StatementState
+	 * @return org\jecat\framework\db\sql\StatementState
 	 */
 	public function sharedStatementState()
 	{
@@ -58,7 +58,7 @@ class PDODriver extends \PDO implements IDriver
 	}
 
 	/**
-	 * @return jc\db\recordset\IRecordSet
+	 * @return org\jecat\framework\db\recordset\IRecordSet
 	 */
 	public function query($sql)
 	{

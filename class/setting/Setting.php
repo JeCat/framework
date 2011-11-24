@@ -1,9 +1,9 @@
 <?php
-namespace jc\setting;
+namespace org\jecat\framework\setting;
 
-use jc\lang\Exception;
+use org\jecat\framework\lang\Exception;
 
-use jc\lang\Object;
+use org\jecat\framework\lang\Object;
 
 abstract class Setting extends Object implements ISetting
 {	

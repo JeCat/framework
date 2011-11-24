@@ -1,18 +1,18 @@
 <?php
-namespace jc\ui\xhtml\compiler ;
+namespace org\jecat\framework\ui\xhtml\compiler ;
 
-use jc\ui\xhtml\Tag;
-use jc\ui\xhtml\Node;
-use jc\lang\Assert;
-use jc\ui\TargetCodeOutputStream;
-use jc\ui\CompilerManager;
-use jc\ui\IObject;
+use org\jecat\framework\ui\xhtml\Tag;
+use org\jecat\framework\ui\xhtml\Node;
+use org\jecat\framework\lang\Assert;
+use org\jecat\framework\ui\TargetCodeOutputStream;
+use org\jecat\framework\ui\CompilerManager;
+use org\jecat\framework\ui\IObject;
 
 class NodeCompiler extends BaseCompiler
 {
 	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		Assert::type("jc\\ui\\xhtml\\Node",$aObject,'aObject') ;
+		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject,'aObject') ;
 
 		if( $aCompiler=$this->subCompiler(strtolower($aObject->tagName())) )
 		{

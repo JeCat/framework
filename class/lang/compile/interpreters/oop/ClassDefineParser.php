@@ -1,10 +1,10 @@
 <?php
-namespace jc\lang\compile\interpreters\oop ;
+namespace org\jecat\framework\lang\compile\interpreters\oop ;
 
-use jc\pattern\iterate\INonlinearIterator;
-use jc\lang\compile\object\TokenPool;
-use jc\lang\compile\object\Token;
-use jc\lang\compile\object\ClassDefine;
+use org\jecat\framework\pattern\iterate\INonlinearIterator;
+use org\jecat\framework\lang\compile\object\TokenPool;
+use org\jecat\framework\lang\compile\object\Token;
+use org\jecat\framework\lang\compile\object\ClassDefine;
 
 class ClassDefineParser implements ISyntaxParser
 {

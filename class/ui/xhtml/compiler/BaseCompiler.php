@@ -1,18 +1,18 @@
 <?php
-namespace jc\ui\xhtml\compiler ;
+namespace org\jecat\framework\ui\xhtml\compiler ;
 
-use jc\ui\ICompiler;
-use jc\lang\Object as JcObject;
-use jc\lang\Type;
-use jc\ui\TargetCodeOutputStream;
-use jc\ui\CompilerManager;
-use jc\ui\IObject;
+use org\jecat\framework\ui\ICompiler;
+use org\jecat\framework\lang\Object as JcObject;
+use org\jecat\framework\lang\Type;
+use org\jecat\framework\ui\TargetCodeOutputStream;
+use org\jecat\framework\ui\CompilerManager;
+use org\jecat\framework\ui\IObject;
 
 class BaseCompiler extends JcObject implements ICompiler
 {
 	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{	
-		if( $aObject instanceof \jc\ui\xhtml\ObjectBase and !$aObject->count() )
+		if( $aObject instanceof \org\jecat\framework\ui\xhtml\ObjectBase and !$aObject->count() )
 		{
 			$aDev->write($aObject->source()) ;
 		}

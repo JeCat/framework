@@ -1,10 +1,10 @@
 <?php
-namespace jc\mvc\controller ;
+namespace org\jecat\framework\mvc\controller ;
 
 
-use jc\mvc\view\IView;
-use jc\mvc\model\IModel;
-use jc\message\IMessageQueueHolder;
+use org\jecat\framework\mvc\view\IView;
+use org\jecat\framework\mvc\model\IModel;
+use org\jecat\framework\message\IMessageQueueHolder;
 
 interface IController extends IMessageQueueHolder
 {
@@ -13,7 +13,7 @@ interface IController extends IMessageQueueHolder
 	public function process() ;
     
     /**
-     * @return jc\util\IDataSrc
+     * @return org\jecat\framework\util\IDataSrc
      */
     public function params() ;
     
@@ -22,7 +22,7 @@ interface IController extends IMessageQueueHolder
     public function addModel(IModel $aModel,$sName=null) ;
     public function removeModel(IModel $aModel) ;
     /**
-	 * @return jc\mvc\model\IModel
+	 * @return org\jecat\framework\mvc\model\IModel
      */
     public function modelByName($sName) ;
     public function modelIterator() ;
@@ -32,7 +32,7 @@ interface IController extends IMessageQueueHolder
     public function addView(IView $aView,$sName=null) ;
     public function removeView(IView $aView) ;
     /**
-	 * @return jc\mvc\view\IView
+	 * @return org\jecat\framework\mvc\view\IView
      */
     public function viewByName($sName) ;
     public function viewIterator() ;

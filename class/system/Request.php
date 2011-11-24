@@ -1,8 +1,8 @@
 <?php
-namespace jc\system ;
+namespace org\jecat\framework\system ;
 
-use jc\util\IFilterMangeger;
-use jc\util\DataSrc ;
+use org\jecat\framework\util\IFilterMangeger;
+use org\jecat\framework\util\DataSrc ;
 
 class Request extends DataSrc
 {
@@ -35,7 +35,7 @@ class Request extends DataSrc
 	/**
 	 * Enter description here ...
 	 * 
-	 * @var jc\io\PrintSteam
+	 * @var org\jecat\framework\io\PrintSteam
 	 */
 	private $aPrinter ;
 }

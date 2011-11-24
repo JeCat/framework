@@ -1,11 +1,11 @@
 <?php
-namespace jc\ui ;
+namespace org\jecat\framework\ui ;
 
-use jc\io\IOutputStream;
+use org\jecat\framework\io\IOutputStream;
 
-use jc\lang\Exception;
-use jc\lang\Object as JcObject;
-use jc\fs\IFile;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\Object as JcObject;
+use org\jecat\framework\fs\IFile;
 
 class CompilerManager extends JcObject
 {

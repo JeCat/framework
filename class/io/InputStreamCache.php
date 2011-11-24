@@ -1,8 +1,8 @@
 <?php
-namespace jc\io ;
+namespace org\jecat\framework\io ;
 
-use jc\util\String;
-use jc\lang\Object;
+use org\jecat\framework\util\String;
+use org\jecat\framework\lang\Object;
 
 class InputStreamCache extends Object implements IInputStream
 {

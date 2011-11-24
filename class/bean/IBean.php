@@ -1,5 +1,5 @@
 <?php
-namespace jc\bean ;
+namespace org\jecat\framework\bean ;
 
 interface IBean
 {

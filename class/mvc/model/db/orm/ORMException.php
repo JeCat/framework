@@ -1,7 +1,7 @@
 <?php
-namespace jc\mvc\model\db\orm ;
+namespace org\jecat\framework\mvc\model\db\orm ;
 
-use jc\lang\Exception;
+use org\jecat\framework\lang\Exception;
 
 class ORMException extends Exception
 {}

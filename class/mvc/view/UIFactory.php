@@ -1,11 +1,11 @@
 <?php
-namespace jc\mvc\view ;
+namespace org\jecat\framework\mvc\view ;
 
-use jc\fs\FileSystem;
+use org\jecat\framework\fs\FileSystem;
 
-use jc\ui\xhtml\parsers\ParserStateTag;
+use org\jecat\framework\ui\xhtml\parsers\ParserStateTag;
 
-use jc\ui\xhtml\UIFactory as UIFactoryBase;
+use org\jecat\framework\ui\xhtml\UIFactory as UIFactoryBase;
 
 class UIFactory extends UIFactoryBase
 {
@@ -46,7 +46,7 @@ class UIFactory extends UIFactoryBase
 		$aNodeCompilers->addSubCompiler('js',__NAMESPACE__."\\uicompiler\\ScriptCompiler") ;
 		
 		$aNodeCompilers->addSubCompiler('model:foreach',__NAMESPACE__."\\uicompiler\\ModelForeachCompiler") ;
-		$aNodeCompilers->addSubCompiler('model:foreach:end',"jc\\ui\\xhtml\\compiler\\node\\DoubleEndCompiler") ;
+		$aNodeCompilers->addSubCompiler('model:foreach:end',"org\\jecat\\framework\\ui\\xhtml\\compiler\\node\\DoubleEndCompiler") ;
 		$aNodeCompilers->addSubCompiler('model:data',__NAMESPACE__."\\uicompiler\\ModelDataCompiler") ;
 		$aNodeCompilers->addSubCompiler('data',__NAMESPACE__."\\uicompiler\\ModelDataCompiler") ;
 		
@@ -59,7 +59,7 @@ class UIFactory extends UIFactoryBase
 	public function newSourceFileManager()
 	{
 		$aSrcMgr = parent::newSourceFileManager() ;
-		$aSrcMgr->addFolder(FileSystem::singleton()->findFolder('/framework/template/'),null,'jc') ;
+		$aSrcMgr->addFolder(FileSystem::singleton()->findFolder('/framework/template/'),null,org\jecat\framework) ;
 		
 		return $aSrcMgr ;
 	}

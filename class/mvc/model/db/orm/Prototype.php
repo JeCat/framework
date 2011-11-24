@@ -1,22 +1,22 @@
 <?php
-namespace jc\mvc\model\db\orm;
+namespace org\jecat\framework\mvc\model\db\orm;
 
-use jc\db\sql\Statement;
+use org\jecat\framework\db\sql\Statement;
 
-use jc\db\sql\StatementState;
+use org\jecat\framework\db\sql\StatementState;
 
-use jc\db\sql\name\NameTransferFactory;
+use org\jecat\framework\db\sql\name\NameTransferFactory;
 
-use jc\mvc\model\db\orm\Association;
-use jc\bean\BeanFactory;
-use jc\bean\IBean;
-use jc\db\sql\name\NameTransfer;
-use jc\mvc\model\db\ModelList;
-use jc\mvc\model\db\Model;
-use jc\db\reflecter\AbstractReflecterFactory;
-use jc\lang\Exception;
-use jc\db\DB;
-use jc\db\sql\StatementFactory;
+use org\jecat\framework\mvc\model\db\orm\Association;
+use org\jecat\framework\bean\BeanFactory;
+use org\jecat\framework\bean\IBean;
+use org\jecat\framework\db\sql\name\NameTransfer;
+use org\jecat\framework\mvc\model\db\ModelList;
+use org\jecat\framework\mvc\model\db\Model;
+use org\jecat\framework\db\reflecter\AbstractReflecterFactory;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\db\DB;
+use org\jecat\framework\db\sql\StatementFactory;
 
 class Prototype extends StatementFactory implements IBean
 {
@@ -108,7 +108,7 @@ class Prototype extends StatementFactory implements IBean
 	}
 	
 	/**
-	 * @return jc\db\sql\Criteria
+	 * @return org\jecat\framework\db\sql\Criteria
 	 */
 	public function criteria($bCreate=true)
 	{
@@ -406,7 +406,7 @@ class Prototype extends StatementFactory implements IBean
 	}
 	
 	/**
-	 * @return jc\db\reflecter\AbstractReflecterFactory
+	 * @return org\jecat\framework\db\reflecter\AbstractReflecterFactory
 	 */
 	public function tableReflecter()
 	{
@@ -432,7 +432,7 @@ class Prototype extends StatementFactory implements IBean
 	}
 	
 	/**
-	 * @return jc\mvc\model\db\IModel
+	 * @return org\jecat\framework\mvc\model\db\IModel
 	 */
 	public function createModel($bList=false)
 	{
@@ -629,7 +629,7 @@ class Prototype extends StatementFactory implements IBean
 		return $this->aStatementSelect ;
 	}
 	/**
-	 * return jc\db\sql\Update
+	 * return org\jecat\framework\db\sql\Update
 	 */
 	public function statementUpdate()
 	{
@@ -652,7 +652,7 @@ class Prototype extends StatementFactory implements IBean
 	}
 
 	/**
-	 * @return jc\db\sql\name\NameTransfer
+	 * @return org\jecat\framework\db\sql\name\NameTransfer
 	 */
 	public function nameTransfer()
 	{
@@ -665,14 +665,14 @@ class Prototype extends StatementFactory implements IBean
 	}
 
 	/**
-	 * @return jc\db\sql\StatementFactory ;
+	 * @return org\jecat\framework\db\sql\StatementFactory ;
 	 */
 	public function statementFactory()
 	{
 		return $this ;
 	}
 	/**
-	 * @return jc\db\sql\Table ;
+	 * @return org\jecat\framework\db\sql\Table ;
 	 */
 	public function createSqlTable()
 	{
@@ -725,7 +725,7 @@ class Prototype extends StatementFactory implements IBean
 	private $aCriteria = null;
 	private $arrAssociations =  array();
 	private $aAssociationBy = null;
-	private $sModelClass = 'jc\\mvc\\model\\db\\Model' ;
+	private $sModelClass = 'org\\jecat\\framework\\mvc\\model\\db\\Model' ;
 	private $arrBeanConfig ;
 	
 	// 共享状态

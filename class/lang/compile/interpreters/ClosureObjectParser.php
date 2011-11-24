@@ -1,15 +1,15 @@
 <?php
 
-namespace jc\lang\compile\interpreters ;
+namespace org\jecat\framework\lang\compile\interpreters ;
 
-use jc\lang\compile\ClassCompileException;
-use jc\lang\compile\object\TokenPool;
-use jc\util\Stack;
-use jc\lang\compile\object\ClosureToken;
-use jc\lang\compile\object\Token;
-use jc\pattern\composite\IContainer;
-use jc\lang\compile\IInterpreter;
-use jc\lang\Object;
+use org\jecat\framework\lang\compile\ClassCompileException;
+use org\jecat\framework\lang\compile\object\TokenPool;
+use org\jecat\framework\util\Stack;
+use org\jecat\framework\lang\compile\object\ClosureToken;
+use org\jecat\framework\lang\compile\object\Token;
+use org\jecat\framework\pattern\composite\IContainer;
+use org\jecat\framework\lang\compile\IInterpreter;
+use org\jecat\framework\lang\Object;
 
 /**
  * 闭合对象分析

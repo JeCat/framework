@@ -1,5 +1,5 @@
 <?php
-namespace jc\lang\compile\object ;
+namespace org\jecat\framework\lang\compile\object ;
 
 class Token extends AbstractObject
 {
@@ -72,7 +72,7 @@ class Token extends AbstractObject
 	}
 
 	/**
-	 * @return jc\pattern\composite\IContainer
+	 * @return org\jecat\framework\pattern\composite\IContainer
 	 */
 	public function objectPool()
 	{

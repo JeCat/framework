@@ -1,13 +1,13 @@
 <?php
 
-namespace jc\ui\xhtml ;
+namespace org\jecat\framework\ui\xhtml ;
 
-use jc\util\CombinedIterator;
+use org\jecat\framework\util\CombinedIterator;
 
-use jc\lang\Exception;
-use jc\lang\Type;
-use jc\util\HashTable;
-use jc\ui\xhtml\compiler\ExpressionCompiler ;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\Type;
+use org\jecat\framework\util\HashTable;
+use org\jecat\framework\ui\xhtml\compiler\ExpressionCompiler ;
 
 class Attributes extends HashTable
 {
@@ -41,7 +41,7 @@ class Attributes extends HashTable
 	
 	public function anonymousIterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator($this->arrAnonymous) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator($this->arrAnonymous) ;
 	}
 	
 	public function remove($req)
@@ -51,7 +51,7 @@ class Attributes extends HashTable
 			parent::remove($req) ;
 		}
 		
-		else if( $req instanceof \jc\ui\xhtml\AttributeValue )
+		else if( $req instanceof \org\jecat\framework\ui\xhtml\AttributeValue )
 		{
 			$this->removeByValue($req) ;
 			

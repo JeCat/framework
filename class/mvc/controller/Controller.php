@@ -1,35 +1,35 @@
 <?php
 
-namespace jc\mvc\controller ;
+namespace org\jecat\framework\mvc\controller ;
 
-use jc\locale\LocaleManager;
+use org\jecat\framework\locale\LocaleManager;
 
-use jc\system\Response;
+use org\jecat\framework\system\Response;
 
-use jc\locale\Locale;
+use org\jecat\framework\locale\Locale;
 
-use jc\bean\BeanConfException;
+use org\jecat\framework\bean\BeanConfException;
 
-use jc\bean\BeanFactory;
+use org\jecat\framework\bean\BeanFactory;
 
-use jc\bean\IBean ;
-use jc\mvc\model\IModel;
-use jc\pattern\composite\Container;
-use jc\mvc\view\DataExchanger;
-use jc\mvc\view\IFormView;
-use jc\util\match\RegExp;
-use jc\mvc\model\db\orm\Prototype;
-use jc\mvc\model\db\orm\PrototypeAssociationMap;
-use jc\mvc\view\VagrantViewSearcher;
-use jc\message\IMessageQueue;
-use jc\message\MessageQueue;
-use jc\util\DataSrc;
-use jc\util\IDataSrc;
-use jc\util\HashTable ;
-use jc\lang\Exception ;
-use jc\mvc\view\IView ; 
-use jc\mvc\view\View ; 
-use jc\pattern\composite\NamableComposite ;
+use org\jecat\framework\bean\IBean ;
+use org\jecat\framework\mvc\model\IModel;
+use org\jecat\framework\pattern\composite\Container;
+use org\jecat\framework\mvc\view\DataExchanger;
+use org\jecat\framework\mvc\view\IFormView;
+use org\jecat\framework\util\match\RegExp;
+use org\jecat\framework\mvc\model\db\orm\Prototype;
+use org\jecat\framework\mvc\model\db\orm\PrototypeAssociationMap;
+use org\jecat\framework\mvc\view\VagrantViewSearcher;
+use org\jecat\framework\message\IMessageQueue;
+use org\jecat\framework\message\MessageQueue;
+use org\jecat\framework\util\DataSrc;
+use org\jecat\framework\util\IDataSrc;
+use org\jecat\framework\util\HashTable ;
+use org\jecat\framework\lang\Exception ;
+use org\jecat\framework\mvc\view\IView ; 
+use org\jecat\framework\mvc\view\View ; 
+use org\jecat\framework\pattern\composite\NamableComposite ;
 
 /** 
  * @author root
@@ -49,7 +49,7 @@ class Controller extends NamableComposite implements IController, IBean
     	
     	$this->setName($sName) ;
     	
-		parent::__construct("jc\\mvc\\controller\\IController") ;
+		parent::__construct("org\\jecat\\framework\\mvc\\controller\\IController") ;
 		
 		$this->buildParams($params) ;
 		
@@ -73,12 +73,12 @@ class Controller extends NamableComposite implements IController, IBean
     /**
      * properties:
      * 	name				string						名称
-     * 	params				array,jc\util\IDataSrc 		参数
+     * 	params				array,org\jecat\framework\util\IDataSrc 		参数
      *  model.ooxx			config
      *  view.ooxx			config
      *  controller.ooxx		config
      * 
-     * @see jc\bean\IBean::build()
+     * @see org\jecat\framework\bean\IBean::build()
      */
     public function build(array & $arrConfig,$sNamespace='*')
     {
@@ -159,7 +159,7 @@ class Controller extends NamableComposite implements IController, IBean
 		return $this->arrBeanConfig ;
 	}
 	
-    public function createModel($prototype,array $arrProperties=array(),$bAgg=false,$sName=null,$sClass='jc\\mvc\\model\\db\\Model')
+    public function createModel($prototype,array $arrProperties=array(),$bAgg=false,$sName=null,$sClass='org\\jecat\\framework\\mvc\\model\\db\\Model')
     {
     	if( $prototype instanceof Prototype )
     	{
@@ -192,7 +192,7 @@ class Controller extends NamableComposite implements IController, IBean
      * @param $formview		该参数可以为：true 则创建一个 FormView 类型的视图; false 则创建一个 View 普通视图; 或是其他视图的类名 
      * @return IView
      */
-    public function createView($sName=null,$sSourceFile=null,$formview='jc\\mvc\\view\\View')
+    public function createView($sName=null,$sSourceFile=null,$formview='org\\jecat\\framework\\mvc\\view\\View')
     {
 		if( is_string($formview) and class_exists($formview) )
 	    {
@@ -200,7 +200,7 @@ class Controller extends NamableComposite implements IController, IBean
 	    }
 	    else
 	    {
-	    	$sClass = $formview? 'jc\\mvc\\view\\FormView': 'jc\\mvc\\view\\View' ;
+	    	$sClass = $formview? 'org\\jecat\\framework\\mvc\\view\\FormView': 'org\\jecat\\framework\\mvc\\view\\View' ;
 	    }
 	    
 	    if( !$sName )
@@ -222,7 +222,7 @@ class Controller extends NamableComposite implements IController, IBean
     
     public function createFormView($sName=null,$sSourceFile=null)
     {
-    	return $this->createView($sName,$sSourceFile,'jc\\mvc\\view\\FormView') ;
+    	return $this->createView($sName,$sSourceFile,'org\\jecat\\framework\\mvc\\view\\FormView') ;
     }
         
     /**
@@ -295,7 +295,7 @@ class Controller extends NamableComposite implements IController, IBean
 		}
 		
 		// 建立 relocation 视图
-		$aViewRelocater = new View("Relocater", "jc:Relocater.html") ;
+		$aViewRelocater = new View("Relocater", "org.jecat.framework:Relocater.html") ;
 		$this->addView($aViewRelocater) ;
 		
 		$aViewRelocater->variables()->set('message' ,$aLocale->trans($sMessage,$messageArgvs) ) ;
@@ -322,7 +322,7 @@ class Controller extends NamableComposite implements IController, IBean
     	}
     	else
     	{
-    		throw new Exception(__CLASS__."对象传入的 params 参数必须为 array 或 jc\\util\\IDataSrc 对象") ;
+    		throw new Exception(__CLASS__."对象传入的 params 参数必须为 array 或 org\\jecat\\framework\\util\\IDataSrc 对象") ;
     	}
     
     	// 为子控制器设置执行参数
@@ -450,7 +450,7 @@ class Controller extends NamableComposite implements IController, IBean
 	}
 	
     /**
-     * @return jc\util\IDataSrc
+     * @return org\jecat\framework\util\IDataSrc
      */
     public function params()
     {
@@ -586,7 +586,7 @@ class Controller extends NamableComposite implements IController, IBean
     	$this->modelContainer()->remove($aModel) ;
     }
     /**
-	 * @return jc\mvc\model\IModel
+	 * @return org\jecat\framework\mvc\model\IModel
      */
     public function modelByName($sName)
     {
@@ -618,7 +618,7 @@ class Controller extends NamableComposite implements IController, IBean
     	$this->mainView()->remove($aView) ;
     }
     /**
-	 * @return jc\mvc\view\IView
+	 * @return org\jecat\framework\mvc\view\IView
      */
     public function viewByName($sName)
     {
@@ -642,7 +642,7 @@ class Controller extends NamableComposite implements IController, IBean
     {
     	if(!$this->aModelContainer)
     	{
-    		$this->aModelContainer = new Container("jc\\mvc\\model\\IModel") ;
+    		$this->aModelContainer = new Container("org\\jecat\\framework\\mvc\\model\\IModel") ;
     	}
     	
     	return $this->aModelContainer ;
@@ -662,7 +662,7 @@ class Controller extends NamableComposite implements IController, IBean
     /**
      * Enter description here ...
      * 
-     * @var jc\util\IDataSrc
+     * @var org\jecat\framework\util\IDataSrc
      */
     protected $params = null ;
     

@@ -1,12 +1,12 @@
 <?php
-namespace jc\ui\xhtml\compiler\macro;
+namespace org\jecat\framework\ui\xhtml\compiler\macro;
 
-use jc\lang\Exception;
-use jc\ui\xhtml\compiler\NodeCompiler;
-use jc\ui\xhtml\compiler\MacroCompiler;
-use jc\ui\TargetCodeOutputStream;
-use jc\ui\CompilerManager;
-use jc\ui\IObject;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
+use org\jecat\framework\ui\xhtml\compiler\MacroCompiler;
+use org\jecat\framework\ui\TargetCodeOutputStream;
+use org\jecat\framework\ui\CompilerManager;
+use org\jecat\framework\ui\IObject;
 
 class CycleMacroCompiler extends MacroCompiler
 {
@@ -27,7 +27,7 @@ class CycleMacroCompiler extends MacroCompiler
 				$aDev->write ( "{$sArrName} = " . var_export ( $arrStrings, true ) . ";
 								if(!isset({$sObjName}))
 								{
-									{$sObjName} = new jc\\ui\\xhtml\\compiler\\macro\\Cycle({$sArrName});
+									{$sObjName} = new org\\jecat\\framework\\ui\\xhtml\\compiler\\macro\\Cycle({$sArrName});
 								}
 								\$aVariables->set( '" . substr($sObjName,1) . "' , {$sObjName} ) ;
 								");
@@ -52,7 +52,7 @@ class CycleMacroCompiler extends MacroCompiler
 			$aDev->write ( "{$sArrName} = " . var_export ( $this->getElementsBySource($sSource), true ) . ";
 				if(!isset({$sObjName}))
 				{
-					{$sObjName} = new jc\\ui\\xhtml\\compiler\\macro\\Cycle({$sArrName});
+					{$sObjName} = new org\\jecat\\framework\\ui\\xhtml\\compiler\\macro\\Cycle({$sArrName});
 				}
 				{$sObjName}->printArr(\$aDevice);
 				\$aVariables->set( '" . substr($sObjName,1) . "' ,{$sObjName} ) ;

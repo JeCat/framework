@@ -1,6 +1,6 @@
 <?php
 
-namespace jc\locale ;
+namespace org\jecat\framework\locale ;
 
 interface ILocale extends ITranslator
 {	

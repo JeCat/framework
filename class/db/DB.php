@@ -1,14 +1,14 @@
 <?php 
-namespace jc\db ;
+namespace org\jecat\framework\db ;
 
-use jc\system\Response;
+use org\jecat\framework\system\Response;
 
-use jc\system\Application;
+use org\jecat\framework\system\Application;
 
-use jc\db\driver\IDriver;
-use jc\db\sql\Select;
-use jc\lang\Object;
-use jc\db\sql\Statement;
+use org\jecat\framework\db\driver\IDriver;
+use org\jecat\framework\db\sql\Select;
+use org\jecat\framework\lang\Object;
+use org\jecat\framework\db\sql\Statement;
 
 class DB extends Object
 {
@@ -30,7 +30,7 @@ class DB extends Object
 	}
 	
 	/**
-	 * @return jc\db\recordset\IRecordSet
+	 * @return org\jecat\framework\db\recordset\IRecordSet
 	 */
 	public function query($sql)
 	{
@@ -77,7 +77,7 @@ class DB extends Object
 	}
 	
 	/**
-	 * @return jc\db\sql\reflecter\AbstractReflecterFactory 
+	 * @return org\jecat\framework\db\sql\reflecter\AbstractReflecterFactory 
 	 */
 	public function reflecterFactory()
 	{

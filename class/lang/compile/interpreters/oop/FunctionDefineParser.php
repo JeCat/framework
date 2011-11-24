@@ -1,13 +1,13 @@
 <?php
-namespace jc\lang\compile\interpreters\oop ;
+namespace org\jecat\framework\lang\compile\interpreters\oop ;
 
-use jc\lang\compile\object\DocCommentDeclare;
-use jc\lang\compile\ClassCompileException;
-use jc\pattern\iterate\INonlinearIterator;
-use jc\lang\compile\object\FunctionDefine;
-use jc\lang\compile\object\TokenPool;
-use jc\lang\compile\object\Token;
-use jc\lang\compile\object\ClassDefine;
+use org\jecat\framework\lang\compile\object\DocCommentDeclare;
+use org\jecat\framework\lang\compile\ClassCompileException;
+use org\jecat\framework\pattern\iterate\INonlinearIterator;
+use org\jecat\framework\lang\compile\object\FunctionDefine;
+use org\jecat\framework\lang\compile\object\TokenPool;
+use org\jecat\framework\lang\compile\object\Token;
+use org\jecat\framework\lang\compile\object\ClassDefine;
 
 class FunctionDefineParser implements ISyntaxParser
 {

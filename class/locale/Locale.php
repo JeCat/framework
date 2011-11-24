@@ -1,8 +1,8 @@
 <?php
 
-namespace jc\locale ;
+namespace org\jecat\framework\locale ;
 
-use jc\lang\SentencePackage;
+use org\jecat\framework\lang\SentencePackage;
 
 class Locale implements ILocale
 {
@@ -90,7 +90,7 @@ class Locale implements ILocale
 	}
 
 	/**
-	 * @see jc\locale.ILocale::number()
+	 * @see org\jecat\framework\locale.ILocale::number()
 	 */
 	public function number($Number)
 	{

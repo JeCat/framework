@@ -1,8 +1,8 @@
 <?php
-namespace jc\fs\imp ;
+namespace org\jecat\framework\fs\imp ;
 
-use jc\fs\IFolder;
-use jc\fs\FileSystem;
+use org\jecat\framework\fs\IFolder;
+use org\jecat\framework\fs\FileSystem;
 
 class LocalFolder extends LocalFSO implements IFolder
 {
@@ -60,7 +60,7 @@ class LocalFolder extends LocalFSO implements IFolder
 	/**
 	 * @return \Iterator
 	 */
-	public function iterator($nFlag=\jc\fs\FSIterator::FLAG_DEFAULT)
+	public function iterator($nFlag=\org\jecat\framework\fs\FSIterator::FLAG_DEFAULT)
 	{
 		return new LocalFolderIterator($this,$nFlag);
 	}

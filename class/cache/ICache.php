@@ -1,5 +1,5 @@
 <?php
-namespace jc\cache ;
+namespace org\jecat\framework\cache ;
 
 interface ICache
 {

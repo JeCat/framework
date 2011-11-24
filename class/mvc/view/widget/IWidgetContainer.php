@@ -1,5 +1,5 @@
 <?php
-namespace jc\mvc\view\widget ;
+namespace org\jecat\framework\mvc\view\widget ;
 
 interface IWidgetContainer {
 	
@@ -20,7 +20,7 @@ interface IWidgetContainer {
 	public function widget($sId) ;
 	
 	/**
-	 * @return jc\pattern\iterate\INonlinearIterator
+	 * @return org\jecat\framework\pattern\iterate\INonlinearIterator
 	 */
 	public function widgitIterator() ;
 	

@@ -1,12 +1,12 @@
 <?php
 
-namespace jc\util ;
+namespace org\jecat\framework\util ;
 
-use jc\lang\Type;
+use org\jecat\framework\lang\Type;
 
-use jc\lang\Exception;
+use org\jecat\framework\lang\Exception;
 
-use jc\lang\Object;
+use org\jecat\framework\lang\Object;
 
 class FilterMangeger extends Object implements IFilterMangeger
 {	
@@ -101,11 +101,11 @@ class FilterMangeger extends Object implements IFilterMangeger
 		
 	/**
 	 * 
-	 * @return jc\pattern\iterate\INonlinearIterator
+	 * @return org\jecat\framework\pattern\iterate\INonlinearIterator
 	 */
 	public function iterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator($this->arrFilters) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator($this->arrFilters) ;
 	}
 	
 	private $arrFilters = array() ;

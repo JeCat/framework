@@ -1,8 +1,8 @@
 <?php
 
-namespace jc\ui ;
+namespace org\jecat\framework\ui ;
 
-use jc\ui\TargetCodeOutputStream;
+use org\jecat\framework\ui\TargetCodeOutputStream;
 
 interface ICompiler
 {

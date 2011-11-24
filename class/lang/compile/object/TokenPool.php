@@ -1,9 +1,9 @@
 <?php
-namespace jc\lang\compile\object ;
+namespace org\jecat\framework\lang\compile\object ;
 
-use jc\pattern\iterate\ArrayIterator;
+use org\jecat\framework\pattern\iterate\ArrayIterator;
 
-use jc\pattern\composite\Container;
+use org\jecat\framework\pattern\composite\Container;
 
 class TokenPool extends Container
 {

@@ -1,13 +1,13 @@
 <?php
-namespace jc\ui\xhtml\parsers ;
+namespace org\jecat\framework\ui\xhtml\parsers ;
 
-use jc\lang\Assert;
-use jc\ui\xhtml\IObject;
-use jc\ui\xhtml\Text;
-use jc\ui\xhtml\ObjectBase;
-use jc\ui\xhtml\Tag;
-use jc\lang\Object;
-use jc\util\String;
+use org\jecat\framework\lang\Assert;
+use org\jecat\framework\ui\xhtml\IObject;
+use org\jecat\framework\ui\xhtml\Text;
+use org\jecat\framework\ui\xhtml\ObjectBase;
+use org\jecat\framework\ui\xhtml\Tag;
+use org\jecat\framework\lang\Object;
+use org\jecat\framework\util\String;
 
 class ParserStateText extends ParserState
 {
@@ -35,7 +35,7 @@ class ParserStateText extends ParserState
 
 	public function complete(IObject $aObject,String $aSource,$nPosition)
 	{
-		Assert::type("jc\\ui\\xhtml\\Text", $aObject, 'aObject') ;
+		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Text", $aObject, 'aObject') ;
 		
 		$sTextPos = $aObject->position() ;
 		$sTextLen = $nPosition - $sTextPos + 1 ;

@@ -1,11 +1,11 @@
 <?php
-namespace jc\ui\xhtml\weave ;
+namespace org\jecat\framework\ui\xhtml\weave ;
 
-use jc\ui\xhtml\Node;
-use jc\ui\xhtml\Macro;
-use jc\ui\xhtml\Text;
-use jc\ui\xhtml\IObject;
-use jc\lang\Exception;
+use org\jecat\framework\ui\xhtml\Node;
+use org\jecat\framework\ui\xhtml\Macro;
+use org\jecat\framework\ui\xhtml\Text;
+use org\jecat\framework\ui\xhtml\IObject;
+use org\jecat\framework\lang\Exception;
 
 class PatchSlotPathSegment 
 {
@@ -49,7 +49,7 @@ class PatchSlotPathSegment
 	}
 	
 	/**
-	 * @return jc\ui\xhtml\ObjectBase
+	 * @return org\jecat\framework\ui\xhtml\ObjectBase
 	 */
 	public function localObject(IObject $aParentObject)
 	{

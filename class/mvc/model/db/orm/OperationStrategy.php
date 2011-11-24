@@ -1,11 +1,11 @@
 <?php
-namespace jc\mvc\model\db\orm ;
+namespace org\jecat\framework\mvc\model\db\orm ;
 
-use jc\mvc\model\db\Model;
-use jc\db\sql\IDataSettableStatement;
-use jc\mvc\model\IModel;
-use jc\db\sql\StatementFactory;
-use jc\lang\Object;
+use org\jecat\framework\mvc\model\db\Model;
+use org\jecat\framework\db\sql\IDataSettableStatement;
+use org\jecat\framework\mvc\model\IModel;
+use org\jecat\framework\db\sql\StatementFactory;
+use org\jecat\framework\lang\Object;
 
 abstract class OperationStrategy extends Object
 {

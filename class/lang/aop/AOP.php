@@ -1,14 +1,14 @@
 <?php
-namespace jc\lang\aop ;
+namespace org\jecat\framework\lang\aop ;
 
-use jc\lang\compile\IStrategySummary;
-use jc\fs\IFSO;
-use jc\lang\Exception;
-use jc\lang\oop\Package;
-use jc\lang\compile\CompilerFactory;
-use jc\lang\oop\ClassLoader;
-use jc\pattern\composite\Container;
-use jc\lang\Object;
+use org\jecat\framework\lang\compile\IStrategySummary;
+use org\jecat\framework\fs\IFSO;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\oop\Package;
+use org\jecat\framework\lang\compile\CompilerFactory;
+use org\jecat\framework\lang\oop\ClassLoader;
+use org\jecat\framework\pattern\composite\Container;
+use org\jecat\framework\lang\Object;
 
 class AOP extends Object implements IStrategySummary
 {
@@ -142,13 +142,13 @@ class AOP extends Object implements IStrategySummary
 	public function createClassCompiler()
 	{
 		$aCompiler = CompilerFactory::createInstance()->create() ;
-		$aCompiler->registerGenerator("jc\\lang\\compile\\object\\FunctionDefine","jc\\lang\\aop\\compiler\\FunctionDefineGenerator") ;
+		$aCompiler->registerGenerator("org\\jecat\\framework\\lang\\compile\\object\\FunctionDefine","org\\jecat\\framework\\lang\\aop\\compiler\\FunctionDefineGenerator") ;
 		
 		return $aCompiler ;
 	}
 	
 	/**
-	 * jc\lang\oop\ClassLoader
+	 * org\jecat\framework\lang\oop\ClassLoader
 	 */
 	public function classLoader()
 	{
@@ -188,13 +188,13 @@ class AOP extends Object implements IStrategySummary
 	}
 	
 	/**
-	 * @return jc\pattern\composite\IContainer
+	 * @return org\jecat\framework\pattern\composite\IContainer
 	 */
 	protected function aspects()
 	{
 		if( !$this->aAspects )
 		{
-			$this->aAspects = new Container('jc\\lang\\aop\\Aspect') ;
+			$this->aAspects = new Container('org\\jecat\\framework\\lang\\aop\\Aspect') ;
 		}
 	
 		return $this->aAspects ;

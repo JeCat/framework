@@ -1,14 +1,14 @@
 <?php
 
-namespace jc\ui ;
+namespace org\jecat\framework\ui ;
 
-use jc\system\Response;
+use org\jecat\framework\system\Response;
 
-use jc\system\Application;
+use org\jecat\framework\system\Application;
 
-use jc\io\IOutputStream;
-use jc\pattern\composite\IContainer;
-use jc\pattern\composite\Composite;
+use org\jecat\framework\io\IOutputStream;
+use org\jecat\framework\pattern\composite\IContainer;
+use org\jecat\framework\pattern\composite\Composite;
 
 class Object extends Composite implements IObject
 {

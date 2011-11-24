@@ -1,5 +1,5 @@
 <?php
-namespace jc\db\sql ;
+namespace org\jecat\framework\db\sql ;
 
 class StatementState 
 {

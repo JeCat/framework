@@ -1,10 +1,10 @@
 <?php
-namespace jc\auth ;
+namespace org\jecat\framework\auth ;
 
-use jc\session\Session;
-use jc\session\ISession;
-use jc\lang\Object;
-use jc\lang\Exception;
+use org\jecat\framework\session\Session;
+use org\jecat\framework\session\ISession;
+use org\jecat\framework\lang\Object;
+use org\jecat\framework\lang\Exception;
 
 class IdManager extends Object implements \Serializable
 {
@@ -135,7 +135,7 @@ class IdManager extends Object implements \Serializable
 	 */
 	public function iterator() 
 	{
-		return new \jc\pattern\iterate\ArrayIterator($this->arrIds) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator($this->arrIds) ;
 	}
 
 	private $arrIds = array() ;

@@ -1,7 +1,7 @@
 <?php
-namespace jc\setting ;
+namespace org\jecat\framework\setting ;
 
-use jc\lang\Object;
+use org\jecat\framework\lang\Object;
 
 abstract class Key extends Object implements IKey
 {

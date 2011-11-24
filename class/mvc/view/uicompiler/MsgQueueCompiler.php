@@ -1,18 +1,18 @@
 <?php
-namespace jc\mvc\view\uicompiler ;
+namespace org\jecat\framework\mvc\view\uicompiler ;
 
-use jc\lang\Assert;
-use jc\lang\Exception;
-use jc\ui\IObject;
-use jc\ui\CompilerManager;
-use jc\ui\TargetCodeOutputStream;
-use jc\ui\xhtml\compiler\NodeCompiler;
+use org\jecat\framework\lang\Assert;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\ui\IObject;
+use org\jecat\framework\ui\CompilerManager;
+use org\jecat\framework\ui\TargetCodeOutputStream;
+use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 
 class MsgQueueCompiler extends NodeCompiler
 {
 	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		Assert::type("jc\\ui\\xhtml\\Node",$aObject,'aObject') ;
+		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject,'aObject') ;
 				
 		if( $aObject->attributes()->has('for') )
 		{
@@ -23,9 +23,9 @@ class MsgQueueCompiler extends NodeCompiler
 			$sMsgQueue = "\$aVariables->get('theView')->messageQueue()" ;
 		}
 		$aDev->write("\$__ui_msgqueue = {$sMsgQueue} ;\r\n") ;		
-		$aDev->write("if( \$__ui_msgqueue instanceof \\jc\\message\\IMessageQueueHolder ){\r\n") ;	
+		$aDev->write("if( \$__ui_msgqueue instanceof \\org\\jecat\\framework\\message\\IMessageQueueHolder ){\r\n") ;	
 		$aDev->write("\t\$__ui_msgqueue = \$__ui_msgqueue->messageQueue() ;\r\n\t}\r\n") ;			
-		$aDev->write("\\jc\\lang\\Assert::type( '\\\\jc\\\\message\\\\IMessageQueue',\$__ui_msgqueue);\r\n") ;
+		$aDev->write("\\org\\jecat\\framework\\lang\\Assert::type( '\\\\org\\jecat\\framework\\\\message\\\\IMessageQueue',\$__ui_msgqueue);\r\n") ;
 		
 		
 		// 使用 <msgqueue> 节点内部的模板内容

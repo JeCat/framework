@@ -1,8 +1,8 @@
 <?php
 
-namespace jc\io ;
+namespace org\jecat\framework\io ;
 
-use jc\lang\Type;
+use org\jecat\framework\lang\Type;
 
 class OutputStreamBuffer extends OutputStream
 {	

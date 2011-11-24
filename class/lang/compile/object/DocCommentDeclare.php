@@ -1,8 +1,8 @@
 <?php
-namespace jc\lang\compile\object ;
+namespace org\jecat\framework\lang\compile\object ;
 
-use jc\lang\compile\DocComment;
-use jc\lang\compile\ClassCompileException;
+use org\jecat\framework\lang\compile\DocComment;
+use org\jecat\framework\lang\compile\ClassCompileException;
 
 class DocCommentDeclare extends Token
 {
@@ -17,7 +17,7 @@ class DocCommentDeclare extends Token
 	}
 	
 	/**
-	 * @return jc\lang\compile\DocComment
+	 * @return org\jecat\framework\lang\compile\DocComment
 	 */
 	public function docComment()
 	{

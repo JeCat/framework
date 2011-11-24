@@ -1,22 +1,22 @@
 <?php
-namespace jc\system ;
+namespace org\jecat\framework\system ;
 
-use jc\fs\imp\LocalFileSystem;
+use org\jecat\framework\fs\imp\LocalFileSystem;
 
-use jc\setting\Setting;
+use org\jecat\framework\setting\Setting;
 
-use jc\fs\FileSystem;
+use org\jecat\framework\fs\FileSystem;
 
-use jc\setting\imp\FsSetting;
+use org\jecat\framework\setting\imp\FsSetting;
 
-use jc\lang\Exception;
+use org\jecat\framework\lang\Exception;
 
-use jc\locale\LocaleManager;
+use org\jecat\framework\locale\LocaleManager;
 
-use jc\lang\oop\ClassLoader;
-use jc\io\StdOutputFilterMgr;
-use jc\io\PrintStream;
-use jc\lang\Object ;
+use org\jecat\framework\lang\oop\ClassLoader;
+use org\jecat\framework\io\StdOutputFilterMgr;
+use org\jecat\framework\io\PrintStream;
+use org\jecat\framework\lang\Object ;
 
 abstract class ApplicationFactory extends Object
 {
@@ -93,7 +93,7 @@ abstract class ApplicationFactory extends Object
 		$aFileSystem = new LocalFileSystem($sRootPath) ;
 		
 		// 将 jc framework 挂载到 /framework 目录下
-		$aFileSystem->mount( '/framework', LocalFileSystem::flyweight(\jc\PATH) ) ;
+		$aFileSystem->mount( '/framework', LocalFileSystem::flyweight(\org\jecat\framework\PATH) ) ;
 		
 		return $aFileSystem ;
 	}
@@ -101,7 +101,7 @@ abstract class ApplicationFactory extends Object
 	public function createClassLoader()
 	{		
 		$aClassLoader = new ClassLoader( FileSystem::singleton()->findFile("/classpath.php") ) ;
-		$aClassLoader->addPackage( 'jc', '/framework/class' ) ; // 将 jecat 加入到 class loader 中
+		$aClassLoader->addPackage( 'org\\jecat\\framework', '/framework/class' ) ; // 将 jecat 加入到 class loader 中
 			
 		return $aClassLoader ;
 	}
@@ -128,7 +128,7 @@ abstract class ApplicationFactory extends Object
 	}
 	
 	/**
-	 * @return use jc\setting\Setting;
+	 * @return use org\jecat\framework\setting\Setting;
 	 */
 	public function createSetting()
 	{

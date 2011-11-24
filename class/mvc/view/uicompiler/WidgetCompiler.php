@@ -1,22 +1,22 @@
 <?php
-namespace jc\mvc\view\uicompiler ;
+namespace org\jecat\framework\mvc\view\uicompiler ;
 
-use jc\ui\xhtml\Node;
+use org\jecat\framework\ui\xhtml\Node;
 
-use jc\ui\xhtml\compiler\ExpressionCompiler;
-use jc\ui\xhtml\compiler\NodeCompiler;
-use jc\lang\Exception;
-use jc\lang\Assert;
-use jc\ui\IObject;
-use jc\ui\CompilerManager;
-use jc\ui\TargetCodeOutputStream;
+use org\jecat\framework\ui\xhtml\compiler\ExpressionCompiler;
+use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\Assert;
+use org\jecat\framework\ui\IObject;
+use org\jecat\framework\ui\CompilerManager;
+use org\jecat\framework\ui\TargetCodeOutputStream;
 
 
 class WidgetCompiler extends NodeCompiler
 {
 	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		Assert::type("jc\\ui\\xhtml\\Node",$aObject,'aObject') ;
+		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject,'aObject') ;
 		
 
 		$aAttrs = $aObject->attributes() ;
@@ -46,7 +46,7 @@ class WidgetCompiler extends NodeCompiler
 			$aDev->write("\r\n//// ------- 显示 Widget Instance ---------------------") ;
 			$aDev->write("{$sWidgetVarName} = {$sInstanceExpress} ;") ;
 
-			$aDev->write("if( !{$sWidgetVarName} or !({$sWidgetVarName} instanceof \\jc\\mvc\\view\\widget\\IViewWidget) ){") ;
+			$aDev->write("if( !{$sWidgetVarName} or !({$sWidgetVarName} instanceof \\org\\jecat\\framework\\mvc\\view\\widget\\IViewWidget) ){") ;
 			$aDev->output("无效的widget对象：".$sInstanceOrigin ) ;
 			$aDev->write("} else {") ;
 				
@@ -107,7 +107,7 @@ class WidgetCompiler extends NodeCompiler
 		else
 		{
 			$aDev->write("	if(empty(\$__aVariablesForWidgets)){	// 创建一个被所有 widget 共享的 Variables 对象") ;
-			$aDev->write("		\$__aVariablesForWidgets = new \\jc\\util\\DataSrc() ;") ;
+			$aDev->write("		\$__aVariablesForWidgets = new \\org\\jecat\\framework\\util\\DataSrc() ;") ;
 			$aDev->write("		\$__aVariablesForWidgets->addChild(\$aVariables) ;");
 			$aDev->write("	}") ;
 			$aDev->write("	{$sOldWidgetVarVarName} = \$__aVariablesForWidgets->get('theWidget') ;") ;

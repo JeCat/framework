@@ -1,21 +1,21 @@
 <?php
-namespace jc\ui\xhtml\compiler\node;
+namespace org\jecat\framework\ui\xhtml\compiler\node;
 
-use jc\lang\Exception;
+use org\jecat\framework\lang\Exception;
 
-use jc\ui\xhtml\AttributeValue;
-use jc\ui\TargetCodeOutputStream;
-use jc\lang\Type;
-use jc\ui\xhtml\compiler\ExpressionCompiler;
-use jc\ui\CompilerManager;
-use jc\ui\IObject;
-use jc\ui\xhtml\compiler\NodeCompiler;
+use org\jecat\framework\ui\xhtml\AttributeValue;
+use org\jecat\framework\ui\TargetCodeOutputStream;
+use org\jecat\framework\lang\Type;
+use org\jecat\framework\ui\xhtml\compiler\ExpressionCompiler;
+use org\jecat\framework\ui\CompilerManager;
+use org\jecat\framework\ui\IObject;
+use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 
 class SubTemplateDefineCompiler extends NodeCompiler
 {
 	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		Type::check ( "jc\\ui\\xhtml\\Node", $aObject ) ;
+		Type::check ( "org\\jecat\\framework\\ui\\xhtml\\Node", $aObject ) ;
 		
 		$aAttributes = $aObject->attributes() ;	
 		if( $aAttributes->has("name") )

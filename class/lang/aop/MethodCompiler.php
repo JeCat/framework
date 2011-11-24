@@ -1,7 +1,7 @@
 <?php
-namespace jc\lang\aop ;
+namespace org\jecat\framework\lang\aop ;
 
-use jc\lang\Object;
+use org\jecat\framework\lang\Object;
 
 class MethodCompiler extends Object
 {

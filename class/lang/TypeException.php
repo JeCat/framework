@@ -1,8 +1,8 @@
 <?php
 
-namespace jc\lang ;
+namespace org\jecat\framework\lang ;
 
-use jc\locale\ILocale;
+use org\jecat\framework\locale\ILocale;
 
 class TypeException extends Exception
 {

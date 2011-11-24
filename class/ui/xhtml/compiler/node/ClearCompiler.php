@@ -1,20 +1,20 @@
 <?php
-namespace jc\ui\xhtml\compiler\node;
+namespace org\jecat\framework\ui\xhtml\compiler\node;
 
-use jc\ui\xhtml\Text;
-use jc\ui\xhtml\Node;
-use jc\lang\Type;
-use jc\ui\ICompiler;
-use jc\ui\TargetCodeOutputStream;
-use jc\ui\CompilerManager;
-use jc\ui\IObject;
-use jc\ui\xhtml\compiler\NodeCompiler;
+use org\jecat\framework\ui\xhtml\Text;
+use org\jecat\framework\ui\xhtml\Node;
+use org\jecat\framework\lang\Type;
+use org\jecat\framework\ui\ICompiler;
+use org\jecat\framework\ui\TargetCodeOutputStream;
+use org\jecat\framework\ui\CompilerManager;
+use org\jecat\framework\ui\IObject;
+use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 
 class ClearCompiler extends NodeCompiler
 {
 	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		Type::check ( "jc\\ui\\xhtml\\Node", $aObject );
+		Type::check ( "org\\jecat\\framework\\ui\\xhtml\\Node", $aObject );
 		self::clearAfterWhitespace($aObject) ;
 	}
 	

@@ -1,7 +1,7 @@
 <?php
-namespace jc\util ;
+namespace org\jecat\framework\util ;
 
-use jc\lang\Exception;
+use org\jecat\framework\lang\Exception;
 
 class VersionExcetion extends Exception
 {}

@@ -1,15 +1,15 @@
 <?php
-namespace jc\ui\xhtml\parsers ;
+namespace org\jecat\framework\ui\xhtml\parsers ;
 
-use jc\ui\xhtml\Text;
+use org\jecat\framework\ui\xhtml\Text;
 
-use jc\lang\Exception;
-use jc\ui\xhtml\AttributeValue;
-use jc\ui\xhtml\IObject;
-use jc\util\String;
-use jc\lang\Assert;
-use jc\ui\xhtml\ObjectBase;
-use jc\ui\xhtml\Tag;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\ui\xhtml\AttributeValue;
+use org\jecat\framework\ui\xhtml\IObject;
+use org\jecat\framework\util\String;
+use org\jecat\framework\lang\Assert;
+use org\jecat\framework\ui\xhtml\ObjectBase;
+use org\jecat\framework\ui\xhtml\Tag;
 
 class ParserStateAttribute extends ParserState
 {
@@ -23,7 +23,7 @@ class ParserStateAttribute extends ParserState
 	
 	public function active(IObject $aParent,String $aSource,$nPosition)
 	{
-		Assert::type("jc\\ui\\xhtml\\Tag", $aParent, 'aParent') ;
+		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Tag", $aParent, 'aParent') ;
 		
 		$sByte = $aSource->byte($nPosition) ;
 				
@@ -64,7 +64,7 @@ class ParserStateAttribute extends ParserState
 
 	public function complete(IObject $aObject,String $aSource,$nPosition)
 	{
-		Assert::type("jc\\ui\\xhtml\\AttributeValue", $aObject, 'aObject') ;
+		Assert::type("org\\jecat\\framework\\ui\\xhtml\\AttributeValue", $aObject, 'aObject') ;
 
 		$sByte = $aSource->byte($nPosition) ;
 		
@@ -91,7 +91,7 @@ class ParserStateAttribute extends ParserState
 
 	public function examineEnd(String $aSource, &$nPosition,IObject $aObject)
 	{
-		Assert::type("jc\\ui\\xhtml\\AttributeValue", $aObject, 'aObject') ;
+		Assert::type("org\\jecat\\framework\\ui\\xhtml\\AttributeValue", $aObject, 'aObject') ;
 		
 		$sByte = $aSource->byte($nPosition) ;
 		$sQuote = $aObject->quoteType() ;

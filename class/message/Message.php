@@ -1,10 +1,10 @@
 <?php
-namespace jc\message ;
+namespace org\jecat\framework\message ;
 
-use jc\locale\LocaleManager;
+use org\jecat\framework\locale\LocaleManager;
 
-use jc\locale\ILocale;
-use jc\lang\Object;
+use org\jecat\framework\locale\ILocale;
+use org\jecat\framework\lang\Object;
 
 class Message extends Object 
 {

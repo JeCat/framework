@@ -1,9 +1,9 @@
 <?php
-namespace jc\setting\imp ;
+namespace org\jecat\framework\setting\imp ;
 
-use jc\fs\FSIterator;
-use jc\fs\IFile;
-use jc\setting\Key;
+use org\jecat\framework\fs\FSIterator;
+use org\jecat\framework\fs\IFile;
+use org\jecat\framework\setting\Key;
 
 class FsKey extends Key
 {
@@ -36,7 +36,7 @@ class FsKey extends Key
 	}
 
 	/**
-	 * @var jc\fs\IFile
+	 * @var org\jecat\framework\fs\IFile
 	 */
 	private $aItemFile ;
 }

@@ -1,7 +1,7 @@
 <?php
-namespace jc\util ;
+namespace org\jecat\framework\util ;
 
-use jc\lang\Object;
+use org\jecat\framework\lang\Object;
 
 class Stack extends Object
 {
@@ -42,11 +42,11 @@ class Stack extends Object
 	}
 	
 	/**
-	 * @return jc\pattern\iterate\INonlinearIterator
+	 * @return org\jecat\framework\pattern\iterate\INonlinearIterator
 	 */
 	public function iterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator($this->arrDataStack) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator($this->arrDataStack) ;
 	}
 
 	private $arrDataStack ;

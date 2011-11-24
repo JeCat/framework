@@ -1,9 +1,9 @@
 <?php
-namespace jc\db\driver ;
+namespace org\jecat\framework\db\driver ;
 
 
-use jc\db\sql\reflecter\AbstractReflecterFactory;
-use jc\db\DB;
+use org\jecat\framework\db\sql\reflecter\AbstractReflecterFactory;
+use org\jecat\framework\db\DB;
 
 interface IDriver
 {

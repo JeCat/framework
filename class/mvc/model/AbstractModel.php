@@ -1,9 +1,9 @@
 <?php
-namespace jc\mvc\model;
+namespace org\jecat\framework\mvc\model;
 
-use jc\io\IOutputStream;
+use org\jecat\framework\io\IOutputStream;
 
-use jc\lang\Object;
+use org\jecat\framework\lang\Object;
 
 abstract class AbstractModel extends Object implements IModel, \Serializable
 {
@@ -59,7 +59,7 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	 */
 	public function childIterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator ( $this->arrChildren );
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator ( $this->arrChildren );
 	}
 	
 	/**
@@ -67,7 +67,7 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	 */
 	public function childNameIterator()
 	{
-		return new \jc\pattern\iterate\ArrayIterator ( array_keys ( $this->arrChildren ) );
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator ( array_keys ( $this->arrChildren ) );
 	}
 	
 	// for data ///////////////////////////////
@@ -174,7 +174,7 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 		{
 			return new \EmptyIterator ();
 		}
-		return new \jc\pattern\iterate\ArrayIterator ( $this->arrDatas );
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator ( $this->arrDatas );
 	}
 	
 	public function dataNameIterator()
@@ -183,7 +183,7 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 		{
 			return new \EmptyIterator ();
 		}
-		return new \jc\pattern\iterate\ArrayIterator ( array_keys ( $this->arrDatas ) );
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator ( array_keys ( $this->arrDatas ) );
 	}
 	
 	///////////////////////////////////////////

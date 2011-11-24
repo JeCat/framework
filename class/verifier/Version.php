@@ -1,10 +1,10 @@
 <?php
-namespace jc\verifier;
+namespace org\jecat\framework\verifier;
 
-use jc\bean\IBean;
-use jc\message\Message;
-use jc\lang\Exception;
-use jc\lang\Object;
+use org\jecat\framework\bean\IBean;
+use org\jecat\framework\message\Message;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\Object;
 
 class Version extends Object implements IVerifier ,IBean{
 	
@@ -20,7 +20,7 @@ class Version extends Object implements IVerifier ,IBean{
 	
 	public function verify($data, $bThrowException)
 	{		
-		if( !\jc\util\Version::VerifyFormat($data) )
+		if( !\org\jecat\framework\util\Version::VerifyFormat($data) )
 		{
 			if ($bThrowException)
 			{

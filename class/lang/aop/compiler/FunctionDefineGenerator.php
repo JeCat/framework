@@ -1,17 +1,17 @@
 <?php
-namespace jc\lang\aop\compiler ;
+namespace org\jecat\framework\lang\aop\compiler ;
 
-use jc\lang\compile\object\TokenPool;
-use jc\lang\compile\object\Token;
-use jc\lang\compile\object\ClosureToken;
-use jc\util\Stack;
-use jc\lang\aop\Advice;
-use jc\lang\aop\jointpoint\JointPoint;
-use jc\lang\aop\Pointcut;
-use jc\lang\compile\object\FunctionDefine;
-use jc\lang\aop\AOP;
-use jc\lang\Assert;
-use jc\lang\Exception;
+use org\jecat\framework\lang\compile\object\TokenPool;
+use org\jecat\framework\lang\compile\object\Token;
+use org\jecat\framework\lang\compile\object\ClosureToken;
+use org\jecat\framework\util\Stack;
+use org\jecat\framework\lang\aop\Advice;
+use org\jecat\framework\lang\aop\jointpoint\JointPoint;
+use org\jecat\framework\lang\aop\Pointcut;
+use org\jecat\framework\lang\compile\object\FunctionDefine;
+use org\jecat\framework\lang\aop\AOP;
+use org\jecat\framework\lang\Assert;
+use org\jecat\framework\lang\Exception;
 
 class FunctionDefineGenerator extends AOPWeaveGenerator
 {
@@ -20,7 +20,7 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 	 */
 	protected function generateAdviceDispatchFunction(GenerateStat $aStat)
 	{
-		Assert::type("jc\\lang\\compile\\object\\FunctionDefine", $aStat->aExecutePoint) ;
+		Assert::type("org\\jecat\\framework\\lang\\compile\\object\\FunctionDefine", $aStat->aExecutePoint) ;
 	
 		if( !$aStat->aExecutePoint->bodyToken() )
 		{
@@ -119,7 +119,7 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 	 */
 	protected function generateOriginJointCode(GenerateStat $aStat)
 	{
-		Assert::type("jc\\lang\\compile\\object\\FunctionDefine", $aStat->aExecutePoint) ;
+		Assert::type("org\\jecat\\framework\\lang\\compile\\object\\FunctionDefine", $aStat->aExecutePoint) ;
 		
 		$aStat->sOriginJointCode = '' ;
 		

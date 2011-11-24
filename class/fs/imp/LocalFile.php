@@ -1,17 +1,17 @@
 <?php
-namespace jc\fs\imp ;
+namespace org\jecat\framework\fs\imp ;
 
-use jc\fs\FileSystem;
+use org\jecat\framework\fs\FileSystem;
 
-use jc\lang\Type;
+use org\jecat\framework\lang\Type;
 
-use jc\lang\Exception;
+use org\jecat\framework\lang\Exception;
 
-use jc\fs\IFolder;
+use org\jecat\framework\fs\IFolder;
 
-use jc\fs\IFile;
-use jc\io\OutputStream;
-use jc\io\InputStream;
+use org\jecat\framework\fs\IFile;
+use org\jecat\framework\io\OutputStream;
+use org\jecat\framework\io\InputStream;
 
 class LocalFile extends LocalFSO implements IFile
 {	

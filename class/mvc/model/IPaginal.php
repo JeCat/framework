@@ -1,7 +1,7 @@
 <?php
-namespace jc\mvc\model ;
+namespace org\jecat\framework\mvc\model ;
 
-use jc\mvc\view\widget\Paginator;
+use org\jecat\framework\mvc\view\widget\Paginator;
 
 interface IPaginal
 {

@@ -1,5 +1,5 @@
 <?php
-namespace jc\message ;
+namespace org\jecat\framework\message ;
 
 interface IMessageQueueHolder
 {

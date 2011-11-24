@@ -1,7 +1,7 @@
 <?php
-namespace jc\verifier ;
+namespace org\jecat\framework\verifier ;
 
-use jc\lang\Exception ;
+use org\jecat\framework\lang\Exception ;
 
 class VerifyFailed extends Exception
 {
@@ -14,7 +14,7 @@ class VerifyFailed extends Exception
 	}
 	
 	public function verifyFaildIterator(){
-		return new \jc\pattern\iterate\ArrayIterator ( $this->arrVerify );
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator ( $this->arrVerify );
 	}
 	
 	private $arrVerify = array(); 

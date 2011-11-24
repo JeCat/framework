@@ -1,8 +1,8 @@
 <?php
-namespace jc\mvc\view\widget\paginator;
+namespace org\jecat\framework\mvc\view\widget\paginator;
 
-use jc\mvc\view\widget\paginator\Middle;
-use jc\lang\Exception;
+use org\jecat\framework\mvc\view\widget\paginator\Middle;
+use org\jecat\framework\lang\Exception;
 
 abstract class AbstractStrategy{
     abstract public function pageNumList($iWidth,$iCurrent,$iTotal);

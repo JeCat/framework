@@ -1,7 +1,7 @@
 <?php
-namespace jc\ui\xhtml\weave ;
+namespace org\jecat\framework\ui\xhtml\weave ;
 
-use jc\ui\xhtml\ObjectBase;
+use org\jecat\framework\ui\xhtml\ObjectBase;
 
 class WeaveinObject extends ObjectBase
 {
@@ -11,7 +11,7 @@ class WeaveinObject extends ObjectBase
 	}
 	
 	/**
-	 * @return jc\util\String
+	 * @return org\jecat\framework\util\String
 	 */
 	public function compiled()
 	{

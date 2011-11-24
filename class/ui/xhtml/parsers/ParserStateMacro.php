@@ -1,12 +1,12 @@
 <?php
-namespace jc\ui\xhtml\parsers ;
+namespace org\jecat\framework\ui\xhtml\parsers ;
 
-use jc\lang\Exception;
-use jc\lang\Assert;
-use jc\ui\xhtml\ObjectBase;
-use jc\ui\xhtml\Macro;
-use jc\ui\xhtml\IObject;
-use jc\util\String;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\Assert;
+use org\jecat\framework\ui\xhtml\ObjectBase;
+use org\jecat\framework\ui\xhtml\Macro;
+use org\jecat\framework\ui\xhtml\IObject;
+use org\jecat\framework\util\String;
 
 class ParserStateMacro extends ParserState
 {
@@ -29,7 +29,7 @@ class ParserStateMacro extends ParserState
 	
 	public function examineEnd(String $aSource, &$nPosition,IObject $aObject) 
 	{
-		Assert::type("jc\\ui\\xhtml\\Macro", $aObject) ;
+		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Macro", $aObject) ;
 		
 		$sEndMacro = $aObject->borderEndMacro() ;
 		$nBorderWidth = strlen($sEndMacro) ;
@@ -47,7 +47,7 @@ class ParserStateMacro extends ParserState
 	
 	public function complete(IObject $aObject,String $aSource,$nPosition)
 	{
-		Assert::type("jc\\ui\\xhtml\\Macro", $aObject, 'aObject') ;
+		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Macro", $aObject, 'aObject') ;
 				
 		$sTextPos = $aObject->position() + strlen($aObject->borderStartMacro()) + 1 ;
 		$sTextLen = ($nPosition-strlen($aObject->borderEndMacro())) - $sTextPos + 1 ;

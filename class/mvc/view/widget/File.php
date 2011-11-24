@@ -1,20 +1,20 @@
 <?php
-namespace jc\mvc\view\widget;
+namespace org\jecat\framework\mvc\view\widget;
 
-use jc\fs\FileSystem;
+use org\jecat\framework\fs\FileSystem;
 
-use jc\message\Message;
-use jc\mvc\view\DataExchanger;
-use jc\lang\Type;
-use jc\lang\Exception;
-use jc\system\Request;
-use jc\mvc\view\IView;
-use jc\mvc\view\widgetIViewFormWidget;
-use jc\util\IDataSrc;
-use jc\fs\archive\IAchiveStrategy;
-use jc\fs\archive\DateAchiveStrategy;
-use jc\fs\IFile;
-use jc\fs\IFolder;
+use org\jecat\framework\message\Message;
+use org\jecat\framework\mvc\view\DataExchanger;
+use org\jecat\framework\lang\Type;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\system\Request;
+use org\jecat\framework\mvc\view\IView;
+use org\jecat\framework\mvc\view\widgetIViewFormWidget;
+use org\jecat\framework\util\IDataSrc;
+use org\jecat\framework\fs\archive\IAchiveStrategy;
+use org\jecat\framework\fs\archive\DateAchiveStrategy;
+use org\jecat\framework\fs\IFile;
+use org\jecat\framework\fs\IFolder;
 
 class File extends FormWidget
 {
@@ -30,7 +30,7 @@ class File extends FormWidget
 		{
 			$this->aAchiveStrategy = $aAchiveStrategy;
 		}
-		parent::__construct ( $sId, 'jc:WidgetFileUpdate.template.html', $sTitle, $aView );
+		parent::__construct ( $sId, 'org.jecat.framework:WidgetFileUpdate.template.html', $sTitle, $aView );
 	}
 	
 	public function build(array & $arrConfig,$sNamespace='*')
@@ -87,7 +87,7 @@ class File extends FormWidget
 	
 	public function setValue($data = null)
 	{
-		Type::check ( "jc\\fs\\IFile", $data );
+		Type::check ( "org\\jecat\\framework\\fs\\IFile", $data );
 		parent::setValue ( $data );
 	}
 	
@@ -196,7 +196,7 @@ class File extends FormWidget
 		{
 			if (! $this->aUploadedFile instanceof IFile)
 			{
-				throw new Exception ( __METHOD__ . "() %s数据必须是一个 jc\\fs\\IFile 对象，提供的是%s类型", array ($this->formName (), Type::detectType ( $this->aUploadedFile ) ) );
+				throw new Exception ( __METHOD__ . "() %s数据必须是一个 org\\jecat\\framework\\fs\\IFile 对象，提供的是%s类型", array ($this->formName (), Type::detectType ( $this->aUploadedFile ) ) );
 			}
 		}
 		
@@ -243,12 +243,12 @@ class File extends FormWidget
 	private $aAchiveStrategy;
 	
 	/**
-	 * @var	jc\fs\IFolder
+	 * @var	org\jecat\framework\fs\IFolder
 	 */
 	private $aStoreFolder;
 	
 	/**
-	 * @var	jc\fs\IFile
+	 * @var	org\jecat\framework\fs\IFile
 	 */
 	private $aUploadedFile;
 }

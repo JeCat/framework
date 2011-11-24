@@ -1,11 +1,11 @@
 <?php
-namespace jc\system ;
+namespace org\jecat\framework\system ;
 
-class AccessRouter extends \jc\lang\Object
+class AccessRouter extends \org\jecat\framework\lang\Object
 {
 	public function __construct()
 	{
-		$this->addController('jc\\mvc\\controller\\AjaxAction','ajax') ;
+		$this->addController('org\\jecat\\framework\\mvc\\controller\\AjaxAction','ajax') ;
 	}
 	
     /**
@@ -76,7 +76,7 @@ class AccessRouter extends \jc\lang\Object
     /**
      * Enter description here ...
      * 
-     * @return jc\pattern\iterate\INonlinearIterator
+     * @return org\jecat\framework\pattern\iterate\INonlinearIterator
      */
     public function iterateController()
     {

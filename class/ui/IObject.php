@@ -1,10 +1,10 @@
 <?php
 
-namespace jc\ui ;
+namespace org\jecat\framework\ui ;
 
-use jc\io\IOutputStream;
-use jc\pattern\composite\IContainer;
-use jc\pattern\composite\IContainedable;
+use org\jecat\framework\io\IOutputStream;
+use org\jecat\framework\pattern\composite\IContainer;
+use org\jecat\framework\pattern\composite\IContainedable;
 
 interface IObject extends IContainer, IContainedable
 {

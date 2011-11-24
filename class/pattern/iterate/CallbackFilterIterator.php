@@ -1,7 +1,7 @@
 <?php
-namespace jc\pattern\iterate ;
+namespace org\jecat\framework\pattern\iterate ;
 
-use jc\lang\Object;
+use org\jecat\framework\lang\Object;
 
 class CallbackFilterIterator extends Object implements \OuterIterator
 {

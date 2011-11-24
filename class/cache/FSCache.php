@@ -1,7 +1,7 @@
 <?php
-namespace jc\cache ;
+namespace org\jecat\framework\cache ;
 
-use jc\fs\FileSystem;
+use org\jecat\framework\fs\FileSystem;
 
 class FSCache implements ICache
 {
@@ -90,7 +90,7 @@ class FSCache implements ICache
 	}
 	
 	/**
-	 * @var jc\fs\FileSystem
+	 * @var org\jecat\framework\fs\FileSystem
 	 */
 	private $aCacheFilesystem ;
 }

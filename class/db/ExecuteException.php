@@ -1,8 +1,8 @@
 <?php
-namespace jc\db ;
+namespace org\jecat\framework\db ;
 
-use jc\db\driver\IDriver;
-use jc\lang\Exception as JcException ;
+use org\jecat\framework\db\driver\IDriver;
+use org\jecat\framework\lang\Exception as JcException ;
 
 class ExecuteException extends JcException
 {

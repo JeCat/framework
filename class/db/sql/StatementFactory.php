@@ -1,9 +1,9 @@
 <?php
-namespace jc\db\sql ;
+namespace org\jecat\framework\db\sql ;
 
-use jc\db\sql\name\NameTransferFactory;
-use jc\db\sql\name\NameTransfer;
-use jc\lang\Object;
+use org\jecat\framework\db\sql\name\NameTransferFactory;
+use org\jecat\framework\db\sql\name\NameTransfer;
+use org\jecat\framework\lang\Object;
 
 class StatementFactory extends Object
 {
@@ -107,7 +107,7 @@ class StatementFactory extends Object
 
 	
 	/**
-	 * @return jc\db\sql\name\NameTransferFactory
+	 * @return org\jecat\framework\db\sql\name\NameTransferFactory
 	 */
 	public function createNameTransferFactory()
 	{
@@ -115,7 +115,7 @@ class StatementFactory extends Object
 	}
 
 	/**
-	 * @return jc\db\sql\name\NameTransfer
+	 * @return org\jecat\framework\db\sql\name\NameTransfer
 	 */
 	public function nameTransfer()
 	{

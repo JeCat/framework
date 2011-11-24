@@ -1,14 +1,14 @@
 <?php
-namespace jc\ui\xhtml ;
+namespace org\jecat\framework\ui\xhtml ;
 
-use jc\system\Application;
+use org\jecat\framework\system\Application;
 
-use jc\util\String;
-use jc\ui\ICompiler;
-use jc\lang\Exception;
-use jc\lang\Assert;
-use jc\pattern\composite\IContainedable;
-use jc\ui\Object ;
+use org\jecat\framework\util\String;
+use org\jecat\framework\ui\ICompiler;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\Assert;
+use org\jecat\framework\pattern\composite\IContainedable;
+use org\jecat\framework\ui\Object ;
 
 class ObjectBase extends Object implements IObject
 {

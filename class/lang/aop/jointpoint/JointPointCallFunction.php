@@ -1,10 +1,10 @@
 <?php
-namespace jc\lang\aop\jointpoint ;
+namespace org\jecat\framework\lang\aop\jointpoint ;
 
-use jc\lang\compile\object\CallFunction;
+use org\jecat\framework\lang\compile\object\CallFunction;
 
-use jc\lang\compile\object\FunctionDefine;
-use jc\lang\compile\object\Token ;
+use org\jecat\framework\lang\compile\object\FunctionDefine;
+use org\jecat\framework\lang\compile\object\Token ;
 
 class JointPointCallFunction extends JointPoint
 {

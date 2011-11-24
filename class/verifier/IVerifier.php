@@ -1,5 +1,5 @@
 <?php
-namespace jc\verifier ;
+namespace org\jecat\framework\verifier ;
 
 interface IVerifier
 {

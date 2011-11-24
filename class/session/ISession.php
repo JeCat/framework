@@ -1,5 +1,5 @@
 <?php
-namespace jc\session ;
+namespace org\jecat\framework\session ;
 
 interface ISession 
 {
@@ -37,7 +37,7 @@ interface ISession
 	public function commit() ;
 	
 	/**
-	 * @return jc\pattern\iterate\INonlinearIterator
+	 * @return org\jecat\framework\pattern\iterate\INonlinearIterator
 	 */
 	public function variableNameIterator() ;
 	

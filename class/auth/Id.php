@@ -1,9 +1,9 @@
 <?php
-namespace jc\auth ;
+namespace org\jecat\framework\auth ;
 
-use jc\pattern\iterate\ArrayIterator;
-use jc\mvc\model\IModel;
-use jc\lang\Object;
+use org\jecat\framework\pattern\iterate\ArrayIterator;
+use org\jecat\framework\mvc\model\IModel;
+use org\jecat\framework\lang\Object;
 
 class Id extends Object implements IIdentity, \Serializable
 {
@@ -114,7 +114,7 @@ class Id extends Object implements IIdentity, \Serializable
 
 	
 	/**
-	 * @return jc\mvc\model\IModel
+	 * @return org\jecat\framework\mvc\model\IModel
 	 */
 	public function userDataModel()
 	{

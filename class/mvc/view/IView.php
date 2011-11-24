@@ -1,22 +1,22 @@
 <?php
-namespace jc\mvc\view ;
+namespace org\jecat\framework\mvc\view ;
 
-use jc\mvc\controller\IController;
-use jc\resrc\HtmlResourcePool;
-use jc\message\IMessageQueueHolder;
-use jc\io\IOutputStream;
-use jc\util\IHashTable;
-use jc\mvc\model\IModel;
-use jc\mvc\view\widget\IViewWidget;
-use jc\mvc\view\widget\IWidgetContainer ;
-use jc\pattern\composite\IContainer;
-use jc\pattern\composite\Container;
+use org\jecat\framework\mvc\controller\IController;
+use org\jecat\framework\resrc\HtmlResourcePool;
+use org\jecat\framework\message\IMessageQueueHolder;
+use org\jecat\framework\io\IOutputStream;
+use org\jecat\framework\util\IHashTable;
+use org\jecat\framework\mvc\model\IModel;
+use org\jecat\framework\mvc\view\widget\IViewWidget;
+use org\jecat\framework\mvc\view\widget\IWidgetContainer ;
+use org\jecat\framework\pattern\composite\IContainer;
+use org\jecat\framework\pattern\composite\Container;
 
 interface IView extends IContainer, IMessageQueueHolder, IWidgetContainer
 {
 	
 	/**
-	 * @return jc\util\IHashTable
+	 * @return org\jecat\framework\util\IHashTable
 	 */
 	public function variables() ;
 	
@@ -42,14 +42,14 @@ interface IView extends IContainer, IMessageQueueHolder, IWidgetContainer
 	public function exchangeData($nWay=DataExchanger::MODEL_TO_WIDGET) ;
 	
 	/**
-	 * @return jc\mvc\model\IModel
+	 * @return org\jecat\framework\mvc\model\IModel
 	 */
 	public function model() ;
 	
 	public function setModel(IModel $aModel) ;
 	
 	/**
-	 * @return jc\mvc\controller\IContainer
+	 * @return org\jecat\framework\mvc\controller\IContainer
 	 */
 	public function controller() ;
 	

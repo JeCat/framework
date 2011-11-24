@@ -1,12 +1,12 @@
 <?php
-namespace jc\system ;
+namespace org\jecat\framework\system ;
 
-use jc\lang\Object;
-use jc\resrc\ResourceManager;
-use jc\lang\Exception;
-use jc\setting\imp\FsSetting;
-use jc\fs\imp\LocalFileSystem;
-use jc\fs\FileSystem;
+use org\jecat\framework\lang\Object;
+use org\jecat\framework\resrc\ResourceManager;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\setting\imp\FsSetting;
+use org\jecat\framework\fs\imp\LocalFileSystem;
+use org\jecat\framework\fs\FileSystem;
 
 class Application extends Object implements \Serializable
 {
@@ -50,7 +50,7 @@ class Application extends Object implements \Serializable
 	}
 	
 	/**
-	 * @return jc\resrc\ResourceManager
+	 * @return org\jecat\framework\resrc\ResourceManager
 	 */
 	public function publicFolders()
 	{
@@ -61,7 +61,7 @@ class Application extends Object implements \Serializable
 			{
 				throw new Exception("目录 /framework/public 丢失，无法提供该目录下的文件") ;
 			}
-			$this->aPublicFolders->addFolder($aFolder,'jc') ;
+			$this->aPublicFolders->addFolder($aFolder,'org.jecat.framework') ;
 		}
 		return $this->aPublicFolders ;
 	}

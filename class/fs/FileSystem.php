@@ -1,15 +1,15 @@
 <?php
-namespace jc\fs ;
+namespace org\jecat\framework\fs ;
 
-use jc\lang\Type;
+use org\jecat\framework\lang\Type;
 
-use jc\lang\Exception;
-use jc\lang\Object;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\Object;
 
 abstract class FileSystem extends Object
 {
-	const file = 'jc\\fs\\IFile' ;
-	const folder = 'jc\\fs\\IFolder' ;
+	const file = 'org\\jecat\\framework\\fs\\IFile' ;
+	const folder = 'org\\jecat\\framework\\fs\\IFolder' ;
 	const unknow = 0 ;
 	
 	const CREATE_RECURSE_DIR = 020000 ;		// 创建文件或目录时，递归创建所属的目录
@@ -257,7 +257,7 @@ abstract class FileSystem extends Object
 		}
 		else 
 		{
-			throw new Exception('参数$from必须为 jc\\fs\\IFSO 或 表示路径的字符串格式，传入的参数格式为 %s',Type::detectType($from)) ;
+			throw new Exception('参数$from必须为 org\\jecat\\framework\\fs\\IFSO 或 表示路径的字符串格式，传入的参数格式为 %s',Type::detectType($from)) ;
 		}
 		
 		return $aFromFSO->copy($to) ;
@@ -284,7 +284,7 @@ abstract class FileSystem extends Object
 		}
 		else 
 		{
-			throw new Exception('参数$from必须为 jc\\fs\\IFSO 或 表示路径的字符串格式，传入的参数格式为 %s',Type::detectType($from)) ;
+			throw new Exception('参数$from必须为 org\\jecat\\framework\\fs\\IFSO 或 表示路径的字符串格式，传入的参数格式为 %s',Type::detectType($from)) ;
 		}
 		
 		return $aFromFSO->move($to) ;

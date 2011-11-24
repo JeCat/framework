@@ -1,10 +1,10 @@
 <?php
 
-namespace jc\locale ;
+namespace org\jecat\framework\locale ;
 
-use jc\lang\Object;
-use jc\fs\FSO;
-use jc\fs\FSOIterator;
+use org\jecat\framework\lang\Object;
+use org\jecat\framework\fs\FSO;
+use org\jecat\framework\fs\FSOIterator;
 
 class LocaleManager extends Object
 {

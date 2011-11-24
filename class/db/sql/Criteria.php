@@ -1,7 +1,7 @@
 <?php
-namespace jc\db\sql;
+namespace org\jecat\framework\db\sql;
 
-use jc\lang\Exception;
+use org\jecat\framework\lang\Exception;
 
 class Criteria extends SubStatement
 {

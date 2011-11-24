@@ -1,7 +1,7 @@
 <?php
-namespace jc\mvc\model\db ;
+namespace org\jecat\framework\mvc\model\db ;
 
-use jc\lang\Exception;
+use org\jecat\framework\lang\Exception;
 
 class CategoryPointException extends Exception
 {}

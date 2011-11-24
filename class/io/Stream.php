@@ -1,8 +1,8 @@
 <?php
-namespace jc\io ; 
+namespace org\jecat\framework\io ; 
 
-use jc\io\IClosable ;
-use jc\lang\Object ;
+use org\jecat\framework\io\IClosable ;
+use org\jecat\framework\lang\Object ;
 
 
 abstract class Stream extends Object implements IStream, IClosable

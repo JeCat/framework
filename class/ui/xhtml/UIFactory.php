@@ -1,13 +1,13 @@
 <?php
-namespace jc\ui\xhtml ;
+namespace org\jecat\framework\ui\xhtml ;
 
-use jc\ui\xhtml\parsers\ParserStateTag;
-use jc\ui\xhtml\compiler\TextCompiler;
-use jc\ui\xhtml\parsers\ParserStateMacro;
-use jc\ui\xhtml\compiler\MacroCompiler;
-use jc\ui\xhtml\compiler\NodeCompiler;
-use jc\ui\xhtml\nodes\TagLibrary;
-use jc\ui\UIFactory as UIFactoryBase ;
+use org\jecat\framework\ui\xhtml\parsers\ParserStateTag;
+use org\jecat\framework\ui\xhtml\compiler\TextCompiler;
+use org\jecat\framework\ui\xhtml\parsers\ParserStateMacro;
+use org\jecat\framework\ui\xhtml\compiler\MacroCompiler;
+use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
+use org\jecat\framework\ui\xhtml\nodes\TagLibrary;
+use org\jecat\framework\ui\UIFactory as UIFactoryBase ;
 
 class UIFactory extends UIFactoryBase 
 {	

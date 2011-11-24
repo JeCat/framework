@@ -1,8 +1,8 @@
 <?php
-namespace jc\mvc\view\widget;
+namespace org\jecat\framework\mvc\view\widget;
 
-use jc\mvc\view\IView;
-use jc\lang\Exception;
+use org\jecat\framework\mvc\view\IView;
+use org\jecat\framework\lang\Exception;
 
 class Text extends FormWidget
 {
@@ -19,7 +19,7 @@ class Text extends FormWidget
 	{
 		$this->setType ( $nType );
 		$this->setValue ( $sValue );
-		parent::__construct ( $sId, 'jc:WidgetText.template.html', $sTitle, $aView );
+		parent::__construct ( $sId, 'org.jecat.framework:WidgetText.template.html', $sTitle, $aView );
 	}
 	
 	public function build(array & $arrConfig,$sNamespace='*')

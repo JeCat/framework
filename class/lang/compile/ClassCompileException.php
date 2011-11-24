@@ -1,9 +1,9 @@
 <?php
-namespace jc\lang\compile ;
+namespace org\jecat\framework\lang\compile ;
 
-use jc\fs\IFile ;
-use jc\lang\Exception;
-use jc\lang\compile\object\Token;
+use org\jecat\framework\fs\IFile ;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\compile\object\Token;
 
 class ClassCompileException extends Exception
 {
@@ -16,7 +16,7 @@ class ClassCompileException extends Exception
 	}
 	
 	/**
-	 * @return jc\lang\compile\object\Token
+	 * @return org\jecat\framework\lang\compile\object\Token
 	 */
 	public function causeToken()
 	{
@@ -29,7 +29,7 @@ class ClassCompileException extends Exception
 	}
 	
 	/**
-	 * @return jc\fs\IFile
+	 * @return org\jecat\framework\fs\IFile
 	 */
 	public function classSouce()
 	{
@@ -37,12 +37,12 @@ class ClassCompileException extends Exception
 	}
 	
 	/**
-	 * @var jc\lang\compile\object\Token
+	 * @var org\jecat\framework\lang\compile\object\Token
 	 */
 	private $aCauseToken ;
 	
 	/**
-	 * @var jc\fs\IFile
+	 * @var org\jecat\framework\fs\IFile
 	 */
 	private $aClassSouce ;
 }

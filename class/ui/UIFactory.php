@@ -1,9 +1,9 @@
 <?php
-namespace jc\ui ;
+namespace org\jecat\framework\ui ;
 
-use jc\util\HashTable;
-use jc\util\DataSrc;
-use jc\lang\Object as JeObject ;
+use org\jecat\framework\util\HashTable;
+use org\jecat\framework\util\DataSrc;
+use org\jecat\framework\lang\Object as JeObject ;
 
 abstract class UIFactory extends JeObject implements IFactory 
 {

@@ -1,15 +1,15 @@
 <?php
-namespace jc\ui\xhtml\parsers ;
+namespace org\jecat\framework\ui\xhtml\parsers ;
 
-use jc\fs\IFile;
-use jc\io\OutputStreamBuffer;
-use jc\lang\Exception;
-use jc\ui\ObjectContainer ;
-use jc\util\String;
-use jc\ui\IInterpreter;
-use jc\util\Stack ;
-use jc\ui\xhtml\ObjectBase ;
-use jc\lang\Object as JcObject ;
+use org\jecat\framework\fs\IFile;
+use org\jecat\framework\io\OutputStreamBuffer;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\ui\ObjectContainer ;
+use org\jecat\framework\util\String;
+use org\jecat\framework\ui\IInterpreter;
+use org\jecat\framework\util\Stack ;
+use org\jecat\framework\ui\xhtml\ObjectBase ;
+use org\jecat\framework\lang\Object as JcObject ;
 
 /**
  * @author alee

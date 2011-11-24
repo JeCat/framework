@@ -1,11 +1,11 @@
 <?php 
 
-namespace jc\db\sql ;
+namespace org\jecat\framework\db\sql ;
 
-use jc\system\Application;
+use org\jecat\framework\system\Application;
 
-use jc\lang\Exception;
-use jc\db\sql\Criteria;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\db\sql\Criteria;
 
 class Select extends MultiTableStatement 
 {

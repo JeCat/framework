@@ -1,5 +1,5 @@
 <?php
-namespace jc\db\reflecter;
+namespace org\jecat\framework\db\reflecter;
 
 abstract class AbStractColumnReflecter extends DBStructReflecter
 {

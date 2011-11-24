@@ -1,5 +1,5 @@
 <?php
-namespace jc\pattern\iterate ;
+namespace org\jecat\framework\pattern\iterate ;
 
 interface IReversableIterator extends \Iterator
 {

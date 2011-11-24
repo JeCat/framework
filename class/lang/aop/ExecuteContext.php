@@ -1,5 +1,5 @@
 <?php
-namespace jc\lang\aop ;
+namespace org\jecat\framework\lang\aop ;
 
 class ExecuteContext
 {

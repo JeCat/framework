@@ -1,15 +1,15 @@
 <?php
-namespace jc\verifier;
+namespace org\jecat\framework\verifier;
 
-use jc\bean\IBean;
+use org\jecat\framework\bean\IBean;
 
-use jc\lang\Type;
+use org\jecat\framework\lang\Type;
 
-use jc\message\Message;
+use org\jecat\framework\message\Message;
 
-use jc\lang\Exception;
-use jc\lang\Object;
-use jc\fs\IFile;
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\Object;
+use org\jecat\framework\fs\IFile;
 
 class FileExt extends Object implements IVerifier,IBean {
 	/**

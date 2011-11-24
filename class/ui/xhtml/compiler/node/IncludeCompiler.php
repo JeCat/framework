@@ -1,22 +1,22 @@
 <?php
-namespace jc\ui\xhtml\compiler\node ;
+namespace org\jecat\framework\ui\xhtml\compiler\node ;
 
-use jc\lang\Exception;
+use org\jecat\framework\lang\Exception;
 
-use jc\ui\xhtml\compiler\ExpressionCompiler;
-use jc\ui\xhtml\Node;
-use jc\lang\Type;
-use jc\ui\ICompiler;
-use jc\ui\TargetCodeOutputStream;
-use jc\ui\CompilerManager;
-use jc\ui\IObject;
-use jc\ui\xhtml\compiler\NodeCompiler;
+use org\jecat\framework\ui\xhtml\compiler\ExpressionCompiler;
+use org\jecat\framework\ui\xhtml\Node;
+use org\jecat\framework\lang\Type;
+use org\jecat\framework\ui\ICompiler;
+use org\jecat\framework\ui\TargetCodeOutputStream;
+use org\jecat\framework\ui\CompilerManager;
+use org\jecat\framework\ui\IObject;
+use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 
 class IncludeCompiler extends NodeCompiler 
 {
 	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		Type::check("jc\\ui\\xhtml\\Node",$aObject) ;
+		Type::check("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject) ;
 		$aAttributes = $aObject->attributes() ;
 
 		if( $aAttributes->has("file") )
@@ -41,7 +41,7 @@ class IncludeCompiler extends NodeCompiler
 		// variables
 		if(!$bExtendParentVars)
 		{
-			$aDev->write("\$__include_aVariables = new \\jc\\util\\DataSrc() ; \r\n");
+			$aDev->write("\$__include_aVariables = new \\org\\jecat\\framework\\util\\DataSrc() ; \r\n");
 			$aDev->write("\$__include_aVariables->addChild(\$aVariables) ;");
 		}
 		else

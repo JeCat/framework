@@ -1,13 +1,13 @@
 <?php
 
-namespace jc\mvc\view\widget ;
+namespace org\jecat\framework\mvc\view\widget ;
 
-use jc\resrc\HtmlResourcePool;
-use jc\message\IMessageQueueHolder;
-use jc\io\IOutputStream;
-use jc\util\IHashTable;
-use jc\mvc\view\IView;
-use jc\ui\UI;
+use org\jecat\framework\resrc\HtmlResourcePool;
+use org\jecat\framework\message\IMessageQueueHolder;
+use org\jecat\framework\io\IOutputStream;
+use org\jecat\framework\util\IHashTable;
+use org\jecat\framework\mvc\view\IView;
+use org\jecat\framework\ui\UI;
 
 interface IViewWidget extends IMessageQueueHolder
 {

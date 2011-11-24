@@ -1,7 +1,7 @@
 <?php
-namespace jc\message ;
+namespace org\jecat\framework\message ;
 
-use jc\util\IFilterMangeger;
+use org\jecat\framework\util\IFilterMangeger;
 
 interface IMessageQueue
 {
@@ -12,7 +12,7 @@ interface IMessageQueue
 	public function count() ;
 	
 	/**
-	 * @return jc\util\IFilterMangeger
+	 * @return org\jecat\framework\util\IFilterMangeger
 	 */
 	public function filters() ;
 	

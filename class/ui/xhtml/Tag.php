@@ -1,8 +1,8 @@
 <?php
-namespace jc\ui\xhtml ;
+namespace org\jecat\framework\ui\xhtml ;
 
-use jc\ui\ICompiler;
-use jc\lang\Type;
+use org\jecat\framework\ui\ICompiler;
+use org\jecat\framework\lang\Type;
 
 class Tag extends ObjectBase
 {

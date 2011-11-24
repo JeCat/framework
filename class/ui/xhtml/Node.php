@@ -1,12 +1,12 @@
 <?php
 
-namespace jc\ui\xhtml ;
+namespace org\jecat\framework\ui\xhtml ;
 
-use jc\util\CombinedIterator;
-use jc\lang\Type;
-use jc\ui\xhtml\nodes\TagLibrary;
-use jc\ui\ICompiler;
-use jc\util\IDataSrc;
+use org\jecat\framework\util\CombinedIterator;
+use org\jecat\framework\lang\Type;
+use org\jecat\framework\ui\xhtml\nodes\TagLibrary;
+use org\jecat\framework\ui\ICompiler;
+use org\jecat\framework\util\IDataSrc;
 
 class Node extends ObjectBase
 {	

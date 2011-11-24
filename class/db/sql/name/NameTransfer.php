@@ -1,9 +1,9 @@
 <?php
-namespace jc\db\sql\name ;
+namespace org\jecat\framework\db\sql\name ;
 
-use jc\db\sql\StatementState;
-use jc\db\sql\Statement;
-use jc\util\FilterMangeger;
+use org\jecat\framework\db\sql\StatementState;
+use org\jecat\framework\db\sql\Statement;
+use org\jecat\framework\util\FilterMangeger;
 
 class NameTransfer 
 {
@@ -38,7 +38,7 @@ class NameTransfer
 	}
 	
 	/**
-	 * @return jc\util\FilterMangeger
+	 * @return org\jecat\framework\util\FilterMangeger
 	 */
 	public function filter($sType='Column',$bCreate=true)
 	{

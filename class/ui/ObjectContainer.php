@@ -1,5 +1,5 @@
 <?php
-namespace jc\ui ;
+namespace org\jecat\framework\ui ;
 
 
 class ObjectContainer extends Object

@@ -1,10 +1,10 @@
 <?php
-namespace jc\system ;
+namespace org\jecat\framework\system ;
 
-use jc\fs\imp\UploadFile;
-use jc\fs\imp\LocalFileSystem;
-use jc\util\DataSrc ;
-use jc\fs\FileSystem ;
+use org\jecat\framework\fs\imp\UploadFile;
+use org\jecat\framework\fs\imp\LocalFileSystem;
+use org\jecat\framework\util\DataSrc ;
+use org\jecat\framework\fs\FileSystem ;
 
 class HttpRequest extends Request
 {

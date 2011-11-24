@@ -1,9 +1,9 @@
 <?php
-namespace jc\lang\aop\jointpoint ;
+namespace org\jecat\framework\lang\aop\jointpoint ;
 
-use jc\lang\Object;
-use jc\lang\compile\object\Token;
-use jc\lang\Exception;
+use org\jecat\framework\lang\Object;
+use org\jecat\framework\lang\compile\object\Token;
+use org\jecat\framework\lang\Exception;
 
 abstract class JointPoint extends Object
 {
