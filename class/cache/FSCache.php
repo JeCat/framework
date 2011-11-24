@@ -1,6 +1,7 @@
 <?php
 namespace org\jecat\framework\cache ;
 
+use org\jecat\framework\fs\FileSystem;
 use org\jecat\framework\fs\IFolder;
 
 class FSCache implements ICache
@@ -19,15 +20,15 @@ class FSCache implements ICache
 			return ;
 		}
 
-		list( ,$data ) = $aFile->includeFile(false,false) ;
-		return $data ;
+		$arrItem = $aFile->includeFile(false,false) ;
+		return isset($arrItem['data'])? $arrItem['data']: null ;
 	}
 	
 	function setItem($sDataPath,$data,$fCreateTimeMicroSec=-1)
 	{
 		self::trimPath($sDataPath) ;
 		
-		if( !$aFile=$this->aFolder->findFile($sDataPath) and !$aFile=$this->aFolder->createFile($sDataPath) )
+		if( !$aFile=$this->aFolder->findFile($sDataPath,FileSystem::FIND_AUTO_CREATE) )
 		{
 			return false ;
 		}
@@ -47,7 +48,11 @@ class FSCache implements ICache
 		}
 		
 		$aWriter = $aFile->openWriter() ;
-		$aWriter->write("<?php return array( 'create'=>{$fCreateTimeMicroSec}, 'data'=>" . $sSerialize) . ") ;" ;
+		$aWriter->write("<?php
+return array(
+	'create'=>{$fCreateTimeMicroSec},
+	'data'=>{$sSerialize}
+) ;") ;
 		$aWriter->close() ;
 	}
 	
@@ -77,8 +82,8 @@ class FSCache implements ICache
 			return ;
 		}
 
-		list( $fTime ) = $aFile->includeFile(false,false) ;
-		return $fTime + $fValidSec < microtime(true) ;
+		$arrItem = $aFile->includeFile(false,false) ;
+		return $arrItem['create'] + $fValidSec < microtime(true) ;
 	}
 	
 	/**
@@ -95,8 +100,8 @@ class FSCache implements ICache
 			return ;
 		}
 
-		list( $fTime ) = $aFile->includeFile(false,false) ;
-		return $fTime ;
+		$arrItem = $aFile->includeFile(false,false) ;
+		return $arrItem['create'] ;
 	}
 	
 	static public function trimPath(&$sPath)
