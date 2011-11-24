@@ -75,9 +75,7 @@ abstract class UIFactory extends JeObject implements IFactory
 	 */
 	public function newCompilerManager()
 	{
-		$aCompilers = CompilerManager::singleton(true) ;
-		$aCompilers->setApplication($this->application(true)) ;
-		
+		$aCompilers = CompilerManager::singleton(true) ;		
 		return $aCompilers ;
 	}
 	public function setCompilerManager(CompilerManager $aCompilers)

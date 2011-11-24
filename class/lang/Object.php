@@ -151,7 +151,7 @@ class Object implements IObject
 		
 		if( !($aInstance instanceof static) )
 		{
-			throw new Exception('%s::setSingleton() 设置的单件实例必须为一个 %s 类型的对象',array($sClass,$sClass)) ;
+			throw new Exception('%s::setSingleton() 设置的单件实例必须为一个 %s 类型的对象，传入的对象类型为:%s',array($sClass,$sClass,Type::reflectType($aInstance))) ;
 		}
 
 		self::$arrGlobalInstancs[$sClass] = $aInstance ;
@@ -167,9 +167,10 @@ class Object implements IObject
 			$sClass = get_called_class() ;
 		}
 		
-		$aOri = call_user_func_array(array($sClass,'singleton'),array(false,null,$sClass)) ;
 		
-		call_user_func_array(array($sClass,'setSingleton'),array($aInstance,$sClass)) ;
+		$aOri = $sClass::singleton(false) ;
+		
+		$sClass::setSingleton($aInstance) ;
 		
 		return $aOri ;
 	}
