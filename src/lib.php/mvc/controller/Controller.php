@@ -2,6 +2,10 @@
 
 namespace jc\mvc\controller ;
 
+use jc\locale\LocaleManager;
+
+use jc\system\Response;
+
 use jc\locale\Locale;
 
 use jc\bean\BeanConfException;
@@ -282,7 +286,7 @@ class Controller extends NamableComposite implements IController, IBean
 
 		if(!$aLocale)
 		{
-			$aLocale = $this->application()->localeManager()->locale() ;
+			$aLocale = LocaleManager::singleton()->locale() ;
 		}
 		
 		if($sLinkText===null)
@@ -631,7 +635,7 @@ class Controller extends NamableComposite implements IController, IBean
 
     protected function response()
     {
-    	return $this->application()->response() ;
+    	return Response::singleton() ;
     }
     
     protected function modelContainer()

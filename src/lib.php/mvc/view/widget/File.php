@@ -39,7 +39,7 @@ class File extends FormWidget
 		
 		if (array_key_exists ( 'folder', $arrConfig ))
 		{
-			$this->aStoreFolder = $this->application()->fileSystem()->findFolder($arrConfig['folder'],FileSystem::FIND_AUTO_CREATE);
+			$this->aStoreFolder = FileSystem::singleton()->findFolder($arrConfig['folder'],FileSystem::FIND_AUTO_CREATE);
 		}
 	}
 	
@@ -150,9 +150,9 @@ class File extends FormWidget
 		$aSavedFile = $this->aAchiveStrategy->makeFilePath ( $this->aUploadedFile, $this->aStoreFolder );
 		
 		// 创建保存目录
-		if (! $aFolderOfSavedFile = $this->application ()->fileSystem ()->findFolder ( $aSavedFile ))
+		if (! $aFolderOfSavedFile = FileSystem::singleton()->findFolder ( $aSavedFile ))
 		{
-			if (! $this->application ()->fileSystem ()->createFolder ( $aSavedFile ))
+			if (! FileSystem::singleton()->createFolder ( $aSavedFile ))
 			{
 				throw new Exception ( __CLASS__ . "的" . __METHOD__ . "在创建路径\"%s\"时出错", array ($this->aStoreFolder->path () ) );
 			}

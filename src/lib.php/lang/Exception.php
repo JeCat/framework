@@ -1,6 +1,7 @@
 <?php
 namespace jc\lang ;
 
+use jc\locale\LocaleManager;
 use jc\locale\ILocale ;
 use jc\System\Application ;
 
@@ -21,12 +22,9 @@ class Exception extends \Exception implements IException, IObject
 	
 	public function message(ILocale $aLocale=null)
 	{
-		if( !$aLocale )
+		if( !$aLocale and class_exists('LocaleManager'))
 		{
-			if( $aLocaleMgr=$this->application(true)->localeManager() )
-			{
-				$aLocale = $aLocaleMgr->locale() ;
-			}
+			$aLocale = LocaleManager::singleton()->locale() ;
 		}
 		
 		return $aLocale?

@@ -2,6 +2,8 @@
 
 namespace jc\ui ;
 
+use jc\system\Response;
+
 use jc\system\Application;
 
 use jc\io\IOutputStream;
@@ -47,7 +49,7 @@ class Object extends Composite implements IObject
 	{
 		if(!$aDevice)
 		{
-			$aDevice = Application::singleton()->response()->printer() ;
+			$aDevice = Response::singleton()->printer() ;
 		}
 		
 		$aDevice->write( str_repeat("\t",$nDepth) . $this->summary() . "\r\n" ) ;

@@ -2,6 +2,12 @@
 
 namespace jc\ui ;
 
+use jc\locale\LocaleManager;
+
+use jc\system\Response;
+
+use jc\system\Request;
+
 use jc\system\Application;
 
 use jc\io\IInputStream;
@@ -182,14 +188,14 @@ class UI extends JcObject
 			$aDevice = $this->outputStream() ;
 			if(!$aDevice)
 			{
-				$aDevice = $this->application()->response()->printer() ;
+				$aDevice = Response::singleton()->printer() ;
 			}
 		}
 		
 		// 模板变量
 		if( !$aVariables->has('theRequest') )
 		{
-			$aVariables->set('theRequest',$this->application()->request()) ;
+			$aVariables->set('theRequest',Request::singleton()) ;
 		}
 		$aVariables->set('theDevice',$aDevice) ;		
 		
@@ -217,7 +223,7 @@ class UI extends JcObject
 	 */
 	public function locale()
 	{
-		return Application::singleton()->localeManager()->locale() ;
+		return LocaleManager::singleton()->locale() ;
 	}
 	
 	private $aSourceFileManager ;

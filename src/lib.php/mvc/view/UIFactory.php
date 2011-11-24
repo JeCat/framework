@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\view ;
 
+use jc\fs\FileSystem;
+
 use jc\ui\xhtml\parsers\ParserStateTag;
 
 use jc\ui\xhtml\UIFactory as UIFactoryBase;
@@ -57,7 +59,7 @@ class UIFactory extends UIFactoryBase
 	public function newSourceFileManager()
 	{
 		$aSrcMgr = parent::newSourceFileManager() ;
-		$aSrcMgr->addFolder($this->application()->fileSystem()->findFolder('/framework/src/template/'),null,'jc') ;
+		$aSrcMgr->addFolder(FileSystem::singleton()->findFolder('/framework/src/template/'),null,'jc') ;
 		
 		return $aSrcMgr ;
 	}

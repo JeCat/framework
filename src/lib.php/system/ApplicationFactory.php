@@ -1,6 +1,18 @@
 <?php
 namespace jc\system ;
 
+use jc\fs\imp\LocalFileSystem;
+
+use jc\setting\Setting;
+
+use jc\fs\FileSystem;
+
+use jc\setting\imp\FsSetting;
+
+use jc\lang\Exception;
+
+use jc\locale\LocaleManager;
+
 use jc\lang\oop\ClassLoader;
 use jc\io\StdOutputFilterMgr;
 use jc\io\PrintStream;
@@ -29,85 +41,104 @@ abstract class ApplicationFactory extends Object
 		return $aInstance ;
 	}
 
-	public function create($sAppDirPath)
+	public function create($sApplicationRootPath)
 	{
-		$aApp = new Application($sAppDirPath) ;
-		
-		$this->build($aApp) ;
-		
-		if( !Application::singleton(false) )
-		{
-			Application::setSingleton($aApp) ;
-		}
+		$aApp = new Application() ;
+				
+		$this->buildApplication($aApp,$sApplicationRootPath) ;
 		
 		return $aApp ;
 	}
 	
-	public function build(CoreApplication $aApp)
+	/**
+	 * 创建 Application 系统中的核心对象
+	 * 如果没有 Application 单件对像，则将传入的 Application对像做为 Application 的全局单件
+	 */
+	public function buildApplication(Application $aApp,$sApplicationRootPath)
 	{
+		$aOriApp = Application::switchSingleton($aApp) ;		
+		
+		// filesystem
+		FileSystem::setSingleton($this->createFileSystem($sApplicationRootPath)) ;
+		
 		// 初始化 class loader
-		$aApp->setClassLoader(
-			$this->createClassLoader($aApp)
-		) ;
+		ClassLoader::setSingleton($this->createClassLoader()) ;
 		
-		// 创建 AccessRouter 对象
-		$aApp->setAccessRouter(
-			$this->createAccessRouter($aApp)
-		) ;
+		// AccessRouter
+		AccessRouter::setSingleton($this->createAccessRouter()) ;
 		
-		// 创建 LocaleManager 对象
-		$aApp->setLocaleManager(
-			$this->createLocaleManager($aApp)
-		) ;
+		// LocalManager
+		LocaleManager::setSingleton($this->createLocaleManager()) ;
 		
-		// 创建 Request/Response
-		$aApp->setRequest(
-			$this->createRequest($aApp)
-		) ;
-		$aApp->setResponse(
-			$this->createResponse($aApp)
-		) ;
+		// Request
+		Request::setSingleton( $this->createRequest() ) ;
 		
-		return $aApp ;
+		// Response
+		Response::setSingleton( $this->createResponse() ) ;
+		
+		// setting
+		Setting::setSingleton($this->createSetting()) ;
+		
+		// setting
+		Setting::setSingleton($this->createSetting()) ;
+		
+		if($aOriApp)
+		{
+			Application::setSingleton($aOriApp) ;
+		}
+	}
+	
+	public function createFileSystem($sRootPath)
+	{
+		$aFileSystem = new LocalFileSystem($sRootPath) ;
+		
+		// 将 jc framework 挂载到 /framework 目录下
+		$aFileSystem->mount( '/framework', LocalFileSystem::flyweight(\jc\PATH) ) ;
+		
+		return $aFileSystem ;
 	}
 
-	public function createClassLoader(Application $aApp)
-	{
-		$aClassLoader = new ClassLoader(
-			$aApp->application()->fileSystem()->findFile("/classpath.php") 
-		) ;
+	public function createClassLoader()
+	{		
+		$aClassLoader = new ClassLoader( FileSystem::singleton()->findFile("/classpath.php") ) ;
 		$aClassLoader->addPackage( 'jc', '/framework/src/lib.php', '/framework/bin/lib.php' ) ; // 将 jecat 加入到 class loader 中
-		
+			
 		return $aClassLoader ;
 	}
-
-	public function createAccessRouter(Application $aApp)
+	
+	public function createAccessRouter()
 	{
-		$aAccessRouter = new AccessRouter('cn') ;
-		$aAccessRouter->setApplication($aApp) ;
-		return $aAccessRouter ;
+		return new AccessRouter() ;
 	}
 	
-	public function createLocaleManager(Application $aApp)
+	public function createLocaleManager()
 	{
-		$aLocal = new \jc\locale\LocaleManager('cn') ;
-		$aLocal->setApplication($aApp) ;
-		return $aLocal ;
+		return new LocaleManager('cn') ;
 	}
 	
-	abstract public function createRequest(Application $aApp) ;
+	abstract public function createRequest() ;
 
 	
-	public function createResponse(Application $aApp,PrintStream $aPrinter)
+	public function createResponse(PrintStream $aPrinter)
 	{
-		$aFilter = StdOutputFilterMgr::singleton() ;
-		$aFilter->setApplication($aApp) ;
-		
 		$aRespn = new Response($aPrinter) ;
-		$aRespn->setApplication($aApp) ;
-		$aRespn->setFilters($aFilter) ;
+		$aRespn->setFilters(StdOutputFilterMgr::singleton()) ;
 		
 		return $aRespn ;
+	}
+	
+	/**
+	 * @return use jc\setting\Setting;
+	 */
+	public function createSetting()
+	{
+		if( !$aSettingFolder=FileSystem::singleton()->findFolder("/settings",FileSystem::FIND_AUTO_CREATE) )
+		{
+			throw new Exception("无法在目录 /setting 中建立系统配置") ;
+		}
+
+		return new FsSetting( $aSettingFolder ) ;
+
 	}
 	
 	static private $aGlobalInstance ;

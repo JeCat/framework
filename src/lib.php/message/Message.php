@@ -1,6 +1,8 @@
 <?php
 namespace jc\message ;
 
+use jc\locale\LocaleManager;
+
 use jc\locale\ILocale;
 use jc\lang\Object;
 
@@ -62,7 +64,7 @@ class Message extends Object
 	{
 		if( !$aLocale )
 		{
-			$aLocale = $this->application(true)->localeManager()->locale() ;
+			$aLocale = LocaleManager::singleton()->locale() ;
 		}
 		
 		return $aLocale->trans($this->sMessage,$this->arrMessageArgs) ;

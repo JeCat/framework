@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\view\widget\paginator;
 
+use jc\system\Request;
+
 use jc\mvc\view\widget\FormWidget;
 use jc\mvc\view\IModelChangeObserver;
 use jc\mvc\model\db\Model;
@@ -116,7 +118,7 @@ class Paginator extends FormWidget implements IModelChangeObserver{
     }
     
     public function pageUrl($iPageNum){
-        $aRequest = Application::singleton()->request();
+        $aRequest = Request::singleton();
         if( $aRequest instanceof HttpRequest )
         {
             $str=$aRequest -> urlQuery();

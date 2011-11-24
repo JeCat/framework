@@ -25,7 +25,7 @@ class HttpRequest extends Request
 		self::SERVER => '_SERVER' ,
 	) ;
 	
-	public function __construct(Application $aApp)
+	public function __construct(Application $aApp=null)
 	{
 		parent::__construct() ;
 		
@@ -38,7 +38,7 @@ class HttpRequest extends Request
 		}
 		
 		// $_FILES 
-		$this->buildUploadFiles($aApp) ;
+		$this->buildUploadFiles($aApp?:Application::singleton()) ;
 		
 		// 
 		$this->set('REQUEST_URL',(empty($_SERVER['HTTPS'])?'http://':'https://').$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']) ;
@@ -186,7 +186,7 @@ class HttpRequest extends Request
 			return ;
 		}
 		
-		$aFs = $aApp->fileSystem() ;
+		$aFs = FileSystem::singleton() ;
 		$this->mountUploadTmp($aFs) ;
 		
 		$aDataSrc = new DataSrc() ;

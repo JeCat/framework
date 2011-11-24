@@ -1,6 +1,8 @@
 <?php
 namespace jc\mvc\view ;
 
+use jc\system\Response;
+
 use jc\mvc\controller\IController;
 use jc\bean\BeanConfException;
 use jc\bean\BeanFactory;
@@ -299,7 +301,7 @@ class View extends NamableComposite implements IView, IBean
 		
 		if(!$aDevice)
 		{
-			$aDevice = $this->application()->response()->printer() ;
+			$aDevice = Response::singleton()->printer() ;
 		}
 		
 		// display myself

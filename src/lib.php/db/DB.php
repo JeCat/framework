@@ -1,6 +1,8 @@
 <?php 
 namespace jc\db ;
 
+use jc\system\Response;
+
 use jc\system\Application;
 
 use jc\db\driver\IDriver;
@@ -59,7 +61,7 @@ class DB extends Object
 	{
 		if($bPrint)
 		{
-			Application::singleton()->response()->printer()->write(
+			Response::singleton()->printer()->write(
 				"<pre>\r\n".print_r($this->driver()->executeLog(),true)."\r\n</pre>"
 			) ;
 		}

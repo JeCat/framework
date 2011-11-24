@@ -27,7 +27,6 @@ require_once __DIR__."/src/lib.php/lang/IException.php" ;
 require_once __DIR__."/src/lib.php/lang/Exception.php" ;
 require_once __DIR__."/src/lib.php/lang/oop/Package.php" ;
 require_once __DIR__."/src/lib.php/lang/oop/ClassLoader.php" ;
-require_once __DIR__."/src/lib.php/system/CoreApplication.php" ;
 require_once __DIR__."/src/lib.php/system/Application.php" ;
 require_once __DIR__."/src/lib.php/system/ApplicationFactory.php" ;
 

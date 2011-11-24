@@ -1,8 +1,8 @@
 <?php
 namespace jc\lang\oop ;
 
+use jc\system\Application;
 use jc\fs\IFile;
-
 use jc\lang\Object;
 use jc\lang\compile\ClassCompileException;
 use jc\fs\FileSystem;
@@ -36,13 +36,20 @@ class ClassLoader extends Object
 			$this->aClasspathCache = $aClasspathCache ;
 		}
 		
-		
 		spl_autoload_register( array($this,"load") ) ;
+	}
+	
+	/**
+	 * @return ClassLoader
+	 */
+	static public function singleton($bCreateNew=true,$createArgvs=null,$sClass=null)
+	{
+		return parent::singleton($bCreateNew,$createArgvs,$sClass) ;
 	}
 
 	public function addPackage($sNamespace,$sSourceFolder=null) 
 	{
-		$aFs = $this->application()->fileSystem() ;
+		$aFs = FileSystem::singleton() ;
 		
 		/*$aCompiledFolder = null ;
 		if( $sCompiledFolder )

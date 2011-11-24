@@ -75,7 +75,7 @@ class AOP extends Object implements IStrategySummary
 		
 	public function weave()
 	{
-		$aClassLoader = $this->classLoader() ;
+		$aClassLoader = ClassLoader::singleton() ;
 		$arrBeWeavedClasses = array() ;
 		$aCompiler = null ;
 		
@@ -127,7 +127,7 @@ class AOP extends Object implements IStrategySummary
 		
 		// 根据所有 apect 类的最后修改时间生成签名
 		$arrBox = null ;
-		$aClassLoader = $this->classLoader() ;
+		$aClassLoader = ClassLoader::singleton() ;
 		foreach($this->arrAspectClasses as $sAspectClass)
 		{
 			if( $aClassFile = $aClassLoader->searchClass($sAspectClass,ClassLoader::SEARCH_SOURCE) )
@@ -154,7 +154,7 @@ class AOP extends Object implements IStrategySummary
 	{
 		if( !$this->aClassLoader )
 		{
-			$this->aClassLoader = $this->application()->classLoader() ;
+			$this->aClassLoader = ClassLoader::singleton() ;
 		}
 		
 		return $this->aClassLoader ;
@@ -168,7 +168,7 @@ class AOP extends Object implements IStrategySummary
 	
 	private function parseAspectClass($sAspectClass)
 	{
-		if( !$aClassFile = $this->classLoader()->searchClass($sAspectClass) )
+		if( !$aClassFile = ClassLoader::singleton()->searchClass($sAspectClass) )
 		{
 			throw new Exception("注册到AOP中的Aspace(%s)不存在; Aspace必须是一个有效的类",$sAspectClass) ;
 		}

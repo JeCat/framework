@@ -29,7 +29,7 @@ class Compiler extends JcObject
 		if(!$this->aCompiledPackage)
 		{
 			$sFolderPath = $this->sCompiledFolderPath.'/'.$this->strategySignature() ;
-			$aFolder = Application::singleton()->fileSystem()->findFolder($sFolderPath,FileSystem::FIND_AUTO_CREATE) ;
+			$aFolder = FileSystem::singleton()->findFolder($sFolderPath,FileSystem::FIND_AUTO_CREATE) ;
 			$this->aCompiledPackage = new Package('',$aFolder) ;
 		}
 		

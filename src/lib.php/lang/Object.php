@@ -154,7 +154,24 @@ class Object implements IObject
 			throw new Exception('%s::setSingleton() 设置的单件实例必须为一个 %s 类型的对象',array($sClass,$sClass)) ;
 		}
 
-		return self::$arrGlobalInstancs[$sClass] = $aInstance ;
+		self::$arrGlobalInstancs[$sClass] = $aInstance ;
+	}
+	
+	/*
+	 * @return jc\lang\Object
+	 */
+	static public function switchSingleton(self $aInstance=null,$sClass=null)
+	{
+		if(!$sClass)
+		{
+			$sClass = get_called_class() ;
+		}
+		
+		$aOri = call_user_func_array(array($sClass,'singleton'),array(false,null,$sClass)) ;
+		
+		call_user_func_array(array($sClass,'setSingleton'),array($aInstance,$sClass)) ;
+		
+		return $aOri ;
 	}
 
 	// 以下是将 单件 和 享员 对象保存在所属的 application 中的实现
