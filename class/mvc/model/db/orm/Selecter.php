@@ -2,9 +2,7 @@
 namespace org\jecat\framework\mvc\model\db\orm;
 
 use org\jecat\framework\db\sql\Restriction;
-
 use org\jecat\framework\mvc\model\db\Model;
-use org\jecat\framework\mvc\model\IModelList;
 use org\jecat\framework\db\sql\Table;
 use org\jecat\framework\db\sql\Select;
 use org\jecat\framework\lang\Object;

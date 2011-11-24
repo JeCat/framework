@@ -235,7 +235,7 @@ class Category extends Model
 	 */
 	static public function loadTotalCategory(Prototype $aPrototype)
 	{
-		$aCategoryList = new ModelList($aPrototype) ;
+		$aCategoryList = new Model($aPrototype,true) ;
 		
 		$aCriteria = clone $aPrototype->criteria() ;
 		$aCriteria->addOrderBy('lft',false) ;
@@ -258,7 +258,7 @@ class Category extends Model
 			throw new CategoryPointException("尚未为临接表模型设置原型，无法完成操作") ;
 		}
 		
-		$aCategoryList = new ModelList($aOrmPrototype) ;
+		$aCategoryList = new Model($aOrmPrototype,true) ;
 		
 		$aCriteria = clone $aOrmPrototype->criteria() ;
 		$aCriteria->addOrderBy('lft',false)

@@ -1,7 +1,6 @@
 <?php
 namespace org\jecat\framework\mvc\model\db ;
 
-use org\jecat\framework\mvc\model\IModelList;
 use org\jecat\framework\pattern\composite\INamable;
 use org\jecat\framework\bean\BeanFactory;
 use org\jecat\framework\bean\IBean;
@@ -20,9 +19,9 @@ use org\jecat\framework\mvc\model\db\orm\Prototype;
 
 class Model extends AbstractModel implements IModel, IBean
 {
-	public function __construct(Prototype $aPrototype=null)
+	public function __construct(Prototype $aPrototype=null,$bList=false)
 	{
-	    parent::__construct();
+	    parent::__construct($bList);
 	    $this->setPrototype($aPrototype);
 	}
 	
@@ -65,32 +64,58 @@ class Model extends AbstractModel implements IModel, IBean
 
 	public function loadData( IRecordSet $aRecordSet, $bSetSerialized=false )
 	{
-		// 通过 prototype 加载各字段数据
-		if( $aPrototype=$this->prototype() )
+		// Model List ------------------------
+		if($this->isList())
 		{
-			$arrColumns = array_merge($aPrototype->columns(),$aPrototype->keys());
-			foreach( $arrColumns as $sClm )
-			{
-				$this->setData( $sClm, $aRecordSet->field($aPrototype->sqlColumnAlias($sClm)) ,false) ;
-			}
+			$aPrototype = $this->prototype() ;
 			
-			// 加载所有单属关系的子模型
-			foreach($aPrototype->associations() as $aAssoc)
+			for( ;$aRecordSet->valid(); $aRecordSet->next() )
 			{
-				if( $aAssoc->isType(Association::oneToOne) )
+				if( $aPrototype )
 				{
-					$this->child($aAssoc->name())->loadData($aRecordSet,$bSetSerialized) ;					
+					$aModel = $aPrototype->createModel(false) ;
 				}
+				else
+				{
+					$aModel = new Model() ;
+				}
+			
+				$this->addChild($aModel) ;
+			
+				$aModel->loadData($aRecordSet,$bSetSerialized) ;
 			}
 		}
 		
-		// 通过 数据集 加载各字段数据
-		else 
+		// Model ------------------------
+		else
 		{
-			$arrRow = $aRecordSet->current() ;
-			foreach ($arrRow as $sClmName=>&$sValue)
+			// 通过 prototype 加载各字段数据
+			if( $aPrototype=$this->prototype() )
 			{
-				$this->setData($sClmName,$sValue,false) ;
+				$arrColumns = array_merge($aPrototype->columns(),$aPrototype->keys());
+				foreach( $arrColumns as $sClm )
+				{
+					$this->setData( $sClm, $aRecordSet->field($aPrototype->sqlColumnAlias($sClm)) ,false) ;
+				}
+				
+				// 加载所有单属关系的子模型
+				foreach($aPrototype->associations() as $aAssoc)
+				{
+					if( $aAssoc->isType(Association::oneToOne) )
+					{
+						$this->child($aAssoc->name())->loadData($aRecordSet,$bSetSerialized) ;					
+					}
+				}
+			}
+			
+			// 通过 数据集 加载各字段数据
+			else 
+			{
+				$arrRow = $aRecordSet->current() ;
+				foreach ($arrRow as $sClmName=>&$sValue)
+				{
+					$this->setData($sClmName,$sValue,false) ;
+				}
 			}
 		}
 		
@@ -103,9 +128,81 @@ class Model extends AbstractModel implements IModel, IBean
 	
 	public function load($values=null,$keys=null)
 	{
+		if($this->isList())
+		{
+			$this->nTotalCount = -1 ;
+		}
+		
 		return Selecter::singleton()->execute(
-					$this , null , self::buildCriteria($this->prototype(),$values,$keys), false, $this->db()
+					$this , null , self::buildCriteria($this->prototype(),$values,$keys), $this->isList(), $this->db()
 		) ;
+	}
+	
+	public function save()
+	{
+		if( $this->isList() )
+		{
+			foreach($this->childIterator() as $aChildModel)
+			{
+				if( !$aChildModel->save() )
+				{
+					return false ;
+				}
+			}
+			return true ;
+		}
+		else
+		{
+			// update
+			if( $this->hasSerialized() )
+			{
+				return $this->update() ;
+			}
+			
+			// insert
+			else 
+			{
+				return $this->insert() ;
+			}
+		}
+	}
+
+	protected function insert()
+	{
+		return Inserter::singleton()->execute($this->db(), $this) ;
+	}
+	
+	protected function update()
+	{
+		return Updater::singleton()->execute($this->db(), $this) ;
+	}
+	
+	public function delete()
+	{
+		if( $this->isList() )
+		{
+			foreach($this->childIterator() as $aChildModel)
+			{
+				if( !$aChildModel->delete() )
+				{
+					return false ;
+				}
+			}
+			return true ;
+		}
+		
+		else
+		{
+			if( $this->hasSerialized() )
+			{
+				return Deleter::singleton()->execute($this->db(), $this) ;	
+			}
+			
+			else 
+			{
+				return true ;
+			}
+		}
 	}
 	
 	static public function buildCriteria(Prototype $aPrototype,$values=null,$keys=null)
@@ -138,44 +235,6 @@ class Model extends AbstractModel implements IModel, IBean
 				$aSelectCriteria->where()->eq( $sKey, $values[$nIdx] ) ;
 			}
 			return $aSelectCriteria ;
-		}
-	}
-	
-	public function save()
-	{
-		// update
-		if( $this->hasSerialized() )
-		{
-			return $this->update() ;
-		}
-		
-		// insert
-		else 
-		{
-			return $this->insert() ;
-		}
-	}
-
-	protected function insert()
-	{
-		return Inserter::singleton()->execute($this->db(), $this) ;
-	}
-	
-	protected function update()
-	{
-		return Updater::singleton()->execute($this->db(), $this) ;
-	}
-	
-	public function delete()
-	{
-		if( $this->hasSerialized() )
-		{
-			return Deleter::singleton()->execute($this->db(), $this) ;	
-		}
-		
-		else 
-		{
-			return true ;
 		}
 	}
 	
@@ -312,6 +371,8 @@ class Model extends AbstractModel implements IModel, IBean
 	
 	public function build(array & $arrConfig,$sNamespace='*')
 	{
+		$this->setList(!empty($arrConfig['list'])) ;
+		
 		if( !empty($arrConfig['orm']) )
 		{
 			if( !empty($arrConfig['name']) )
@@ -345,6 +406,35 @@ class Model extends AbstractModel implements IModel, IBean
 	{
 		return DB::singleton() ;
 	}
+	
+	public function createChild($bAdd=true)
+	{
+		if( !$this->prototype() )
+		{
+			throw new Exception("模型没有缺少对应的原型，无法为其创建子模型") ;
+		}
+	
+		$aChild = $this->prototype()->createModel(false) ;
+	
+		if($bAdd)
+		{
+			$this->addChild($aChild) ;
+		}
+	
+		return $aChild ;
+	}
+	
+	public function totalCount()
+	{
+		if($this->nTotalCount<0)
+		{
+			$this->nTotalCount =Selecter::singleton()->totalCount(DB::singleton(),$this->prototype()) ;
+		}
+		return $this->nTotalCount ;
+	}
+	
+	
+	private $nTotalCount = -1 ;
 	
 	/**
 	 * @var org\jecat\framework\mvc\model\db\orm\Prototype

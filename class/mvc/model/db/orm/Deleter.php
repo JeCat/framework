@@ -1,8 +1,5 @@
 <?php
-
 namespace org\jecat\framework\mvc\model\db\orm;
-
-use org\jecat\framework\mvc\model\IModelList;
 
 use org\jecat\framework\lang\Object;
 use org\jecat\framework\db\DB;
@@ -82,7 +79,7 @@ class Deleter extends Object{
     
     private function setAssociatedModelData(IModel $aModel,IModel $aChildModel,array $arrFromKeys,array $arrToKeys){
     	foreach($arrToKeys as $nIdx=>$sKey){
-    		if($aChildModel instanceof IModelList){
+    		if($aChildModel->isList()){
     			$value = $aModel->data($arrFromKeys[$nIdx]);
     			foreach($aChildModel->childIterator() as $aChildChildModel){
     				$aChildChildModel->setData($sKey,$value,false);
