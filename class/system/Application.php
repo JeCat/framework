@@ -9,7 +9,12 @@ use jc\fs\imp\LocalFileSystem;
 use jc\fs\FileSystem;
 
 class Application extends Object implements \Serializable
-{	
+{
+	public function __construct()
+	{
+		$this->fUptime = microtime(true) ;
+	}
+	
 	public function singletonInstance($sClass,$bCreateNew=true)
 	{
 		if(!isset($this->arrGlobalSingeltonInstance[$sClass]))
@@ -32,6 +37,16 @@ class Application extends Object implements \Serializable
 	public function setSingletonInstance($sClass,$aInstance)
 	{
 		$this->arrGlobalSingeltonInstance[$sClass] = $aInstance ;
+	}
+	
+	/**
+	 * Application的启动时间
+	 * 
+	 * $bRunTime 为 true 时，返回Application启动到当前所经过的时间
+	 */
+	public function uptime($bRunTime=false)
+	{
+		return $bRunTime? (microtime(true)-$this->fUptime): $this->fUptime ;
 	}
 	
 	/**
@@ -90,9 +105,9 @@ class Application extends Object implements \Serializable
 	
 	private $sEntrance = '' ; 
 	
-	private $aFileSystem ;
-	
 	private $aPublicFolders ;
+	
+	private $fUptime ;
 	
 	static private $aGlobalSingeltonInstance ; 
 }
