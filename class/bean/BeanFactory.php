@@ -76,7 +76,7 @@ class BeanFactory extends Object implements \Serializable
 			return $aFile->includeFile(false,false) ;
 		}
 		
-		$this->loadConfig(arrConfig,$sNamespace) ;
+		$this->loadConfig($arrConfig,$sNamespace) ;
 		
 		if( !empty($arrConfig['class']) )
 		{
