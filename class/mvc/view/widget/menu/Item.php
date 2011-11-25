@@ -71,8 +71,20 @@ class Item extends AbstractBase
     }
     
     // from Bean
-	public function build(array & $arrConfig,$sNamespace='*'){
-		parent::build($arrConfig,$sNamespace);
+    static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce)
+    {
+		$sClass = get_called_class() ;
+		$aBean = new $sClass() ;
+    	if($bBuildAtOnce)
+    	{
+    		$aBean->buildBean($arrConfig,$sNamespace) ;
+    	}
+    	return $aBean ;
+    }
+    
+    public function buildBean(array & $arrConfig,$sNamespace='*')
+    {
+		parent::buildBean($arrConfig,$sNamespace);
 		if( !empty($arrConfig['menu'])){
 			$this->buildSubMenu($arrConfig['menu']);
 		}

@@ -20,16 +20,27 @@ class Group extends FormWidget {
 		parent::__construct ( $sId, null, $sTitle, $aView );
 	}
 	
-	public function build(array & $arrConfig,$sNamespace='*')
+	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce)
 	{
-		parent::build ( $arrConfig, $sNamespace );
+		$sClass = get_called_class() ;
+		$aBean = new $sClass() ;
+		if($bBuildAtOnce)
+		{
+			$aBean->buildBean($arrConfig,$sNamespace) ;
+		}
+		return $aBean ;
+	}
+	
+	public function buildBean(array & $arrConfig,$sNamespace='*')
+	{
+		parent::buildBean ( $arrConfig, $sNamespace );
 			
     	// widgets
     	if( !empty($arrConfig['widgets']) )
     	{
     		if( !$aView = $this->view() )
     		{
-    			throw new BeanConfException("Group Widget 尚未设置 View 对象，无法完成 Bean::build()操作") ;
+    			throw new BeanConfException("Group Widget 尚未设置 View 对象，无法完成 Bean::buildBean()操作") ;
     		}
     		if( !is_array($arrConfig['widgets']) )
     		{

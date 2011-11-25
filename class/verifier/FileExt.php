@@ -23,7 +23,18 @@ class FileExt extends Object implements IVerifier,IBean {
 		$this->setAllow($bAllow);
 	}
 	
-	public function build(array & $arrConfig)
+	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce)
+	{
+		$sClass = get_called_class() ;
+		$aBean = new $sClass() ;
+		if($bBuildAtOnce)
+		{
+			$aBean->buildBean($arrConfig,$sNamespace) ;
+		}
+		return $aBean ;
+	}
+	
+	public function buildBean(array & $arrConfig,$sNamespace='*')
 	{
 		if (! empty ( $arrConfig ['exts'] ))
 		{

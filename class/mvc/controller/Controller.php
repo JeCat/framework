@@ -56,7 +56,7 @@ class Controller extends NamableComposite implements IController, IBean
 		// auto build bean config
     	if( $arrConfig = $this->createBeanConfig() )
     	{
-    		$this->build($arrConfig) ;
+    		$this->buildBean($arrConfig) ;
     	}
     	
 		$this->init() ;
@@ -70,17 +70,18 @@ class Controller extends NamableComposite implements IController, IBean
     	return null ;
     }
     
-    /**
-     * properties:
-     * 	name				string						名称
-     * 	params				array,org\jecat\framework\util\IDataSrc 		参数
-     *  model.ooxx			config
-     *  view.ooxx			config
-     *  controller.ooxx		config
-     * 
-     * @see org\jecat\framework\bean\IBean::build()
-     */
-    public function build(array & $arrConfig,$sNamespace='*')
+    static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce)
+    {
+		$sClass = get_called_class() ;
+		$aBean = new $sClass() ;
+    	if($bBuildAtOnce)
+    	{
+    		$aBean->buildBean($arrConfig,$sNamespace) ;
+    	}
+    	return $aBean ;
+    }
+    
+    public function buildBean(array & $arrConfig,$sNamespace='*')
     {
     	if( isset($arrConfig['name']) )
     	{

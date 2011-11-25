@@ -106,20 +106,13 @@ class BeanFactory extends Object implements \Serializable
 				throw new BeanConfException("Bean对象配置数组中的 class 属性无效：%s，必须是一个实现 org\\jecat\\framework\\bean\\IBean 接口的类",$arrConfig['class']) ;
 			}
 			
-			$aBean = new $arrConfig['class'] ;
-			
-			if($bAutoBuild)
-			{
-				$aBean->build($arrConfig,$sNamespace) ;
-			}
+			return $arrConfig['class']::createBean($arrConfig,$sNamespace,$bAutoBuild) ;
 		}
 		
 		else 
 		{
 			throw new BeanConfException("无法根据配置数组创建 Bean 对象，缺少必须的 ins, config 或 class 属性: %s。",var_export($arrConfig,true)) ;
 		}
-		
-		return $aBean ;
 	}
 	
 	static public function mergeConfig(&$arrConfigA,&$arrConfigB)

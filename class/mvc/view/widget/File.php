@@ -33,9 +33,20 @@ class File extends FormWidget
 		parent::__construct ( $sId, 'org.jecat.framework:WidgetFileUpdate.template.html', $sTitle, $aView );
 	}
 	
-	public function build(array & $arrConfig,$sNamespace='*')
+	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce)
 	{
-		parent::build ( $arrConfig, $sNamespace );
+		$sClass = get_called_class() ;
+		$aBean = new $sClass() ;
+		if($bBuildAtOnce)
+		{
+			$aBean->buildBean($arrConfig,$sNamespace) ;
+		}
+		return $aBean ;
+	}
+	
+	public function buildBean(array & $arrConfig,$sNamespace='*')
+	{
+		parent::buildBean ( $arrConfig, $sNamespace );
 		
 		if (array_key_exists ( 'folder', $arrConfig ))
 		{

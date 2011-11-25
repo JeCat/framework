@@ -113,10 +113,7 @@ class FSCache implements ICache
 	
 	static public function trimPath(&$sPath)
 	{
-		if( strlen($sPath)>0 and substr($sPath,0,1)=='/' )
-		{
-			$sPath = substr($sPath,1) ;
-		}
+		$sPath = preg_replace('`^\\s*/+`','',$sPath) ;
 	}
 	
 	/**

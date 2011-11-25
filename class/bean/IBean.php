@@ -3,13 +3,9 @@ namespace org\jecat\framework\bean ;
 
 interface IBean
 {
+	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce) ;
 	
-	/**
-	 * Bean Class 的构造函数必须是一个不要求参数的公共方法
-	 */
-	public function __construct() ;
-	
-	public function build(array & $arrConfig,$sNamespace='*') ;
+	public function buildBean(array & $arrConfig,$sNamespace='*') ;
 	
 	public function beanConfig() ;
 }

@@ -9,8 +9,19 @@ use org\jecat\framework\lang\Object;
 class Email extends Object implements IVerifier ,IBean{
 	
 	public function __construct() {}
-
-	public function build(array & $arrConfig,$sNamespace='*')
+	
+	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce)
+	{
+		$sClass = get_called_class() ;
+		$aBean = new $sClass() ;
+		if($bBuildAtOnce)
+		{
+			$aBean->buildBean($arrConfig,$sNamespace) ;
+		}
+		return $aBean ;
+	}
+	
+	public function buildBean(array & $arrConfig,$sNamespace='*')
 	{
 		$this->arrBeanConfig = $arrConfig;
 	}

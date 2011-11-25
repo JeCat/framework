@@ -22,9 +22,20 @@ class WebpageFrame extends Controller
 		$this->setMainView(WebpageFactory::singleton()->create()) ;
 	}
 	
-	public function build(array & $arrConfig,$sNamespace='*')
+	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce)
 	{
-		parent::build($arrConfig,$sNamespace) ;
+		$sClass = get_called_class() ;
+		$aBean = new $sClass() ;
+		if($bBuildAtOnce)
+		{
+			$aBean->buildBean($arrConfig,$sNamespace) ;
+		}
+		return $aBean ;
+	}
+	
+	public function buildBean(array & $arrConfig,$sNamespace='*')
+	{
+		parent::buildBean($arrConfig,$sNamespace) ;
 		
 		$aBeanFactory = BeanFactory::singleton() ;
     	$aModelContainer = $this->modelContainer() ;
