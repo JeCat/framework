@@ -70,18 +70,18 @@ class Controller extends NamableComposite implements IController, IBean
     	return null ;
     }
     
-    static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce)
+    static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {
 		$sClass = get_called_class() ;
 		$aBean = new $sClass() ;
     	if($bBuildAtOnce)
     	{
-    		$aBean->buildBean($arrConfig,$sNamespace) ;
+    		$aBean->buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
     	}
     	return $aBean ;
     }
     
-    public function buildBean(array & $arrConfig,$sNamespace='*')
+    public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {
     	if( isset($arrConfig['name']) )
     	{

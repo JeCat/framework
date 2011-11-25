@@ -76,21 +76,7 @@ class BeanFactory extends Object implements \Serializable
 			return $aFile->includeFile(false,false) ;
 		}
 		
-		else if( !empty($arrConfig['conf']) or !empty($arrConfig['config']) )
-		{
-			$sConfName = isset($arrConfig['conf'])?$arrConfig['conf']:$arrConfig['config'] ;
-			
-			// 设置 namespace 
-			if( strstr($sConfName,':')!==false )
-			{
-				list($sNamespace,) = explode(':', $sConfName, 2) ;
-			}
-			$arrConfigFile = $this->findConfig( $sConfName, $sNamespace 
-			) ;
-			// 合并数组
-			self::mergeConfig($arrConfigFile,$arrConfig) ;
-			$arrConfig = $arrConfigFile ;
-		}
+		$this->loadConfig(arrConfig,$sNamespace) ;
 		
 		if( !empty($arrConfig['class']) )
 		{
@@ -106,7 +92,7 @@ class BeanFactory extends Object implements \Serializable
 				throw new BeanConfException("Bean对象配置数组中的 class 属性无效：%s，必须是一个实现 org\\jecat\\framework\\bean\\IBean 接口的类",$arrConfig['class']) ;
 			}
 			
-			return $arrConfig['class']::createBean($arrConfig,$sNamespace,$bAutoBuild) ;
+			return $arrConfig['class']::createBean($arrConfig,$sNamespace,$bAutoBuild,$this) ;
 		}
 		
 		else 
@@ -175,6 +161,25 @@ class BeanFactory extends Object implements \Serializable
 		}
 		
 		return $arrBeans ;
+	}
+	
+	public function loadConfig(&$arrBeanConfig,&$sNamespace)
+	{
+		if( !empty($arrBeanConfig['conf']) or !empty($arrBeanConfig['config']) )
+		{
+			$sConfName = isset($arrBeanConfig['conf'])?$arrBeanConfig['conf']:$arrBeanConfig['config'] ;
+		
+			// 设置 namespace
+			if( strstr($sConfName,':')!==false )
+			{
+				list($sNamespace,) = explode(':', $sConfName, 2) ;
+			}
+			$arrConfigFile = $this->findConfig( $sConfName, $sNamespace ) ;
+			
+			// 合并数组
+			self::mergeConfig($arrConfigFile,$arrBeanConfig) ;
+			$arrBeanConfig = $arrConfigFile ;
+		}
 	}
 	
 	/**
