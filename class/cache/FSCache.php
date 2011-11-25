@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\cache ;
 
+use org\jecat\framework\util\String;
+
 use org\jecat\framework\fs\FileSystem;
 use org\jecat\framework\fs\IFolder;
 
@@ -15,44 +17,56 @@ class FSCache implements ICache
 	{
 		self::trimPath($sDataPath) ;
 		
-		if( !$aFile = $this->aFolder->findFile($sDataPath) )
+		// 尝试 .php
+		if( $aFile = $this->aFolder->findFile($sDataPath.'.php') )
 		{
-			return ;
+			return $aFile->includeFile(false,false) ;
+		}
+		// 尝试 .data
+		if( $aFile = $this->aFolder->findFile($sDataPath.'.data') )
+		{
+			return unserialize(file_get_contents($aFile->url()) ) ;
 		}
 
-		$arrItem = $aFile->includeFile(false,false) ;
-		return isset($arrItem['data'])? $arrItem['data']: null ;
+		return null ;
 	}
 	
 	function setItem($sDataPath,$data,$fCreateTimeMicroSec=-1)
 	{
 		self::trimPath($sDataPath) ;
 		
-		if( !$aFile=$this->aFolder->findFile($sDataPath,FileSystem::FIND_AUTO_CREATE) )
-		{
-			return false ;
-		}
-		
 		if( is_object($data) )
 		{
-			$sSerialize = 'unserialize("'.addslashes(serialize($data)).'")' ;
+			if( !$aFile=$this->aFolder->findFile($sDataPath.'.data',FileSystem::FIND_AUTO_CREATE) )
+			{
+				return false ;
+			}
+			$sSerialize = serialize($data) ;
 		}
 		else 
 		{
-			$sSerialize = var_export($data,true) ;
+			if( !$aFile=$this->aFolder->findFile($sDataPath.'.php',FileSystem::FIND_AUTO_CREATE) )
+			{
+				return false ;
+			}
+			$sSerialize = "<?php\r\nreturn ".var_export($data,true).' ;' ;
 		}
 		
+		$aWriter = $aFile->openWriter() ;
+		$aWriter->write($sSerialize) ;
+		$aWriter->close() ;
+		
+		// create time
 		if($fCreateTimeMicroSec<0)
 		{
 			$fCreateTimeMicroSec = microtime(true) ;
 		}
-		
+		if( !$aFile=$this->aFolder->findFile($sDataPath.'.time',FileSystem::FIND_AUTO_CREATE) )
+		{
+			return false ;
+		}
 		$aWriter = $aFile->openWriter() ;
-		$aWriter->write("<?php
-return array(
-	'create'=>{$fCreateTimeMicroSec},
-	'data'=>{$sSerialize}
-) ;") ;
+		$aWriter->write("<?php return {$fCreateTimeMicroSec} ;") ;
 		$aWriter->close() ;
 	}
 	
@@ -65,7 +79,9 @@ return array(
 	{
 		self::trimPath($sDataPath) ;
 		
-		$this->aFolder->delete($sDataPath) ;
+		$this->aFolder->delete($sDataPath.'.data') ;
+		$this->aFolder->delete($sDataPath.'.php') ;
+		$this->aFolder->delete($sDataPath.'.time') ;
 	}
 	
 	/**
@@ -75,15 +91,7 @@ return array(
 	 */
 	function isExpire($sDataPath,$fValidSec)
 	{
-		self::trimPath($sDataPath) ;
-		
-		if( !$aFile = $this->aFolder->findFile($sDataPath) )
-		{
-			return ;
-		}
-
-		$arrItem = $aFile->includeFile(false,false) ;
-		return $arrItem['create'] + $fValidSec < microtime(true) ;
+		return $this->createTime($sDataPath) + $fValidSec < microtime(true) ;
 	}
 	
 	/**
@@ -95,21 +103,17 @@ return array(
 	{
 		self::trimPath($sDataPath) ;
 		
-		if( !$aFile = $this->aFolder->findFile($sDataPath) )
+		if( !$aFile = $this->aFolder->findFile($sDataPath.'.time') )
 		{
-			return ;
+			return 0 ;
 		}
 
-		$arrItem = $aFile->includeFile(false,false) ;
-		return $arrItem['create'] ;
+		return (float)$aFile->includeFile(false,false) ;
 	}
 	
 	static public function trimPath(&$sPath)
 	{
-		if( strlen($sPath)>0 and substr($sPath,0,1)=='/' )
-		{
-			$sPath = substr($sPath,1) ;
-		}
+		$sPath = preg_replace('`^\\s*/+`','',$sPath) ;
 	}
 	
 	/**

@@ -30,8 +30,20 @@ class CheckBtn extends FormWidget
 		parent::__construct ( $sId, 'org.jecat.framework:WidgetCheckBtn.template.html', $sTitle, $aView );
 	}
 	
-	public function build(array & $arrConfig,$sNamespace='*'){
-		parent::build ( $arrConfig );
+	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
+	{
+		$sClass = get_called_class() ;
+		$aBean = new $sClass() ;
+		if($bBuildAtOnce)
+		{
+			$aBean->buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
+		}
+		return $aBean ;
+	}
+	
+	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
+	{
+		parent::buildBean ( $arrConfig );
 		
 		if (array_key_exists ( 'type', $arrConfig ))
 		{

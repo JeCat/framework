@@ -11,7 +11,18 @@ class NotEmpty extends Object implements IVerifier,IBean {
 	public function __construct() {
 	}
 	
-	public function build(array & $arrConfig,$sNamespace='*')
+	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
+	{
+		$sClass = get_called_class() ;
+		$aBean = new $sClass() ;
+		if($bBuildAtOnce)
+		{
+			$aBean->buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
+		}
+		return $aBean ;
+	}
+	
+	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
 		$this->arrBeanConfig = $arrConfig;
 	}

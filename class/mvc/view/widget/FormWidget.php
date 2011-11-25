@@ -14,22 +14,20 @@ use org\jecat\framework\util\IDataSrc;
 
 class FormWidget extends Widget implements IViewFormWidget
 {	
-    /**
-     * properties:	
-     *  value				mixed
-     *  valueString			string
-     *  formName			string
-     *  readOnly			bool
-     *  disabled			bool
-     *  exchange			string 		( 在 View中实现 )
-     *  verifier.ooxx		array
-     *  
-     *   
-     * @see org\jecat\framework\bean\IBean::build()
-     */
-	public function build(array & $arrConfig,$sNamespace='*')
+	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
-		parent::build($arrConfig,$sNamespace) ;
+		$sClass = get_called_class() ;
+		$aBean = new $sClass() ;
+		if($bBuildAtOnce)
+		{
+			$aBean->buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
+		}
+		return $aBean ;
+	}
+	
+	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
+	{
+		parent::buildBean($arrConfig,$sNamespace) ;
 	
 		if( array_key_exists('value',$arrConfig) )
 		{

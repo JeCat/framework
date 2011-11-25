@@ -105,8 +105,20 @@ class Menu extends AbstractBase
     }
     
 	// from Bean
-	public function build(array & $arrConfig,$sNamespace='*'){
-		parent::build($arrConfig,$sNamespace);
+    static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
+    {
+		$sClass = get_called_class() ;
+		$aBean = new $sClass() ;
+    	if($bBuildAtOnce)
+    	{
+    		$aBean->buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
+    	}
+    	return $aBean ;
+    }
+    
+    public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
+    {
+		parent::buildBean($arrConfig,$sNamespace);
 		if( !empty($arrConfig['items']) && is_array($arrConfig['items'])){
 			foreach($arrConfig['items'] as $key =>$item){
 				$this->buildItems($item,$key);

@@ -17,7 +17,18 @@ class FileSize extends Object implements IVerifier,IBean {
 		$this->setMinSize($nMinSize);
 	}
 	
-	public function build(array & $arrConfig)
+	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
+	{
+		$sClass = get_called_class() ;
+		$aBean = new $sClass() ;
+		if($bBuildAtOnce)
+		{
+			$aBean->buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
+		}
+		return $aBean ;
+	}
+	
+	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
 		if (! empty ( $arrConfig ['nMaxSize'] ))
 		{

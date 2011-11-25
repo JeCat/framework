@@ -15,9 +15,20 @@ class RadioGroup extends Group {
 		parent::__construct ( $sId, $sTitle, $aView );
 	}
 	
-	public function build(array & $arrConfig,$sNamespace='*')
+	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
-		parent::build ( $arrConfig, $sNamespace );
+		$sClass = get_called_class() ;
+		$aBean = new $sClass() ;
+		if($bBuildAtOnce)
+		{
+			$aBean->buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
+		}
+		return $aBean ;
+	}
+	
+	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
+	{
+		parent::buildBean ( $arrConfig, $sNamespace );
 	}
 	
 	public function createRadio( $sId = null ,$sTitle, $sValue, $bChecked = false, IView $aView = null) {

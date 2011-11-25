@@ -55,16 +55,18 @@ class View extends NamableComposite implements IView, IBean
 		},$this) ;
 	}
 	
-    /**
-     * properties:
-     * 	name				string						名称
-     * 	model				string						关联模型的实例（在constroller中实现）
-     *  widget.ooxx			config
-     *  view.ooxx			config
-     * 
-     * @see org\jecat\framework\bean\IBean::build()
-     */
-    public function build(array & $arrConfig,$sNamespace='*')
+	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
+	{
+		$sClass = get_called_class() ;
+		$aBean = new $sClass() ;
+		if($bBuildAtOnce)
+		{
+			$aBean->buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
+		}
+		return $aBean ;
+	}
+	
+	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {
     	if( empty($arrConfig['name']) )
     	{
@@ -122,7 +124,7 @@ class View extends NamableComposite implements IView, IBean
     			$this->addWidget( $aWidget, empty($arrConfig['widgets'][$key]['exchange'])?null:$arrConfig['widgets'][$key]['exchange'] ) ;
     			
     			// 完成初始化
-    			$aWidget->build($arrConfig['widgets'][$key],$sNamespace) ;
+    			$aWidget->buildBean($arrConfig['widgets'][$key],$sNamespace) ;
     		}
     	}
     	
