@@ -1,7 +1,6 @@
 <?php
 namespace org\jecat\framework\mvc\model\db ;
 
-
 use org\jecat\framework\util\Stack;
 
 use org\jecat\framework\mvc\model\db\orm\Selecter;
@@ -65,6 +64,18 @@ class Category extends Model
 		$this->insertCategoryToPoint( $aCategory->rightPoint() ) ;
 	}
 	
+	/**
+	 * 
+	 * 添加一个节点到目标($nTarget)位置
+	 * 
+	 * 如果传入的是目标的lft,则加到目标左侧同级位置
+	 * 如果传入目标的rgt,则加到目标内部末尾
+	 * 如果传入本类top属性,则加载整个队列最前
+	 * 如果传入本类end属性,则加在整个队列的最后
+	 * 
+	 * @param int $nTarget 目标位置
+	 * @throws CategoryPointException
+	 */
 	public function insertCategoryToPoint($nTarget=self::end)
 	{
 		if( !$aOrmPrototype = $this->prototype() )
