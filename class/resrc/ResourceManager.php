@@ -104,7 +104,7 @@ class ResourceManager extends Object
 		return new \org\jecat\framework\pattern\iterate\ArrayIterator(array_keys($this->arrFolders)) ;
 	}
 	
-	public function foldersIterator($sNamespace='*')
+	public function folderIterator($sNamespace='*')
 	{
 		return new \org\jecat\framework\pattern\iterate\ArrayIterator(
 			isset($this->arrFolders[$sNamespace])?

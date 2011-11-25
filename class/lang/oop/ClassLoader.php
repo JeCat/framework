@@ -22,20 +22,8 @@ class ClassLoader extends Object implements \Serializable
 	const SEARCH_ALL = 3 ;				// 搜索编译文件和源文件：SEARCH_COMPILED | SEARCH_SOURCE
 	const SEARCH_DEFAULT = 7 ;			// SEARCH_COMPILED_FIRST | AUTO_COMPILE
 	
-	public function __construct(IFile $aClasspathCache=null)
-	{
-		// 加载 classpath 缓存
-		if( $aClasspathCache )
-		{
-			$arrClassPath = $aClasspathCache->includeFile() ;
-			if( is_array($arrClassPath) )
-			{
-				$this->arrClassPathCache = $arrClassPath ;
-			}
-			
-			$this->aClasspathCache = $aClasspathCache ;
-		}
-		
+	public function __construct()
+	{		
 		spl_autoload_register( array($this,"load") ) ;
 	}
 	
@@ -50,20 +38,6 @@ class ClassLoader extends Object implements \Serializable
 	public function addPackage($sNamespace,$sSourceFolder=null) 
 	{
 		$aFs = FileSystem::singleton() ;
-		
-		/*$aCompiledFolder = null ;
-		if( $sCompiledFolder )
-		{
-			$sCompiledFolder.= '/' . $this->compiler()->strategySignature() ;
-			
-			if( !$aCompiledFolder=$aFs->find($sCompiledFolder) and !$aCompiledFolder=$aFs->createFolder($sCompiledFolder) )
-			{
-				throw new Exception(
-						"注册 class package (%s)时，提供的class编译目录不存在，且无法自动创建：%s"
-						, array($sNamespace,$sCompiledFolder)
-				) ;
-			}
-		}*/
 		
 		$aSourceFolder = null ;
 		if( $sSourceFolder and !$aSourceFolder=$aFs->findFolder($sSourceFolder) )
@@ -84,17 +58,24 @@ class ClassLoader extends Object implements \Serializable
 	{
 			$fTime = microtime(true) ;
 		// 从缓存的 classpath 中加载类
-		/*if( isset($this->arrClassPathCache[$sClassName]) and is_file($this->arrClassPathCache[$sClassName]) )
+		if( $this->bEnableClassCache and isset($this->arrClassPathCache[$sClassName]) and is_file($this->arrClassPathCache[$sClassName]) )
 		{
-			require $this->arrClassPathCache[$sClassName] ;
-			return ;
-		}*/
+			if( is_file($this->arrClassPathCache[$sClassName]) )
+			{
+				include_once $this->arrClassPathCache[$sClassName] ;
+				return ;
+			}
+			else
+			{
+				unset($this->arrClassPathCache[$sClassName]) ;
+			}
+		}
 		
 		// 搜索类
 		try{
 			if( $aClassFile=$this->searchClass($sClassName) )
 			{
-				// $this->arrClassPathCache[$sClassName] = $aClassFile->url() ;
+				$this->arrClassPathCache[$sClassName] = $aClassFile->url() ;
 				
 				$aClassFile->includeFile(false,true) ;
 			}
@@ -129,8 +110,11 @@ class ClassLoader extends Object implements \Serializable
 			}
 		}
 		
-		$aCmpdPackage = $this->compiler()->compiledPackage() ;
-		$sFullInnerPath = dirname( str_replace('\\','/',$sClassName) ) ;
+		if( ($nSearchFlag&self::SEARCH_COMPILED)==self::SEARCH_COMPILED )
+		{
+			$aCmpdPackage = $this->compiler()->compiledPackage() ;
+			$sFullInnerPath = dirname( str_replace('\\','/',$sClassName) ) ;
+		}
 		
 		for( end($this->arrPackages); $aSrcPackage=current($this->arrPackages); prev($this->arrPackages) )
 		{
@@ -250,14 +234,6 @@ class ClassLoader extends Object implements \Serializable
 		return preg_match($this->sSkipClassesForCompile,$sClassFullName) ;
 	}
 	
-	public function __destruct()
-	{
-		if( $this->aClasspathCache )
-		{
-			$this->aClasspathCache->openWriter()->write( '<?php return ' . var_export($this->arrClassPathCache,1) . ' ; ?>' ) ;
-		}
-	}
-	
 	public function totalLoadTime()
 	{
 		return $this->fLoadTime ;
@@ -268,6 +244,7 @@ class ClassLoader extends Object implements \Serializable
 		$arrData = array(
 			'arrPackages' => array() ,
 			'bEnableClassCompile' => &$this->bEnableClassCompile ,
+			'arrClassPathCache' => &$this->arrClassPathCache ,
 		) ;
 		
 		foreach($this->arrPackages as $aPackage)
@@ -286,10 +263,20 @@ class ClassLoader extends Object implements \Serializable
 		
 		$arrData = unserialize($serialized) ;
 		$this->bEnableClassCompile =& $arrData['bEnableClassCompile'] ;
+		$this->arrClassPathCache =& $arrData['arrClassPathCache'] ;
 		foreach($arrData['arrPackages'] as $arrPackage)
 		{
 			$this->addPackage($arrPackage[0],$arrPackage[1]) ;
 		}
+	}
+	
+	public function enableClassCache()
+	{
+		return $this->bEnableClassCache ;
+	}
+	public function setEnableClassCache($bEnable=true)
+	{
+		$this->bEnableClassCache = $bEnable? true: false ;
 	}
 	
 	private $arrPackages = array() ;
@@ -303,7 +290,7 @@ class ClassLoader extends Object implements \Serializable
 	private $fLoadTime = 0 ;
 	
 	private $arrClassPathCache = array() ;
-	private $aClasspathCache = array() ;
+	private $bEnableClassCache = true ;
 }
 
 ?>

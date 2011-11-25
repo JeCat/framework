@@ -168,7 +168,7 @@ class AOP extends Object implements IStrategySummary
 	
 	private function parseAspectClass($sAspectClass)
 	{
-		if( !$aClassFile = ClassLoader::singleton()->searchClass($sAspectClass) )
+		if( !$aClassFile = ClassLoader::singleton()->searchClass($sAspectClass,ClassLoader::SEARCH_SOURCE) )
 		{
 			throw new Exception("注册到AOP中的Aspace(%s)不存在; Aspace必须是一个有效的类",$sAspectClass) ;
 		}

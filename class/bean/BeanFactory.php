@@ -1,11 +1,13 @@
 <?php
 namespace org\jecat\framework\bean ;
 
+use org\jecat\framework\fs\FileSystem;
+
 use org\jecat\framework\resrc\ResourceManager;
 use org\jecat\framework\lang\Type;
 use org\jecat\framework\lang\Object;
 
-class BeanFactory extends Object
+class BeanFactory extends Object implements \Serializable
 {
 	/**
 	 * @return BeanFactory
@@ -244,6 +246,43 @@ class BeanFactory extends Object
 			$this->aBeanFolders = new ResourceManager() ;
 		}
 		return $this->aBeanFolders ;
+	}
+	
+	
+	public function serialize ()
+	{
+		$arrData = array(
+				'arrFolderPaths' => array() ,
+				'arrBeanClassAlias' => &$this->arrBeanClassAlias ,
+		) ;
+		foreach($this->beanFolders()->folderNamespacesIterator() as $sNamespace)
+		{
+			foreach($this->beanFolders()->folderIterator($sNamespace) as $aFolder)
+			{
+				$arrData['arrFolderPaths'][$sNamespace][]  = $aFolder->path() ;
+			}
+		}
+		return serialize($arrData) ;
+	}
+	
+	/**
+	 * @param serialized
+	 */
+	public function unserialize ($serialized)
+	{
+		$arrData = unserialize($serialized) ;
+		$this->arrBeanClassAlias =& $arrData['arrBeanClassAlias'] ;
+		foreach($arrData['arrFolderPaths'] as $sNamespace=>$arrFolderPaths)
+		{
+			foreach($arrFolderPaths as $sPath)
+			{
+				if(!$aFolder=FileSystem::singleton()->findFolder($sPath))
+				{
+					throw new BeanConfException("恢复BeanFactory时无法找到Bean目录:%s; 只有挂载到系统目录下的目录才能正确序列/反序列化") ;
+				}
+				$this->beanFolders()->addFolder( $aFolder, $sNamespace ) ;
+			}
+		}
 	}
 	
 	private $arrBeanClassAlias = array() ;
