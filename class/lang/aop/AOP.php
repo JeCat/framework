@@ -120,6 +120,11 @@ class AOP extends Object implements IStrategySummary
 	 */
 	public function strategySummary()
 	{
+		if( $this->sAspectLibSignture )
+		{
+			return $this->sAspectLibSignture ;
+		}
+		
 		if(!$this->arrAspectClasses)
 		{
 			return '' ;
@@ -145,24 +150,6 @@ class AOP extends Object implements IStrategySummary
 		$aCompiler->registerGenerator("org\\jecat\\framework\\lang\\compile\\object\\FunctionDefine","org\\jecat\\framework\\lang\\aop\\compiler\\FunctionDefineGenerator") ;
 		
 		return $aCompiler ;
-	}
-	
-	/**
-	 * org\jecat\framework\lang\oop\ClassLoader
-	 */
-	public function classLoader()
-	{
-		if( !$this->aClassLoader )
-		{
-			$this->aClassLoader = ClassLoader::singleton() ;
-		}
-		
-		return $this->aClassLoader ;
-	}
-	
-	public function setClassLoader(ClassLoader $aClassLoader)
-	{
-		$this->aClassLoader = $aClassLoader ;
 	}
 	
 	
@@ -200,10 +187,9 @@ class AOP extends Object implements IStrategySummary
 		return $this->aAspects ;
 	}
 	
-	
 	private $arrAspectClasses ;
 	
 	private $aAspects ;
 	
-	private $aClassLoader ;
+	private $sAspectLibSignture ;
 }

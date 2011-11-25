@@ -56,13 +56,16 @@ class ClassLoader extends Object implements \Serializable
 	 */
 	public function load($sClassName)
 	{
-			$fTime = microtime(true) ;
+		$fTime = microtime(true) ;
+		
 		// 从缓存的 classpath 中加载类
 		if( $this->bEnableClassCache and isset($this->arrClassPathCache[$sClassName]) and is_file($this->arrClassPathCache[$sClassName]) )
 		{
 			if( is_file($this->arrClassPathCache[$sClassName]) )
 			{
 				include_once $this->arrClassPathCache[$sClassName] ;
+		
+				$this->fLoadTime+= microtime(true) - $fTime ;
 				return ;
 			}
 			else
