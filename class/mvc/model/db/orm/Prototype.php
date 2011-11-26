@@ -427,12 +427,41 @@ class Prototype extends StatementFactory implements IBean
 		return ($sTableAlias?$sTableAlias.'.':'').$sColumnName ;
 	}
 	
+	public function modelClass()
+	{
+		if(!$this->sModelClass)
+		{
+			$this->sModelClass = 'org\\jecat\\framework\\mvc\\model\\db\\Model' ;
+			//$this->sModelClass = 'org\\jecat\\framework\\mvc\\model\\db\\tables\\' . $this->tableName() ;
+			//$this->sModelClass = preg_replace('[^\w_]','_',$this->sModelClass) ;
+		}
+		return $this->sModelClass ;
+	}
+	
 	/**
 	 * @return org\jecat\framework\mvc\model\db\IModel
 	 */
 	public function createModel($bList=false)
 	{
-		return new $this->sModelClass($this,$bList) ;
+		$sModelClass = $this->modelClass() ;
+		
+		// 生成模型类
+		if(!class_exists($sModelClass))
+		{
+			self::generateModelClass($sModelClass) ;
+		}		
+		
+		return new $sModelClass($this,$bList) ;
+	}
+	
+	static function generateModelClass($sClassName)
+	{
+		$aClassRef = new \ReflectionClass('org\\jecat\\framework\\mvc\\model\\db\\Model') ;
+		
+		foreach($aClassRef->getMethods() as $aMethodRef)
+		{
+			// $aMethodRef-> ;
+		}
 	}
 	
 	// criteria setter
@@ -602,7 +631,7 @@ class Prototype extends StatementFactory implements IBean
 			}
 			$item['fromPrototype'] = $this ;
 			
-			$aAssociation = $aBeanFactory->createBean($item,$sNamespace) ;
+			$aAssociation = $aBeanFactory->createBean($item,$sNamespace,$aBeanFactory) ;
 			$aAssociation->setDB($this->aDB) ;
 			
 			$this->arrAssociations[] = $aAssociation ;
@@ -732,7 +761,7 @@ class Prototype extends StatementFactory implements IBean
 	private $aCriteria = null;
 	private $arrAssociations =  array();
 	private $aAssociationBy = null;
-	private $sModelClass = 'org\\jecat\\framework\\mvc\\model\\db\\Model' ;
+	private $sModelClass = null ;
 	private $arrBeanConfig ;
 	
 	// 共享状态

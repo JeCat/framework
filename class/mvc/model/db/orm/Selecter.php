@@ -115,14 +115,18 @@ class Selecter extends OperationStrategy
 		$aSelect->clearColumns() ;
 		
 		// 被直接关联的model
+			$aFromModel = $aModel ;/*
 		if( $aFromPrototype->associatedBy() )
 		{
-			$aFromModel = $aModel->child($aFromPrototype->path(false)) ;
+			if( !$aFromModel = $aModel->child($aFromPrototype->path(false)) )
+			{
+				throw new Exception("系统遇到意外的错误：查询多属关联子模型的时候，缺失被关联模型。") ;
+			}
 		}
 		else
 		{
-			$aFromModel = $aModel ;
-		}
+			$aFromModel = $aModel* ;
+		}*/
 
 		// 根据上一轮查询设置条件
 		if( $aMultitermAssoc->isType(Association::hasMany) )				// hasMany

@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\model\db ;
 
+use org\jecat\framework\bean\BeanConfException;
+
 use org\jecat\framework\pattern\composite\INamable;
 use org\jecat\framework\bean\BeanFactory;
 use org\jecat\framework\bean\IBean;
@@ -370,8 +372,33 @@ class Model extends AbstractModel implements IModel, IBean
 	// implements IBean
 	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
-		$sClass = get_called_class() ;
-		$aBean = new $sClass() ;
+		if( !empty($arrConfig['orm']) )
+		{
+			if( !empty($arrConfig['name']) )
+			{
+				$arrConfig['orm']['name'] = $arrConfig['name'] ;
+			}
+			if(empty($arrConfig['orm']['class']))
+			{
+				$arrConfig['orm']['class'] = 'prototype' ;
+			}
+			if(empty($arrConfig['orm']['model-class']))
+			{
+				$arrConfig['orm']['model-class'] = $arrConfig['class'] ;
+			}
+			if( !$aPrototype = BeanFactory::singleton()->createBean($arrConfig['orm'],$sNamespace) )
+			{
+				throw new BeanConfException("无法创建orm bean: %s , %s",array($sNamespace,var_export($arrConfig['orm'],true))) ;
+			}
+			
+			$aBean = $aPrototype->createModel( !empty($arrConfig['list']) ) ;
+		}
+		else
+		{
+			$sClass = get_called_class() ;
+			$aBean = new $sClass() ;
+		}
+		
 		if($bBuildAtOnce)
 		{
 			$aBean->buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
@@ -382,28 +409,6 @@ class Model extends AbstractModel implements IModel, IBean
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
 		$this->setList(!empty($arrConfig['list'])) ;
-		
-		if( !empty($arrConfig['orm']) )
-		{
-			if( !empty($arrConfig['name']) )
-			{
-				$arrConfig['orm']['name'] = $arrConfig['name'] ;
-			}
-			
-			if(empty($arrConfig['orm']['class']))
-			{
-				$arrConfig['orm']['class'] = 'prototype' ;
-			}
-			if(empty($arrConfig['model-class']) )
-			{
-				$arrConfig['orm']['model-class'] = $arrConfig['class'] ;
-			}
-			if( $aPrototype = BeanFactory::singleton()->createBean($arrConfig['orm'],$sNamespace) )
-			{
-				$this->setPrototype($aPrototype) ;
-			}
-		}
-		
 		$this->arrBeanConfig = $arrConfig ;
 	}
 	
