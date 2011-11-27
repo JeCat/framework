@@ -92,7 +92,13 @@ class Object implements IObject
 		}
 		
 		// create object
-		if(empty($argvs))
+		$aRefClass = new \ReflectionClass($sClassName) ;
+		if($aRefClass->isAbstract())
+		{
+			throw new Exception("无法创建抽象类:%s的实例",$sClassName) ;
+		}
+		$aObject = $aRefClass->newInstanceArgs($argvs) ;
+		/*if(empty($argvs))
 		{
 			$aObject = new $sClassName() ;
 		}
@@ -100,7 +106,7 @@ class Object implements IObject
 		{
 			$aRefClass = new \ReflectionClass($sClassName) ;
 			$aObject = $aRefClass->newInstanceArgs($argvs) ;
-		}
+		}*/
 		
 		// set application
 		if( $aApp and $aObject instanceof IObject )
