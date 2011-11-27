@@ -6,7 +6,9 @@ use org\jecat\framework\util\String;
 
 interface IInterpreter
 {
-	public function parse(String $aSource,ObjectContainer $aObjectContainer) ; 
+	public function parse(String $aSource,ObjectContainer $aObjectContainer,UI $aUI) ; 
+	
+	public function compileStrategySignture() ;
 }
 
 ?>

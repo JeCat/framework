@@ -29,15 +29,25 @@ class InterpreterManager extends Container
 	/**
 	 * @return IObject
 	 */
-	public function parse(IInputStream $aSourceInput,ObjectContainer $aObjectContainer)
+	public function parse(IInputStream $aSourceInput,ObjectContainer $aObjectContainer,UI $aUI)
 	{
 		$aSource = new String ;
 		$aSourceInput->readInString($aSource) ;
 				
 		foreach($this->iterator() as $aInterpreter)
 		{
-			$aInterpreter->parse($aSource,$aObjectContainer) ;
+			$aInterpreter->parse($aSource,$aObjectContainer,$aUI) ;
 		}
+	}
+
+	public function compileStrategySignture()
+	{
+		$seed = __CLASS__."\r\n" ;
+		foreach($this->iterator() as $aInterpreter)
+		{
+			$seed.= $aInterpreter->compileStrategySignture()."\r\n" ;
+		}
+		return md5($seed) ;
 	}
 }
 

@@ -85,6 +85,16 @@ class CompilerManager extends JcObject
 			$aCompiledFile->create() ;
 		}
 	}
+
+	public function compileStrategySignture()
+	{
+		$seed = __CLASS__."\r\n" ;
+		foreach($this->arrCompilers as $aCompiler)
+		{
+			$seed.= $aCompiler->compileStrategySignture()."\r\n" ;
+		}
+		return md5($seed) ;
+	}
 	
 	private $arrCompilers = array() ;
 }

@@ -56,6 +56,12 @@ class WeaveManager extends Object
 		
 		return $this->arrPatchSlots[$sTemplateName][$sKey] ;
 	}
+
+	public function compileStrategySignture()
+	{
+		return __CLASS__ ;
+	}
+	
 	private $arrPatchSlots = array() ;
 }
 

@@ -1,6 +1,7 @@
 <?php
 namespace org\jecat\framework\ui\xhtml\parsers ;
 
+use org\jecat\framework\ui\UI;
 use org\jecat\framework\fs\IFile;
 use org\jecat\framework\io\OutputStreamBuffer;
 use org\jecat\framework\lang\Exception;
@@ -19,7 +20,7 @@ class Parser extends JcObject implements IInterpreter
 	/**
 	 * return IObject
 	 */
-	public function parse(String $aSource,ObjectContainer $aObjectContainer)
+	public function parse(String $aSource,ObjectContainer $aObjectContainer,UI $aUI)
 	{
 		$nProcIndex = 0 ;
 		
@@ -81,6 +82,10 @@ class Parser extends JcObject implements IInterpreter
 		}
 	}
 	
+	public function compileStrategySignture()
+	{
+		return __CLASS__ ;
+	}
 }
 
 ?>

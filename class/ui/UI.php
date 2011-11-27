@@ -3,15 +3,10 @@
 namespace org\jecat\framework\ui ;
 
 use org\jecat\framework\locale\LocaleManager;
-
 use org\jecat\framework\system\Response;
-
 use org\jecat\framework\system\Request;
-
 use org\jecat\framework\system\Application;
-
 use org\jecat\framework\io\IInputStream;
-
 use org\jecat\framework\fs\IFile;
 use org\jecat\framework\resrc\ResourceManager;
 use org\jecat\framework\lang\Assert;
@@ -171,7 +166,7 @@ class UI extends JcObject
 		}
 		
 		// 解析
-		$this->interpreters()->parse($aSourceInput,$aObjectContainer) ;
+		$this->interpreters()->parse($aSourceInput,$aObjectContainer,$this) ;
 		
 		// 编译
 		$this->compilers()->compile($aObjectContainer,$aCompiledOutput) ;

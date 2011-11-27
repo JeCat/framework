@@ -10,6 +10,8 @@ interface ICompiler
 	 * @return ICompiled
 	 */
 	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) ;
+	
+	public function compileStrategySignture() ;
 }
 
 ?>

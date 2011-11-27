@@ -1,25 +1,20 @@
 <?php
-namespace org\jecat\framework\ui\xhtml\parsers ;
+namespace org\jecat\framework\ui\xhtml\weave ;
 
+use org\jecat\framework\lang\Object;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\ui\xhtml\UIFactory;
 use org\jecat\framework\ui\UI;
 use org\jecat\framework\util\String;
 use org\jecat\framework\ui\ObjectContainer ;
-use org\jecat\framework\lang\Object as JcObject ;
 use org\jecat\framework\ui\IInterpreter;
 
-class WeaveParser extends JcObjec implements IInterpreter
-{
-	public function __construct(UI $aUi)
-	{
-		$this->setUi($aUi) ;
-	}
-	
+class WeaveParser extends Object implements IInterpreter
+{	
 	/**
 	 * return IObject
 	 */
-	public function parse(String $aSource,ObjectContainer $aObjectContainer)
+	public function parse(String $aSource,ObjectContainer $aObjectContainer,UI $aUI)
 	{
 		$sTempateName = $aObjectContainer->ns() . ':' . $aObjectContainer->templateName() ;
 		$aWeaveMgr = $this->weaveManager() ;
@@ -31,7 +26,7 @@ class WeaveParser extends JcObjec implements IInterpreter
 
 		foreach($aWeaveMgr->patchSlotIterator($sTempateName) as $aPatchSlot)
 		{
-			$aPatchSlot->applyPatchs($aObjectContainer,$this->ui()) ;
+			$aPatchSlot->applyPatchs($aObjectContainer,$aUI) ;
 		} 
 	}
 
@@ -52,22 +47,13 @@ class WeaveParser extends JcObjec implements IInterpreter
 	{
 		$this->aWeaveManager = $aWeaveManager ;
 	}
-	
-	/**
-	 * @return org\jecat\framework\ui\xhtml\weave\WeaveManager
-	 */
-	public function ui()
+
+	public function compileStrategySignture()
 	{
-		return $this->aUi ; 
-	}
-	
-	public function setUi(UI $aUi)
-	{
-		$this->aUi = $aUi ;
+		return WeaveManager::singleton()->compileStrategySignture() ;
 	}
 	
 	private $aWeaveManager ;
-	private $aUi ;
 }
 
 ?>

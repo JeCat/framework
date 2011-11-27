@@ -35,11 +35,11 @@ class SourceFileManager extends ResourceManager
 		
 		if( $aCompiledFolder = $aFolder->property('compiled') )
 		{
-			return $aCompiledFolder->findFile($this->compiledSubFolderName().'/'.$aSourceFile->name().'.php') ;
+			return $aCompiledFolder->findFile($this->compileStrategySignture().'/'.$aSourceFile->name().'.php') ;
 		}
 		else
 		{
-			return $aSourceFile->directory()->findFile('compileds/'.$this->compiledSubFolderName().'/'.$aSourceFile->name().'.php') ;	
+			return $aSourceFile->directory()->findFile("compileds/".$this->compileStrategySignture()."/".$aSourceFile->name().'.php') ;	
 		}
 	}
 	
@@ -52,28 +52,27 @@ class SourceFileManager extends ResourceManager
 		
 		if( $aCompiledFolder = $aFolder->property('compiled') )
 		{
-			return $aCompiledFolder->createFile($this->compiledSubFolderName().'/'.$aSourceFile->name().'.php') ;
+			return $aCompiledFolder->createFile($this->compileStrategySignture().'/'.$aSourceFile->name().'.php') ;
 		}
 		else
 		{
-			return $aSourceFile->directory()->createFile('compileds/'.$this->compiledSubFolderName().'/'.$aSourceFile->name().'.php') ;		
+			return $aSourceFile->directory()->createFile("compileds/".$this->sCompileStrategySignture."/".$aSourceFile->name().'.php') ;		
 		}
 	}
 	
-	/**
-	 * 这是一个临时方案，如果去要使所有已编译的 template 失效（ui机制发生变化），修改 md5() 中的数字
-	 */
-	private function compiledSubFolderName()
+	public function setCompileStrategySignture($sCompileStrategySignture)
 	{
-		if( !$this->sCompiledSubFolderName )
+		$this->sCompileStrategySignture = $sCompileStrategySignture ;
+	} 
+	public function compileStrategySignture()
+	{
+		if(!$this->sCompileStrategySignture)
 		{
-			$this->sCompiledSubFolderName = md5(1) ;
+			$this->sCompileStrategySignture = md5(__CLASS__) ;
 		}
-		
-		return $this->sCompiledSubFolderName ;
-	}  
+		return $this->sCompileStrategySignture ;
+	}
 	
-
 	public function isForceCompile()
 	{
 		return $this->bForceCompile ;
@@ -84,7 +83,7 @@ class SourceFileManager extends ResourceManager
 		$this->bForceCompile = $bForceCompile ;
 	}
 	
-	private $sCompiledSubFolderName ;
+	private $sCompileStrategySignture ;
 	
 	private $bForceCompile = false ;
 }

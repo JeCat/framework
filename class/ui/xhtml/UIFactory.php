@@ -20,6 +20,7 @@ class UIFactory extends UIFactoryBase
 		
 		// 注册  parser
 		$aInterpreters->add(parsers\Parser::singleton()) ;
+		$aInterpreters->add(weave\WeaveParser::singleton()) ;
 		
 		ParserStateMacro::singleton()
 				->addMacroType('?')
@@ -123,6 +124,11 @@ class UIFactory extends UIFactoryBase
 		}
 		
 		return $aMacroCompiler ;
+	}
+	public function newSourceFileManager()
+	{
+		$aSourceFileManager = parent::newSourceFileManager() ;
+		return $aSourceFileManager ;
 	}
 }
 

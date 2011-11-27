@@ -14,6 +14,11 @@ class WeaveCompiler extends BaseCompiler
 		Assert::type("org\\jecat\\framework\\ui\\xhtml\\weave\\WeaveinObject",$aObject,'aObject') ;
 		$aDev->write( $aObject->compiled() ) ;
 	}
+	
+	public function compileStrategySignture()
+	{
+		return WeaveManager::singleton()->compileStrategySignture() ;
+	}
 }
 
 ?>

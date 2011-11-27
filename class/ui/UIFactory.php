@@ -12,10 +12,7 @@ abstract class UIFactory extends JeObject implements IFactory
 	 */
 	public function create()
 	{
-		$aUI = new UI($this) ;
-		$aUI->setApplication($this->application(true)) ;
-
-		return $aUI ;
+		return new UI($this) ;
 	}
 	
 	/**
@@ -42,10 +39,7 @@ abstract class UIFactory extends JeObject implements IFactory
 	 */
 	public function newSourceFileManager()
 	{
-		$aSourceFileManager = SourceFileManager::singleton(true) ;
-		$aSourceFileManager->setApplication($this->application(true)) ;
-		
-		return $aSourceFileManager ;
+		return SourceFileManager::singleton(true) ;
 	}
 	public function setSourceFileManager(SourceFileManager $aSrcMgr)
 	{
@@ -75,8 +69,7 @@ abstract class UIFactory extends JeObject implements IFactory
 	 */
 	public function newCompilerManager()
 	{
-		$aCompilers = CompilerManager::singleton(true) ;		
-		return $aCompilers ;
+		return CompilerManager::singleton(true) ;
 	}
 	public function setCompilerManager(CompilerManager $aCompilers)
 	{
@@ -106,10 +99,7 @@ abstract class UIFactory extends JeObject implements IFactory
 	 */
 	public function newInterpreterManager()
 	{
-		$aInterpreters = InterpreterManager::singleton(true) ;
-		$aInterpreters->setApplication($this->application(true)) ;
-
-		return $aInterpreters ;
+		return InterpreterManager::singleton(true) ;
 	}
 	public function setInterpreter(InterpreterManager $aInterpreters)
 	{
