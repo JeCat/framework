@@ -1,18 +1,13 @@
 <?php
 namespace org\jecat\framework\system ;
 
+use org\jecat\framework\mvc\model\db\orm\Prototype;
 use org\jecat\framework\fs\imp\LocalFileSystem;
-
 use org\jecat\framework\setting\Setting;
-
 use org\jecat\framework\fs\FileSystem;
-
 use org\jecat\framework\setting\imp\FsSetting;
-
 use org\jecat\framework\lang\Exception;
-
 use org\jecat\framework\locale\LocaleManager;
-
 use org\jecat\framework\lang\oop\ClassLoader;
 use org\jecat\framework\io\StdOutputFilterMgr;
 use org\jecat\framework\io\PrintStream;
@@ -98,8 +93,14 @@ abstract class ApplicationFactory extends Object
 	public function createClassLoader(Application $aApp)
 	{		
 		$aClassLoader = new ClassLoader( FileSystem::singleton()->findFile("/classpath.php") ) ;
-		$aClassLoader->addPackage( 'org\\jecat\\framework', '/framework/class' ) ; // 将 jecat 加入到 class loader 中
+		
+		// 将 jecat 加入到 class loader 中
+		$aClassLoader->addPackage( 'org\\jecat\\framework', '/framework/class' ) ;
 			
+		// 将保存数据表实现类的临时目录加入到 class loader 中
+		FileSystem::singleton()->findFolder(Prototype::$sModelImpPackage,FileSystem::FIND_AUTO_CREATE) ;
+		$aClassLoader->addPackage( Prototype::MODEL_IMPLEMENT_CLASS_NS , Prototype::$sModelImpPackage ) ;
+
 		return $aClassLoader ;
 	}
 	

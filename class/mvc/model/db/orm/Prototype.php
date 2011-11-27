@@ -1,6 +1,7 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\fs\FileSystem;
 use org\jecat\framework\db\sql\Statement;
 use org\jecat\framework\db\sql\StatementState;
 use org\jecat\framework\db\sql\name\NameTransferFactory;
@@ -17,6 +18,9 @@ use org\jecat\framework\db\sql\StatementFactory;
 class Prototype extends StatementFactory implements IBean
 {
 	const youKnow = null ;
+	
+	const MODEL_IMPLEMENT_CLASS_NS = 'org\\jecat\\framework\\mvc\\model\\db\\tables' ;
+	static public $sModelImpPackage = '/data/class/dbmodel' ;
 	
 	// static creator
 	/**
@@ -427,41 +431,112 @@ class Prototype extends StatementFactory implements IBean
 		return ($sTableAlias?$sTableAlias.'.':'').$sColumnName ;
 	}
 	
-	public function modelClass()
-	{
-		if(!$this->sModelClass)
-		{
-			$this->sModelClass = 'org\\jecat\\framework\\mvc\\model\\db\\Model' ;
-			//$this->sModelClass = 'org\\jecat\\framework\\mvc\\model\\db\\tables\\' . $this->tableName() ;
-			//$this->sModelClass = preg_replace('[^\w_]','_',$this->sModelClass) ;
-		}
-		return $this->sModelClass ;
-	}
-	
 	/**
 	 * @return org\jecat\framework\mvc\model\db\IModel
 	 */
 	public function createModel($bList=false)
 	{
 		$sModelClass = $this->modelClass() ;
-		
-		// 生成模型类
-		if(!class_exists($sModelClass))
-		{
-			self::generateModelClass($sModelClass) ;
-		}		
-		
 		return new $sModelClass($this,$bList) ;
 	}
-	
-	static function generateModelClass($sClassName)
+	public function modelClass()
 	{
-		$aClassRef = new \ReflectionClass('org\\jecat\\framework\\mvc\\model\\db\\Model') ;
+		if(!$this->sModelClass)
+		{
+			$sModelShortClass = preg_replace('[^\w_]','_',$this->tableName()) ;
+			$this->sModelClass = self::MODEL_IMPLEMENT_CLASS_NS .'\\'. $this->tableName() ;
+			
+			// 生成模型类
+			if(!class_exists($this->sModelClass))
+			{
+				$sClassSource = self::generateModelClass($sModelShortClass,self::MODEL_IMPLEMENT_CLASS_NS) ;
+				
+				$sClassFilePath = self::$sModelImpPackage.'/'.$sModelShortClass.'.php' ;
+				if( !$aClassFile = FileSystem::singleton()->findFile($sClassFilePath,FileSystem::FIND_AUTO_CREATE) )
+				{
+					throw new Exception("无法自动创建数据库实现类 %s 的类文件：%s",array($this->sModelClass,$sClassFilePath)) ;
+				}
+				
+				$aWriter = $aClassFile->openWriter() ;
+				$aWriter->write($sClassSource) ;
+				$aWriter->close() ;
+			}
+		}
+		return $this->sModelClass ;
+	}
+	
+	static function & generateModelClass($sModelShortClass,$sNamespace)
+	{
+		$sModelBaseClass = 'org\\jecat\\framework\\mvc\\model\\db\\Model' ;
+		$aClassRef = new \ReflectionClass($sModelBaseClass) ;
+		
+		$sClassSource = "<?php " ;
+		$sClassSource.= "namespace {$sNamespace};\r\n" ;
+		$sClassSource.= "class ".basename(str_replace('\\','/',$sNamespace.'\\'.$sModelShortClass))." extends \\{$sModelBaseClass}\r\n" ;
+		$sClassSource.= "{\r\n" ;
 		
 		foreach($aClassRef->getMethods() as $aMethodRef)
 		{
-			// $aMethodRef-> ;
+			if( $aMethodRef->isFinal() or $aMethodRef->isAbstract() or $aMethodRef->isPrivate() )
+			{
+				continue ;
+			}
+			
+			$sMethodName = $aMethodRef->getName() ;
+			
+			$sClassSource.= "\t" ;
+			if( $aMethodRef->isStatic() )
+			{
+				$sClassSource.= 'static ' ;
+			}
+			$sClassSource.= $aMethodRef->isPublic()? 'public ': 'protected ' ;
+			if( $aMethodRef->returnsReference() )
+			{
+				$sClassSource.= '& ' ;
+			}
+			$sClassSource.= 'function ' ;
+			$sClassSource.= $sMethodName .'( ' ;
+			$sCallParams = '' ;
+			
+			// 参数
+			foreach($aMethodRef->getParameters() as $aParamRef)
+			{
+				if($aParamRef->getPosition())
+				{
+					$sClassSource.= ', ' ;
+					$sCallParams.= ',' ;
+				}
+				// 参数类型
+				if($aParamClass=$aParamRef->getClass())
+				{
+					$sClassSource.= '\\'.$aParamClass->getName().' ' ;
+				}
+				else if($aParamRef->isArray())
+				{
+					$sClassSource.= 'array ' ;
+				}
+				// 引用传递
+				if($aParamRef->isPassedByReference())
+				{
+					$sClassSource.= '&' ;
+				}
+				// 参数名称/默认值
+				$sClassSource.= '$'.$aParamRef->getName() ;
+				if($aParamRef->isDefaultValueAvailable())
+				{
+					$sClassSource.= '=' . var_export($aParamRef->getDefaultValue(),true) ;
+				}
+				$sCallParams.= '$'.$aParamRef->getName() ;
+			}
+			$sClassSource.= " )\r\n" ;
+			$sClassSource.= "\t{\r\n" ;
+			$sClassSource.= "\t\treturn parent::{$sMethodName}({$sCallParams}) ;\r\n" ;
+			$sClassSource.= "\t}\r\n" ;  
 		}
+		
+		$sClassSource.= "}" ;
+		
+		return $sClassSource ;
 	}
 	
 	// criteria setter
