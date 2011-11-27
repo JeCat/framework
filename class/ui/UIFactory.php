@@ -105,6 +105,14 @@ abstract class UIFactory extends JeObject implements IFactory
 	{
 		$this->aInterpreters = $aInterpreters ;
 	}
+
+	public function calculateCompileStrategySignture()
+	{
+		$sSignture = md5( $this->interpreterManager()->compileStrategySignture()
+							. $this->compilerManager()->compileStrategySignture() ) ;
+		
+		$this->sourceFileManager()->setCompileStrategySignture($sSignture) ;
+	}
 	
 	protected $aSourceFileManager ;
 	protected $aCompilers ;

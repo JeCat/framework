@@ -89,9 +89,9 @@ class CompilerManager extends JcObject
 	public function compileStrategySignture()
 	{
 		$seed = __CLASS__."\r\n" ;
-		foreach($this->arrCompilers as $aCompiler)
+		foreach($this->arrCompilers as $compiler)
 		{
-			$seed.= $aCompiler->compileStrategySignture()."\r\n" ;
+			$seed.= (is_object($compiler)? $compiler->compileStrategySignture(): $compiler)."\r\n" ;
 		}
 		return md5($seed) ;
 	}
