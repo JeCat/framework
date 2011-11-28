@@ -185,13 +185,15 @@ class Container extends Object implements IContainer
 		$nPos = $this->search($object) ;
 		if($nPos===false)
 		{
-			return ;
+			return false ;
 		}
 		
 		$arrArgs = func_get_args() ;
 		$arrArgs[0] = $nPos ;
 		
 		call_user_func_array(array($this,'insertBeforeByPosition'),$arrArgs) ;
+		
+		return true ;
 	}
 	
 	public function insertBeforeByPosition($nPos=0,$_)
@@ -217,13 +219,15 @@ class Container extends Object implements IContainer
 		$nPos = $this->search($object) ;
 		if($nPos===false)
 		{
-			return ;
+			return false ;
 		}
 		
 		$arrArgs = func_get_args() ;
 		$arrArgs[0] = $nPos ;
 		
 		call_user_func_array(array($this,'insertAfterByPosition'),$arrArgs) ;
+		
+		return true ;
 	}
 	
 	public function insertAfterByPosition($nPos,$_)
