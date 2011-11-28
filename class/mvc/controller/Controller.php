@@ -251,10 +251,8 @@ class Controller extends NamableComposite implements IController, IBean
      */
     public function mainRun ()
     {
-    	if( !$this->params->bool('noframe') )
+    	if( !$this->params->bool('noframe') and $aFrame=$this->frame() )
     	{
-    		$aFrame = $this->frame() ;
-			
     		$aFrame->add($this) ;
 			
     		$aFrame->mainRun() ;

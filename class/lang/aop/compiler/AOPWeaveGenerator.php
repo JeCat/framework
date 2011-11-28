@@ -50,6 +50,7 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 
 	protected function weave(GenerateStat $aStat)
 	{
+			$pos = $aStat->aTokenPool->search($aStat->aExecutePoint) ;
 		if( $aStat->aExecutePoint and !$aStat->aExecutePoint->belongsClass() )
 		{
 			throw new Exception("AOP织入遇到错误：正在对一段全局代码进行织入操作，只能对类方法进行织入。") ;
@@ -177,7 +178,10 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 		while($aAdvice=$aAdvices->out())
 		{			
 			// 织入advice定义代码
-			$aStat->aTokenPool->insertAfter($aBodyEnd,$this->generateAdviceDefine($aAdvice,$aStat)) ;
+			if( !$aStat->aTokenPool->insertAfter($aBodyEnd,$this->generateAdviceDefine($aAdvice,$aStat)) )
+			{
+				throw new Exception("遇到错误！") ;
+			}
 			
 			// 织入advice调用代码
 			$sAdviceFuncName = $this->generateAdviceWeavedFunctionName($aStat,$aAdvice) ;

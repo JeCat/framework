@@ -31,7 +31,7 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		// 新建同名方法
 		$aOriFuncStart = $aStat->aExecutePoint->startToken() ;
 		$aOriFuncEnd = $aStat->aExecutePoint->endToken() ;
-	
+		
 		$aStat->aAdvicesDispatchFunc = new FunctionDefine(
 				$aStat->aExecutePoint
 				, new Token(T_STRING,$aStat->aExecutePoint->name(),0)
@@ -52,6 +52,7 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		$aNewAccess = $aOriAccess?
 				new Token($aOriAccess->tokenType(),$aOriAccess->sourceCode(),0) :
 				new Token(T_PUBLIC,'public',0) ;
+		
 		$aStat->aAdvicesDispatchFunc->setAccessToken($aNewAccess) ;
 		$aStat->aTokenPool->insertBefore($aOriFuncStart,$aNewAccess) ;
 		$aStat->aTokenPool->insertBefore($aOriFuncStart,new Token(T_WHITESPACE, ' ', 0)) ;

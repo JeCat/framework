@@ -74,9 +74,9 @@ class FunctionDefineParser implements ISyntaxParser
 						$aNewToken->setAbstractToken($aToken) ;
 						break ;
 					case T_DOC_COMMENT :
-						$aNewToken->setDocToken(
-							new DocCommentDeclare($aToken)
-						) ;
+						$aDocToken = new DocCommentDeclare($aToken) ;
+						$aNewToken->setDocToken($aDocToken) ;
+						$aTokenPool->replace($aToken,$aDocToken) ;
 						break ;
 				}
 			}
