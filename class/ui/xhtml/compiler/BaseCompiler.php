@@ -25,7 +25,7 @@ class BaseCompiler extends JcObject implements ICompiler
 	
 	public function compileStrategySignture()
 	{
-		return __CLASS__ ;
+		return md5(__CLASS__. var_export($this->arrCompilers,true)) ;
 	}
 		
 	protected function compileChildren(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
