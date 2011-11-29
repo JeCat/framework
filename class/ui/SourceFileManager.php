@@ -82,6 +82,42 @@ class SourceFileManager extends ResourceManager
 	{
 		$this->bForceCompile = $bForceCompile ;
 	}
+	public function serialize()
+	{
+		$arrData = array(
+			'arrFolders' => array() ,
+		) ;
+		
+		foreach($this->folderNamespacesIterator() as $sNamespace)
+		{
+			foreach($this->folderIterator($sNamespace) as $aFolder)
+			{
+				$aCompiled = $aFolder->property('compiled') ;
+				$arrData['arrFolders'][$sNamespace][] = array( $aFolder->path(), $aCompiled?$aCompiled->path():null ) ;
+			}
+		}
+		
+		return serialize($arrData) ;
+	}
+
+	public function unserialize($serialized)
+	{
+		$this->__construct() ;
+		
+		$aFileSystem = FileSystem::singleton() ;
+		$arrData = unserialize($serialized) ;
+		foreach($arrData['arrFolders'] as $sNamespace=>&$arrFolders)
+		{
+			foreach($arrFolders as &$array)
+			{
+				$this->addFolder(
+					$aFileSystem->findFolder($array[0])
+					, $aFileSystem->findFolder($array[1])
+					, $sNamespace
+				) ;
+			}
+		}
+	}
 	
 	private $sCompileStrategySignture ;
 	

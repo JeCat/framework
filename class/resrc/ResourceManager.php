@@ -1,10 +1,12 @@
 <?php
 namespace org\jecat\framework\resrc ;
 
+use org\jecat\framework\fs\FileSystem;
+
 use org\jecat\framework\fs\IFolder;
 use org\jecat\framework\lang\Object;
 
-class ResourceManager extends Object
+class ResourceManager extends Object implements \Serializable
 {
 	public function addFolder(IFolder $aFolder,$sNamespace='*')
 	{
@@ -99,19 +101,6 @@ class ResourceManager extends Object
 		$this->arrFilenameWrappers = array() ;
 	}
 
-	public function folderNamespacesIterator()
-	{
-		return new \org\jecat\framework\pattern\iterate\ArrayIterator(array_keys($this->arrFolders)) ;
-	}
-	
-	public function folderIterator($sNamespace='*')
-	{
-		return new \org\jecat\framework\pattern\iterate\ArrayIterator(
-			isset($this->arrFolders[$sNamespace])?
-				$this->arrFolders[$sNamespace]: array()
-		) ;
-	}
-
 	public function detectNamespace($sFilename)
 	{
 		if( ($nPos=strpos($sFilename,':'))!==false )
@@ -122,6 +111,49 @@ class ResourceManager extends Object
 		{
 			return array('*', $sFilename) ;
 		}
+	}
+
+	public function serialize()
+	{
+		$arrData = array(
+			'arrFolders' => array() ,
+		) ;
+		
+		foreach($this->arrFolders as $sNamespace=>$arrFolders)
+		{
+			foreach($arrFolders as $aFolder)
+			{
+				$arrData['arrFolders'][$sNamespace][] = $aFolder->path() ;
+			}
+		}
+		
+		return serialize($arrData) ;
+	}
+
+	public function unserialize($serialized)
+	{
+		$this->__construct() ;
+		
+		$arrData = unserialize($serialized) ;
+		foreach($arrData['arrFolders'] as $sNamespace=>$arrFolders)
+		{
+			foreach($arrFolders as $sFolderPath)
+			{
+				$aFolder = FileSystem::singleton()->findFolder($sFolderPath) ;
+				$this->addFolder($aFolder,$sNamespace) ;
+			}
+		}
+	}
+
+	public function folderNamespacesIterator()
+	{
+		return new \ArrayIterator(array_keys($this->arrFolders)) ;
+	}
+	public function folderIterator($sNamespace='*')
+	{
+		return isset($this->arrFolders[$sNamespace])?
+				new \ArrayIterator($this->arrFolders[$sNamespace]):
+				new \EmptyIterator() ;
 	}
 	
 	protected $arrFolders = array() ;
