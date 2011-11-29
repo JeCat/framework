@@ -8,9 +8,9 @@ use org\jecat\framework\system\Request;
 
 class FormView extends View implements IFormView
 {
-	public function __construct($sName=null,$sSourceFilename=null,UI $aUI=null)
+	public function __construct($sName=null,$sTemplate=null,UI $aUI=null)
 	{
-		parent::__construct($sName,$sSourceFilename,$aUI) ;
+		parent::__construct($sName,$sTemplate,$aUI) ;
 	}
 	
 	public function loadWidgets(IDataSrc $aDataSrc)
@@ -71,12 +71,12 @@ class FormView extends View implements IFormView
 	
 	protected function calculateHtmlFormFignature()
 	{
-		if( !$sSourceFilename=$this->sourceFilename() )
+		if( !$sTemplate=$this->template() )
 		{
 			return null ;
 		}
 		
-		if( !$aTemplateFile=$this->ui()->sourceFileManager()->find($sSourceFilename) )
+		if( !$aTemplateFile=$this->ui()->sourceFileManager()->find($sTemplate) )
 		{
 			return ;
 		}

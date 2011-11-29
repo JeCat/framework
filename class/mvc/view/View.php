@@ -26,12 +26,12 @@ use org\jecat\framework\ui\UI;
 
 class View extends NamableComposite implements IView, IBean
 {
-	public function __construct($sName=null,$sSourceFilename=null,UI $aUI=null)
+	public function __construct($sName=null,$sTemplate=null,UI $aUI=null)
 	{
 		parent::__construct("org\\jecat\\framework\\mvc\\view\\IView") ;
 		
 		$this->setName($sName) ;
-		$this->setSourceFilename($sSourceFilename) ;
+		$this->setTemplate($sTemplate) ;
 		$this->setUi( $aUI ) ;
 		
 		// 消息队列过滤器
@@ -82,7 +82,7 @@ class View extends NamableComposite implements IView, IBean
     			$arrConfig['template'] = $sNamespace.':'.$arrConfig['template'] ;
     		}
     		
-    		$this->setSourceFilename($arrConfig['template']) ;
+    		$this->setTemplate($arrConfig['template']) ;
     	}
     	
     	$aBeanFactory = BeanFactory::singleton() ;
@@ -206,16 +206,16 @@ class View extends NamableComposite implements IView, IBean
 		$this->aUI = $aUI ;
 	}
 	
-	public function sourceFilename()
+	public function template()
 	{
 		return $this->sSourceFile ;
 	}
 	/**
 	 * @return IView
 	 */
-	public function setSourceFilename($sSourceFilename)
+	public function setTemplate($sTemplate)
 	{
-		$this->sSourceFile = $sSourceFilename ;
+		$this->sSourceFile = $sTemplate ;
 		return $this ;
 	}
 
@@ -270,7 +270,7 @@ class View extends NamableComposite implements IView, IBean
 		}
 		
 		// render myself
-		if( $sSourceFilename=$this->sourceFilename() )
+		if( $sTemplate=$this->template() )
 		{
 			$aVars = $this->variables() ;
 			$aVars->set('theView',$this) ;
@@ -281,7 +281,7 @@ class View extends NamableComposite implements IView, IBean
 				$aVars->set('theParams',$this->aController->params()) ;
 			}
 		
-			$this->ui()->display($sSourceFilename,$aVars,$this->OutputStream()) ;
+			$this->ui()->display($sTemplate,$aVars,$this->OutputStream()) ;
 		}
 		
 		

@@ -12,7 +12,7 @@ class CompilingStatus
 	{
 		return isset($this->arrStatuses[__FUNCTION__])? $this->arrStatuses[__FUNCTION__]: null ;
 	}
-	public function sourceFilename()
+	public function template()
 	{
 		return isset($this->arrStatuses[__FUNCTION__])? $this->arrStatuses[__FUNCTION__]: null ;
 	}
