@@ -25,7 +25,14 @@ interface IController extends IMessageQueueHolder
 	 * @return org\jecat\framework\mvc\model\IModel
      */
     public function modelByName($sName) ;
+    /**
+     * @return \Iterator
+     */
     public function modelIterator() ;
+    /**
+     * @return \Iterator
+     */
+    public function modelNameIterator() ;
     public function clearModels() ;
     
     

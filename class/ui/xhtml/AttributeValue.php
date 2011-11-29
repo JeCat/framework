@@ -27,6 +27,11 @@ class AttributeValue extends Text
 		return $this->sQuoteType ;
 	} 
 	
+	public function setQuoteType($sQuoteType)
+	{
+		$this->sQuoteType = $sQuoteType ;
+	} 
+	
 	private $sQuoteType ;
 	
 	private $sName ;

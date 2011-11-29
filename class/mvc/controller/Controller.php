@@ -589,11 +589,15 @@ class Controller extends NamableComposite implements IController, IBean
      */
     public function modelByName($sName)
     {
-    	$this->modelContainer()->getByName($sName) ;
+    	return $this->modelContainer()->getByName($sName) ;
     }
     public function modelIterator()
     {
-    	$this->modelContainer()->iterator() ;
+    	return $this->modelContainer()->iterator() ;
+    }
+    public function modelNameIterator()
+    {
+    	return $this->modelContainer()->nameIterator() ;
     }
     public function clearModels()
     {

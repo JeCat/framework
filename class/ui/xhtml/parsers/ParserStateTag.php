@@ -20,8 +20,8 @@ class ParserStateTag extends ParserState
 		parent::__construct() ;
 		self::setSingleton($this) ;
 		
-		$this->arrChangeToStates[] = ParserStateMacro::singleton() ;
-		$this->arrChangeToStates[] = ParserStateAttribute::singleton() ;
+		$this->arrChangeToStates[__NAMESPACE__.'\\ParserStateMacro'] = ParserStateMacro::singleton() ;
+		$this->arrChangeToStates[__NAMESPACE__.'\\ParserStateAttribute'] = ParserStateAttribute::singleton() ;
 	}
 
 	public function active(IObject $aParent,String $aSource,&$nPosition)
