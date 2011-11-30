@@ -25,18 +25,21 @@ class FsSetting extends Setting
 	 */
 	public function key($sPath,$bCreate=false)
 	{
-		if( !isset($this->arrKeys[$sPath]) )
+		$sItemsPath = self::transPath($sPath) ;
+		$sFlyweightKey = $this->aRootFolder->url() . '/' . $sItemsPath ;
+					
+		if( !$aKey=FsKey::flyweight($sFlyweightKey,false) )
 		{
-			$sItemsPath = self::transPath($sPath) ;
 			if( !$aFile=$this->aRootFolder->findFile($sItemsPath,$bCreate?FileSystem::FIND_AUTO_CREATE:0) )
 			{
 				return null ;
 			}
 			
-			$this->arrKeys[$sPath] = new FsKey($aFile) ;
+			$aKey = new FsKey($aFile) ;
+			FsKey::setFlyweight($aKey,$sFlyweightKey) ;
 		}
 		
-		return $this->arrKeys[$sPath] ;
+		return $aKey ;
 	}
 	
 	public function createKey($sPath)
@@ -95,11 +98,21 @@ class FsSetting extends Setting
 	}
 	
 	/**
+	 * 在指定的路径上，分离出一个setting
+	 * @param string $sPath 键路径
+	 * @return ISetting
+	 */
+	public function separate($sPath)
+	{
+		$sPath = self::transPath($sPath,false) ;
+		$aNewSettingFolder = $this->aRootFolder->findFolder($sPath,FileSystem::FIND_AUTO_CREATE) ;
+		return new self($aNewSettingFolder) ;
+	}
+	
+	/**
 	 * @var org\jecat\framework\fs\IFolder
 	 */
 	private $aRootFolder;
-	
-	private $arrKeys = array() ;
 }
 
 ?>

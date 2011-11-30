@@ -81,6 +81,13 @@ interface ISetting
 	 * @return \Iterator 
 	 */
 	public function itemIterator($sPath) ;
+	
+	/**
+	 * 在指定的路径上，分离出一个setting
+	 * @param string $sPath 键路径
+	 * @return ISetting
+	 */
+	public function separate($sPath) ;
 }
 
 ?>
