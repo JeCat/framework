@@ -481,7 +481,7 @@ class Controller extends NamableComposite implements IController, IBean
     	return true ;
     }
     
-    public function doAction($sActParamName=null)
+    public function doActions($sActParamName=null)
     {
     	if(!$sActParamName)
     	{
