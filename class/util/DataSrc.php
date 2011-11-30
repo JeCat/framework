@@ -35,31 +35,7 @@ class DataSrc extends HashTable implements IDataSrc, \ArrayAccess, \Iterator
 	// implement ArrayAccess
 	public function offsetGet($offset)
 	{	
-		if( !substr($offset,1,1)=='<' )
-		{
-			return ;
-		}
-		
-		$sModifier = substr($offset,0,1) ;
-		$sRealName = substr($offset,2) ;
-		
-		$arrTypecastFuncNames = array(
-			'i' => 'getInt' ,
-			'f' => 'getFloat' ,
-			'b' => 'getBool' ,
-			's' => 'getString' ,
-			'q' => 'getQuoteString' ,
-		) ;
-		
-		if(isset($arrTypecastFuncNames[$sModifier]))
-		{
-			$sFunc = $arrTypecastFuncNames[$sModifier] ; 
-			return $this->$sFunc($sRealName) ;
-		}
-		else
-		{
-			return $this->get($offset) ;
-		}
+		return $this->get($offset) ;
 	}
 	
 	// implement IHashTable
