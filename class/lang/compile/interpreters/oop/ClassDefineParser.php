@@ -1,6 +1,10 @@
 <?php
 namespace org\jecat\framework\lang\compile\interpreters\oop ;
 
+use org\jecat\framework\lang\compile\object\NamespaceString;
+
+use org\jecat\framework\lang\compile\object\DocCommentDeclare;
+use org\jecat\framework\lang\compile\ClassCompileException;
 use org\jecat\framework\pattern\iterate\INonlinearIterator;
 use org\jecat\framework\lang\compile\object\TokenPool;
 use org\jecat\framework\lang\compile\object\Token;
@@ -43,6 +47,7 @@ class ClassDefineParser implements ISyntaxParser
 			while( $aToken=$aTokenPoolIter->current() and $aToken->tokenType()!=T_STRING ) ;
 			
 			$aNewToken->setNameToken($aToken) ;
+			$aNewToken->setBelongsNamespace($aState->currentNamespace()) ;
 			
 			// doc comment
 			for(
@@ -63,18 +68,63 @@ class ClassDefineParser implements ISyntaxParser
 						break ;
 				}
 			}
+			// parent/body
+			$aClassBodyToken = $aParentNameToken = null ;
+			$bFoundExtendsKeyword = $bParentClassNameOver = false ;
+			for( $aTokenPoolIter->next(); $aToken=$aTokenPoolIter->current(); $aTokenPoolIter->next() )
+			{
+				if($aToken->tokenType()==Token::T_BRACE_OPEN)
+				{
+					$aClassBodyToken = $aToken ;
+					break ;
+				}
+				else if($aToken->tokenType()==T_EXTENDS)
+				{
+					$bFoundExtendsKeyword = true ;
+				}
+				else if( $bFoundExtendsKeyword and !$bParentClassNameOver )
+				{
+					$type = $aToken->tokenType() ; 
+					if(!$aParentNameToken)
+					{
+						$aParentNameToken = new NamespaceString(0,'') ;
+					}
+					else if( $type==T_STRING or $type==T_NS_SEPARATOR )
+					{
+						$aParentNameToken->addNameToken($aToken) ;
+					}
+					else if( $type==T_WHITESPACE ) // 遇到空白字符结束
+					{
+						$bParentClassNameOver = true ;
+					}
+					else
+					{
+						throw new ClassCompileException(null,$aToken,"编译class: %s时遇到了错误，extends 关键词后出现无效的内容",$aNewToken->name()) ;
+					} 
+				}
+			}
 			
-			// class body
-			do{ $aTokenPoolIter->next() ; }
-			while( $aToken=$aTokenPoolIter->current() and $aToken->tokenType()!=Token::T_BRACE_OPEN ) ;
+			if(!$aClassBodyToken)
+			{
+				throw new ClassCompileException($aOriToken,"编译class: %s时遇到了错误，class没有body",$aNewToken->name()) ;
+			}
+			$aNewToken->setBodyToken($aClassBodyToken) ;
 			
-			$aNewToken->setBodyToken($aToken) ;
+			if($bFoundExtendsKeyword)
+			{
+				if( !$aParentNameToken or !$bParentClassNameOver )
+				{
+					throw new ClassCompileException(null,$aToken,"编译class: %s时遇到了错误，extends 关键词后没有找到 parent class name",$aNewToken->name()) ;
+				}
+				$aNewToken->setParentClassName( $aParentNameToken->findRealName($aState) ) ;
+			}
 	
+			$aParentNameToken ;
+			
+			// 完成
 			$aTokenPool->replace($aOriToken,$aNewToken) ;
 			$aState->setCurrentClass($aNewToken) ;
-			
-			$aNewToken->setBelongsNamespace($aState->currentNamespace()) ;
-			
+						
 			$aTokenPool->addClass($aNewToken) ;
 		}
 		

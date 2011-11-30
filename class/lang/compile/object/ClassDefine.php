@@ -25,7 +25,17 @@ class ClassDefine extends StructDefine
 		}
 	}
 	
+	public function setParentClassName($sParentClassName)
+	{
+		$this->sParentClassName = $sParentClassName ;
+	}
+	public function parentClassName()
+	{
+		return $this->sParentClassName ;
+	}
+	
 	private $aTokenName ;
+	private $sParentClassName ;
 	private $aTokenBody ;
 }
 

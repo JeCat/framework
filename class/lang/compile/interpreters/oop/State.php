@@ -1,6 +1,12 @@
 <?php
 namespace org\jecat\framework\lang\compile\interpreters\oop ;
 
+use org\jecat\framework\lang\compile\object\NamespaceString;
+
+use org\jecat\framework\lang\compile\ClassCompileException;
+
+use org\jecat\framework\lang\compile\object\UseDeclare;
+
 use org\jecat\framework\lang\compile\object\NamespaceDeclare;
 use org\jecat\framework\lang\compile\object\ClassDefine;
 use org\jecat\framework\lang\compile\object\FunctionDefine;
@@ -59,6 +65,21 @@ class State
 		$this->aCurrentClass = $aCurrentClass ;
 	}
 	
+	public function addUseDeclare(UseDeclare $aUseToken)
+	{
+		if( !$sName = $aUseToken->name() )
+		{
+			throw new ClassCompileException(null,$aUseToken,"编译class时遇到无效的 use 关键词") ;
+		}
+		
+		$this->arrNamespaces[$sName] = $aUseToken->fullName() ;
+	}
+	
+	public function findName($sName)
+	{
+		return isset($this->arrNamespaces[$sName])? $this->arrNamespaces[$sName]: $sName ;
+	}
+	
 	/**
 	 * @var bool
 	  **/
@@ -78,6 +99,8 @@ class State
 	 * @var NamespaceDeclare
 	  **/
 	private $aCurrentNamespace  ;
+	
+	private $arrNamespaces  ;
 }
 
 ?>

@@ -21,6 +21,7 @@ class CompilerFactory extends Object
 		// generator
 		$aCompiler->registerGenerator("org\\jecat\\framework\\lang\\compile\\object\\FunctionDefine","org\\jecat\\framework\\lang\\compile\\generators\\CompiledAlert") ;
 		$aCompiler->registerGenerator("org\\jecat\\framework\\lang\\compile\\object\\FunctionDefine","org\\jecat\\framework\\lang\\aop\\compiler\\FunctionDefineGenerator") ;
+		$aCompiler->registerGenerator("org\\jecat\\framework\\lang\\compile\\object\\ClosureToken","org\\jecat\\framework\\lang\\aop\\compiler\\FunctionDefineGenerator") ;		// FunctionDefineGenerator 需要同时监听 class结束Token"}" 和 method define token
 		$aCompiler->registerGenerator("org\\jecat\\framework\\lang\\compile\\object\\CallFunction","org\\jecat\\framework\\lang\\aop\\compiler\\CallFunctionGenerator") ;
 		
 		//--------------------
@@ -29,6 +30,7 @@ class CompilerFactory extends Object
 		$aCompiler->addStrategySummary("org\\jecat\\framework\\lang\\compile\\interpreters\\oop\\SyntaxScanner") ;
 		$aCompiler->addStrategySummary("org\\jecat\\framework\\lang\\compile\\interpreters\\oop\\PHPCodeParser") ;
 		$aCompiler->addStrategySummary("org\\jecat\\framework\\lang\\compile\\interpreters\\oop\\NamespaceDeclareParser") ;
+		$aCompiler->addStrategySummary("org\\jecat\\framework\\lang\\compile\\interpreters\\oop\\UseDeclareParser") ;
 		$aCompiler->addStrategySummary("org\\jecat\\framework\\lang\\compile\\interpreters\\oop\\ClassDefineParser") ;
 		$aCompiler->addStrategySummary("org\\jecat\\framework\\lang\\compile\\interpreters\\oop\\FunctionDefineParser") ;
 		$aCompiler->addStrategySummary("org\\jecat\\framework\\lang\\compile\\interpreters\\oop\\CallFunctionParser") ;
