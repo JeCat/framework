@@ -237,67 +237,75 @@ class Object implements IObject
 			$sClassName = get_called_class() ;
 		}
 		
-		$keys = (array)$keys ;
-		$sKey = implode(',', $keys) ;
+		$aIns =& self::locationFlyweight($keys,true,$sClassName) ;
 		
-		if( !isset(self::$arrFlyweightInstancs[$sClassName]) )
-		{
-			self::$arrFlyweightInstancs[$sClassName] = array() ;
-		}
-		
-		return self::$arrFlyweightInstancs[$sClassName][$sKey] = $aInstance ;
+		return $aIns = $aInstance ;
 	}
 	
-	static public function flyweight($keys,$sClassName=null)
+	static public function flyweight($keys,$bCreateNew=true,$sClassName=null)
 	{
 		if(!$sClassName)
 		{
 			$sClassName = get_called_class() ;
 		}
 		
-		$sKey = self::genFlyweightKey($keys) ;
+		$aIns =& self::locationFlyweight($keys,$bCreateNew,$sClassName) ;
 		
+		if( !$aIns and $bCreateNew )
+		{
+			return $bCreateNew? ($aIns=self::createInstance($keys,null,$sClassName)): null ;
+		}
+		else
+		{
+			return $aIns ;
+		}
+	}
+	
+	static private function &locationFlyweight($keys,$bCreateNew,$sClassName)
+	{
 		if( !isset(self::$arrFlyweightInstancs[$sClassName]) )
 		{
 			self::$arrFlyweightInstancs[$sClassName] = array() ;
 		}
+		$arrPool =& self::$arrFlyweightInstancs[$sClassName] ;
 		
-		if( empty(self::$arrFlyweightInstancs[$sClassName][$sKey]) )
+		$keys = (array)$keys ; // 如果 $keys == null , 就转换成 array(null)
+		$sLastKey = (string)array_pop($keys) ;
+		
+		foreach($keys as &$sKey)
 		{
-			self::$arrFlyweightInstancs[$sClassName][$sKey] = self::createInstance($keys,null,$sClassName) ;
-		}
+			$sKey = (string) $sKey ;
 		
-		return self::$arrFlyweightInstancs[$sClassName][$sKey] ;
-	}
-	
-	static private function genFlyweightKey(& $keys )
-	{
-		$keys = (array)$keys ;
-		$sKey = '' ;
+			if( empty($arrPool[$sKey]) )
+			{
+				if($bCreateNew)
+				{
+					$arrPool[$sKey] = array('others'=>array()) ;
+				}
+				else
+				{
+					$null = null ;
+					return $null ;
+				}
+			}
 		
-		$nLoopIdx = 0 ;
-		foreach($keys as &$element)
+			$arrPool =& $arrPool[$sKey]['others'] ;
+		}	
+		
+		if( empty($arrPool[$sLastKey]['ins']) )
 		{
-			if($nLoopIdx++)
+			if($bCreateNew)
 			{
-				$sKey.= ',' ;
-			}
-			
-			if( is_array($element) )
-			{
-				$sKey.= self::genFlyweightKey($element) ;
-			}
-			else if( is_object($element) )
-			{
-				$sKey.= spl_object_hash($element) ;
+				$arrPool[$sLastKey]['ins'] = null ;
 			}
 			else
 			{
-				$sKey.= strval($element) ;
+				$null = null ;
+				return $null ;
 			}
 		}
 		
-		return $sKey ;		
+		return $arrPool[$sLastKey]['ins'] ;
 	}
 	
 		
