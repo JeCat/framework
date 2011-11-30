@@ -40,7 +40,7 @@ abstract class JointPoint extends Object
 		$aJointPoint = new self() ;
 		$aJointPoint->setExecutionPattern("->\${$sCallPropertyNamePattern} {$sAccess}") ;
 		$aJointPoint->setWeaveClass($sWeaveClass) ;
-		$aJointPoint->setWeaveFunctionNamePattern($sWeaveMethodNamePattern) ;
+		$aJointPoint->setWeaveMethod($sWeaveMethodNamePattern) ;
 		return $aJointPoint ;
 	}
 	
@@ -52,7 +52,7 @@ abstract class JointPoint extends Object
 		$aJointPoint = new self() ;
 		$aJointPoint->setExecutionPattern("throw {$sThrowClassNamePattern}") ;
 		$aJointPoint->setWeaveClass($sWeaveClass) ;
-		$aJointPoint->setWeaveFunctionNamePattern($sWeaveMethodNamePattern) ;
+		$aJointPoint->setWeaveMethod($sWeaveMethodNamePattern) ;
 		return $aJointPoint ;
 	}
 	
@@ -67,10 +67,10 @@ abstract class JointPoint extends Object
 	
 	//////////////////////////////////////////////////////////////////
 	
-	public function __construct($sWeaveClass,$sWeaveMethodNamePattern='*')
+	public function __construct($sWeaveClass,$sWeaveMethod='*')
 	{
 		$this->setWeaveClass($sWeaveClass) ;
-		$this->setWeaveMethodNamePattern($sWeaveMethodNamePattern) ;
+		$this->setWeaveMethod($sWeaveMethod) ;
 	}
 		
 	static public function transRegexp($sPartten)
@@ -80,7 +80,7 @@ abstract class JointPoint extends Object
 		
 		return '`' . $sPartten . '`is' ;
 	}
-
+	
 	public function setWeaveClass($sWeaveClass)
 	{
 		$this->sWeaveClass = $sWeaveClass ;
@@ -89,21 +89,19 @@ abstract class JointPoint extends Object
 	{
 		return $this->sWeaveClass ;
 	}
-	
-	public function setWeaveMethodNamePattern($sWeaveMethodNamePattern)
+	public function setWeaveMethod($sWeaveMethod)
 	{
-		$this->sWeaveMethodNamePattern = $sWeaveMethodNamePattern ;
-		$this->sWeaveMethodNameRegexp = self::transRegexp($sWeaveMethodNamePattern) ;
+		$this->sWeaveMethod = $sWeaveMethod ;
+		$this->sWeaveMethodNameRegexp = self::transRegexp($sWeaveMethod) ;
 	}
-	public function weaveMethodNamePattern()
+	public function weaveMethod()
 	{
-		return $this->sWeaveMethodNamePattern ;
+		return $this->sWeaveMethod ;
 	}
 	public function weaveMethodNameRegexp()
 	{
 		return $this->sWeaveMethodNameRegexp ;
 	}
-
 	public function matchWeaveMethod(Token $aToken)
 	{
 		if( !$aClass=$aToken->belongsClass() or $aMethod=$aToken->belongsFunction() )
@@ -119,11 +117,16 @@ abstract class JointPoint extends Object
 		return preg_match( $this->weaveMethodNameRegexp(), $aMethod->name() ) ;
 	}
 	
+	public function weaveMethodIsPattern()
+	{
+		return preg_match('/^[\w_]+$/',$this->sWeaveMethod) ;
+	}
+	
 	abstract public function matchExecutionPoint(Token $aToken) ;
 	
 	private $sWeaveClass ;
 	
-	private $sWeaveMethodNamePattern ;
+	private $sWeaveMethod ;
 	
 	private $sWeaveMethodNameRegexp ;
 	

@@ -1,6 +1,7 @@
 <?php
 namespace org\jecat\framework\lang\aop\jointpoint ;
 
+use org\jecat\framework\lang\compile\object\ClosureToken;
 use org\jecat\framework\lang\compile\object\FunctionDefine;
 use org\jecat\framework\lang\compile\object\Token ;
 
@@ -13,18 +14,47 @@ class JointPointMethodDefine extends JointPoint
 	
 	public function matchExecutionPoint(Token $aToken)
 	{		
-		// 必须是一个类方法
-		if( !($aToken instanceof FunctionDefine) or !$aClass=$aToken->belongsClass() )
+		$aIsPattern = $this->weaveMethodIsPattern() ;
+		
+		// 模糊匹配每个方法
+		if( $aIsPattern and ($aToken instanceof FunctionDefine) )
 		{
-			return false ;
+			// 必须是一个类方法
+			if( !$aClass=$aToken->belongsClass() )
+			{
+				return false ;
+			}
+			
+			if( $aClass->fullName()!=$this->weaveClass() )
+			{
+				return false ;
+			}
+			
+			return preg_match( $this->weaveMethodNameRegexp(),$aToken->name() )? true: false ;
 		}
 		
-		if( $aClass->fullName()!=$this->weaveClass() )
+		// 精确匹配 class token
+		else if( !$aIsPattern and ($aToken instanceof ClosureToken) )
 		{
-			return false ;
+			// 必须是一个 "}" , 并且成对
+			if( $aToken->tokenType()!=Token::T_BRACE_CLOSE or !$aToken->theOther() )
+			{
+				return false ;
+			}
+			
+			// 必须做为 class 的结束边界
+			if( $aClass=$aToken->belongsClass() or $aToken->theOther()!==$aClass->bodyToken() )
+			{
+				return false ;
+			}
+			
+			if( $aClass->fullName()!=$this->weaveClass() )
+			{
+				return false ;
+			}
+			
+			return true ;
 		}
-		
-		return preg_match( $this->weaveMethodNameRegexp(),$aToken->name() )? true: false ;
 	}
 }
 ?>

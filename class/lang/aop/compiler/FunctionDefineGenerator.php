@@ -1,6 +1,11 @@
 <?php
 namespace org\jecat\framework\lang\aop\compiler ;
 
+use org\jecat\framework\lang\aop\jointpoint\JointPointMethodDefine;
+
+use org\jecat\framework\lang\Type;
+use org\jecat\framework\lang\compile\ClassCompileException;
+use org\jecat\framework\lang\compile\object\ClassDefine;
 use org\jecat\framework\lang\compile\object\TokenPool;
 use org\jecat\framework\lang\compile\object\Token;
 use org\jecat\framework\lang\compile\object\ClosureToken;
@@ -15,6 +20,116 @@ use org\jecat\framework\lang\Exception;
 
 class FunctionDefineGenerator extends AOPWeaveGenerator
 {
+	public function generateTargetCode(TokenPool $aTokenPool, Token $aObject)
+	{
+		if( !($aObject instanceof ClassDefine) )
+		{
+			throw new ClassCompileException(null,$aObject,"传入的类新必须为 ClassDefine: %s",Type::detectType($aObject)) ;
+		}
+		
+		$sTargetClassName = $aObject->fullName() ;
+		
+		// 反射父类的所有方法
+		$arrParentMethodNames = array() ;
+		if( $sParentClass = $aObject->parentClassName() )
+		{
+			if( !class_exists($sParentClass) )	// << 这里可能会触发对父类的编译
+			{
+				throw new ClassCompileException(null,$aObject,"编译class时遇到错误，class %s 的父类 %s 不存在 ",array($sTargetClassName,$sParentClass)) ;
+			}
+			$aRefParentClass = new \ReflectionClass($sParentClass) ;
+			foreach($aRefParentClass->getMethods() as $aRefParentMethod)
+			{
+				if( !$aRefParentMethod->isPrivate() and !$aRefParentMethod->isAbstract() and !$aRefParentMethod->isFinal() )  
+				{
+					$arrParentMethodNames[$aRefParentMethod->getName()] = $aRefParentMethod ;
+				}
+			}
+		}
+		
+		// 需要编入的方法
+		$arrNeedWeaveMethods = array() ;
+		foreach($this->aop()->pointcutIterator() as $aPointcut)
+		{
+			foreach($aPointcut->jointPoints()->iterator() as $aJointPoint)
+			{
+				if( !($aJointPoint instanceof JointPointMethodDefine) )
+				{
+					continue ;
+				}
+				
+				// 模糊匹配函数名 -----------------------
+				if( $aJointPoint->weaveMethodIsPattern() )
+				{
+					foreach( $aTokenPool->functionIterator($aObject->fullName()) as $aMethodToken )
+					{
+						// bingo !
+						if( $aJointPoint->matchExecutionPoint($aMethodToken) )
+						{
+							$sMethodName = $aMethodToken->name() ;
+							if( empty($arrNeedWeaveMethods[$sMethodName]) )
+							{
+								$arrNeedWeaveMethods[$sMethodName] = new GenerateStat($aTokenPool,$aMethodToken,array()) ;
+							}
+							
+							foreach($aPointcut->advices()->iterator() as $aAdvice)
+							{
+								$arrNeedWeaveMethods[$sMethodName]->addAdvice($aAdvice) ;
+							}
+						}
+					}
+				}
+				
+				// 精确匹配函数名 -----------------------
+				else
+				{
+					$sFuncName = $aJointPoint->weaveMethod() ;
+					
+					// 目标类的方法
+					if( $aMethodToken=$aTokenPool->findFunction($sFuncName,$sTargetClassName) )
+					{}
+					// 目标类的父类的方法
+					else if( isset($arrParentMethodNames[$sFuncName]) )
+					{
+						if( $arrParentMethodNames[$sFuncName]->isPublic() )
+						{
+							$sAccess = 'public' ;
+						}
+						else if( $arrParentMethodNames[$sFuncName]->isProtected() )
+						{
+							$sAccess = 'protected' ;
+						}
+						else if( $arrParentMethodNames[$sFuncName]->isPrivate() )
+						{
+							$sAccess = 'private' ;
+						}
+						
+						// 创建一个覆盖父类的方法用于 aop
+						$aMethodToken = $this->createMethod($sFuncName,$sAccess,$arrParentMethodNames[$sFuncName]->isStatic()) ;
+					}
+					// 不存在的方法
+					else
+					{
+						// 创建一个全新的方法用于 aop
+						$aMethodToken = $this->createMethod($sFuncName,$sAccess,$arrParentMethodNames[$sFuncName]->isStatic()) ;
+					}
+					
+					$sMethodName = $aMethodToken->name() ;
+					if( empty($arrNeedWeaveMethods[$sMethodName]) )
+					{
+						$arrNeedWeaveMethods[$sMethodName] = new GenerateStat($aTokenPool,$aMethodToken,array()) ;
+					}
+					
+					foreach($aPointcut->advices()->iterator() as $aAdvice)
+					{
+						$arrNeedWeaveMethods[$sMethodName]->addAdvice($aAdvice) ;
+					}
+				}
+			}
+		}
+	}
+	
+	
 	/**
 	 * 创建并织入一个用于集中调用各个advice的函数
 	 */
@@ -210,7 +325,12 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		
 		// advice 调用参数
 		$aStat->sAdviceCallArgvsLit = $this->generateArgvs($aStat->aTokenPool,$aStat->aExecutePoint) ;
-	} 
+	}
+	
+	protected function createMethod($sName,$sAccess,$bStatic=false)
+	{
+		
+	}
 }
 
 ?>

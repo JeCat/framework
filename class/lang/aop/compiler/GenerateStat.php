@@ -2,6 +2,8 @@
 
 namespace org\jecat\framework\lang\aop\compiler ;
 
+use org\jecat\framework\lang\aop\Advice;
+
 use org\jecat\framework\lang\aop\jointpoint\JointPoint;
 use org\jecat\framework\lang\compile\object\TokenPool;
 use org\jecat\framework\lang\compile\object\Token;
@@ -14,6 +16,14 @@ class GenerateStat
 		$this->aTokenPool = $aTokenPool ;
 		$this->aExecutePoint = $aToken ;
 		$this->arrAdvices =& $arrAdvices ;
+	}
+	
+	public function addAdvice(Advice $aAdvice)
+	{
+		if( in_array($aAdvice,$this->arrAdvices,true) )
+		{
+			$this->arrAdvices[] = $aAdvice ;
+		}
 	}
 	
 	/**

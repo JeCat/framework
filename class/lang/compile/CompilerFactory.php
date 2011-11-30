@@ -20,8 +20,7 @@ class CompilerFactory extends Object
 
 		// generator
 		$aCompiler->registerGenerator("org\\jecat\\framework\\lang\\compile\\object\\FunctionDefine","org\\jecat\\framework\\lang\\compile\\generators\\CompiledAlert") ;
-		$aCompiler->registerGenerator("org\\jecat\\framework\\lang\\compile\\object\\FunctionDefine","org\\jecat\\framework\\lang\\aop\\compiler\\FunctionDefineGenerator") ;
-		$aCompiler->registerGenerator("org\\jecat\\framework\\lang\\compile\\object\\ClosureToken","org\\jecat\\framework\\lang\\aop\\compiler\\FunctionDefineGenerator") ;		// FunctionDefineGenerator 需要同时监听 class结束Token"}" 和 method define token
+		$aCompiler->registerGenerator("org\\jecat\\framework\\lang\\compile\\object\\ClassDefine","org\\jecat\\framework\\lang\\aop\\compiler\\FunctionDefineGenerator") ;
 		$aCompiler->registerGenerator("org\\jecat\\framework\\lang\\compile\\object\\CallFunction","org\\jecat\\framework\\lang\\aop\\compiler\\CallFunctionGenerator") ;
 		
 		//--------------------
