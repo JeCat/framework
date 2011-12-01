@@ -57,6 +57,11 @@ class LocalFolder extends LocalFSO implements IFolder
 		) ;
 	}
 	
+	public function deleteChild($sPath)
+	{
+		$this->fileSystem()->rootFileSystem()->delete( (substr($sPath,0,1)=='/')? $sPath: ($this->path().'/'.$sPath) ) ;
+	}
+	
 	/**
 	 * @return \Iterator
 	 */

@@ -23,6 +23,8 @@ interface IFolder extends IFSO
 	 */
 	public function createFolder($sPath,$nMode=FileSystem::CREATE_FOLDER_DEFAULT) ;
 	
+	public function deleteChild($sPath) ;
+	
 	/**
 	 * @return \Iterator
 	 */
