@@ -63,13 +63,13 @@ class FormView extends View implements IFormView
 	{
 		if(!$this->sHtmlFormSignature)
 		{
-			$this->calculateHtmlFormFignature() ;
+			$this->calculateHtmlFormSignature() ;
 		}
 		
 		return $this->sHtmlFormSignature ;
 	}
 	
-	protected function calculateHtmlFormFignature()
+	protected function calculateHtmlFormSignature()
 	{
 		if( !$sTemplate=$this->template() )
 		{
