@@ -659,7 +659,16 @@ class Controller extends NamableComposite implements IController, IBean
    		}
    		return self::$aRegexpModelName ;
    	}
-   
+   	
+   	public function id()
+   	{
+   		if($this->sId===null)
+   		{
+   			$this->sId = ++self::$nAssignedId ;
+   		}
+   		return $this->sId ;
+   	}
+   	
     static private $aRegexpModelName = null ;
     
     /**
@@ -680,6 +689,10 @@ class Controller extends NamableComposite implements IController, IBean
     private $aFrame = null ;
     
     private $arrBeanConfig ;
+    
+    private $sId ;
+    
+    static private $nAssignedId = 0 ;
 }
 
 class _ExceptionRelocation extends \Exception

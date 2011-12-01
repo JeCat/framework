@@ -76,12 +76,7 @@ class FormView extends View implements IFormView
 			return null ;
 		}
 		
-		if( !$aTemplateFile=$this->ui()->sourceFileManager()->find($sTemplate) )
-		{
-			return ;
-		}
-		
-		$this->sHtmlFormSignature = $this->name().':'.md5_file($aTemplateFile->url()) ;
+		$this->sHtmlFormSignature = $this->name().':'.$this->id() ;
 	}
 	
 	public function isShowForm()

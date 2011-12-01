@@ -44,5 +44,7 @@ interface IController extends IMessageQueueHolder
     public function viewByName($sName) ;
     public function viewIterator() ;
     public function clearViews() ;
+    
+    public function id() ;
 }
 ?>

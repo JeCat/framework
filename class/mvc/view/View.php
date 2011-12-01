@@ -489,6 +489,15 @@ class View extends NamableComposite implements IView, IBean
     public function clearModelObserver(){
         $this->arrObserver=array();
     }
+    
+    public function id()
+    {
+   		if($this->sId===null)
+    	{
+    		$this->sId = ++self::$nAssignedId ;
+    	}
+    	return $this->sId ;
+    }
 	
 	private $aModel ;
 	private $aWidgets ;
@@ -502,6 +511,9 @@ class View extends NamableComposite implements IView, IBean
 	private $arrObserver = array();
     private $arrBeanConfig ;
     private $aController ;
+    private $sId ;
+    
+    static private $nAssignedId = 0 ;
 }
 
 ?>
