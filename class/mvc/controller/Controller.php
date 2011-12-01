@@ -394,22 +394,11 @@ class Controller extends NamableComposite implements IController, IBean
 	 */
 	public function messageQueue()
 	{
-		if( $this->aMsgQueue )
+		if( !$this->aMsgQueue )
 		{
-			return $this->aMsgQueue ;
+			$this->aMsgQueue = new MessageQueue() ;
 		}
-		
-		else 
-		{
-			if( $aParent=$this->parent() and ( $aParent instanceof IMessageQueueHolder ) )
-			{
-				return $aParent->messageQueue() ;
-			}
-			else 
-			{
-				return MessageQueue::singleton(true) ;				
-			}
-		}
+		return $this->aMsgQueue ;
 	}
 	
 	public function setMessageQueue(IMessageQueue $aMsgQueue)
