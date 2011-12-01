@@ -77,7 +77,18 @@ class State
 	
 	public function findName($sName)
 	{
-		return isset($this->arrNamespaces[$sName])? $this->arrNamespaces[$sName]: $sName ;
+		if( isset($this->arrNamespaces[$sName]) )
+		{
+			return $this->arrNamespaces[$sName] ;
+		}
+		else if( $this->aCurrentNamespace )
+		{
+			return $this->aCurrentNamespace->name() . '\\' . $sName ;
+		}
+		else
+		{
+			return $sName ;
+		}
 	}
 	
 	/**

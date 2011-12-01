@@ -45,7 +45,7 @@ class NamespaceString extends Token
 		// 绝对路径
 		if( $aFirtToken->tokenType()==T_NS_SEPARATOR )
 		{
-			return $this->name() ;
+			return '\\'.implode("\\",$arrNameAndSlashes) ;
 		}
 		else
 		{
