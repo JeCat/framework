@@ -50,6 +50,7 @@ abstract class StructDefine extends Token
 	
 	/**
 	 * 返回class body 开始的大括号token
+	 * @return ClosureToken
 	 */
 	public function bodyToken()
 	{

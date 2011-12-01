@@ -119,7 +119,7 @@ abstract class JointPoint extends Object
 	
 	public function weaveMethodIsPattern()
 	{
-		return preg_match('/^[\w_]+$/',$this->sWeaveMethod) ;
+		return preg_match('/^[^\w_]+$/',$this->sWeaveMethod) ;
 	}
 	
 	abstract public function matchExecutionPoint(Token $aToken) ;

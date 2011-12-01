@@ -49,7 +49,12 @@ class NamespaceString extends Token
 		}
 		else
 		{
-			return $aState->findName($aFirtToken->targetCode()) . '\\' . implode("\\",$arrNameAndSlashes) ;
+			$sName = $aState->findName($aFirtToken->targetCode()) ;
+			if(!empty($arrNameAndSlashes))
+			{
+				$sName.= '\\' . implode("\\",$arrNameAndSlashes) ;
+			}
+			return $sName ;
 		}
 	}
 	

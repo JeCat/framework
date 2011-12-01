@@ -127,9 +127,12 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 		{
 			throw new Exception("正在切入的连接点不在一个函数中") ;
 		}
+		
+		$sFuncName = 'aop_advice_dispatch_' . md5(spl_object_hash($aStat->aExecutePoint)) ;
+		$this->createMethod($sFuncName,$aStat->sAdviceDefineArgvsLit,'private',false,$aStat->aTokenPool,$aBelongsFunction,'insertAfter') ;
 				
 		// 函数体
-		$aBodyStart = new ClosureToken(new Token(T_STRING, '{')) ;
+		/*$aBodyStart = new ClosureToken(new Token(T_STRING, '{')) ;
 		$aBodyEnd = new ClosureToken(new Token(T_STRING, '}')) ;
 		$aBodyStart->setTheOther($aBodyEnd) ;
 		
@@ -163,9 +166,63 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 		$aStat->aTokenPool->insertBefore($aBodyStart,new Token(T_STRING,$aStat->sAdviceDefineArgvsLit)) ;
 		$aStat->aTokenPool->insertBefore($aBodyStart,$aArgvLstEnd) ;
 		
-		$aStat->aTokenPool->insertBefore($aBodyStart,new Token(T_WHITESPACE, "\r\n\t")) ;
+		$aStat->aTokenPool->insertBefore($aBodyStart,new Token(T_WHITESPACE, "\r\n\t")) ;*/
 	}
-
+	
+	protected function createMethod($sFuncName,$aArgLstToken=null,$sAccess,$bStatic=false,TokenPool $aTokenPool,Token $aTargetToken,$sWhere='insertAfter')
+	{
+		$aFuncToken = new FunctionDefine(new Token(T_FUNCTION, 'function')) ;
+		
+		// 函数体
+		$aBodyStart = new ClosureToken(new Token(T_STRING, '{')) ;
+		$aBodyEnd = new ClosureToken(new Token(T_STRING, '}')) ;
+		$aBodyStart->setTheOther($aBodyEnd) ;
+		
+		$aTokenPool->$sWhere($aTargetToken,$aBodyStart) ;
+		$aTokenPool->insertAfter($aBodyStart,$aBodyEnd) ;
+		$aTokenPool->insertAfter($aBodyEnd,new Token(T_WHITESPACE, "\r\n")) ;
+		
+		$aTokenPool->insertBefore($aBodyStart,new Token(T_WHITESPACE, "\r\n\t")) ;
+		
+		// static
+		if($bStatic)
+		{
+			$aStaticToken = new Token(T_PRIVATE, 'static') ;
+			$aTokenPool->insertBefore($aBodyStart,$aStaticToken) ;
+			$aTokenPool->insertBefore($aBodyStart,new Token(T_WHITESPACE, "\r\n\t")) ;
+			$aFuncToken->setStaticToken($aStaticToken) ;
+		}
+		
+		// access
+		$arrAccessTokenTypes = array('private'=>T_PRIVATE,'protected'=>T_PROTECTED,'public'=>T_PUBLIC,) ;
+		$aAccessToken = new Token($arrAccessTokenTypes[$sAccess], $sAccess) ;
+		$aTokenPool->insertBefore($aBodyStart,$aAccessToken) ;
+		$aTokenPool->insertBefore($aBodyStart,new Token(T_WHITESPACE, ' ')) ;
+		$aFuncToken->setAccessToken($aAccessToken) ;
+		
+		// function
+		$aTokenPool->insertBefore($aBodyStart,$aFuncToken) ;
+		$aTokenPool->insertBefore($aBodyStart,new Token(T_WHITESPACE, ' ')) ;
+		$aFuncToken->setBodyToken($aBodyStart) ;
+		
+		// function name
+		$aFuncNameToken = new Token(T_STRING,$sFuncName) ;
+		$aTokenPool->insertBefore($aBodyStart,$aFuncNameToken) ;
+		$aFuncToken->setNameToken($aFuncNameToken) ;
+		
+		// 参数表
+		$aArgvLstStart = new ClosureToken(new Token(T_STRING, '(')) ;
+		$aArgvLstEnd = new ClosureToken(new Token(T_STRING, ')')) ;
+		$aArgvLstStart->setTheOther($aArgvLstEnd) ;
+		$aTokenPool->insertBefore($aBodyStart,$aArgvLstStart) ;
+		$aTokenPool->insertBefore($aBodyStart,new Token(T_STRING,$aArgLstToken)) ;
+		$aTokenPool->insertBefore($aBodyStart,$aArgvLstEnd) ;
+		$aTokenPool->insertBefore($aBodyStart,new Token(T_WHITESPACE, "\r\n\t")) ;
+		$aFuncToken->setArgListToken($aArgvLstStart) ;
+		
+		return $aFuncToken ;
+	}
+	
 	private function generateAndWeaveAdviceDefines(GenerateStat $aStat,$aAdvices)
 	{
 		if($aAdvices->isEmpty())
