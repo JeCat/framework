@@ -76,6 +76,10 @@ class ClassDefineParser implements ISyntaxParser
 				if($aToken->tokenType()==Token::T_BRACE_OPEN)
 				{
 					$aClassBodyToken = $aToken ;
+					if($aParentNameToken)
+					{
+						$bParentClassNameOver = true ;
+					}
 					break ;
 				}
 				else if($aToken->tokenType()==T_EXTENDS)
@@ -94,12 +98,10 @@ class ClassDefineParser implements ISyntaxParser
 						$aParentNameToken->addNameToken($aToken) ;
 					}
 					else if( $type==T_WHITESPACE ) // 遇到空白字符结束
-					{
-						$bParentClassNameOver = true ;
-					}
+					{ }
 					else
 					{
-						throw new ClassCompileException(null,$aToken,"编译class: %s时遇到了错误，extends 关键词后出现无效的内容",$aNewToken->name()) ;
+						$bParentClassNameOver = true ;
 					} 
 				}
 			}
