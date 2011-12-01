@@ -355,10 +355,10 @@ class Controller extends NamableComposite implements IController, IBean
 			$sName = $object->name() ;
 		}
 		
-		if( $this->hasName($sName) )
+		/*if( $this->hasName($sName) )
 		{
 			throw new Exception("名称为：%s 的子控制器在控制器 %s 中已经存在，无法添加同名的子控制器",array($sName,$this->name())) ;
-		}
+		}*/
 		
 		$this->takeOverView($object,$sName) ;
 
