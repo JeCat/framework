@@ -79,9 +79,9 @@ class FSCache implements ICache
 	{
 		self::trimPath($sDataPath) ;
 		
-		$this->aFolder->delete($sDataPath.'.data') ;
-		$this->aFolder->delete($sDataPath.'.php') ;
-		$this->aFolder->delete($sDataPath.'.time') ;
+		$this->aFolder->deleteChild($sDataPath.'.data') ;
+		$this->aFolder->deleteChild($sDataPath.'.php') ;
+		$this->aFolder->deleteChild($sDataPath.'.time') ;
 	}
 	
 	/**
@@ -117,7 +117,7 @@ class FSCache implements ICache
 	}
 	
 	/**
-	 * @var org\jecat\framework\fs\FileSystem
+	 * @var org\jecat\framework\fs\FsFolder
 	 */
 	private $aFolder ;
 }
