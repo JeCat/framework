@@ -39,3 +39,21 @@
 .jc_message_type_notice{
 	
 }
+
+.org_jecat_framework_view_layout_frame{
+	padding-top: 5px ;
+	padding-left: 5px ;
+	padding-right: 5px ;
+	padding-bottom: 10px ;
+}
+.org_jecat_framework_view_layout_frame_h .org_jecat_framework_view{
+	/*float: left ;*/
+}
+.org_jecat_framework_view_layout_frame_v .org_jecat_framework_view{
+	/*float:none;*/
+}
+.org_jecat_framework_view_layout_end{
+	clear:both;
+}
+.org_jecat_framework_view{
+}

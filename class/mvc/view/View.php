@@ -271,7 +271,9 @@ class View extends NamableComposite implements IView, IBean
 				$aVars->set('theParams',$this->aController->params()) ;
 			}
 		
-			$this->ui()->display($sTemplate,$aVars,$this->OutputStream()) ;
+			$this->outputStream()->write( '<div class="org_jecat_framework_view" id="'.$this->name().'">' ) ;
+			
+			$this->ui()->display($sTemplate,$aVars,$this->outputStream()) ;
 		}
 		
 		
@@ -281,6 +283,11 @@ class View extends NamableComposite implements IView, IBean
 			$aChildView->render() ;
 			
 			$this->OutputStream()->write( $aChildView->OutputStream() ) ;
+		}
+		
+		if( $sTemplate )
+		{
+			$this->outputStream()->write( '</div>' ) ;
 		}
 	}
 	
