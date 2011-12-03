@@ -28,7 +28,8 @@ class ViewLayout extends View
 	
 	public function add($aView,$sName=null,$bTakeover=false)
 	{
-		parent::add($aView,$sName,$bTakeover) ;
+		// 跳过 View 对同名视图的检查
+		Container::add($aView,$sName,$bTakeover) ;
 		
 		if( $this->type()==self::type_horizontal )
 		{
@@ -38,6 +39,11 @@ class ViewLayout extends View
 		{
 			$aView->removeCssClass('org_jecat_framework_view-layout-horizontal') ;
 		}
+	}
+	public function remove($aView)
+	{
+		$aView->removeCssClass('org_jecat_framework_view-layout-horizontal') ;
+		return parent::remove($aView) ;
 	}
 
 	protected function renderChildren()
