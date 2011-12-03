@@ -30,7 +30,7 @@ namespace org\jecat\framework\pattern\composite ;
 
 interface IContainer
 {
-	public function add($object,$sName=null) ;
+	public function add($object,$sName=null,$bTakeover=true) ;
 	
 	public function remove($object) ;
 	

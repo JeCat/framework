@@ -40,19 +40,19 @@
 	
 }
 
-.org_jecat_framework_view_layout_frame{
+/* 视图布局框架 */
+.org_jecat_framework_view-layout-frame{
 	padding-top: 5px ;
 	padding-left: 5px ;
 	padding-right: 5px ;
 	padding-bottom: 10px ;
 }
-.org_jecat_framework_view_layout_frame_h .org_jecat_framework_view{
-	/*float: left ;*/
+
+/* 视图布局框架中的横向布局视图 */
+.org_jecat_framework_view-layout-frame .org_jecat_framework_view-layout-horizontal{
+	float: left ;
 }
-.org_jecat_framework_view_layout_frame_v .org_jecat_framework_view{
-	/*float:none;*/
-}
-.org_jecat_framework_view_layout_end{
+.org_jecat_framework_view-layout-end{
 	clear:both;
 }
 .org_jecat_framework_view{

@@ -56,6 +56,10 @@ interface IView extends IContainer, IMessageQueueHolder, IWidgetContainer
 	public function setController(IController $aController=null) ;
     
     public function id() ;
+    
+    public function addCssClass($sClassName) ;
+    
+    public function removeCssClass($sClassName) ;
 }
 
 ?>

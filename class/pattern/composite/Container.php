@@ -62,7 +62,7 @@ class Container extends Object implements IContainer
 		return false ;
 	}
 	
-	public function add($object,$sName=null)
+	public function add($object,$sName=null,$bTakeover=true)
 	{
 		if( $object==$this )
 		{
@@ -78,7 +78,7 @@ class Container extends Object implements IContainer
 		{
 			$this->arrObjects[] = $object ;
 			
-			$this->attach($object,$sName) ;
+			$this->attach($object,$sName,$bTakeover) ;
 		}
 		
 		return $object ;
@@ -267,7 +267,7 @@ class Container extends Object implements IContainer
 		}
 	}
 
-	private function attach($object,$sName=null)
+	private function attach($object,$sName=null,$bTakeover=true)
 	{
 		if( $sName===null and $object instanceof INamable )
 		{
@@ -279,7 +279,7 @@ class Container extends Object implements IContainer
 			$this->arrNames[$sName] = $object ;
 		}
 	
-		if( $object instanceof IContainedable )
+		if( $bTakeover and $object instanceof IContainedable )
 		{
 			$object->setParent($this) ;
 		}

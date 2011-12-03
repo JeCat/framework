@@ -88,6 +88,11 @@ class Controller extends NamableComposite implements IController, IBean
     		$this->setName($arrConfig['name']) ;
     	}
     	
+    	if( !empty($arrConfig['title']) )
+    	{
+    		$this->setTitle($arrConfig['title']) ;
+    	}
+    	
     	if( isset($arrConfig['params']) )
     	{
     		$this->buildParams($arrConfig['params']) ;
@@ -348,7 +353,7 @@ class Controller extends NamableComposite implements IController, IBean
 		}
     }
 
-	public function add($object,$sName=null)
+	public function add($object,$sName=null,$bTakeover=true)
 	{
 		if($sName===null)
 		{
@@ -367,7 +372,7 @@ class Controller extends NamableComposite implements IController, IBean
 			$object->params()->addChild($this->params()) ;
 		}
 		
-		parent::add($object,$sName) ;
+		parent::add($object,$sName,$bTakeover) ;
 	}
 	
 	/**
@@ -656,6 +661,15 @@ class Controller extends NamableComposite implements IController, IBean
    			$this->sId = ++self::$nAssignedId ;
    		}
    		return $this->sId ;
+   	}
+   	
+   	public function title()
+   	{
+   		return $this->sTitle ;
+   	}
+   	public function setTitle($sTitle)
+   	{
+   		$this->sTitle = sTitle ;
    	}
    	
     static private $aRegexpModelName = null ;

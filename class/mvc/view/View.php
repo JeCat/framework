@@ -259,6 +259,9 @@ class View extends NamableComposite implements IView, IBean
 			return ;
 		}
 		
+		$sCssClass = implode(' ',$this->arrCssClass) ;
+		$this->outputStream()->write( "<div class=\"{$sCssClass}\" id=\"".addslashes($this->name())."\">" ) ;
+			
 		// render myself
 		if( $sTemplate=$this->template() )
 		{
@@ -270,24 +273,23 @@ class View extends NamableComposite implements IView, IBean
 			{
 				$aVars->set('theParams',$this->aController->params()) ;
 			}
-		
-			$this->outputStream()->write( '<div class="org_jecat_framework_view" id="'.$this->name().'">' ) ;
 			
 			$this->ui()->display($sTemplate,$aVars,$this->outputStream()) ;
 		}
 		
-		
 		// render child view
+		$this->renderChildren() ;
+		
+		// 结束 div
+		$this->outputStream()->write( '</div>' ) ;
+	}
+	
+	protected function renderChildren()
+	{
 		foreach($this->iterator() as $aChildView)
 		{
 			$aChildView->render() ;
-			
 			$this->OutputStream()->write( $aChildView->OutputStream() ) ;
-		}
-		
-		if( $sTemplate )
-		{
-			$this->outputStream()->write( '</div>' ) ;
 		}
 	}
 	
@@ -505,6 +507,22 @@ class View extends NamableComposite implements IView, IBean
     	}
     	return $this->sId ;
     }
+    
+    public function addCssClass($sClassName)
+    {
+    	if( !in_array($sClassName,$this->arrCssClass) )
+    	{
+    		$this->arrCssClass[] = $sClassName ;
+    	}    	
+    }
+    public function removeCssClass($sClassName)
+    {
+    	$pos=array_search($sClassName,$this->arrCssClass) ;
+    	if( $pos!==false )
+    	{
+    		unset($this->arrCssClass[$pos]) ;
+    	}   
+    }
 	
 	private $aModel ;
 	private $aWidgets ;
@@ -519,6 +537,7 @@ class View extends NamableComposite implements IView, IBean
     private $arrBeanConfig ;
     private $aController ;
     private $sId ;
+    private $arrCssClass = array('org_jecat_framework_view') ;
     
     static private $nAssignedId = 0 ;
 }

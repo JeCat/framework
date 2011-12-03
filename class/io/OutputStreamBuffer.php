@@ -42,7 +42,7 @@ class OutputStreamBuffer extends OutputStream
 		
 		if($bClear)
 		{
-			$this->arrBuffer = array() ;
+			$this->clean() ;
 		}
 		
 		return $sBytes ;
