@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\view ;
 
+use org\jecat\framework\pattern\composite\IContainer;
+
 use org\jecat\framework\system\Response;
 
 use org\jecat\framework\mvc\controller\IController;
@@ -101,7 +103,7 @@ class View extends NamableComposite implements IView, IBean
     			// 自动配置缺少的 class, name 属性
     			$aBeanFactory->_typeProperties( $arrBeanConf, 'view', is_int($key)?null:$key, 'name' ) ;
     		
-    			$this->addView( $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ) ;
+    			$this->add( $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ) ;
     		}
     	}
     		
@@ -536,6 +538,28 @@ class View extends NamableComposite implements IView, IBean
     	{
     		unset($this->arrCssClass[$pos]) ;
     	}   
+    }
+    
+    /**
+     * @return IView
+     */
+    static public function xpath(IContainer $aViewContainer,$sViewXPath)
+    {
+    	$arrPath = explode('/',$sViewXPath) ;
+    	while( ($sViewName=array_shift($arrPath))!==null )
+    	{
+    		if(empty($sViewName))
+    		{
+    			continue ;
+    		}
+    		if( !$aView = $aViewContainer->getByName($sViewName) )
+    		{
+    			return null ;
+    		}
+    		$aViewContainer = $aView ;
+    	}
+    	
+    	return $aView ;
     }
 	
 	private $aModel ;
