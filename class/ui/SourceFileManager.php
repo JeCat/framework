@@ -112,7 +112,7 @@ class SourceFileManager extends ResourceManager
 			{
 				$this->addFolder(
 					$aFileSystem->findFolder($array[0])
-					, $aFileSystem->findFolder($array[1])
+					, $aFileSystem->findFolder($array[1],FileSystem::FIND_AUTO_CREATE)
 					, $sNamespace
 				) ;
 			}
