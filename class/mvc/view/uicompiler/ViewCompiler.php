@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\view\uicompiler ;
 
+use org\jecat\framework\lang\Exception;
+use org\jecat\framework\mvc\view\ViewLayout;
 use org\jecat\framework\lang\Assert;
 use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\CompilerManager;
@@ -31,8 +33,23 @@ class ViewCompiler extends NodeCompiler
 		}
 		else 
 		{
-			$aDev->write("\$_aViewLayout = new \\org\\jecat\\framework\\mvc\\view\\ViewLayout();") ;
-			$aDev->write("\$theView->(\$_aViewLayout);") ;
+			if( $sType = $aAttrs->string('type') )
+			{
+				if( !isset(self::$arrLayoutTypes[$sType]) )
+				{
+					throw new Exception("节点<views> 中的 type 属性值无效：%s",$sType) ;
+				} 
+				$sType = self::$arrLayoutTypes[$sType] ;
+			}
+			else
+			{
+				$sType = 'null' ;
+			}
+			
+			$aDev->write("if( !isset(\$__nViewLayoutAssignedId) ){ \$__nViewLayoutAssignedId=1 ;}") ;
+			$aDev->write("\$__sViewLayoutName = md5(__FILE__).':'.(\$__nViewLayoutAssignedId++) ;") ;
+			$aDev->write("\$_aViewLayout = new \\org\\jecat\\framework\\mvc\\view\\ViewLayout({$sType},\$__sViewLayoutName);") ;
+			$aDev->write("\\org\\jecat\\framework\\mvc\\view\\ViewLayout::setFlyweight(\$_aViewLayout,\$__sViewLayoutName);") ;
 			$aDev->write("foreach(\$theView->iterator() as \$aChildView){") ;
 			$aDev->write("\t\$_aViewLayout->add(\$aChildView) ;") ;
 			$aDev->write("}") ;
@@ -41,10 +58,11 @@ class ViewCompiler extends NodeCompiler
 		}
 	}
 	
-	static public function FindVagrantView()
-	{
-		
-	}
+	static $arrLayoutTypes = array(
+			'h' => '\\org\\jecat\\framework\\mvc\\view\\ViewLayout::type_horizontal' ,
+			'v' => '\\org\\jecat\\framework\\mvc\\view\\ViewLayout::type_vertical' ,
+			'tab' => '\\org\\jecat\\framework\\mvc\\view\\ViewLayout::type_tab' ,
+	) ;
 }
 
 ?>

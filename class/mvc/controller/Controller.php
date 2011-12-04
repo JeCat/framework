@@ -695,6 +695,8 @@ class Controller extends NamableComposite implements IController, IBean
     
     private $sId ;
     
+    private $sTitle ;
+    
     static private $nAssignedId = 0 ;
 }
 

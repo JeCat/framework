@@ -2,9 +2,7 @@
 namespace org\jecat\framework\mvc\view ;
 
 use org\jecat\framework\pattern\composite\IContainer;
-
 use org\jecat\framework\system\Response;
-
 use org\jecat\framework\mvc\controller\IController;
 use org\jecat\framework\bean\BeanConfException;
 use org\jecat\framework\bean\BeanFactory;
@@ -55,6 +53,9 @@ class View extends NamableComposite implements IView, IBean
 			
 			StopFilterSignal::stop() ;
 		},$this) ;
+		
+		// css
+		$this->addCssClass('org_jecat_framework_view') ;
 	}
 	
 	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
@@ -226,7 +227,7 @@ class View extends NamableComposite implements IView, IBean
 	}
 
 	/**
-	 * @return IHashTable
+	 * @return org\jecat\framework\util\IHashTable
 	 */
 	public function variables()
 	{
@@ -275,31 +276,73 @@ class View extends NamableComposite implements IView, IBean
 			return ;
 		}
 		
-		$sCssClass = implode(' ',$this->arrCssClass) ;
-		$this->outputStream()->write( "<div class=\"{$sCssClass}\" id=\"".addslashes($this->name())."\">" ) ;
-			
 		// render myself
-		if( $sTemplate=$this->template() )
+		$sTemplate=$this->template() ;
+		if( $sTemplate )
 		{
-			$aVars = $this->variables() ;
-			$aVars->set('theView',$this) ;
-			$aVars->set('theModel',$this->model()) ;
-			$aVars->set('theController',$this->aController) ;
-			if( $this->aController )
-			{
-				$aVars->set('theParams',$this->aController->params()) ;
-			}
-			
-			$this->ui()->display($sTemplate,$aVars,$this->outputStream()) ;
+			$this->renderTemplate($sTemplate) ;
+		}
+		
+		// 如果本身有内容，则输出 html wrapper
+		if( $this->isRenderHtmlWrapper() )
+		{
+			$this->renderHtmlWrapper() ;
 		}
 		
 		// render child view
 		$this->renderChildren() ;
+	}
+	
+	protected function isRenderHtmlWrapper()
+	{
+		return ($this->bForceRenderHtmlWrapper or $this->template()) ;
+	}
+	
+	protected function renderHtmlWrapper()
+	{
+		// css class
+    	$arrClasses =& $this->variables()->getRef('__view.wrapper.css') ;
+		$sCssClass = $arrClasses? implode(' ',$arrClasses): '' ;
 		
-		// 结束 div
+		// id
+		$sIdEsc = addslashes(self::htmlWrapperId($this)) ;
+		
+		// name
+		$sNameEsc = addslashes($this->name()) ;
+		
+		// other attrs
+    	$arrAttrs =& $this->variables()->getRef('__view.wrapper.attrs') ;
+    	if($arrAttrs)
+    	{
+	    	foreach($arrAttrs as $name=>&$item)
+	    	{
+	    		$arrAttrs[$name] = $name.'="' . addslashes((string)$item) . '"' ;
+	    	}
+	    	$sAttrs = ' ' . implode(' ',$arrAttrs) ;
+    	}
+    	else
+    	{
+    		$sAttrs = '' ;
+    	}
+		
+		$this->outputStream()->writePrepend( "<div class=\"{$sCssClass}\" id=\"{$sIdEsc}\" name=\"{$sNameEsc}\"{$sAttrs}>" ) ;
+		
 		$this->outputStream()->write( '</div>' ) ;
 	}
 	
+	protected function renderTemplate($sTemplate)
+	{
+		$aVars = $this->variables() ;
+		$aVars->set('theView',$this) ;
+		$aVars->set('theModel',$this->model()) ;
+		$aVars->set('theController',$this->aController) ;
+		if( $this->aController )
+		{
+			$aVars->set('theParams',$this->aController->params()) ;
+		}
+		
+		$this->ui()->display($sTemplate,$aVars,$this->outputStream()) ;
+	}
 	protected function renderChildren()
 	{
 		foreach($this->iterator() as $aChildView)
@@ -307,6 +350,11 @@ class View extends NamableComposite implements IView, IBean
 			$aChildView->render() ;
 			$this->OutputStream()->write( $aChildView->OutputStream() ) ;
 		}
+	}
+	
+	static public function htmlWrapperId(IView $aView)
+	{
+		return 'org.jecat.framework.mvc.view:'.$aView->id() ;
 	}
 	
 	public function display(IOutputStream $aDevice=null)
@@ -526,18 +574,31 @@ class View extends NamableComposite implements IView, IBean
     
     public function addCssClass($sClassName)
     {
-    	if( !in_array($sClassName,$this->arrCssClass) )
+    	$arrClasses =& $this->variables()->getRef('__view.wrapper.css') ;
+    	
+    	if( !$arrClasses or !in_array($sClassName,$arrClasses) )
     	{
-    		$this->arrCssClass[] = $sClassName ;
+    		$arrClasses[] = $sClassName ;
     	}    	
     }
     public function removeCssClass($sClassName)
     {
-    	$pos=array_search($sClassName,$this->arrCssClass) ;
-    	if( $pos!==false )
+    	$arrClasses =& $this->variables()->getRef('__view.wrapper.css') ;
+    	
+    	if( $arrClasses and ($pos=array_search($sClassName,$arrClasses))!==false )
     	{
-    		unset($this->arrCssClass[$pos]) ;
+    		unset($arrClasses[$pos]) ;
     	}   
+    }
+    public function setWrapperAttribute($sName,$value)
+    {
+    	$aAttrs =& $this->variables()->getRef('__view.wrapper.atrrs') ;
+    	$aAttrs[$sName] = $value ;  	
+    }
+    public function removeWrapperAttribute($sName)
+    {
+    	$aAttrs =& $this->variables()->getRef('__view.wrapper.atrrs') ;
+    	unset($aAttrs[$sName]) ;
     }
     
     /**
@@ -575,7 +636,7 @@ class View extends NamableComposite implements IView, IBean
     private $arrBeanConfig ;
     private $aController ;
     private $sId ;
-    private $arrCssClass = array('org_jecat_framework_view') ;
+    protected $bForceRenderHtmlWrapper = false ;
     
     static private $nAssignedId = 0 ;
 }
