@@ -26,6 +26,18 @@ class OutputStreamBuffer extends OutputStream
 		}
 	}
 	
+	public function writePrepend($content)
+	{
+		if( !empty($this->arrBuffer) and is_string($this->arrBuffer[0]) )
+		{
+			$this->arrBuffer[0] = $content.$this->arrBuffer[0] ;
+		}
+		else
+		{
+			array_unshift($this->arrBuffer,$content) ;
+		}		
+	}
+	
 	public function __toString()
 	{
 		return $this->bufferBytes() ;
