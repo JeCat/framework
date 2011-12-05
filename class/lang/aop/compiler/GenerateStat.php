@@ -11,7 +11,7 @@ use org\jecat\framework\lang\aop\Pointcut;
 
 class GenerateStat 
 {
-	public function __construct(TokenPool $aTokenPool,Token $aToken,array &$arrAdvices=array())
+	public function __construct(TokenPool $aTokenPool,Token $aToken=null,array &$arrAdvices=array())
 	{
 		$this->aTokenPool = $aTokenPool ;
 		$this->aExecutePoint = $aToken ;

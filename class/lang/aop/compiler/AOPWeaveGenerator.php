@@ -169,7 +169,7 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 		$aStat->aTokenPool->insertBefore($aBodyStart,new Token(T_WHITESPACE, "\r\n\t")) ;*/
 	}
 	
-	protected function createMethod($sFuncName,$aArgLstToken=null,$sAccess,$bStatic=false,TokenPool $aTokenPool,Token $aTargetToken,$sWhere='insertAfter')
+	protected function createMethod($sFuncName,$argLstToken=null,$sAccess,$bStatic=false,TokenPool $aTokenPool,Token $aTargetToken,$sWhere='insertAfter')
 	{
 		$aFuncToken = new FunctionDefine(new Token(T_FUNCTION, 'function')) ;
 		
@@ -215,7 +215,12 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 		$aArgvLstEnd = new ClosureToken(new Token(T_STRING, ')')) ;
 		$aArgvLstStart->setTheOther($aArgvLstEnd) ;
 		$aTokenPool->insertBefore($aBodyStart,$aArgvLstStart) ;
-		$aTokenPool->insertBefore($aBodyStart,new Token(T_STRING,$aArgLstToken)) ;
+		
+		if($argLstToken)
+		{
+			$aTokenPool->insertBefore($aBodyStart,new Token(T_STRING,$argLstToken)) ;
+		}
+		
 		$aTokenPool->insertBefore($aBodyStart,$aArgvLstEnd) ;
 		$aTokenPool->insertBefore($aBodyStart,new Token(T_WHITESPACE, "\r\n\t")) ;
 		$aFuncToken->setArgListToken($aArgvLstStart) ;
@@ -275,7 +280,7 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 		// 没有 around advice， 直接调用原始函数
 		else 
 		{
-			$this->weaveAroundAdviceCall($aStat,$aStat->sOriginJointCode."({$aStat->sAdviceCallArgvsLit})") ;
+			$this->weaveAroundAdviceCall($aStat,$aStat->sOriginJointCode."(/*----------*/{$aStat->sAdviceCallArgvsLit})") ;
 		}
 	}
 	
