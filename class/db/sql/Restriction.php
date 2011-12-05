@@ -356,15 +356,16 @@ class Restriction extends SubStatement
 	
     function __clone()
     {
-        $arrTemp = $this->arrExpressions;
-        $this->arrExpressions = array();
-        foreach( $arrTemp as $tmp){
-            if(is_object($tmp)){
-                $this->arrExpressions [] = clone $tmp;
-            }else{
-                $this->arrExpressions [] = $tmp;
-            }
-        }
+    	if( $this->arrExpressions )
+    	{
+	        foreach( $this->arrExpressions as &$expression)
+	        {
+	            if(is_object($expression))
+	            {
+	                $expression = clone $expression;
+	            }
+	        }
+    	}
     }
     
 	private $sLogic = ' AND ';
