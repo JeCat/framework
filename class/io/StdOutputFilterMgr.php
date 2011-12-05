@@ -4,7 +4,7 @@ namespace org\jecat\framework\io ;
 use org\jecat\framework\util\FilterMangeger;
 
 /**
- * 注意：直接使用 ob_end_flush() 或 ob_end_clean() 等php原生函数，可能会导致 StdOutputFilterMgr 失效
+ * 注意：直接使用 ob_end_flush() 或 ob_end_clear() 等php原生函数，可能会导致 StdOutputFilterMgr 失效
  */
 class StdOutputFilterMgr extends FilterMangeger 
 {

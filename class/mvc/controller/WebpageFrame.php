@@ -74,7 +74,7 @@ class WebpageFrame extends Controller
 		
 		$this->process() ;
 		
-		$this->mainView()->show() ;
+		$this->showMainView() ;
     }
 	
 	/**

@@ -32,7 +32,7 @@ class OutputStream extends Stream implements IOutputStream, ILockable
 		return '' ;
 	}
 	
-	public function clean()
+	public function clear()
 	{ }
 	
 	/**

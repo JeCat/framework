@@ -143,6 +143,22 @@ class Container extends Object implements IContainer
 		return isset($this->arrNames[$sName])? $this->arrNames[$sName]: null ;
 	}
 
+	public function getName($object)
+	{
+		if( $sName = array_search($object,$this->arrNames,is_object($object)) )
+		{
+			return $sName ;
+		}
+		else if( $object instanceof INamable ) 
+		{
+			return $object->name() ;
+		}
+		else
+		{
+			return null ;
+		}
+	}
+
 	public function getByPosition($nPosition)
 	{
 		return isset($this->arrObjects[$nPosition])? $this->arrObjects[$nPosition]: null ;

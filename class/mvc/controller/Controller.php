@@ -3,15 +3,10 @@
 namespace org\jecat\framework\mvc\controller ;
 
 use org\jecat\framework\locale\LocaleManager;
-
 use org\jecat\framework\system\Response;
-
 use org\jecat\framework\locale\Locale;
-
 use org\jecat\framework\bean\BeanConfException;
-
 use org\jecat\framework\bean\BeanFactory;
-
 use org\jecat\framework\bean\IBean ;
 use org\jecat\framework\mvc\model\IModel;
 use org\jecat\framework\pattern\composite\Container;
@@ -256,29 +251,63 @@ class Controller extends NamableComposite implements IController, IBean
      */
     public function mainRun ()
     {
-    	if( !$this->params->bool('noframe') and $aFrame=$this->frame() )
+    	if( $this->params->bool('only_msg_queue') )
     	{
-    		$aFrame->add($this) ;
+			$this->process() ;
 			
-    		$aFrame->mainRun() ;
+    		$this->messageQueue()->display() ;
     	}
-
     	else
     	{
-			$this->processChildren() ;
-			
-			try{
-				$this->process() ;
-			}
-			catch(_ExceptionRelocation $e)
-			{}
-			
-			if( !$this->params->bool('noview') )
-			{
-				$this->mainView()->show() ;
-			}
+	    	if( !$this->params->bool('noframe') and $aFrame=$this->frame() )
+	    	{
+	    		$aFrame->add($this) ;
+	    		
+	    		$aFrame->processChildren() ;
+	    		
+	    		try{
+	    			$aFrame->process() ;
+	    		}
+	    		catch(_ExceptionRelocation $e)
+	    		{}
+	    		
+				// show main view
+				$this->showMainView($aFrame->mainView()) ;
+	    	}
+	
+	    	else
+	    	{
+				$this->processChildren() ;
+				
+				try{
+					$this->process() ;
+				}
+				catch(_ExceptionRelocation $e)
+				{}
+				
+				// show main view
+				$this->showMainView($this->mainView()) ;
+	    	}
+				
     	}
     }
+    
+    protected function showMainView(IView $aMainView)
+    {
+		$this->renderMainView($aMainView) ;
+		
+		$this->displayMainView($aMainView) ;
+    }
+    
+    protected function renderMainView(IView $aMainView)
+    {
+    	$aMainView->render() ;
+    }
+    
+    protected function displayMainView(IView $aMainView)
+    {
+    	$aMainView->display($this->response()->printer()) ;
+    } 
     
     public function location($sUrl,$sMessage,$messageArgvs=null,$sLinkText=null,$linkArgvs=null,$nWaitingSec=3,Locale $aLocale=null)
     {

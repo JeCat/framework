@@ -354,7 +354,7 @@ class View extends NamableComposite implements IView, IBean
 	
 	static public function htmlWrapperId(IView $aView)
 	{
-		return 'org.jecat.framework.mvc.view:'.$aView->id() ;
+		return 'org_jecat_framework_mvc_view-'.$aView->id() ;
 	}
 	
 	public function display(IOutputStream $aDevice=null)

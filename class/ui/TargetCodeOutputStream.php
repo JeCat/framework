@@ -39,7 +39,7 @@ class TargetCodeOutputStream implements IOutputStream
 	public function bufferBytes()
 	{}
 	
-	public function clean()
+	public function clear()
 	{}
 	
 	public function flush()
