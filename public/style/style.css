@@ -49,11 +49,16 @@
 }
 
 /* 视图布局框架中的横向布局视图 */
-.org_jecat_framework_view-layout-frame .org_jecat_framework_view-layout-horizontal{
+.org_jecat_framework_view-layout-frame-horizontal>.org_jecat_framework_view{
 	float: left ;
+}
+.org_jecat_framework_view-layout-frame-vertical>.org_jecat_framework_view{
+	float: none ;
+}
+.org_jecat_framework_view-layout-tab>.org_jecat_framework_view{
+	float: none ;
 }
 .org_jecat_framework_view-layout-end{
 	clear:both;
 }
-.org_jecat_framework_view{
-}
+.org_jecat_framework_view{}

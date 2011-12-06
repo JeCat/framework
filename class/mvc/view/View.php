@@ -276,6 +276,12 @@ class View extends NamableComposite implements IView, IBean
 			return ;
 		}
 		
+		// 如果本身有内容，则输出 html wrapper
+		if( $this->isRenderHtmlWrapper() )
+		{
+			$this->renderHtmlWrapperHead() ;
+		}
+
 		// render myself
 		$sTemplate=$this->template() ;
 		if( $sTemplate )
@@ -286,7 +292,7 @@ class View extends NamableComposite implements IView, IBean
 		// 如果本身有内容，则输出 html wrapper
 		if( $this->isRenderHtmlWrapper() )
 		{
-			$this->renderHtmlWrapper() ;
+			$this->renderHtmlWrapperTail() ;
 		}
 		
 		// render child view
@@ -298,7 +304,7 @@ class View extends NamableComposite implements IView, IBean
 		return ($this->bForceRenderHtmlWrapper or $this->template()) ;
 	}
 	
-	protected function renderHtmlWrapper()
+	protected function renderHtmlWrapperHead()
 	{
 		// css class
     	$arrClasses =& $this->variables()->getRef('__view.wrapper.css') ;
@@ -325,8 +331,10 @@ class View extends NamableComposite implements IView, IBean
     		$sAttrs = '' ;
     	}
 		
-		$this->outputStream()->writePrepend( "<div class=\"{$sCssClass}\" id=\"{$sIdEsc}\" name=\"{$sNameEsc}\"{$sAttrs}>" ) ;
-		
+		$this->outputStream()->write( "<div class=\"{$sCssClass}\" id=\"{$sIdEsc}\" name=\"{$sNameEsc}\"{$sAttrs}>" ) ;
+	}
+	protected function renderHtmlWrapperTail()
+	{
 		$this->outputStream()->write( '</div>' ) ;
 	}
 	

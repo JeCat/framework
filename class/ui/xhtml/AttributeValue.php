@@ -12,6 +12,13 @@ class AttributeValue extends Text
 		$this->sName = $sName ;
 	}
 	
+	static public function createInstance($sName,$sValue,$sQuoteType='"',$nPosition=0,$nLine=0)
+	{
+		$aVal = new self($sName,$sQuoteType,$nPosition,$nLine) ;
+		$aVal->setSource($sValue) ;
+		return $aVal ;
+	}
+	
 	public function name()
 	{
 		return $this->sName ;
