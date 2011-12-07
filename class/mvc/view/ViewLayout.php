@@ -12,16 +12,16 @@ class ViewLayout extends View
 	const type_tab = 'tab' ;
 	
 	static public $arrFrameCssClass = array(
-				self::type_horizontal => 'org_jecat_framework_view-layout-frame-horizontal' ,
-				self::type_vertical => 'org_jecat_framework_view-layout-frame-vertical' ,
-				self::type_tab => 'org_jecat_framework_view-layout-frame-tab' ,
+				self::type_horizontal => 'jc-view-layout-frame-horizontal' ,
+				self::type_vertical => 'jc-view-layout-frame-vertical' ,
+				self::type_tab => 'jc-view-layout-frame-tab' ,
 	) ;
 	
 	public function __construct($sType=self::type_vertical,$sName=null,UI $aUI=null)
 	{
 		parent::__construct($sName,null,$aUI) ;
 		
-		$this->addCssClass('org_jecat_framework_view-layout-frame') ;
+		$this->addCssClass('jc-view-layout-frame') ;
 		$this->setType($sType) ;
 		
 		$this->bForceRenderHtmlWrapper = true ;
@@ -83,10 +83,16 @@ class ViewLayout extends View
 			return ;
 		}
 		
+		$sTemplate=$this->template() ;
+		
+		if( empty($sTemplate) and !$this->count() )
+		{
+			return ;
+		}
+		
 		$this->renderHtmlWrapperHead() ;
 		
 		// render myself
-		$sTemplate=$this->template() ;
 		if( $sTemplate )
 		{
 			$this->renderTemplate($sTemplate) ;
@@ -98,25 +104,16 @@ class ViewLayout extends View
 		// wrapper
 		$this->renderHtmlWrapperTail() ;
 	}
+	
 	protected function renderHtmlWrapperTail()
 	{
-		$this->outputStream()->write( '<div class="org_jecat_framework_view-layout-end"></div></div>' ) ;
+		$this->outputStream()->write( '<div class="jc-view-layout-end"></div></div>' ) ;
 	}
 	
-	public function add($aView,$sName=null,$bTakeover=false)
+	public function add($aView,$sName=null,$bTakeover=true)
 	{
 		// 跳过 View 对同名视图的检查
 		Container::add($aView,$sName,$bTakeover) ;
-	}
-	
-	protected function renderChildren()
-	{
-		// render child view
-		foreach($this->iterator() as $aChildView)
-		{
-			// 由于 LayoutFrame 不做为视图的父对象，因此不负责所维护的视图的 render 工作
-			$this->OutputStream()->write( $aChildView->OutputStream() ) ;
-		}
 	}
 	
 	private $sType = self::type_vertical ;

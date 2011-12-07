@@ -46,15 +46,31 @@ class ViewCompiler extends NodeCompiler
 				$sType = 'null' ;
 			}
 			
-			$aDev->write("if( !isset(\$__nViewLayoutAssignedId) ){ \$__nViewLayoutAssignedId=1 ;}") ;
-			$aDev->write("\$__sViewLayoutName = md5(__FILE__).':'.(\$__nViewLayoutAssignedId++) ;") ;
-			$aDev->write("\$_aViewLayout = new \\org\\jecat\\framework\\mvc\\view\\ViewLayout({$sType},\$__sViewLayoutName);") ;
-			$aDev->write("\\org\\jecat\\framework\\mvc\\view\\ViewLayout::setFlyweight(\$_aViewLayout,\$__sViewLayoutName);") ;
-			$aDev->write("foreach(\$theView->iterator() as \$aChildView){") ;
-			$aDev->write("\t\$_aViewLayout->add(\$aChildView) ;") ;
+			if( !$aAttrs->has('name') )
+			{
+				$aDev->write("if( !isset(\$__nViewLayoutAssignedId) ){ \$__nViewLayoutAssignedId=1 ;}") ;
+				$aDev->write("\$__sViewLayoutName = '__layoutframe_' . \$__nViewLayoutAssignedId++ ;") ;
+			}
+			else
+			{
+				$sName = $aAttrs->get('name') ;
+				$aDev->write("\$__sViewLayoutName = {$sName} ;") ;
+			}
+			
+			$aDev->write("\$_aViewLayout = \$theView->getByName(\$__sViewLayoutName) ;") ;
+			$aDev->write("if(!\$_aViewLayout){") ;
+			$aDev->write("	if(\$theView->count()){") ;
+			$aDev->write("		\$_aViewLayout = new \\org\\jecat\\framework\\mvc\\view\\ViewLayout({$sType},\$__sViewLayoutName);") ;
+			$aDev->write("		foreach(\$theView->iterator() as \$aChildView){") ;
+			$aDev->write("			\$theView->remove(\$aChildView) ;") ;
+			$aDev->write("			\$_aViewLayout->add(\$aChildView) ;") ;
+			$aDev->write("		}") ;
+			$aDev->write("		\$theView->add(\$_aViewLayout) ;") ;
+			$aDev->write("		\$theView->outputStream()->write(\$_aViewLayout->outputStream()) ;") ;
+			$aDev->write("	}") ;
+			$aDev->write("}else{") ;
+			$aDev->write("	\$theView->outputStream()->write(\$_aViewLayout->outputStream()) ;") ;
 			$aDev->write("}") ;
-			$aDev->write("\$_aViewLayout->render() ;") ;
-			$aDev->write("\$theView->outputStream()->write(\$_aViewLayout->outputStream()) ;") ;
 		}
 	}
 	

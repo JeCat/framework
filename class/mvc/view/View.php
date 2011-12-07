@@ -55,7 +55,7 @@ class View extends NamableComposite implements IView, IBean
 		},$this) ;
 		
 		// css
-		$this->addCssClass('org_jecat_framework_view') ;
+		$this->addCssClass('jc-view') ;
 	}
 	
 	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
@@ -362,7 +362,7 @@ class View extends NamableComposite implements IView, IBean
 	
 	static public function htmlWrapperId(IView $aView)
 	{
-		return 'org_jecat_framework_mvc_view-'.$aView->id() ;
+		return 'jc-view-'.$aView->id() ;
 	}
 	
 	public function display(IOutputStream $aDevice=null)

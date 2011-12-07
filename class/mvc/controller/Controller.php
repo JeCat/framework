@@ -2,6 +2,8 @@
 
 namespace org\jecat\framework\mvc\controller ;
 
+use org\jecat\framework\mvc\view\ViewLayout;
+
 use org\jecat\framework\locale\LocaleManager;
 use org\jecat\framework\system\Response;
 use org\jecat\framework\locale\Locale;
@@ -234,7 +236,7 @@ class Controller extends NamableComposite implements IController, IBean
     {
     	if( !$this->aMainView )
     	{
-    		$this->setMainView( new View('controllerMainView'.ucfirst($this->name())) ) ;
+    		$this->setMainView( new ViewLayout(ViewLayout::type_vertical,'controllerMainView_'.$this->name()) ) ;
     	}
 
     	return $this->aMainView ;
@@ -701,6 +703,21 @@ class Controller extends NamableComposite implements IController, IBean
    		$this->sTitle = sTitle ;
    	}
    	
+   	/**
+   	 * @return IController
+   	 */
+   	static public function topController(IController $aController)
+   	{
+   		if( !$aParent = $aController->parent() )
+   		{
+   			return $aController ;
+   		}
+   		else
+   		{
+   			return self::topController($aParent) ;
+   		}
+   	}
+
     static private $aRegexpModelName = null ;
     
     /**

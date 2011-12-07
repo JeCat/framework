@@ -41,7 +41,7 @@
 }
 
 /* 视图布局框架 */
-.org_jecat_framework_view-layout-frame{
+.jc-view-layout-frame{
 	padding-top: 5px ;
 	padding-left: 5px ;
 	padding-right: 5px ;
@@ -49,16 +49,16 @@
 }
 
 /* 视图布局框架中的横向布局视图 */
-.org_jecat_framework_view-layout-frame-horizontal>.org_jecat_framework_view{
+.jc-view-layout-frame-horizontal>.jc-view{
 	float: left ;
 }
-.org_jecat_framework_view-layout-frame-vertical>.org_jecat_framework_view{
+.jc-view-layout-frame-vertical>.jc-view{
 	float: none ;
 }
-.org_jecat_framework_view-layout-tab>.org_jecat_framework_view{
+.jc-view-layout-tab>.jc-view{
 	float: none ;
 }
-.org_jecat_framework_view-layout-end{
+.jc-view-layout-end{
 	clear:both;
 }
-.org_jecat_framework_view{}
+.jc-view{}
