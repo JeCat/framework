@@ -1,11 +1,6 @@
-<li
-	id='{=$theWidget->showId(true)}'
-	{=$theWidget->getCssClassString()}
-	onmouseover = "jc.mvc.view.widget.menu.base.item_onActive(this);"
-	onmouseout = "jc.mvc.view.widget.menu.base.item_onDisactive(this);"
->
+<li	id='{=$theWidget->showId(true)}' {=$theWidget->getCssClassString()}	onmouseover = "jc.mvc.view.widget.menu.base.item_onActive(this);" onmouseout = "jc.mvc.view.widget.menu.base.item_onDisactive(this);">
 	{=$theWidget->html()}
-<!--	<if "$theWidget->parentMenu() !== null">父菜单：{=$theWidget->parentMenu()->id()}</if> -->
+	<!-- <if "$theWidget->parentMenu() !== null">父菜单：{=$theWidget->parentMenu()->id()}</if> -->
 	<if "$theWidget->isShowContinue()" >
 		<widget instance="$theWidget->subMenu()" />
 	</if>
