@@ -1,17 +1,23 @@
-ul .jc-mvc-view-widget-menu-menu{
-	width:500px;
+
+/* --- for menu ---*/
+.jc-widget-menu{
 	border:solid 1px;
 }
-.jc-mvc-view-widget-menu-menu-depth1{
-	width:200px;
+.jc-widget-menu-depth-1{
 }
-ul.jc-mvc-view-widget-menu-direction-h{
+.jc-widget-menu-direction-h{
 	margin:0;
-	width:200px;
 }
-li.jc-mvc-view-widget-menu-direction-h{
-	display:inline;
-}
-.jc-mvc-view-widget-menu-menu-alone{
+.jc-widget-menu-tearoff{
 	display:none;
+	position:absolute;
+}
+
+
+/* --- for menu item ---*/
+.jc-widget-menu-item-direction-h{
+	float:left;
+}
+.jc-widget-menu-item-active{
+	color: #8D7754;
 }

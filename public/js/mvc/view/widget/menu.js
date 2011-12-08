@@ -33,19 +33,19 @@ jc.mvc.view.widget.menu.base.hide=function(o){
 jc.mvc.view.widget.menu.base.isShow=function(o){
 	return this.getStyle(o,'display')== "block";
 }
-jc.mvc.view.widget.menu.base.isAlone=function(o){
-	return ( o.className && ( o.className.match('jc-mvc-view-widget-menu-menu-alone') == 'jc-mvc-view-widget-menu-menu-alone'));
+jc.mvc.view.widget.menu.base.isTearoff=function(o){
+	return ( o.className && ( o.className.match('jc-widget-menu-tearoff') == 'jc-widget-menu-tearoff'));
 }
 jc.mvc.view.widget.menu.base.isVertical=function(o){
-	return ( o.className && ( o.className.match('jc-mvc-view-widget-menu-direction-v') == 'jc-mvc-view-widget-menu-direction-v'));
+	return ( o.className && ( o.className.match('jc-widget-menu-direction-v') == 'jc-widget-menu-direction-v'));
 }
 jc.mvc.view.widget.menu.base.isHorizontal=function(o){
-	return ( o.className && ( o.className.match('jc-mvc-view-widget-menu-direction-h') == 'jc-mvc-view-widget-menu-direction-h'));
+	return ( o.className && ( o.className.match('jc-widget-menu-direction-h') == 'jc-widget-menu-direction-h'));
 }
 jc.mvc.view.widget.menu.base.expand=function(o){
 	var childlist = o.childNodes;
 	for(var i=0;i<childlist.length;++i){
-		if(this.isAlone(childlist[i])){
+		if(this.isTearoff(childlist[i])){
 			o = childlist[i];
 			this.show(o);
 			this.arrActive.push(o.id);
@@ -55,7 +55,7 @@ jc.mvc.view.widget.menu.base.expand=function(o){
 jc.mvc.view.widget.menu.base.contract=function(o){
 	var childlist = o.childNodes;
 	for(var i=0;i<childlist.length;++i){
-		if(this.isAlone(childlist[i])){
+		if(this.isTearoff(childlist[i])){
 			var o = childlist[i];
 			this.hide(o);
 		}
@@ -77,7 +77,7 @@ jc.mvc.view.widget.menu.base.hideActive=function(item){//隐藏所有和item无�
 		}
 	}
 }
-jc.mvc.view.widget.menu.base.item_onActive=function(item){
+jc.mvc.view.widget.menu.base.item_onmouseover=function(item){
 	clearTimeout(this.t);
 	this.t=-1;
 	this.hideActive(item);
@@ -88,11 +88,21 @@ jc.mvc.view.widget.menu.base.t=-1;
 jc.mvc.view.widget.menu.base.timeout=function(){
 	this.hideActive(null);
 }
-jc.mvc.view.widget.menu.base.item_onDisactive=function(item){
+jc.mvc.view.widget.menu.base.item_onmouseout=function(item){
 	if(this.t == -1){
 		this.t=setTimeout("jc.mvc.view.widget.menu.base.timeout()",500);
 	}
 }
+jc.mvc.view.widget.menu.base.bindItemEvent = function(elementId)
+{
+	var element = document.getElementById(elementId) ;
+	if(element)
+	{
+		element.onmouseover = function(){jc.mvc.view.widget.menu.base.item_onmouseover(this)} ;
+		element.onmouseout = function(){jc.mvc.view.widget.menu.base.item_onmouseout(this)} ;
+	}
+}
+
 jc.mvc.view.widget.menu.base.stopBubble=function(e) {  
     var e = e ? e : window.event;
     if (window.event) { // IE
@@ -102,7 +112,7 @@ jc.mvc.view.widget.menu.base.stopBubble=function(e) {
     }
 }
 //jsobject
-jc.mvc.view.widget.menu.base.jsobject=function(id){
+jc.mvc.view.widget.menu.base.jsobject=function(id,direction,tearoff,parentMenuId){
 	this.id = id;
 	this.attribute={};
 	this.setAttribute=function(key,value){
@@ -132,6 +142,15 @@ jc.mvc.view.widget.menu.base.jsobject=function(id){
 		this.constructor.objectlist[this.id]=this;
 	};
 	this.registerObject();
+	
+	// 
+	if( typeof(parentMenuId)!='undefinde' && parentMenuId )
+	{
+		this.setParentId(parentMenuId) ;
+	}
+
+	this.setAttribute('direction',direction) ;
+	this.setAttribute('tearoff',tearoff) ;
 }
 jc.mvc.view.widget.menu.base.jsobject.objectlist={};
 jc.mvc.view.widget.menu.base.jsobject.getObjectById=function(id){
