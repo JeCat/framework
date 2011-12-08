@@ -289,9 +289,7 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 	protected function replaceOriginExecutePoint(GenerateStat $aStat)
 	{
 		// 原始方法改名
-		$sWeavedMethodName = $aStat->aExecutePoint->name() ;
-		$sNewMethodName = "__aop_jointpoint_".$sWeavedMethodName ;
-		$aStat->aExecutePoint->nameToken()->setTargetCode($sNewMethodName) ;
+		$aStat->aExecutePoint->nameToken()->setTargetCode( $aStat->sOriginJointMethodName ) ;
 	}
 
 	/**
@@ -301,10 +299,12 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 	{
 		Assert::type("org\\jecat\\framework\\lang\\compile\\object\\FunctionDefine", $aStat->aExecutePoint) ;
 		
+		$aStat->sOriginJointMethodName = '__aop_jointpoint_'.$aStat->aExecutePoint->nameToken()->targetCode().'_'.md5($aStat->aExecutePoint->belongsClass()->name()) ;
+		
 		$aStat->sOriginJointCode = '' ;
 		
 		$aStat->sOriginJointCode.= $aStat->aExecutePoint->staticToken()? 'self::': '$this->' ;
-		$aStat->sOriginJointCode.= '__aop_jointpoint_'.$aStat->aExecutePoint->nameToken()->targetCode() ;
+		$aStat->sOriginJointCode.= $aStat->sOriginJointMethodName ;
 	}
 	
 	/**

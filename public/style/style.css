@@ -42,10 +42,15 @@
 
 /* 视图布局框架 */
 .jc-view-layout-frame{
+}
+.jc-view-layout-item{
 	padding-top: 5px ;
 	padding-left: 5px ;
 	padding-right: 5px ;
 	padding-bottom: 10px ;
+}
+.jc-view-layout-end-item{
+	clear:both;
 }
 
 /* 视图布局框架中的横向布局视图 */
@@ -57,8 +62,5 @@
 }
 .jc-view-layout-tab>.jc-view{
 	float: none ;
-}
-.jc-view-layout-end{
-	clear:both;
 }
 .jc-view{}

@@ -5,7 +5,7 @@ use org\jecat\framework\bean\BeanConfException;
 
 use org\jecat\framework\pattern\composite\Container;
 
-class ViewLayout extends View
+class ViewLayoutFrame extends View
 {
 	const type_vertical = 'v' ;
 	const type_horizontal = 'h' ;
@@ -20,11 +20,12 @@ class ViewLayout extends View
 	public function __construct($sType=self::type_vertical,$sName=null,UI $aUI=null)
 	{
 		parent::__construct($sName,null,$aUI) ;
+		if(!$sName)
+		{
+			$sName = $this->id() ;
+		}
 		
-		$this->addCssClass('jc-view-layout-frame') ;
 		$this->setType($sType) ;
-		
-		$this->bForceRenderHtmlWrapper = true ;
 	}
 	
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
@@ -40,7 +41,7 @@ class ViewLayout extends View
     	) ;
     	if( !isset($aTypes[$arrConfig['type']]) )
     	{
-    		throw new BeanConfException("ViewLayout bean 配置的type属性无效:%s",$arrConfig['type']) ;
+    		throw new BeanConfException("ViewLayoutFrame bean 配置的type属性无效:%s",$arrConfig['type']) ;
     	}
     	
 		array(
@@ -59,61 +60,84 @@ class ViewLayout extends View
 	{
 		$this->sType = $sType ;
 		
-		foreach(self::$arrFrameCssClass as $sFrameType=>&$sCssClass)
+		$arrClasses =& $this->variables()->getRef('wrapper.classes') ;
+		if($arrClasses===null)
 		{
-			if($sFrameType==$sType)
+			$arrClasses = array() ;
+		}
+		
+		foreach(self::$arrFrameCssClass as $type=>$sCss)
+		{
+			if( $type == $sType )
 			{
-				$this->addCssClass($sCssClass) ;
+				if( !in_array($sCss,$arrClasses) )
+				{
+					$arrClasses[] = $sCss ;
+				}
 			}
-			else 
+			else
 			{
-				$this->removeCssClass($sCssClass) ;
+				$key = array_search($sCss, $arrClasses) ;
+				if($key!==false)
+				{
+					unset($arrClasses[$key]) ;
+				}
 			}
 		}
+		
 	}
-	public function type()
-	{
-		return $this->sType ;
-	}
-
-	public function render($bRerender=false)
+	
+	public function render($bRerender=true)
 	{
 		if(!$this->isEnable())
 		{
 			return ;
 		}
 		
-		$sTemplate=$this->template() ;
+		$this->outputStream()->clear() ;
 		
-		if( empty($sTemplate) and !$this->count() )
+		// render wrapper header
+		$sStyle = null ;
+		if( $aParent=$this->parent() and ($aParent instanceof ViewLayoutFrame) and $aParent->type()==ViewLayoutFrame::type_horizontal )
 		{
-			return ;
+			$sStyle = 'float:left;' ;
 		}
-		
-		$this->renderHtmlWrapperHead() ;
-		
+		ViewLayoutItem::renderWrapperHeader($this,$this->outputStream(),'jc-view-layout-frame',$sStyle) ;
+				
 		// render myself
-		if( $sTemplate )
+		if( $sTemplate=$this->template() )
 		{
 			$this->renderTemplate($sTemplate) ;
 		}
 		
 		// render child view
-		$this->renderChildren() ;
+		$this->renderChildren(true) ;
 		
-		// wrapper
-		$this->renderHtmlWrapperTail() ;
+		$this->bRendered = true ;
+		
+		$this->outputStream()->write("<div class='jc-view-layout-end-item'></div></div>") ;
 	}
 	
-	protected function renderHtmlWrapperTail()
+	public function type()
 	{
-		$this->outputStream()->write( '<div class="jc-view-layout-end"></div></div>' ) ;
+		return $this->sType ;
 	}
 	
 	public function add($aView,$sName=null,$bTakeover=true)
 	{
+		if( !($aView instanceof ViewLayoutItem) and !($aView instanceof ViewLayoutFrame) )
+		{
+			$aView = new ViewLayoutItem($aView,$sName) ;
+		}
+		
 		// 跳过 View 对同名视图的检查
 		Container::add($aView,$sName,$bTakeover) ;
+	}
+	
+	public function getByName($sName)
+	{
+		$aView = parent::getByName($sName) ;
+		return ( $aView instanceof ViewLayoutItem )? $aView->view(): $aView ;
 	}
 	
 	private $sType = self::type_vertical ;

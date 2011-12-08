@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\view ;
 
+use org\jecat\framework\lang\Type;
+
 use org\jecat\framework\pattern\composite\IContainer;
 use org\jecat\framework\system\Response;
 use org\jecat\framework\mvc\controller\IController;
@@ -53,9 +55,6 @@ class View extends NamableComposite implements IView, IBean
 			
 			StopFilterSignal::stop() ;
 		},$this) ;
-		
-		// css
-		$this->addCssClass('jc-view') ;
 	}
 	
 	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
@@ -152,6 +151,11 @@ class View extends NamableComposite implements IView, IBean
 	
  	public function add($object,$sName=null,$bTakeover=true)
 	{
+		if( !($object instanceof IView) )
+		{
+			throw new Exception("参数 \$object 必须为 IView 对像，传入的类型为:%s",Type::reflectType($object)) ;
+		}
+		
 		if(!$sName)
 		{
 			$sName = $object->name() ;
@@ -269,75 +273,30 @@ class View extends NamableComposite implements IView, IBean
 		return !$this->aOutputStream or $this->aOutputStream->isEmpty() ;
 	}
 	
-	public function render()
+	public function render($bRerender=true)
 	{
 		if(!$this->bEnable)
 		{
 			return ;
 		}
 		
-		// 如果本身有内容，则输出 html wrapper
-		if( $this->isRenderHtmlWrapper() )
+		if( $this->bRendered and !$bRerender )
 		{
-			$this->renderHtmlWrapperHead() ;
+			return ;
 		}
-
+		
 		// render myself
-		$sTemplate=$this->template() ;
-		if( $sTemplate )
+		if( $sTemplate=$this->template() )
 		{
 			$this->renderTemplate($sTemplate) ;
 		}
 		
-		// 如果本身有内容，则输出 html wrapper
-		if( $this->isRenderHtmlWrapper() )
-		{
-			$this->renderHtmlWrapperTail() ;
-		}
-		
 		// render child view
-		$this->renderChildren() ;
-	}
-	
-	protected function isRenderHtmlWrapper()
-	{
-		return ($this->bForceRenderHtmlWrapper or $this->template()) ;
-	}
-	
-	protected function renderHtmlWrapperHead()
-	{
-		// css class
-    	$arrClasses =& $this->variables()->getRef('__view.wrapper.css') ;
-		$sCssClass = $arrClasses? implode(' ',$arrClasses): '' ;
+		$this->renderChildren($bRerender) ;
 		
-		// id
-		$sIdEsc = addslashes(self::htmlWrapperId($this)) ;
-		
-		// name
-		$sNameEsc = addslashes($this->name()) ;
-		
-		// other attrs
-    	$arrAttrs =& $this->variables()->getRef('__view.wrapper.attrs') ;
-    	if($arrAttrs)
-    	{
-	    	foreach($arrAttrs as $name=>&$item)
-	    	{
-	    		$arrAttrs[$name] = $name.'="' . addslashes((string)$item) . '"' ;
-	    	}
-	    	$sAttrs = ' ' . implode(' ',$arrAttrs) ;
-    	}
-    	else
-    	{
-    		$sAttrs = '' ;
-    	}
-		
-		$this->outputStream()->write( "<div class=\"{$sCssClass}\" id=\"{$sIdEsc}\" name=\"{$sNameEsc}\"{$sAttrs}>" ) ;
+		$this->bRendered = true ;
 	}
-	protected function renderHtmlWrapperTail()
-	{
-		$this->outputStream()->write( '</div>' ) ;
-	}
-	
+		
 	protected function renderTemplate($sTemplate)
 	{
 		$aVars = $this->variables() ;
@@ -351,18 +310,13 @@ class View extends NamableComposite implements IView, IBean
 		
 		$this->ui()->display($sTemplate,$aVars,$this->outputStream()) ;
 	}
-	protected function renderChildren()
+	protected function renderChildren($bRerender=true)
 	{
 		foreach($this->iterator() as $aChildView)
 		{
-			$aChildView->render() ;
+			$aChildView->render($bRerender) ;
 			$this->OutputStream()->write( $aChildView->OutputStream() ) ;
 		}
-	}
-	
-	static public function htmlWrapperId(IView $aView)
-	{
-		return 'jc-view-'.$aView->id() ;
 	}
 	
 	public function display(IOutputStream $aDevice=null)
@@ -580,41 +534,13 @@ class View extends NamableComposite implements IView, IBean
     	return $this->sId ;
     }
     
-    public function addCssClass($sClassName)
-    {
-    	$arrClasses =& $this->variables()->getRef('__view.wrapper.css') ;
-    	
-    	if( !$arrClasses or !in_array($sClassName,$arrClasses) )
-    	{
-    		$arrClasses[] = $sClassName ;
-    	}    	
-    }
-    public function removeCssClass($sClassName)
-    {
-    	$arrClasses =& $this->variables()->getRef('__view.wrapper.css') ;
-    	
-    	if( $arrClasses and ($pos=array_search($sClassName,$arrClasses))!==false )
-    	{
-    		unset($arrClasses[$pos]) ;
-    	}   
-    }
-    public function setWrapperAttribute($sName,$value)
-    {
-    	$aAttrs =& $this->variables()->getRef('__view.wrapper.atrrs') ;
-    	$aAttrs[$sName] = $value ;  	
-    }
-    public function removeWrapperAttribute($sName)
-    {
-    	$aAttrs =& $this->variables()->getRef('__view.wrapper.atrrs') ;
-    	unset($aAttrs[$sName]) ;
-    }
-    
     /**
      * @return IView
      */
     static public function xpath(IContainer $aViewContainer,$sViewXPath)
     {
     	$arrPath = explode('/',$sViewXPath) ;
+    	$aView = $aViewContainer ;
     	while( ($sViewName=array_shift($arrPath))!==null )
     	{
     		if(empty($sViewName))
@@ -631,6 +557,11 @@ class View extends NamableComposite implements IView, IBean
     	return $aView ;
     }
 	
+    public function isRendered()
+    {
+    	return $this->bRendered ;
+    }
+    
 	private $aModel ;
 	private $aWidgets ;
 	private $sSourceFile ;
@@ -644,7 +575,7 @@ class View extends NamableComposite implements IView, IBean
     private $arrBeanConfig ;
     private $aController ;
     private $sId ;
-    protected $bForceRenderHtmlWrapper = false ;
+	protected $bRendered = false ;
     
     static private $nAssignedId = 0 ;
 }

@@ -60,6 +60,9 @@ class GenerateStat
 	public $sAdviceCallArgvsLit = '' ;
 	
 	public $sOriginJointCode = '' ;
+
+	public $sOriginJointMethodName = '' ;
+	
 }
 
 ?>

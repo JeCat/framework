@@ -57,9 +57,6 @@ interface IView extends IContainer, IMessageQueueHolder, IWidgetContainer
     
     public function id() ;
     
-    public function addCssClass($sClassName) ;
-    
-    public function removeCssClass($sClassName) ;
 }
 
 ?>

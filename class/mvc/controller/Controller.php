@@ -2,7 +2,7 @@
 
 namespace org\jecat\framework\mvc\controller ;
 
-use org\jecat\framework\mvc\view\ViewLayout;
+use org\jecat\framework\mvc\view\ViewLayoutFrame;
 
 use org\jecat\framework\locale\LocaleManager;
 use org\jecat\framework\system\Response;
@@ -236,7 +236,7 @@ class Controller extends NamableComposite implements IController, IBean
     {
     	if( !$this->aMainView )
     	{
-    		$this->setMainView( new ViewLayout(ViewLayout::type_vertical,'controllerMainView_'.$this->name()) ) ;
+    		$this->setMainView( new ViewLayoutFrame(ViewLayoutFrame::type_vertical,'controllerMainView_'.$this->name()) ) ;
     	}
 
     	return $this->aMainView ;
