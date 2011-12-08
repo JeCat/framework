@@ -1,13 +1,14 @@
 ul .jc-mvc-view-widget-menu-menu{
 	width:500px;
 	border:solid 1px;
+	background:#fff;
 }
 .jc-mvc-view-widget-menu-menu-depth1{
-	width:200px;
+	/*width:200px;*/
 }
 ul.jc-mvc-view-widget-menu-direction-h{
 	margin:0;
-	width:200px;
+	/*width:200px;*/
 }
 li.jc-mvc-view-widget-menu-direction-h{
 	display:inline;
