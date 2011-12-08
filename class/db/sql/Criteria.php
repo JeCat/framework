@@ -70,7 +70,7 @@ class Criteria extends SubStatement
 		$sLimit = ' LIMIT ';
 		if($aState->supportLimitStart() and $this->sLimitFrom != 0)
 		{
-			$sLimit .= $this->transColumn($this->sLimitFrom,$aState) . ', ';
+			$sLimit .= $this->sLimitFrom . ', ';
 		}
 		$sLimit .= $this->nLimitLen ;
 		return $sLimit;

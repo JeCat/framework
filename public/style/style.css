@@ -41,19 +41,22 @@
 }
 
 /* 视图布局框架 */
-.org_jecat_framework_view-layout-frame{
-	/*padding-top: 5px ;
-	padding-left: 5px ;
-	padding-right: 5px ;
-	padding-bottom: 10px ;*/
+.jc-view-layout-frame{
+}
+.jc-view-layout-item{
+}
+.jc-view-layout-end-item{
+	clear:both;
 }
 
 /* 视图布局框架中的横向布局视图 */
-.org_jecat_framework_view-layout-frame .org_jecat_framework_view-layout-horizontal{
+.jc-view-layout-frame-horizontal>.jc-view{
 	float: left ;
 }
-.org_jecat_framework_view-layout-end{
-	clear:both;
+.jc-view-layout-frame-vertical>.jc-view{
+	float: none ;
 }
-.org_jecat_framework_view{
+.jc-view-layout-tab>.jc-view{
+	float: none ;
 }
+.jc-view{}

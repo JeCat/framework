@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\message ;
 
+use org\jecat\framework\io\IOutputStream;
+use org\jecat\framework\ui\UI;
 use org\jecat\framework\util\IFilterMangeger;
 
 interface IMessageQueue
@@ -17,6 +19,8 @@ interface IMessageQueue
 	public function filters() ;
 	
 	public function setFilters(IFilterMangeger $aFilterManager) ;
+	
+	public function display(UI $aUI=null,IOutputStream $aDevice=null,$sTemplateFilename=null) ;
 }
 
 ?>

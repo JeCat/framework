@@ -42,9 +42,9 @@ class DB extends Object
 		return $this->driver()->execute($sql) ;
 	}
 	
-	public function queryCount(Select $aSelect)
+	public function queryCount(Select $aSelect,$sColumn='*')
 	{		
-		$aRecords = $this->query( $aSelect->makeStatementForCount('rowCount') ) ;
+		$aRecords = $this->query( $aSelect->makeStatementForCount('rowCount',$sColumn,$this->driver()->sharedStatementState()) ) ;
 		
 		if( $aRecords )
 		{

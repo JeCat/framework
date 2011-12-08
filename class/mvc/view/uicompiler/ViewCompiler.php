@@ -2,7 +2,7 @@
 namespace org\jecat\framework\mvc\view\uicompiler ;
 
 use org\jecat\framework\lang\Exception;
-use org\jecat\framework\mvc\view\ViewLayout;
+use org\jecat\framework\mvc\view\ViewLayoutFrame;
 use org\jecat\framework\lang\Assert;
 use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\CompilerManager;
@@ -46,22 +46,38 @@ class ViewCompiler extends NodeCompiler
 				$sType = 'null' ;
 			}
 			
-			$aDev->write("if( !isset(\$__nViewLayoutAssignedId) ){ \$__nViewLayoutAssignedId=1 ;}") ;
-			$aDev->write("\$__sViewLayoutName = md5(__FILE__).':'.(\$__nViewLayoutAssignedId++) ;") ;
-			$aDev->write("\$_aViewLayout = new \\org\\jecat\\framework\\mvc\\view\\ViewLayout({$sType},\$__sViewLayoutName);") ;
-			$aDev->write("\\org\\jecat\\framework\\mvc\\view\\ViewLayout::setFlyweight(\$_aViewLayout,\$__sViewLayoutName);") ;
-			$aDev->write("foreach(\$theView->iterator() as \$aChildView){") ;
-			$aDev->write("\t\$_aViewLayout->add(\$aChildView) ;") ;
+			if( !$aAttrs->has('name') )
+			{
+				$aDev->write("if( !isset(\$__nViewLayoutFrameAssignedId) ){ \$__nViewLayoutFrameAssignedId=1 ;}") ;
+				$aDev->write("\$__sViewLayoutFrameName = '__layoutframe_' . \$__nViewLayoutFrameAssignedId++ ;") ;
+			}
+			else
+			{
+				$sName = $aAttrs->get('name') ;
+				$aDev->write("\$__sViewLayoutFrameName = {$sName} ;") ;
+			}
+			
+			$aDev->write("\$_aViewLayoutFrame = \$theView->getByName(\$__sViewLayoutFrameName) ;") ;
+			$aDev->write("if(!\$_aViewLayoutFrame){") ;
+			$aDev->write("	if(\$theView->count()){") ;
+			$aDev->write("		\$_aViewLayoutFrame = new \\org\\jecat\\framework\\mvc\\view\\ViewLayoutFrame({$sType},\$__sViewLayoutFrameName);") ;
+			$aDev->write("		foreach(\$theView->iterator() as \$aChildView){") ;
+			$aDev->write("			\$theView->remove(\$aChildView) ;") ;
+			$aDev->write("			\$_aViewLayoutFrame->add(\$aChildView) ;") ;
+			$aDev->write("		}") ;
+			$aDev->write("		\$theView->add(\$_aViewLayoutFrame) ;") ;
+			$aDev->write("		\$theView->outputStream()->write(\$_aViewLayoutFrame->outputStream()) ;") ;
+			$aDev->write("	}") ;
+			$aDev->write("}else{") ;
+			$aDev->write("	\$theView->outputStream()->write(\$_aViewLayoutFrame->outputStream()) ;") ;
 			$aDev->write("}") ;
-			$aDev->write("\$_aViewLayout->render() ;") ;
-			$aDev->write("\$theView->outputStream()->write(\$_aViewLayout->outputStream()) ;") ;
 		}
 	}
 	
 	static $arrLayoutTypes = array(
-			'h' => '\\org\\jecat\\framework\\mvc\\view\\ViewLayout::type_horizontal' ,
-			'v' => '\\org\\jecat\\framework\\mvc\\view\\ViewLayout::type_vertical' ,
-			'tab' => '\\org\\jecat\\framework\\mvc\\view\\ViewLayout::type_tab' ,
+			'h' => '\\org\\jecat\\framework\\mvc\\view\\ViewLayoutFrame::type_horizontal' ,
+			'v' => '\\org\\jecat\\framework\\mvc\\view\\ViewLayoutFrame::type_vertical' ,
+			'tab' => '\\org\\jecat\\framework\\mvc\\view\\ViewLayoutFrame::type_tab' ,
 	) ;
 }
 

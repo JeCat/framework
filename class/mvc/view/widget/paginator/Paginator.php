@@ -57,14 +57,45 @@ use org\jecat\framework\system\HttpRequest;
 	    <widget id='paginator' attr.nums='7' attr.strategy.type='expression' attr.strategy='new \org\jecat\framework\mvc\view\widget\paginatorstrategy\Middle' attr.onclick='alert(\"hello\")' />
     </form>
 */
-class Paginator extends FormWidget implements IModelChangeObserver{
+class Paginator extends FormWidget implements IModelChangeObserver
+{
     public function __construct($sId =null ,IDataSrc $aDataSource = null , IView $aView = null) {
         parent::__construct ( $sId , 'org.jecat.framework:WidgetPaginator.template.html', null , $aView );
-        $this->iCount=5;
+        $this->iCount=10;
         $this->iShowWidth=5;
-        if( $aDataSource) $this->setDataFromSubmit($aDataSource);
+        if($aDataSource)
+        {
+        	$this->setDataFromSubmit($aDataSource);
+        }
     }
-	
+    
+    public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
+    {
+    	parent::buildBean($arrConfig,$sNamespace) ;
+    	
+    	if( !empty($arrConfig['count']) )
+    	{
+    		$this->setPerPageCount($arrConfig['count']) ;
+    	}
+    	if( !empty($arrConfig['nums']) )
+    	{
+    		$this->setCurrentPageNum($arrConfig['nums']) ;
+    	}
+    
+    	$this->setDataFromSubmit(Request::singleton()) ;
+    }
+    
+    static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
+    {
+    	$sClass = get_called_class() ;
+    	$aBean = new $sClass() ;
+    	if($bBuildAtOnce)
+    	{
+    		$aBean->buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
+    	}
+    	return $aBean ;
+    }
+    
     public function setPerPageCount($iCount){
         $this->iCount=(int)$iCount;
         $this->updatePaginal();
@@ -143,17 +174,6 @@ class Paginator extends FormWidget implements IModelChangeObserver{
             return '#' ;
         }
     }
-    
-    public function attributeBool($sName,$bValue=true){
-        $aValue=$this->attribute($sName,null);
-        if($aValue === null ){
-            return (bool)$bValue;
-        }else if($aValue === 'true' || $aValue === 'True' || $aValue === 1 || $aValue === '1' ){
-            return true;
-        }else{
-            return false;
-        }
-	}
 	
 	public function setStrategy($Strategy){
 	    if( is_string($Strategy) ){

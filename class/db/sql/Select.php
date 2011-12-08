@@ -22,13 +22,16 @@ class Select extends MultiTableStatement
 		$this->criteria()->setLimit(30) ;
 	}
 	
-	public function makeStatementForCount($sCntClmName='rowCount',StatementState $aState)
+	public function makeStatementForCount($sCntClmName='rowCount',$sColumn='*',StatementState $aState)
 	{
+		$aState->setSupportLimitStart(true)
+				->setSupportTableAlias(true) ;
+		
 		$this->checkValid(true) ;
 		
 		return "SELECT"
 			. $this->makeStatementPredicate($aState)
-			. " count(*) AS {$sCntClmName} "
+			. " count({$sColumn}) AS {$sCntClmName} "
 			. parent::makeStatement($aState)
 			. ' ;' ;
 	}

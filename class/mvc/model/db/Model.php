@@ -305,7 +305,7 @@ class Model extends AbstractModel implements IModel, IBean
 	}
 	
 	public function setPagination($iPerPage,$iPageNum){
-	    $this->criteria()->setLimit( $iPerPage, $iPerPage*($iPageNum-1) ) ;
+	    $this->prototype()->criteria()->setLimit( $iPerPage, $iPerPage*($iPageNum-1) ) ;
 	}
 
 	/**

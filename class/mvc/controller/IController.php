@@ -2,11 +2,13 @@
 namespace org\jecat\framework\mvc\controller ;
 
 
+use org\jecat\framework\pattern\composite\IContainedable;
+use org\jecat\framework\pattern\composite\IContainer;
 use org\jecat\framework\mvc\view\IView;
 use org\jecat\framework\mvc\model\IModel;
 use org\jecat\framework\message\IMessageQueueHolder;
 
-interface IController extends IMessageQueueHolder
+interface IController extends IMessageQueueHolder, IContainer, IContainedable
 {
 	public function mainRun() ;
 	

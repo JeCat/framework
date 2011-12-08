@@ -60,6 +60,8 @@ interface IContainer
 	
 	public function has($object) ;
 	
+	public function getName($object) ;
+	
 	public function replace($object,$newObject,$sName=null) ;
 	
 	public function insertBefore($object,$_) ;

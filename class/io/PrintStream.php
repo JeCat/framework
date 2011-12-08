@@ -50,9 +50,9 @@ class PrintStream extends OutputStream
 		return ob_get_contents() ;
 	}
 	
-	public function clean()
+	public function clear()
 	{
-		ob_get_clean() ;
+		ob_get_clear() ;
 	}
 	
 	public function supportsLock()

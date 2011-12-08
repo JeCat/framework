@@ -166,11 +166,32 @@ class Widget extends Object implements IViewWidget, IBean
 	
 	public function setAttribute($sName,$sValue)
 	{
+		$sName = strtolower($sName) ;
 		$this->arrAttributes[$sName] = $sValue ;
 	}
 	public function attribute($sName,$sValue)
 	{
+		$sName = strtolower($sName) ;
 		return isset($this->arrAttributes[$sName])? $this->arrAttributes[$sName]: $sValue ;
+	}
+    public function attributeBool($sName,$bValue=true)
+    {
+        $value=$this->attribute($sName,null);
+        
+        if($value === null)
+        {
+            return $bValue? true: false;
+        }
+        
+        $value = strtolower($value) ;
+        
+        if($value === 'false' || $value === '0' || $value === 0 || $value === 'no' || $value === 'off' ){
+            return false;
+        }
+        else
+       {
+            return true;
+        }
 	}
 	public function attributeNameIterator()
 	{

@@ -54,20 +54,20 @@ class OutputStreamBuffer extends OutputStream
 		
 		if($bClear)
 		{
-			$this->clean() ;
+			$this->clear() ;
 		}
 		
 		return $sBytes ;
 	}
 	
-	public function clean()
+	public function clear()
 	{
 		$this->arrBuffer = array() ;
 	}
 	
 	public function flush()
 	{		
-		$this->clean() ;
+		$this->clear() ;
 	}
 	
 	public function isEmpty()

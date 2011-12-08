@@ -2,16 +2,13 @@
 
 namespace org\jecat\framework\mvc\controller ;
 
+use org\jecat\framework\mvc\view\ViewLayoutFrame;
+
 use org\jecat\framework\locale\LocaleManager;
-
 use org\jecat\framework\system\Response;
-
 use org\jecat\framework\locale\Locale;
-
 use org\jecat\framework\bean\BeanConfException;
-
 use org\jecat\framework\bean\BeanFactory;
-
 use org\jecat\framework\bean\IBean ;
 use org\jecat\framework\mvc\model\IModel;
 use org\jecat\framework\pattern\composite\Container;
@@ -239,7 +236,7 @@ class Controller extends NamableComposite implements IController, IBean
     {
     	if( !$this->aMainView )
     	{
-    		$this->setMainView( new View('controllerMainView'.ucfirst($this->name())) ) ;
+    		$this->setMainView( new ViewLayoutFrame(ViewLayoutFrame::type_vertical,'controllerMainView_'.$this->name()) ) ;
     	}
 
     	return $this->aMainView ;
@@ -256,29 +253,63 @@ class Controller extends NamableComposite implements IController, IBean
      */
     public function mainRun ()
     {
-    	if( !$this->params->bool('noframe') and $aFrame=$this->frame() )
+    	if( $this->params->bool('only_msg_queue') )
     	{
-    		$aFrame->add($this) ;
+			$this->process() ;
 			
-    		$aFrame->mainRun() ;
+    		$this->messageQueue()->display() ;
     	}
-
     	else
     	{
-			$this->processChildren() ;
-			
-			try{
-				$this->process() ;
-			}
-			catch(_ExceptionRelocation $e)
-			{}
-			
-			if( !$this->params->bool('noview') )
-			{
-				$this->mainView()->show() ;
-			}
+	    	if( !$this->params->bool('noframe') and $aFrame=$this->frame() )
+	    	{
+	    		$aFrame->add($this) ;
+	    		
+	    		$aFrame->processChildren() ;
+	    		
+	    		try{
+	    			$aFrame->process() ;
+	    		}
+	    		catch(_ExceptionRelocation $e)
+	    		{}
+	    		
+				// show main view
+				$this->showMainView($aFrame->mainView()) ;
+	    	}
+	
+	    	else
+	    	{
+				$this->processChildren() ;
+				
+				try{
+					$this->process() ;
+				}
+				catch(_ExceptionRelocation $e)
+				{}
+				
+				// show main view
+				$this->showMainView($this->mainView()) ;
+	    	}
+				
     	}
     }
+    
+    protected function showMainView(IView $aMainView)
+    {
+		$this->renderMainView($aMainView) ;
+		
+		$this->displayMainView($aMainView) ;
+    }
+    
+    protected function renderMainView(IView $aMainView)
+    {
+    	$aMainView->render() ;
+    }
+    
+    protected function displayMainView(IView $aMainView)
+    {
+    	$aMainView->display($this->response()->printer()) ;
+    } 
     
     public function location($sUrl,$sMessage,$messageArgvs=null,$sLinkText=null,$linkArgvs=null,$nWaitingSec=3,Locale $aLocale=null)
     {
@@ -672,6 +703,21 @@ class Controller extends NamableComposite implements IController, IBean
    		$this->sTitle = sTitle ;
    	}
    	
+   	/**
+   	 * @return IController
+   	 */
+   	static public function topController(IController $aController)
+   	{
+   		if( !$aParent = $aController->parent() )
+   		{
+   			return $aController ;
+   		}
+   		else
+   		{
+   			return self::topController($aParent) ;
+   		}
+   	}
+
     static private $aRegexpModelName = null ;
     
     /**
