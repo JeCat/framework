@@ -127,9 +127,12 @@ class Controller extends NamableComposite implements IController, IBean
     			$aBeanFactory->_typeProperties( $arrBeanConf, 'view', is_int($key)?null:$key, 'name' ) ;
     			
     			// 创建对象
-				$aBean = $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ;
+				$aBean = $aBeanFactory->createBean($arrBeanConf,$sNamespace,false) ;
+				$aBean->setName($arrBeanConf['name']) ;
 				
 				$this->addView( $aBean ) ;
+				
+				$aBean->buildBean($arrBeanConf,$sNamespace) ;
 				
 				if(!empty($arrBeanConf['model']))
 				{
@@ -398,7 +401,7 @@ class Controller extends NamableComposite implements IController, IBean
 		
 		$this->takeOverView($object,$sName) ;
 
-		if( $object->params()!==$this->params())
+		if( $bTakeover and $object->params()!==$this->params())
 		{
 			$object->params()->addChild($this->params()) ;
 		}
@@ -588,7 +591,7 @@ class Controller extends NamableComposite implements IController, IBean
     
     public function createFrame()
     {
-    	return new WebpageFrame() ;
+    	return new WebpageFrame($this->params()) ;
     }
     
     public function frame()

@@ -13,6 +13,12 @@ ul.jc-mvc-view-widget-menu-direction-h{
 li.jc-mvc-view-widget-menu-direction-h{
 	display:inline;
 }
-.jc-mvc-view-widget-menu-menu-alone{
-	display:none;
+
+
+/* --- for menu item ---*/
+.jc-widget-menu-item-direction-h{
+	float:left;
+}
+.jc-widget-menu-item-active{
+	background-color: #ff0000;
 }

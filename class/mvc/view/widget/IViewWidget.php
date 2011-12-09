@@ -20,7 +20,7 @@ interface IViewWidget extends IMessageQueueHolder
 	 */
 	public function view() ;
 
-	public function setView(IView $aView) ;
+	public function setView(IView $aView=null) ;
 
 	public function id() ;
 

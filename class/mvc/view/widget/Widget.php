@@ -94,7 +94,7 @@ class Widget extends Object implements IViewWidget, IBean
 		return $this->aView ;
 	}
 
-	public function setView(IView $aView)
+	public function setView(IView $aView=null)
 	{
 		$this->aView = $aView ;
 	}

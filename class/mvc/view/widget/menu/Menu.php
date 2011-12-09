@@ -20,6 +20,56 @@ class Menu extends AbstractBase
         parent::__construct ( $sId , 'org.jecat.framework:WidgetMenu.template.html', null , $aView );
     }
     
+    // from Bean
+    static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
+    {
+    	$sClass = get_called_class() ;
+    	$aBean = new $sClass() ;
+    	if($bBuildAtOnce)
+    	{
+    		$aBean->buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
+    	}
+    	return $aBean ;
+    }
+    
+    public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
+    {
+    	parent::buildBean($arrConfig,$sNamespace);
+    	if( !empty($arrConfig['items']) && is_array($arrConfig['items'])){
+    		foreach($arrConfig['items'] as $key =>$item){
+    			$this->buildItems($item,$key);
+    		}
+    	}
+    	if(!empty($arrConfig['direction'])){
+    		$this->setDirection($arrConfig['direction']);
+    	}
+    	if(!empty($arrConfig['top'])){
+    		$this->setPosTop($arrConfig['top']);
+    	}
+    	if(!empty($arrConfig['left'])){
+    		$this->setPosLeft($arrConfig['left']);
+    	}
+    	if( array_key_exists('tearoff',$arrConfig) ){
+    		$this->setTearoff($arrConfig['tearoff']);
+    	}
+    }
+    
+    
+    public function view()
+    {
+    	if( $aView = parent::view() )
+    	{
+    		return $aView ;
+    	}
+    
+    	if( $aParentItem = $this->parentItem() )
+    	{
+    		return $aParentItem->view() ;
+    	}
+    
+    	return null ;
+    }
+    
 	/**
 	 * @brief 添加一个item。
 	 *
@@ -75,6 +125,12 @@ class Menu extends AbstractBase
 	private function addItemPrivate(Item $aItem){
 		$this->arrItems[]=$aItem;
 		$aItem->setParentMenu($this);
+		
+		if(!$aItem->view())
+		{
+			$aItem->setView($this->view()) ;
+		}
+		
 		return $aItem;
 	}
 	
@@ -110,40 +166,6 @@ class Menu extends AbstractBase
     	return null;
     }
     
-	// from Bean
-    static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
-    {
-		$sClass = get_called_class() ;
-		$aBean = new $sClass() ;
-    	if($bBuildAtOnce)
-    	{
-    		$aBean->buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
-    	}
-    	return $aBean ;
-    }
-    
-    public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
-    {
-		parent::buildBean($arrConfig,$sNamespace);
-		if( !empty($arrConfig['items']) && is_array($arrConfig['items'])){
-			foreach($arrConfig['items'] as $key =>$item){
-				$this->buildItems($item,$key);
-			}
-		}
-		if(!empty($arrConfig['direction'])){
-			$this->setDirection($arrConfig['direction']);
-		}
-		if(!empty($arrConfig['top'])){
-			$this->setPosTop($arrConfig['top']);
-		}
-		if(!empty($arrConfig['left'])){
-			$this->setPosLeft($arrConfig['left']);
-		}
-		if( array_key_exists('tearoff',$arrConfig) ){
-			$this->setTearoff($arrConfig['tearoff']);
-		}
-	}
-	
 	private function buildItems($configItems,$id=null){
 		if($configItems instanceof Item){
 			if(!is_int($id)) $configItems->setId($id);
@@ -157,7 +179,11 @@ class Menu extends AbstractBase
 			if(empty($configItems['id']) && !is_int($id) ){
 				$configItems['id'] = $id;
 			}
-			$this->addItem( BeanFactory::singleton()->createBean($configItems));
+			
+			$aItem = BeanFactory::singleton()->createBean($configItems,'*',false) ;
+			$this->addItem($aItem);
+			
+			$aItem->buildBean($configItems) ;
 		}
 	}
 	
@@ -252,6 +278,19 @@ class Menu extends AbstractBase
 			return null ;
 		}
 		return $aParentMenu->id() ;
+	}
+	
+	public function isActive()
+	{
+		foreach($this->arrItems as $aItem)
+		{
+			if( $aItem->isActive() )
+			{
+				return true ;
+			}
+		}
+		
+		return false ;
 	}
 	
 	public function generateJsCode()
