@@ -20,5 +20,6 @@ li.jc-mvc-view-widget-menu-direction-h{
 	float:left;
 }
 .jc-widget-menu-item-active{
-	background-color: #ff0000;
+	
 }
+.jc-widget-menu-depth-1 .jc-widget-menu-item-active a{ background:#1C7BB6; border-radius:13px;}
