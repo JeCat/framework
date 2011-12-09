@@ -212,6 +212,11 @@ class Widget extends Object implements IViewWidget, IBean
 	
 	public function displayInputAttributes()
 	{
+		if(!$this->arrAttributes)
+		{
+			return '' ;
+		}
+		
 		$sRet = '' ;
 		foreach($this->arrAttributes as $sName=>$sValue)
 		{

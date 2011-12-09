@@ -371,7 +371,9 @@ class Controller extends NamableComposite implements IController, IBean
     }
     
     public function process ()
-    {}
+    {
+    	$this->doActions() ;
+    }
     
     protected function processChildren()
     {
