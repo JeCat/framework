@@ -1,6 +1,7 @@
 <?php
 namespace org\jecat\framework\mvc\view\widget\menu;
 
+use org\jecat\framework\util\DataSrc;
 use org\jecat\framework\resrc\HtmlResourcePool;
 use org\jecat\framework\bean\BeanFactory ;
 
@@ -15,6 +16,82 @@ class Item extends AbstractBase
         $this->setTitle($sTitle);
     }
     
+    // from Bean
+    static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
+    {
+		$sClass = get_called_class() ;
+		$aBean = new $sClass() ;
+    	if($bBuildAtOnce)
+    	{
+    		$aBean->buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
+    	}
+    	return $aBean ;
+    }
+    
+    public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
+    {
+		parent::buildBean($arrConfig,$sNamespace);
+		
+		if( !empty($arrConfig['menu'])){
+			$this->buildSubMenu($arrConfig['menu']);
+		}
+		
+		if( !empty( $arrConfig['link'])){
+			$this->setLink($arrConfig['link']);
+		}
+		if( !empty( $arrConfig['onclick'])){
+			$this->setEventOnClick($arrConfig['onclick']);
+		}
+		if( !empty( $arrConfig['html'])){
+			$this->setHtml($arrConfig['html']);
+		}
+		
+		if(!empty($arrConfig['quote']))
+		{
+			if($aView=$this->view())
+			{
+				if( $aController = $aView->controller() )
+				{
+					$aParams = $aController->params() ;
+					
+					foreach((array)$arrConfig['quote'] as $sQuote)
+					{
+						if( DataSrc::compare($aParams,$sQuote) )
+						{
+							$this->setActive(true);
+							break ;
+						}
+					}
+				}
+			}
+		}
+		
+		if( array_key_exists('active',$arrConfig) )
+		{
+			$this->setActive($arrConfig['active']);
+		}
+		
+		if( $aSubMenu=$this->subMenu() and $aSubMenu->isActive() )
+		{
+			$this->setActive(true);
+		}
+	}
+	
+	public function view()
+	{
+		if( $aView = parent::view() )
+		{
+			return $aView ;
+		}
+		
+		if( $aMenu = $this->parentMenu() )
+		{
+			return $aMenu->view() ;
+		}
+		
+		return null ;
+	}
+    
     public function createSubMenu(){
     	$aMenu = new Menu;
     	$this->setSubMenu($aMenu);
@@ -25,9 +102,18 @@ class Item extends AbstractBase
     	if($this->subMenu !== $aMenu){
 	    	$this->subMenu = $aMenu;
 	    	$aMenu->setParentItem($this);
+	    	
+	    	if(!$aMenu->view())
+	    	{
+	    		$aMenu->setView($this->view()) ;
+	    	}
+	    	
     	}
     }
     
+    /**
+     * @return Menu
+     */
     public function subMenu(){
     	return $this->subMenu;
     }
@@ -62,10 +148,10 @@ class Item extends AbstractBase
     }
     
     public function setActive($bActive){
-    	return $this->setAttribute('active',$bActive?true:false);
+    	$this->bActive = $bActive?true:false ;
     }
     public function isActive(){
-    	return $this->attribute('active',false);
+    	return $this->bActive ;
     }
     
     protected function showdepth(){
@@ -77,39 +163,6 @@ class Item extends AbstractBase
     	}
     	return null;
     }
-    
-    // from Bean
-    static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
-    {
-		$sClass = get_called_class() ;
-		$aBean = new $sClass() ;
-    	if($bBuildAtOnce)
-    	{
-    		$aBean->buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
-    	}
-    	return $aBean ;
-    }
-    
-    public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
-    {
-		parent::buildBean($arrConfig,$sNamespace);
-		if( !empty($arrConfig['menu'])){
-			$this->buildSubMenu($arrConfig['menu']);
-		}
-		if( array_key_exists('active',$arrConfig) )
-		{
-			$this->setActive($arrConfig['active']);
-		}
-		if( !empty( $arrConfig['link'])){
-			$this->setLink($arrConfig['link']);
-		}
-		if( !empty( $arrConfig['onclick'])){
-			$this->setEventOnClick($arrConfig['onclick']);
-		}
-		if( !empty( $arrConfig['html'])){
-			$this->setHtml($arrConfig['html']);
-		}
-	}
 	
 	private function buildSubMenu($subMenu){
 		if($subMenu instanceof Menu){
@@ -118,7 +171,9 @@ class Item extends AbstractBase
 			$this->setSubMenu( new Menu($subMenu) );
 		}else if(is_array($subMenu)){
 			$subMenu['class'] = __NAMESPACE__.'\Menu';
-			$this->setSubMenu( BeanFactory::singleton()->createBean($subMenu));
+			$aMenu = BeanFactory::singleton()->createBean($subMenu,'*',false) ;
+			$this->setSubMenu($aMenu);
+			$aMenu->buildBean($subMenu) ;
 		}
 	}
 	
@@ -190,6 +245,7 @@ class Item extends AbstractBase
     private $parentMenu = null;
     private $subMenu = null;
     
+    private $bActive = false ;
     private $sLink ;
     private $sOnClick ;
     private $sHtml ;

@@ -185,11 +185,11 @@ class Paginator extends FormWidget implements IModelChangeObserver
 	    }
 	}
 	
-	public function setView(IView $aView)
+	public function setView(IView $aView=null)
 	{
 	    $formerView = $this->view();
 	    if( $formerView ){
-	        if ( $former === $aView ){
+	        if ( $formerView === $aView ){
 	            return;
 	        }else{
 	            $formerView -> removeModelObserver( $this ) ;

@@ -113,7 +113,8 @@ class DataSrc extends HashTable implements IDataSrc, \ArrayAccess, \Iterator
 			}
 		}
 		
-		return null ;
+		$this->arrDatas[ $sName ] = null ;
+		return $this->arrDatas[ $sName ] ;
 	}
 	
 
@@ -156,7 +157,7 @@ class DataSrc extends HashTable implements IDataSrc, \ArrayAccess, \Iterator
 	 */
 	public function removeChild(IHashTable $aParams)
 	{
-		$nIdx = array_search($this->arrChildren, $aParams) ;
+		$nIdx = array_search($aParams,$this->arrChildren,true) ;
 		if($nIdx!==false)
 		{
 			unset($this->arrChildren[$nIdx]) ;

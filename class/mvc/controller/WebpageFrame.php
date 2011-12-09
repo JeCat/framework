@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\controller ;
 
+use org\jecat\framework\util\IDataSrc;
+
 use org\jecat\framework\bean\BeanConfException;
 
 use org\jecat\framework\bean\BeanFactory;
@@ -15,9 +17,9 @@ use org\jecat\framework\pattern\composite\IContainer;
 class WebpageFrame extends Controller
 {
 	
-	public function __construct()
+	public function __construct($params=null)
 	{
-		parent::__construct() ;
+		parent::__construct($params) ;
 		
 		$this->setMainView(WebpageFactory::singleton()->create()) ;
 	}
@@ -52,9 +54,12 @@ class WebpageFrame extends Controller
 				$aBeanFactory->_typeProperties( $arrBeanConf, 'view', is_int($key)?null:$key, 'name' ) ;
 		
 				// 创建对象
-				$aBean = $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ;
+				$aBean = $aBeanFactory->createBean($arrBeanConf,$sNamespace,false) ;
+				$aBean->setName($arrBeanConf['name']) ;
 		
 				$this->addFrameView( $aBean ) ;
+				
+				$aBean->buildBean($arrBeanConf,$sNamespace) ;
 		
 				if(!empty($arrBeanConf['model']))
 				{

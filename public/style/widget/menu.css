@@ -19,5 +19,5 @@
 	float:left;
 }
 .jc-widget-menu-item-active{
-	color: #8D7754;
+	background-color: #ff0000;
 }
