@@ -1,22 +1,24 @@
+<div class="coresystem-listfoot">
+<if "{=$theWidget->attributeBool('showtotal',true)} and $theWidget->totalPageCount() >=1" >
+    <span class="coresystem-pagetatal">共{=$theWidget->totalPageCount()}页</span>
+</if>
 <if "$theWidget->attributeBool('showfirst',true) and $theWidget->totalPageCount() >=1" >
-    <a href="{=$theWidget->pageUrl(1)}"{=($theWidget->attribute("onclick",null)===null?'':('onclick='."'".$theWidget->attribute("onclick",null)."'") ) }>第一页</a>
+    <a  class="coresystem-pagefirst" href="{=$theWidget->pageUrl(1)}"{=($theWidget->attribute("onclick",null)===null?'':('onclick='."'".$theWidget->attribute("onclick",null)."'") ) }>第一页</a>
 </if>
 <if "$theWidget->attributeBool('showpre',true) && $theWidget->currentPageNum() > 1" >
-    <a href="{=$theWidget->pageUrl($theWidget->currentPageNum() -1 )}"{=($theWidget->attribute("onclick",null)===null?'':('onclick='."'".$theWidget->attribute("onclick",null)."'") ) }>上一页</a>
+    <a class="coresystem-pagepre" href="{=$theWidget->pageUrl($theWidget->currentPageNum() -1 )}"{=($theWidget->attribute("onclick",null)===null?'':('onclick='."'".$theWidget->attribute("onclick",null)."'") ) }>上一页</a>
 </if>
 <foreach for='{=$theWidget->pageNumList()}' item='index'>
     <if "{= ($index == $theWidget->currentPageNum() )}" >
-        <a>第{=$index}页</a>
+        <a class="coresystem-pagecurrent">{=$index}</a>
 	<else />
-	    <a href="{=$theWidget->pageUrl($index)}"{=($theWidget->attribute("onclick",null)===null?'':('onclick='."'".$theWidget->attribute("onclick",null)."'") ) }>第{=$index}页</a>
+	    <a class="coresystem-page" href="{=$theWidget->pageUrl($index)}"{=($theWidget->attribute("onclick",null)===null?'':('onclick='."'".$theWidget->attribute("onclick",null)."'") ) }>{=$index}</a>
 	</if>
 </foreach>
 <if "{=$theWidget->attributeBool('shownext',true) && $theWidget->currentPageNum() < $theWidget->totalPageCount() }" >
-    <a href="{=$theWidget->pageUrl($theWidget->currentPageNum() +1 )}"{=($theWidget->attribute("onclick",null)===null?'':('onclick='."'".$theWidget->attribute("onclick",null)."'") ) }>下一页</a>
+    <a class="coresystem-pagenext" href="{=$theWidget->pageUrl($theWidget->currentPageNum() +1 )}"{=($theWidget->attribute("onclick",null)===null?'':('onclick='."'".$theWidget->attribute("onclick",null)."'") ) }>下一页</a>
 </if>
 <if "{=$theWidget->attributeBool('showlast',true)} and $theWidget->totalPageCount() >=1" >
-    <a href="{=$theWidget->pageUrl($theWidget->totalPageCount()  )}"{=($theWidget->attribute("onclick",null)===null?'':('onclick='."'".$theWidget->attribute("onclick",null)."'") ) }>最后一页</a>
+    <a class="coresystem-pagelast" href="{=$theWidget->pageUrl($theWidget->totalPageCount()  )}"{=($theWidget->attribute("onclick",null)===null?'':('onclick='."'".$theWidget->attribute("onclick",null)."'") ) }>最后一页</a>
 </if>
-<if "{=$theWidget->attributeBool('showtotal',true)} and $theWidget->totalPageCount() >=1" >
-    共{=$theWidget->totalPageCount()}页
-</if>
+</div>
