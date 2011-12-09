@@ -1,12 +1,17 @@
 <?php
 namespace org\jecat\framework\mvc\view\widget\menu;
 
+use org\jecat\framework\resrc\HtmlResourcePool;
 use org\jecat\framework\bean\BeanFactory ;
+
+HtmlResourcePool::singleton()->addRequire('org.jecat.framework:style/widget/menu.css',HtmlResourcePool::RESRC_CSS) ;
+HtmlResourcePool::singleton()->addRequire('org.jecat.framework:js/mvc/view/widget/menu.js',HtmlResourcePool::RESRC_JS) ;
 
 class Item extends AbstractBase
 {
-	public function __construct($sTitle='',$sId =null , IView $aView = null) {
-        parent::__construct ( $sId , 'org.jecat.framework:WidgetItem.template.html', null , $aView );
+	public function __construct($sTitle='',$sId =null , IView $aView = null)
+	{
+        parent::__construct ( $sId , 'org.jecat.framework:WidgetItem.template.html', null , $aView ) ;
         $this->setTitle($sTitle);
     }
     
@@ -41,7 +46,7 @@ class Item extends AbstractBase
     	return $this->parentMenu;
     }
     
-    public function isShowContinue(){
+    public function isDisplaySubMenu(){
     	if($this->subMenu() === null) return false;
     	if($this->showdepth() === null) return true;
     	if($this->depth() >= $this->showdepth()) return false;
@@ -56,6 +61,9 @@ class Item extends AbstractBase
 		}
     }
     
+    public function setActive($bActive){
+    	return $this->setAttribute('active',$bActive?true:false);
+    }
     public function isActive(){
     	return $this->attribute('active',false);
     }
@@ -88,8 +96,9 @@ class Item extends AbstractBase
 		if( !empty($arrConfig['menu'])){
 			$this->buildSubMenu($arrConfig['menu']);
 		}
-		if( !empty( $arrConfig['active'])){
-			$this->setAttribute('active',$arrConfig);
+		if( array_key_exists('active',$arrConfig) )
+		{
+			$this->setActive($arrConfig['active']);
 		}
 		if( !empty( $arrConfig['link'])){
 			$this->setLink($arrConfig['link']);
@@ -115,13 +124,17 @@ class Item extends AbstractBase
 	
 	public function getCssClassString(){
 		$arrClass=array(
-			$this->cssClassBase().'item-depth'.$this->depth(),
+			parent::CSS_CLASS_BASE.'-item',
+			parent::CSS_CLASS_BASE.'-item-depth-'.$this->depth(),
 		);
 		if($this->parent() !== null){
-			$arrClass[] = $this->cssClassBase().'direction-'.$this->parent()->getDirection();
+			$arrClass[] = parent::CSS_CLASS_BASE.'-item-direction-'.$this->parent()->getDirection();
+		}
+		if($this->isActive())
+		{
+			$arrClass[] = parent::CSS_CLASS_BASE.'-item-active' ;
 		}
 		return 'class ="'.implode(' ',$arrClass).'"';
-		return 'class ="'.$this->cssClassBase().'item-depth'.$this->depth().'"';
 	}
 	
 	public function link()

@@ -1,17 +1,7 @@
-<css src="org.jecat.framework:style/widget/menu.css" />
-<js src="org.jecat.framework:js/mvc/view/widget/menu/base.js" />
-<script type="text/javascript">
-var o=new jc.mvc.view.widget.menu.base.jsobject("{=$theWidget->showId(true)}");
-o.setAttribute('direction','{=$theWidget->getDirection()}');
-o.setAttribute('alone','{=$theWidget->getIndependence()}');
-<if "$theWidget->parentItem() != null && $theWidget->parentItem()->parentMenu()">
-	o.setParentId('{=$theWidget->parentItem()->parentMenu()->showId()}');
-</if>
-</script>
-<ul id='{=$theWidget->showId()}' {=$theWidget->getStyleString()} {=$theWidget->getCssClassString()}>{=$theWidget->title()}
-<!-- <if "$theWidget->parentItem() != null">父项目：{=$theWidget->parentItem()->title();}</if> -->
-<foreach for='$theWidget->itemIterator()' item='item'>
-	<widget instance='$item' />
+<ul id='{=$theWidget->id()}' {=$theWidget->getStyleString()} {=$theWidget->getCssClassString()}>
+<foreach for='$theWidget->itemIterator()' item='aItem'>
+	<widget instance='$aItem' />
 </foreach>
 </ul>
 
+<script>{= $theWidget->generateJsCode() }</script>

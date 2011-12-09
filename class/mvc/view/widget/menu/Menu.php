@@ -1,6 +1,7 @@
 <?php
 namespace org\jecat\framework\mvc\view\widget\menu;
 
+use org\jecat\framework\resrc\HtmlResourcePool;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\util\IDataSrc;
 use org\jecat\framework\bean\BeanFactory ;
@@ -8,9 +9,14 @@ use org\jecat\framework\ui\UI;
 use org\jecat\framework\io\IOutputStream;
 use org\jecat\framework\util\IHashTable;
 
+
+HtmlResourcePool::singleton()->addRequire('org.jecat.framework:style/widget/menu.css',HtmlResourcePool::RESRC_CSS) ;
+HtmlResourcePool::singleton()->addRequire('org.jecat.framework:js/mvc/view/widget/menu.js',HtmlResourcePool::RESRC_JS) ;
+
 class Menu extends AbstractBase
 {
-	public function __construct($sId =null , IView $aView = null) {
+	public function __construct($sId =null , IView $aView = null)
+	{        
         parent::__construct ( $sId , 'org.jecat.framework:WidgetMenu.template.html', null , $aView );
     }
     
@@ -133,8 +139,8 @@ class Menu extends AbstractBase
 		if(!empty($arrConfig['left'])){
 			$this->setPosLeft($arrConfig['left']);
 		}
-		if(!empty($arrConfig['independence'])){
-			$this->setIndependence($arrConfig['independence']);
+		if( array_key_exists('tearoff',$arrConfig) ){
+			$this->setTearoff($arrConfig['tearoff']);
 		}
 	}
 	
@@ -176,12 +182,12 @@ class Menu extends AbstractBase
 		return $this->attribute('left',null);
 	}
 	
-	public function setIndependence($bIndependence){
-		$this->setAttribute('alone',$bIndependence);
+	public function setTearoff($bTearoff){
+		$this->setAttribute('tearoff',$bTearoff?true:false);
 	}
 	
-	public function getIndependence(){
-		return $this->attribute('alone',false);
+	public function isTearoff(){
+		return $this->attribute('tearoff',false);
 	}
 	
 	/// v-vertical h-horizontal
@@ -202,7 +208,7 @@ class Menu extends AbstractBase
 			$arrStyle[] = 'top:'.$this->getPosTop().'px';
 			//return "style='position: absolute;left:".$this->getPosLeft()."px;top:".$this->getPosTop()."px;'";
 		}
-		if($this->getIndependence()){
+		if($this->isTearoff()){
 			$arrStyle[] = 'z-index:'.( 1000 + $this->depth() );
 		}else{
 			$arrStyle[] = 'z-index:'.$this->depth();
@@ -212,13 +218,13 @@ class Menu extends AbstractBase
 	
 	public function getCssClassString(){
 		$arrClass=array(
-			$this->cssClassBase().'menu-depth'.$this->depth(),
+			parent::CSS_CLASS_BASE.'-depth-'.$this->depth(),
 		);
-		if($this->getIndependence()){
-			$arrClass[] = $this->cssClassBase().'menu-alone';
+		if($this->isTearoff()){
+			$arrClass[] = parent::CSS_CLASS_BASE.'-tearoff';
 		}
-		$arrClass[] = $this->cssClassBase().'direction-'.$this->getDirection();
-		$arrClass[] = 'jc-mvc-view-widget-menu-menu';
+		$arrClass[] = parent::CSS_CLASS_BASE.'-direction-'.$this->getDirection();
+		$arrClass[] = parent::CSS_CLASS_BASE ;
 		return 'class ="'.implode(' ',$arrClass).'"';
 	}
 	
@@ -233,6 +239,25 @@ class Menu extends AbstractBase
 		}else{
 			parent::display($aUI,$aVariables,$aDevice);
 		}
+	}
+	
+	public function parentMenuId()
+	{
+		if( !$aParentItem = $this->parentItem() )
+		{
+			return null ;
+		}
+		if( !$aParentMenu = $aParentItem->parentMenu() )
+		{
+			return null ;
+		}
+		return $aParentMenu->id() ;
+	}
+	
+	public function generateJsCode()
+	{
+		return 'new jc.mvc.view.widget.menu.base.jsobject("'
+				.$this->id().'","'.$this->getDirection().'",'.($this->isTearoff()?'true':'false').',"'.$this->parentMenuId().'");' ;
 	}
 	
 	private $arrItems = array();

@@ -206,6 +206,88 @@ class DataSrc extends HashTable implements IDataSrc, \ArrayAccess, \Iterator
 		$this->arrDisables = null ;
 	}
 	
+	static public function compare(IDataSrc $aDataSrc,$otherDataSrc)
+	{
+		if( $otherDataSrc instanceof IDataSrc )
+		{
+			foreach($otherDataSrc->nameIterator() as $sName)
+			{
+				$value =& $otherDataSrc->getRef($sName) ;
+				$thisValue =& $aDataSrc->getRef($sName) ;
+			
+				if( is_object($value) )
+				{
+					if( $thisValue!==$value )	// 对象 用 === 判断
+					{
+						return false ;
+					}
+				}
+				else if( $thisValue!=$value )	// 普通变量 用 == 判断
+				{
+					return false ;
+				}
+			}
+		}
+		else 
+		{
+			if( is_string($otherDataSrc) )
+			{
+				parse_str($otherDataSrc,$otherDataSrc) ;
+			}
+			else if( !is_array($otherDataSrc) )
+			{
+				return false ;
+			}
+			
+			foreach($otherDataSrc as $name=>&$value)
+			{
+				$thisValue =& $aDataSrc->getRef($name) ;
+			
+				if( is_object($value) )
+				{
+					if( $thisValue!==$value )	// 对象 用 === 判断
+					{
+						return false ;
+					}
+				}
+				else if( $thisValue!=$value )	// 普通变量 用 == 判断
+				{
+					return false ;
+				}
+			}
+		}
+		
+		return true ;
+	}
+	
+	static public function sortQuery($dataSrc)
+	{
+		if( is_string($dataSrc) )
+		{
+			parse_str($dataSrc,$dataSrc) ;
+		}
+		else if( !is_array($dataSrc) )
+		{
+			return (string)$dataSrc ;
+		}
+		
+		self::recursionSortArray($dataSrc) ;
+		
+		return http_build_query($dataSrc) ;
+	}
+	static private function recursionSortArray(&$dataSrc)
+	{
+		ksort($dataSrc) ;
+	
+		foreach($dataSrc as &$item)
+		{
+			if( is_array($item) )
+			{
+				self::recursionSortArray($item) ;
+			}
+		}
+	}
+	
 	protected $arrChildren = array() ;
 	
 	private $arrDisables ;
