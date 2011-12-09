@@ -98,12 +98,14 @@ class Selecter extends OperationStrategy
 		$aCriteria = $aSelect->criteria() ;
 		$aCriteria->setLimit(-1) ;
 		$aCriteria->clearGroupBy() ;
+		
+		$sKey = 'DISTINCT ' ;
 		foreach($aPrototype->keys() as $sClmName)
 		{
-			$aCriteria->addGroupBy('`'.$aPrototype->sqlTableAlias().'`.`'.$sClmName.'`') ;
+			$sKey.= ' `'.$aPrototype->sqlTableAlias().'`.`'.$sClmName.'`' ;
 		}
 		
-		return $aDB->queryCount($aSelect) ;
+		return $aDB->queryCount($aSelect,$sKey) ;
 	}
 	
 	private function queryForMultitermAssoc(DB $aDB,Association $aMultitermAssoc,IModel $aModel,Select $aSelect)
