@@ -80,6 +80,8 @@ class WidgetCompiler extends NodeCompiler
 		}
 		
 		// html attribute
+		$aDev->write("	{$sWidgetVarName}->clearAttribute() ;") ;
+		
 		$arrInputAttrs = array() ; 
 		foreach($aAttrs as $sName=>$aValue)
 		{
@@ -106,10 +108,8 @@ class WidgetCompiler extends NodeCompiler
 		
 		else
 		{
-			$aDev->write("	if(empty(\$__aVariablesForWidgets)){	// 创建一个被所有 widget 共享的 Variables 对象") ;
-			$aDev->write("		\$__aVariablesForWidgets = new \\org\\jecat\\framework\\util\\DataSrc() ;") ;
-			$aDev->write("		\$__aVariablesForWidgets->addChild(\$aVariables) ;");
-			$aDev->write("	}") ;
+			$aDev->write("	\$__aVariablesForWidgets = new \\org\\jecat\\framework\\util\\DataSrc() ;") ;
+			$aDev->write("	\$__aVariablesForWidgets->addChild(\$aVariables) ;");
 			$aDev->write("	{$sOldWidgetVarVarName} = \$__aVariablesForWidgets->get('theWidget') ;") ;
 			$aDev->write("	\$__aVariablesForWidgets->set('theWidget',{$sWidgetVarName}) ;") ;
 			

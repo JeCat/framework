@@ -134,10 +134,9 @@ class Menu extends AbstractBase
 		return $aItem;
 	}
 	
-	protected function parent(){
-		return $this->parentItem();
-	}
-	
+	/**
+	 * @return Item
+	 */
 	public function parentItem(){
 		return $this->parentItem;
 	}
@@ -148,22 +147,33 @@ class Menu extends AbstractBase
 		}
 	}
 	
+	/**
+	 * @return Menu
+	 */
+	public function parentMenu()
+	{
+		if( !$aParentItem = $this->parentItem() )
+		{
+			return null ;
+		}
+		return $aParentItem->parentMenu() ;
+	}
+	
+	public function parentMenuId()
+	{
+		if( !$aParentMenu = $this->parentMenu() )
+		{
+			return null ;
+		}
+		return $aParentMenu->id() ;
+	}
+	
 	public function depth(){
-    	if($this->parent() === null){
+    	if($this->parentItem() === null){
 			return 1;
 		}else{
-			return $this->parent()->depth() +1;
+			return $this->parentItem()->depth() +1;
 		}
-    }
-    
-	protected function showdepth(){
-    	$maxdepth_attr = $this->attribute('depth',-1);
-    	if($maxdepth_attr >=0 ){
-    		return $maxdepth_attr;
-    	}else if($this->parent() !== null){
-    		return $this->parent()->showdepth();
-    	}
-    	return null;
     }
     
 	private function buildItems($configItems,$id=null){
@@ -254,30 +264,66 @@ class Menu extends AbstractBase
 		return 'class ="'.implode(' ',$arrClass).'"';
 	}
 	
-	public function display(UI $aUI,IHashTable $aVariables=null,IOutputStream $aDevice=null){
-		if($this->attribute('startWith',null) !== null){
-			$m = $this ->getMenuByPath( $this->attribute('startWith',null));
-			if($m !== null){
-				$m->display($aUI,$aVariables,$aDevice);
-			}else{
+	public function findActiveSubMenu($nDepth)
+	{
+		if($nDepth<1)
+		{
+			return $this ;
+		}
+		
+		foreach($this->arrItems as $aItem)
+		{
+			if( $aItem->isActive() and $sSubMenu=$aItem->subMenu() )
+			{
+				return $sSubMenu->findActiveSubMenu($nDepth-1) ;
 			}
-			return;
-		}else{
-			parent::display($aUI,$aVariables,$aDevice);
+		}
+		
+		return null ;
+	}
+	
+	public function display(UI $aUI,IHashTable $aVariables=null,IOutputStream $aDevice=null)
+	{
+		if(($depth=$this->attribute('depth'))!==null)
+		{
+			if( $aMenu = $this->findActiveSubMenu((int)$depth) )
+			{
+				$aMenu->display($aUI,$aVariables,$aDevice);
+			}
+		}
+		else if(($xpath=$this->attribute('xpath'))!==null)
+		{
+			if( $aMenu = $this ->getMenuByPath($xpath) )
+			{
+				$aMenu->display($aUI,$aVariables,$aDevice);
+			}
+		}
+		
+		else
+		{
+			if($this->showDepths()!=0)
+			{
+				parent::display($aUI,$aVariables,$aDevice) ;
+			}
 		}
 	}
 	
-	public function parentMenuId()
+	public function showDepths()
 	{
-		if( !$aParentItem = $this->parentItem() )
+		$showDepths = $this->attribute('showDepths') ;
+		if($showDepths===null)
 		{
-			return null ;
+			if( $aParentMenu = $this->parentMenu() )
+			{
+				return $aParentMenu->showDepths() - 1 ;
+			}
+			else
+			{
+				return -1 ;
+			}
 		}
-		if( !$aParentMenu = $aParentItem->parentMenu() )
-		{
-			return null ;
-		}
-		return $aParentMenu->id() ;
+		
+		return (int) $showDepths ;
 	}
 	
 	public function isActive()

@@ -1,8 +1,10 @@
 <li	id='{=$theWidget->id()}' {=$theWidget->getCssClassString()}>
-	{=$theWidget->html()}
+	<span {=$theWidget->getCssClassString()}>{=$theWidget->html()}</span>
 	
 	<if "$theWidget->isDisplaySubMenu()" >
-		<widget instance="$theWidget->subMenu()" />
+		<widget instance="$theWidget->subMenu()"  />
 	</if>
 </li>
+
 <script>jc.mvc.view.widget.menu.base.bindItemEvent('{=$theWidget->id()}')</script>
+

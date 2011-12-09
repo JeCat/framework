@@ -164,15 +164,19 @@ class Widget extends Object implements IViewWidget, IBean
 		return $this->messageQueue()->create($sType,$sMessage,$arrMessageArgs,$aPoster) ;
 	}
 	
-	public function setAttribute($sName,$sValue)
+	public function setAttribute($sName,$value)
 	{
 		$sName = strtolower($sName) ;
-		$this->arrAttributes[$sName] = $sValue ;
+		$this->arrAttributes[$sName] = $value ;
 	}
-	public function attribute($sName,$sValue)
+	public function attribute($sName,$default=null)
 	{
+		if(!$this->arrAttributes)
+		{
+			return null ;
+		}
 		$sName = strtolower($sName) ;
-		return isset($this->arrAttributes[$sName])? $this->arrAttributes[$sName]: $sValue ;
+		return isset($this->arrAttributes[$sName])? $this->arrAttributes[$sName]: $default ;
 	}
     public function attributeBool($sName,$bValue=true)
     {
@@ -195,11 +199,15 @@ class Widget extends Object implements IViewWidget, IBean
 	}
 	public function attributeNameIterator()
 	{
-		return new \org\jecat\framework\pattern\iterate\ArrayIterator(array_keys($this->arrAttributes)) ;
+		return $this->arrAttributes? new \org\jecat\framework\pattern\iterate\ArrayIterator(array_keys($this->arrAttributes)): new \EmptyIterator() ;
 	}
 	public function removeAttribute($sName)
 	{
 		unset($this->arrAttributes[$sName]) ;
+	}
+	public function clearAttribute()
+	{
+		$this->arrAttributes = null ;
 	}
 	
 	public function displayInputAttributes()
@@ -224,7 +232,7 @@ class Widget extends Object implements IViewWidget, IBean
 
 	private $sTitle ;
 	
-	private $arrAttributes = array() ;
+	private $arrAttributes ;
 	
     private $arrBeanConfig ;
 }

@@ -132,11 +132,17 @@ class Item extends AbstractBase
     	return $this->parentMenu;
     }
     
-    public function isDisplaySubMenu(){
-    	if($this->subMenu() === null) return false;
-    	if($this->showdepth() === null) return true;
-    	if($this->depth() >= $this->showdepth()) return false;
-    	return true;
+    public function isDisplaySubMenu()
+    {
+    	if(!$this->subMenu())
+    	{
+    		return false;
+    	}
+    	if(!$aMenu=$this->parentMenu())
+    	{
+    		return true;
+    	}
+    	return $aMenu->showDepths()!=0 ;
     }
     
     public function depth(){
@@ -152,16 +158,6 @@ class Item extends AbstractBase
     }
     public function isActive(){
     	return $this->bActive ;
-    }
-    
-    protected function showdepth(){
-    	$maxdepth_attr = $this->attribute('depth',-1);
-    	if($maxdepth_attr >=0 ){
-    		return $maxdepth_attr;
-    	}else if($this->parent() !== null){
-    		return $this->parent()->showdepth();
-    	}
-    	return null;
     }
 	
 	private function buildSubMenu($subMenu){
