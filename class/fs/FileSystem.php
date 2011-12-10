@@ -567,7 +567,6 @@ abstract class FileSystem extends Object
 	
 	private $arrMounteds = array() ;
 	private $bCaseSensitive = true ;
-	private $sMountPath = '/' ;
 	private $aMounted = null ;
 	private $arrFSOFlyweights = array() ;
 }
