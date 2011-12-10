@@ -26,7 +26,33 @@ class Advice extends NamedObject
 		
 		$this->sSource = $sSource ;
 		$this->sPosition = $sPosition ;
-		$this->aToken = $aToken ;
+	
+		// access
+		if( $aToken and $aAccessToken=$aToken->accessToken() )
+		{
+			$this->sAccess = $aAccessToken->targetCode() ;
+		}
+		
+		// static
+		$this->bStatic = ($aToken and $aToken->staticToken())? true: false ;
+
+		// signtrue
+		if($aToken)
+		{
+			$this->sSigntrue = '' ;
+			if( $aClass = $aToken->belongsClass() )
+			{
+				$this->sSigntrue = $aClass->fullName().'::' ;
+			}
+			if( $aFunction = $aToken->belongsFunction() )
+			{
+				$this->sSigntrue.= $aFunction->name().'()' ;
+			}
+		}
+		if(!$this->sSigntrue)
+		{
+			$this->sSigntrue = $sName ;
+		}
 	}
 
 	static public function createFromToken(FunctionDefine $aFunctionDefine)
@@ -78,27 +104,28 @@ class Advice extends NamedObject
 	
 	public function isStatic()
 	{
-		return ($this->aToken and $this->aToken->staticToken())? true: false ;
+		$this->bStatic ;
 	}
 	
 	public function access()
 	{
-		if(!$this->aToken or !$aAccessToken=$this->aToken->accessToken() )
-		{
-			return 'public' ;
-		}
-		
-		return $aAccessToken->targetCode() ;
+		$this->sAccess ;
+	}
+	
+	public function signtrue()
+	{
+		return $this->sSigntrue ;
 	}
 	
 	private $sSource ;
 	
 	private $sPosition ;
 	
-	/**
-	 * @var org\jecat\framework\lang\compile\object\FunctionDefine
-	 */
-	private $aToken ;
+	private $sAccess = 'private' ;
+	
+	private $bStatic = false ;
+	
+	private $sSigntrue ;
 }
 
 ?>

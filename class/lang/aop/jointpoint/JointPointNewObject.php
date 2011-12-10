@@ -16,6 +16,11 @@ class JointPointNewObject extends JointPoint
 		$this->setNewObjectRegexp( self::transRegexp($sNewObjectPattern) );
 	}
 	
+	public function exportDeclare($bWithClass=true)
+	{
+		return '[new object]new '.($bWithClass?$this->weaveClass():'').'() ;' ;
+	}
+	
 	public function matchExecutionPoint(Token $aToken)
 	{
 		return preg_match( $this->newObjectRegexp(),$aToken->sourceCode() )? true: false ;

@@ -12,6 +12,11 @@ class JointPointMethodDefine extends JointPoint
 		parent::__construct($sClassName,$sMethodNamePattern) ;
 	}
 	
+	public function exportDeclare($bWithClass=true)
+	{
+		return '[define method]'.($bWithClass?$this->weaveClass():'')."::".$this->weaveMethod().'() ;' ;
+	}
+	
 	public function matchExecutionPoint(Token $aToken)
 	{		
 		$aIsPattern = $this->weaveMethodIsPattern() ;

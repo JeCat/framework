@@ -64,6 +64,8 @@ class Aspect extends NamedObject
 			}
 		}
 		
+		$aAspect->sAspectName = $sAspectName ;
+		
 		return $aAspect ;
 	}
 	
@@ -113,7 +115,14 @@ class Aspect extends NamedObject
 		return $this->aPointcuts ;
 	}
 	
+	public function aspectName()
+	{
+		return $this->sAspectName ;
+	}
+	
 	private $aPointcuts ;
+	
+	private $sAspectName ;
 	
 }
 

@@ -72,6 +72,8 @@ abstract class JointPoint extends Object
 		$this->setWeaveClass($sWeaveClass) ;
 		$this->setWeaveMethod($sWeaveMethod) ;
 	}
+	
+	abstract public function exportDeclare($bWithClass=true) ;
 		
 	static public function transRegexp($sPartten)
 	{

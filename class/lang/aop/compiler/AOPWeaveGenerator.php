@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\lang\aop\compiler ;
 
+use org\jecat\framework\lang\compile\ClassCompileException;
+
 use org\jecat\framework\lang\compile\object\ClosureToken;
 use org\jecat\framework\util\Stack;
 use org\jecat\framework\lang\Exception;
@@ -292,10 +294,8 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 
 	private function generateAdviceWeavedFunctionName(GenerateStat $aStat,Advice $aAdvice)
 	{
-		$aToken = $aAdvice->token() ;
-		
-		return $aToken->name().'_cut_'.$aAdvice->position().'_'.md5(
-			spl_object_hash($aStat->aExecutePoint) . '<<' . $aToken->belongsClass()->fullName().'::'.$aToken->name()
+		return $aStat->aExecutePoint->belongsFunction()->name().'_cut_'.$aAdvice->position().'_'.md5(
+			spl_object_hash($aStat->aExecutePoint) . '<<' . $aAdvice->signtrue()
 		) ;
 	}
 	
