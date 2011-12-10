@@ -112,7 +112,7 @@ class BeanFactory extends Object implements \Serializable
 			}
 			
 			// 在两个config中都是数组元素
-			if( is_array($item) and is_array($arrConfigA[$key]) )
+			if( $arrConfigA and array_key_exists($key,$arrConfigA) and is_array($arrConfigA[$key]) and is_array($item) )
 			{
 				self::mergeConfig($arrConfigA[$key],$item) ;
 			}
