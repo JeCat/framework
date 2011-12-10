@@ -47,9 +47,72 @@ class LocalFileSystem extends FileSystem
 		return unlink($this->sLocalPath.$sPath) ;
 	}
 	
-	protected function deleteDirOperation(&$sPath)
+	protected function deleteDirOperation(&$sPath,$bRecurse=false,$bIgnoreError=false)
 	{
-		return rmdir($this->sLocalPath.$sPath) ;
+		if(!$bRecurse)
+		{
+			return rmdir($this->sLocalPath.'/'.$sPath) ;
+		}
+		
+		else 
+		{
+			$sDirPath = $this->sLocalPath.'/'.$sPath ;
+			
+			if( !$hDir = opendir($sDirPath) )
+			{
+				return false ;
+			}
+			
+			$bReturn = true ;
+			
+			while( $sFilename=readdir($hDir) )
+			{
+				if( $sFilename=='.' or $sFilename=='..' )
+				{
+					continue ;
+				}
+				
+				$sFilePath = $sDirPath.'/'.$sFilename ;
+				
+				if( is_dir($sFilePath) )
+				{
+					// 递归删除子目录
+					$sSubPath = $sPath.'/'.$sFilename ;
+					if( !$this->deleteDirOperation($sSubPath,$bRecurse,$bIgnoreError) )
+					{
+						if(!$bIgnoreError)
+						{
+							return false ;
+						}
+						$bReturn = true ;
+					}
+				}
+				else
+				{
+					// 删除子文件
+					if( !unlink($sFilePath) )
+					{
+						if(!$bIgnoreError)
+						{
+							return false ;
+						}
+						$bReturn = true ;
+					}
+				}
+			}
+			
+			closedir($hDir) ;
+				
+			// 删除自己
+			if( rmdir($sDirPath) )
+			{
+				return $bReturn ;
+			}
+			else 
+			{
+				return false ;
+			}
+		}
 	}
 	
 	protected function createFileObject(&$sPath)

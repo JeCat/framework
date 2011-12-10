@@ -372,7 +372,7 @@ abstract class FileSystem extends Object
 		return $this->arrFSOFlyweights[$sFlyweightKey] ;
 	}
 	
-	public function delete($sPath)
+	public function delete($sPath,$bRecurse=false,$bIgnoreError=false)
 	{		
 		// 是否在挂载的文件系统中
 		list($aMountFS,$sInnerPath) = $this->localeFileSystem($sPath) ;
@@ -398,7 +398,7 @@ abstract class FileSystem extends Object
 		}
 		else if( $this->isFolder($sPath) )
 		{
-			if( $this->deleteDirOperation($sPath) )
+			if( $this->deleteDirOperation($sPath,$bRecurse,$bIgnoreError) )
 			{
 				$sFlyweightKey = $this->fsoFlyweightKey($sPath) ;
 				unset($this->arrFSOFlyweights[$sFlyweightKey]) ;
@@ -505,7 +505,7 @@ abstract class FileSystem extends Object
 	
 	abstract protected function deleteFileOperation(&$sPath) ;
 	
-	abstract protected function deleteDirOperation(&$sPath) ;
+	abstract protected function deleteDirOperation(&$sPath,$bRecurse) ;
 	
 	abstract protected function createFileObject(&$sPath) ;
 	
@@ -563,6 +563,14 @@ abstract class FileSystem extends Object
 	protected function fsoFlyweightKey($sPath)
 	{
 		return $this->isCaseSensitive()? strtolower($sPath): $sPath ;
+	}
+	
+	/**
+	 * @return FileSystem
+	 */
+	static public function singleton($bCreateNew=true,$createArgvs=null,$sClass=null)
+	{
+		return parent::singleton($bCreateNew,$createArgvs,$sClass?:__CLASS__) ;
 	}
 	
 	private $arrMounteds = array() ;

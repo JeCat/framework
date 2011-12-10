@@ -25,6 +25,8 @@ interface IFolder extends IFSO
 	
 	public function deleteChild($sPath) ;
 	
+	public function delete($bRecurse=false,$bIgnoreError=false) ;
+	
 	/**
 	 * @return \Iterator
 	 */

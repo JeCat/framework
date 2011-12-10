@@ -88,9 +88,9 @@ abstract class FSO extends Object implements IFSO
 	 * 
 	 * @return bool
 	 */
-	public function delete()
+	public function delete($bRecurse=false,$bIgnoreError=false)
 	{
-		return $this->fileSystem()->delete($this->path()) ;
+		return $this->fileSystem()->delete($this->path(),$bRecurse,$bIgnoreError) ;
 	}
 	
 	/**

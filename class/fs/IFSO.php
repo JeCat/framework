@@ -35,8 +35,6 @@ interface IFSO
 	
 	public function setPerms($nMode) ; 
 	
-	public function delete() ;
-	
 	/**
 	 * 复制这个文件对象
 	 * @param string,IFolder		 $to	复制目标路径 或 目标目录

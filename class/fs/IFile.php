@@ -22,6 +22,8 @@ interface IFile extends IFSO
 	public function hash() ;
 	
 	public function includeFile($bOnce=false,$bRequire=false) ;
+	
+	public function delete() ;
 }
 
 ?>
