@@ -39,33 +39,27 @@ abstract class FileSystem extends Object
 		}
 
 		$sFlyweightKey = $this->fsoFlyweightKey($sPath) ;
-		if( !$aFlyweight=FSO::flyweight($sFlyweightKey,false) )
+		if( !isset($this->arrFSOFlyweights[$sFlyweightKey]) )
 		{
 			if( $this->exists($sPath) )
 			{
 				if( $this->isFile($sPath) and ($type===self::file or $type===self::unknow) )
 				{
-					$aFlyweight = $this->createFileObject($sPath) ; 
+					$this->arrFSOFlyweights[$sFlyweightKey] = $this->createFileObject($sPath) ; 
 				}
 				
 				else if($this->isFolder($sPath) and ($type===self::folder or $type===self::unknow) )
 				{
-					$aFlyweight = $this->createFolderObject($sPath) ; 
-				}
-				else
-				{
+					$this->arrFSOFlyweights[$sFlyweightKey] = $this->createFolderObject($sPath) ; 
+				}else{
 					return null;
 				}
-			}
-			else
-			{
+			}else{
 				return null;
 			}
-			
-			FSO::setFlyweight($aFlyweight,$sFlyweightKey) ;
 		}
 
-		return $aFlyweight ;
+		return $this->arrFSOFlyweights[$sFlyweightKey] ;
 	}
 
 	/**
@@ -168,11 +162,11 @@ abstract class FileSystem extends Object
 			
 			if(!$aFSO)
 			{
-				FSO::setFlyweight(null,$sFlyweightKey) ;
+				unset($this->arrFSOFlyweights[$sFlyweightKey]) ;
 			}
 			else 
 			{
-				FSO::setFlyweight($aFSO,$sFlyweightKey) ;
+				$this->arrFSOFlyweights[$sFlyweightKey] = $aFSO ;
 				
 				$aFSO->setInnerPath($sPath) ;
 				$aFSO->setFileSystem($this) ;
@@ -311,7 +305,8 @@ abstract class FileSystem extends Object
 
 		// 检查享元对象及类型是否匹配
 		$sFlyweightKey = $this->fsoFlyweightKey($sPath) ;
-		if( !$aFlyweight=FSO::flyweight($sFlyweightKey,false) or !$aFlyweight instanceof IFile)
+		if( !isset($this->arrFSOFlyweights[$sFlyweightKey]) 
+				or ! $this->arrFSOFlyweights[$sFlyweightKey] instanceof IFile )
 		{
 			if( $this->isFolder($sPath) )
 			{
@@ -319,21 +314,21 @@ abstract class FileSystem extends Object
 			}
 			else
 			{
-				$aFlyweight = $this->createFileObject($sPath);
+				$aFile = $this->createFileObject($sPath);
 				
 				// 如果文件不存在，且没有要求 self::CREATE_ONLY_OBJECT ，则创建之
-				if( !($nMode&self::CREATE_ONLY_OBJECT) and !$aFlyweight->exists())
+				if( !($nMode&self::CREATE_ONLY_OBJECT) and !$aFile->exists())
 				{
-					if( !$aFlyweight->create( $nMode ) )
+					if( !$aFile->create( $nMode ) )
 					{
 						throw new Exception('无法创建文件:%s',$sPath) ;
 					}
 				}
-				FSO::setFlyweight($aFlyweight,$sFlyweightKey) ;
+				$this -> arrFSOFlyweights[$sFlyweightKey] =$aFile;
 			}
 		}
 
-		return $aFlyweight ;
+		return $this->arrFSOFlyweights[$sFlyweightKey] ;
 	}
 
 	/**
@@ -351,7 +346,8 @@ abstract class FileSystem extends Object
 
 		// 检查享元对象及类型是否匹配
 		$sFlyweightKey = $this->fsoFlyweightKey($sPath) ;
-		if( !$aFlyweight=FSO::flyweight($sFlyweightKey,false) or !$aFlyweight instanceof IFolder)
+		if( !isset($this->arrFSOFlyweights[$sFlyweightKey]) 
+				or ! $this->arrFSOFlyweights[$sFlyweightKey] instanceof IFolder )
 		{
 			if( $this->isFile($sPath) )
 			{
@@ -359,21 +355,21 @@ abstract class FileSystem extends Object
 			}
 			else
 			{
-				$aFlyweight = $this->createFolderObject($sPath);
+				$aFolder = $this->createFolderObject($sPath);
 				
-				if( !($nMode&self::CREATE_ONLY_OBJECT) and !$aFlyweight->exists())
+				if( !($nMode&self::CREATE_ONLY_OBJECT) and !$aFolder->exists())
 				{
-					if( !$aFlyweight->create($nMode) )
+					if( !$aFolder->create($nMode) )
 					{
 						throw new Exception('无法创建目录:%s',$sPath) ;
 					}
 				}
 				
-				FSO::setFlyweight($aFlyweight,$sFlyweightKey) ;
+				$this -> arrFSOFlyweights[$sFlyweightKey] =$aFolder;
 			}
 		}
 
-		return $aFlyweight ;
+		return $this->arrFSOFlyweights[$sFlyweightKey] ;
 	}
 	
 	public function delete($sPath)
@@ -390,8 +386,8 @@ abstract class FileSystem extends Object
 		{
 			if( $this->deleteFileOperation($sPath) )
 			{
-				$sFlyweight = $this->fsoFlyweightKey($sPath) ;
-				FSO::setFlyweight(null,$sFlyweight) ;
+				$sFlyweightKey = $this->fsoFlyweightKey($sPath) ;
+				unset($this->arrFSOFlyweights[$sFlyweightKey]) ;
 				
 				return true ;
 			} 
@@ -405,7 +401,7 @@ abstract class FileSystem extends Object
 			if( $this->deleteDirOperation($sPath) )
 			{
 				$sFlyweightKey = $this->fsoFlyweightKey($sPath) ;
-				FSO::setFlyweight(null,$sFlyweightKey) ;
+				unset($this->arrFSOFlyweights[$sFlyweightKey]) ;
 				
 				return true ;
 			}
@@ -573,6 +569,7 @@ abstract class FileSystem extends Object
 	private $bCaseSensitive = true ;
 	private $sMountPath = '/' ;
 	private $aMounted = null ;
+	private $arrFSOFlyweights = array() ;
 }
 
 
