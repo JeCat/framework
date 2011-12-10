@@ -152,9 +152,16 @@ abstract class LocalFSO extends FSO
 		}
 	}
 	
-	public function url() 
+	public function url($bProtocol=true) 
 	{
-		return 'file://' . $this->localPath() ;
+		if($bProtocol)
+		{
+			return $this->localPath() ;
+		}
+		else
+		{
+			return 'file://' . $this->localPath() ;
+		}
 	}
 	
 	private $sLocalPath = "" ;

@@ -73,7 +73,7 @@ interface IFSO
 	/**
 	 * 返回 file:///file/path 这样的url
 	 */
-	public function url() ;
+	public function url($bProtocol=true) ;
 	
 	/**
 	 * 返回能够通过http访问该文件对象的url——如果该文将对象可以在http上被访问的话
