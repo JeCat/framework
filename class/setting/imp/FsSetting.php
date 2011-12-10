@@ -9,7 +9,7 @@ use org\jecat\framework\fs\IFolder;
 use org\jecat\framework\setting\IKey;
 use org\jecat\framework\setting\Setting;
 
-class FsSetting extends Setting
+class FsSetting extends Setting implements \Serializable
 {
 	/**
 	 * 
@@ -107,6 +107,19 @@ class FsSetting extends Setting
 		$sPath = self::transPath($sPath,false) ;
 		$aNewSettingFolder = $this->aRootFolder->findFolder($sPath,FileSystem::FIND_AUTO_CREATE) ;
 		return new self($aNewSettingFolder) ;
+	}
+	
+	public function serialize ()
+	{		
+		return $this->aRootFolder->path() ;
+	}
+
+	/**
+	 * @param serialized
+	 */
+	public function unserialize ($serialized)
+	{
+		$this->aRootFolder = FileSystem::singleton()->findFolder($serialized,FileSystem::FIND_AUTO_CREATE) ;
 	}
 	
 	/**

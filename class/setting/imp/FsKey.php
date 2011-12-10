@@ -5,7 +5,7 @@ use org\jecat\framework\fs\FSIterator;
 use org\jecat\framework\fs\IFile;
 use org\jecat\framework\setting\Key;
 
-class FsKey extends Key
+class FsKey extends Key implements \Serializable
 {
 	public function __construct(IFile $aFile)
 	{
@@ -33,6 +33,19 @@ class FsKey extends Key
 		$aWriter->close() ;
 		
 		$this->bDataChanged = false ;
+	}
+
+	public function serialize ()
+	{		
+		return $this->aItemFile->path() ;
+	}
+
+	/**
+	 * @param serialized
+	 */
+	public function unserialize ($serialized)
+	{
+		$this->aItemFile = FileSystem::singleton()->findFile($serialized,FileSystem::FIND_AUTO_CREATE) ;
 	}
 
 	/**

@@ -8,7 +8,7 @@ use org\jecat\framework\lang\Type;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\Object;
 
-class Container extends Object implements IContainer
+class Container extends Object implements IContainer, \Serializable
 {
 	public function __construct($Classes=null)
 	{
@@ -25,7 +25,7 @@ class Container extends Object implements IContainer
 		foreach((array)$Classes as $sClass)
 		{
 			$sClass = strval($sClass) ;
-			if( !in_array($sClass,$this->arrAcceptClasses) )
+			if( empty($this->arrAcceptClasses) or !in_array($sClass,$this->arrAcceptClasses) )
 			{
 				$this->arrAcceptClasses[] = $sClass ;
 			}
@@ -118,14 +118,18 @@ class Container extends Object implements IContainer
 	 */
 	public function nameIterator()
 	{
-		return new \org\jecat\framework\pattern\iterate\ArrayIterator( array_keys($this->arrNames) ) ;
+		return empty($this->arrNames)?
+			new \EmptyIterator():
+			new \org\jecat\framework\pattern\iterate\ArrayIterator( array_keys($this->arrNames) ) ;
 	}
 	/**
 	 * @return \Iterate
 	 */
 	public function acceptClassIterator()
 	{
-		return new \org\jecat\framework\pattern\iterate\ArrayIterator($this->arrAcceptClasses) ;
+		return  empty($this->arrAcceptClasses)?
+			new \EmptyIterator():
+			new \org\jecat\framework\pattern\iterate\ArrayIterator($this->arrAcceptClasses) ;
 	}
 	
 	public function addFilters()
@@ -145,6 +149,10 @@ class Container extends Object implements IContainer
 
 	public function getName($object)
 	{
+		if(empty($this->arrNames))
+		{
+			return null ;
+		}
 		if( $sName = array_search($object,$this->arrNames,is_object($object)) )
 		{
 			return $sName ;
@@ -166,7 +174,7 @@ class Container extends Object implements IContainer
 	
 	public function hasName($sName)
 	{
-		return array_key_exists($sName,$this->arrNames) ;
+		return empty($this->arrNames)? false: array_key_exists($sName,$this->arrNames) ;
 	}
 	
 	public function has($object)
@@ -303,10 +311,13 @@ class Container extends Object implements IContainer
 	private function free($object)
 	{
 		// 移除名称检索
-		$sName = array_search($object,$this->arrNames,is_object($object)) ;
-		if($sName!==false)
+		if(!empty($this->arrNames))
 		{
-			unset($this->arrNames[$sName]) ;
+			$sName = array_search($object,$this->arrNames,is_object($object)) ;
+			if($sName!==false)
+			{
+				unset($this->arrNames[$sName]) ;
+			}
 		}
 		
 		// 解除父子关系
@@ -315,14 +326,55 @@ class Container extends Object implements IContainer
 			$object->setParent(null) ;
 		}
 	}
+
+	public function serialize ()
+	{
+		$arrData['arrObjects'] =& $this->arrObjects ;
+		if(!empty($this->arrAcceptClasses))
+		{
+			$arrData['arrAcceptClasses'] =& $this->arrAcceptClasses ;
+		}
+		if(!empty($this->arrNames))
+		{
+			foreach($this->arrNames as $sName=>$aObject)
+			{
+				$pos = $this->search($aObject) ;
+				if($pos!==false)
+				{
+					$arrData['arrNames'][$sName] = $pos ;
+				}
+			}
+		}
+		
+		return serialize($arrData) ;
+	}
+
+	/**
+	 * @param serialized
+	 */
+	public function unserialize ($serialized)
+	{
+		$arrData = unserialize($serialized) ;
+		$this->arrObjects =& $arrData['arrObjects'] ;
+		if(!empty($arrData['arrAcceptClasses']))
+		{
+			$this->arrAcceptClasses =& $arrData['arrAcceptClasses'] ;
+		}
+		if(!empty($arrData['arrNames']))
+		{
+			foreach($arrData['arrNames'] as $sName=>&$pos)
+			{
+				$this->arrNames[$sName] = $this->arrObjects[$pos] ;
+			}
+		}
+	}
 	
 	private $arrObjects = array() ;
 	
-	private $arrNames = array() ;
+	private $arrNames = null ;
 	
-	private $arrAcceptClasses = array() ;
+	private $arrAcceptClasses = null ;
 	
 	private $aAddFilters ;
 }
 
-?>
