@@ -38,8 +38,8 @@ interface IIdentity
 	/**
 	 * @return org\jecat\framework\mvc\model\IModel
 	 */
-	public function userDataModel() ;
-	public function setUserDataModel(IModel $aModel) ;
+	public function model() ;
+	public function setModel(IModel $aModel) ;
 	
 	
 }
