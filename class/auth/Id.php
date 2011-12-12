@@ -13,9 +13,9 @@ use org\jecat\framework\lang\Object;
 
 class Id extends Object implements IIdentity, \Serializable
 {
-	const COOKIE_KEY_USERNAME = 'jc.id.username' ;
-	const COOKIE_KEY_LOGINTIME = 'jc.id.logintime' ;
-	const COOKIE_KEY_SIGNTURE = 'jc.id.signture' ;
+	const COOKIE_KEY_USERNAME = 'jc_id_username' ;
+	const COOKIE_KEY_LOGINTIME = 'jc_id_logintime' ;
+	const COOKIE_KEY_SIGNTURE = 'jc_id_signture' ;
 	
 	public function __construct( IModel $aModel )
 	{
@@ -77,11 +77,11 @@ class Id extends Object implements IIdentity, \Serializable
 			$sPath = '/' ;
 		}
 		
-		$nCookieExpire = time() - 36000 ;
+		$nCookieExpire = time() + 36000 ;
 		
-		setcookie(self::COOKIE_KEY_USERNAME,null,$nCookieExpire,$sPath) ;
-		setcookie(self::COOKIE_KEY_LOGINTIME,null,$nCookieExpire,$sPath) ;
-		setcookie(self::COOKIE_KEY_SIGNTURE,null,$nCookieExpire,$sPath) ;
+		setcookie(self::COOKIE_KEY_USERNAME,'',$nCookieExpire,$sPath) ;
+		setcookie(self::COOKIE_KEY_LOGINTIME,'',$nCookieExpire,$sPath) ;
+		setcookie(self::COOKIE_KEY_SIGNTURE,'',$nCookieExpire,$sPath) ;
 	}
 	
 	static public function makeCookieSignture(IModel $aUserModel)
@@ -91,25 +91,25 @@ class Id extends Object implements IIdentity, \Serializable
 	
 	static public function detectCookie()
 	{
-		return( !empty($_COOKIE[parent::COOKIE_KEY_USERNAME]) 
-				and !empty($_COOKIE[parent::COOKIE_KEY_LOGINTIME]) 
-				and !empty($_COOKIE[parent::COOKIE_KEY_SIGNTURE]) ) ;
+		return( !empty($_COOKIE[self::COOKIE_KEY_USERNAME]) 
+				and !empty($_COOKIE[self::COOKIE_KEY_LOGINTIME]) 
+				and !empty($_COOKIE[self::COOKIE_KEY_SIGNTURE]) ) ;
 	}
 	
 	static public function restoreFromCookie(IModel $aUserModel)
 	{
 		// load model
-		if( !$aUserModel->load($_COOKIE[parent::COOKIE_KEY_USERNAME],'username') )
+		if( !$aUserModel->load($_COOKIE[self::COOKIE_KEY_USERNAME],'username') )
 		{
 			self::clearCookie() ;
 			return null ;
 		}
 		
 		// login 
-		$aUserModel->setData('lastLoginTime',$_COOKIE[parent::COOKIE_KEY_LOGINTIME]) ;
+		$aUserModel->setData('lastLoginTime',$_COOKIE[self::COOKIE_KEY_LOGINTIME]) ;
 		
 		// verify signture
-		if( parent::makeCookieSignture($aUserModel)!=$_COOKIE[parent::COOKIE_KEY_SIGNTURE] )
+		if( self::makeCookieSignture($aUserModel)!=$_COOKIE[self::COOKIE_KEY_SIGNTURE] )
 		{
 			self::clearCookie() ;
 			return null ;

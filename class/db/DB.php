@@ -1,6 +1,8 @@
 <?php 
 namespace org\jecat\framework\db ;
 
+use org\jecat\framework\lang\Exception;
+
 use org\jecat\framework\system\Response;
 
 use org\jecat\framework\system\Application;
@@ -20,8 +22,12 @@ class DB extends Object
 	/**
 	 * @return IDriver
 	 */
-	public function driver()
+	public function driver($bRequire=false)
 	{
+		if( $bRequire and !$this->aDriver )
+		{
+			throw new Exception("DB对像缺少Driver配置") ;
+		}
 		return $this->aDriver ;
 	}
 	public function setDriver(IDriver $aDriver)
@@ -34,17 +40,17 @@ class DB extends Object
 	 */
 	public function query($sql)
 	{
-		return $this->driver()->query($sql) ;
+		return $this->driver(true)->query($sql) ;
 	}
 	
 	public function execute($sql)
 	{
-		return $this->driver()->execute($sql) ;
+		return $this->driver(true)->execute($sql) ;
 	}
 	
 	public function queryCount(Select $aSelect,$sColumn='*')
 	{		
-		$aRecords = $this->query( $aSelect->makeStatementForCount('rowCount',$sColumn,$this->driver()->sharedStatementState()) ) ;
+		$aRecords = $this->query( $aSelect->makeStatementForCount('rowCount',$sColumn,$this->driver(true)->sharedStatementState()) ) ;
 		
 		if( $aRecords )
 		{
@@ -62,18 +68,22 @@ class DB extends Object
 		if($bPrint)
 		{
 			Response::singleton()->printer()->write(
-				"<pre>\r\n".print_r($this->driver()->executeLog(),true)."\r\n</pre>"
+				"<pre>\r\n".print_r($this->driver(true)->executeLog(),true)."\r\n</pre>"
 			) ;
 		}
 		else
 		{
-			return $this->driver()->executeLog() ;
+			return $this->driver(true)->executeLog() ;
 		}
 	}
 	
 	public function lastInsertId()
 	{
-		return $this->driver()->lastInsertId() ;
+		if(!$this->aDriver)
+		{
+			throw new Exception("DB对像缺少Driver配置") ;
+		}
+		return $this->driver(true)->lastInsertId() ;
 	}
 	
 	/**
@@ -81,7 +91,7 @@ class DB extends Object
 	 */
 	public function reflecterFactory()
 	{
-		return $this->aDriver->reflecterFactory($this);
+		return $this->driver(true)->reflecterFactory($this);
 	}
 	
 	private $aDriver ;

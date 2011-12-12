@@ -8,6 +8,23 @@ use org\jecat\framework\lang\Exception;
 
 class IdManager extends Object implements \Serializable
 {
+	/**
+	 * @return IdManager
+	 */
+	static public function singleton($bCreateNew=true,$createArgvs=null,$sClass=null)
+	{
+		if( !$aIns = parent::singleton(false,null,$sClass?:__CLASS__) )
+		{
+			$aIns = self::fromSession() ;
+			parent::setSingleton($aIns,$sClass?:__CLASS__) ;
+		}
+		
+		return $aIns ;
+	}
+	
+	/**
+	 * @return IdManager
+	 */
 	static public function fromSession(ISession $aSession=null,$sSessionName=null)
 	{
 		if(!$aSession)

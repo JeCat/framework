@@ -24,7 +24,7 @@ class AuthenticationException extends Exception
 	
 	static public function checkLogined(IController $aCauseController)
 	{
-		if( !IdManager::fromSession()->currentId() )
+		if( !IdManager::singleton()->currentId() )
 		{
 			throw new AuthenticationException($aCauseController) ; 
 		}
