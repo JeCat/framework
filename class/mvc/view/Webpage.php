@@ -16,22 +16,34 @@ class Webpage extends View
 	}
 
 	public function title()
-	{}
+	{
+		return $this->sTitle ;
+	}
 	
 	public function setTitle($sTitle)
-	{}
+	{
+		$this->sTitle = $sTitle ;
+	}
 	
 	public function keywords()
-	{}
+	{
+		return $this->sKeywords ;
+	}
 	
 	public function setKeywords($sKeywords)
-	{}
+	{
+		$this->sKeywords = $sKeywords ;
+	}
 	
 	public function description()
-	{}
+	{
+		return $this->sDescription ;
+	}
 	
 	public function setDescription($sDescription)
-	{}
+	{
+		$this->sDescription = $sDescription ;
+	}
 	
 	public function contents()
 	{
@@ -56,5 +68,11 @@ class Webpage extends View
 	}
 	
 	private $sContents = null ;
+	
+	private $sTitle = null ;
+	
+	private $sDescription = null ;
+	
+	private $sKeywords = null ;
 }
 ?>

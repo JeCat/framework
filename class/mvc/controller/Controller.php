@@ -85,14 +85,22 @@ class Controller extends NamableComposite implements IController, IBean
     		$this->setName($arrConfig['name']) ;
     	}
     	
+    	if( isset($arrConfig['params']) )
+    	{
+    		$this->buildParams($arrConfig['params']) ;
+    	}
+    	
     	if( !empty($arrConfig['title']) )
     	{
     		$this->setTitle($arrConfig['title']) ;
     	}
-    	
-    	if( isset($arrConfig['params']) )
+    	if( !empty($arrConfig['description']) )
     	{
-    		$this->buildParams($arrConfig['params']) ;
+    		$this->setDescription($arrConfig['description']) ;
+    	}
+    	if( !empty($arrConfig['keywords']) )
+    	{
+    		$this->setKeywords($arrConfig['keywords']) ;
     	}
     	
     	$aBeanFactory = BeanFactory::singleton() ;
@@ -154,6 +162,16 @@ class Controller extends NamableComposite implements IController, IBean
     			$aBeanFactory->_typeProperties( $arrBeanConf, 'controller', is_int($key)?null:$key, 'name' ) ;
     			
     			$this->add( $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ) ;
+    		}
+    	}
+    	
+    	// properties --------------------
+    	if( !empty($arrConfig['props']) )
+    	{
+    		$aProperties = $this->properties() ;
+    		foreach($arrConfig['props'] as $key=>&$value)
+    		{
+    			$aProperties->set($key,$value) ;
     		}
     	}
     	
@@ -567,6 +585,12 @@ class Controller extends NamableComposite implements IController, IBean
     		return $child ;
     	}
     	
+    	// properties
+    	else if( $aProperties=$this->properties(false) and $value=$aProperties->get($sName) )
+    	{
+    		return $value ;
+    	}
+    	
     	// ----------------
     	$nNameLen = strlen($sName) ;
     	
@@ -586,6 +610,12 @@ class Controller extends NamableComposite implements IController, IBean
     	{
     		$sControllerName = substr($sName,10) ;
     		return $this->getByName($sControllerName)?: $this->getByName(lcfirst($sControllerName)) ;
+    	}
+    	
+    	else if( $aProperties and $nNameLen>8 and substr($sName,0,8)=='property' )
+    	{
+    		$sPropertyName = substr($sName,8) ;
+    		return $aProperties->get($sPropertyName)?: $aProperties->get(lcfirst($sPropertyName)) ;
     	}
     	
 		throw new Exception("正在访问控制器 %s 中不存在的属性:%s",array($this->name(),$sName)) ;
@@ -699,14 +729,18 @@ class Controller extends NamableComposite implements IController, IBean
    		return $this->sId ;
    	}
    	
-   	public function title()
+   	/**
+   	 * @return org\jecat\framework\util\IHashTable
+   	 */
+   	public function properties($bAutoCreate=true)
    	{
-   		return $this->sTitle ;
+   		if(!$this->aProperties)
+   		{
+   			$this->aProperties = new HashTable() ;
+   		}
+   		return $this->aProperties ;
    	}
-   	public function setTitle($sTitle)
-   	{
-   		$this->sTitle = $sTitle ;
-   	}
+   	
    	
    	/**
    	 * @return IController
@@ -722,6 +756,51 @@ class Controller extends NamableComposite implements IController, IBean
    			return self::topController($aParent) ;
    		}
    	}
+   	
+   	
+   	// for webpage html head (is not belongs to IController) ----------------------
+   	public function title()
+   	{
+   		if(!$aProperties=$this->properties(false))
+   		{
+   			return ;
+   		}
+   		return $aProperties->get('title') ;
+   	}
+   	public function setTitle($sTitle)
+   	{
+   		$this->properties()->set('title',$sTitle) ;
+   	}
+   	
+   	public function description()
+   	{
+   		if(!$aProperties=$this->properties(false))
+   		{
+   			return ;
+   		}
+   		return $aProperties->get('description') ;
+   	}
+   	public function setDescription($sDescription)
+   	{
+   		$this->properties()->set('description',$sDescription) ;
+   	}
+   	
+   	public function keywords($bImplode=true)
+   	{
+   		if(!$aProperties=$this->properties(false))
+   		{
+   			return ;
+   		}
+   		$arrKeywords = $aProperties->get('keywords') ;
+   		return is_array($arrKeywords)? implode(',',$arrKeywords): '' ;
+   	}
+   	public function setKeywords($keys)
+   	{
+   		$this->properties()->set('keywords',(array)$keys) ;
+   	}
+   	
+   	
+   	
 
     static private $aRegexpModelName = null ;
     
@@ -746,9 +825,10 @@ class Controller extends NamableComposite implements IController, IBean
     
     private $sId ;
     
-    private $sTitle ;
+    private $aProperties ;
     
     static private $nAssignedId = 0 ;
+    
 }
 
 class _ExceptionRelocation extends \Exception

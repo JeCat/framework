@@ -19,8 +19,6 @@ interface IController extends IMessageQueueHolder, IContainer, IContainedable
      */
     public function params() ;
     
-    
-    
     public function addModel(IModel $aModel,$sName=null) ;
     public function removeModel(IModel $aModel) ;
     /**
@@ -48,5 +46,10 @@ interface IController extends IMessageQueueHolder, IContainer, IContainedable
     public function clearViews() ;
     
     public function id() ;
+    
+    /**
+     * @return org\jecat\framework\util\IHashTable
+     */
+    public function properties() ;
 }
 ?>
