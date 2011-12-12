@@ -705,7 +705,7 @@ class Controller extends NamableComposite implements IController, IBean
    	}
    	public function setTitle($sTitle)
    	{
-   		$this->sTitle = sTitle ;
+   		$this->sTitle = $sTitle ;
    	}
    	
    	/**
