@@ -196,7 +196,7 @@ class Item extends AbstractBase
 	{
 		$this->sLink = $sLink ;
 	}
-	public function eventOnClick($sOnClick)
+	public function eventOnClick()
 	{
 		return $this->sOnClick ;
 	}
@@ -209,26 +209,10 @@ class Item extends AbstractBase
 		if(!$this->sHtml)
 		{
 			$sTitle = "<span class=\"".parent::CSS_CLASS_BASE."-item-text\">".$this->title()."</span>" ;
+			$sLink = $this->link() ;
+			$sOnClick = $this->eventOnClick() ;
 			
-			if( $this->sLink or $this->sOnClick )
-			{
-				$this->sHtml = "<a" ;
-				
-				if($this->sLink)
-				{
-					$this->sHtml.= " href='{$this->sLink}'" ;
-				}
-				if($this->sOnClick)
-				{
-					$sOnClick = addslashes($this->sOnClick) ;
-					$this->sHtml.= " onclick=\"{$sOnClick}\"" ;
-				}
-				$this->sHtml.= ">{$sTitle}</a>" ;
-			}
-			else
-			{
-				$this->sHtml = $sTitle ;
-			}
+			$this->sHtml = "<a href=\"{$sLink}\" onclick=\"{$sOnClick}\">{$sTitle}</a>" ;
 		}
 		
 		return $this->sHtml ;
