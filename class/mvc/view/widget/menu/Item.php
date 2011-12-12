@@ -208,7 +208,7 @@ class Item extends AbstractBase
 	{
 		if(!$this->sHtml)
 		{
-			$sTitle = $this->title() ;
+			$sTitle = "<span class=\"".parent::CSS_CLASS_BASE."-item-text\">".$this->title()."</span>" ;
 			
 			if( $this->sLink or $this->sOnClick )
 			{

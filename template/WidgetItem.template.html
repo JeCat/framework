@@ -1,5 +1,5 @@
 <li	id='{=$theWidget->id()}' {=$theWidget->getCssClassString()}>
-	<span {=$theWidget->getCssClassString()}>{=$theWidget->html()}</span>
+	{=$theWidget->html()}
 	
 	<if "$theWidget->isDisplaySubMenu()" >
 		<widget instance="$theWidget->subMenu()"  />
