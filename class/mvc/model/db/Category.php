@@ -1,67 +1,41 @@
 <?php
 namespace org\jecat\framework\mvc\model\db ;
 
+use org\jecat\framework\lang\Object;
 use org\jecat\framework\util\Stack;
-
 use org\jecat\framework\mvc\model\db\orm\Selecter;
-
 use org\jecat\framework\mvc\model\db\orm\Prototype;
-
 use org\jecat\framework\db\sql\StatementFactory;
-
 use org\jecat\framework\db\sql\Update;
-
 use org\jecat\framework\db\DB;
-
 use org\jecat\framework\lang\Exception;
 
-class Category extends Model 
+class Category extends Object 
 {	
 	const top = 1 ;
 	const end = null ;
 	
-	public function leftPoint()
+	public function __construct(IModel $aModel)
 	{
-		return (int)$this->data('lft') ;
-	}
-	public function rightPoint()
-	{
-		return (int)$this->data('rgt') ;
-	}
-	
-	public function leftColumn()
-	{
-		if( !$aOrmPrototype = $this->prototype() )
-		{
-			throw new CategoryPointException("尚未为临接表模型设置原型，无法完成操作") ;
-		}
-		return '`'.($aOrmPrototype->getColumnByAlias('lft')?:'lft').'`' ;
-	}
-	public function rightColumn()
-	{
-		if( !$aOrmPrototype = $this->prototype() )
-		{
-			throw new CategoryPointException("尚未为临接表模型设置原型，无法完成操作") ;
-		}
-		return '`'.($aOrmPrototype->getColumnByAlias('rgt')?:'rgt').'`' ;
+		$this->aModel = $aModel ;
 	}
 	
 	/**
 	 * 将自己插入到 $aCategory 后面，与 $aCategory 同等层级
 	 */
-	public function insertBefore(Category $aCategory=null)
+	public function insertBefore(IModel $aCategoryModel=null)
 	{
 		$this->insertCategoryToPoint(
-			$aCategory===self::end?  self::end: $aCategory->rightPoint()+1
+			$aCategoryModel===self::end?  self::end: self::rightPoint($aCategoryModel)+1
 		) ;
 	}
 	
 	/**
 	 * 将自己做为 $aCategory 的下级分类，插入到 $aCategory 的末尾
 	 */
-	public function insertEndOf(Category $aCategory)
+	public function insertEndOf(IModel $aCategoryModel)
 	{
-		$this->insertCategoryToPoint( $aCategory->rightPoint() ) ;
+		$this->insertCategoryToPoint( self::rightPoint($aCategoryModel) ) ;
 	}
 	
 	/**
@@ -78,16 +52,16 @@ class Category extends Model
 	 */
 	public function insertCategoryToPoint($nTarget=self::end)
 	{
-		if( !$aOrmPrototype = $this->prototype() )
+		if( !$aOrmPrototype = $this->aModel->prototype() )
 		{
 			throw new CategoryPointException("尚未为临接表模型设置原型，无法完成操作") ;
 		}
 		
-		$nOriLft = $this->leftPoint() ;
-		$nOriRgt = $this->rightPoint() ;
+		$nOriLft = self::leftPoint($this->model()) ;
+		$nOriRgt = self::rightPoint($this->model()) ;
 				
-		$sLftClm = $this->leftColumn() ;
-		$sRgtClm = $this->rightColumn() ;
+		$sLftClm = self::leftColumn($aOrmPrototype) ;
+		$sRgtClm = self::rightColumn($aOrmPrototype) ;
 		
 		$aSqlFactory = StatementFactory::singleton() ;
 		
@@ -152,9 +126,9 @@ class Category extends Model
 			// 移动 rgt
 			$this->moveFeet( $aUpdate,$sRgtClm,2,$nTarget-1,null) ;	
 			
-			$this->setData('lft', $nTarget) ;
-			$this->setData('rgt', $nTarget+1) ;
-			$this->save() ;
+			$this->aModel->setData('lft', $nTarget) ;
+			$this->aModel->setData('rgt', $nTarget+1) ;
+			$this->aModel->save() ;
 		}
 	}
 	
@@ -163,15 +137,15 @@ class Category extends Model
 	 */
 	public function delete()
 	{
-		if( !$aOrmPrototype = $this->prototype() )
+		if( !$aOrmPrototype = $this->aModel->prototype() )
 		{
 			throw new CategoryPointException("尚未为临接表模型设置原型，无法完成操作") ;
 		}
 		
-		$nOriLft = $this->leftPoint() ;
-		$nOriRgt = $this->rightPoint() ;
-		$sLftClm = $this->leftColumn() ;
-		$sRgtClm = $this->rightColumn() ;
+		$nOriLft = self::leftPoint($this->model()) ;
+		$nOriRgt = self::rightPoint($this->model()) ;
+		$sLftClm = self::leftColumn($aOrmPrototype) ;
+		$sRgtClm = self::rightColumn($aOrmPrototype) ;
 		
 		DB::singleton()->execute("delete from ".$aOrmPrototype->tableName()." where {$sLftClm}>={$nOriLft} and {$sRgtClm}<={$nOriRgt}") ;
 		
@@ -185,7 +159,7 @@ class Category extends Model
 		// Unserialize
 		$fnSetUnserialize = function(Category $aCategory,$fnSetUnserialize)
 		{
-			$aCategory->setSerialized(false) ;
+			$aCategory->model()->setSerialized(false) ;
 			foreach($aCategory->childCategoryIterator() as $aChildCategory)
 			{
 				$fnSetUnserialize($aChildCategory,$fnSetUnserialize) ;
@@ -197,21 +171,36 @@ class Category extends Model
 	
 	/**
 	 * 建立分类所属关系的树形结构
-	 * $aCategories 中的分类必须按照 lft 排序
+	 * $aModelList 中的子元素必须拥有 lft 字段值
 	 * 
-	 * 改造参数$aCategories中的元素,将元素间的关系保存在元素的属性中,$aCategories的迭代顺序依然不变
-	 * 如果提供 $aRoot 参数，则将所有第一层分类add给 $aRoot分类，并将add后的$aRoot作为函数返回值返回,
-	 * 如果 $aRoot=null，则返回一个包含所有 第一层分类的数组
+	 * 改造参数$aModelList中的元素,将元素间的关系保存在元素的属性中,$aModelList的迭代顺序依然不变
+	 * 如果 $bReturnTopModels=true 则返回一个包含所有 第一层分类的数组
 	 */
-	static public function buildTree(\Iterator $aCategories,self $aRoot=null)
+	static public function buildTree(IModel $aModelList,$bReturnTopModels=false)
 	{
 		$aParentStack = new Stack() ;
-		
-		foreach($aCategories as $aCategory)
+		if($bReturnTopModels)
 		{
+			$arrTopCategories = array() ;
+		}
+		
+		$arrAllCategories = array() ;
+		foreach($aModelList->childIterator() as $aModel)
+		{
+			$arrAllCategories[ self::leftPoint($aModel) ] = $aModel ;
+		}
+		
+		// 按照 lft 排序
+		ksort($arrAllCategories) ;
+		$aModelList->clearChildren() ;
+		
+		foreach($arrAllCategories as $aModel)
+		{
+			$aModelList->addChild($aModel) ;
+
 			for(; $aParent=$aParentStack->get(); $aParentStack->out() )
 			{
-				if( $aParent->lft < $aCategory->lft and $aParent->rgt > $aCategory->rgt )
+				if( $aParent->lft < $aModel->lft and $aParent->rgt > $aModel->rgt )
 				{
 					break ;
 				}
@@ -219,44 +208,40 @@ class Category extends Model
 			
 			if($aParent)
 			{
-				$aParent->addChildCategory($aCategory) ;
+				self::addChildCategory($aParent,$aModel) ;
 			}
 			else
 			{
-				if($aRoot)
+				self::setDepth($aModel,0) ;
+				
+				if($bReturnTopModels)
+				
 				{
-					$aRoot->addChildCategory($aCategory) ;
-				}
-				else
-				{
-					$arrTopCategories[] = $aCategory ;
+					$arrTopCategories[] = $aModel ;
 				}
 			}
-			
-			$aParentStack->put($aCategory) ;
+			$aParentStack->put($aModel) ;
 		}
 		
-		return $aRoot?: (isset($arrTopCategories)?$arrTopCategories:array()) ;
+		return $bReturnTopModels? $arrTopCategories: null ;
 	}
 	
 	/**
-	 * 加载原型中的所有分类,作为迭代器返回
+	 * 加载原型中的所有分类,
 	 * 返回的迭代器的元素中不包含他们之间的关系,如果需要分类间的关系,使用本类的buildTree方法
-	 * @return \Iterator
+	 * @return IModel
 	 */
-	static public function loadTotalCategory(Prototype $aPrototype)
-	{
-		$aCategoryList = new Model($aPrototype,true) ;
-		
-		$aCriteria = clone $aPrototype->criteria() ;
+	static public function load(IModel $aModelList)
+	{		
+		$aCriteria = clone $aModelList->prototype()->criteria() ;
 		$aCriteria->addOrderBy('lft',false) ;
 		
-		if( !$aCategoryList->load($aCriteria) )
+		if( !$aModelList->load($aCriteria) )
 		{
 			return new \EmptyIterator();
 		}
 		
-		return $aCategoryList->childIterator() ;
+		return $aModelList ;
 	}
 	
 	/**
@@ -264,7 +249,7 @@ class Category extends Model
 	 */
 	public function loadTree()
 	{
-		if( !$aOrmPrototype = $this->prototype() )
+		if( !$aOrmPrototype = $this->aModel->prototype() )
 		{
 			throw new CategoryPointException("尚未为临接表模型设置原型，无法完成操作") ;
 		}
@@ -282,33 +267,45 @@ class Category extends Model
 			return ;
 		}
 		
-		self::buildTree($aCategoryList->childIterator(),$this) ;
+		self::buildTree($aCategoryList->childIterator(),$this->aModel) ;
 	}
 	
+	/**
+	 * @return \Iterator
+	 */
 	public function childCategoryIterator()
 	{
-		return new \ArrayIterator($this->arrChildCategories) ;
+		$aChildren = self::categoryChildren($this->model(),false) ;
+		return $aChildren? new \ArrayIterator($aChildren): new \EmptyIterator() ;
 	}
 	
-	public function depth()
+	static public function depth(IModel $aModel)
 	{
-		return (int) $this->__category_depth ;
+		return (int) $aModel->data('__category_depth') ;
 	}
-	public function setDepth($nDepth)
+	static public function setDepth(IModel $aModel,$nDepth)
 	{
-		return $this->__category_depth = $nDepth ;
+		$aModel->setData('__category_depth',(int)$nDepth) ;
 	}
 	
-	private function addChildCategory(Category $aCategory)
+	
+	/**
+	 * @return IModel
+	 */
+	static public function categoryChildren(IModel $aParentModel,$bAutoCreate=true)
 	{
-		$this->addChild($aCategory) ;
-		
-		if( !in_array($aCategory,$this->arrChildCategories,true) )
+		if( !$aChildren=$aParentModel->child('__category_children') )
 		{
-			$this->arrChildCategories[] = $aCategory ;
+			$aChildren = new Model(null,true) ;
+			$aParentModel->addChild($aChildren,'__category_children') ;
 		}
-		
-		$aCategory->setDepth($this->depth()+1) ;
+		return $aChildren ;
+	}
+	
+	static private function addChildCategory(IModel $aParentModel,IModel $aChildModel)
+	{
+		self::categoryChildren($aParentModel)->addChild($aChildModel) ;
+		self::setDepth($aChildModel,self::depth($aParentModel)+1) ;
 	}
 	
 	private function endRightFoot(Prototype $aPrototype,$sRightColumn=null)
@@ -316,7 +313,7 @@ class Category extends Model
 		$sTableName = $aPrototype->tableName() ;
 		if(!$sRightColumn)
 		{
-			$sRightColumn = $this->rightColumn() ;
+			$sRightColumn = self::rightColumn($aPrototype) ;
 		}
 		
 		$aRecords = DB::singleton()->query("select {$sRightColumn} as rgt from {$sTableName} order by {$sRightColumn} desc limit 1 ;") ;
@@ -399,5 +396,35 @@ class Category extends Model
 		}
 	}
 	
-	private $arrChildCategories = array() ;
+	static public function leftPoint(IModel $aModel)
+	{
+		return (int)$aModel->data('lft') ;
+	}
+	static public function rightPoint(IModel $aModel)
+	{
+		return (int)$aModel->data('rgt') ;
+	}
+	
+	static public function leftColumn(Prototype $aPrototype)
+	{
+		return '`'.($aPrototype->getColumnByAlias('lft')?:'lft').'`' ;
+	}
+	static public function rightColumn(Prototype $aPrototype)
+	{
+		return '`'.($aPrototype->getColumnByAlias('rgt')?:'rgt').'`' ;
+	}
+	
+	/**
+	 * @return IModel
+	 */
+	public function model()
+	{
+		return $this->aModel ; 
+	}
+	
+	/**
+	 * @var IModel
+	 */
+	private $aModel ;
+	// private $arrChildCategories = array() ;
 }

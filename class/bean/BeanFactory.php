@@ -25,7 +25,6 @@ class BeanFactory extends Object implements \Serializable
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\view\\View",'view') ;
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\view\\FormView",'form') ;
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\model\\db\\Model",'model') ;
-			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\model\\db\\Category",'category') ;
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\model\\db\\orm\\Prototype",'prototype') ;
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\model\\db\\orm\\Association",'association') ;
 			
