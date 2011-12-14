@@ -71,7 +71,7 @@ class LayoutableView extends View
 	public function renderWrapperHeader(IView $aView,IOutputStream $aOutputStream,$sClass=null,$sStyle=null)
 	{
 		// id
-		$sId = self::htmlWrapperId($this) ;
+		$sId = self::htmlWrapperId($aView) ;
 	
 		// name
 		$sViewNameEsc = addslashes($this->name()) ;
