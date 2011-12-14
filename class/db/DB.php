@@ -94,6 +94,14 @@ class DB extends Object
 		return $this->driver(true)->reflecterFactory($this);
 	}
 	
+	/**
+	 * @return org\jecat\framework\db\DB
+	 */
+	static public function singleton($bCreateNew=true,$createArgvs=null,$sClass=null)
+	{
+		return parent::singleton($bCreateNew,$createArgvs,$sClass?:__CLASS__) ;
+	}
+	
 	private $aDriver ;
 }
 

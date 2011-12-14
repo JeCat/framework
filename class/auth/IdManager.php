@@ -9,7 +9,7 @@ use org\jecat\framework\lang\Exception;
 class IdManager extends Object implements \Serializable
 {
 	/**
-	 * @return IdManager
+	 * @return org\jecat\framework\auth\IdManager
 	 */
 	static public function singleton($bCreateNew=true,$createArgvs=null,$sClass=null)
 	{
