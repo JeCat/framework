@@ -23,11 +23,6 @@ class Id extends Object implements IIdentity, \Serializable
 		
 		$this->aModel = $aModel ;
 	}
-	
-	public function hasPurview($sNamespace,$sPurviewName,$target=null,$nBit=1)
-	{
-		return PurviewManager::singleton()->hasPurview($this->userId(),$sNamespace,$sPurviewName,$target,$nBit,false) ;
-	}
 
 	static public function buryCookie(IIdentity $aId,$nCookieExpire=-1)
 	{

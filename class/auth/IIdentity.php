@@ -4,9 +4,7 @@ namespace org\jecat\framework\auth ;
 use org\jecat\framework\mvc\model\IModel;
 
 interface IIdentity 
-{
-	public function hasPurview($sNamespace,$sPurviewName,$target=null,$nBit=1) ;
-	
+{	
 	public function username() ;
 	public function setUsername($sUsername) ;
 	
