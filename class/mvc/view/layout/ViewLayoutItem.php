@@ -1,9 +1,10 @@
 <?php
-namespace org\jecat\framework\mvc\view ;
+namespace org\jecat\framework\mvc\view\layout ;
 
+use org\jecat\framework\mvc\view\IView;
 use org\jecat\framework\io\IOutputStream;
 
-class ViewLayoutItem extends View
+class ViewLayoutItem extends LayoutableView
 {
 	public function __construct(IView $aView,$sName=null)
 	{
@@ -79,41 +80,6 @@ class ViewLayoutItem extends View
 		$aOutputStream->write("</div>") ;
 	}
 	
-	static public function renderWrapperHeader(IView $aView,IOutputStream $aOutputStream,$sClass=null,$sStyle=null)
-	{
-		// id
-		$sId = self::htmlWrapperId($aView) ;
-		
-		// name
-		$sViewNameEsc = addslashes($aView->name()) ;
-		
-		// class
-		$arrClasses = $aView->variables()->get('wrapper.classes')?: array() ;
-		if($sClass)
-		{
-			$arrClasses[] = $sClass ;
-		}
-		$sClasses = implode(' ',$arrClasses) ;
-		
-		// style
-		if( $sStyle = $aView->variables()->get('wrapper.style').$sStyle )
-		{
-			$sStyle = ' style="' . $sStyle . '"' ;
-		}
-		
-		// attrs
-		$sAttrs = '' ;
-		foreach($aView->variables()->get('wrapper.attrs')?: array() as $sName=>$value)
-		{
-			$sAttrs.= " {$sName}=\"".addslashes($value).'"' ;
-		}
-		
-		$aOutputStream->write("<div{$sAttrs} id='{$sId}' class='{$sClasses}' name='{$sViewNameEsc}'{$sStyle}>") ;
-	}
-	static public function htmlWrapperId(IView $aView)
-	{
-		return 'view-wrapper-'.$aView->id() ;
-	}
 }
 
 ?>

@@ -2,7 +2,7 @@
 namespace org\jecat\framework\mvc\view\uicompiler ;
 
 use org\jecat\framework\lang\Exception;
-use org\jecat\framework\mvc\view\ViewLayoutFrame;
+use org\jecat\framework\mvc\view\layout\ViewLayoutFrame;
 use org\jecat\framework\lang\Assert;
 use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\CompilerManager;
@@ -60,7 +60,7 @@ class ViewCompiler extends NodeCompiler
 			$aDev->write("\$_aViewLayoutFrame = \$theView->getByName(\$__sViewLayoutFrameName) ;") ;
 			$aDev->write("if(!\$_aViewLayoutFrame){") ;
 			$aDev->write("	if(\$theView->count()){") ;
-			$aDev->write("		\$_aViewLayoutFrame = new \\org\\jecat\\framework\\mvc\\view\\ViewLayoutFrame({$sType},\$__sViewLayoutFrameName);") ;
+			$aDev->write("		\$_aViewLayoutFrame = new \\org\\jecat\\framework\\mvc\\view\\layout\\ViewLayoutFrame({$sType},\$__sViewLayoutFrameName);") ;
 			$aDev->write("		foreach(\$theView->iterator() as \$aChildView){") ;
 			$aDev->write("			\$theView->remove(\$aChildView) ;") ;
 			$aDev->write("			\$_aViewLayoutFrame->add(\$aChildView) ;") ;
@@ -75,9 +75,9 @@ class ViewCompiler extends NodeCompiler
 	}
 	
 	static $arrLayoutTypes = array(
-			'h' => '\\org\\jecat\\framework\\mvc\\view\\ViewLayoutFrame::type_horizontal' ,
-			'v' => '\\org\\jecat\\framework\\mvc\\view\\ViewLayoutFrame::type_vertical' ,
-			'tab' => '\\org\\jecat\\framework\\mvc\\view\\ViewLayoutFrame::type_tab' ,
+			'h' => '\\org\\jecat\\framework\\mvc\\view\\layout\\ViewLayoutFrame::type_horizontal' ,
+			'v' => '\\org\\jecat\\framework\\mvc\\view\\layout\\ViewLayoutFrame::type_vertical' ,
+			'tab' => '\\org\\jecat\\framework\\mvc\\view\\layout\\ViewLayoutFrame::type_tab' ,
 	) ;
 }
 

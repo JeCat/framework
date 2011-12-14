@@ -1,11 +1,10 @@
 <?php
-namespace org\jecat\framework\mvc\view ;
+namespace org\jecat\framework\mvc\view\layout ;
 
 use org\jecat\framework\bean\BeanConfException;
-
 use org\jecat\framework\pattern\composite\Container;
 
-class ViewLayoutFrame extends View
+class ViewLayoutFrame extends LayoutableView
 {
 	const type_vertical = 'v' ;
 	const type_horizontal = 'h' ;
@@ -102,7 +101,7 @@ class ViewLayoutFrame extends View
 		{
 			$sStyle = 'float:left;' ;
 		}
-		ViewLayoutItem::renderWrapperHeader($this,$this->outputStream(),'jc-view-layout-frame',$sStyle) ;
+		$this->renderWrapperHeader($this,$this->outputStream(),'jc-view-layout-frame',$sStyle) ;
 				
 		// render myself
 		if( $sTemplate=$this->template() )

@@ -2,7 +2,7 @@
 
 namespace org\jecat\framework\mvc\controller ;
 
-use org\jecat\framework\mvc\view\ViewLayoutFrame;
+use org\jecat\framework\mvc\view\layout\ViewLayoutFrame;
 
 use org\jecat\framework\locale\LocaleManager;
 use org\jecat\framework\system\Response;
