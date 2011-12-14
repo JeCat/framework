@@ -9,11 +9,13 @@ use org\jecat\framework\resrc\ResourceManager;
 
 class SourceFileManager extends ResourceManager
 {
-	public function addFolder(IFolder $aFolder,IFolder $aCompiled=null,$sNamespace='*')
-	{		
-		$aFolder->setProperty('compiled',$aCompiled) ;
-		
-		parent::addFolder($aFolder,$sNamespace) ;
+	public function setCompiledFolderPath($sPath)
+	{
+		$this->sCompiledFolderPath = $sPath ;
+	}
+	public function compiledFolderPath()
+	{
+		return $this->sCompiledFolderPath ;
 	}
 	
 	public function isCompiledValid(IFile $aSourceFile,IFile $aCompiledFile)
@@ -29,35 +31,10 @@ class SourceFileManager extends ResourceManager
 	/**
 	 * @return org\jecat\framework\fs\IFile
 	 */
-	public function findCompiled(IFile $aSourceFile)
+	public function findCompiled($sSourceFile,$sNamespace,$bAutoCreate=false)
 	{
-		$aFolder = $aSourceFile->directory() ;
-		
-		if( $aCompiledFolder = $aFolder->property('compiled') )
-		{
-			return $aCompiledFolder->findFile($this->compileStrategySignture().'/'.$aSourceFile->name().'.php') ;
-		}
-		else
-		{
-			return $aSourceFile->directory()->findFile("compileds/".$this->compileStrategySignture()."/".$aSourceFile->name().'.php') ;	
-		}
-	}
-	
-	/**
-	 * @return org\jecat\framework\fs\IFile
-	 */
-	public function createCompiled(IFile $aSourceFile)
-	{
-		$aFolder = $aSourceFile->directory() ;
-		
-		if( $aCompiledFolder = $aFolder->property('compiled') )
-		{
-			return $aCompiledFolder->createFile($this->compileStrategySignture().'/'.$aSourceFile->name().'.php') ;
-		}
-		else
-		{
-			return $aSourceFile->directory()->createFile("compileds/".$this->sCompileStrategySignture."/".$aSourceFile->name().'.php') ;		
-		}
+		$sPath = $this->compiledFolderPath() . '/' . $this->compileStrategySignture() . '/' . $sNamespace . '/' . $sSourceFile . '.php' ; 
+		return FileSystem::singleton()->findFile($sPath,$bAutoCreate?FileSystem::FIND_AUTO_CREATE:0) ;
 	}
 	
 	public function setCompileStrategySignture($sCompileStrategySignture)
@@ -92,8 +69,7 @@ class SourceFileManager extends ResourceManager
 		{
 			foreach($this->folderIterator($sNamespace) as $aFolder)
 			{
-				$aCompiled = $aFolder->property('compiled') ;
-				$arrData['arrFolders'][$sNamespace][] = array( $aFolder->path(), $aCompiled?$aCompiled->path():null ) ;
+				$arrData['arrFolders'][$sNamespace][] = $aFolder->path() ;
 			}
 		}
 		
@@ -108,20 +84,19 @@ class SourceFileManager extends ResourceManager
 		$arrData = unserialize($serialized) ;
 		foreach($arrData['arrFolders'] as $sNamespace=>&$arrFolders)
 		{
-			foreach($arrFolders as &$array)
+			foreach($arrFolders as &$sPath)
 			{
-				$this->addFolder(
-					$aFileSystem->findFolder($array[0])
-					, $aFileSystem->findFolder($array[1],FileSystem::FIND_AUTO_CREATE)
-					, $sNamespace
-				) ;
+				$this->addFolder( $aFileSystem->findFolder($sPath), $sNamespace ) ;
 			}
 		}
 	}
 	
 	private $sCompileStrategySignture ;
 	
+	private $sCompiledFolderPath = '/data/compiled/template' ;
+	
 	private $bForceCompile = false ;
+	
 }
 
 ?>

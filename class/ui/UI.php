@@ -131,14 +131,14 @@ class UI extends JcObject
 		{
 			throw new Exception("无法找到指定的源文件：%s:%s",array($sNamespace,$sSourceFile)) ;
 		}
-		$aCompiledFile = $this->sourceFileManager()->findCompiled($aSourceFile) ;
+		$aCompiledFile = $this->sourceFileManager()->findCompiled($sSourceFile,$sNamespace) ;
 		
 		// 检查编译文件是否有效
 		if( !$aCompiledFile or !$this->sourceFileManager()->isCompiledValid($aSourceFile,$aCompiledFile) )
 		{
 			if(!$aCompiledFile)
 			{
-				if( !$aCompiledFile = $this->sourceFileManager()->createCompiled($aSourceFile) )
+				if( !$aCompiledFile = $this->sourceFileManager()->findCompiled($sSourceFile,$sNamespace,true) )
 				{
 					throw new Exception("UI引擎在编译模板文件时遇到了错误，无法创建编译文件：%s",$aSourceFile->url()) ;
 				}
