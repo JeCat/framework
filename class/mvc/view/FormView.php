@@ -54,8 +54,18 @@ class FormView extends View implements IFormView
 		return $bRet ;
 	}
 	
-	public function isSubmit(IDataSrc $aDataSrc)
+	public function isSubmit(IDataSrc $aDataSrc=null)
 	{
+		if(!$aDataSrc)
+		{
+			$aController = $this->controller() ;
+			if(!$aController)
+			{
+				return false ;
+			}
+			$aDataSrc = $aController->params() ;
+		}
+		
 		return $aDataSrc->get( $this->htmlFormSignature() ) == '1' ;
 	}
 	
