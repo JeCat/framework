@@ -134,7 +134,7 @@ class BeanFactory extends Object implements \Serializable
 	{
 		if( !$aFile = $this->beanFolders()->find($sConfName.'.conf.php',$sNamespace) )
 		{
-			throw new BeanConfException("Bean对象配置数组中的 conf 属性无效，找不到指定的配置文件: %s",$sConfName) ;
+			throw new BeanConfException("Bean对象配置数组中的 conf 属性无效，找不到指定的配置文件: %s, namespace: %s",array($sConfName,$sNamespace)) ;
 		}
 		$arrConfigFile = $aFile->includeFile(false,false) ;
 		if( !is_array($arrConfigFile) )
