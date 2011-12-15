@@ -72,7 +72,7 @@ class Group extends FormWidget {
 	}
 	
 	//当把当前的group对象添加到view中时,同时把group的子对象也添加到view中去,这样无论group什么时候添加子widget,view对象都可以准确的添加group的子控件
-	public function setView(IView $aView)
+	public function setView(IView $aView=null)
 	{
 		parent::setView($aView);
 		foreach ( $this->widgetIterator() as $aWidget ) {
