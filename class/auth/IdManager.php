@@ -99,14 +99,14 @@ class IdManager extends Object implements \Serializable
 		$this->aCurrentId = $aId ;
 	}
 	
-	public function addId(IIdentity $aId)
+	public function addId(IIdentity $aId,$bCurrent=false)
 	{
 		if( in_array($aId,$this->arrIds) )
 		{
 			return ;
 		}
 		
-		if( !$this->aCurrentId )
+		if( $bCurrent or !$this->aCurrentId )
 		{
 			$this->aCurrentId = $aId ;
 		}
