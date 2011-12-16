@@ -46,7 +46,7 @@ class Item extends AbstractBase
 			$this->setHtml($arrConfig['html']);
 		}
 		
-		if(!empty($arrConfig['quote']))
+		if(!empty($arrConfig['query']))
 		{
 			if($aView=$this->view())
 			{
@@ -54,7 +54,7 @@ class Item extends AbstractBase
 				{
 					$aParams = $aController->params() ;
 					
-					foreach((array)$arrConfig['quote'] as $sQuote)
+					foreach((array)$arrConfig['query'] as $sQuote)
 					{
 						if( DataSrc::compare($aParams,$sQuote) )
 						{
