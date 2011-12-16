@@ -33,7 +33,13 @@ class HttpRequest extends Request
 		{
 			if( isset($GLOBALS[$sVarName]) )
 			{
-				$this->addChild( new DataSrc($GLOBALS[$sVarName],true) ) ;
+				if( !$aDataSrc=DataSrc::flyweight(array('request',$sVarName),false) )
+				{
+					$aDataSrc = new DataSrc($GLOBALS[$sVarName],true) ;
+					DataSrc::setFlyweight($aDataSrc,array('request',$sVarName)) ;
+				}
+				
+				$this->addChild($aDataSrc) ;
 			}
 		}
 		
@@ -41,9 +47,21 @@ class HttpRequest extends Request
 		$this->buildUploadFiles($aApp?:Application::singleton()) ;
 		
 		// 
-		$this->set('REQUEST_URL',(empty($_SERVER['HTTPS'])?'http://':'https://').$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']) ;
+		$this->sRequestUrl = (empty($_SERVER['HTTPS'])?'http://':'https://').$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'] ;
 	}
-
+	
+	public function exportToArray(array &$arrToArray)
+	{
+		// get 参数
+		$aDataSrc = DataSrc::flyweight(array('request','_GET'),false) ;
+		$aDataSrc->exportToArray($arrToArray) ;
+		
+		foreach($this->nameIterator() as $sDataName)
+		{
+			$arrToArray[$sDataName] = $this->get($sDataName) ;
+		}
+	}
+	
 	public function referer()
 	{
 		return $this->get('HTTP_REFERER') ;
@@ -71,7 +89,7 @@ class HttpRequest extends Request
 	{
 		if(!$excludeQueryArgvs)
 		{
-			return $this->get('REQUEST_URL') ;
+			return $this->sRequestUrl ;
 		}
 		else
 		{
@@ -208,6 +226,7 @@ class HttpRequest extends Request
 	
 	private $sUri ;
 	private $arrUrlPathInfo ;
+	private $sRequestUrl ;
 	static private $sUploadTmpPath = '/tmp/upload' ;
 }
 ?>

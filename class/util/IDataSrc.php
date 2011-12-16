@@ -20,6 +20,8 @@ interface IDataSrc extends IHashTable
 	public function disableData($sName) ;
 	public function enableData($sName) ;
 	public function clearDisabled() ;
+	
+	public function toUrlQuery() ;
 }
 
 ?>

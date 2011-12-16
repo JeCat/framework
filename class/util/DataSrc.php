@@ -4,6 +4,11 @@ namespace org\jecat\framework\util ;
 use org\jecat\framework\lang\Factory;
 use org\jecat\framework\lang\Object;
 
+/**
+ * 
+ * @example aaa/bbb/ccc
+ *
+ */
 class DataSrc extends HashTable implements IDataSrc, \ArrayAccess, \Iterator
 {
 	public function __construct(array &$arrDatas=null,$bByRef=false)
@@ -207,6 +212,29 @@ class DataSrc extends HashTable implements IDataSrc, \ArrayAccess, \Iterator
 		$this->arrDisables = null ;
 	}
 	
+	public function toUrlQuery()
+	{
+		$arrData = array() ;
+		$this->exportToArray($arrData) ;
+		
+		ksort($arrData) ;
+		
+		return http_build_query($arrData) ;
+	}
+	
+	public function exportToArray(array &$arrToArray)
+	{		
+		foreach($this->childIterator() as $aChild)
+		{
+			$aChild->exportToArray($arrToArray) ;
+		}
+		
+		foreach($this->nameIterator() as $sDataName)
+		{
+			$arrToArray[$sDataName] = $this->get($sDataName) ;
+		}
+	}
+
 	static public function compare(IDataSrc $aDataSrc,$otherDataSrc)
 	{
 		if( $otherDataSrc instanceof IDataSrc )
