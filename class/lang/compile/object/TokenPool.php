@@ -88,15 +88,28 @@ class TokenPool extends Container
 		$this->arrNamespaces[$sName] = $aUseToken->fullName() ;
 	}
 	
-	public function findName($sName,NamespaceDeclare $aCurrentNamespace=null)
+	public function findName($name,NamespaceDeclare $aBelongNamespace=null)
 	{
+		if( $name instanceof Token )
+		{
+			$sName = $name->sourceCode() ;
+			if( $name->belongsNamespace() )
+			{
+				$aBelongNamespace = $name->belongsNamespace() ;
+			}
+		}
+		else
+		{
+			$sName = (string)$name ;
+		}
+		
 		if( isset($this->arrNamespaces[$sName]) )
 		{
 			return $this->arrNamespaces[$sName] ;
 		}
-		else if( $aCurrentNamespace )
+		else if( $aBelongNamespace )
 		{
-			return $aCurrentNamespace->name() . '\\' . $sName ;
+			return $aBelongNamespace->name() . '\\' . $sName ;
 		}
 		else
 		{
