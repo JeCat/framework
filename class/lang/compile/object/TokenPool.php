@@ -2,7 +2,7 @@
 namespace org\jecat\framework\lang\compile\object ;
 
 use org\jecat\framework\pattern\iterate\ArrayIterator;
-
+use org\jecat\framework\lang\compile\ClassCompileException;
 use org\jecat\framework\pattern\composite\Container;
 
 class TokenPool extends Container
@@ -77,8 +77,36 @@ class TokenPool extends Container
 					new ArrayIterator() ;
 	}
 	
+	
+	public function addUseDeclare(UseDeclare $aUseToken)
+	{
+		if( !$sName = $aUseToken->name() )
+		{
+			throw new ClassCompileException(null,$aUseToken,"编译class时遇到无效的 use 关键词") ;
+		}
+	
+		$this->arrNamespaces[$sName] = $aUseToken->fullName() ;
+	}
+	
+	public function findName($sName,NamespaceDeclare $aCurrentNamespace=null)
+	{
+		if( isset($this->arrNamespaces[$sName]) )
+		{
+			return $this->arrNamespaces[$sName] ;
+		}
+		else if( $aCurrentNamespace )
+		{
+			return $aCurrentNamespace->name() . '\\' . $sName ;
+		}
+		else
+		{
+			return $sName ;
+		}
+	}
+	
 	private $arrClasses = array() ;
 	private $arrMethods = array() ;
+	private $arrNamespaces  ;
 }
 
 ?>

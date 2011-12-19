@@ -32,7 +32,7 @@ class NamespaceString extends Token
 		return implode("\\",$this->arrNameAndSlashes) ;
 	}
 	
-	public function findRealName(State $aState)
+	public function findRealName(TokenPool $aTokenPool)
 	{
 		if(empty($this->arrNameAndSlashes))
 		{
@@ -49,7 +49,7 @@ class NamespaceString extends Token
 		}
 		else
 		{
-			$sName = $aState->findName($aFirtToken->targetCode()) ;
+			$sName = $aTokenPool->findName($aFirtToken->targetCode(),$this->belongsNamespace()) ;
 			if(!empty($arrNameAndSlashes))
 			{
 				$sName.= '\\' . implode("\\",$arrNameAndSlashes) ;

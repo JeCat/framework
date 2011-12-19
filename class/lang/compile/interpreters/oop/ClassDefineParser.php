@@ -2,7 +2,6 @@
 namespace org\jecat\framework\lang\compile\interpreters\oop ;
 
 use org\jecat\framework\lang\compile\object\NamespaceString;
-
 use org\jecat\framework\lang\compile\object\DocCommentDeclare;
 use org\jecat\framework\lang\compile\ClassCompileException;
 use org\jecat\framework\pattern\iterate\INonlinearIterator;
@@ -92,6 +91,7 @@ class ClassDefineParser implements ISyntaxParser
 					if(!$aParentNameToken)
 					{
 						$aParentNameToken = new NamespaceString(0,'') ;
+						$aParentNameToken->setBelongsNamespace($aState->currentNamespace()) ;
 					}
 					else if( $type==T_STRING or $type==T_NS_SEPARATOR )
 					{
@@ -102,7 +102,7 @@ class ClassDefineParser implements ISyntaxParser
 					else
 					{
 						$bParentClassNameOver = true ;
-					} 
+					}
 				}
 			}
 			
@@ -118,7 +118,7 @@ class ClassDefineParser implements ISyntaxParser
 				{
 					throw new ClassCompileException(null,$aToken,"编译class: %s时遇到了错误，extends 关键词后没有找到 parent class name",$aNewToken->name()) ;
 				}
-				$aNewToken->setParentClassName( $aParentNameToken->findRealName($aState) ) ;
+				$aNewToken->setParentClassName( $aParentNameToken->findRealName($aTokenPool) ) ;
 			}
 	
 			$aParentNameToken ;

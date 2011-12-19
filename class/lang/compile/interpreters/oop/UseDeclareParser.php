@@ -63,7 +63,7 @@ class UseDeclareParser implements ISyntaxParser
 		}
 		
 		$aTokenPool->replace($aOriToken,$aNewToken) ;
-		$aState->addUseDeclare($aNewToken) ;
+		$aTokenPool->addUseDeclare($aNewToken) ;
 	}
 }
 
