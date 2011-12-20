@@ -48,7 +48,7 @@ class Version
 	 * @param	$aTo		Version
 	 * @return	int
 	 */
-	public function Compare(Version $aTo)
+	public function compare(Version $aTo)
 	{
 		// 比较主版本
 		if( $this->GetPrimaryNumber() > $aTo->GetPrimaryNumber() )
@@ -156,7 +156,7 @@ class Version
 	 * @access	public
 	 * @return	int
 	 */
-	public function GetPrimaryNumber()
+	public function primaryNumber()
 	{
 		return $this->nPrimaryNum ;
 	}
@@ -167,7 +167,7 @@ class Version
 	 * @access	public
 	 * @return	int
 	 */
-	public function GetSecondaryNumber()
+	public function secondaryNumber()
 	{
 		return $this->nSecondaryNum ;
 	}
@@ -178,7 +178,7 @@ class Version
 	 * @access	public
 	 * @return	int
 	 */
-	public function GetModificatoryNumber()
+	public function modificatoryNumber()
 	{
 		return $this->nModificatoryNum ;
 	}
@@ -189,7 +189,7 @@ class Version
 	 * @access	public
 	 * @return	int
 	 */
-	public function GetInternalNumber()
+	public function internalNumber()
 	{
 		return $this->nInternalNum ;
 	}
@@ -200,7 +200,7 @@ class Version
 	 * @access	public
 	 * @return	string
 	 */
-	public function GetVersionCode()
+	public function versionCode()
 	{
 		return $this->sVersionCode ;
 	}
@@ -215,7 +215,7 @@ class Version
 	 * @access	public
 	 * @return	int
 	 */
-	public function Get32Integer()
+	public function to32Integer()
 	{
 		return	($this->GetPrimaryNumber()<< (self::INT32_BIT_INTERNAL+self::INT32_BIT_MODIFICTORY+self::INT32_BIT_SECONDARY) )
 				+ ($this->GetSecondaryNumber()<< (self::INT32_BIT_INTERNAL+self::INT32_BIT_MODIFICTORY) )
@@ -229,7 +229,7 @@ class Version
 	 * @access	public
 	 * @return	int
 	 */
-	public function GetCeil32Integer()
+	public function toCeil32Integer()
 	{		
 		// 主版本号
 		$sPrimaryNumber = $this->GetPrimaryNumber() ;
@@ -274,7 +274,7 @@ class Version
 	 * @access	public
 	 * @return	Version
 	 */
-	static public function From32Integer($n32Version,$sVerCode='')
+	static public function from32Integer($n32Version,$sVerCode='')
 	{
 		// 转换为 二进制
 		$sDecVersion = decbin($n32Version) ;
@@ -305,7 +305,7 @@ class Version
 	 * @access	public
 	 * @return	Version
 	 */
-	static public function FromString($sVersion)
+	static public function fromString($sVersion)
 	{
 		if(!self::VerifyFormat($sVersion))
 		{
@@ -335,7 +335,7 @@ class Version
 	 * @static
 	 * @return	bool
 	 */
-	static public function VerifyFormat($sVersion)
+	static public function verifyFormat($sVersion)
 	{
 		return (bool)preg_match('/^\d+(\.\d+){0,3}( [\w_\-]+)?$/',$sVersion) ;
 	}

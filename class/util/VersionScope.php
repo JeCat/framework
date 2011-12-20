@@ -9,110 +9,114 @@ use org\jecat\framework\lang\Object;
 
 class VersionScope
 {
-	public function __construct(Version $aLow, Version $aHigh=null, $bEqualLow=true, $bEqualHigh=true)
+	static private $arrValidCompares = array(
+		'=','<','>','<=','>='		
+	) ; 
+	
+	/**
+	 * @param	$aLow					Version		下位版本
+	 * @param	$aHigh＝null			Version		上位版本
+	 * @param	$sLowCompare='>='		string		下位比较
+	 * @param	$sHighCompare='<='		string		上位比较
+	 */
+	public function __construct(Version $aLow, Version $aHigh=null, $sLowCompare='>=', $sHighCompare='<=')
 	{
+		if( !in_array($sLowCompare,self::$arrValidCompares) )
+		{
+			throw new Exception("遇到意外的版本范围表示符号:%s",$sLowCompare) ;
+		}
+		if( !in_array($sHighCompare,self::$arrValidCompares) )
+		{
+			throw new Exception("遇到意外的版本范围表示符号:%s",$sHighCompare) ;
+		}
+		
 		$this->aLow = $aLow ;
-		if($aHigh)
-		{
-			$this->aHigh = $aHigh ;
-			$this->bEqualLow = $bEqualLow? true: false ;
-			$this->bEqualHigh = $bEqualHigh? true: false ;
-			$this->bScope = true ;
-		}
+		$this->sLowCompare = $sLowCompare ;
 		
+		$this->aHigh = $aHigh ;
+		$this->sHighCompare = $sHighCompare ;
+	}
+	
+	static public function fromString($sScopeString)
+	{
+		@list($sLow,$sHigh) = explode(',',$sScopeString,2) ;
+		$sLow = trim($sLow) ;
+		$sHigh = trim($sHigh) ;
+		
+		list($aLowVersion,$sLowCompare) = self::parseVersionExpression($sLow) ;
+		if($sHigh)
+		{
+			list($aHighVersion,$sHighCompare) = self::parseVersionExpression($sHigh) ;
+		}
 		else
 		{
-			$this->aHigh = null ;
-			$this->bEqualLow = true ;
-			$this->bEqualHigh = false ;
-			$this->bScope = false ;
+			$aHighVersion = null ;
+			$sHighCompare = '<=' ;
+		}
+		
+		return new self($aLowVersion,$aHighVersion,$sLowCompare,$sHighCompare) ;
+	}
+	
+	private function parseVersionExpression($sExpression)
+	{
+		if( !preg_match('/^(<|>|<=|>=|=)([\w\. _]+)$/',$sExpression,$arrRes) )
+		{
+			throw new Exception( '遇到错误的版本范围表达式:%s',$sExpression) ;
+		}
+		return array( Version::FromString($arrRes[2]), $arrRes[1] ) ;
+	}
+	
+	public function isInScope(Version $aVersion)
+	{
+		// for low
+		if( !$this->compare($aVersion,$this->aLow,$this->sLowCompare) )
+		{
+			return false ;
+		}
+		
+		if( $this->aHigh and !$this->compare($aVersion,$this->aHigh,$this->sHighCompare) )
+		{
+			return false ;
+		}
+		
+		return true ;
+	}
+	
+	private function compare(Version $aFromVersion,Version $aToVersion,$sCompare)
+	{
+		switch ($sCompare)
+		{
+			case '>=' :
+				return $aFromVersion->compare($aToVersion) >= 0 ;
+			case '<=' :
+				return $aFromVersion->compare($aToVersion) <= 0 ;
+			case '>' :
+				return $aFromVersion->compare($aToVersion) > 0 ;
+			case '<' :
+				return $aFromVersion->compare($aToVersion) < 0 ;
+			case '=' :
+				return $aFromVersion->compare($aToVersion) == 0 ;
 		}
 	}
 	
-	static public function FromString($sScopeString)
+	public function __toString()
 	{
-		$arrRes = array() ;
-		if( !preg_match('/^([\w\. _]+)((<\-|\->|<>|\-)([\w\. _]+))?$/',$sScopeString,$arrRes) )
-		{
-			throw new Exception( '遇到错误的版本兼容范围') ;
-		}
-
-		$sLow = trim($arrRes[1]) ;
-		$sSeparator = isset($arrRes[3])? trim($arrRes[3]): null ;
-		$sHigh = isset($arrRes[4])? trim($arrRes[4]): null ;
-		
-		// 低位
-		if( !Version::VerifyFormat($sLow) )
-		{
-			throw new Exception( '遇到错误的版本兼容范围') ;
-		}
-		$aLow = Version::FromString($sLow) ;
-
-		if(!$sHigh)
-		{
-			return new self($aLow) ;
-		}
-		else 
-		{
-			// 高位
-			if( !Version::VerifyFormat($sHigh) )
-			{
-				throw new Exception( '遇到错误的版本兼容范围') ;
-			}
-			$aHigh = Version::FromString($sHigh) ;
-			
-			$bEqualLow = strstr($sSeparator,'<')===false ;
-			$bEqualHigh = strstr($sSeparator,'>')===false ;
-			
-			return new self($aLow,$aHigh,$bEqualLow,$bEqualHigh) ;
-		}
+		return $this->toString(false) ;
 	}
 	
-	public function IsInScope(Version $aVersion)
-	{
-		// 检查范围
-		if( $this->bScope )
-		{
-			// 比较下位版本
-			$nLow = $aVersion->Compare($this->aLow) ;
-			if( ($this->bEqualLow and $nLow<0) or (!$this->bEqualLow and $nLow<=0) )
-			{
-				return false ;
-			}
-			
-			// 比较上位版本
-			$nHigh = $aVersion->Compare($this->aHigh) ;
-			if( ($this->bEqualHigh and $nHigh>0) or (!$this->bEqualHigh and $nHigh>=0) )
-			{
-				return false ;
-			}
-			
-			return true ;
-		}
-		
-		// 指定版本
-		else
-		{
-			return ($aVersion->Compare($this->aLow)==0) ;
-		}
-	}
-
 	/**
 	 * Description
 	 *
 	 * @access	public
 	 * @return	string
 	 */
-	public function MakeString()
+	public function toString($bFullVersion)
 	{
-		$sString = $this->aLow->toString(true) ;
+		$sString = $this->sLowCompare . $this->aLow->toString($bFullVersion) ;
+		
 		if( $this->aHigh )
 		{
-			$sString.= $this->bEqualLow? '': '<' ;
-			$sString.= (!$this->bEqualLow and !$this->bEqualHigh)? '':'-' ;
-			$sString.= $this->bEqualHigh? '': '>' ;
-			
-			$sString.= $this->aHigh->toString(true) ;
+			$sString = ',' . $this->sHighCompare . $this->aHigh->toString($bFullVersion) ;
 		}
 		
 		return $sString ;
@@ -135,20 +139,20 @@ class VersionScope
 	private $aHigh ;
 	
 	/**
-	 * 下位相等
+	 * 下位比较
 	 * 
 	 * @access	private
-	 * @var		bool
+	 * @var		string
 	 */
-	private $bEqualLow ;
+	private $sLowCompare ;
 	
 	/**
-	 * 上位相等
+	 * 上位比较
 	 * 
 	 * @access	private
-	 * @var		bool
+	 * @var		string
 	 */
-	private $bEqualHigh ;
+	private $sHighCompare ;
 	
 	/**
 	 * 是否是一个版本范围（或指定版本）
@@ -156,7 +160,4 @@ class VersionScope
 	 * @access	private
 	 * @var		bool
 	 */
-	private $bScope ;
-	
-	
 }
