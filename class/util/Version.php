@@ -51,12 +51,12 @@ class Version
 	public function compare(Version $aTo)
 	{
 		// 比较主版本
-		if( $this->GetPrimaryNumber() > $aTo->GetPrimaryNumber() )
+		if( $this->primaryNumber() > $aTo->primaryNumber() )
 		{
 			return 1 ;
 		}
 		
-		else if( $this->GetPrimaryNumber() < $aTo->GetPrimaryNumber() )
+		else if( $this->primaryNumber() < $aTo->primaryNumber() )
 		{
 			return -1 ;
 		}
@@ -64,12 +64,12 @@ class Version
 		else
 		{
 			// 比较 次版本
-			if( $this->GetSecondaryNumber() > $aTo->GetSecondaryNumber() )
+			if( $this->secondaryNumber() > $aTo->secondaryNumber() )
 			{
 				return 1 ;
 			}
 			
-			else if( $this->GetSecondaryNumber() < $aTo->GetSecondaryNumber() )
+			else if( $this->secondaryNumber() < $aTo->secondaryNumber() )
 			{
 				return -1 ;
 			}
@@ -77,12 +77,12 @@ class Version
 			else 
 			{
 				// 比较修正版本
-				if( $this->GetModificatoryNumber() > $aTo->GetModificatoryNumber() )
+				if( $this->modificatoryNumber() > $aTo->modificatoryNumber() )
 				{
 					return 1 ;
 				}
 				
-				else if( $this->GetModificatoryNumber() < $aTo->GetModificatoryNumber() )
+				else if( $this->modificatoryNumber() < $aTo->modificatoryNumber() )
 				{
 					return -1 ;
 				}
@@ -90,12 +90,12 @@ class Version
 				else 
 				{
 					// 比较内部版本
-					if( $this->GetInternalNumber() > $aTo->GetInternalNumber() )
+					if( $this->internalNumber() > $aTo->internalNumber() )
 					{
 						return 1 ;
 					}
 					
-					else if( $this->GetInternalNumber() < $aTo->GetInternalNumber() )
+					else if( $this->internalNumber() < $aTo->internalNumber() )
 					{
 						return -1 ;
 					}
@@ -217,10 +217,10 @@ class Version
 	 */
 	public function to32Integer()
 	{
-		return	($this->GetPrimaryNumber()<< (self::INT32_BIT_INTERNAL+self::INT32_BIT_MODIFICTORY+self::INT32_BIT_SECONDARY) )
-				+ ($this->GetSecondaryNumber()<< (self::INT32_BIT_INTERNAL+self::INT32_BIT_MODIFICTORY) )
-				+ ($this->GetModificatoryNumber()<< self::INT32_BIT_INTERNAL )
-				+ $this->GetInternalNumber() ;
+		return	($this->primaryNumber()<< (self::INT32_BIT_INTERNAL+self::INT32_BIT_MODIFICTORY+self::INT32_BIT_SECONDARY) )
+				+ ($this->secondaryNumber()<< (self::INT32_BIT_INTERNAL+self::INT32_BIT_MODIFICTORY) )
+				+ ($this->modificatoryNumber()<< self::INT32_BIT_INTERNAL )
+				+ $this->internalNumber() ;
 	}
 	
 	/**
@@ -232,10 +232,10 @@ class Version
 	public function toCeil32Integer()
 	{		
 		// 主版本号
-		$sPrimaryNumber = $this->GetPrimaryNumber() ;
-		$sSecondaryNumber = $this->GetSecondaryNumber() ;
-		$sModificatoryNumber = $this->GetModificatoryNumber() ;
-		$tsInternalNumber = $this->GetInternalNumber() ;
+		$sPrimaryNumber = $this->primaryNumber() ;
+		$sSecondaryNumber = $this->secondaryNumber() ;
+		$sModificatoryNumber = $this->modificatoryNumber() ;
+		$tsInternalNumber = $this->internalNumber() ;
 		
 		// 从 内部版本号 开始
 		if( $tsInternalNumber===0 )
