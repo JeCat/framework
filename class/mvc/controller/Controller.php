@@ -282,7 +282,7 @@ class Controller extends NamableComposite implements IController, IBean
     	}
     	else
     	{
-	    	if( !$this->params->bool('noframe') and $aFrame=$this->frame() )
+	    	if( $aFrame=$this->frame() )
 	    	{
 	    		$aFrame->add($this) ;
 	    		
@@ -628,7 +628,7 @@ class Controller extends NamableComposite implements IController, IBean
     
     public function frame()
     {
-    	if( !$this->aFrame )
+    	if( !$this->aFrame and !$this->params->bool('noframe') )
     	{
     		$this->aFrame = $this->createFrame() ;
     	}

@@ -2,7 +2,6 @@
 namespace org\jecat\framework\mvc\view ;
 
 use org\jecat\framework\lang\Type;
-
 use org\jecat\framework\pattern\composite\IContainer;
 use org\jecat\framework\system\Response;
 use org\jecat\framework\mvc\controller\IController;
