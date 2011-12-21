@@ -40,7 +40,7 @@ class Category extends Object
 	
 	/**
 	 * 
-	 * 添加一个节点到目标($nTarget)位置
+	 * 移动一个节点到目标($nTarget)位置
 	 * 
 	 * 如果传入的是目标的lft,则加到目标左侧同级位置
 	 * 如果传入目标的rgt,则加到目标内部末尾
@@ -92,28 +92,37 @@ class Category extends Object
 			// 整体转移到0以前
 			// --------------------
 			$nTmpMove = $nOriRgt+1 ;
-			$this->moveCategory($aUpdate,-$nTmpMove,$nOriLft,$nOriRgt,$sLftClm,$sRgtClm) ;
+			$this->moveCategory($aUpdate,-$nTmpMove,$nOriLft-1,$nOriRgt+1,$sLftClm,$sRgtClm) ;
 			
 			// 移动 源位置 和 目标位置 之间的记录
 			// --------------------
-			$nMove = $nOriRgt<$nTarget? ($nOriLft-$nOriRgt-1): ($nOriRgt+1-$nOriLft) ;
+			if($nOriRgt<$nTarget)		// 从左向右移动
+			{
+				$nSpeceMove = $nOriLft-$nOriRgt-1 ;
+				$nTmpMove = $nTarget ;	// 目标位置已经改变,实际一定距离不用考虑 $nSpeceMove 
+			}
+			else							// 从右向左移动
+			{
+				$nSpeceMove = $nOriRgt+1-$nOriLft ;
+				$nTmpMove = abs($nSpeceMove)+$nTarget ;
+			}
 			
 			// 从左向右移动
 			if($nOriRgt<$nTarget)
 			{
-				$this->moveFeet($aUpdate,$sLftClm,nMove,$nOriRgt,$nTarget) ;	// 移动 lft
-				$this->moveFeet($aUpdate,$sRgtClm,nMove,$nOriRgt,$nTarget) ;	// 移动 rgt
+				$this->moveFeet($aUpdate,$sLftClm,$nSpeceMove,$nOriRgt,$nTarget) ;	// 移动 lft
+				$this->moveFeet($aUpdate,$sRgtClm,$nSpeceMove,$nOriRgt,$nTarget) ;	// 移动 rgt
 			}
 			// 从右向左移动
 			else
 			{
-				$this->moveFeet($aUpdate,$sLftClm,nMove,$nTarget-1,$nOriLft) ;	// 移动 lft
-				$this->moveFeet($aUpdate,$sRgtClm,nMove,$nTarget-1,$nOriLft) ;	// 移动 rgt
+				$this->moveFeet($aUpdate,$sLftClm,$nSpeceMove,$nTarget-1,$nOriLft) ;	// 移动 lft
+				$this->moveFeet($aUpdate,$sRgtClm,$nSpeceMove,$nTarget-1,$nOriLft) ;	// 移动 rgt
 			}
 					
 			// 将 源记录 移动至 目标位置
 			// --------------------
-			$this->moveCategory( $aUpdate, abs($nMove)+$nTarget, null, 0, $sLftClm, $sRgtClm ) ;
+			$this->moveCategory( $aUpdate, $nTmpMove, null, 0, $sLftClm, $sRgtClm ) ;
 		}
 		
 		// 插入新记录
