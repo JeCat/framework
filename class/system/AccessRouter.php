@@ -26,6 +26,13 @@ class AccessRouter extends \org\jecat\framework\lang\Object
     public function setDefaultController($sControllerName)
     {
     	$this->sDefaultControllerName = (string)$sControllerName ;
+    	
+    	// 自动注册为 index 控制器名称
+    	if($sControllerName!='index')
+    	{
+	    	$sControllerClass = $this->transControllerClass($sControllerName) ;
+	    	$this->addController($sControllerClass,'index') ;
+    	}
     }
         
     /**
