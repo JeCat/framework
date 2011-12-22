@@ -1,13 +1,15 @@
 <?php
 namespace org\jecat\framework\ui\xhtml\weave ;
 
+use org\jecat\framework\ui\IObject;
+
 use org\jecat\framework\lang\Exception;
 
 use org\jecat\framework\ui\ObjectContainer;
 
 class PatchSlotPath
 {
-	private public function __construct()
+	private function __construct()
 	{}
 	
 	/**
@@ -67,6 +69,24 @@ class PatchSlotPath
 		return '/' . implode('/', $this->arrSegments) ;
 	}
 
+	static public function reflectXPath(IObject $aParentObject,$sParentXPath='')
+	{
+		$arrChildIdxies = array() ;
+		echo __METHOD__ ;
+		foreach($aParentObject->iterator() as $aChildObject)
+		{
+			echo $sType = PatchSlotPathSegment::xpathType($aChildObject) ;
+			if( !isset($arrChildIdxies[$sType]) )
+			{
+				$arrChildIdxies[$sType] = 0 ;
+			}echo $arrChildIdxies[$sType] ;
+				
+			$sXPath = $sParentXPath.'/'.$sType.'@'.($arrChildIdxies[$sType]++) ;
+			$aChildObject->properties()->set('xpath',$sXPath) ;
+			
+			self::reflectXPath($aChildObject,$sXPath) ;
+		}
+	}
 	
 	private $arrSegments = array() ;
 }

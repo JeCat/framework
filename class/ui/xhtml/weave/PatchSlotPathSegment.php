@@ -4,12 +4,12 @@ namespace org\jecat\framework\ui\xhtml\weave ;
 use org\jecat\framework\ui\xhtml\Node;
 use org\jecat\framework\ui\xhtml\Macro;
 use org\jecat\framework\ui\xhtml\Text;
-use org\jecat\framework\ui\xhtml\IObject;
+use org\jecat\framework\ui\IObject;
 use org\jecat\framework\lang\Exception;
 
 class PatchSlotPathSegment 
 {
-	private public function __construct()
+	private function __construct()
 	{}
 	
 	/**
@@ -19,7 +19,7 @@ class PatchSlotPathSegment
 	{
 		$aObjectPathSegment = new self() ;
 		
-		if( strstr($sSegment,':')===false )
+		if( strstr($sSegment,'@')===false )
 		{
 			if(is_numeric($sSegment))
 			{
@@ -29,7 +29,7 @@ class PatchSlotPathSegment
 		}
 		else
 		{
-			list($aObjectPathSegment->sObjectType,$sPos) = explode(':',$sSegment,2) ;
+			list($aObjectPathSegment->sObjectType,$sPos) = explode('@',$sSegment,2) ;
 			
 			if( !is_numeric($sPos) )
 			{
@@ -45,7 +45,7 @@ class PatchSlotPathSegment
 	
 	public function __toString()
 	{
-		return "{$aObjectPathSegment->sObjectType}:{$aObjectPathSegment->nPos}" ;
+		return "{$this->sObjectType}@{$this->nPos}" ;
 	}
 	
 	/**
@@ -78,6 +78,26 @@ class PatchSlotPathSegment
 				return ($aObject instanceof Macro) ;
 			default:
 				return ($aObject instanceof Node) and $aObject->tagName()==$this->sObjectType ;
+		}
+	}
+	
+	static public function xpathType(IObject $aObject)
+	{
+		if( $aObject instanceof Text )
+		{
+			return '<text>' ;
+		}
+		else if( $aObject instanceof Macro )
+		{
+			return '<macro>' ;
+		}
+		else if( $aObject instanceof Node )
+		{
+			return $aObject->tagName() ;
+		}
+		else 
+		{
+			return '<unknow>' ;
 		}
 	}
 	
