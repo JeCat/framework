@@ -1,8 +1,14 @@
 <?php
 namespace org\jecat\framework\setting ;
 
-interface IKey
+interface IKey extends \ArrayAccess
 {
+	/**
+	 * 返回键的名称
+	 * @return string
+	 */
+	public function name() ;
+	
 	/**
 	 * 读取特定项的值
 	 * @param string $sName 项的名字

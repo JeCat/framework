@@ -2,7 +2,6 @@
 namespace org\jecat\framework\setting;
 
 use org\jecat\framework\lang\Exception;
-
 use org\jecat\framework\lang\Object;
 
 abstract class Setting extends Object implements ISetting

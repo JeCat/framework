@@ -8,7 +8,7 @@ interface ISetting
 	 * @param string $sPath 键路径
 	 * @return IKey 
 	 */
-	public function key($sPath) ;
+	public function key($sPath,$bAutoCreate=false) ;
 	
 	/**
 	 * 新建一个键
