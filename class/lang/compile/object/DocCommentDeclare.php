@@ -8,7 +8,7 @@ class DocCommentDeclare extends Token
 {
 	public function __construct(Token $aToken)
 	{
-		if( $aToken->tokenType()!==T_DOC_COMMENT )
+		if( $aToken->tokenType()!==T_DOC_COMMENT && $aToken->tokenType()!==T_COMMENT)
 		{
 			throw new ClassCompileException(null,$aToken,"参数 \$aToken 必须为 T_DOC_COMMENT 类型的Token对象") ;
 		}

@@ -44,18 +44,20 @@ class FunctionDefineParser implements ISyntaxParser
 			// function 修饰符 ------
 			for(
 				$aTokenPoolIter->prev() ;
-				$aToken=$aTokenPoolIter->current() and in_array($aToken->tokenType(), array(
-						T_PUBLIC ,
-						T_PROTECTED ,
-						T_PRIVATE ,
-						T_STATIC ,
-						T_ABSTRACT ,
-						T_DOC_COMMENT ,
-						T_WHITESPACE ,
-				)) ;
+#				$aToken=$aTokenPoolIter->current() and in_array($aToken->tokenType(), array(
+#						T_PUBLIC ,
+#						T_PROTECTED ,
+#						T_PRIVATE ,
+#						T_STATIC ,
+#						T_ABSTRACT ,
+#						T_DOC_COMMENT ,
+#						T_WHITESPACE ,
+#				)) ;
+				$aToken=$aTokenPoolIter->current() ;
 				$aTokenPoolIter->prev()
 			)
 			{
+				//echo $aToken->tokenType().$aToken."<br/>\n";
 				switch ($aToken->tokenType())
 				{
 					case T_PUBLIC :
@@ -74,10 +76,15 @@ class FunctionDefineParser implements ISyntaxParser
 						$aNewToken->setAbstractToken($aToken) ;
 						break ;
 					case T_DOC_COMMENT :
+					case T_COMMENT :
 						$aDocToken = new DocCommentDeclare($aToken) ;
 						$aNewToken->setDocToken($aDocToken) ;
 						$aTokenPool->replace($aToken,$aDocToken) ;
 						break ;
+					case T_WHITESPACE :
+						break;
+					default:
+						break(2);
 				}
 			}
 			
@@ -94,7 +101,10 @@ class FunctionDefineParser implements ISyntaxParser
 				// 匿名函数
 				case Token::T_BRACE_ROUND_OPEN :
 					$aTokenPoolIter->prev() ;
-					break(2) ;										
+					break(2) ;
+				case Token::T_BIT_AND :
+					$aNewToken->setReturnByRef(true);
+					break(2);
 				}
 			}
 			

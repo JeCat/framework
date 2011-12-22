@@ -11,6 +11,8 @@ class Token extends AbstractObject
 	const T_BRACE_ROUND_CLOSE = ')' ;
 	const T_SEMICOLON = ';' ;
 	const T_COLON = ',' ;
+	const T_BIT_AND = '&' ;
+	const T_EQUAL = '=' ;
 	
 	static private $arrExtTypes = array(
 			self::T_BRACE_OPEN => 'Token::T_BRACE_OPEN',
@@ -21,6 +23,8 @@ class Token extends AbstractObject
 			self::T_BRACE_ROUND_CLOSE => 'Token::T_BRACE_ROUND_CLOSE',
 			self::T_SEMICOLON => 'Token::T_SEMICOLON',
 			self::T_COLON => 'Token::T_COLON',
+			self::T_BIT_AND => 'Token::T_BIT_AND',
+			self::T_EQUAL => 'Token::T_EQUAL',
 	) ; 
 
 	public function __construct($nType,$sSource,$nPostion=0,$nLine=0)
