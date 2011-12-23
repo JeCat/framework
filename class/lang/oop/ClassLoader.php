@@ -301,7 +301,7 @@ class ClassLoader extends Object implements \Serializable
 	private $fLoadTime = 0 ;
 	
 	private $arrClassPathCache = array() ;
-	private $bEnableClassCache = true ;
+	private $bEnableClassCache = false ;
 }
 
 ?>
