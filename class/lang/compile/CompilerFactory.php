@@ -37,8 +37,20 @@ class CompilerFactory extends Object
 		
 		$aCompiler->addStrategySummary(AOP::singleton()) ;
 		
+		if( $this->sStrategySignature )
+		{
+			$aCompiler->setStrategySignature($this->sStrategySignature) ;
+		}
+		
 		return $aCompiler ;
 	}
+	
+	public function setStrategySignature($sStrategySignature)
+	{
+		$this->sStrategySignature = $sStrategySignature ;
+	}
+	
+	private $sStrategySignature ;
 }
 
 ?>
