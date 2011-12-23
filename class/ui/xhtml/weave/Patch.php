@@ -1,12 +1,11 @@
 <?php
 namespace org\jecat\framework\ui\xhtml\weave ;
 
-
 use org\jecat\framework\util\String;
 use org\jecat\framework\io\OutputStreamBuffer;
 use org\jecat\framework\io\InputStreamCache;
 use org\jecat\framework\ui\UI;
-use org\jecat\framework\ui\xhtml\IObject;
+use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\ObjectContainer;
 use org\jecat\framework\lang\Exception;
 
@@ -46,7 +45,7 @@ class Patch
 	
 		if( !in_array($sType, self::$arrValidTypes) )
 		{
-			throw new Exception("传入了无效的参数：%s",$sType) ;
+			throw new Exception("传入了无效的参数\$sType：%s",$sType) ;
 		}
 		
 		$aPatch->nKind = self::code ;
@@ -58,7 +57,7 @@ class Patch
 	
 	public function compile(UI $aUi)
 	{
-		if( !$this->aCompiled )
+		if( $this->aCompiled )
 		{
 			return ;
 		}
@@ -66,7 +65,7 @@ class Patch
 		if( $this->nKind==self::code )
 		{
 			$aOutput = new OutputStreamBuffer() ;
-			$aUi->compile(new InputStreamCache($this->sCode),$aOutput) ;
+			$aUi->compile(new InputStreamCache($this->sCode),$aOutput,null,false) ;
 			
 			$this->aCompiled = new String($aOutput->bufferBytes()) ;
 		}
@@ -80,7 +79,7 @@ class Patch
 		}
 	}
 	
-	public function apply(IObject &$aTargetObject)
+	public function apply(ObjectContainer $aObjectContainer,IObject &$aTargetObject)
 	{
 		$aWeaveinObject = new WeaveinObject($this->aCompiled) ;
 		

@@ -2,10 +2,9 @@
 
 namespace org\jecat\framework\ui ;
 
+use org\jecat\framework\util\HashTable;
 use org\jecat\framework\system\Response;
-
 use org\jecat\framework\system\Application;
-
 use org\jecat\framework\io\IOutputStream;
 use org\jecat\framework\pattern\composite\IContainer;
 use org\jecat\framework\pattern\composite\Composite;
@@ -59,8 +58,19 @@ class Object extends Composite implements IObject
 		}
 	}
 	
-	private $aParent ;
+	/**
+	 * @return org\jecat\framework\util\IHashTable
+	 */
+	public function properties($bAutoCreate=true)
+	{
+		if(!$this->aProperties)
+		{
+			$this->aProperties = new HashTable() ;
+		}
+		return $this->aProperties ;
+	}
 	
+	private $aProperties ;
 }
 
 ?>

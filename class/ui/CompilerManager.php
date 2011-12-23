@@ -52,10 +52,10 @@ class CompilerManager extends JcObject
 	/**
 	 * @return ICompiled
 	 */
-	public function compile(ObjectContainer $aObjectContainer,IOutputStream $aCompiledOutput)
+	public function compile(ObjectContainer $aObjectContainer,IOutputStream $aCompiledOutput,$bPHPTag=true)
 	{
 		$aTargetCodeStream = new TargetCodeOutputStream ;
-		$aTargetCodeStream->open($aCompiledOutput) ;
+		$aTargetCodeStream->open($aCompiledOutput,$bPHPTag) ;
 		
 		foreach($aObjectContainer->iterator() as $aObject)
 		{
@@ -66,7 +66,7 @@ class CompilerManager extends JcObject
 			}
 		}
 				
-		$aTargetCodeStream->close() ;
+		$aTargetCodeStream->close($bPHPTag) ;
 	}
 	
 	public function createCompiledFile(IFile $aCompiledFile)

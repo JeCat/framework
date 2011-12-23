@@ -26,7 +26,7 @@ class WeaveManager extends Object
 	public function patchSlotIterator($sSourceTemplateName)
 	{
 		return	isset($this->arrPatchSlots[$sSourceTemplateName])?
-			new \ArrayIterator( array_keys($this->arrPatchSlots[$sSourceTemplateName]) ) :
+			new \ArrayIterator( $this->arrPatchSlots[$sSourceTemplateName] ) :
 			new \EmptyIterator() ;
 	}
 	

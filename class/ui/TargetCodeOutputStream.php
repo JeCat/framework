@@ -7,7 +7,7 @@ use org\jecat\framework\io\IOutputStream;
 
 class TargetCodeOutputStream implements IOutputStream
 {
-	public function open(IOutputStream $aWriter)
+	public function open(IOutputStream $aWriter,$bStartScript=true)
 	{
 		/*$aWriter = $aCompiledFile->openWriter(false) ;
 		if(!$aWriter)
@@ -17,14 +17,21 @@ class TargetCodeOutputStream implements IOutputStream
 		
 		$this->aCompiledWriter = $aWriter ;
 		
-		$this->write("<?php\r\n") ;
+		if($bStartScript)
+		{
+			$this->write("<?php\r\n") ;
+		}
 	}
 	
-	public function close()
+	public function close($bStartScript=true)
 	{
 		$this->generateOutputCode() ;
 		
-		$this->write("?>") ;
+		if($bStartScript)
+		{
+			$this->write("?>") ;
+		}
+		
 		$this->aCompiledWriter->close() ;
 	}
 	

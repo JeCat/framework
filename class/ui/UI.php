@@ -158,7 +158,7 @@ class UI extends JcObject
 		return $aCompiledFile ;
 	}
 	
-	public function compile(IInputStream $aSourceInput,IOutputStream $aCompiledOutput,ObjectContainer $aObjectContainer=null)
+	public function compile(IInputStream $aSourceInput,IOutputStream $aCompiledOutput,ObjectContainer $aObjectContainer=null,$bPHPTag=true)
 	{
 		if(!$aObjectContainer)
 		{
@@ -169,7 +169,7 @@ class UI extends JcObject
 		$this->interpreters()->parse($aSourceInput,$aObjectContainer,$this) ;
 		
 		// 编译
-		$this->compilers()->compile($aObjectContainer,$aCompiledOutput) ;
+		$this->compilers()->compile($aObjectContainer,$aCompiledOutput,$bPHPTag) ;
 	}
 	
 	public function render(IFile $aCompiledFile,IHashTable $aVariables=null,IOutputStream $aDevice=null)

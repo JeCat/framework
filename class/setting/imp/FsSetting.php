@@ -11,6 +11,7 @@ use org\jecat\framework\setting\Setting;
 
 class FsSetting extends Setting implements \Serializable
 {
+	
 	/**
 	 * 
 	 * @param IFolder $aRootFolder
@@ -23,14 +24,14 @@ class FsSetting extends Setting implements \Serializable
 	/**
 	 * @return IKey 
 	 */
-	public function key($sPath,$bCreate=false)
+	public function key($sPath,$bAutoCreate=false)
 	{
 		$sItemsPath = self::transPath($sPath) ;
 		$sFlyweightKey = $this->aRootFolder->url() . '/' . $sItemsPath ;
 					
 		if( !$aKey=FsKey::flyweight($sFlyweightKey,false) )
 		{
-			if( !$aFile=$this->aRootFolder->findFile($sItemsPath,$bCreate?FileSystem::FIND_AUTO_CREATE:0) )
+			if( !$aFile=$this->aRootFolder->findFile($sItemsPath,$bAutoCreate?FileSystem::FIND_AUTO_CREATE:0) )
 			{
 				return null ;
 			}
@@ -91,7 +92,7 @@ class FsSetting extends Setting implements \Serializable
 				$sPath.= '/' ;
 			}
 			
-			$sPath.= 'items.php' ;
+			$sPath.= FsKey::itemFilename ;
 		}
 		
 		return $sPath ;

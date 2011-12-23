@@ -59,6 +59,40 @@ abstract class Key extends Object implements IKey
 		}
 	}
 	
+	// implements ArrayAccess	
+	/**
+	 * @param offset
+	 */
+	public function offsetExists ($offset)
+	{
+		return isset($this->arrItems[$offset]) ;
+	}
+	
+	/**
+	 * @param offset
+	 */
+	public function offsetGet ($offset)
+	{
+		return $this->item($offset) ;
+	}
+	
+	/**
+	 * @param offset
+	 * @param value
+	 */
+	public function offsetSet ($offset, $value)
+	{
+		return $this->setItem($offset, $value) ;
+	}
+	
+	/**
+	 * @param offset
+	 */
+	public function offsetUnset ($offset)
+	{
+		return $this->deleteItem($offset) ;
+	}
+	
 	protected $arrItems = array() ;
 	
 	protected $bDataChanged = false ;
