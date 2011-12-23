@@ -4,7 +4,7 @@ namespace org\jecat\framework\io ;
 
 use org\jecat\framework\lang\Type;
 
-class OutputStreamBuffer extends OutputStream
+class OutputStreamBuffer extends OutputStream implements IRedirectable, IBuffRemovable
 {	
 	public function write($Content,$nLen=null,$bFlush=false)
 	{
@@ -75,7 +75,36 @@ class OutputStreamBuffer extends OutputStream
 		return empty($this->arrBuffer) ;
 	}
 	
+	public function removeBuff($content)
+	{
+		$pos=in_array($content,$this->arrBuffer,is_object($content)) ;
+		if( $pos!==false )
+		{
+			unset($this->arrBuffer[$pos]) ;
+		}
+	}
+	
+	public function redirect(IOutputStream $aOutputStream)
+	{
+		// 从原来的重定向目标设备中解除
+		if( $this->aRedirectionDev and $this->aRedirectionDev instanceof IBuffRemovable )
+		{
+			$this->aRedirectionDev->removeBuff($this) ;
+		}
+		
+		// 重定向到新的目标
+		$aOutputStream->write($this) ;
+		$this->aRedirectionDev = $aOutputStream ;
+	}
+	
+	public function redirectionDev()
+	{
+		return $this->aRedirectionDev ;
+	}
+	
 	private $arrBuffer = array() ;
+	
+	private $aRedirectionDev ;
 }
 
 ?>

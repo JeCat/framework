@@ -141,7 +141,7 @@ class AOP extends Object implements IStrategySummary
 			}
 		}
 		
-		return md5( serialize($arrBox) ) ;
+		return $this->sAspectLibSignture = md5( serialize($arrBox) ) ;
 	}
 	
 	public function createClassCompiler()
