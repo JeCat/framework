@@ -104,7 +104,7 @@ class FunctionDefineParser implements ISyntaxParser
 					break(2) ;
 				case Token::T_BIT_AND :
 					$aNewToken->setReturnByRef(true);
-					break(2);
+					break;
 				}
 			}
 			
