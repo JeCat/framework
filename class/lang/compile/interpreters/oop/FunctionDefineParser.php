@@ -80,7 +80,7 @@ class FunctionDefineParser implements ISyntaxParser
 						$aDocToken = new DocCommentDeclare($aToken) ;
 						$aNewToken->setDocToken($aDocToken) ;
 						$aTokenPool->replace($aToken,$aDocToken) ;
-						break ;
+						break (2);
 					case T_WHITESPACE :
 						break;
 					default:
