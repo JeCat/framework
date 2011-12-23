@@ -213,6 +213,14 @@ class ClassLoader extends Object implements \Serializable
 		return new \org\jecat\framework\pattern\iterate\ArrayIterator( array_keys($this->arrPackages) ) ;
 	}
 	
+	/**
+	 * @return \IIterator
+	 */
+	public function packageIterator()
+	{
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator( $this->arrPackages ) ;
+	}
+	
 	public function compiler()
 	{
 		if(!$this->aCompiler)
