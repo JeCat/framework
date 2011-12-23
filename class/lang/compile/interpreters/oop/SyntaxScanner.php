@@ -26,6 +26,7 @@ class SyntaxScanner extends Object implements IInterpreter
 		$this->arrParsers[] = new ClassDefineParser() ;
 		$this->arrParsers[] = new FunctionDefineParser() ;
 		$this->arrParsers[] = new CallFunctionParser() ;
+		$this->arrParsers[] = new ParameterParser() ;
 		//$this->arrParsers[] = new FunctionCallParser() ;
 		//$this->arrParsers[] = new NewObjectParser() ;
 		//$this->arrParsers[] = new ThrowParser() ;

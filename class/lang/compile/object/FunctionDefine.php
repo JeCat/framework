@@ -2,6 +2,7 @@
 namespace org\jecat\framework\lang\compile\object ;
 
 use org\jecat\framework\lang\compile\ClassCompileException;
+use org\jecat\framework\pattern\iterate\ArrayIterator;
 
 class FunctionDefine extends StructDefine
 {
@@ -123,11 +124,29 @@ class FunctionDefine extends StructDefine
 		$this->aEndToken = $aEndToken ;
 	}
 	
+	public function setReturnByRef($bReturnByRef){
+		$this->bReturnByRef = $bReturnByRef ;
+	}
+	
+	public function isReturnByRef(){
+		return $this->bReturnByRef ;
+	}
+	
+	public function addParameterToken($argumentToken){
+		$this->arrParameterToken [] = $argumentToken;
+	}
+	
+	public function parameterIterator(){
+		return new ArrayIterator($this->arrParameterToken) ;
+	}
+	
 	private $aTokenArgList ;
 	private $aAccessToken ;
 	private $aStaticToken ;
 	private $aAbstractToken ;
 	private $aEndToken ;
+	private $arrParameterToken = array();
+	private $bReturnByRef = false ;
 }
 
 ?>

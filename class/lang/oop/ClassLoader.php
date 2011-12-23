@@ -103,7 +103,7 @@ class ClassLoader extends Object implements \Serializable
 	}
 	
 	public function searchClass($sClassName,$nSearchFlag=null)
-	{//echo " signture:", $this->compiler()->strategySignature(), ' classLoader:', $sClassName, '<br />' ;
+	{
 		if($nSearchFlag===null)
 		{
 			$nSearchFlag = self::SEARCH_COMPILED_FIRST ;
@@ -213,6 +213,14 @@ class ClassLoader extends Object implements \Serializable
 		return new \org\jecat\framework\pattern\iterate\ArrayIterator( array_keys($this->arrPackages) ) ;
 	}
 	
+	/**
+	 * @return \IIterator
+	 */
+	public function packageIterator()
+	{
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator( $this->arrPackages ) ;
+	}
+
 	/**
 	 * @return org\jecat\framework\lang\compile\Compiler
 	 */
