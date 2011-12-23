@@ -48,23 +48,31 @@ class ClassDefineParser implements ISyntaxParser
 			$aNewToken->setNameToken($aToken) ;
 			$aNewToken->setBelongsNamespace($aState->currentNamespace()) ;
 			
-			// doc comment
+			// doc comment and abstract
 			for(
 				$aTokenPoolIter->prev() ;
-				$aToken=$aTokenPoolIter->current() and in_array($aToken->tokenType(), array(T_ABSTRACT ,T_DOC_COMMENT)) ;
+				// $aToken=$aTokenPoolIter->current() and in_array($aToken->tokenType(), array(T_ABSTRACT ,T_DOC_COMMENT ,T_COMMENT, T_WHITESPACE)) ;
+				$aToken=$aTokenPoolIter->current() ;
 				$aTokenPoolIter->prev()
 			)
 			{
+				//echo $aToken->tokenType().$aToken."<br/>\n";
 				switch ($aToken->tokenType())
 				{
 					case T_ABSTRACT :
-						// nothing todo
+						$aNewToken->setAbstract(true);
 						break ;
 					case T_DOC_COMMENT :
+					case T_COMMENT:
 						$aNewToken->setDocToken(
 							new DocCommentDeclare($aToken)
 						) ;
 						break ;
+					case T_WHITESPACE:
+					case T_CLASS:
+						break;
+					default:
+						break(2);
 				}
 			}
 			// parent/body

@@ -34,9 +34,17 @@ class ClassDefine extends StructDefine
 		return $this->sParentClassName ;
 	}
 	
+	public function isAbstract(){
+		return $this->bAbstract ;
+	}
+	public function setAbstract($bAbstract){
+		$this->bAbstract = $bAbstract ;
+	} 
+	
 	private $aTokenName ;
 	private $sParentClassName ;
 	private $aTokenBody ;
+	private $bAbstract = false ;
 }
 
 ?>
