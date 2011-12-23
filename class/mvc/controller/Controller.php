@@ -282,13 +282,20 @@ class Controller extends NamableComposite implements IController, IBean
     	}
     	else
     	{
+			try{
+				$this->processChildren() ;
+				$this->process() ;
+			}
+			catch(_ExceptionRelocation $e)
+			{}
+				
+			// 处理 frame
 	    	if( $aFrame=$this->frame() )
 	    	{
-	    		$aFrame->add($this) ;
-	    		
-	    		$aFrame->processChildren() ;
+	    		$aFrame->takeOverView($this) ;
 	    		
 	    		try{
+	    			$aFrame->processChildren() ;
 	    			$aFrame->process() ;
 	    		}
 	    		catch(_ExceptionRelocation $e)
@@ -300,14 +307,6 @@ class Controller extends NamableComposite implements IController, IBean
 	
 	    	else
 	    	{
-				$this->processChildren() ;
-				
-				try{
-					$this->process() ;
-				}
-				catch(_ExceptionRelocation $e)
-				{}
-				
 				// show main view
 				$this->showMainView($this->mainView()) ;
 	    	}

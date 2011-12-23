@@ -36,9 +36,7 @@ class WebpageFrame extends Controller
 	}
 	
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
-	{
-		parent::buildBean($arrConfig,$sNamespace) ;
-		
+	{		
 		$aBeanFactory = BeanFactory::singleton() ;
     	$aModelContainer = $this->modelContainer() ;
 		
@@ -71,6 +69,9 @@ class WebpageFrame extends Controller
 				}
 			}
 		}
+		
+		//
+		parent::buildBean($arrConfig,$sNamespace) ;
 	}
 
     public function mainRun ()
