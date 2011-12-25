@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\view ;
 
+use org\jecat\framework\mvc\view\layout\ViewLayoutFrame;
+
 use org\jecat\framework\lang\Type;
 use org\jecat\framework\pattern\composite\IContainer;
 use org\jecat\framework\system\Response;
@@ -16,6 +18,7 @@ use org\jecat\framework\message\Message;
 use org\jecat\framework\message\MessageQueue;
 use org\jecat\framework\message\IMessageQueue;
 use org\jecat\framework\io\IOutputStream;
+use org\jecat\framework\io\IRedirectableStream;
 use org\jecat\framework\mvc\model\IModel;
 use org\jecat\framework\mvc\view\widget\IViewWidget;
 use org\jecat\framework\pattern\composite\Container;
@@ -251,7 +254,7 @@ class View extends NamableComposite implements IView, IBean
 	}
 	
 	/**
-	 * @return OutputStreamBuffer
+	 * @return org\jecat\framework\io\IRedirectableStream
 	 */
 	public function outputStream()
 	{
@@ -262,7 +265,7 @@ class View extends NamableComposite implements IView, IBean
 		
 		return $this->aOutputStream ;
 	}
-	public function setOutputStream(IOutputStream $aDev)
+	public function setOutputStream(IRedirectableStream $aDev)
 	{
 		$this->aOutputStream = $aDev ;
 	}
@@ -270,6 +273,11 @@ class View extends NamableComposite implements IView, IBean
 	public function isOutputStreamEmpty()
 	{
 		return !$this->aOutputStream or $this->aOutputStream->isEmpty() ;
+	}
+	
+	public function isVagrant()
+	{
+		return !$this->aOutputStream or !$this->aOutputStream->redirectionDev() ;
 	}
 	
 	public function render($bRerender=true)
@@ -309,12 +317,28 @@ class View extends NamableComposite implements IView, IBean
 		
 		$this->ui()->display($sTemplate,$aVars,$this->outputStream()) ;
 	}
+	
 	protected function renderChildren($bRerender=true)
 	{
 		foreach($this->iterator() as $aChildView)
 		{
 			$aChildView->render($bRerender) ;
-			$this->OutputStream()->write( $aChildView->OutputStream() ) ;
+			
+			// 显示下级“流浪”视图
+			if( $aChildView->isVagrant() )
+			{
+				if(empty($aLayoutFrame))
+				{
+					$aLayoutFrame = new ViewLayoutFrame(null,'vagranters') ;
+					$aLayoutFrame->outputStream()->redirect($this->outputStream()) ;
+					$this->add($aLayoutFrame) ;
+				}
+				$aLayoutFrame->add($aChildView) ;
+			}
+		}
+		if(!empty($aLayoutFrame))
+		{
+			$aLayoutFrame->render() ;
 		}
 	}
 	
@@ -337,10 +361,10 @@ class View extends NamableComposite implements IView, IBean
 		}
 		
 		// display children view
-		foreach($this->iterator() as $aChildView)
+		/*foreach($this->iterator() as $aChildView)
 		{
 			$aChildView->display($aDevice) ;
-		}
+		}*/
 	}
 	
 	public function show()
@@ -559,6 +583,43 @@ class View extends NamableComposite implements IView, IBean
     public function isRendered()
     {
     	return $this->bRendered ;
+    }
+    
+    public function printStruct(IOutputStream $aOutput=null,$nDepth=0)
+    {
+		if(!$aOutput)
+		{
+			$aOutput = Response::singleton()->printer();
+		}
+		
+		$aOutput->write ( "<pre>\r\n" );
+		$sIndent = str_repeat ( "\t", $nDepth ) ;
+		
+		$aOutput->write ( $sIndent."--- VIEW ---\r\n" );
+		$aOutput->write ( $sIndent."	name:	".$this->name()."\r\n" );
+		$aOutput->write ( $sIndent."	id:		".$this->id()."\r\n" );
+		$aOutput->write ( $sIndent."	class:	".get_class($this)."\r\n" );
+		$aOutput->write ( $sIndent."	tpl:	".$this->template()."\r\n" );
+		$aOutput->write ( $sIndent."	hash:	".spl_object_hash($this)."\r\n" );
+		
+		if( $this->count() )
+		{
+			foreach ( $this->nameIterator() as $aChildName )
+			{
+				$aOutput->write( "{$sIndent}\tchild:\"{$aChildName}\" => " );
+				
+				if($aChild = $this->getByName($aChildName))
+				{
+					$aChild->printStruct($aOutput,$nDepth+1) ;
+				}
+				else 
+				{
+					$aOutput->write( "<miss>\r\n" );
+				}
+			}
+		}
+		
+		$aOutput->write("\r\n</pre>");
     }
     
 	private $aModel ;

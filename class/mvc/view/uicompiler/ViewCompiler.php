@@ -17,6 +17,9 @@ class ViewCompiler extends NodeCompiler
 
 		$aAttrs = $aObject->attributes() ;
 		
+		
+		$aDev->write("\r\n// display views by layout frame-------------------") ;
+		
 		$aDev->write("\$theView = \$aVariables->get('theView') ;") ;
 		
 		if( $aAttrs->has('for') )
@@ -26,7 +29,7 @@ class ViewCompiler extends NodeCompiler
 			
 			$aDev->write("\$aView = {$sFor} ;") ;
 			$aDev->write("if(\$aView){") ;
-			$aDev->write("\t\$theView->outputStream()->write(\$aView->outputStream()) ;") ;
+			$aDev->write("	\$aView->outputStream()->redirect(\$theView->outputStream()) ;") ;
 			$aDev->write("}else{") ;
 			$aDev->write("\techo '指定的视图不存在：\"{$sForSrc}\"' ;") ;
 			$aDev->write("}") ;
@@ -62,16 +65,21 @@ class ViewCompiler extends NodeCompiler
 			$aDev->write("	if(\$theView->count()){") ;
 			$aDev->write("		\$_aViewLayoutFrame = new \\org\\jecat\\framework\\mvc\\view\\layout\\ViewLayoutFrame({$sType},\$__sViewLayoutFrameName);") ;
 			$aDev->write("		foreach(\$theView->iterator() as \$aChildView){") ;
-			$aDev->write("			\$theView->remove(\$aChildView) ;") ;
-			$aDev->write("			\$_aViewLayoutFrame->add(\$aChildView) ;") ;
+			$aDev->write("			if( \$aChildView->isVagrant() ){") ;
+			//$aDev->write("				\$theView->remove(\$aChildView) ;") ;
+			$aDev->write("				\$_aViewLayoutFrame->add(\$aChildView) ;") ;
+			//$aDev->write("				\$aChildView->outputStream()->redirect(\$_aViewLayoutFrame->outputStream()) ;") ;
+			$aDev->write("			}") ;
 			$aDev->write("		}") ;
 			$aDev->write("		\$theView->add(\$_aViewLayoutFrame) ;") ;
-			$aDev->write("		\$theView->outputStream()->write(\$_aViewLayoutFrame->outputStream()) ;") ;
+			$aDev->write("		\$_aViewLayoutFrame->outputStream()->redirect(\$theView->outputStream()) ;") ;
 			$aDev->write("	}") ;
 			$aDev->write("}else{") ;
-			$aDev->write("	\$theView->outputStream()->write(\$_aViewLayoutFrame->outputStream()) ;") ;
+			$aDev->write("	\$_aViewLayoutFrame->outputStream()->redirect(\$theView->outputStream()) ;") ;
 			$aDev->write("}") ;
 		}
+		
+		$aDev->write("//-------------------\r\n") ;
 	}
 	
 	static $arrLayoutTypes = array(

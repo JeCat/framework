@@ -130,15 +130,12 @@ class AOP extends Object implements IStrategySummary
 			return '' ;
 		}
 		
-		// 根据所有 apect 类的最后修改时间生成签名
+		// 根据注册的 apect 类生成签名
 		$arrBox = null ;
 		$aClassLoader = ClassLoader::singleton() ;
 		foreach($this->arrAspectClasses as $sAspectClass)
 		{
-			if( $aClassFile = $aClassLoader->searchClass($sAspectClass,ClassLoader::SEARCH_SOURCE) )
-			{
-				$arrBox[$sAspectClass] = $aClassFile->modifyTime() ;
-			}
+			$arrBox[] = $sAspectClass ;
 		}
 		
 		return $this->sAspectLibSignture = md5( serialize($arrBox) ) ;

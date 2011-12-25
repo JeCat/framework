@@ -4,7 +4,7 @@ namespace org\jecat\framework\mvc\view ;
 use org\jecat\framework\mvc\controller\IController;
 use org\jecat\framework\resrc\HtmlResourcePool;
 use org\jecat\framework\message\IMessageQueueHolder;
-use org\jecat\framework\io\IOutputStream;
+use org\jecat\framework\io\IRedirectableStream;
 use org\jecat\framework\util\IHashTable;
 use org\jecat\framework\mvc\model\IModel;
 use org\jecat\framework\mvc\view\widget\IViewWidget;
@@ -23,11 +23,13 @@ interface IView extends IContainer, IMessageQueueHolder, IWidgetContainer
 	public function setVariables(IHashTable $aVariables) ;
 	
 	/**
-	 * @return IViewOutputStream
+	 * @return IRedirectableStream
 	 */
 	public function outputStream() ;
 	
-	public function setOutputStream(IOutputStream $aDev) ;
+	public function setOutputStream(IRedirectableStream $aDev) ;
+	
+	public function isVagrant() ;
 
 	public function render() ;
 	

@@ -3,7 +3,6 @@
 namespace org\jecat\framework\mvc\controller ;
 
 use org\jecat\framework\mvc\view\layout\ViewLayoutFrame;
-
 use org\jecat\framework\locale\LocaleManager;
 use org\jecat\framework\system\Response;
 use org\jecat\framework\locale\Locale;
@@ -25,7 +24,7 @@ use org\jecat\framework\util\IDataSrc;
 use org\jecat\framework\util\HashTable ;
 use org\jecat\framework\lang\Exception ;
 use org\jecat\framework\mvc\view\IView ; 
-use org\jecat\framework\mvc\view\View ; 
+use org\jecat\framework\mvc\view\TransparentViewContainer ; 
 use org\jecat\framework\pattern\composite\NamableComposite ;
 
 /** 
@@ -257,7 +256,7 @@ class Controller extends NamableComposite implements IController, IBean
     {
     	if( !$this->aMainView )
     	{
-    		$this->setMainView( new ViewLayoutFrame(ViewLayoutFrame::type_vertical,'controllerMainView_'.$this->name()) ) ;
+    		$this->setMainView( new TransparentViewContainer('mainView-'.$this->name(),null) ) ;
     	}
 
     	return $this->aMainView ;
@@ -437,7 +436,7 @@ class Controller extends NamableComposite implements IController, IBean
 		{
 			$sChildName = $aChild->name() ;
 		}
-		$this->mainView()->add( $aChild->mainView(), "childrenMainViewFor".$sChildName, true )  ;
+		$this->mainView()->add( $aChild->mainView(), "mainView-".$sChildName, true )  ;
 	} 
 	
 	public function remove($object)

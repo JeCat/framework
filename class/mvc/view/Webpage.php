@@ -7,9 +7,9 @@ class Webpage extends View
 {
 	public function __construct($sName=null,UI $aUI=null)
 	{
-		if($sName)
+		if(!$sName)
 		{
-			$sName = 'theWebpage' ;
+			$sName = 'webpage' ;
 		}
 		
 		parent::__construct($sName,'org.jecat.framework:Webpage.template.html',$aUI) ;
