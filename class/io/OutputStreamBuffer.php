@@ -77,7 +77,7 @@ class OutputStreamBuffer extends OutputStream implements IRedirectableStream, IB
 	
 	public function removeBuff($content)
 	{
-		$pos=in_array($content,$this->arrBuffer,is_object($content)) ;
+		$pos=array_search($content,$this->arrBuffer,is_object($content)) ;
 		if( $pos!==false )
 		{
 			unset($this->arrBuffer[$pos]) ;
