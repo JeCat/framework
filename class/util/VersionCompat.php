@@ -18,7 +18,7 @@ class VersionCompat
 	 */
 	public function addCompatibleVersion(Version $aVersion)
 	{
-		$this->arrScopes[] = new VersionScope($aVersion) ;
+		$this->arrScopes[] = new VersionScope($aVersion,$aVersion,'>=','<=') ;
 	}
 	
 	/**

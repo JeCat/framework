@@ -161,14 +161,18 @@ class VersionScope
 	 */
 	public function toString($bFullVersion)
 	{
-		$sString = $this->sLowCompare . $this->aLow->toString($bFullVersion) ;
+		if( $this->aLow === $this->aHigh ){
+			return '='.$this->aLow->toString($bFullVersion) ;
+		}else{
+			$sString = $this->sLowCompare . $this->aLow->toString($bFullVersion) ;
 		
-		if( $this->aHigh )
-		{
-			$sString .= ',' . $this->sHighCompare . $this->aHigh->toString($bFullVersion) ;
+			if( $this->aHigh )
+			{
+				$sString .= ',' . $this->sHighCompare . $this->aHigh->toString($bFullVersion) ;
+			}
+		
+			return $sString ;
 		}
-		
-		return $sString ;
 	}
 	
 	const SEPARATE = 5;
