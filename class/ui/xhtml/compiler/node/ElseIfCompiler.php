@@ -24,7 +24,7 @@ class ElseIfCompiler extends NodeCompiler {
 		Type::check ( "org\\jecat\\framework\\ui\\xhtml\\Node", $aObject );
 		
 		$aDev->write ( ' }elseif(' );
-		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes ()->source () ) );
+		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes ()->anonymous()->source () ) );
 		$aDev->write ( "){ " );
 		
 		$this->compileChildren ( $aObject, $aDev, $aCompilerManager );
