@@ -85,16 +85,26 @@ class VersionCompat
 	 * @param	$aVersion		JCAT_Version
 	 * @return	bool
 	 */
-	public function check(Version $aVersion)
+	public function check($aVersion)
 	{
-		foreach ($this->arrScopes as $aScope)
-		{
-			if( $aScope->isInScope($aVersion) )
+		if($aVersion instanceof Version){
+			foreach ($this->arrScopes as $aScope)
 			{
-				return true ;
+				if( $aScope->isInScope($aVersion) )
+				{
+					return true ;
+				}
 			}
+		}else if($aVersion instanceof VersionScope){
+			foreach ($this->arrScopes as $aScope)
+			{
+				if( VersionScope::SEPARATE !== VersionScope::compareScope($aScope,$aVersion) )
+				{
+					return true ;
+				}
+			}
+			return false;
 		}
-		
 		return false ;
 	}
 	

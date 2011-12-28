@@ -4,7 +4,6 @@
  */
 namespace org\jecat\framework\util;
 
-use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\Object;
 
 class Version
@@ -309,7 +308,7 @@ class Version
 	{
 		if(!self::VerifyFormat($sVersion))
 		{
-			throw new VersionExcetion('无效的版本号格式：%s',$sVersion);
+			throw new VersionException('无效的版本号格式：%s',$sVersion);
 		}
 		
 		//@list($sVersion,$sCode) = explode(' ',$sVersion) ;
