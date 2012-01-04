@@ -3,8 +3,6 @@ namespace org\jecat\framework\db\reflecter\imp;
 
 use org\jecat\framework\db\reflecter\AbStractDBReflecter;
 
-use org\jecat\framework\db\reflecter\AbStractDBReflecter;
-
 class MySQLDBReflecter extends AbStractDBReflecter
 {
 	function __construct($aDBReflecterFactory, $sDBName)
@@ -22,7 +20,6 @@ class MySQLDBReflecter extends AbStractDBReflecter
 		{
 			$this->arrTableNames [] = $aResult;
 		}
-		
 		$this->sName = $sDBName;
 	}
 	

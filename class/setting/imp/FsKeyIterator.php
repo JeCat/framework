@@ -9,7 +9,7 @@ class FsKeyIterator extends \IteratorIterator
 	public function __construct(FsKey $aKey)
 	{
 		parent::__construct(
-				$aKey->itemFile()->directory()->iterator(FSIterator::FOLDER|FSIterator::RETURN_FSO)
+				$aKey->folder()->iterator(FSIterator::FOLDER|FSIterator::RETURN_FSO)
 		) ;
 		
 		$this->valid() ;
