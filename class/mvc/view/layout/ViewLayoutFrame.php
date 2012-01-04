@@ -99,7 +99,7 @@ class ViewLayoutFrame extends View
 		
 		if( !$this->parent() or !($this->parent() instanceof self) )
 		{
-			$this->outputStream()->write(self::renderWrapperHeader($this, 'jc-view-layout-frame xx')) ;
+			$this->outputStream()->write(self::renderWrapperHeader($this, 'jc-view-layout-frame')) ;
 			$bInOtherFrame = false ;
 		}
 		else

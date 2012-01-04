@@ -10,7 +10,7 @@ use org\jecat\framework\lang\oop\ClassLoader;
 use org\jecat\framework\pattern\composite\Container;
 use org\jecat\framework\lang\Object;
 
-class AOP extends Object implements IStrategySummary
+class AOP extends Object implements IStrategySummary, \Serializable
 {
 	/**
 	 * 注册一个 Aspect 类
@@ -23,6 +23,8 @@ class AOP extends Object implements IStrategySummary
 		}
 		$this->arrAspectClasses[$sAspectClass] = $sAspectClass ;
 		$this->parseAspectClass($sAspectClass) ;
+		$this->aPointcutIterator = null ;
+		$this->aJointPointIterator = null ;
 	}
 	
 	/**
@@ -37,40 +39,49 @@ class AOP extends Object implements IStrategySummary
 	 * @return \Iterator
 	 */
 	public function jointPointIterator() 
-	{		
-		if( !$this->aAspects )
+	{
+		if(!$this->aJointPointIterator)
 		{
-			return new \EmptyIterator() ;
-		}
-		
-		$aIterator = new \AppendIterator() ;
-		foreach($this->aspects()->iterator() as $aAspects)
-		{
-			foreach ($aAspects->pointcuts()->iterator() as $aPointcut)
+			if( !$this->aAspects )
 			{
-				$aIterator->append($aPointcut->jointPoints()->iterator()) ;
+				$this->aJointPointIterator = new \EmptyIterator() ;
+			}
+			else
+			{
+				$this->aJointPointIterator = new \AppendIterator() ;
+				foreach($this->aspects()->iterator() as $aAspects)
+				{
+					foreach ($aAspects->pointcuts()->iterator() as $aPointcut)
+					{
+						$this->aJointPointIterator->append($aPointcut->jointPoints()->iterator()) ;
+					}
+				}
 			}
 		}
-		
-		return $aIterator ;
+		return $this->aJointPointIterator ;
 	}
 	
 	/**
 	 * @return \Iterator
 	 */
 	public function pointcutIterator() 
-	{
-		if( !$this->aAspects )
+	{		
+		if(!$this->aPointcutIterator)
 		{
-			return new \EmptyIterator() ;
+			if( !$this->aAspects )
+			{
+				$this->aPointcutIterator = new \EmptyIterator() ;
+			}
+			else
+			{
+				$this->aPointcutIterator = new \AppendIterator() ;
+				foreach($this->aspects()->iterator() as $aAspects)
+				{
+					$this->aPointcutIterator->append($aAspects->pointcuts()->iterator()) ;
+				}
+			}
 		}
-		
-		$aIterator = new \AppendIterator() ;
-		foreach($this->aspects()->iterator() as $aAspects)
-		{
-			$aIterator->append($aAspects->pointcuts()->iterator()) ;
-		}
-		return $aIterator;
+		return $this->aPointcutIterator;
 	}
 		
 	public function weave()
@@ -184,9 +195,33 @@ class AOP extends Object implements IStrategySummary
 		return $this->aAspects ;
 	}
 	
+	public function serialize()
+	{
+		$arrData = array(
+				'arrAspectClasses' => &$this->arrAspectClasses ,
+				'aAspects' => $this->aAspects ,
+				'sAspectLibSignture' => &$this->sAspectLibSignture ,
+		) ;
+		
+		return serialize($arrData) ;
+	}
+	
+	public function unserialize($serialized)
+	{
+		$this->__construct() ;
+	
+		$arrData = unserialize($serialized) ;
+		$this->arrAspectClasses =& $arrData['arrAspectClasses'] ;
+		$this->aAspects =& $arrData['aAspects'] ;
+		$this->sAspectLibSignture =& $arrData['sAspectLibSignture'] ;
+	}
+	
 	private $arrAspectClasses ;
 	
 	private $aAspects ;
+	
+	private $aPointcutIterator ;
+	private $aJointPointIterator ;
 	
 	private $sAspectLibSignture ;
 }

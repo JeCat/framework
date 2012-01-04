@@ -19,9 +19,9 @@ class WebpageFrame extends Controller
 	
 	public function __construct($params=null)
 	{
-		parent::__construct($params) ;
-		
 		$this->setMainView(WebpageFactory::singleton()->create()) ;
+		
+		parent::__construct($params) ;
 	}
 	
 	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
@@ -97,14 +97,16 @@ class WebpageFrame extends Controller
 	
 	public function addFrameView(IView $aFrameView)
 	{
-		$this->addView($aFrameView) ;
-		
-		$this->setViewContainer($aFrameView) ;	
-
-		if( $aParent=$this->parent() )
+		if( $aOriController = $aFrameView->controller() )
 		{
-			$aParent->setViewContainer($aFrameView) ;
+			$aOriController->removeView($aFrameView) ;
 		}
+		$aFrameView->setController($this) ;
+	
+	
+		$this->viewContainer()->add( $aFrameView ) ;
+	
+		$this->setViewContainer($aFrameView) ;
 	}
     
     public function setMainView(IView $aView)
