@@ -260,7 +260,10 @@ class Object implements IObject
 		}
 		$arrPool =& self::$arrFlyweightInstancs[$sClassName] ;
 		
-		$keys = (array)$keys ; // 如果 $keys == null , 就转换成 array(null)
+		if( !is_array($keys) )
+		{
+			$keys = array($keys) ; // 如果 $keys == null , 就转换成 array(null)
+		}
 		$sLastKey = (string)array_pop($keys) ;
 		
 		foreach($keys as &$sKey)
