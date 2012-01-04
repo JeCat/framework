@@ -76,9 +76,9 @@ class Object implements IObject
 		{
 			$argvs = array() ;
 		}
-		else 
+		else if(!is_array($argvs))
 		{
-			$argvs = (array) $argvs ;
+			$argvs = array($argvs) ;
 		}
 		
 		if(!$sClassName)
@@ -98,15 +98,6 @@ class Object implements IObject
 			throw new Exception("无法创建抽象类:%s的实例",$sClassName) ;
 		}
 		$aObject = $aRefClass->newInstanceArgs($argvs) ;
-		/*if(empty($argvs))
-		{
-			$aObject = new $sClassName() ;
-		}
-		else 
-		{
-			$aRefClass = new \ReflectionClass($sClassName) ;
-			$aObject = $aRefClass->newInstanceArgs($argvs) ;
-		}*/
 		
 		// set application
 		if( $aApp and $aObject instanceof IObject )
