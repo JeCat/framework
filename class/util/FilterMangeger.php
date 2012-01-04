@@ -39,7 +39,10 @@ class FilterMangeger extends Object implements IFilterMangeger
 			$arrFilterFuncArgvs = array_merge($arrArgvs,$arrFilter[1]) ;
 			
 			try{
-				$arrArgvs = (array)call_user_func_array($arrFilter[0],$arrFilterFuncArgvs) ;
+				$arrArgvs = Type::toArray(
+					call_user_func_array($arrFilter[0],$arrFilterFuncArgvs)
+					, Type::toArray_normal
+				) ;
 				
 				if( ($miss=count($arrOriArgvs)-count($arrArgvs)) > 0 )
 				{

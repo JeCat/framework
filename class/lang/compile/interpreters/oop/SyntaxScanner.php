@@ -2,6 +2,8 @@
 
 namespace org\jecat\framework\lang\compile\interpreters\oop ;
 
+use org\jecat\framework\lang\Type;
+
 use org\jecat\framework\pattern\iterate\IReversableIterator;
 
 use org\jecat\framework\lang\compile\object\TokenPool;
@@ -234,7 +236,7 @@ class SyntaxScanner extends Object implements IInterpreter
 	
 	private function findFirstToken(INonlinearIterator $aObjectPoolIter,$types,$bReverse=false)
 	{		
-		$types = (array)$types ;
+		Type::toArray($types,Type::toArray_ignoreNull) ;
 		
 		do{
 			
@@ -259,7 +261,7 @@ class SyntaxScanner extends Object implements IInterpreter
 	{
 		$arrTokens = array() ;
 		
-		$types = (array)$types ;
+		Type::toArray($types,Type::toArray_ignoreNull) ;
 		
 		do{
 			

@@ -2,6 +2,8 @@
 namespace org\jecat\framework\verifier ;
 
 
+use org\jecat\framework\lang\Type;
+
 use org\jecat\framework\lang\Object;
 
 class VerifierManager extends Object
@@ -84,7 +86,7 @@ class VerifierManager extends Object
 							$this->arrVerifierOthers[$nIdx][1]
 							, array_merge(
 									array( $value, $aVerifier, $e, $this->arrVerifierOthers[$nIdx][0] )
-									, (array)$this->arrVerifierOthers[$nIdx][2]
+									, Type::toArray($this->arrVerifierOthers[$nIdx][2],Type::toArray_normal)
 							)
 					) ;
 				}
