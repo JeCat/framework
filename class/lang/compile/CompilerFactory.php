@@ -21,7 +21,7 @@ class CompilerFactory extends Object
 		// generator
 		$aCompiler->registerGenerator("org\\jecat\\framework\\lang\\compile\\object\\FunctionDefine","org\\jecat\\framework\\lang\\compile\\generators\\CompiledAlert") ;
 		$aCompiler->registerGenerator("org\\jecat\\framework\\lang\\compile\\object\\ClassDefine","org\\jecat\\framework\\lang\\aop\\compiler\\FunctionDefineGenerator") ;
-		$aCompiler->registerGenerator("org\\jecat\\framework\\lang\\compile\\object\\CallFunction","org\\jecat\\framework\\lang\\aop\\compiler\\CallFunctionGenerator") ;
+		// $aCompiler->registerGenerator("org\\jecat\\framework\\lang\\compile\\object\\CallFunction","org\\jecat\\framework\\lang\\aop\\compiler\\CallFunctionGenerator") ;
 		
 		//--------------------
 		// 添加编译策略概要，用于生成编译器的”策略签名“
@@ -37,20 +37,8 @@ class CompilerFactory extends Object
 		
 		$aCompiler->addStrategySummary(AOP::singleton()) ;
 		
-		if( $this->sStrategySignature )
-		{
-			$aCompiler->setStrategySignature($this->sStrategySignature) ;
-		}
-		
 		return $aCompiler ;
 	}
-	
-	public function setStrategySignature($sStrategySignature)
-	{
-		$this->sStrategySignature = $sStrategySignature ;
-	}
-	
-	private $sStrategySignature ;
 }
 
 ?>

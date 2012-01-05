@@ -130,6 +130,36 @@ class Type
 		return $aRefClass->implementsInterface($sInterfaceName) ;
 	}
 	
+	const toArray_normal = 1 ;
+	const toArray_emptyForNull = 2 ;
+	const toArray_ignoreNull = 3 ;
+	
+	static public function toArray(&$variable,$nFlag=self::toArray_emptyForNull)
+	{
+		if( !is_array($variable) )
+		{
+			if( $variable===null )
+			{
+				if( $variable===self::toArray_ignoreNull )
+				{}
+				else if( $variable===self::toArray_emptyForNull )
+				{
+					$variable = array() ;
+				}
+				else if( $variable===self::toArray_normal )
+				{
+					$variable = array($variable) ;
+				}
+			}
+			else 
+			{
+				$variable = array($variable) ;
+			}
+			
+		}
+
+		return $variable ;
+	}
 }
 
 ?>

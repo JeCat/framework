@@ -64,7 +64,7 @@ class Assert
 			return ;
 		}
 		
-		$Types = (array) $Types ;
+		Type::toArray($Types,Type::toArray_ignoreNull) ;
 		if( !Type::check($Types,$Variable) )
 		{
 			throw new TypeException($Variable,$Types,$sVarName) ;

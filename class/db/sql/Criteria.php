@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\db\sql;
 
+use org\jecat\framework\lang\Type;
+
 use org\jecat\framework\lang\Exception;
 
 class Criteria extends SubStatement
@@ -152,7 +154,7 @@ class Criteria extends SubStatement
 		
 		else
 		{
-			$this->arrGroupByClms = (array) $columns ;
+			$this->arrGroupByClms = Type::toArray($columns,Type::toArray_emptyForNull) ;
 		}
 		return $this ;
 	}

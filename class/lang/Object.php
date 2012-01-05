@@ -76,9 +76,9 @@ class Object implements IObject
 		{
 			$argvs = array() ;
 		}
-		else 
+		else if(!is_array($argvs))
 		{
-			$argvs = (array) $argvs ;
+			$argvs = array($argvs) ;
 		}
 		
 		if(!$sClassName)
@@ -98,15 +98,6 @@ class Object implements IObject
 			throw new Exception("无法创建抽象类:%s的实例",$sClassName) ;
 		}
 		$aObject = $aRefClass->newInstanceArgs($argvs) ;
-		/*if(empty($argvs))
-		{
-			$aObject = new $sClassName() ;
-		}
-		else 
-		{
-			$aRefClass = new \ReflectionClass($sClassName) ;
-			$aObject = $aRefClass->newInstanceArgs($argvs) ;
-		}*/
 		
 		// set application
 		if( $aApp and $aObject instanceof IObject )
@@ -269,7 +260,10 @@ class Object implements IObject
 		}
 		$arrPool =& self::$arrFlyweightInstancs[$sClassName] ;
 		
-		$keys = (array)$keys ; // 如果 $keys == null , 就转换成 array(null)
+		if( !is_array($keys) )
+		{
+			$keys = array($keys) ; // 如果 $keys == null , 就转换成 array(null)
+		}
 		$sLastKey = (string)array_pop($keys) ;
 		
 		foreach($keys as &$sKey)

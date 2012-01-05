@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\lang\Type;
+
 use org\jecat\framework\db\sql\StatementState;
 use org\jecat\framework\db\sql\Statement;
 use org\jecat\framework\db\sql\Restriction;
@@ -55,7 +57,7 @@ class Association implements IBean
 	}
 	public function setFromKeys($fromKeys)
 	{
-		$this->arrFromKeys = $fromKeys? (array) $fromKeys: array() ;
+		$this->arrFromKeys = Type::toArray($fromKeys) ;
 	}
 	
 	public function toKeys()

@@ -73,15 +73,28 @@ class FSCache implements ICache
 	/**
 	 * Enter description here ...
 	 * 
-	 * @return bool
 	 */
 	function delete($sDataPath)
 	{
 		self::trimPath($sDataPath) ;
 		
-		$this->aFolder->deleteChild($sDataPath.'.data') ;
-		$this->aFolder->deleteChild($sDataPath.'.php') ;
-		$this->aFolder->deleteChild($sDataPath.'.time') ;
+		// 所有
+		if( empty($sDataPath) )
+		{
+			$this->aFolder->delete(true,true) ;
+		}
+		// 删除目录
+		else if( $aFolder=$this->aFolder->findFolder($sDataPath) )
+		{
+			$aFolder->delete(true,true) ;
+		}
+		// 删除指定内容
+		else
+		{
+			$this->aFolder->deleteChild($sDataPath.'.data') ;
+			$this->aFolder->deleteChild($sDataPath.'.php') ;
+			$this->aFolder->deleteChild($sDataPath.'.time') ;
+		}
 	}
 	
 	/**

@@ -179,7 +179,7 @@ class ViewLayoutFrame extends View
 		}
 	}
 	
-	static public function setWrapperStyle(IView $aView,IView $aView,$sStyle)
+	static public function setWrapperStyle(IView $aView,$sStyle)
 	{
 		$aView->variables()->set('wrapper.style',$sStyle) ;
 	}

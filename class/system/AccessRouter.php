@@ -4,9 +4,7 @@ namespace org\jecat\framework\system ;
 class AccessRouter extends \org\jecat\framework\lang\Object
 {
 	public function __construct()
-	{
-		$this->addController('org\\jecat\\framework\\mvc\\controller\\AjaxAction','ajax') ;
-	}
+	{}
 	
     /**
      * Enter description here ...

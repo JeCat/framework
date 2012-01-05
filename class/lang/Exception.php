@@ -14,7 +14,7 @@ class Exception extends \Exception implements IException, IObject
 	 */
 	public function __construct($sMessage,$Argvs=array(),\Exception $aCause=null)
 	{
-		$this->arrArgvs = (array)$Argvs ;
+		$this->arrArgvs = \org\jecat\framework\lang\Type::toArray($Argvs) ;
 		$this->sMessage = $sMessage ;
 		
 		parent::__construct($this->message(), 0, $aCause) ;

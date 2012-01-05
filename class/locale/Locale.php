@@ -2,6 +2,8 @@
 
 namespace org\jecat\framework\locale ;
 
+use org\jecat\framework\lang\Type;
+
 use org\jecat\framework\lang\SentencePackage;
 
 class Locale implements ILocale
@@ -70,7 +72,7 @@ class Locale implements ILocale
 	
 	public function trans($sOri,$argvs=null,$sSavePackageName=null)
 	{
-		$arrArgvs = $argvs===null? array(): (array)$argvs ;
+		$arrArgvs = Type::toArray($argvs) ;
 		
 		$sSentence = $this->findSentence($sOri) ;
 		
