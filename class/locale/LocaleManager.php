@@ -4,7 +4,6 @@ namespace org\jecat\framework\locale ;
 
 use org\jecat\framework\lang\Object;
 use org\jecat\framework\fs\FSO;
-use org\jecat\framework\fs\FSOIterator;
 
 class LocaleManager extends Object
 {
