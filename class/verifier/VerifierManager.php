@@ -68,7 +68,7 @@ class VerifierManager extends Object
 		return new \org\jecat\framework\pattern\iterate\ArrayIterator($this->arrVerifiers) ;
 	}
 	
-	public function verifyData($value,$bThrowExcetion=false)
+	public function verify($value,$bThrowExcetion=false)
 	{		
 		$aVerifyFailed = new VerifyFailed(''); 
 		foreach($this->arrVerifiers as $nIdx=>$aVerifier)
