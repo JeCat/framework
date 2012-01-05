@@ -18,6 +18,8 @@ abstract class FSIterator implements \Iterator{
 	// 常用组合
 	const DIR_ALL = 0x05 ; // CONTAIN_DOT | CONTAIN_FOLDER
 	const FILE_AND_FOLDER = 0x06 ; // CONTAIN_FILE | CONTAIN_FOLDER
+	const FILE = 0x02 ; // CONTAIN_FILE
+	const FOLDER = 0x04 ; // CONTAIN_FOLDER
 	
 	// 默认值
 	const FLAG_DEFAULT = 0x36 ; // CONTAIN_FILE | CONTAIN_FOLDER | RETURN_ABSOLUTE_PATH | RECURSIVE_SEARCH
