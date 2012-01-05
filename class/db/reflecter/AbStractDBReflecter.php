@@ -10,6 +10,7 @@ abstract class AbStractDBReflecter extends DBStructReflecter
 	 * 
 	 * Enter description here ...
 	 * @return \iterator
+	 * 为何这个函数迭代出来一种很奇怪的格式？ -- elephant_liu
 	 */
 	abstract public function tableNameIterator();
 	

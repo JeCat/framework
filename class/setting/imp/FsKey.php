@@ -13,30 +13,18 @@ class FsKey extends Key implements \Serializable
 {
 	const itemFilename = 'items.php' ;
 	
-	public function __construct(IFile $aFile)
+	public function __construct(IFolder $aFolder)
 	{
-		$this->aItemFile = $aFile ;
-		
-		$this->arrItems = $this->aItemFile->includeFile(false,false) ;
-		
-		if(!is_array($this->arrItems))
-		{
-			$this->arrItems = array() ;
-			$this->bDataChanged = true ;
-		}
+		$this->aKeyFolder = $aFolder ;
+		$this->readItemFile();
 	}
 	
 	static public function createKey(IFolder $aFolder)
 	{
-		$sFlyweightKey = $aFolder->url() . '/' . self::itemFilename ;
+		$sFlyweightKey = $aFolder->url();
 		if( !$aKey=FsKey::flyweight($sFlyweightKey,false) )
 		{
-			if( !$aFile=$aFolder->findFile(self::itemFilename,FileSystem::FIND_AUTO_CREATE) )
-			{
-				return null ;
-			}
-		
-			$aKey = new FsKey($aFile) ;
+			$aKey = new FsKey($aFolder) ;
 			FsKey::setFlyweight($aKey,$sFlyweightKey) ;
 		}
 		
@@ -45,7 +33,7 @@ class FsKey extends Key implements \Serializable
 	
 	public function name()
 	{
-		return $this->aItemFile->directory()->name() ;
+		return $this->folder()->name() ;
 	}
 	
 	public function keyIterator()
@@ -55,18 +43,22 @@ class FsKey extends Key implements \Serializable
 	
 	public function save()
 	{
-		$aWriter = $this->aItemFile->openWriter() ;
-		$aWriter->write(
-			"<?php\r\nreturn ".var_export($this->arrItems,true)." ;"
-		) ;
-		$aWriter->close() ;
+		if( $aItemFile = $this->aKeyFolder->findFile(self::itemFilename,FileSystem::FIND_AUTO_CREATE)){
+			$aWriter = $aItemFile->openWriter() ;
+			$aWriter->write(
+				"<?php\r\nreturn ".var_export($this->arrItems,true)." ;"
+			) ;
+			$aWriter->close() ;
 		
-		$this->bDataChanged = false ;
+			$this->bDataChanged = false ;
+		}else{
+			throw new Exception('create file failed : %s',$this->aKeyFolder->path().'/'.self::itemFilename);
+		}
 	}
 
 	public function serialize ()
 	{		
-		return $this->aItemFile->path() ;
+		return $this->folder()->path() ;
 	}
 
 	/**
@@ -74,22 +66,36 @@ class FsKey extends Key implements \Serializable
 	 */
 	public function unserialize ($serialized)
 	{
-		$this->aItemFile = FileSystem::singleton()->findFile($serialized,FileSystem::FIND_AUTO_CREATE) ;
+		$this->aKeyFolder = FileSystem::singleton()->findFolder($serialized,FileSystem::FIND_AUTO_CREATE) ;
 	}
 	
 	/**
 	 * 这不是 IKey 接口中的方法
-	 * @return FsKey
+	 * @return IFolder
 	 */
-	public function itemFile()
+	public function folder()
 	{
-		return $this->aItemFile ;
+		return $this->aKeyFolder ;
 	}
-
+	
 	/**
-	 * @var org\jecat\framework\fs\IFile
+	 * 这不是 IKey 接口中的方法
 	 */
-	private $aItemFile ;
+	private function readItemFile(){
+		if( $aItemFile = $this->folder()->findFile(self::itemFilename)){
+			$this->arrItems = $aItemFile->includeFile(false,false) ;
+			if(!is_array($this->arrItems))
+			{
+				$this->arrItems = array() ;
+				$this->bDataChanged = true ;
+			}
+		}
+	}
+	
+	/**
+	 * @var org\jecat\framework\fs\IFolder
+	 */
+	private $aKeyFolder ;
 }
 
 ?>
