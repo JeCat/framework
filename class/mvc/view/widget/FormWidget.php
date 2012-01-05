@@ -120,7 +120,7 @@ class FormWidget extends Widget implements IViewFormWidget
 		{			
 			try{
 				
-				if( !$this->aVerifiers->verifyData( $this->value(), true ) )
+				if( !$this->aVerifiers->verify( $this->value(), true ) )
 				{
 					return false ;
 				}
