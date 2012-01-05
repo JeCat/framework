@@ -50,6 +50,10 @@ class ClassLoader extends Object implements \Serializable
 		
 		$this->arrPackages[$sNamespace] = new Package($sNamespace,$aSourceFolder) ;
 	}
+	
+	public function removePackage($sNamespace){
+		unset( $this->arrPackages[$sNamespace] );
+	}
 		
 	/**
 	 * 自动加载类文件

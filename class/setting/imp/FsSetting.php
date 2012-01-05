@@ -26,17 +26,16 @@ class FsSetting extends Setting implements \Serializable
 	 */
 	public function key($sPath,$bAutoCreate=false)
 	{
-		$sItemsPath = self::transPath($sPath) ;
-		$sFlyweightKey = $this->aRootFolder->url() . '/' . $sItemsPath ;
-					
+		$sKeyPath = self::transPath($sPath,false) ;
+		$sFlyweightKey = $this->aRootFolder->url() . '/' . $sKeyPath ;
+		
 		if( !$aKey=FsKey::flyweight($sFlyweightKey,false) )
 		{
-			if( !$aFile=$this->aRootFolder->findFile($sItemsPath,$bAutoCreate?FileSystem::FIND_AUTO_CREATE:0) )
+			if( !$aFolder=$this->aRootFolder->findFolder($sKeyPath,$bAutoCreate?FileSystem::FIND_AUTO_CREATE:0) )
 			{
 				return null ;
 			}
-			
-			$aKey = new FsKey($aFile) ;
+			$aKey = new FsKey($aFolder) ;
 			FsKey::setFlyweight($aKey,$sFlyweightKey) ;
 		}
 		
