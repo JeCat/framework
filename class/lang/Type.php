@@ -140,13 +140,13 @@ class Type
 		{
 			if( $variable===null )
 			{
-				if( $variable===self::toArray_ignoreNull )
+				if( $nFlag===self::toArray_ignoreNull )
 				{}
-				else if( $variable===self::toArray_emptyForNull )
+				else if( $nFlag===self::toArray_emptyForNull )
 				{
 					$variable = array() ;
 				}
-				else if( $variable===self::toArray_normal )
+				else if( $nFlag===self::toArray_normal )
 				{
 					$variable = array($variable) ;
 				}
