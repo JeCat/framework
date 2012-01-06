@@ -12,12 +12,12 @@ class Exception extends \Exception implements IException, IObject
 	 * 
 	 * @return void
 	 */
-	public function __construct($sMessage,$Argvs=array(),\Exception $aCause=null)
+	public function __construct($sMessage,$Argvs=array(),\Exception $aCause=null,$nCode=0)
 	{
 		$this->arrArgvs = \org\jecat\framework\lang\Type::toArray($Argvs) ;
 		$this->sMessage = $sMessage ;
 		
-		parent::__construct($this->message(), 0, $aCause) ;
+		parent::__construct($this->message(), $nCode, $aCause) ;
 	}
 	
 	public function message(ILocale $aLocale=null)
@@ -55,6 +55,10 @@ class Exception extends \Exception implements IException, IObject
 	public function messageArgvs()
 	{
 		return $this->arrArgvs ;
+	}
+	public function messageSentence()
+	{
+		return $this->sMessage ;
 	}
 	
 	// for IJeCatObject //////////////////////////////////
