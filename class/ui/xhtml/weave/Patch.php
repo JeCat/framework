@@ -72,10 +72,11 @@ class Patch
 		
 		else if( $this->nKind==self::template )
 		{
-			$aCompiledFile = $aUi->compileSourceFile($this->sTemplate) ;
-			
-			$this->aCompiled = new String() ;
-			$aCompiledFile->openReader()->readInString($this->aCompiled) ;
+			$this->aCompiled = new String("
+// 织入模板： {$this->sTemplate}----------------------
+\$this->display(\"{$this->sTemplate}\",\$aVariables,\$aDevice) ;
+// -------------------------------------------------------------------------
+") ;
 		}
 	}
 	
