@@ -140,6 +140,11 @@ class HttpRequest extends Request
 		return $this->urlInfo('pass') ;
 	}
 	
+	public function urlNoQuery()
+	{
+		return $this->urlInfo('scheme') . '://' . $this->urlInfo('host') . $this->urlInfo('path') ;
+	}
+	
 	public function uri($excludeQueryArgvs=null)
 	{
 		if(!$excludeQueryArgvs)
