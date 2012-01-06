@@ -1,21 +1,12 @@
+<msgqueue for="$theController->messageQueue()" />
 <div>
-
-	<div>
-		{=$message}
-	</div>
+	<a href="{=$url}">
+		如果浏览器没有自动跳转到目标网页，请点击操作
+	</a>
 	
-	<if "$url">
-	
-		<a href="{=$url}">
-			{=$linkText}
-		</a>
-		
-		<script>
-		setTimeout(function(){
-			location = "{=$url}" ;
-		},1000*{=$waitingSec});
-		</script>
-
-	</if>
-	
+	<script>
+	setTimeout(function(){
+		location = "{=$url}" ;
+	},1000*{=$flashSec});
+	</script>
 </div>
