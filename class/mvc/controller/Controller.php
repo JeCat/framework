@@ -2,6 +2,7 @@
 
 namespace org\jecat\framework\mvc\controller ;
 
+use org\jecat\framework\mvc\view\View;
 use org\jecat\framework\mvc\view\layout\ViewLayoutFrame;
 use org\jecat\framework\locale\LocaleManager;
 use org\jecat\framework\system\Response;
@@ -328,33 +329,21 @@ class Controller extends NamableComposite implements IController, IBean
     protected function displayMainView(IView $aMainView)
     {
     	$aMainView->display($this->response()->printer()) ;
-    } 
+    }
     
-    public function location($sUrl,$sMessage,$messageArgvs=null,$sLinkText=null,$linkArgvs=null,$nWaitingSec=3,Locale $aLocale=null)
+    public function location($sUrl,$nFlashSec=3)
     {
 		// 禁用所有视图
 		foreach( $this->mainView()->iterator() as $aView )
 		{
 			$aView->disable() ;
 		}
-
-		if(!$aLocale)
-		{
-			$aLocale = LocaleManager::singleton()->locale() ;
-		}
-		
-		if($sLinkText===null)
-		{
-			$sLinkText = '正在重定向网页...' ;
-		}
-		
+				
 		// 建立 relocation 视图
 		$aViewRelocater = new View("Relocater", "org.jecat.framework:Relocater.html") ;
 		$this->addView($aViewRelocater) ;
 		
-		$aViewRelocater->variables()->set('message' ,$aLocale->trans($sMessage,$messageArgvs) ) ;
-		$aViewRelocater->variables()->set('linkText',$aLocale->trans($sLinkText,$messageArgvs)) ;
-		$aViewRelocater->variables()->set('waitingSec',$nWaitingSec) ;
+		$aViewRelocater->variables()->set('flashSec',$nFlashSec) ;
 		$aViewRelocater->variables()->set('url',$sUrl) ;
 		
 		throw new _ExceptionRelocation ;
