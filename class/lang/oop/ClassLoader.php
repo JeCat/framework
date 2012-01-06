@@ -34,7 +34,10 @@ class ClassLoader extends Object implements \Serializable
 	{
 		return parent::singleton($bCreateNew,$createArgvs,$sClass) ;
 	}
-
+	
+	/**
+	 * @return Package
+	 */
 	public function addPackage($sNamespace,$sSourceFolder=null) 
 	{
 		$aFs = FileSystem::singleton() ;
@@ -48,11 +51,17 @@ class ClassLoader extends Object implements \Serializable
 			) ;
 		}
 		
-		$this->arrPackages[$sNamespace] = new Package($sNamespace,$aSourceFolder) ;
+		$aPackage = new Package($sNamespace,$aSourceFolder) ;
+		$this->arrPackages[$sNamespace] = $aPackage ;
+		return $aPackage ;
 	}
 	
-	public function removePackage($sNamespace){
-		unset( $this->arrPackages[$sNamespace] );
+	public function removePackage($aPackage){
+		foreach($this->packageIterator() as $package){
+			if($aPackage->folder()->path() === $package->folder()->path() ){
+				unset( $this->arrPackages[$package->ns()] );
+			}
+		}
 	}
 		
 	/**
