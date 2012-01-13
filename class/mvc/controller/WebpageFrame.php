@@ -76,11 +76,9 @@ class WebpageFrame extends Controller
 
     public function mainRun ()
     {
-		$this->processChildren() ;
+		parent::processController($this) ;
 		
-		$this->process() ;
-		
-		$this->showMainView() ;
+		$this->response()->process($this) ;
     }
 	
 	/**

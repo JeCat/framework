@@ -2,6 +2,8 @@
 
 namespace org\jecat\framework\mvc\controller ;
 
+use org\jecat\framework\io\IOutputStream;
+
 use org\jecat\framework\mvc\view\View;
 use org\jecat\framework\mvc\view\layout\ViewLayoutFrame;
 use org\jecat\framework\locale\LocaleManager;
@@ -274,61 +276,42 @@ class Controller extends NamableComposite implements IController, IBean
      */
     public function mainRun ()
     {
-    	if( $this->params->bool('only_msg_queue') )
-    	{
-			$this->process() ;
+		self::processController($this) ;
 			
-    		$this->messageQueue()->display() ;
-    	}
-    	else
+		// 处理 frame
+		// （先执行自己，后执行 frame）
+    	if( $aFrame=$this->frame() )
     	{
-			try{
-				$this->processChildren() ;
-				$this->process() ;
-			}
-			catch(_ExceptionRelocation $e)
-			{}
-				
-			// 处理 frame
-	    	if( $aFrame=$this->frame() )
-	    	{
-	    		$aFrame->takeOverView($this) ;
-	    		
-	    		try{
-	    			$aFrame->processChildren() ;
-	    			$aFrame->process() ;
-	    		}
-	    		catch(_ExceptionRelocation $e)
-	    		{}
-	    		
-				// show main view
-				$this->showMainView($aFrame->mainView()) ;
-	    	}
-	
-	    	else
-	    	{
-				// show main view
-				$this->showMainView($this->mainView()) ;
-	    	}
-				
+    		$aFrame->takeOverView($this) ;
+    		
+    		self::processController($aFrame) ;
     	}
+    	
+    	$this->response()->process($this) ;
     }
     
-    protected function showMainView(IView $aMainView)
+    static protected function processController(IController $aController)
     {
-		$this->renderMainView($aMainView) ;
-		
-		$this->displayMainView($aMainView) ;
+		foreach($aController->iterator() as $aChild)
+		{
+			self::processController($aChild) ;
+		}
+    		
+    	try{
+    		$aController->process() ;
+    	}
+    	catch(_ExceptionRelocation $e)
+    	{}
     }
     
-    protected function renderMainView(IView $aMainView)
+    public function renderMainView(IView $aMainView)
     {
     	$aMainView->render() ;
     }
     
-    protected function displayMainView(IView $aMainView)
+    public function displayMainView(IView $aMainView,IOutputStream $aDev)
     {
-    	$aMainView->display($this->response()->printer()) ;
+    	$aMainView->display($aDev) ;
     }
     
     public function location($sUrl,$nFlashSec=3)
@@ -380,20 +363,6 @@ class Controller extends NamableComposite implements IController, IBean
     	$this->doActions() ;
     }
     
-    protected function processChildren()
-    {
-		foreach($this->iterator() as $aChild)
-		{
-			$aChild->processChildren() ;
-			
-			try{
-				$aChild->process() ;
-			}
-			catch(_ExceptionRelocation $e)
-			{}
-		}
-    }
-
 	public function add($object,$sName=null,$bTakeover=true)
 	{
 		if($sName===null)

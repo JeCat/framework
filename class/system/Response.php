@@ -1,6 +1,7 @@
 <?php
 namespace org\jecat\framework\system ;
 
+use org\jecat\framework\mvc\controller\IController;
 use org\jecat\framework\util\IFilterMangeger;
 use org\jecat\framework\io\PrintStream;
 use org\jecat\framework\lang\Object ;
@@ -12,6 +13,93 @@ class Response extends Object
 		$this->aPrinter = $aPrinter ;
 	}
 	
+	public function process(IController $aController)
+	{
+		switch ($aController->params()->get('rspn'))
+		{
+		// msgqueue ------------
+		case 'msgqueue.json' :
+			break ;
+			
+		case 'msgqueue.xml' :
+			break ;
+			
+		case 'msgqueue' :
+		case 'msgqueue.html' :
+			
+			$aController->messageQueue()->display() ;
+			
+			break ;
+			
+		// var ------------
+		case 'var' :
+		case 'var.json' :
+			$this->printer()->write(json_encode($this->arrReturnVariables)) ;
+			break ;
+			
+		case 'var.xml' :
+			break ;
+			
+		case 'var.php' :
+			$this->printer()->write(var_export($this->arrReturnVariables,true)) ;
+			break ;
+			
+		// view ------------
+		case 'noframe' :
+		case 'view.noframe' :
+			break ;
+			
+		case 'view' :
+		case 'view.inframe' :
+		default :
+			
+			if( $aFrame = $aController->frame() )
+			{
+				$aController->renderMainView($aFrame->mainView()) ;
+				
+				$aController->displayMainView($aFrame->mainView(),$this->printer()) ;
+			}
+			else
+			{
+				$aController->renderMainView($aController->mainView()) ;
+				
+				$aController->displayMainView($aController->mainView(),$this->printer()) ;
+			}
+			
+			break ;
+		}
+	}
+	
+	// ------------------------
+	public function putReturnVariable($aVar,$key=null)
+	{
+		if($key===null)
+		{
+			$this->arrReturnVariables[] =& $aVar ;
+		}
+		else
+		{
+			$this->arrReturnVariables[$key] =& $aVar ;
+		}
+	}
+	public function returnVariable($key=null)
+	{
+		
+	}
+	public function removeReturnVariable($key)
+	{
+		
+	}
+	public function clearReturnVariables()
+	{
+		$this->arrReturnVariables = null ;
+	}
+	public function returnVariableKeyIterator()
+	{
+		
+	}
+	
+	// ------------------------
 	/**
 	 * Enter description here ...
 	 * 
@@ -58,6 +146,8 @@ class Response extends Object
 	private $aPrinter ;
 	
 	private $aFilters ;
+	
+	private $arrReturnVariables ;
 }
 
 ?>

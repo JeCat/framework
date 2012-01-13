@@ -1,7 +1,6 @@
 <?php
 namespace org\jecat\framework\mvc\controller ;
 
-
 use org\jecat\framework\pattern\composite\IContainedable;
 use org\jecat\framework\pattern\composite\IContainer;
 use org\jecat\framework\mvc\view\IView;
@@ -45,11 +44,17 @@ interface IController extends IMessageQueueHolder, IContainer, IContainedable
     public function viewIterator() ;
     public function clearViews() ;
     
+    /**
+     * @return org\jecat\framework\mvc\controller\IController
+     */
+    public function frame() ;
+    
     public function id() ;
     
     /**
      * @return org\jecat\framework\util\IHashTable
      */
     public function properties() ;
+
 }
 ?>

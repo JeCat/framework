@@ -84,17 +84,17 @@ abstract class LocalFSO extends FSO
 	
 	public function createTime()
 	{
-		return filectime($this->sLocalPath) ;
+		return @filectime($this->sLocalPath) ;
 	}
 	
 	public function modifyTime()
 	{
-		return filemtime($this->sLocalPath) ;
+		return @filemtime($this->sLocalPath) ;
 	}
 	
 	public function accessTime()
 	{
-		return fileatime($this->sLocalPath) ;
+		return @fileatime($this->sLocalPath) ;
 	}
 	
 	public function isHidden()
