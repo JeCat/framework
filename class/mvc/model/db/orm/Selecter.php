@@ -100,8 +100,13 @@ class Selecter extends OperationStrategy
 		$aCriteria->clearGroupBy() ;
 		
 		$sKey = 'DISTINCT ' ;
+		$nKeyIdx = 0 ;
 		foreach($aPrototype->keys() as $sClmName)
 		{
+			if( $nKeyIdx++ )
+			{
+				$sKey.= ',' ;
+			}
 			$sKey.= ' `'.$aPrototype->sqlTableAlias().'`.`'.$sClmName.'`' ;
 		}
 		
