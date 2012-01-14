@@ -63,7 +63,6 @@ class Selecter extends OperationStrategy
 		}
 		$aModel->loadData($aRecordset,true) ;
 		
-		$aModel->setSerialized(true) ;
 		$aModel->clearChanged() ;
 
 		// -----------------
@@ -94,8 +93,10 @@ class Selecter extends OperationStrategy
 		{
 			$aSelect->setCriteria($aCriteria);
 		}
-		
-		$aCriteria = $aSelect->criteria() ;
+		else 
+		{
+			$aCriteria = $aSelect->criteria() ;
+		}
 		$aCriteria->setLimit(-1) ;
 		$aCriteria->clearGroupBy() ;
 		
@@ -111,6 +112,34 @@ class Selecter extends OperationStrategy
 		}
 		
 		return $aDB->queryCount($aSelect,$sKey) ;
+	}
+	
+	public function hasExists(IModel $aModel,Prototype $aPrototype=null,Select $aSelect=null,DB $aDB=null)
+	{
+		if(!$aPrototype)
+		{
+			$aPrototype = $aModel->prototype() ;
+		}
+		if(!$aSelect)
+		{
+			$aSelect = $aPrototype->sharedStatementSelect() ;
+		}
+		if(!$aDB)
+		{
+			$aDB = DB::singleton() ;
+		}
+		
+		$aCriteria = $aPrototype->statementFactory()
+						->createCriteria()
+						->setLimit(1) ;
+		$aSelect->setCriteria($aCriteria) ;
+		
+		foreach($aPrototype->keys() as $sKey)
+		{
+			$aCriteria->where()->eq($sKey,$aModel->data($sKey)) ;
+		}
+		
+		return $aDB->queryCount($aSelect)>0 ;
 	}
 	
 	private function queryForMultitermAssoc(DB $aDB,Association $aMultitermAssoc,IModel $aModel,Select $aSelect)

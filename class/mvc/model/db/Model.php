@@ -2,7 +2,6 @@
 namespace org\jecat\framework\mvc\model\db ;
 
 use org\jecat\framework\bean\BeanConfException;
-
 use org\jecat\framework\pattern\composite\INamable;
 use org\jecat\framework\bean\BeanFactory;
 use org\jecat\framework\bean\IBean;
@@ -64,7 +63,7 @@ class Model extends AbstractModel implements IModel, IBean
 		$this->aPrototype = $aPrototype ;
 	}
 
-	public function loadData( IRecordSet $aRecordSet, $bSetSerialized=false )
+	public function loadData( IRecordSet $aRecordSet )
 	{
 		// Model List ------------------------
 		if($this->isList())
@@ -84,7 +83,7 @@ class Model extends AbstractModel implements IModel, IBean
 			
 				$this->addChild($aModel) ;
 			
-				$aModel->loadData($aRecordSet,$bSetSerialized) ;
+				$aModel->loadData($aRecordSet) ;
 			}
 		}
 		
@@ -105,7 +104,7 @@ class Model extends AbstractModel implements IModel, IBean
 				{
 					if( $aAssoc->isType(Association::oneToOne) )
 					{
-						$this->child($aAssoc->name())->loadData($aRecordSet,$bSetSerialized) ;					
+						$this->child($aAssoc->name())->loadData($aRecordSet) ;					
 					}
 				}
 			}
@@ -120,11 +119,6 @@ class Model extends AbstractModel implements IModel, IBean
 				}
 			}
 		}
-		
-		if($bSetSerialized)
-		{
-			$this->setSerialized(true) ;
-		}
 	}
 	
 	
@@ -136,7 +130,7 @@ class Model extends AbstractModel implements IModel, IBean
 		}
 		
 		return Selecter::singleton()->execute(
-					$this , null , self::buildCriteria($this->prototype(),$values,$keys), $this->isList(), $this->db()
+			$this , null , self::buildCriteria($this->prototype(),$values,$keys), $this->isList(), $this->db()
 		) ;
 	}
 	
@@ -195,15 +189,7 @@ class Model extends AbstractModel implements IModel, IBean
 		
 		else
 		{
-			if( $this->hasSerialized() )
-			{
-				return Deleter::singleton()->execute($this->db(), $this) ;	
-			}
-			
-			else 
-			{
-				return true ;
-			}
+			return Deleter::singleton()->execute($this->db(), $this) ;
 		}
 	}
 	
@@ -448,6 +434,10 @@ class Model extends AbstractModel implements IModel, IBean
 		return $this->nTotalCount ;
 	}
 	
+	public function hasSerialized()
+	{
+		return Selecter::singleton()->hasExists($this) ;
+	}
 	
 	private $nTotalCount = -1 ;
 	

@@ -51,8 +51,6 @@ class Updater extends Object{
 			$aDB->execute($aUpdate);
 		}
 		
-		$aModel->setSerialized(true);
-		
 		// update关联model
 		foreach($aPrototype->associations() as $aAssociation){
 			$aAssociatedModel=$aModel->child($aAssociation->name());

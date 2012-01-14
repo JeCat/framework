@@ -385,17 +385,6 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 			unset($this->arrChanged[$sName]) ;
 		}
 	}
-	
-	public function hasSerialized()
-	{
-		return $this->bSerialized ;
-	}
-	
-	public function setSerialized($bSerialized=true)
-	{
-		$this->bSerialized = $bSerialized? true: false ;
-		return $this ;
-	}
 
 	public function serialize ()
 	{
@@ -403,7 +392,6 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 				'arrDatas' => &$this->arrDatas ,
 				'arrChildren' => &$this->arrChildren ,
 				'arrChanged' => &$this->arrChanged ,
-				'bSerialized' => &$this->bSerialized ,
 		) ) ;
 	}
 
@@ -414,7 +402,6 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 		$this->arrDatas =& $arrData['arrDatas'] ;
 		$this->arrChildren =& $arrData['arrChildren'] ;
 		$this->arrChanged =& $arrData['arrChanged'] ;
-		$this->bSerialized =& $arrData['bSerialized'] ;
 	}
 	protected function _data(&$sName)
 	{
@@ -438,7 +425,5 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	private $arrChildren = array ();
 	
 	private $arrChanged = array ();
-	
-	private $bSerialized = false ;
 }
 ?>

@@ -168,7 +168,6 @@ class Category extends Object
 		// Unserialize
 		$fnSetUnserialize = function(Category $aCategory,$fnSetUnserialize)
 		{
-			$aCategory->model()->setSerialized(false) ;
 			foreach($aCategory->childCategoryIterator() as $aChildCategory)
 			{
 				$fnSetUnserialize($aChildCategory,$fnSetUnserialize) ;

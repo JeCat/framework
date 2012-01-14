@@ -48,8 +48,6 @@ class Inserter extends OperationStrategy
 			$aModel->setData( $sDevicePrimaryKey, $aDB->lastInsertId(), false ) ;
 		}
 		
-		$aModel->setSerialized(true) ;
-		
 		// -----------------------------------
 		// insert 关联model
 		foreach($aPrototype->associations() as $aAssociation)
