@@ -114,6 +114,16 @@ class Controller extends NamableComposite implements IController, IBean
     				'controller:'=>'controllers' ,
     	)) ;
     	
+    	// model=>models(model), view=>views(view)
+    	if( !empty($arrConfig['model']) and is_array($arrConfig['model']) and empty($arrConfig['models']['model']) )
+    	{
+    		$arrConfig['models']['model'] =& $arrConfig['model'] ;
+    	}
+    	if( !empty($arrConfig['view']) and is_array($arrConfig['view']) and empty($arrConfig['views']['view']) )
+    	{
+    		$arrConfig['views']['view'] =& $arrConfig['view'] ;
+    	}
+    	
     	// models --------------------
     	$aModelContainer = $this->modelContainer() ;
     	if( !empty($arrConfig['models']) )
