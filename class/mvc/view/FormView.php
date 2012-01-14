@@ -13,6 +13,16 @@ class FormView extends View implements IFormView
 		parent::__construct($sName,$sTemplate,$aUI) ;
 	}
 	
+	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
+    {
+    	if( isset($arrConfig['hideForm']) )
+    	{
+    		$this->hideForm( $arrConfig['hideForm']?true:false ) ;
+    	}
+    	
+    	parent::buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
+    }
+	
 	public function loadWidgets(IDataSrc $aDataSrc)
 	{
 		foreach($this->widgits() as $aWidget)
