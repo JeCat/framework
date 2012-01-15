@@ -58,7 +58,7 @@ class FsSetting extends Setting implements \Serializable
 		
 		if ($aFolderToDel=$this->aRootFolder->findFolder($sFolderPath)) 
 		{
-			
+			$aFolderToDel->delete(true,true);
 		}
 	}
 	
