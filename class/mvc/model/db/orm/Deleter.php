@@ -29,8 +29,6 @@ class Deleter extends Object{
         }
         $aDB->execute($aDelete);
         
-        $aModel->setSerialized(true);
-        
         // 仅delete hasAndBelongsTo的桥表
 		foreach($aPrototype->associations() as $aAssociation){
 			$aAssociatedModel=$aModel->child($aAssociation->name());
