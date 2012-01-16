@@ -29,6 +29,31 @@ abstract class FSIterator implements \Iterator{
 		$this->aParentFolder = $aParentFolder;
 	}
 	
+	/**
+	 * @return IFSO
+	 */
+	abstract public function getFSO();
+	
+	/**
+	 * @return string
+	 */
+	abstract public function absolutePath();
+	
+	/**
+	 * @return string
+	 */
+	abstract public function relativePath();
+	
+	/**
+	 * @return boolean
+	 */
+	abstract public function isFolder();
+	
+	/**
+	 * @return boolean
+	 */
+	abstract public function isFile();
+	
 	protected $nFlags = self::FLAG_DEFAULT ;
 	protected $aParentFolder = null ;
 }

@@ -69,6 +69,37 @@ class LocalFolderIterator extends FSIterator{
 		return $this->aIterator->valid();
 	}
 	
+	public function getFSO(){
+		$sRelativePath = $this->relativePath();
+		if($this->isFolder()){
+			return $this->aParentFolder->findFolder($sRelativePath) ;
+		}else{
+			return $this->aParentFolder->findFile($sRelativePath) ;
+		}
+	}
+	
+	public function absolutePath(){
+		return $this->aParentFolder->path().'/'.$this->relativePath();
+	}
+	
+	public function relativePath(){
+		if( $this->nFlags & self::RECURSIVE_SEARCH ){
+			return $this->aIterator->getSubPathName() ;
+		}else{
+			return $this->aIterator->current();
+		}
+	}
+	
+	public function isFolder(){
+		return $this->aIterator->isDir();
+	}
+	
+	public function isFile(){
+		return ! $this->isFolder();
+	}
+	
+	/////////////////////
+	
 	private function isSatisfyFlag(){
 		if( $this->aIterator->isDot() and ! ( $this->nFlags & self::CONTAIN_DOT ) ){
 			return false;
