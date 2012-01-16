@@ -44,20 +44,10 @@ class FunctionDefineParser implements ISyntaxParser
 			// function 修饰符 ------
 			for(
 				$aTokenPoolIter->prev() ;
-#				$aToken=$aTokenPoolIter->current() and in_array($aToken->tokenType(), array(
-#						T_PUBLIC ,
-#						T_PROTECTED ,
-#						T_PRIVATE ,
-#						T_STATIC ,
-#						T_ABSTRACT ,
-#						T_DOC_COMMENT ,
-#						T_WHITESPACE ,
-#				)) ;
 				$aToken=$aTokenPoolIter->current() ;
 				$aTokenPoolIter->prev()
 			)
 			{
-				//echo $aToken->tokenType().$aToken."<br/>\n";
 				switch ($aToken->tokenType())
 				{
 					case T_PUBLIC :
@@ -76,7 +66,6 @@ class FunctionDefineParser implements ISyntaxParser
 						$aNewToken->setAbstractToken($aToken) ;
 						break ;
 					case T_DOC_COMMENT :
-					case T_COMMENT :
 						$aDocToken = new DocCommentDeclare($aToken) ;
 						$aNewToken->setDocToken($aDocToken) ;
 						$aTokenPool->replace($aToken,$aDocToken) ;
