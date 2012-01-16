@@ -2,8 +2,8 @@
 namespace org\jecat\framework\lang ;
 
 use org\jecat\framework\system\AppFactory;
-
 use org\jecat\framework\system\Application ;
+use org\jecat\framework\util\HashTable;
 
 /**
  * Object 是所有 JeCat 类的基类，它有以下作用：
@@ -302,10 +302,24 @@ class Object implements IObject
 		return $arrPool[$sLastKey]['ins'] ;
 	}
 	
+	
+	/**
+	 * @return org\jecat\framework\util\IHashTable
+	 */
+	public function properties($bAutoCreate=true)
+	{
+		if( !$this->aProperties and $bAutoCreate )
+		{
+			$this->aProperties = new HashTable() ;
+		}
+		return $this->aProperties ;
+	}
 		
 	static private $arrGlobalInstancs = array() ;
 	static private $arrFlyweightInstancs = array() ;
 	
 	private $aApplication ;
+    
+    private $aProperties ;
 }
 ?>
