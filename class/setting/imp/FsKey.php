@@ -78,6 +78,19 @@ class FsKey extends Key implements \Serializable
 		return $this->aKeyFolder ;
 	}
 	
+	public function deleteKey()
+	{
+		$this->arrItems = array() ;
+		
+		if( $aFolder = $this->folder() )
+		{
+			FsKey::setFlyweight(null,$aFolder->url()) ;
+			
+			$aFolder->delete(true,true) ;
+			$this->bDataChanged = false ;
+		}
+	}
+	
 	/**
 	 * 这不是 IKey 接口中的方法
 	 */

@@ -84,5 +84,17 @@ abstract class Setting extends Object implements ISetting
 		$aKey->deleteItem ( $sName );
 	}
 	
+	public function deleteKey($sPath)
+	{
+		if( $aKey = $this->key($sPath,false) )
+		{
+			foreach($this->keyIterator($sPath) as $aSubKey)
+			{
+				$aSubKey->deleteKey() ;
+			}
+	
+			$aKey->deleteKey() ;
+		}
+	}
 }
 ?>
