@@ -29,9 +29,14 @@ use org\jecat\framework\mvc\view\IView ;
 use org\jecat\framework\mvc\view\TransparentViewContainer ; 
 use org\jecat\framework\pattern\composite\NamableComposite ;
 
-/** 
- * @author root
+/**
+ * 
+ * @wiki /MVC模式/控制器
+ * 
+ * 在JeCat中，一个控制器对像用于完成一项工作。
+ *
  */
+
 class Controller extends NamableComposite implements IController, IBean
 {
     function __construct ($params=null,$sName=null)
