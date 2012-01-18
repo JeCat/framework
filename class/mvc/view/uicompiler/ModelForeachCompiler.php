@@ -14,7 +14,7 @@ class ModelForeachCompiler extends NodeCompiler
 		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject,'aObject') ;
 
 		$aAttrs = $aObject->attributes();
-		$sIdx = $aAttrs->has ( 'idx' ) ? $aAttrs->get ( 'idx' ) : '' ;
+		$sIdx = $aAttrs->has ( 'idx' ) ? $aAttrs->string ( 'idx' ) : '' ;
 		$sFor = $aAttrs->has ( 'for' ) ? $aAttrs->get ( 'for' ) : "\$aVariables->get('theModel')" ;
 		
 		$aDev->write("if(\$aForModel={$sFor}){\r\n") ;

@@ -106,5 +106,10 @@ class NodeCompiler extends BaseCompiler
 	}
 	static private $nVariableAssigned = 0 ;
 }
-
+/**
+ * @wiki /模板/标签/自定义标签
+ *
+ *  xxxxxx
+ *
+ */
 ?>
