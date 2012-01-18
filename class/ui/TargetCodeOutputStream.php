@@ -1,11 +1,12 @@
 <?php
 namespace org\jecat\framework\ui ;
 
+use org\jecat\framework\lang\Object as JcObject;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\fs\IFile;
 use org\jecat\framework\io\IOutputStream;
 
-class TargetCodeOutputStream implements IOutputStream
+class TargetCodeOutputStream extends JcObject implements IOutputStream
 {
 	public function open(IOutputStream $aWriter,$bStartScript=true)
 	{

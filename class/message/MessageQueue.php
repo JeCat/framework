@@ -1,6 +1,12 @@
 <?php
 namespace org\jecat\framework\message ;
 
+use org\jecat\framework\util\HashTable;
+
+use org\jecat\framework\system\Response;
+
+use org\jecat\framework\io\OutputStreamBuffer;
+
 use org\jecat\framework\io\IOutputStream;
 use org\jecat\framework\ui\xhtml\UIFactory;
 use org\jecat\framework\io\OutputStream;
@@ -81,11 +87,11 @@ class MessageQueue extends Object implements IMessageQueue
 		$this->aFilterManager = $aFilterManager ;
 	}
 	
-	public function display(UI $aUI=null,IOutputStream $aDevice=null,$sTemplateFilename=null)
+	public function display(UI $aUI=null,IOutputStream $aDevice=null,$sTemplate=null,$bSubTemplate=false)
 	{
-		if( !$sTemplateFilename )
+		if( !$sTemplate )
 		{
-			$sTemplateFilename = 'org.jecat.framework:MsgQueue.template.html' ;
+			$sTemplate = 'org.jecat.framework:MsgQueue.template.html' ;
 		}
 		
 		if( !$aUI )
@@ -93,12 +99,33 @@ class MessageQueue extends Object implements IMessageQueue
 			$aUI = UIFactory::singleton()->create() ;
 		}
 		
-		$aUI->display($sTemplateFilename,array('aMsgQueue'=>$this),$aDevice) ;
+		if( !$bSubTemplate )
+		{
+			$aUI->display($sTemplate,array('aMsgQueue'=>$this),$aDevice) ;
+		}
+		else
+		{
+			call_user_func_array($sTemplate,array(
+					new HashTable(array('aMsgQueue'=>$this))
+					, $aDevice
+			)) ;
+		}
+	}
+	
+	protected function displayDevice()
+	{
+		if(!$this->aDisplayBuffer)
+		{
+			$this->aDisplayBuffer = new OutputStreamBuffer() ;
+		}
+		return $this->aDisplayBuffer ;
 	}
 	
 	private $arrMsgQueue = array() ;
 	
 	private $aFilterManager ;
+	
+	private $aDisplayBuffer ;
 }
 
 ?>
