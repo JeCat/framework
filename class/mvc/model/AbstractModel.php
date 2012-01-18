@@ -1,7 +1,7 @@
 <?php
 namespace org\jecat\framework\mvc\model;
 
-use org\jecat\framework\system\Response;
+use org\jecat\framework\mvc\controller\Response;
 
 use org\jecat\framework\io\IOutputStream;
 

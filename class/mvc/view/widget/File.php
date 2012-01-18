@@ -7,7 +7,7 @@ use org\jecat\framework\message\Message;
 use org\jecat\framework\mvc\view\DataExchanger;
 use org\jecat\framework\lang\Type;
 use org\jecat\framework\lang\Exception;
-use org\jecat\framework\system\Request;
+use org\jecat\framework\mvc\controller\Request;
 use org\jecat\framework\mvc\view\IView;
 use org\jecat\framework\mvc\view\widgetIViewFormWidget;
 use org\jecat\framework\util\IDataSrc;

@@ -4,7 +4,7 @@ namespace org\jecat\framework\mvc\view ;
 use org\jecat\framework\ui\UI;
 use org\jecat\framework\mvc\view\widget\IViewFormWidget;
 use org\jecat\framework\util\IDataSrc;
-use org\jecat\framework\system\Request;
+use org\jecat\framework\mvc\controller\Request;
 
 class FormView extends View implements IFormView
 {

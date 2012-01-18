@@ -1,6 +1,7 @@
 <?php
 namespace org\jecat\framework\system ;
 
+use org\jecat\framework\mvc\controller\HttpRequest;
 use org\jecat\framework\fs\FileSystem;
 
 class HttpAppFactory extends ApplicationFactory
@@ -11,8 +12,6 @@ class HttpAppFactory extends ApplicationFactory
 		require_once \org\jecat\framework\PATH."/class/util/IDataSrc.php" ;
 		require_once \org\jecat\framework\PATH."/class/util/HashTable.php" ;
 		require_once \org\jecat\framework\PATH."/class/util/DataSrc.php" ;
-		require_once __DIR__.'/Request.php' ;
-		require_once __DIR__.'/HttpRequest.php' ;
 		
 		$aReq = new HttpRequest() ;
 		

@@ -2,7 +2,7 @@
 namespace org\jecat\framework\message ;
 
 use org\jecat\framework\util\HashTable;
-use org\jecat\framework\system\Response;
+use org\jecat\framework\mvc\controller\Response;
 use org\jecat\framework\io\OutputStreamBuffer;
 use org\jecat\framework\io\IOutputStream;
 use org\jecat\framework\ui\xhtml\UIFactory;

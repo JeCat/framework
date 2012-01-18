@@ -5,7 +5,7 @@ use org\jecat\framework\mvc\view\layout\ViewLayoutFrame;
 
 use org\jecat\framework\lang\Type;
 use org\jecat\framework\pattern\composite\IContainer;
-use org\jecat\framework\system\Response;
+use org\jecat\framework\mvc\controller\Response;
 use org\jecat\framework\mvc\controller\IController;
 use org\jecat\framework\bean\BeanConfException;
 use org\jecat\framework\bean\BeanFactory;

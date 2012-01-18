@@ -1,5 +1,5 @@
 <?php
-namespace org\jecat\framework\system ;
+namespace org\jecat\framework\mvc\controller ;
 
 use org\jecat\framework\mvc\controller\IController;
 use org\jecat\framework\util\IFilterMangeger;

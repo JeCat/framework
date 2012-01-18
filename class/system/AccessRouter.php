@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\system ;
 
+use org\jecat\framework\mvc\controller\Request;
+
 class AccessRouter extends \org\jecat\framework\lang\Object
 {
 	public function __construct()

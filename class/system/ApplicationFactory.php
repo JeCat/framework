@@ -1,6 +1,7 @@
 <?php
 namespace org\jecat\framework\system ;
 
+use org\jecat\framework\mvc\controller\Response;
 use org\jecat\framework\mvc\model\db\orm\Prototype;
 use org\jecat\framework\fs\imp\LocalFileSystem;
 use org\jecat\framework\setting\Setting;

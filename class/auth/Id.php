@@ -1,9 +1,9 @@
 <?php
 namespace org\jecat\framework\auth ;
 
-use org\jecat\framework\system\HttpRequest;
+use org\jecat\framework\mvc\controller\HttpRequest;
 
-use org\jecat\framework\system\Request;
+use org\jecat\framework\mvc\controller\Request;
 
 use org\jecat\framework\lang\Exception;
 
