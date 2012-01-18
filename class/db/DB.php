@@ -3,7 +3,7 @@ namespace org\jecat\framework\db ;
 
 use org\jecat\framework\lang\Exception;
 
-use org\jecat\framework\system\Response;
+use org\jecat\framework\mvc\controller\Response;
 
 use org\jecat\framework\system\Application;
 

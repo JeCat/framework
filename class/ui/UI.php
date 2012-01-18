@@ -3,8 +3,8 @@
 namespace org\jecat\framework\ui ;
 
 use org\jecat\framework\locale\LocaleManager;
-use org\jecat\framework\system\Response;
-use org\jecat\framework\system\Request;
+use org\jecat\framework\mvc\controller\Response;
+use org\jecat\framework\mvc\controller\Request;
 use org\jecat\framework\system\Application;
 use org\jecat\framework\io\IInputStream;
 use org\jecat\framework\fs\IFile;

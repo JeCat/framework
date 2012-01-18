@@ -37,6 +37,8 @@ interface IKey extends \ArrayAccess
 	 */
 	public function deleteItem($sName) ;
 	
+	public function deleteKey() ;
+	
 	/**
 	 * 获得所有项的名字的迭代器
 	 * @return \Iterator 

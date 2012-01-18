@@ -13,41 +13,82 @@ class MsgQueueCompiler extends NodeCompiler
 	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject,'aObject') ;
-				
+		
+		$aDev->write("\r\n// display message queue -------------------------------------") ;
+		
+		// 确定需要display的 MessageQueue 对像 
+		// ----------------------
 		if( $aObject->attributes()->has('for') )
 		{
-			$sMsgQueue = $aObject->attributes()->expression('for') ;
+			$aDev->write("\$__ui_msgqueue = ".$aObject->attributes()->expression('for')." ;") ;
 		}
 		else 
 		{
-			$sMsgQueue = "\$aVariables->get('theView')->messageQueue()" ;
+			$aDev->write("\$__ui_msgqueue = \$aVariables->get('theController')? \$aVariables->get('theController')->messageQueue(): null ;") ;
 		}
-		$aDev->write("\$__ui_msgqueue = {$sMsgQueue} ;\r\n") ;		
-		$aDev->write("if( \$__ui_msgqueue instanceof \\org\\jecat\\framework\\message\\IMessageQueueHolder ){\r\n") ;	
-		$aDev->write("\t\$__ui_msgqueue = \$__ui_msgqueue->messageQueue() ;\r\n\t}\r\n") ;			
-		$aDev->write("\\org\\jecat\\framework\\lang\\Assert::type( '\\\\org\\jecat\\framework\\\\message\\\\IMessageQueue',\$__ui_msgqueue);\r\n") ;
+		$aDev->write("if( \$__ui_msgqueue instanceof \\org\\jecat\\framework\\message\\IMessageQueueHolder ){") ;
+		$aDev->write("	\$__ui_msgqueue = \$__ui_msgqueue->messageQueue() ;") ;
+		$aDev->write("}") ;
+		
+		$aDev->write("\\org\\jecat\\framework\\lang\\Assert::type( '\\\\org\\jecat\\framework\\\\message\\\\IMessageQueue',\$__ui_msgqueue);") ;
 		
 		
-		// 使用 <msgqueue> 节点内部的模板内容
+		// 确定使用的 template 
+		// ----------------------
+		//  template 属性
+		$sTemplate = $aObject->attributes()->has('template')? $aObject->attributes()->get('template'): 'null' ;
+		
+		// <template> 内部字节点的模板内容
+		$sIsSubtemplate = 'false' ;
 		if( $aTemplate=$aObject->getChildNodeByTagName('template') )
 		{
-			$sOldMsgQueueVarVarName = '$' . parent::assignVariableName('_aOldMsgQueueVar') ;
-		
-			$aDev->write("{$sOldMsgQueueVarVarName}=\$aVariables->get('aMsgQueue',\$__ui_msgqueue) ;") ;
-			$aDev->write("\$aVariables->set('aMsgQueue',\$__ui_msgqueue) ;") ;
-		
-			$this->compileChildren($aTemplate,$aDev,$aCompilerManager) ;
+			$nSubtemplateIndex = (int)$aDev->properties()->get('nMessageQueueSubtemplateIndex') + 1 ;
+			$aDev->properties()->set('nMessageQueueSubtemplateIndex',$nSubtemplateIndex) ;
+			$sSubTemplateName = '__subtemplate_for_messagequeue_'.$nSubtemplateIndex ;
 			
-			$aDev->write("\$aVariables->set('aMsgQueue',{$sOldMsgQueueVarVarName}) ;") ;
+			$aDev->write("if(!function_exists('$sSubTemplateName')){function {$sSubTemplateName}(\$aVariables,\$aDevice){") ;
+			$this->compileChildren($aTemplate,$aDev,$aCompilerManager) ;
+			$aDev->write("}}") ;
+			
+			$sTemplate = "'{$sSubTemplateName}'" ;
+			$sIsSubtemplate = 'true' ;
 		}
 		
-		// 使用默认模板
-		else 
+		// 显示模式
+		// -------------------------------
+		switch( $aObject->attributes()->has('mode')? strtolower($aObject->attributes()->string('mode')): 'soft' )
 		{
-			$aDev->write("if( \$__ui_msgqueue->count() ){ \r\n") ;
-			$aDev->write("	\$__ui_msgqueue->display(\$this,\$aDevice) ;\r\n") ;
-			$aDev->write("}\r\n") ;
+			case 'hard' :
+				$aDev->write("// display message queue by HARD mode") ;
+				$aDev->write("if( !\$__device_for_msgqueue = \$__ui_msgqueue->properties()->get('aDisplayDevice') ){") ;
+				$aDev->write("	\$__device_for_msgqueue = new \\org\\jecat\\framework\\io\\OutputStreamBuffer() ;") ;
+				$aDev->write("	\$__ui_msgqueue->properties()->set('aDisplayDevice',\$__device_for_msgqueue) ;") ;
+				$aDev->write("}") ;
+				$aDev->write("\$__device_for_msgqueue->redirect(\$aDevice) ;") ;
+				$sCancelDisplay = ' and $__device_for_msgqueue->isEmpty()' ;
+				break ;
+				
+			case 'force' :
+				$aDev->write("// display message queue by FORCE mode") ;
+				$aDev->write("\$__device_for_msgqueue = \$aDevice ;") ;
+				$sCancelDisplay = '' ;
+				break ;
+				
+			default:	// soft
+				$aDev->write("// display message queue by SOFT mode") ;
+				$aDev->write("if( !\$__device_for_msgqueue = \$__ui_msgqueue->properties()->get('aDisplayDevice') ){") ;
+				$aDev->write("	\$__device_for_msgqueue = new \\org\\jecat\\framework\\io\\OutputStreamBuffer() ;") ;
+				$aDev->write("	\$__ui_msgqueue->properties()->set('aDisplayDevice',\$__device_for_msgqueue) ;") ;
+				$aDev->write("}") ;
+				$aDev->write("\$aDevice->write(\$__device_for_msgqueue) ;") ;
+				$sCancelDisplay = ' and $__device_for_msgqueue->isEmpty()' ;
+				break ;
 		}
+		
+		$aDev->write("if( \$__ui_msgqueue->count(){$sCancelDisplay} ){ ") ;
+		$aDev->write("	\$__ui_msgqueue->display(\$this,\$__device_for_msgqueue,{$sTemplate},{$sIsSubtemplate}) ;") ;
+		$aDev->write("}") ;
+		$aDev->write("// -------------------------------------\r\n") ;
 	}
 }
 

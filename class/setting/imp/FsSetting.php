@@ -52,17 +52,6 @@ class FsSetting extends Setting implements \Serializable
 		return $this->aRootFolder->findFile(self::transPath($sPath))? true: false ;
 	}
 	
-	public function deleteKey($sPath)
-	{
-		$sFolderPath = self::transPath($sPath,false) ;
-		
-		if ($aFolderToDel=$this->aRootFolder->findFolder($sFolderPath)) 
-		{
-			$aFolderToDel->delete(true,true);
-		}
-	}
-	
-	
 	/**
 	 * @return \Iterator 
 	 */

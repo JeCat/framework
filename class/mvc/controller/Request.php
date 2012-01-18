@@ -1,5 +1,5 @@
 <?php
-namespace org\jecat\framework\system ;
+namespace org\jecat\framework\mvc\controller ;
 
 use org\jecat\framework\util\IFilterMangeger;
 use org\jecat\framework\util\DataSrc ;
@@ -40,4 +40,3 @@ class Request extends DataSrc
 	private $aPrinter ;
 }
 
-?>

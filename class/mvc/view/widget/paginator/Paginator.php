@@ -1,7 +1,7 @@
 <?php
 namespace org\jecat\framework\mvc\view\widget\paginator;
 
-use org\jecat\framework\system\Request;
+use org\jecat\framework\mvc\controller\Request;
 
 use org\jecat\framework\mvc\view\widget\FormWidget;
 use org\jecat\framework\mvc\view\IModelChangeObserver;
@@ -12,7 +12,7 @@ use org\jecat\framework\mvc\view\widget\paginator\AbstractStrategy;
 use org\jecat\framework\mvc\model\IPaginal;
 use org\jecat\framework\util\IDataSrc;
 use org\jecat\framework\system\Application;
-use org\jecat\framework\system\HttpRequest;
+use org\jecat\framework\mvc\controller\HttpRequest;
 
 /*!
     attr.nums : int 显示几页（即分页器的宽度） 5
@@ -47,7 +47,7 @@ use org\jecat\framework\system\HttpRequest;
         }
     }
     // template:
-    <msgqueue for="$theView" />
+    <msgqueue />
     <table border="1">
         <foreach for='{=$arrTitle}' item='title'>
             <tr><td>{=$title}</td></tr>

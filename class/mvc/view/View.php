@@ -5,7 +5,7 @@ use org\jecat\framework\mvc\view\layout\ViewLayoutFrame;
 
 use org\jecat\framework\lang\Type;
 use org\jecat\framework\pattern\composite\IContainer;
-use org\jecat\framework\system\Response;
+use org\jecat\framework\mvc\controller\Response;
 use org\jecat\framework\mvc\controller\IController;
 use org\jecat\framework\bean\BeanConfException;
 use org\jecat\framework\bean\BeanFactory;
@@ -168,7 +168,18 @@ class View extends NamableComposite implements IView, IBean
 			throw new Exception("名称为：%s 的子视图在视图 %s 中已经存在，无法添加同名的子视图",array($sName,$this->name())) ;
 		}
 		
+		if($bTakeover)
+		{
+			$this->messageQueue()->addChild($object->messageQueue()) ;
+		}
+		
 		parent::add($object,$sName,$bTakeover) ;
+	}
+	public function remove($object)
+	{
+		$this->messageQueue()->removeChild($object->messageQueue()) ;
+		
+		parent::add($object) ;
 	}
 	/**
 	 * @return IModel
@@ -359,12 +370,6 @@ class View extends NamableComposite implements IView, IBean
 		{
 			$aDevice->write( $this->outputStream()->bufferBytes(true) ) ;
 		}
-		
-		// display children view
-		/*foreach($this->iterator() as $aChildView)
-		{
-			$aChildView->display($aDevice) ;
-		}*/
 	}
 	
 	public function show()

@@ -1,5 +1,5 @@
 <?php
-namespace org\jecat\framework\system ;
+namespace org\jecat\framework\mvc\controller ;
 
 use org\jecat\framework\mvc\controller\IController;
 use org\jecat\framework\util\IFilterMangeger;
@@ -136,6 +136,14 @@ class Response extends Object
 	public function setFilters(IFilterMangeger $aFilters)
 	{
 		$this->aFilters = $aFilters ;
+	}
+	
+	/**
+	 * @return org\jecat\framework\io\IOutputStream
+	 */
+	public function device()
+	{
+		return $this->aPrinter ;
 	}
 	
 	/**

@@ -3,7 +3,7 @@
 namespace org\jecat\framework\ui ;
 
 use org\jecat\framework\util\HashTable;
-use org\jecat\framework\system\Response;
+use org\jecat\framework\mvc\controller\Response;
 use org\jecat\framework\system\Application;
 use org\jecat\framework\io\IOutputStream;
 use org\jecat\framework\pattern\composite\IContainer;

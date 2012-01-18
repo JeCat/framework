@@ -3,11 +3,10 @@
 namespace org\jecat\framework\mvc\controller ;
 
 use org\jecat\framework\io\IOutputStream;
-
 use org\jecat\framework\mvc\view\View;
 use org\jecat\framework\mvc\view\layout\ViewLayoutFrame;
 use org\jecat\framework\locale\LocaleManager;
-use org\jecat\framework\system\Response;
+use org\jecat\framework\mvc\controller\Response;
 use org\jecat\framework\locale\Locale;
 use org\jecat\framework\bean\BeanConfException;
 use org\jecat\framework\bean\BeanFactory;
@@ -277,6 +276,12 @@ class Controller extends NamableComposite implements IController, IBean
     
     public function setMainView(IView $aView)
     {    	
+    	if($this->aMainView)
+    	{
+    		$this->messageQueue()->removeChild($this->aMainView->messageQueue()) ;
+    	}
+    	$this->messageQueue()->addChild($aView->messageQueue()) ;
+    	
     	$this->aMainView = $aView ;
     }
         
@@ -315,7 +320,7 @@ class Controller extends NamableComposite implements IController, IBean
     }
     
     public function renderMainView(IView $aMainView)
-    {
+    {    	
     	$aMainView->render() ;
     }
     
@@ -417,9 +422,9 @@ class Controller extends NamableComposite implements IController, IBean
 	/**
 	 * @return IMessageQueue
 	 */
-	public function messageQueue()
+	public function messageQueue($aAutoCreate=true)
 	{
-		if( !$this->aMsgQueue )
+		if( !$this->aMsgQueue and $aAutoCreate )
 		{
 			$this->aMsgQueue = new MessageQueue() ;
 		}
@@ -695,18 +700,6 @@ class Controller extends NamableComposite implements IController, IBean
    		return $this->sId ;
    	}
    	
-   	/**
-   	 * @return org\jecat\framework\util\IHashTable
-   	 */
-   	public function properties($bAutoCreate=true)
-   	{
-   		if(!$this->aProperties)
-   		{
-   			$this->aProperties = new HashTable() ;
-   		}
-   		return $this->aProperties ;
-   	}
-   	
    	
    	/**
    	 * @return IController
@@ -790,8 +783,6 @@ class Controller extends NamableComposite implements IController, IBean
     private $arrBeanConfig ;
     
     private $sId ;
-    
-    private $aProperties ;
     
     static private $nAssignedId = 0 ;
     

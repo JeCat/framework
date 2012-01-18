@@ -1,6 +1,9 @@
 <?php
 namespace org\jecat\framework\message ;
 
+use org\jecat\framework\util\HashTable;
+use org\jecat\framework\mvc\controller\Response;
+use org\jecat\framework\io\OutputStreamBuffer;
 use org\jecat\framework\io\IOutputStream;
 use org\jecat\framework\ui\xhtml\UIFactory;
 use org\jecat\framework\io\OutputStream;
@@ -14,7 +17,7 @@ class MessageQueue extends Object implements IMessageQueue
 {
 	public function add(Message $aMsg , $bIgnoreFilters=true)
 	{
-		if( in_array($aMsg, $this->arrMsgQueue) )
+		if( $this->arrMsgQueue and in_array($aMsg, $this->arrMsgQueue) )
 		{
 			return ;
 		}
@@ -55,12 +58,47 @@ class MessageQueue extends Object implements IMessageQueue
 	
 	public function iterator()
 	{
-		return new \org\jecat\framework\pattern\iterate\ArrayIterator($this->arrMsgQueue) ;
+		$aIterator = $this->arrMsgQueue? new \org\jecat\framework\pattern\iterate\ArrayIterator($this->arrMsgQueue): new \EmptyIterator() ;
+		
+		// for child container's children
+		if($this->arrChildren)
+		{
+			foreach($this->arrChildren as $aChildMessageQueue)
+			{
+				if(empty($aMergedIterator))
+				{
+					$aMergedIterator = new \AppendIterator() ;
+					$aMergedIterator->append($aIterator) ;
+				}
+				$aMergedIterator->append($aChildMessageQueue->iterator()) ;
+			}
+		}
+		
+		// return merged iterators
+		if(!empty($aMergedIterator))
+		{
+			return $aMergedIterator ;
+		}
+		// only self iterator
+		else
+		{
+			return $aIterator ;
+		}
 	}
 	
 	public function count()
 	{
-		return count($this->arrMsgQueue) ;
+		$nCount = $this->arrMsgQueue? count($this->arrMsgQueue): 0 ;
+		
+		if($this->arrChildren)
+		{
+			foreach($this->arrChildren as $aMessageQueue)
+			{
+				$nCount+= $aMessageQueue->count() ;
+			}
+		}
+		
+		return $nCount ;
 	}
 	
 	/**
@@ -81,11 +119,11 @@ class MessageQueue extends Object implements IMessageQueue
 		$this->aFilterManager = $aFilterManager ;
 	}
 	
-	public function display(UI $aUI=null,IOutputStream $aDevice=null,$sTemplateFilename=null)
+	public function display(UI $aUI=null,IOutputStream $aDevice=null,$sTemplate=null,$bSubTemplate=false)
 	{
-		if( !$sTemplateFilename )
+		if( !$sTemplate )
 		{
-			$sTemplateFilename = 'org.jecat.framework:MsgQueue.template.html' ;
+			$sTemplate = 'org.jecat.framework:MsgQueue.template.html' ;
 		}
 		
 		if( !$aUI )
@@ -93,12 +131,39 @@ class MessageQueue extends Object implements IMessageQueue
 			$aUI = UIFactory::singleton()->create() ;
 		}
 		
-		$aUI->display($sTemplateFilename,array('aMsgQueue'=>$this),$aDevice) ;
+		if( !$bSubTemplate )
+		{
+			$aUI->display($sTemplate,array('aMsgQueue'=>$this),$aDevice) ;
+		}
+		else
+		{
+			call_user_func_array($sTemplate,array(
+					new HashTable(array('aMsgQueue'=>$this))
+					, $aDevice
+			)) ;
+		}
 	}
 	
-	private $arrMsgQueue = array() ;
+	public function addChild(self $aMessageQueue)
+	{
+		if( !$this->arrChildren or in_array($aMessageQueue,$this->arrChildren,true) )
+		{
+			$this->arrChildren[] = $aMessageQueue ;
+		}
+	}
+	public function removeChild(self $aMessageQueue)
+	{
+		if( $this->arrChildren and ($pos=array_pop($aMessageQueue,$this->arrChildren,true))!==false )
+		{
+			unset($this->arrChildren[$pos]) ;
+		}
+	}
+	
+	private $arrMsgQueue ;
 	
 	private $aFilterManager ;
+
+	private $arrChildren ;
 }
 
 ?>

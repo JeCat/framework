@@ -1,6 +1,7 @@
 <?php
-namespace org\jecat\framework\system ;
+namespace org\jecat\framework\mvc\controller ;
 
+use org\jecat\framework\system\Application;
 use org\jecat\framework\fs\imp\UploadFile;
 use org\jecat\framework\fs\imp\LocalFileSystem;
 use org\jecat\framework\util\DataSrc ;
