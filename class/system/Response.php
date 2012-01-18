@@ -139,6 +139,14 @@ class Response extends Object
 	}
 	
 	/**
+	 * @return org\jecat\framework\io\IOutputStream
+	 */
+	public function device()
+	{
+		return $this->aPrinter ;
+	}
+	
+	/**
 	 * Enter description here ...
 	 * 
 	 * @var org\jecat\framework\io\PrintSteam
