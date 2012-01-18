@@ -112,20 +112,9 @@ class MessageQueue extends Object implements IMessageQueue
 		}
 	}
 	
-	protected function displayDevice()
-	{
-		if(!$this->aDisplayBuffer)
-		{
-			$this->aDisplayBuffer = new OutputStreamBuffer() ;
-		}
-		return $this->aDisplayBuffer ;
-	}
-	
 	private $arrMsgQueue = array() ;
 	
 	private $aFilterManager ;
-	
-	private $aDisplayBuffer ;
 }
 
 ?>
