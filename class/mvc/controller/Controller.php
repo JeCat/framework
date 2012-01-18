@@ -276,6 +276,12 @@ class Controller extends NamableComposite implements IController, IBean
     
     public function setMainView(IView $aView)
     {    	
+    	if($this->aMainView)
+    	{
+    		$this->messageQueue()->removeChild($this->aMainView->messageQueue()) ;
+    	}
+    	$this->messageQueue()->addChild($aView->messageQueue()) ;
+    	
     	$this->aMainView = $aView ;
     }
         
