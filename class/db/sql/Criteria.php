@@ -144,18 +144,9 @@ class Criteria extends SubStatement
 	}
 	
 	// -- group by --
-	public function addGroupBy($columns=null)
+	public function addGroupBy($columns)
 	{
-		if( empty($columns) )
-		{
-			$this->arrGroupByClms = null ;
-			return ;
-		}
-		
-		else
-		{
-			$this->arrGroupByClms = Type::toArray($columns,Type::toArray_emptyForNull) ;
-		}
+		$this->arrGroupByClms = array_merge(Type::toArray($columns,Type::toArray_emptyForNull) ,Type::toArray($this->arrGroupByClms,Type::toArray_emptyForNull)) ;
 		return $this ;
 	}
 	
@@ -175,6 +166,6 @@ class Criteria extends SubStatement
 	private $aOrder = null;
 	private $sLimitFrom = 0;
 	private $nLimitLen = 30;
-	private $arrGroupByClms ;
+	private $arrGroupByClms;
 }
 ?>

@@ -192,7 +192,9 @@ class SyntaxScanner extends Object implements IInterpreter
 					$aNewToken->setAbstractToken($aToken) ;
 					break ;
 				case T_DOC_COMMENT :
-					$aNewToken->setDocToken($aToken) ;
+					$aDocToken = new DocCommentDeclare($aToken) ;
+					$aNewToken->setDocToken($aDocToken) ;
+					$aTokenPool->replace($aToken,$aDocToken) ;
 					break ;
 			}
 		}
