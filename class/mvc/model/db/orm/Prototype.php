@@ -668,6 +668,14 @@ class Prototype extends StatementFactory implements IBean
 				$this->criteria()->orders()->add($sColumn,true) ;
 			}
 		}
+		// groupby
+		if( !empty($arrConfig['groupby']) )
+		{
+			foreach((array)$arrConfig['groupby'] as $sColumn)
+			{
+				$this->criteria()->addGroupBy($sColumn);
+			}
+		}
 		// restrication
 		// foreach(array('eq'))
 		
