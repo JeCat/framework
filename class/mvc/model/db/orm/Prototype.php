@@ -583,11 +583,20 @@ class Prototype extends StatementFactory implements IBean
 		// 根据 table 自动生成影子class
 		if( !empty($arrConfig['table']) )
 		{
+			$sClassNamespace = self::PROTOTYPE_IMPLEMENT_CLASS_NS ;
+			$sPackageFolder = self::$sPrototypeImpPackage ;
+			if($sNamespace!=='*')
+			{
+				$sSubFolder = preg_replace('[^\w_]','_',$sNamespace) ;
+				$sClassNamespace.= '\\' . $sSubFolder ;
+				$sPackageFolder.= '/' . $sSubFolder ;
+			}
+			
 			$sShortClass = preg_replace('[^\w_]','_',$arrConfig['table']) ;
-			$sClass = self::PROTOTYPE_IMPLEMENT_CLASS_NS .'\\'. $sShortClass ;
+			$sClass = $sClassNamespace .'\\'. $sShortClass ;
 			
 			// 生成模型类
-			self::buildShadowClass($sClass,$sShortClass,self::PROTOTYPE_IMPLEMENT_CLASS_NS,get_called_class(),self::$sPrototypeImpPackage) ;
+			self::buildShadowClass($sClass,$sShortClass,$sClassNamespace,get_called_class(),$sPackageFolder) ;
 		}
 		
 		$aBean = new $sClass() ;
