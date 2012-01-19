@@ -29,9 +29,14 @@ use org\jecat\framework\mvc\view\IView ;
 use org\jecat\framework\mvc\view\TransparentViewContainer ; 
 use org\jecat\framework\pattern\composite\NamableComposite ;
 
-/** 
- * @author root
+/**
+ * 
+ * @wiki /MVC模式/控制器
+ * 
+ * 在JeCat中，一个控制器对像用于完成一项工作。
+ *
  */
+
 class Controller extends NamableComposite implements IController, IBean
 {
     function __construct ($params=null,$sName=null)
@@ -79,6 +84,76 @@ class Controller extends NamableComposite implements IController, IBean
     	return $aBean ;
     }
     
+    /**
+     * @wiki /MVC模式/控制器/控制器的Bean配置数组
+     * 
+     * {|
+     * 	!属性
+     *  !
+     *  !格式
+     *  !说明
+     *  |--- ---
+     *  |name
+     *  |可选
+     *  |string
+     *  |控制器的名称
+     *  |--- ---
+     *  |params
+     *  |可选
+     *  |array,DataSrc
+     *  |控制器执行的参数
+     *  |--- ---
+     *  |title
+     *  |可选
+     *  |string
+     *  |控制器的标题，做为网页执行时，用于网页<head> 中的 <title>
+     *  |--- ---
+     *  |description
+     *  |可选
+     *  |string
+     *  |字符串格式，控制器功能的描述文本，做为网页执行时，用于网页<head>中的 <meta:description>
+     *  |--- ---
+     *  |keywords
+     *  |可选
+     *  |string
+     *  |控制器的关键词，做为网页执行时，用于网页<head>中的 <meta:keywords>
+     *  |--- ---
+     *  |model:ooxx
+     *  |可选
+     *  |bean config
+     *  |一个model的配置数组，”ooxx“为model的名称（model配置数组中的 name 属性可以省略）
+     *  |--- ---
+     *  | models
+     *  |可选
+     *  |bean config array
+     *  |多个model配置数组的集合，集合（数组）中的每个元素都是一个model的配置数组;元素的键名可以做为model的名称（对应的model配置数组可以省略name属性）
+     *  |--- ---
+     *  |view:ooxx
+     *  |可选
+     *  |bean config
+     *  |一个视图的配置数组，”ooxx“为视图的名称（视图配置数组中的 name 属性可以省略）
+     *  |--- ---
+     *  |views
+     *  |可选
+     *  |bean config array
+     *  |多个视图配置数组的集合，集合（数组）中的每个元素都是一个视图的配置数组;元素的键名可以做为视图的名称（对应的视图配置数组可以省略name属性）
+     *  |--- ---
+     *  |controller:ooxx
+     *  |可选
+     *  |bean config
+     *  |一个子控制器的配置数组，”ooxx“为子控制器的名称（子控制器配置数组中的 name 属性可以省略）
+     *  |--- ---
+     *  |controllers
+     *  |可选
+     *  |bean config array
+     *  |多个子控制器配置数组的集合，集合（数组）中的每个元素都是一个子控制器的配置数组;元素的键名可以做为子控制器的名称（对应的子控制器配置数组可以省略name属性）
+     *  |--- ---
+     *  |props
+     *  |可选
+     *  |array
+     *  |控制器的属性
+     *  |}
+     */
     public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {
     	if( isset($arrConfig['name']) )

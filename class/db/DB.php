@@ -63,6 +63,24 @@ class DB extends Object
 		}
 	}
 	
+	/**
+	 * @wiki /数据库/数据库调试
+	 * 
+	 * 每次调用 org\jecat\framework\db\DB::query() 或 DB::execute() 函数后，执行的sql都会记录在 DB 对像中，
+	 * 通过 DB::executeLog() 函数打印这些记录。
+	 * 
+	 * [example lang="php"]
+	 * // 打印数据库执行日志
+	 * DB::singleton()->executeLog() ;
+	 * [/example]
+	 * 
+	 * 如果 executeLog() 的参数为 false ， 则返回一个包含sql执行日志的数组，并且不会打印到浏览器中。
+	 * [example lang="php"]
+	 * // 取得数据库执行日志，不会立刻输出到浏览器
+	 * $arrSqlLog = DB::singleton()->executeLog(false) ;
+	 * [/example]
+	 * 
+	 */
 	public function executeLog($bPrint=true)
 	{
 		if($bPrint)
