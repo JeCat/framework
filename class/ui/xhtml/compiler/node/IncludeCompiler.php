@@ -12,6 +12,34 @@ use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 
+/**
+ * @wiki /模板引擎/标签
+ *
+ * {|
+ * 	!<include>
+ *  !可单行
+ *  !在所在位置载入另一个模板文件
+ *  |--- ---
+ *  !属性
+ *  !
+ *  !类型
+ *  !默认值
+ *  !说明
+ *  |--- ---
+ *  |@匿名/file
+ *  |必须
+ *  |string
+ *  |
+ *  |模板文件名，在模板目录中的相对路径。如果有多个不同namespace的模板目录，可以使用 namespace:templateFilename 的格式
+ *  |--- ---
+ *  |vars
+ *  |可选
+ *  |bool
+ *  |true
+ *  |条件表达式
+ *  |}
+ */
+
 class IncludeCompiler extends NodeCompiler 
 {
 	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)

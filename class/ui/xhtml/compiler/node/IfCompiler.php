@@ -11,6 +11,29 @@ use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 
 /**
+ * @wiki /模板引擎/标签
+ *
+ * {|
+ *  !<if>
+ *  !不可单行
+ *  !条件流程控制，匿名属性必须是一个表达式，当表达式返回true时，执行 <if> 和 </if> 之间的内容
+ *  |---
+ *  !属性
+ *  !
+ *  !类型
+ *  !默认值
+ *  !说明
+ *  |---
+ *  |@匿名
+ *  |必须
+ *  |expression
+ *  |
+ *  |条件表达式
+ *  |}
+ */
+
+
+/**
  * @example /模板/标签/自定义标签:name[1]
  * @forwiki /模板/标签/自定义标签
  *
@@ -19,7 +42,13 @@ use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 
 class IfCompiler extends NodeCompiler {
 	/**
-	 * $aObject 这是一个Node对象.它是模板引擎分析模板文件后的产品之一,一个Node对象就代表了
+	 * $aObject 这是一个Node对象.它是模板引擎分析模板文件后的产品之一.Node对象包含了标签中的所有内容,包括Node的类型,内容,参数,等等,这些信息都是模板引擎分析模板得来.
+	 * 			比如这个if标签,你可以通过Node对象拿到它的源码,if的模板源码类似:
+	 * 			<if '(bool)$nTrue'>
+	 * 				<span>true</span>
+	 * 			</if>
+	 * 			也可以取得if标签的参数,if标签的参数就是上面源码中if后面的部分:
+	 * 			(bool)$nTrue
 	 * $aDev 输出设备,一般指网页
 	 * $aCompilerManager 编译管理器
 	*/

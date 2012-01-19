@@ -70,11 +70,13 @@ use org\jecat\framework\fs\FileSystem;
  * 		模型列表(ModelList)
  * 		模型加载的条件
  * 		模型的组合模式
+ * 		模型的Bean配置数组
  * 	视图
  * 		绑定模型
  * 		模板标签
  * 		表单视图
  * 		视图的组合模式
+ * 		视图的Bean配置数组
  * 	视图窗体(控件)
  * 		表单控件
  * 			... ...
@@ -85,11 +87,12 @@ use org\jecat\framework\fs\FileSystem;
  * 		视图框架
  * 		请求/回应
  * 		控制器的组合模式
+ * 		控制器的Bean配置数组
  * 	数据交换 和 数据校验
  * 
  * 模式
  * 	单件和享元
- * 	Bean 对象
+ * 	Bean对象
  * 	迭代器
  * 	面向方面(AOP)
  * 	
