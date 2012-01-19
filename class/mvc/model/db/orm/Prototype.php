@@ -19,8 +19,11 @@ class Prototype extends StatementFactory implements IBean
 {
 	const youKnow = null ;
 	
-	const MODEL_IMPLEMENT_CLASS_NS = 'org\\jecat\\framework\\mvc\\model\\db\\tables' ;
-	static public $sModelImpPackage = '/data/class/dbmodel' ;
+	const MODEL_IMPLEMENT_CLASS_NS = 'org\\jecat\\framework\\mvc\\model\\db\\table' ;
+	const PROTOTYPE_IMPLEMENT_CLASS_NS = 'org\\jecat\\framework\\mvc\\model\\db\\prototype' ;
+	
+	static public $sModelImpPackage = '/data/class/db/model' ;
+	static public $sPrototypeImpPackage = '/data/class/db/prototype' ;
 	
 	// static creator
 	/**
@@ -447,32 +450,36 @@ class Prototype extends StatementFactory implements IBean
 			$this->sModelClass = self::MODEL_IMPLEMENT_CLASS_NS .'\\'. $this->tableName() ;
 			
 			// 生成模型类
-			if(!class_exists($this->sModelClass))
-			{
-				$sClassSource = self::generateModelClass($sModelShortClass,self::MODEL_IMPLEMENT_CLASS_NS) ;
-				
-				$sClassFilePath = self::$sModelImpPackage.'/'.$sModelShortClass.'.php' ;
-				if( !$aClassFile = FileSystem::singleton()->findFile($sClassFilePath,FileSystem::FIND_AUTO_CREATE) )
-				{
-					throw new Exception("无法自动创建数据库实现类 %s 的类文件：%s",array($this->sModelClass,$sClassFilePath)) ;
-				}
-				
-				$aWriter = $aClassFile->openWriter() ;
-				$aWriter->write($sClassSource) ;
-				$aWriter->close() ;
-			}
+			self::buildShadowClass($this->sModelClass,$sModelShortClass,self::MODEL_IMPLEMENT_CLASS_NS, 'org\\jecat\\framework\\mvc\\model\\db\\Model',self::$sModelImpPackage) ;
 		}
 		return $this->sModelClass ;
 	}
 	
-	static function & generateModelClass($sModelShortClass,$sNamespace)
+	static function buildShadowClass($sClass,$sShortClass,$sNamespace,$sParentClass,$sPackageFolder)
 	{
-		$sModelBaseClass = 'org\\jecat\\framework\\mvc\\model\\db\\Model' ;
-		$aClassRef = new \ReflectionClass($sModelBaseClass) ;
+		if(!class_exists($sClass))
+		{
+			$sClassSource = self::generateShadowlClass($sShortClass,$sNamespace,$sParentClass) ;
+			
+			$sClassFilePath = $sPackageFolder.'/'.$sShortClass.'.php' ;
+			if( !$aClassFile = FileSystem::singleton()->findFile($sClassFilePath,FileSystem::FIND_AUTO_CREATE) )
+			{
+				throw new Exception("无法自动创建影子类 %s 的类文件：%s",array($sClass,$sClassFilePath)) ;
+			}
+			
+			$aWriter = $aClassFile->openWriter() ;
+			$aWriter->write($sClassSource) ;
+			$aWriter->close() ;
+		}
+	} 
+	
+	static function & generateShadowlClass($sShortClass,$sNamespace,$sParentClass)
+	{
+		$aClassRef = new \ReflectionClass($sParentClass) ;
 		
 		$sClassSource = "<?php " ;
 		$sClassSource.= "namespace {$sNamespace};\r\n" ;
-		$sClassSource.= "class ".basename(str_replace('\\','/',$sNamespace.'\\'.$sModelShortClass))." extends \\{$sModelBaseClass}\r\n" ;
+		$sClassSource.= "class ".basename(str_replace('\\','/',$sNamespace.'\\'.$sShortClass))." extends \\{$sParentClass}\r\n" ;
 		$sClassSource.= "{\r\n" ;
 		
 		foreach($aClassRef->getMethods() as $aMethodRef)
@@ -490,11 +497,11 @@ class Prototype extends StatementFactory implements IBean
 				$sClassSource.= 'static ' ;
 			}
 			$sClassSource.= $aMethodRef->isPublic()? 'public ': 'protected ' ;
+			$sClassSource.= 'function ' ;
 			if( $aMethodRef->returnsReference() )
 			{
-				$sClassSource.= '& ' ;
+				$sClassSource.= ' & ' ;
 			}
-			$sClassSource.= 'function ' ;
 			$sClassSource.= $sMethodName .'( ' ;
 			$sCallParams = '' ;
 			
@@ -573,7 +580,16 @@ class Prototype extends StatementFactory implements IBean
 	// implements IBean
 	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
-		$sClass = get_called_class() ;
+		// 根据 table 自动生成影子class
+		if( !empty($arrConfig['table']) )
+		{
+			$sShortClass = preg_replace('[^\w_]','_',$arrConfig['table']) ;
+			$sClass = self::PROTOTYPE_IMPLEMENT_CLASS_NS .'\\'. $sShortClass ;
+			
+			// 生成模型类
+			self::buildShadowClass($sClass,$sShortClass,self::PROTOTYPE_IMPLEMENT_CLASS_NS,get_called_class(),self::$sPrototypeImpPackage) ;
+		}
+		
 		$aBean = new $sClass() ;
 		if($bBuildAtOnce)
 		{

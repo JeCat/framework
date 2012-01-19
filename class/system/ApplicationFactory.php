@@ -101,6 +101,9 @@ abstract class ApplicationFactory extends Object
 		// 将保存数据表实现类的临时目录加入到 class loader 中
 		FileSystem::singleton()->findFolder(Prototype::$sModelImpPackage,FileSystem::FIND_AUTO_CREATE) ;
 		$aClassLoader->addPackage( Prototype::MODEL_IMPLEMENT_CLASS_NS , Prototype::$sModelImpPackage ) ;
+		
+		FileSystem::singleton()->findFolder(Prototype::$sPrototypeImpPackage,FileSystem::FIND_AUTO_CREATE) ;
+		$aClassLoader->addPackage( Prototype::PROTOTYPE_IMPLEMENT_CLASS_NS , Prototype::$sPrototypeImpPackage ) ;
 
 		return $aClassLoader ;
 	}
