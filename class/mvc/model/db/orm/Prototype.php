@@ -447,7 +447,7 @@ class Prototype extends StatementFactory implements IBean
 		if(!$this->sModelClass)
 		{
 			$sModelShortClass = '_'.preg_replace('[^\w_]','_',$this->tableName()) ;
-			$this->sModelClass = self::MODEL_IMPLEMENT_CLASS_NS .'\\'. $this->tableName() ;
+			$this->sModelClass = self::MODEL_IMPLEMENT_CLASS_NS .'\\'. $sModelShortClass ;
 			
 			// 生成模型类
 			self::buildShadowClass($this->sModelClass,$sModelShortClass,self::MODEL_IMPLEMENT_CLASS_NS, 'org\\jecat\\framework\\mvc\\model\\db\\Model',self::$sModelImpPackage) ;

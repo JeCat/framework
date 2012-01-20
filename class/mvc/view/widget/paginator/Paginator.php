@@ -1,8 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\view\widget\paginator;
 
+use org\jecat\framework\lang\Exception;
 use org\jecat\framework\mvc\controller\Request;
-
 use org\jecat\framework\mvc\view\widget\FormWidget;
 use org\jecat\framework\mvc\view\IModelChangeObserver;
 use org\jecat\framework\mvc\model\db\Model;
