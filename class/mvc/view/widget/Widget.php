@@ -173,7 +173,7 @@ class Widget extends Object implements IViewWidget, IBean
 	{
 		if(!$this->arrAttributes)
 		{
-			return null ;
+			return $default ;
 		}
 		$sName = strtolower($sName) ;
 		return isset($this->arrAttributes[$sName])? $this->arrAttributes[$sName]: $default ;
