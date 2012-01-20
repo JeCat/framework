@@ -399,6 +399,12 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 			$aStat->sAdviceCallArgvsLit = $this->generateArgvs($aStat->aTokenPool,$aStat->aExecutePoint) ;
 		}
 	}
+	
+	protected function generateAdviceCalltype(GenerateStat $aStat,Advice $aAdvice)
+	{
+		// 只有在 目标函数 和 切入函数同时为 动态方法时，才通过 $this-> 调用 advice
+		return (!$aAdvice->isStatic() and !$aStat->aExecutePoint->staticToken())? '$this->': 'self::' ;
+	}
 }
 
 ?>

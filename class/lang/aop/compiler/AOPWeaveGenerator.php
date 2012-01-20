@@ -249,7 +249,8 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 			
 			// 织入advice调用代码
 			$sAdviceFuncName = $this->generateAdviceWeavedFunctionName($aStat,$aAdvice) ;
-			$sAdviceCallCode = "\r\n\t\t".($aAdvice->isStatic()? 'self::': '$this->')."{$sAdviceFuncName}({$aStat->sAdviceCallArgvsLit}) ;\r\n" ;
+			$sCallType = $this->generateAdviceCalltype($aStat,$aAdvice) ;
+			$sAdviceCallCode = "\r\n\t\t{$sCallType}{$sAdviceFuncName}({$aStat->sAdviceCallArgvsLit}) ;\r\n" ;
 			$aStat->aTokenPool->insertBefore( $aBodyEnd, new Token(T_STRING,$sAdviceCallCode) ) ;
 		}
 	}
@@ -266,7 +267,8 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 			$sAdviceFuncName = $this->generateAdviceWeavedFunctionName($aStat,$aFirstAdvice) ;
 			
 			// 在 AdviceDispatchFunction 中设置一个 around 类型 advice 的调用代码
-			$this->weaveAroundAdviceCall($aStat,($aFirstAdvice->isStatic()? 'self::': '$this->') . "{$sAdviceFuncName}({$aStat->sAdviceCallArgvsLit})") ;
+			$sCallType = $this->generateAdviceCalltype($aStat,$aFirstAdvice) ;
+			$this->weaveAroundAdviceCall($aStat,"{$sCallType}{$sAdviceFuncName}({$aStat->sAdviceCallArgvsLit})") ;
 		
 			// 陆续植入各个 around 类型 advice
 			while($aAdvice=$aAdvices->out())
@@ -284,6 +286,11 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 		{
 			$this->weaveAroundAdviceCall($aStat,$aStat->sOriginJointCode."(/*----------*/{$aStat->sAdviceCallArgvsLit})") ;
 		}
+	}
+	
+	protected function generateAdviceCalltype(GenerateStat $aStat,Advice $aAdvice)
+	{
+		return $aAdvice->isStatic()? 'self::': '$this->' ;
 	}
 	
 	protected function weaveAroundAdviceCall(GenerateStat $aStat,$sAdviceCallCode)
@@ -329,11 +336,10 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 			// 调用下一个advice
 			if( $aNextAroundAdvice )
 			{
+			$sCallType = $this->generateAdviceCalltype($aStat,$aNextAroundAdvice) ;
 				$sSource = str_ireplace(
 						'aop_call_origin'
-						, ($aNextAroundAdvice->isStatic()?
-								'self::'. $this->generateAdviceWeavedFunctionName($aStat,$aNextAroundAdvice):
-								'$this->'. $this->generateAdviceWeavedFunctionName($aStat,$aNextAroundAdvice))
+						, $sCallType.$this->generateAdviceWeavedFunctionName($aStat,$aNextAroundAdvice)
 						, $sSource) ;
 			}
 			

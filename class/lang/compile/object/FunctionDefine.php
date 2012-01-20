@@ -102,7 +102,7 @@ class FunctionDefine extends StructDefine
 		else
 		{
 			ksort($arrTokens) ;
-			return array_pop($arrTokens) ;
+			return array_shift($arrTokens) ;
 		}
 	}
 	public function endToken()
