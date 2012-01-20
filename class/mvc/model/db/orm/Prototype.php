@@ -446,7 +446,7 @@ class Prototype extends StatementFactory implements IBean
 	{
 		if(!$this->sModelClass)
 		{
-			$sModelShortClass = preg_replace('[^\w_]','_',$this->tableName()) ;
+			$sModelShortClass = '_'.preg_replace('[^\w_]','_',$this->tableName()) ;
 			$this->sModelClass = self::MODEL_IMPLEMENT_CLASS_NS .'\\'. $this->tableName() ;
 			
 			// 生成模型类
@@ -587,12 +587,12 @@ class Prototype extends StatementFactory implements IBean
 			$sPackageFolder = self::$sPrototypeImpPackage ;
 			if($sNamespace!=='*')
 			{
-				$sSubFolder = preg_replace('[^\w_]','_',$sNamespace) ;
+				$sSubFolder = '_'.preg_replace('[^\w_]','_',$sNamespace) ;
 				$sClassNamespace.= '\\' . $sSubFolder ;
 				$sPackageFolder.= '/' . $sSubFolder ;
 			}
 			
-			$sShortClass = preg_replace('[^\w_]','_',$arrConfig['table']) ;
+			$sShortClass = '_'.preg_replace('[^\w_]','_',$arrConfig['table']) ;
 			$sClass = $sClassNamespace .'\\'. $sShortClass ;
 			
 			// 生成模型类
