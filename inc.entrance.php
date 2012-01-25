@@ -25,6 +25,8 @@ define( __NAMESPACE__."\\PATH", __DIR__ ) ;
 define( __NAMESPACE__."\\CLASSPATH", __DIR__.'/class' ) ;
 
 // 预加载类(Before Class Loader)
+require_once CLASSPATH."/pattern/ISingletonable.php" ;
+require_once CLASSPATH."/pattern/IFlyweightable.php" ;
 require_once CLASSPATH."/lang/IObject.php" ;
 require_once CLASSPATH."/lang/Object.php" ;
 require_once CLASSPATH."/lang/IException.php" ;

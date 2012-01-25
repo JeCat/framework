@@ -176,7 +176,7 @@ class Application extends Object implements \Serializable
 	/**
 	 * @return Application
 	 */
-	static public function singleton()
+	static public function singleton($bCreateNew=true,$createArgvs=null,$sClass=null)
 	{
 		return self::$aGlobalSingeltonInstance ;
 	}

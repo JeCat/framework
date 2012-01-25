@@ -16,7 +16,7 @@ use org\jecat\framework\lang\Object ;
 
 abstract class ApplicationFactory extends Object
 {
-	static public function singleton($bCreateNew=true)
+	static public function singleton($bCreateNew=true,$createArgvs=null,$sClass=null)
 	{
 		$aInstance = Object::singleton(false,null,__CLASS__) ;
 		

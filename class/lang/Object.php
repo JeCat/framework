@@ -4,6 +4,8 @@ namespace org\jecat\framework\lang ;
 use org\jecat\framework\system\AppFactory;
 use org\jecat\framework\system\Application ;
 use org\jecat\framework\util\HashTable;
+use org\jecat\framework\pattern\IFlyweightable;
+use org\jecat\framework\pattern\ISingletonable;
 
 /**
  * Object 是所有 JeCat 类的基类，它有以下作用：
@@ -15,7 +17,7 @@ use org\jecat\framework\util\HashTable;
  * @author alee
  *
  */
-class Object implements IObject
+class Object implements IObject, ISingletonable, IFlyweightable
 {
 	public function __construct()
 	{return ;
