@@ -144,19 +144,21 @@ class Prototype extends StatementFactory implements IBean
 	 *  本函数接受一个数组（多个列）或一个字符串（一个列）。
 	 * @return Prototype
 	 */
-	public function addColumns($sColumnName/*, ...*/)
+	public function addColumns($columnNames)
 	{
 		if( $this->arrColumns===self::youKnow or $this->arrColumns=='*' )
 		{
 			$this->arrColumns = array() ;
 		}
-		foreach(func_get_args() as $sColumnName)
+		
+		foreach(Type::toArray($columnNames) as $sColumnName)
 		{
 			if( $sColumnName and !in_array($sColumnName,$this->arrColumns) )
 			{
 				$this->arrColumns[] = $sColumnName ;
 			}
 		}
+		
 		return $this;
 	}
 	
@@ -649,7 +651,7 @@ class Prototype extends StatementFactory implements IBean
 		// columns
 		if( !empty($arrConfig['columns']) )
 		{
-			call_user_func_array(array($this,'addColumns'),Type::toArray($arrConfig['columns'])) ;
+			call_user_func(array($this,'addColumns'),$arrConfig['columns']) ;
 		}
 		// keys
 		if( !empty($arrConfig['keys']) )
