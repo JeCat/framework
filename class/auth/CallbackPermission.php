@@ -1,7 +1,7 @@
 <?php
 namespace org\jecat\framework\auth ;
 
-class CallbackPermission implements IPermission
+class CallbackPermission extends PermissionBase
 {
 	public function __construct($callback)
 	{
@@ -16,4 +16,3 @@ class CallbackPermission implements IPermission
 	private $callback ;
 }
 
-?>

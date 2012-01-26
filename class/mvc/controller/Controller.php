@@ -2,6 +2,7 @@
 
 namespace org\jecat\framework\mvc\controller ;
 
+use org\jecat\framework\auth\Authorizer;
 use org\jecat\framework\io\IOutputStream;
 use org\jecat\framework\mvc\view\View;
 use org\jecat\framework\mvc\view\layout\ViewLayoutFrame;
@@ -31,10 +32,33 @@ use org\jecat\framework\pattern\composite\NamableComposite ;
 
 /**
  * 
- * @wiki /MVC模式/控制器
+ * @wiki /MVC模式
  * 
- * 在JeCat中，一个控制器对像用于完成一项工作。
+ * === 控制器(Controller) ===
+ * 在JeCat中，一个控制器完成一项工作（例如显示一个网页）。多个控制器可以组合起来，几项简单的工作可以组合成一项更复杂的工作。
+ * JeCat的控制器可以自由组合，控制器之间互不干扰、各自独立工作，又可以彼此配合，浑然一体。
+ * 
+ * === 视图(View) ===
+ * 视图负责系统的用户界面，在Web开发时，一个视图负责网页上的一个“区域”；
+ * 一个控制器可以提供多个视图（一个网页常常可以由多个“区块”组成），视图之间可以进行任意位置的布局。
+ * 当多个控制器组合成一个控制器时，系统会将所有控制器的视图都“堆放”在一起；然后你可以自由地布置这些视图，而无须关心他们的来源。
+ * 
+ * == 视图窗体(View Widget) ==
+ * 视图窗体是网页上可以重用的“构件”，他们通常有较复杂的行为机制，可是需要在不同网页上（或不同视图中）重复出现。\
+ * 这样的“构件”通常被封装创意个视图窗体以便于重用。例如常见的文本输入框（连同这个输入框上的用户输入有效性检查等工作）、菜单等。
+ * 封装的好处是：可以容易地重用，避免反复实现相同（或相似）的功能；同时，这些窗体还可以在以后被替换。
+ * 
+ * = 表单窗体(Form Widget) =
+ * 。。。
+ * 
  *
+ * === 模型(Model) ===
+ * 模型负责维护数据，不同类型的模型对数据进行不同方式的存储和载入，在Web开发中，最常用的模型是关系型数据库模型。
+ * 一个控制器可以提供多个模型。模型和视图之间可以建立“关联”。一个模型可以被多个视图关联，但是一个视图只能关联一个模型。他们之间是“观察者”模式。视图是观察者，模型是观察目标。
+ * 
+ * == 数据交换(Data Exchage) ==
+ * JeCat 提供一种机制，用于模型和视图窗体之间的数据自动交换。
+ * 。。。
  */
 
 class Controller extends NamableComposite implements IController, IBean
@@ -260,6 +284,17 @@ class Controller extends NamableComposite implements IController, IBean
     			$aProperties->set($key,$value) ;
     		}
     	}
+    	
+    	// authorizer --------------------
+    	if( !empty($arrConfig['perms']) )
+    	{
+    		$arrAuthorConf = array(
+    			'class' => 'authorizer' ,
+    			'perms' => &$arrConfig['perms'] ,
+    		) ;
+    		$this->setAuthorizer( $aBeanFactory->createBean($arrAuthorConf,$sNamespace) ) ;
+    	}
+    	
     	
     	$this->arrBeanConfig = $arrConfig ;
     }
@@ -741,8 +776,27 @@ class Controller extends NamableComposite implements IController, IBean
     {
     	$this->mainView()->clear() ;
     }
+    
+    /**
+     * @return org\jecat\framework\auth\Authorizer
+     */
+    public function authorizer($bAutoCreate=true)
+    {
+		if( !$this->aAuthorizer and $bAutoCreate )
+		{
+			$sClass = BeanFactory::singleton()->beanClassNameByAlias('authorizer') ;
+			$this->aAuthorizer = new $sClass() ;
+		}
+		return $this->aAuthorizer ;
+    }
+    
+    public function setAuthorizer(Authorizer $aAuthorizer)
+    {
+    	$this->aAuthorizer = $aAuthorizer ;
+    	return $this ;
+    }
 
-    protected function response()
+    public function response()
     {
     	return Response::singleton() ;
     }
@@ -858,6 +912,8 @@ class Controller extends NamableComposite implements IController, IBean
     private $arrBeanConfig ;
     
     private $sId ;
+    
+    private $aAuthorizer ;
     
     static private $nAssignedId = 0 ;
     

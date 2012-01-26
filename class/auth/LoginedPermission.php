@@ -3,7 +3,7 @@ namespace org\jecat\framework\auth ;
 
 use org\jecat\framework\lang\Object;
 
-class LoginedPermission extends Object implements IPermission
+class LoginedPermission extends PermissionBase
 {
 	public function check(IdManager $aIdManager)
 	{
