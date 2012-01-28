@@ -32,7 +32,15 @@ class Text extends FormWidget
 		}
 		return $aBean ;
 	}
-	
+	/**
+	 * @wiki /mvc/视图/表单控件/文字输入框/Bean配置数组
+	 *
+	 * type string 此项须以下列字符串为值,默认值为"single"
+	 * "single" 将Text初始化为单行文字输入框,即html中设置input标签的type属性为"text"
+	 * "password" 将Text初始化为密码数据框,即html中设置input标签的type属性为"password"
+	 * "multiple" 将Text初始化为字符编辑区域,即html中的textarea标签
+	 * "hidden" 将Text初始化为单行文字输入框,即html中设置input标签的type属性为"hidden"
+	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
 		parent::buildBean ( $arrConfig,$sNamespace);

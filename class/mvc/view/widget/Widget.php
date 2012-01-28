@@ -52,7 +52,13 @@ class Widget extends Object implements IViewWidget, IBean
 		}
 		return $aBean ;
 	}
-	
+	/**
+	 * @wiki /mvc/视图/表单控件/Bean配置数组
+	 *
+	 * id string Jecat框架区分控件的唯一参照.也会作为name属性体现在html页面上
+	 * title string 控件的文字说明,方便用户理解控件的内容
+	 * template string 指定模板文件的文件名
+	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
 		if( !empty($arrConfig['id']) )

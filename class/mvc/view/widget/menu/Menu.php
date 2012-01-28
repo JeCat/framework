@@ -31,7 +31,15 @@ class Menu extends AbstractBase
     	}
     	return $aBean ;
     }
-    
+    /**
+     * @wiki /mvc/视图/控件/导航菜单/Bean配置数组
+     *
+     * items array 菜单项目列表,每个元素都是一个菜单项的配置
+     * direction string 菜单描述
+     * top 
+     * left
+     * tearoff
+     */
     public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {
     	parent::buildBean($arrConfig,$sNamespace);

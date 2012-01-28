@@ -260,7 +260,18 @@ class Association implements IBean
 		}
 		return $aBean ;
 	}
-	
+	/**
+	 * @wiki /mvc/模型/关系/Bean配置数组
+	 *
+	 * type string 指定关系类型
+	 * fromkeys array 起始表列名
+	 * tokeys array 目标表列名
+	 * frombridgekeys array 起始桥接表列名
+	 * tobridgekeys array 起始桥接表列名
+	 * bridge string 桥接表名
+	 * fromPrototype string 指定起源原型配置
+	 * on string 
+	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
 		if( !$this->aDB )
