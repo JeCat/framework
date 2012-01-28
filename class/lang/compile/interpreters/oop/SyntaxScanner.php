@@ -37,9 +37,8 @@ class SyntaxScanner extends Object implements IInterpreter
 		$aState = new State() ;
 		$aTokenPoolIter = $aTokenPool->iterator() ;
 		
-		$t = microtime(true) ;$cnt = 0 ;
 		foreach($aTokenPoolIter as $aToken)
-		{$cnt ++ ;
+		{
 			// 扫描php代码
 			$this->aPHPCodeParser->parse($aTokenPool,$aTokenPoolIter,$aState) ;
 			if( !$aState->isPHPCode() )
@@ -56,7 +55,6 @@ class SyntaxScanner extends Object implements IInterpreter
 			$aToken->setBelongsClass($aState->currentClass()) ;
 			$aToken->setBelongsFunction($aState->currentFunction()) ;
 		}
-		echo 'foreach:',microtime(true)-$t, ' tokens:', $cnt, '<br />' ;
 	}
 	
 	

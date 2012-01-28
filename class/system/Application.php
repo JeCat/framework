@@ -91,7 +91,7 @@ use org\jecat\framework\fs\FileSystem;
  * 	数据交换 和 数据校验
  * 
  * 模式
- * 	单件和享元
+ * 	单例和享元
  * 	Bean对象
  * 	迭代器
  * 	面向方面(AOP)
