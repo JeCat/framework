@@ -68,7 +68,12 @@ class Paginator extends FormWidget implements IModelChangeObserver
         	$this->setDataFromSubmit($aDataSource);
         }
     }
-    
+    /**
+     * @wiki /mvc/视图/控件/分页器/Bean配置数组
+     *
+     * count int 
+     * nums int 显示几页（即分页器的宽度）
+     */
     public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {
     	parent::buildBean($arrConfig,$sNamespace) ;

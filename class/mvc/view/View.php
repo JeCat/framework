@@ -69,7 +69,15 @@ class View extends NamableComposite implements IView, IBean
 		}
 		return $aBean ;
 	}
-	
+	/**
+	 * @wiki /mvc/视图/Bean配置数组
+	 *
+	 * name string Jecat框架区分视图的唯一参照
+	 * template string 对应模板文件名
+	 * views array 子视图,元素为一个视图的bean数组
+	 * widgets array 子控件,元素为一个控件的bean数组
+	 * vars array 用于初始化视图对象的参数,以参数名为键,参数值为值
+	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {
     	if( empty($arrConfig['name']) )

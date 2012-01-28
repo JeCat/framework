@@ -30,7 +30,11 @@ class Group extends FormWidget {
 		}
 		return $aBean ;
 	}
-	
+	/**
+	 * @wiki /mvc/视图/表单控件/组/Bean配置数组
+	 *
+	 * widgets array 组控件内部包含的控件元素,每个数组元素都是一个控件的bean数组
+	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
 		parent::buildBean ( $arrConfig, $sNamespace );

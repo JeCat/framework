@@ -615,7 +615,26 @@ class Prototype extends StatementFactory implements IBean
 		}
 		return $aBean ;
 	}
-	
+	/**
+	 * @wiki /mvc/模型/原型/Bean配置数组
+	 *
+	 * model-class string 用哪个类来实现模型对象
+	 * table string 对应的数据库表
+	 * name string 在原型关系中的名字,用来区分不同的原型
+	 * columns array 需要表中哪些列的数据
+	 * keys array 指定表中哪些列为主键,若指定了主键则使用这里的主键而忽略数据库主键,如果未指定则使用数据库指定的主键
+	 * alias string 别名
+	 * limit int 设置读取条目数目的上限,下限为0
+	 * limitLen int 设置读取条目数目的上限
+	 * limitFrom int 设置读取条目数目的下限
+	 * order array 指定依据某一列来排序,同时设置正序或反序
+	 * orderAsc string 指定依据某一列正序排序
+	 * orderDesc string 指定依据某一列反序排序
+	 * hasOne array 配置hasone关系
+	 * belongsTo array 配置belongsTo关系
+	 * hasMany array 配置hasMany关系
+	 * hasAndBelongsToMany array 配置hasAndBelongsToMany关系
+	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
 		if( !$this->aDB )

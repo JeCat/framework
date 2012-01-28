@@ -21,7 +21,11 @@ class Select extends FormWidget {
 		}
 		return $aBean ;
 	}
-	
+	/**
+	 * @wiki /mvc/视图/表单控件/下拉菜单/Bean配置数组
+	 *
+	 * size int 同时可见的选项的数量
+	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
 		parent::buildBean ( $arrConfig,$sNamespace );
