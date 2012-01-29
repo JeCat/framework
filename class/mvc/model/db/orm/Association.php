@@ -180,6 +180,10 @@ class Association implements IBean
 		{
 			throw new ORMException('尚未指定 ORM 关联(%s)的 fromPrototype',$this->path()) ;
 		}
+		if(!$this->aToPrototype)
+		{
+			throw new ORMException('尚未指定 ORM 关联(%s)的 toPrototype',$this->path()) ;
+		}
 		
 		// 
 		if( $this->nType==self::hasAndBelongsToMany )
