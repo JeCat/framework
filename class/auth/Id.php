@@ -253,11 +253,11 @@ class Id extends Object implements IIdentity, \Serializable
 		if( $sNickname = $aUserModel->data('info.nickname') )
 		{
 			return "{$sNickname}({$sUsername})" ;
-	}
-	else
+		}
+		else
 		{
-		return $sUsername ;
-	}
+			return $sUsername ;
+		}
 	}
 	
 	private function getDataFromModel($sProp)
