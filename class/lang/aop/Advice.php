@@ -104,12 +104,12 @@ class Advice extends NamedObject
 	
 	public function isStatic()
 	{
-		$this->bStatic ;
+		return $this->bStatic ;
 	}
 	
 	public function access()
 	{
-		$this->sAccess ;
+		return $this->sAccess ;
 	}
 	
 	public function signtrue()
