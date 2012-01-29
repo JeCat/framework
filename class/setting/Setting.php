@@ -8,13 +8,13 @@ use org\jecat\framework\lang\Object;
  * @wiki /配置
  * 
  * === Key 和 Item ===
- * org\framework\setting\Setting 类负责维护系统运行时所需要的配置信息。
+ * 系统的配置信息保存在 org\framework\setting\Setting 对像中。
  * 
  * 配置信息存储在[b]配置项（item）[/b]中，每个配置项保存一项数据。数据可以是基本数据类型（字符串、整数、布尔等），也可以是复合数据结构（数组、对象）
  * 
  * [b]配置键（key）[/b]负责维护[b]配置项（item）[/b]，一个key可以提供多个 item 和 多个下级 key。
  * 
- * 系统所需的配置信息依据自身的业务关系和职能分类，分别保存在树状结构的各个[b]配置键（key）[/b]。
+ * 系统所需的配置信息依据自身的业务关系和职能分类，分别保存在各个不同的[b]配置键（key）[/b]里，这些[b]配置键[/b]以树状结构存放。
  * 
  * key 和 item 很像文件系统中的目录和文件：每个key可以拥有多个item和下级key；数据是保存在item中的；key负责组织收纳各个item和下级key。
  * 

@@ -74,8 +74,8 @@ class Authorizer implements IBean
 	 *  |array
 	 *  |perms属性数组的成员可以是字符串或数组：
 	 *  |如果是字符串，则表示 IPermission 类的类名（可以是在 BeanFeactory 中注册过的别名），该类必须实现 ISingleton 接口；
-	 *  |如果是数组，则表示一个 IPermission 对象的 Bean 配置数组。
-	 *  |perms属性数组的键名如果是字符串类型，可以做为对应元素Bean Config的class属性。
+	 *  如果是数组，则表示一个 IPermission 对象的 Bean 配置数组。
+	 *  perms属性数组的键名如果是字符串类型，可以做为对应元素Bean Config的class属性。
 	 *  |} 
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',BeanFactory $aBeanFactory=null)
