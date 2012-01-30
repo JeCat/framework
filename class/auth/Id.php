@@ -2,11 +2,8 @@
 namespace org\jecat\framework\auth ;
 
 use org\jecat\framework\mvc\controller\HttpRequest;
-
 use org\jecat\framework\mvc\controller\Request;
-
 use org\jecat\framework\lang\Exception;
-
 use org\jecat\framework\pattern\iterate\ArrayIterator;
 use org\jecat\framework\mvc\model\IModel;
 use org\jecat\framework\lang\Object;
@@ -249,6 +246,19 @@ class Id extends Object implements IIdentity, \Serializable
 		$this->aModel = $aModel ;
 	}
 	
+	static public function displayName(IModel $aUserModel)
+	{
+		$sUsername = $aUserModel->data('username') ;
+	
+		if( $sNickname = $aUserModel->data('info.nickname') )
+		{
+			return "{$sNickname}({$sUsername})" ;
+		}
+		else
+		{
+			return $sUsername ;
+		}
+	}
 	
 	private function getDataFromModel($sProp)
 	{

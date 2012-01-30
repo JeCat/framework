@@ -2,7 +2,6 @@
 namespace org\jecat\framework\mvc\model\db\orm;
 
 use org\jecat\framework\lang\Type;
-
 use org\jecat\framework\fs\FileSystem;
 use org\jecat\framework\db\sql\Statement;
 use org\jecat\framework\db\sql\StatementState;
@@ -40,7 +39,7 @@ class Prototype extends StatementFactory implements IBean
 		$aPrototype->arrColumns = $columns ;
 		$aPrototype->arrKeys = self::youKnow ;
 		
-		$aPrototype->aDB = $aDB===self::youKnow? DB::singleton(): $aDB ;
+		$aPrototype->aDB = $aDB ;
 		
 		return $aPrototype;
 	}
@@ -270,7 +269,7 @@ class Prototype extends StatementFactory implements IBean
 	{
 		if(is_string($to))
 		{
-			$aToPrototype = self::create($to,self::youKnow,'*',$this->aDB) ;
+			$aToPrototype = self::create($to,self::youKnow,'*',$this->db()) ;
 		}
 		else if( $to instanceof Prototype)
 		{
@@ -287,7 +286,7 @@ class Prototype extends StatementFactory implements IBean
 		}
 		
 		$aAsso = new Association(
-				$this->aDB
+				$this->db()
 				, $nType
 				, $this 
 				, $aToPrototype
@@ -370,6 +369,12 @@ class Prototype extends StatementFactory implements IBean
 	
 	public function isValid()
 	{
+		// 检查 table
+		if(!$this->tableName())
+		{
+			throw new Exception('ORM原型table属性不能为空。');
+		}
+		
 		// 检查主键
 		if(!$this->keys())
 		{
@@ -422,7 +427,7 @@ class Prototype extends StatementFactory implements IBean
 	 */
 	public function tableReflecter()
 	{
-		$aTableReflecter = $this->aDB->reflecterFactory()->tableReflecter($this->sTableName) ;
+		$aTableReflecter = $this->db()->reflecterFactory()->tableReflecter($this->sTableName) ;
 		
 		if( !$aTableReflecter->isExist() )
 		{
@@ -637,11 +642,6 @@ class Prototype extends StatementFactory implements IBean
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
-		if( !$this->aDB )
-		{
-			$this->aDB = DB::singleton() ;
-		}
-		
 		if(!empty($arrConfig['model-class']))
 		{
 			$this->sModelClass = $arrConfig['model-class'] ;
@@ -649,7 +649,7 @@ class Prototype extends StatementFactory implements IBean
 		
 		// table
 		if( !empty($arrConfig['table']) )
-		{
+		{echo $arrConfig['table'] ;
 			$this->setTableName($arrConfig['table']) ;
 		}
 		else if( !empty($arrConfig['name']) )
@@ -768,7 +768,7 @@ class Prototype extends StatementFactory implements IBean
 			$item['fromPrototype'] = $this ;
 			
 			$aAssociation = $aBeanFactory->createBean($item,$sNamespace,$aBeanFactory) ;
-			$aAssociation->setDB($this->aDB) ;
+			$aAssociation->setDB($this->db()) ;
 			
 			$this->arrAssociations[] = $aAssociation ;
 		}
@@ -885,6 +885,15 @@ class Prototype extends StatementFactory implements IBean
 		$this->aStatementDelete = null ;
 		$this->aStatementSelect = null ;
 		$this->aStatementUpdate = null ;
+	}
+	
+	public function db()
+	{
+		if(!$this->aDB)
+		{
+			$this->aDB = DB::singleton() ;
+		}
+		return $this->aDB ;
 	}
 	
 	// 固有属性 ----------------------------
