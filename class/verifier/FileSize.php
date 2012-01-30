@@ -28,8 +28,8 @@ class FileSize extends Object implements IVerifier,IBean {
 		return $aBean ;
 	}
 	/**
-	 * @wiki /校验器/文件大小校验器/Bean配置数组
-	 *
+	 * @wiki /校验器/文件大小校验器(FileSize)
+	 * == Bean配置数组 ==
 	 * nMaxSize int 文件大小上限,单位字节(Byte),为空即不限
 	 * nMinSize int 文件大小下限,单位字节(Byte),为空即不限
 	 */

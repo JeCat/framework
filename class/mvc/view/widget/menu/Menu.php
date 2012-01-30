@@ -32,8 +32,8 @@ class Menu extends AbstractBase
     	return $aBean ;
     }
     /**
-     * @wiki /mvc/视图/控件/导航菜单/Bean配置数组
-     *
+     * @wiki /mvc/视图/控件/导航菜单(Menu)
+     * == Bean配置数组 ==
      * items array 菜单项目列表,每个元素都是一个菜单项的配置
      * direction string 菜单描述
      * top 

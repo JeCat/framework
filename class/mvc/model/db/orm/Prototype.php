@@ -616,8 +616,8 @@ class Prototype extends StatementFactory implements IBean
 		return $aBean ;
 	}
 	/**
-	 * @wiki /mvc/模型/原型/Bean配置数组
-	 *
+	 * @wiki /mvc/模型/原型(Prototype)
+	 * == Bean配置数组 ==
 	 * model-class string 用哪个类来实现模型对象
 	 * table string 对应的数据库表
 	 * name string 在原型关系中的名字,用来区分不同的原型

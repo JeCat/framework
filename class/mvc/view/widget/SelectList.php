@@ -32,8 +32,8 @@ class SelectList extends Select {
 		return $aBean ;
 	}
 	/**
-	 * @wiki /mvc/视图/表单控件/列表/Bean配置数组
-	 *
+	 * @wiki /mvc/视图/表单控件/列表(SelectList)
+	 * == Bean配置数组 ==
 	 * size int 同时可见的选项的数量
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)

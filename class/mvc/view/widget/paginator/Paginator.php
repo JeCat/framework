@@ -69,8 +69,8 @@ class Paginator extends FormWidget implements IModelChangeObserver
         }
     }
     /**
-     * @wiki /mvc/视图/控件/分页器/Bean配置数组
-     *
+     * @wiki /mvc/视图/控件/分页器(Paginator)
+     * == Bean配置数组 ==
      * count int 
      * nums int 显示几页（即分页器的宽度）
      */

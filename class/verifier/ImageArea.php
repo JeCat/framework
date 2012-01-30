@@ -26,8 +26,8 @@ class ImageArea extends Object implements IVerifier, IBean
 		return $aBean ;
 	}
 	/**
-	 * @wiki /校验器/图片面积校验器/Bean配置数组
-	 *
+	 * @wiki /校验器/图片面积校验器(ImageArea)
+	 * == Bean配置数组 ==
 	 * max int 面积上限,单位字节(px),为空即不限
 	 * min int 面积下限,单位字节(px),为空即不限
 	 */

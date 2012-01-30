@@ -33,8 +33,8 @@ class Number extends Object implements IVerifier, IBean
 		return $aBean ;
 	}
 	/**
-	 * @wiki /校验器/字符长度校验器/Bean配置数组
-	 *
+	 * @wiki /校验器/字符长度校验器(NotEmpty)
+	 * == Bean配置数组 ==
 	 * int string 此项须以下列字符串为值,默认为"number"
 	 * "int" 要求校验的数据是整数
 	 * "float" 要求校验的数据是小数

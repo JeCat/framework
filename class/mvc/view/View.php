@@ -70,8 +70,8 @@ class View extends NamableComposite implements IView, IBean
 		return $aBean ;
 	}
 	/**
-	 * @wiki /mvc/视图/Bean配置数组
-	 *
+	 * @wiki /mvc/视图(View)
+	 * == Bean配置数组 ==
 	 * name string Jecat框架区分视图的唯一参照
 	 * template string 对应模板文件名
 	 * views array 子视图,元素为一个视图的bean数组

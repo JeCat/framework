@@ -33,8 +33,8 @@ class Text extends FormWidget
 		return $aBean ;
 	}
 	/**
-	 * @wiki /mvc/视图/表单控件/文字输入框/Bean配置数组
-	 *
+	 * @wiki /mvc/视图/表单控件/文字输入框(Text)
+	 * == Bean配置数组 ==
 	 * type string 此项须以下列字符串为值,默认值为"single"
 	 * "single" 将Text初始化为单行文字输入框,即html中设置input标签的type属性为"text"
 	 * "password" 将Text初始化为密码数据框,即html中设置input标签的type属性为"password"

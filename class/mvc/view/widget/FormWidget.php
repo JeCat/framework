@@ -25,8 +25,8 @@ class FormWidget extends Widget implements IViewFormWidget
 		return $aBean ;
 	}
 	/**
-	 * @wiki /mvc/视图/表单控件/表单控件/Bean配置数组
-	 *
+	 * @wiki /mvc/视图/表单控件/表单控件(FormWidget)
+	 * == Bean配置数组 ==
 	 * value mixed 指定控件的值,用于指定值的参数可能是任何类型,如何体现这些值由控件对象自行处理.一般来说,如果是input标签控件,这个值会放到input标签的value属性中,如果是select标签,这个值会让select标签选定特定的选项,其他控件也是类似的功能
 	 * valueString string 用string值指定控件的值,如果是input标签控件,这个值会放到input标签的value属性中,如果是select标签,这个值会让select标签选定特定的选项,其他控件也是类似的功能
 	 * formName string 控件在表单中的name值,无特殊需求不必指定,默认使用控件的id作为name

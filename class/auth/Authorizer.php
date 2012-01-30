@@ -66,8 +66,8 @@ class Authorizer implements IBean
 	}
 	
 	/**
-	 * @wiki /认证和授权/授权-许可/Bean配置数组
-	 * 
+	 * @wiki /认证和授权/授权-许可(Authorizer)
+	 * == Bean配置数组 ==
 	 * {|
 	 *  |perms
 	 *  |可选
