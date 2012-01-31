@@ -265,8 +265,8 @@ class Association implements IBean
 		return $aBean ;
 	}
 	/**
-	 * @wiki /mvc/模型/关系/Bean配置数组
-	 *
+	 * @wiki /mvc/模型/关系(Association)
+	 * == Bean配置数组 ==
 	 * type string 指定关系类型
 	 * fromkeys array 起始表列名
 	 * tokeys array 目标表列名

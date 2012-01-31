@@ -109,8 +109,8 @@ class Controller extends NamableComposite implements IController, IBean
     }
     
     /**
-     * @wiki /MVC模式/控制器/控制器的Bean配置数组
-     * 
+     * @wiki /MVC模式/控制器(Controller)
+     * == Bean配置数组 ==
      * {|
      * 	!属性
      *  !

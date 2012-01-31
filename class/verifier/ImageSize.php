@@ -29,8 +29,8 @@ class ImageSize extends Object implements IVerifier, IBean
 		return $aBean ;
 	}
 	/**
-	 * @wiki /校验器/图片宽高校验器/Bean配置数组
-	 *
+	 * @wiki /校验器/图片宽高校验器(ImageSize)
+	 * == Bean配置数组 ==
 	 * maxWidth int 宽度上限,单位字节(px),为空即不限
 	 * maxHeight int 高度上限,单位字节(px),为空即不限
 	 * minWidth int 宽度下限,单位字节(px),为空即不限

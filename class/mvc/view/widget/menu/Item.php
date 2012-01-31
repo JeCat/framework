@@ -28,8 +28,8 @@ class Item extends AbstractBase
     	return $aBean ;
     }
     /**
-     * @wiki /mvc/视图/控件/导航菜单项/Bean配置数组
-     *
+     * @wiki /mvc/视图/控件/导航菜单项(Item)
+     * == Bean配置数组 ==
      * menu array 子菜单项目列表,每个元素都是一个菜单项的配置
      * link string url地址
      * onclick string 点击后触发的javascript的代码

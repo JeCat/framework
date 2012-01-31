@@ -31,8 +31,8 @@ class ViewLayoutFrame extends View
 		$this->setType($sType) ;
 	}
 	/**
-	 * @wiki /mvc/视图/布局框体/Bean配置数组
-	 *
+	 * @wiki /mvc/视图/布局框体(ViewLayoutFrame)
+	 * == Bean配置数组 ==
 	 * type string "v"为纵向布局,"h"为横向布局,"tab"为选项卡布局
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)

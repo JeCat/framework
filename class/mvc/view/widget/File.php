@@ -44,8 +44,8 @@ class File extends FormWidget
 		return $aBean ;
 	}
 	/**
-	 * @wiki /mvc/视图/表单控件/文件上传/Bean配置数组
-	 *
+	 * @wiki /mvc/视图/表单控件/文件上传(File)
+	 * == Bean配置数组 ==
 	 * folder string 文件夹路径
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
