@@ -649,7 +649,7 @@ class Prototype extends StatementFactory implements IBean
 		
 		// table
 		if( !empty($arrConfig['table']) )
-		{echo $arrConfig['table'] ;
+		{
 			$this->setTableName($arrConfig['table']) ;
 		}
 		else if( !empty($arrConfig['name']) )
