@@ -47,6 +47,8 @@ class Response extends Object
 		// view ------------
 		case 'noframe' :
 		case 'view.noframe' :
+			$aController->renderMainView($aController->mainView()) ;
+			$aController->displayMainView($aController->mainView(),$this->printer()) ;
 			break ;
 			
 		case 'view' :
