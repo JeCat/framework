@@ -312,7 +312,7 @@ class Model extends AbstractModel implements IModel, IBean
 			}
 		}
 		
-		parent::setData($sName,$sValue, $bStrikeChange) ;
+		return parent::setData($sName,$sValue, $bStrikeChange) ;
 	}
 	
 	public function setChanged($sName,$bChanged=true)

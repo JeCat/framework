@@ -15,6 +15,7 @@ class ModelForeachCompiler extends NodeCompiler
 
 		$aAttrs = $aObject->attributes();
 		$sIdx = $aAttrs->has ( 'idx' ) ? $aAttrs->string ( 'idx' ) : '' ;
+		$sItem = $aAttrs->has ( 'item' ) ? $aAttrs->string ( 'item' ) : 'theModel' ;
 		$sFor = $aAttrs->has ( 'for' ) ? $aAttrs->get ( 'for' ) : "\$aVariables->get('theModel')" ;
 		
 		$aDev->write("if(\$aForModel={$sFor}){\r\n") ;
@@ -24,8 +25,8 @@ class ModelForeachCompiler extends NodeCompiler
 			$aDev->write("\t\${$sIdx}=0;\r\n") ;
 		}
 		
-		$aDev->write("\tforeach(\$aForModel->childIterator() as \$aChildModel){\r\n") ;
-		$aDev->write("\t\t\$aVariables->set('theModel',\$aChildModel) ;\r\n") ;
+		$aDev->write("\tforeach(\$aForModel->childIterator() as \$__aChildModel){\r\n") ;
+		$aDev->write("\t\t\$aVariables->set('{$sItem}',\$__aChildModel) ;\r\n") ;
 	
 		if($sIdx)
 		{
