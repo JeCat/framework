@@ -303,12 +303,6 @@ class Controller extends NamableComposite implements IController, IBean
     		$this->setAuthorizer( $aBeanFactory->createBean($arrAuthorConf,$sNamespace) ) ;
     	}
     	
-    	// 补充缺省的 frame 配置
-    	if(empty($arrConfig['frame']))
-    	{
-    		$arrConfig['frame'] = array( 'class'=>'frame' ) ;
-    	}
-    	
     	$this->arrBeanConfig = $arrConfig ;
     	$this->sBeanNamespace = $sNamespace ;
     }
@@ -732,24 +726,29 @@ class Controller extends NamableComposite implements IController, IBean
 		throw new Exception("正在访问控制器 %s 中不存在的属性:%s",array($this->name(),$sName)) ;
     }
     
-    public function createFrame()
+    protected function defaultFrameConfig()
     {
-    	$arrConfig = $this->beanConfig() ;
-    	if(empty($arrConfig['frame']))
-    	{
-    		$arrConfig['frame'] = array('class'=>'frame') ;
-    	}
-    	$aFrame = BeanFactory::singleton()->createBean($arrConfig['frame'],$this->beanNamesapce()) ;
-    	$aFrame->params()->addChild($this->params()) ;
-    	
-    	return new WebpageFrame($aFrame) ;
+    	return array('class'=>'org\\jecat\\framework\\mvc\\controller\\WebpageFrame') ;
     }
     
     public function frame()
     {
     	if( !$this->aFrame and !$this->params->bool('noframe') )
     	{
-    		$this->aFrame = $this->createFrame() ;
+	    	// 补充缺省的 frame 配置
+	    	if(empty($this->arrBeanConfig['frame']))
+	    	{
+	    		$this->arrBeanConfig['frame'] = $this->defaultFrameConfig() ;
+	    	}
+	    	else
+	    	{
+	    		$arrDefaultFrameConfig = $this->defaultFrameConfig() ;
+	    		BeanFactory::singleton()->mergeConfig($arrDefaultFrameConfig,$this->arrBeanConfig['frame']) ;
+	    		$this->arrBeanConfig['frame'] = $arrDefaultFrameConfig ;
+	    	}
+	    	
+	    	$this->aFrame = BeanFactory::singleton()->createBean($this->arrBeanConfig['frame'],$this->beanNamesapce()) ;
+	    	$this->aFrame->params()->addChild($this->params()) ;
     	}
     	
     	return $this->aFrame ;
