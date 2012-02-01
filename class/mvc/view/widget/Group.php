@@ -33,7 +33,18 @@ class Group extends FormWidget {
 	/**
 	 * @wiki /mvc/视图/表单控件/组(Group)
 	 * == Bean配置数组 ==
-	 * widgets array 组控件内部包含的控件元素,每个数组元素都是一个控件的bean数组
+	 * {|
+	 * !属性
+	 * !类型
+	 * !默认值
+	 * !可选
+	 * !说明
+	 * |-- --
+	 * |widgets
+	 * |array
+	 * |无
+	 * |可选
+	 * |组控件内部包含的控件元素,每个数组元素都是一个控件的bean数组
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{

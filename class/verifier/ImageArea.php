@@ -28,8 +28,24 @@ class ImageArea extends Object implements IVerifier, IBean
 	/**
 	 * @wiki /校验器/图片面积校验器(ImageArea)
 	 * == Bean配置数组 ==
-	 * max int 面积上限,单位字节(px),为空即不限
-	 * min int 面积下限,单位字节(px),为空即不限
+	 * {|
+	 * !属性
+	 * !类型
+	 * !默认值
+	 * !可选
+	 * !说明
+	 * |-- --
+	 * |max
+	 * |int
+	 * |无
+	 * |可选
+	 * |面积上限,单位字节(px),为空即不限
+	 * |-- --
+	 * |min
+	 * |int
+	 * |无
+	 * |可选
+	 * |面积下限,单位字节(px),为空即不限
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{

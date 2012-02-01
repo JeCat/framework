@@ -37,8 +37,25 @@ class FileExt extends Object implements IVerifier,IBean {
 	/**
 	 * @wiki /校验器/文件类型校验器(FileExt)
 	 * == Bean配置数组 ==
-	 * exts array 扩展名名单
-	 * allow boolean 为true时arrExt意为允许上传的扩展名列表,false时arrExt意为不允许上传的扩展名列表
+	 * {|
+	 * !属性
+	 * !类型
+	 * !默认值
+	 * !可选
+	 * !说明
+	 * |-- --
+	 * |exts
+	 * |array
+	 * |无
+	 * |必须
+	 * |扩展名名单
+	 * |-- --
+	 * |allow
+	 * |boolean
+	 * |true
+	 * |可选
+	 * |为true时arrExt意为允许上传的扩展名列表,false时arrExt意为不允许上传的扩展名列表
+	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{

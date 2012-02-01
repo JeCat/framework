@@ -34,7 +34,18 @@ class SelectList extends Select {
 	/**
 	 * @wiki /mvc/视图/表单控件/列表(SelectList)
 	 * == Bean配置数组 ==
-	 * size int 同时可见的选项的数量
+	 * {|
+	 * !属性
+	 * !类型
+	 * !默认值
+	 * !可选
+	 * !说明
+	 * |-- --
+	 * |size
+	 * |int
+	 * |4
+	 * |必须
+	 * |同时可见的选项的数量
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{

@@ -34,11 +34,18 @@ class Menu extends AbstractBase
     /**
      * @wiki /mvc/视图/控件/导航菜单(Menu)
      * == Bean配置数组 ==
-     * items array 菜单项目列表,每个元素都是一个菜单项的配置
-     * direction string 菜单描述
-     * top 
-     * left
-     * tearoff
+     * {|
+	 * !属性
+	 * !类型
+	 * !默认值
+	 * !可选
+	 * !说明
+	 * |-- --
+     * |items
+     * |array
+     * |无
+     * |可选
+     * |菜单项目列表,每个元素都是一个菜单项的配置
      */
     public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {

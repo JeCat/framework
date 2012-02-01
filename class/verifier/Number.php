@@ -33,12 +33,20 @@ class Number extends Object implements IVerifier, IBean
 		return $aBean ;
 	}
 	/**
-	 * @wiki /校验器/字符长度校验器(NotEmpty)
+	 * @wiki /校验器/数字校验器(Number)
 	 * == Bean配置数组 ==
-	 * int string 此项须以下列字符串为值,默认为"number"
-	 * "int" 要求校验的数据是整数
-	 * "float" 要求校验的数据是小数
-	 * "number" 要求校验的数据是数字
+	 * {|
+	 * !属性
+	 * !类型
+	 * !默认值
+	 * !可选
+	 * !说明
+	 * |-- --
+	 * |int
+	 * |string
+	 * |"number"
+	 * |必须
+	 * |"int" 要求校验的数据是整数,"float" 要求校验的数据是小数,"number" 要求校验的数据是数字
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{

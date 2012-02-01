@@ -27,8 +27,24 @@ class Length extends Object implements IVerifier, IBean
 	/**
 	 * @wiki /校验器/字符长度校验器(Length)
 	 * == Bean配置数组 ==
-	 * max int 字符个数上限,为空即不限
-	 * min int 字符个数下限,单位字节(px),为空即不限
+	 * {|
+	 * !属性
+	 * !类型
+	 * !默认值
+	 * !可选
+	 * !说明
+	 * |-- --
+	 * |max
+	 * |int
+	 * |无
+	 * |可选
+	 * |字符个数上限,为空即不限
+	 * |-- --
+	 * |min
+	 * |int
+	 * |无
+	 * |可选
+	 * |字符个数下限,单位字节(px),为空即不限
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
