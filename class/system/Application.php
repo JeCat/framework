@@ -82,10 +82,10 @@ use org\jecat\framework\fs\FileSystem;
  * 			... ...
  * 		分页控件
  * 	控制器
- * 		Action
- * 		主视图
- * 		视图框架
- * 		请求/回应
+ * 		控制器执行
+ * 		主视图(mainView)
+ * 		网页框架(frame)
+ * 		请求-回应(request-response)
  * 		控制器的组合模式
  * 		控制器的Bean配置数组
  * 	数据交换 和 数据校验
