@@ -49,7 +49,7 @@ use org\jecat\framework\pattern\composite\NamableComposite ;
  * 封装的好处是：可以容易地重用，避免反复实现相同（或相似）的功能；同时，这些窗体还可以在以后被替换。
  * 
  * = 表单窗体(Form Widget) =
- * 。。。
+ * 表单窗体控件是用于表单的视图窗体，用户可以在这些窗体控件中输入数据，系统可以为这些窗体控件添加数据校验器；并且通过[b]数据交换[/b]可以将模型中的数据复制到窗体控件中，或是将窗体控件中的数据复制到模型中。
  * 
  *
  * === 模型(Model) ===
@@ -61,6 +61,9 @@ use org\jecat\framework\pattern\composite\NamableComposite ;
  * 。。。
  */
 
+/**
+ * @wiki /MVC模式/控制器
+ */
 class Controller extends NamableComposite implements IController, IBean
 {
     function __construct ($params=null,$sName=null)
@@ -176,6 +179,16 @@ class Controller extends NamableComposite implements IController, IBean
      *  |可选
      *  |array
      *  |控制器的属性
+     *  |--- ---
+     *  |frame
+     *  |可选
+     *  |array
+     *  |frame控制器配置
+     *  |--- ---
+     *  |process
+     *  |可选
+     *  |callback
+     *  |一个函数，用来替代 process() 方法。仅在Controller子类没有覆盖父类的process()的情况下有效。在执行 process 回调函数时，所属的Controller对像会作为第一个参数传给回调函数。
      *  |}
      */
     public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
@@ -295,13 +308,24 @@ class Controller extends NamableComposite implements IController, IBean
     		$this->setAuthorizer( $aBeanFactory->createBean($arrAuthorConf,$sNamespace) ) ;
     	}
     	
+    	// process
+    	if( !empty($arrConfig['process']) )
+    	{
+    		$this->fnProcess = $arrConfig['process'] ;
+    	}
     	
     	$this->arrBeanConfig = $arrConfig ;
+    	$this->sBeanNamespace = $sNamespace ;
     }
     
 	public function beanConfig()
 	{
 		return $this->arrBeanConfig ;
+	}
+	
+	public function beanNamesapce()
+	{
+		return $this->sBeanNamespace ;
 	}
 	
     public function createModel($prototype,array $arrProperties=array(),$bAgg=false,$sName=null,$sClass='org\\jecat\\framework\\mvc\\model\\db\\Model')
@@ -369,9 +393,16 @@ class Controller extends NamableComposite implements IController, IBean
     {
     	return $this->createView($sName,$sSourceFile,'org\\jecat\\framework\\mvc\\view\\FormView') ;
     }
-        
+
     /**
-    /**
+     * @wiki /MVC模式/控制器/主视图
+     * 
+     * 每个控制器都有一个”隐藏“的主视图(main view)，控制器所拥有的视图，实际上都存放在这个主视图里（[see /MVC模式/视图/视图的组合模式]），它是管理控制器所有视图的”容器“。
+     * 
+     * 把一个控制器B做为”子控制器“添加给另一个控制器A的时候，B的主视图，会自动成为A的一个普通视图。这样一来，当控制器组合到一起的时候，他们的视图也自动完成了组合。
+     * 
+     * 主视图是一个特殊的视图类 org\jecat\framework\mvc\view\TransparentViewContainer，它在视图的组合结构中，是透明存在的。
+     * 
      * @return IView
      */
     public function mainView()
@@ -396,6 +427,10 @@ class Controller extends NamableComposite implements IController, IBean
     }
         
     /**
+     * @wiki /MVC模式/控制器/控制器执行
+     * 
+     * 控制器的执行入口是 mainRun() 方法，在你写一个控制器类的时候，应该将控制器的执行过程写在 process() 函数里，由mainRun()调用你的process()函数，而不是直接重写mainRun()。
+     * process()是控制器自己的业务逻辑，mainRun()包含了很多系统级的
      * 
      * @see IController::mainRun()
      */
@@ -485,7 +520,14 @@ class Controller extends NamableComposite implements IController, IBean
     
     public function process ()
     {
-    	$this->doActions() ;
+    	if($this->fnProcess)
+    	{
+    		$this->fnProcess($this) ;
+    	}
+    	else
+    	{
+    		$this->doActions() ;
+    	}
     }
     
 	public function add($object,$sName=null,$bTakeover=true)
@@ -702,16 +744,29 @@ class Controller extends NamableComposite implements IController, IBean
 		throw new Exception("正在访问控制器 %s 中不存在的属性:%s",array($this->name(),$sName)) ;
     }
     
-    public function createFrame()
+    protected function defaultFrameConfig()
     {
-    	return new WebpageFrame($this->params()) ;
+    	return array('class'=>'org\\jecat\\framework\\mvc\\controller\\WebpageFrame') ;
     }
     
     public function frame()
     {
     	if( !$this->aFrame and !$this->params->bool('noframe') )
     	{
-    		$this->aFrame = $this->createFrame() ;
+	    	// 补充缺省的 frame 配置
+	    	if(empty($this->arrBeanConfig['frame']))
+	    	{
+	    		$this->arrBeanConfig['frame'] = $this->defaultFrameConfig() ;
+	    	}
+	    	else
+	    	{
+	    		$arrDefaultFrameConfig = $this->defaultFrameConfig() ;
+	    		BeanFactory::singleton()->mergeConfig($arrDefaultFrameConfig,$this->arrBeanConfig['frame']) ;
+	    		$this->arrBeanConfig['frame'] = $arrDefaultFrameConfig ;
+	    	}
+	    	
+	    	$this->aFrame = BeanFactory::singleton()->createBean($this->arrBeanConfig['frame'],$this->beanNamesapce()) ;
+	    	$this->aFrame->params()->addChild($this->params()) ;
     	}
     	
     	return $this->aFrame ;
@@ -911,9 +966,13 @@ class Controller extends NamableComposite implements IController, IBean
     
     private $arrBeanConfig ;
     
+    private $sBeanNamespace = '*' ;
+    
     private $sId ;
     
     private $aAuthorizer ;
+    
+    protected $fnProcess ;
     
     static private $nAssignedId = 0 ;
     

@@ -55,6 +55,13 @@ class WebpageFrame extends Controller
 		$aBeanFactory = BeanFactory::singleton() ;
     	$aModelContainer = $this->modelContainer() ;
 		
+    	
+    	// 将 frameview 转换成 frameViews[frameview] 结构
+    	if(!empty($arrConfig['frameview']))
+    	{
+    		$arrConfig['frameviews']['frameview'] =& $arrConfig['frameview'] ;
+    	}
+    	
 		// 将 frameView:xxxx 转换成 frameViews[] 结构
 		$aBeanFactory->_typeKeyStruct($arrConfig,array('frameview:'=>'frameviews')) ;
 		
@@ -66,6 +73,12 @@ class WebpageFrame extends Controller
 				// 自动配置缺少的 class, name 属性
 				$aBeanFactory->_typeProperties( $arrBeanConf, 'view', is_int($key)?null:$key, 'name' ) ;
 		
+				// 默认 class
+				if(empty($arrBeanConf['class']))
+				{
+					$arrBeanConf['class'] = 'view' ;
+				}
+				
 				// 创建对象
 				$aBean = $aBeanFactory->createBean($arrBeanConf,$sNamespace,false) ;
 				$aBean->setName($arrBeanConf['name']) ;
