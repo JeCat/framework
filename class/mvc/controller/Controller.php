@@ -184,6 +184,11 @@ class Controller extends NamableComposite implements IController, IBean
      *  |可选
      *  |array
      *  |frame控制器配置
+     *  |--- ---
+     *  |process
+     *  |可选
+     *  |callback
+     *  |一个函数，用来替代 process() 方法。仅在Controller子类没有覆盖父类的process()的情况下有效。在执行 process 回调函数时，所属的Controller对像会作为第一个参数传给回调函数。
      *  |}
      */
     public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
@@ -301,6 +306,12 @@ class Controller extends NamableComposite implements IController, IBean
     			'perms' => &$arrConfig['perms'] ,
     		) ;
     		$this->setAuthorizer( $aBeanFactory->createBean($arrAuthorConf,$sNamespace) ) ;
+    	}
+    	
+    	// process
+    	if( !empty($arrConfig['process']) )
+    	{
+    		$this->fnProcess = $arrConfig['process'] ;
     	}
     	
     	$this->arrBeanConfig = $arrConfig ;
@@ -509,7 +520,14 @@ class Controller extends NamableComposite implements IController, IBean
     
     public function process ()
     {
-    	$this->doActions() ;
+    	if($this->fnProcess)
+    	{
+    		$this->fnProcess($this) ;
+    	}
+    	else
+    	{
+    		$this->doActions() ;
+    	}
     }
     
 	public function add($object,$sName=null,$bTakeover=true)
@@ -953,6 +971,8 @@ class Controller extends NamableComposite implements IController, IBean
     private $sId ;
     
     private $aAuthorizer ;
+    
+    protected $fnProcess ;
     
     static private $nAssignedId = 0 ;
     
