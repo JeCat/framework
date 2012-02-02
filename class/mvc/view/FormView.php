@@ -15,7 +15,18 @@ class FormView extends View implements IFormView
 	/**
 	 * @wiki /mvc/视图/表单视图(FormView)
 	 * == Bean配置数组 ==
-	 * hideForm boolean 是否默认隐藏表单(form标签部分)
+	 * {|
+	 * !属性
+	 * !类型
+	 * !默认值
+	 * !可选
+	 * !说明
+	 * |-- --
+	 * |hideForm
+	 * |boolean
+	 * |false
+	 * |必须
+	 * |是否默认隐藏表单(form标签部分)
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {

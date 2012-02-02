@@ -30,12 +30,44 @@ class Item extends AbstractBase
     /**
      * @wiki /mvc/视图/控件/导航菜单项(Item)
      * == Bean配置数组 ==
-     * menu array 子菜单项目列表,每个元素都是一个菜单项的配置
-     * link string url地址
-     * onclick string 点击后触发的javascript的代码
-     * html 用来代替菜单项内容的html代码
-     * query 
-     * active boolean 设置菜单是否可用
+     * {|
+	 * !属性
+	 * !类型
+	 * !默认值
+	 * !可选
+	 * !说明
+	 * |-- --
+     * |menu
+     * |array
+     * |无
+     * |可选
+     * |子菜单项目列表,每个元素都是一个菜单项的配置
+     * |-- --
+     * |link
+     * |string
+     * |无
+     * |可选
+     * |url地址
+     * |-- --
+     * |onclick
+     * |string
+     * |无
+     * |可选
+     * |点击后触发的javascript的代码
+     * |-- --
+     * |html
+     * |string
+     * |无
+     * |可选
+     * |用来代替菜单项内容的html代码
+     * |-- --
+     * |query
+     * |-- -- 
+     * |active
+     * |boolean
+     * |true
+     * |可选
+     * |设置菜单是否可用
      */
     public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {

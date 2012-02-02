@@ -30,8 +30,24 @@ class FileSize extends Object implements IVerifier,IBean {
 	/**
 	 * @wiki /校验器/文件大小校验器(FileSize)
 	 * == Bean配置数组 ==
-	 * nMaxSize int 文件大小上限,单位字节(Byte),为空即不限
-	 * nMinSize int 文件大小下限,单位字节(Byte),为空即不限
+	 * {|
+	 * !属性
+	 * !类型
+	 * !默认值
+	 * !可选
+	 * !说明
+	 * |-- --
+	 * |nMaxSize
+	 * |int
+	 * |无
+	 * |可选
+	 * |文件大小上限,单位字节(Byte),为空即不限
+	 * |-- --
+	 * |nMinSize
+	 * |int
+	 * |无
+	 * |可选
+	 * |文件大小下限,单位字节(Byte),为空即不限
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{

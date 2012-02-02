@@ -43,9 +43,18 @@ class CheckBtn extends FormWidget
 	/**
 	 * @wiki /mvc/视图/表单控件/选项(CheckBtn)
 	 * == Bean配置数组 ==
-	 * type string 此项须以下列字符串为值,用来指定选项是checkbox还是radio
-	 * "checkbox" 控件以checkbox形式体现
-	 * "radio" 控件以radio形式体现
+	 * {|
+	 * !属性
+	 * !类型
+	 * !默认值
+	 * !可选
+	 * !说明
+	 * |-- --
+	 * |type
+	 * |string
+	 * |无
+	 * |必须
+	 * |此项须以下列字符串为值,用来指定选项是checkbox还是radio,"checkbox" 控件以checkbox形式体现,"radio" 控件以radio形式体现
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{

@@ -37,7 +37,18 @@ class WebpageFrame extends Controller
 	/**
 	 * @wiki /mvc/模型/页面框体(WebpageFrame)
 	 * == Bean配置数组 ==
-	 * frameviews array 
+	 * {|
+	 * !属性
+	 * !类型
+	 * !默认值
+	 * !可选
+	 * !说明
+	 * |-- --
+	 * |frameviews
+	 * |array 
+	 * |无
+	 * |可选
+	 * |子框体视图
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{		
