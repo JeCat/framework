@@ -7,10 +7,11 @@ use org\jecat\framework\ui\xhtml\compiler\node\ScriptCompiler as UiScriptCompile
 use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\TargetCodeOutputStream;
+use org\jecat\framework\ui\ObjectContainer;
 
 class ScriptCompiler extends UiScriptCompiler
 {
-	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject,'aObject') ;
 		
@@ -25,7 +26,7 @@ class ScriptCompiler extends UiScriptCompiler
 		}
 		else 
 		{
-			parent::compile($aObject, $aDev, $aCompilerManager) ;
+			parent::compile($aObject, $aObjectContainer, $aDev, $aCompilerManager) ;
 		}
 	}
 }

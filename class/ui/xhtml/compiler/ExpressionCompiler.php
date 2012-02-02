@@ -2,18 +2,22 @@
 
 namespace org\jecat\framework\ui\xhtml\compiler ;
 
+use org\jecat\framework\ui\VariableDeclares;
+
 use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\IObject;
+use org\jecat\framework\ui\ObjectContainer;
 
 class ExpressionCompiler extends BaseCompiler
 {
-	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		$aDev->write(self::compileExpression($aObject->source())) ;
+		debug_print_backtrace() ;
+		$aDev->write(self::compileExpression($aObject->source(),$aObjectContainer->variableDeclares())) ;
 	}
 
-	static public function compileExpression($sSource,$bEval=true,$bReturn=true)
+	static public function compileExpression($sSource,VariableDeclares $aVarDeclares,$bEval=true,$bReturn=true)
 	{
 		if( !$bEval )
 		{
@@ -45,7 +49,10 @@ class ExpressionCompiler extends BaseCompiler
 					$sVarName = substr($arrOneTkn[1],1) ;
 					$sVarNameNew = '__uivar_'.$sVarName ;
 					
-					$arrVarDefineLines[$sVarName] = "if(!isset(\${$sVarNameNew})){ \${$sVarNameNew}=&\$aVariables->getRef('{$sVarName}') ;}" ;
+					// 声明变量
+					$aVarDeclares->declareVarible($sVarName,$sVarNameNew) ;
+					
+					// $arrVarDefineLines[$sVarName] = "if(!isset(\${$sVarNameNew})){ \${$sVarNameNew}=&\$aVariables->getRef('{$sVarName}') ;}" ;
 					$sLineCode.= '$'.$sVarNameNew ;
 				}
 				else 

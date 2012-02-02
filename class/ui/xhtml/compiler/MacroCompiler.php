@@ -5,16 +5,17 @@ use org\jecat\framework\lang\Assert;
 use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\IObject;
+use org\jecat\framework\ui\ObjectContainer;
 
 class MacroCompiler extends BaseCompiler
 {
-	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Macro",$aObject,'aObject') ;
 		
 		if( $aCompiler=$this->subCompiler($aObject->macroType()) )
 		{
-			$aCompiler->compile($aObject,$aDev,$aCompilerManager) ;
+			$aCompiler->compile($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
 		}
 		
 		else 

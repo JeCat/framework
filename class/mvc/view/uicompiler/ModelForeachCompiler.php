@@ -6,10 +6,11 @@ use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
+use org\jecat\framework\ui\ObjectContainer;
 
 class ModelForeachCompiler extends NodeCompiler
 {
-	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject,'aObject') ;
 
@@ -37,7 +38,7 @@ class ModelForeachCompiler extends NodeCompiler
 		if(!$aObject->headTag()->isSingle())
 		{
 			
-			$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
+			$this->compileChildren($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
 
 			$aDev->write("\t}\r\n}\r\n") ;
 		}

@@ -7,10 +7,11 @@ use org\jecat\framework\lang\Type;
 use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\IObject;
+use org\jecat\framework\ui\ObjectContainer;
 
 class BaseCompiler extends JcObject implements ICompiler
 {
-	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{	
 		if( $aObject instanceof \org\jecat\framework\ui\xhtml\ObjectBase and !$aObject->count() )
 		{
@@ -19,7 +20,7 @@ class BaseCompiler extends JcObject implements ICompiler
 		
 		else 
 		{
-			$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
+			$this->compileChildren($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
 		}
 	}
 	
@@ -28,13 +29,13 @@ class BaseCompiler extends JcObject implements ICompiler
 		return md5(__CLASS__. var_export($this->arrCompilers,true)) ;
 	}
 		
-	protected function compileChildren(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
+	protected function compileChildren(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		foreach ($aObject->iterator() as $aChild)
 		{
 			if( $aCompiler = $aCompilerManager->compiler($aChild) )
 			{
-				$aCompiler->compile($aChild,$aDev,$aCompilerManager) ;
+				$aCompiler->compile($aChild,$aObjectContainer,$aDev,$aCompilerManager) ;
 			}
 		}
 	}

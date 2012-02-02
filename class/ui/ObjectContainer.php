@@ -9,6 +9,13 @@ class ObjectContainer extends Object
 		$this->sTemplateName = $sTemplateName ;
 		$this->sNamespace= $sNamespace ;
 	}
+	
+	public function clear()
+	{
+		$this->arrDeclareVariables = array() ;
+		
+		return parent::clear() ;
+	}
 
 	public function templateName() 
 	{
@@ -20,9 +27,26 @@ class ObjectContainer extends Object
 		return $this->sNamespace ;
 	}
 	
+	/**
+	 * @return VariableDeclares
+	 */
+	public function variableDeclares()
+	{
+		if(!$this->aDeclareVariables)
+		{
+			$this->aDeclareVariables = new VariableDeclares() ;
+		}
+		return $this->aDeclareVariables ;
+	}
+	
+	private $aDeclareVariables ;
+	
+	// private $aDeclareNamespace ;
+	
+	// private $aDeclareNameUses ;
+	
 	private $sTemplateName ;
 	
 	private $sNamespace = '*' ;
 }
 
-?>

@@ -9,7 +9,7 @@ interface ICompiler
 	/**
 	 * @return ICompiled
 	 */
-	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) ;
+	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) ;
 	
 	public function compileStrategySignture() ;
 }

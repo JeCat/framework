@@ -63,7 +63,7 @@ class LoopCompiler extends NodeCompiler
 // 		$aDev->write ( '' );
 		
 		if(!$aObject->headTag()->isSingle()){
-			$this->compileChildren ( $aObject, $aDev, $aCompilerManager );
+			$this->compileChildren ( $aObject, $aObjectContainer, $aDev, $aCompilerManager );
 			$aDev->write ( '} ' );
 		}
 	}

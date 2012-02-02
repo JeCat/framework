@@ -141,7 +141,17 @@ class Attributes extends HashTable
 	}
 	public function expression($sName)
 	{
-		return ($aText=parent::get($sName))? ExpressionCompiler::compileExpression($aText->source()): null ;
+		if( !$aText=parent::get($sName) )
+		{
+			return null ;
+		}
+		
+		if( !$aObContainer = $aText->objectContainer() )
+		{
+			throw new Exception('AttributeVar::objectContainer() 返回空') ;
+		}
+		
+		return ExpressionCompiler::compileExpression($aText->source(),$aObContainer->variableDeclares()) ;
 	}
 	public function object($sName)
 	{

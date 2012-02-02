@@ -17,9 +17,10 @@ use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
+use org\jecat\framework\ui\ObjectContainer;
 
 class WhileCompiler extends NodeCompiler {
-	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) {
+	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) {
 		Type::check ( "org\\jecat\\framework\\ui\\xhtml\\Node", $aObject );
 		
 		$sIdxUserName = $aObject->attributes()->has ( 'idx' ) ? $aObject->attributes()->get ( 'idx' ) : '' ;
@@ -28,7 +29,7 @@ class WhileCompiler extends NodeCompiler {
 			$aDev->write ( "  {$sIdxAutoName} = -1;   " );
 		}
 		$aDev->write ( " while(" );
-		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes ()->anonymous()->source () ) );
+		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes ()->anonymous()->source (), $aObjectContainer->variableDeclares() ) );
 		$aDev->write ( "){  " );
 		if( !empty($sIdxUserName) ){
 			$aDev->write ( " {$sIdxAutoName}++; 
@@ -36,7 +37,7 @@ class WhileCompiler extends NodeCompiler {
 		}
 		
 		if(!$aObject->headTag()->isSingle()){
-			$this->compileChildren ( $aObject, $aDev, $aCompilerManager );
+			$this->compileChildren ( $aObject, $aObjectContainer, $aDev, $aCompilerManager );
 			$aDev->write ( " }   " );
 		}
 	}

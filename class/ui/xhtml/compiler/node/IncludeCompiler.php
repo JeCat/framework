@@ -2,7 +2,6 @@
 namespace org\jecat\framework\ui\xhtml\compiler\node ;
 
 use org\jecat\framework\lang\Exception;
-
 use org\jecat\framework\ui\xhtml\compiler\ExpressionCompiler;
 use org\jecat\framework\ui\xhtml\Node;
 use org\jecat\framework\lang\Type;
@@ -11,6 +10,7 @@ use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
+use org\jecat\framework\ui\ObjectContainer;
 
 /**
  * @wiki /模板引擎/标签
@@ -42,7 +42,7 @@ use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 
 class IncludeCompiler extends NodeCompiler 
 {
-	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Type::check("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject) ;
 		$aAttributes = $aObject->attributes() ;
@@ -83,7 +83,7 @@ class IncludeCompiler extends NodeCompiler
 			if( substr($sName,0,4)=='var.' and $sVarName=substr($sName,4) )
 			{
 				$sVarName = '"'. addslashes($sVarName) . '"' ;
-				$sValue = ExpressionCompiler::compileExpression($aValue->source()) ;
+				$sValue = ExpressionCompiler::compileExpression($aValue->source(),$aObjectContainer->variableDeclares()) ;
 				$aDev->write("\$__include_aVariables->set({$sVarName},{$sValue}) ; \r\n");
 			}
 		}
