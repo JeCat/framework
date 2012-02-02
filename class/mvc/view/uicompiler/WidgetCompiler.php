@@ -109,14 +109,7 @@ class WidgetCompiler extends NodeCompiler
 		
 		else
 		{
-			$aDev->write("	\$__aVariablesForWidgets = new \\org\\jecat\\framework\\util\\DataSrc() ;") ;
-			$aDev->write("	\$__aVariablesForWidgets->addChild(\$aVariables) ;");
-			$aDev->write("	{$sOldWidgetVarVarName} = \$__aVariablesForWidgets->get('theWidget') ;") ;
-			$aDev->write("	\$__aVariablesForWidgets->set('theWidget',{$sWidgetVarName}) ;") ;
-			
-			$aDev->write("	{$sWidgetVarName}->display(\$this,\$__aVariablesForWidgets,\$aDevice) ;") ;
-			
-			$aDev->write("	\$__aVariablesForWidgets->set('theWidget',{$sOldWidgetVarVarName}) ;") ;
+			$aDev->write("	{$sWidgetVarName}->display(\$this,new \\org\\jecat\\framework\\util\\DataSrc(),\$aDevice) ;") ;
 		}
 		
 		$aDev->write("}") ;
