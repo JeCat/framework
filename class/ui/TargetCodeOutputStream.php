@@ -1,12 +1,12 @@
 <?php
 namespace org\jecat\framework\ui ;
 
-use org\jecat\framework\lang\Object as JcObject;
+use org\jecat\framework\io\OutputStreamBuffer;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\fs\IFile;
 use org\jecat\framework\io\IOutputStream;
 
-class TargetCodeOutputStream extends JcObject implements IOutputStream
+class TargetCodeOutputStream extends OutputStreamBuffer implements IOutputStream
 {
 	public function open(IOutputStream $aWriter,$bStartScript=true)
 	{
@@ -33,6 +33,7 @@ class TargetCodeOutputStream extends JcObject implements IOutputStream
 			$this->write("?>") ;
 		}
 		
+		$this->aCompiledWriter->write($this->bufferBytes(true)) ;
 		$this->aCompiledWriter->close() ;
 	}
 	
@@ -40,18 +41,10 @@ class TargetCodeOutputStream extends JcObject implements IOutputStream
 	{
 		$this->generateOutputCode() ;
 		
-		$this->aCompiledWriter->write($sBytes) ;
-		$this->aCompiledWriter->write("\r\n") ;
+		parent::write($sBytes) ;
+		parent::write("\r\n") ;
 	}
 	
-	public function bufferBytes()
-	{}
-	
-	public function clear()
-	{}
-	
-	public function flush()
-	{}
 	
 	public function output($sBytes)
 	{
@@ -76,17 +69,17 @@ class TargetCodeOutputStream extends JcObject implements IOutputStream
 			$this->sOutputContents = str_replace("\r","\\r",$this->sOutputContents) ;
 			$this->sOutputContents = str_replace("\t","\\t",$this->sOutputContents) ;
 			
-			$this->aCompiledWriter->write("\r\n// output text content -------------\r\n") ;
-			$this->aCompiledWriter->write("\$aDevice->write(\"{$this->sOutputContents}\") ;\r\n") ;
-			$this->aCompiledWriter->write("// ---------------------------------\r\n") ;
+			parent::write("\r\n// output text content -------------\r\n") ;
+			parent::write("\$aDevice->write(\"{$this->sOutputContents}\") ;\r\n") ;
+			parent::write("// ---------------------------------\r\n") ;
 		}
 		
 		else
 		{
-			$this->aCompiledWriter->write("\r\n// output text content -------------\r\n") ;
-			$this->aCompiledWriter->write("\$aDevice->write(<<<OUTPUT\r\n{$this->sOutputContents}\r\nOUTPUT\r\n) ;") ;
-			$this->aCompiledWriter->write("") ;
-			$this->aCompiledWriter->write("// ---------------------------------\r\n") ;
+			parent::write("\r\n// output text content -------------\r\n") ;
+			parent::write("\$aDevice->write(<<<OUTPUT\r\n{$this->sOutputContents}\r\nOUTPUT\r\n) ;") ;
+			parent::write("") ;
+			parent::write("// ---------------------------------\r\n") ;
 		}
 		$this->sOutputContents = '' ;
 	}

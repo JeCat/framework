@@ -6,10 +6,11 @@ use org\jecat\framework\lang\Assert;
 use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\IObject;
+use org\jecat\framework\ui\ObjectContainer;
 
 class WeaveCompiler extends BaseCompiler
 {
-	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Assert::type("org\\jecat\\framework\\ui\\xhtml\\weave\\WeaveinObject",$aObject,'aObject') ;
 		$aDev->write( $aObject->compiled() ) ;

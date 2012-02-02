@@ -33,9 +33,10 @@ use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
+use org\jecat\framework\ui\ObjectContainer;
 
 class ForeachCompiler extends NodeCompiler {
-	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) {
+	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) {
 		
 		Type::check("org\\jecat\\framework\\ui\\xhtml\\Node", $aObject );
 		
@@ -83,7 +84,7 @@ if(!empty({$sForAutoName})){
 		//是否是单行标签?
 		if(!$aObject->headTag()->isSingle()){
 			//循环体，可能会包含foreach:else标签
-			$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
+			$this->compileChildren($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
 			$aDev->write("\t}\r\n}\r\n") ; // end if   (如果foreach的内容包含foreach:else标签,则此处为foreach:else的end)
 		}
 	}

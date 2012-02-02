@@ -7,32 +7,33 @@ use org\jecat\framework\lang\Assert;
 use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\IObject;
+use org\jecat\framework\ui\ObjectContainer;
 
 class NodeCompiler extends BaseCompiler
 {
-	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject,'aObject') ;
 
 		if( $aCompiler=$this->subCompiler(strtolower($aObject->tagName())) )
 		{
-			$aCompiler->compile($aObject,$aDev,$aCompilerManager) ;
+			$aCompiler->compile($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
 		}
 		
 		else 
 		{
-			$this->compileTag($aObject->headTag(), $aDev, $aCompilerManager) ;
+			$this->compileTag($aObject->headTag(), $aObjectContainer, $aDev, $aCompilerManager) ;
 			
 			if( $aTailTag = $aObject->tailTag() )
 			{
-				$this->compileChildren($aObject, $aDev, $aCompilerManager) ;
+				$this->compileChildren($aObject, $aObjectContainer, $aDev, $aCompilerManager) ;
 				
-				$this->compileTag($aTailTag, $aDev, $aCompilerManager) ;
+				$this->compileTag($aTailTag, $aObjectContainer, $aDev, $aCompilerManager) ;
 			}
 		}
 	}
 
-	protected function compileTag(Tag $aTag,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
+	protected function compileTag(Tag $aTag,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		$aDev->output('<') ;
 		if( $aTag->isTail() )
@@ -58,7 +59,7 @@ class NodeCompiler extends BaseCompiler
 			$aDev->output($aAttrVal->quoteType()) ;
 			if( $aAttrCompiler = $aCompilerManager->compiler($aAttrVal) )
 			{
-				$aAttrCompiler->compile($aAttrVal,$aDev,$aCompilerManager) ;
+				$aAttrCompiler->compile($aAttrVal,$aObjectContainer,$aDev,$aCompilerManager) ;
 				get_class($aAttrCompiler) ;
 			}
 			else 
@@ -88,13 +89,13 @@ class NodeCompiler extends BaseCompiler
 		$aDev->output('>') ;
 	}
 	
-	public function compileChildren(Node $aNode,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compileChildren(Node $aNode,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		foreach($aNode->childElementsIterator() as $aObject)
 		{
 			if( $aCompiler = $aCompilerManager->compiler($aObject) )
 			{
-				$aCompiler->compile($aObject,$aDev,$aCompilerManager) ;
+				$aCompiler->compile($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
 			}
 		}
 	}

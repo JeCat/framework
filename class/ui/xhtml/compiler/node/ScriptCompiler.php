@@ -8,10 +8,11 @@ use org\jecat\framework\ui\xhtml\compiler\ExpressionCompiler;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
+use org\jecat\framework\ui\ObjectContainer;
 
 class ScriptCompiler extends NodeCompiler
 {
-	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Type::check ( "org\\jecat\\framework\\ui\\xhtml\\Node", $aObject );
 
@@ -26,7 +27,7 @@ class ScriptCompiler extends NodeCompiler
 					continue ;
 				}
 				$aDev->write(
-					ExpressionCompiler::compileExpression($aChild->source(),false,false)
+					ExpressionCompiler::compileExpression($aChild->source(), $aObjectContainer->variableDeclares(),false,false)
 				) ;
 			}
 		}
@@ -34,7 +35,7 @@ class ScriptCompiler extends NodeCompiler
 		// 按照普通 html 节点处理
 		else 
 		{
-			parent::compile($aObject,$aDev,$aCompilerManager) ;
+			parent::compile($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
 		}
 	}
 

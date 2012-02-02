@@ -2,16 +2,16 @@
 namespace org\jecat\framework\mvc\view\uicompiler ;
 
 use org\jecat\framework\ui\xhtml\compiler\node\ClearCompiler;
-
 use org\jecat\framework\lang\Assert;
 use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
+use org\jecat\framework\ui\ObjectContainer;
 
 class CssCompiler extends NodeCompiler
 {
-	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject,'aObject') ;
 		
@@ -36,14 +36,14 @@ class CssCompiler extends NodeCompiler
 		}
 		else 
 		{
-			$this->compileTag($aObject->headTag(), $aDev, $aCompilerManager) ;
+			$this->compileTag($aObject->headTag(), $aObjectContainer, $aDev, $aCompilerManager) ;
 			
-			$this->compileChildren($aObject, $aDev, $aCompilerManager) ;
+			$this->compileChildren($aObject, $aObjectContainer, $aDev, $aCompilerManager) ;
 			
 			if( $aTailTag=$aObject->tailTag() )
 			{
-				$this->compileChildren($aObject, $aDev, $aCompilerManager) ;
-				$this->compileTag($aTailTag, $aDev, $aCompilerManager) ;
+				$this->compileChildren($aObject, $aObjectContainer, $aDev, $aCompilerManager) ;
+				$this->compileTag($aTailTag, $aObjectContainer, $aDev, $aCompilerManager) ;
 			} 
 		}
 	}

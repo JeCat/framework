@@ -2,6 +2,8 @@
 
 namespace org\jecat\framework\ui ;
 
+use org\jecat\framework\lang\Exception;
+
 use org\jecat\framework\util\HashTable;
 use org\jecat\framework\mvc\controller\Response;
 use org\jecat\framework\system\Application;
@@ -68,6 +70,21 @@ class Object extends Composite implements IObject
 			$this->aProperties = new HashTable() ;
 		}
 		return $this->aProperties ;
+	}
+	
+	/**
+	 * @return ObjectContainer
+	 */
+	public function objectContainer()
+	{
+		$aParent = $this ;
+		while($aParent = $aParent->parent())
+		{
+			if( $aParent instanceof ObjectContainer )
+			{
+				return $aParent ;
+			}
+		}
 	}
 	
 	private $aProperties ;

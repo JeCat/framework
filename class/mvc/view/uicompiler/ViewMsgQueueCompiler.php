@@ -7,10 +7,11 @@ use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
+use org\jecat\framework\ui\ObjectContainer;
 
 class ViewMsgQueueCompiler extends NodeCompiler
 {
-	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject,'aObject') ;
 		
@@ -22,7 +23,7 @@ class ViewMsgQueueCompiler extends NodeCompiler
 			$aDev->write("	{$sOldMsgQueueVarVarName}=\$aVariables->get('aMsgQueue') ;") ;
 			$aDev->write("	\$aVariables->set('aMsgQueue',\$aVariables->get('theView')->messageQueue()) ;") ;
 		
-			$this->compileChildren($aTemplate,$aDev,$aCompilerManager) ;
+			$this->compileChildren($aTemplate,$aObjectContainer,$aDev,$aCompilerManager) ;
 			
 			$aDev->write("	\$aVariables->set('aMsgQueue',{$sOldMsgQueueVarVarName}) ;") ;
 		}

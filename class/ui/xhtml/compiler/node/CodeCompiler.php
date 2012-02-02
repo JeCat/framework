@@ -8,10 +8,11 @@ use org\jecat\framework\ui\xhtml\compiler\ExpressionCompiler;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
+use org\jecat\framework\ui\ObjectContainer;
 
 class CodeCompiler extends NodeCompiler
 {
-	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Type::check ( "org\\jecat\\framework\\ui\\xhtml\\Node", $aObject );
 
@@ -22,7 +23,7 @@ class CodeCompiler extends NodeCompiler
 		if( in_array($sLang, array('text/php','php')) and $aTailTag=$aObject->tailTag() )
 		{
 			// 编译头标签
-			$this->compileTag($aObject->headTag(), $aDev, $aCompilerManager) ;
+			$this->compileTag($aObject->headTag(), $aObjectContainer, $aDev, $aCompilerManager) ;
 			
 			// 设置代码"上色器"
 			$sVarName = parent::assignVariableName() ;
@@ -33,7 +34,7 @@ class CodeCompiler extends NodeCompiler
 			$aDev->write("") ;
 			
 			// 编译 node body
-			$this->compileChildren($aObject, $aDev, $aCompilerManager) ;
+			$this->compileChildren($aObject, $aObjectContainer, $aDev, $aCompilerManager) ;
 			
 			// 输出代码
 			$aDev->write("\r\n") ;
@@ -42,13 +43,13 @@ class CodeCompiler extends NodeCompiler
 			$aDev->write("") ;
 			
 			// 编译尾标签
-			$this->compileTag($aTailTag, $aDev, $aCompilerManager) ;
+			$this->compileTag($aTailTag, $aObjectContainer, $aDev, $aCompilerManager) ;
 		}
 		
 		// 按照普通 html 节点处理
 		else 
 		{
-			parent::compile($aObject,$aDev,$aCompilerManager) ;
+			parent::compile($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
 		}
 	}
 

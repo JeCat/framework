@@ -8,6 +8,11 @@ use org\jecat\framework\pattern\composite\IContainedable;
 
 interface IObject extends IContainer, IContainedable
 {
+	/**
+	 * @return ObjectContainer
+	 */
+	public function objectContainer() ;
+	
 	public function summary() ;
 	
 	public function printStruct(IOutputStream $aDevice=null,$nDepth=0) ;

@@ -7,10 +7,11 @@ use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
+use org\jecat\framework\ui\ObjectContainer;
 
 class FormCompiler extends NodeCompiler
 {
-	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject,'aObject') ;
 		
@@ -18,9 +19,9 @@ class FormCompiler extends NodeCompiler
 		{
 			$aDev->write("if( !(\$aVariables->get('theView') instanceof \\org\\jecat\\framework\\mvc\\view\\IFormView) or \$aVariables->get('theView')->isShowForm() )\r\n{\r\n") ;
 			
-			$this->compileTag($aObject->headTag(), $aDev, $aCompilerManager) ;
+			$this->compileTag($aObject->headTag(), $aObjectContainer, $aDev, $aCompilerManager) ;
 
-			$this->compileChildren($aObject, $aDev, $aCompilerManager) ;
+			$this->compileChildren($aObject, $aObjectContainer, $aDev, $aCompilerManager) ;
 
 			$aDev->write("\tif(\$aVariables->get('theView') instanceof \\org\\jecat\\framework\\mvc\\view\\IFormView){\r\n") ;
 			$aDev->write("\t\t") ;
@@ -29,7 +30,7 @@ class FormCompiler extends NodeCompiler
 			$aDev->output('" value="1" />') ;
 			$aDev->write("\t}\r\n") ;
 			
-			$this->compileTag($aTailTag, $aDev, $aCompilerManager) ;
+			$this->compileTag($aTailTag, $aObjectContainer, $aDev, $aCompilerManager) ;
 			
 			$aDev->write("}\r\n") ;
 		}

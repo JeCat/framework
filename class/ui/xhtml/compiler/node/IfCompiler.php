@@ -1,6 +1,7 @@
 <?php
 namespace org\jecat\framework\ui\xhtml\compiler\node;
 
+use org\jecat\framework\ui\ObjectContainer;
 use org\jecat\framework\ui\xhtml\compiler\ExpressionCompiler;
 use org\jecat\framework\ui\xhtml\Node;
 use org\jecat\framework\lang\Type;
@@ -49,7 +50,7 @@ class IfCompiler extends NodeCompiler {
 	 * $aDev 输出设备,一般指网页
 	 * $aCompilerManager 编译管理器
 	*/
-	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) {
+	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) {
 		//确保传入的$aObject参数是node对象
 		Type::check ( "org\\jecat\\framework\\ui\\xhtml\\Node", $aObject );
 		
@@ -57,7 +58,7 @@ class IfCompiler extends NodeCompiler {
 		//把<if>标签转换成php代码,也就是"if("
 		$aDev->write ( 'if(' );
 		//获得<if>标签中的条件语句,原封不动的放到if后面的括号中充当条件
-		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes ()->anonymous()->source () ) );
+		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes ()->anonymous()->source (), $aObjectContainer->variableDeclares() ) );
 		//给if后面的括号结尾,并开始if代码块
 		$aDev->write ( "){ " );
 		//但是这里并没有给代码块结尾,因为结尾在别的编译器中了,对于if标签来说,它的结尾工作放在</if>编译器那里了.是的,if标签是至少需要两个编译器才能完整编译
@@ -75,7 +76,7 @@ class IfCompiler extends NodeCompiler {
 		 */
 		
 		if (!$aObject->headTag()->isSingle()) {
-			$this->compileChildren ( $aObject, $aDev, $aCompilerManager );
+			$this->compileChildren ( $aObject, $aObjectContainer, $aDev, $aCompilerManager );
 			//如果是单行格式,那么if就在这里结尾
 			$aDev->write ( "} " );
 		}

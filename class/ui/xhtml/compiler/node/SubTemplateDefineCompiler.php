@@ -10,10 +10,11 @@ use org\jecat\framework\ui\xhtml\compiler\ExpressionCompiler;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
+use org\jecat\framework\ui\ObjectContainer;
 
 class SubTemplateDefineCompiler extends NodeCompiler
 {
-	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Type::check ( "org\\jecat\\framework\\ui\\xhtml\\Node", $aObject ) ;
 		
@@ -39,7 +40,7 @@ class SubTemplateDefineCompiler extends NodeCompiler
 		$aDev->write("\r\n\r\n// -- subtemplate start ----------------------") ;
 		$aDev->write("function __subtemplate_{$sSubTemplateName}(\$aVariables,\$aDevice){ ") ;
 		
-		$this->compileChildren($aObject,$aDev,$aCompilerManager) ;
+		$this->compileChildren($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
 		
 		$aDev->write("}// -- subtemplate end ----------------------\r\n\r\n") ;
 	}

@@ -6,12 +6,13 @@ use org\jecat\framework\ui\xhtml\compiler\MacroCompiler ;
 use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\IObject;
+use org\jecat\framework\ui\ObjectContainer;
 
 class EvalMacroCompiler extends MacroCompiler
 {
-	public function compile(IObject $aObject,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		$aDev->write( ExpressionCompiler::compileExpression($aObject->source(),false,false) ) ;
+		$aDev->write( ExpressionCompiler::compileExpression($aObject->source(),$aObjectContainer->variableDeclares(),false,false) ) ;
 	}
 }
 

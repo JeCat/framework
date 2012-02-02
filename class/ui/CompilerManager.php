@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\ui ;
 
+use org\jecat\framework\io\OutputStreamBuffer;
+
 use org\jecat\framework\io\IOutputStream;
 
 use org\jecat\framework\lang\Exception;
@@ -57,15 +59,27 @@ class CompilerManager extends JcObject
 		$aTargetCodeStream = new TargetCodeOutputStream ;
 		$aTargetCodeStream->open($aCompiledOutput,$bPHPTag) ;
 		
+		// 变量声明
+		$aBuffVarsDeclare = new OutputStreamBuffer() ;
+		$aTargetCodeStream->write($aBuffVarsDeclare) ;
+		
+		// 编译正文
 		foreach($aObjectContainer->iterator() as $aObject)
 		{
 			$aCompiler = $this->compiler($aObject) ;
 			if($aCompiler)
 			{
-				$aCompiler->compile($aObject,$aTargetCodeStream,$this) ;
+				$aCompiler->compile($aObject,$aObjectContainer,$aTargetCodeStream,$this) ;
 			}
 		}
-				
+		
+		// 变量声明
+		$aBuffVarsDeclare->write("// declare ui variables -------------------\r\n") ;
+		foreach($aObjectContainer->variableDeclares()->declaredVaribles() as $sVarOriginName=>$sVarSyName)
+		{
+			$aBuffVarsDeclare->write("\${$sVarSyName} =& \$aVariables->getRef('{$sVarOriginName}') ;\r\n") ;
+		}
+
 		$aTargetCodeStream->close($bPHPTag) ;
 	}
 	
