@@ -2,11 +2,8 @@
 namespace org\jecat\framework\mvc\controller ;
 
 use org\jecat\framework\util\IDataSrc;
-
 use org\jecat\framework\bean\BeanConfException;
-
 use org\jecat\framework\bean\BeanFactory;
-
 use org\jecat\framework\lang\Assert;
 use org\jecat\framework\mvc\view\IView;
 use org\jecat\framework\lang\Exception;
@@ -17,23 +14,13 @@ use org\jecat\framework\pattern\composite\IContainer;
 class WebpageFrame extends Controller
 {
 	
-	public function __construct($params=null)
+	public function __construct($params=null,$sName=null,$bBuildAtonce=true)
 	{
 		$this->setMainView(WebpageFactory::singleton()->create()) ;
 		
-		parent::__construct($params) ;
+		parent::__construct($params,$sName,$bBuildAtonce) ;
 	}
 	
-	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
-	{
-		$sClass = get_called_class() ;
-		$aBean = new $sClass() ;
-		if($bBuildAtOnce)
-		{
-			$aBean->buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
-		}
-		return $aBean ;
-	}
 	/**
 	 * @wiki /mvc/模型/页面框体(WebpageFrame)
 	 * == Bean配置数组 ==

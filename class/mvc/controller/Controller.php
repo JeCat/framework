@@ -66,7 +66,7 @@ use org\jecat\framework\pattern\composite\NamableComposite ;
  */
 class Controller extends NamableComposite implements IController, IBean
 {
-    function __construct ($params=null,$sName=null)
+    function __construct ($params=null,$sName=null,$bBuildAtonce=true)
     {
     	if($sName===null)
     	{
@@ -84,7 +84,7 @@ class Controller extends NamableComposite implements IController, IBean
 		$this->buildParams($params) ;
 		
 		// auto build bean config
-    	if( $arrConfig = $this->createBeanConfig() )
+    	if( $bBuildAtonce and $arrConfig = $this->createBeanConfig() )
     	{
     		$this->buildBean($arrConfig) ;
     	}
@@ -100,10 +100,22 @@ class Controller extends NamableComposite implements IController, IBean
     	return null ;
     }
     
+    /**
+     * @example /Bean/合并Bean配置
+     * @forwiki /Bean/合并Bean配置
+     */
     static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {
 		$sClass = get_called_class() ;
-		$aBean = new $sClass() ;
+		$aBean = new $sClass(null,null,false) ;
+		
+		// 将传入的 bean 配置 和 controller 提供的默认bean配置合并
+		if( $arrDefaultConfig = $aBean->createBeanConfig() )
+		{
+			BeanFactory::mergeConfig($arrDefaultConfig,$arrConfig) ;
+			$arrConfig = $arrDefaultConfig ;
+		}
+		
     	if($bBuildAtOnce)
     	{
     		$aBean->buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
@@ -416,12 +428,12 @@ class Controller extends NamableComposite implements IController, IBean
     }
     
     public function setMainView(IView $aView)
-    {    	
+    {
     	if($this->aMainView)
     	{
-    		$this->messageQueue()->removeChild($this->aMainView->messageQueue()) ;
+    		$this->messageQueue()->removeChildHolder($this->aMainView) ;
     	}
-    	$this->messageQueue()->addChild($aView->messageQueue()) ;
+    	$this->messageQueue()->addChildHolder($aView) ;
     	
     	$this->aMainView = $aView ;
     }
@@ -494,18 +506,26 @@ class Controller extends NamableComposite implements IController, IBean
     
     public function buildParams($Params)
     {
-    	if(empty($Params))
+    	if(!$this->params)
     	{
     		$this->params = new DataSrc() ;
     	}
-    	else if( $Params instanceof IDataSrc )
+    	
+    	if( $Params instanceof IDataSrc )
     	{
-    		$this->params = $Params ;
+    		$this->params->addChild($Params) ;
     	}
    		else if( is_array($Params) )
     	{
-    		$this->params = new DataSrc($Params) ;
+    		foreach($Params as $name=>&$value)
+    		{
+    			$this->params->set($name,$value) ;
+    		};
     	}
+		else if( $Params===null )
+		{
+			// nothing todo
+		}
     	else
     	{
     		throw new Exception(__CLASS__."对象传入的 params 参数必须为 array 或 org\\jecat\\framework\\util\\IDataSrc 对象") ;
@@ -618,6 +638,15 @@ class Controller extends NamableComposite implements IController, IBean
 		
 		$this->messageQueue()->display($this->mainView()->ui(),$aView->outputStream(),$sTemplateFilename) ;		
 	}
+	
+    /**
+     * @return org\jecat\framework\util\IDataSrc
+     */
+    public function setParams(IDataSrc $aParams)
+    {
+    	$this->params = $aParams ;
+    	return $this ;
+    }
 	
     /**
      * @return org\jecat\framework\util\IDataSrc
@@ -765,8 +794,9 @@ class Controller extends NamableComposite implements IController, IBean
 	    		$this->arrBeanConfig['frame'] = $arrDefaultFrameConfig ;
 	    	}
 	    	
-	    	$this->aFrame = BeanFactory::singleton()->createBean($this->arrBeanConfig['frame'],$this->beanNamesapce()) ;
-	    	$this->aFrame->params()->addChild($this->params()) ;
+	    	$this->aFrame = BeanFactory::singleton()->createBean($this->arrBeanConfig['frame'],$this->beanNamesapce(),false) ;
+	    	$this->aFrame->buildParams($this->params()) ;
+	    	$this->aFrame->buildBean($this->arrBeanConfig['frame']) ;
     	}
     	
     	return $this->aFrame ;

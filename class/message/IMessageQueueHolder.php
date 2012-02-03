@@ -6,7 +6,7 @@ interface IMessageQueueHolder
 	/**
 	 * @return IMessageQueue
 	 */
-	public function messageQueue() ;
+	public function messageQueue($bAutoCreate=true) ;
 	
 	public function setMessageQueue(IMessageQueue $aMsgQueue) ;
 	

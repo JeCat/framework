@@ -21,6 +21,15 @@ interface IMessageQueue
 	public function setFilters(IFilterMangeger $aFilterManager) ;
 	
 	public function display(UI $aUI=null,IOutputStream $aDevice=null,$sTemplateFilename=null) ;
+	
+	// 组合模式
+	public function addChild(IMessageQueue $aMessageQueue) ;
+	
+	public function removeChild(IMessageQueue $aMessageQueue) ;
+	
+	public function addChildHolder(IMessageQueueHolder $aMessageQueue) ;
+	
+	public function removeChildHolder(IMessageQueueHolder $aMessageQueue) ;
 }
 
 ?>

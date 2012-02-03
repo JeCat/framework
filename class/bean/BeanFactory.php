@@ -107,6 +107,11 @@ class BeanFactory extends Object implements \Serializable
 		}
 	}
 	
+	/**
+	 * @wiki /Bean/合并Bean配置
+	 * BeanFactory::mergeConfig() 静态方法可以将第二个参数 $arrConfigB 中的内容递归合并到第一个参数 $arrConfigA 中。
+	 * $arrConfigB 中的配置会覆盖 $arrConfigA 中相同的配置。
+	 */
 	static public function mergeConfig(&$arrConfigA,&$arrConfigB)
 	{
 		foreach($arrConfigB as $key=>&$item)
