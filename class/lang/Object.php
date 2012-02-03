@@ -324,4 +324,9 @@ class Object implements IObject, ISingletonable, IFlyweightable
     
     private $aProperties ;
 }
+/**
+ * @wiki /Jecat/Jecat简介
+ * 
+ * Jecat 是一个PHP开源框架.
+ */
 ?>
