@@ -294,65 +294,23 @@ class Model extends AbstractModel implements IModel, IBean
 	    $this->prototype()->criteria()->setLimit( $iPerPage, $iPerPage*($iPageNum-1) ) ;
 	}
 
+	
 	/**
-	 * @notice 不会发生级连操作。
-	 * 既，如果$sName是外键，这个函数不会修改关联表中相应外键的值。
-	 * 需要开发者手动保持外键的同步问题。
-	 * 或者调用save()方法来保持同步。
+	 * 覆盖父类方法，实现 prototype 字段别名
 	 */
-	public function setData($sName,$sValue, $bStrikeChange=true)
+	protected function findDataByPath(&$sDataName,&$aModel,&$bDataExist)
 	{
 		// 原型中的别名
-		if( $this->aPrototype )
+		if( $aPrototype = $this->prototype() )
 		{
-			$sRealName = $this->aPrototype->getColumnByAlias($sName) ;
+			$sRealName = $aPrototype->getColumnByAlias($sDataName) ;
 			if( $sRealName!==null )
 			{
-				$sName = $sRealName ;
+				$sDataName = $sRealName ;
 			}
 		}
 		
-		return parent::setData($sName,$sValue, $bStrikeChange) ;
-	}
-	
-	public function setChanged($sName,$bChanged=true)
-	{
-		// 原型中的别名
-		if( $this->aPrototype && $sRealName=$this->aPrototype->getColumnByAlias($sName) )
-		{
-			$sName = $sRealName ;
-		}
-		parent::setChanged($sName,$bChanged) ;
-	}
-	
-	/**
-	 * @param string $sName	$sName=null返回一个数组，或返回指定数据项的“是否变化”状态
-	 */
-	public function changed($sName=null)
-	{
-		// 原型中的别名
-		if( $this->aPrototype && $sRealName=$this->aPrototype->getColumnByAlias($sName) )
-		{
-			$sName = $sRealName ;
-		}
-		return parent::changed($sName) ;
-	}
-	
-	protected function _data(&$sName)
-	{
-		$data = parent::_data($sName) ;
-		
-		// 原型中的别名
-		if( $data===null and $this->aPrototype )
-		{
-			$sAlias = $this->aPrototype->getColumnByAlias($sName) ;
-			if( $sAlias!==null )
-			{
-				return parent::_data($sAlias) ;
-			}
-		}
-		
-		return $data ;
+		return parent::findDataByPath($sDataName,$aModel,$bDataExist) ;
 	}
 	
 	// implements IBean

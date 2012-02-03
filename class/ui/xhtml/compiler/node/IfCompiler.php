@@ -56,12 +56,9 @@ class IfCompiler extends NodeCompiler {
 		
 		//以下是编译过程
 		//把<if>标签转换成php代码,也就是"if("
-		$aDev->write ( 'if(' );
 		//获得<if>标签中的条件语句,原封不动的放到if后面的括号中充当条件
-		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes ()->anonymous()->source (), $aObjectContainer->variableDeclares() ) );
-		//给if后面的括号结尾,并开始if代码块
-		$aDev->write ( "){ " );
 		//但是这里并没有给代码块结尾,因为结尾在别的编译器中了,对于if标签来说,它的结尾工作放在</if>编译器那里了.是的,if标签是至少需要两个编译器才能完整编译
+		$aDev->write ( 'if(' . ExpressionCompiler::compileExpression ( $aObject->attributes ()->anonymous()->source (), $aObjectContainer->variableDeclares() ) . '){' );
 		
 		/* 
 		 * 处理单行标签.单行格式是为了解决跨模板文件问题

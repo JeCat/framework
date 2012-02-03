@@ -20,7 +20,7 @@ class Prototype extends StatementFactory implements IBean
 {
 	const youKnow = null ;
 	
-	const MODEL_IMPLEMENT_CLASS_NS = 'org\\jecat\\framework\\mvc\\model\\db\\table' ;
+	const MODEL_IMPLEMENT_CLASS_NS = 'org\\jecat\\framework\\mvc\\model\\db\\imp' ;
 	const PROTOTYPE_IMPLEMENT_CLASS_NS = 'org\\jecat\\framework\\mvc\\model\\db\\prototype' ;
 	
 	static public $sModelImpPackage = '/data/class/db/model' ;
@@ -599,12 +599,6 @@ class Prototype extends StatementFactory implements IBean
 		{
 			$sClassNamespace = self::PROTOTYPE_IMPLEMENT_CLASS_NS ;
 			$sPackageFolder = self::$sPrototypeImpPackage ;
-			if($sNamespace!=='*')
-			{
-				$sSubFolder = '_'.preg_replace('[^\w_]','_',$sNamespace) ;
-				$sClassNamespace.= '\\' . $sSubFolder ;
-				$sPackageFolder.= '/' . $sSubFolder ;
-			}
 			
 			$sShortClass = '_'.preg_replace('[^\w_]','_',$arrConfig['table']) ;
 			$sClass = $sClassNamespace .'\\'. $sShortClass ;
@@ -668,7 +662,7 @@ class Prototype extends StatementFactory implements IBean
 		}
 		
 		// columns
-		if( !empty($arrConfig['columns']) )
+		if( key_exists('columns',$arrConfig) )
 		{
 			call_user_func(array($this,'addColumns'),$arrConfig['columns']) ;
 		}

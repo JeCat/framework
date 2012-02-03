@@ -2,9 +2,7 @@
 namespace org\jecat\framework\mvc\model;
 
 use org\jecat\framework\mvc\controller\Response;
-
 use org\jecat\framework\io\IOutputStream;
-
 use org\jecat\framework\lang\Object;
 
 abstract class AbstractModel extends Object implements IModel, \Serializable
@@ -80,39 +78,27 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 			return null;
 		}
 		
-		$sData = $this->_data($sName) ;
-		if($sData!==null)
-		{
-			return $sData ;
-		}
-		
-		list ( $aModel, $sName ) = $this->findDataByPath ( $sName );
-		if ($aModel)
-		{
-			return $aModel->data ( $sName );
-		}
-		
-		return null;
+		return $this->findDataByPath($sName,$aModel,$bDataExist) ;
 	}
 	
 	public function setData($sName, $sValue, $bChanged=true)
 	{
-		list ( $aModel, $sChildName ) = $this->findDataByPath ( $sName );
-		if ($aModel)
+		$data = $this->findDataByPath($sName,$aModel,$bDataExist) ;
+		
+		// 无法直接操作 被定位模型的 arrData 和 arrChanged 属性
+		if(!$aModel instanceof self)
 		{
-			$aModel->setData ( $sChildName, $sValue ,$bChanged);
+			return $aModel->setData($sName,$sValue,$bChanged) ;
 		}
-		else
+		
+		// 数据在子模型中
+		if( !$bDataExist or $data!==$sValue )
 		{
-			if ($this->isEmpty ())
+			$aModel->arrDatas[$sName] =& $sValue ;
+			
+			if($bChanged)
 			{
-				$this->arrDatas = array ();
-			}
-			if( $this->hasData($sName)===false or $this->data($sName) !== $sValue ){
-				$this->arrDatas [$sName] = $sValue;
-				if($bChanged){
-					$this->setChanged($sName);
-				}
+				self::_setChanged($aModel,$sName,true) ;
 			}
 		}
 		
@@ -126,16 +112,8 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 			return false;
 		}
 		
-		if ($this->_data($sName)!==null)
-		{
-			return true;
-		}
-		
-		else
-		{
-			list ( $aChildModel, $sName ) = $this->findDataByPath ( $sName );
-			return $aChildModel ? $aChildModel->_data($sName)!==null : false ;
-		}
+		$this->findDataByPath ($sName,$aModel,$bDataExists) ;
+		return $bDataExists ;
 	}
 	
 	public function removeData($sName)
@@ -145,20 +123,25 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 			return;
 		}
 		
-		if (array_key_exists ( $sName, $this->arrDatas ))
+		$data = $this->findDataByPath($sName,$aModel,$bDataExist) ;
+		
+		// 无法直接操作 被定位模型的 arrData 和 arrChanged 属性
+		if(!$aModel instanceof self)
 		{
-			unset ( $this->arrDatas [$sName] );
-			$this->removeChanged($sName);
+			return $aModel->removeData($sName) ;
 		}
 		
-		else
+		// 数据在子模型中
+		if( $bDataExist )
 		{
-			list ( $aModel ) = $this->findDataByPath ( $sName );
-			if ($aModel)
-			{
-				$aModel->removeData ( $sName );
-			}
+			unset($aModel->arrDatas[$sName]) ;
+			
+			// TODO
+			// 是否应该 remove changed 有待考虑
+			self::_setChanged($aModel,$sName,false) ;
 		}
+		
+		return $this ;
 	}
 	
 	public function clearData()
@@ -167,6 +150,7 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 		{
 			return;
 		}
+		$aModel->arrDatas = null ;
 		$this->clearChanged();
 	}
 	
@@ -275,26 +259,37 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 		}
 		return reset ( $this->arrDatas );
 	}
-	
-	protected function findDataByPath($sDataPath)
+		
+	/**
+	 * 定位数据所在的子模型。
+	 */
+	protected function findDataByPath(&$sDataName,&$aModel,&$bDataExist)
 	{
-		$arrSlices = explode ( '.', $sDataPath );
-		if (count ( $arrSlices ) > 1)
-		{
-			$sName = array_pop ( $arrSlices );
-			$aModel = $this;
-			do
-			{
-				$sModelName = array_shift ( $arrSlices );
-			} while ( $aModel = $aModel->child ( $sModelName ) and ! empty ( $arrSlices ) );
+		$aModel = $this ;
 			
-			if ($aModel)
+		// 当前模型
+		if( !empty($this->arrDatas) and key_exists($sDataName,$this->arrDatas) )
+		{
+			$bDataExist = true ;
+			return $this->arrDatas[$sDataName] ;
+		}
+		
+		// 子模型中的数据
+		$pos = strpos($sDataName,'.') ;
+		if ( $pos!==false )
+		{
+			$sChildName = substr($sDataName,0,$pos) ;
+			
+			if($aChildModel=$this->child($sChildName))
 			{
-				return array ($aModel, $sName );
+				$sDataName = substr($sDataName,$pos+1) ;
+				return $aChildModel->findDataByPath($sDataName,$aModel,$bDataExist) ;
 			}
 		}
 		
-		return array (null, null );
+		// 当前模型没有数据，子模型中也没有数据
+		$bDataExist = false ;
+		return null ;
 	}
 	
 	public function __get($sName)
@@ -361,11 +356,26 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	{
 		if($sName)
 		{
-			return isset($this->arrChanged[$sName])? true: false ;
+			return !empty($aModel->arrChanged[$sName]) ;
 		}
 		else
 		{
-			return $this->arrChanged ;
+			$this->findDataByPath($sName,$aModel,$bDataExist) ;
+			
+			// 不存在的数据
+			if(!$bDataExist)
+			{
+				return false ;
+			}
+			
+			if(!$aModel instanceof self)
+			{
+				return $aModel->changed($sName) ;
+			}
+			else
+			{
+				return $aModel->arrChanged ;
+			}
 		}
 	}
 	
@@ -376,13 +386,29 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	
 	public function setChanged($sName,$bChanged=true)
 	{
-		if($bChanged)
+		$this->findDataByPath($sName,$aModel,$bDataExist) ;
+		
+		if(!$aModel instanceof self)
 		{
-			$this->arrChanged[$sName] = $sName ;
+			$aModel->setChanged($sName,$bChanged) ;
 		}
 		else
 		{
-			unset($this->arrChanged[$sName]) ;
+			self::_setChanged($aModel,$sName,$bChanged) ;
+		}
+		
+		return $this ;
+	}
+	
+	static protected function _setChanged(self $aModel,$sName,$bChanged=true)
+	{
+		if($bChanged)
+		{
+			$aModel->arrChanged[$sName] = $sName ;
+		}
+		else
+		{
+			unset($aModel->arrChanged[$sName]) ;
 		}
 	}
 
@@ -420,10 +446,13 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	
 	private $bList = false ;
 	
-	private $arrDatas = null;
-	
 	private $arrChildren = array ();
 	
-	private $arrChanged = array ();
+	protected $arrDatas ;
+	
+	protected $arrChanged = array ();
 }
-?>
+
+
+class _ExceptionDataNotExists extends \Exception
+{}
