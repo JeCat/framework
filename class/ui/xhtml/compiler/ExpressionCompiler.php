@@ -17,12 +17,12 @@ class ExpressionCompiler extends BaseCompiler
 		$aDev->write(self::compileExpression($aObject->source(),$aObjectContainer->variableDeclares())) ;
 	}
 
-	static public function compileExpression($sSource,VariableDeclares $aVarDeclares,$bEval=true,$bReturn=true)
+	static public function compileExpression($sSource,VariableDeclares $aVarDeclares,$bForceEval=false,$bAloneLine=false)
 	{
-		if( !$bEval )
+		/*if( !$bForceEval )
 		{
 			$bReturn = false ;
-		}
+		}*/
 		
 		$sSource = trim($sSource) ;
 		if( !preg_match("/;\\s*/", $sSource) )
@@ -36,7 +36,6 @@ class ExpressionCompiler extends BaseCompiler
 		array_pop($arrTokens) ;
 		
 		$sLineCode = '' ;
-		$arrVarDefineLines = array() ;
 		$arrLines = array() ;
 		foreach($arrTokens as $arrOneTkn)
 		{
@@ -76,29 +75,38 @@ class ExpressionCompiler extends BaseCompiler
 			}
 		}
 		
-		// 合并 变量声明行, 执行行 和 变量保
-		$arrLines = array_merge(array_values($arrVarDefineLines),$arrLines) ;
-		
-		// return 最末行的结果
-		if( $bReturn )
-		{
-			$arrLines[] = 'return ' . array_pop($arrLines) ;
-		}
-		
-		// 
 		$sCompiled = implode(";", $arrLines) ;
-		if( $bEval )
+		
+		if( count($arrLines)>1 or $bForceEval )
 		{
+			// return 最后一行
+			$arrLines[] = 'return ' . array_pop($arrLines) ;
+			
+			// 为 eval 转义
 			$sCompiled = addcslashes($sCompiled,'"\\') ;	
-			$sCompiled = str_replace('$','\\$',$sCompiled) ;		
+			$sCompiled = str_replace('$','\\$',$sCompiled) ;
+			
+			// 末尾加上 ;
+			if( !preg_match("/;\\s*$/",$sCompiled) )
+			{
+				$sCompiled.= ';' ;
+			}
+			
+			// 套上 eval 返回
+			return "eval(\"" . $sCompiled . "\")" ;
 		}
-		
-		if( !preg_match("/;\\s*$/",$sCompiled) )
+		else
 		{
-			$sCompiled.= ';' ;
+			if($bAloneLine)
+			{
+				if( !preg_match("/;\\s*$/",$sCompiled) )
+				{
+					$sCompiled.= ';' ;
+				}
+			}
+			
+			return $sCompiled ;
 		}
-		
-		return $bEval? ("eval(\"" . $sCompiled . "\")"): $sCompiled ;
 	}
 }
 

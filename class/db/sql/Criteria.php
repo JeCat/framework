@@ -70,6 +70,7 @@ class Criteria extends SubStatement
 			return '';
 		}		
 		$sLimit = ' LIMIT ';
+		
 		if($aState->supportLimitStart() and $this->sLimitFrom != 0)
 		{
 			$sLimit .= $this->sLimitFrom . ', ';
@@ -88,7 +89,7 @@ class Criteria extends SubStatement
 	}
 	
 	public function setLimitLen($nLimitLen){
-		$this->nLimitLen = $nLimitLen;
+		$this->nLimitLen = (int)$nLimitLen;
 		return $this ;
 	}
 	
