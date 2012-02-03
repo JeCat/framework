@@ -19,7 +19,6 @@ class ScriptCompiler extends NodeCompiler
 		$sType = strtolower($aObject->attributes()->string('type')) ;
 		if( in_array($sType, array('text/php','php')) )
 		{
-			
 			foreach($aObject->iterator() as $aChild)
 			{
 				if( $aChild instanceof AttributeValue )
@@ -27,7 +26,7 @@ class ScriptCompiler extends NodeCompiler
 					continue ;
 				}
 				$aDev->write(
-					ExpressionCompiler::compileExpression($aChild->source(), $aObjectContainer->variableDeclares(),false,false)
+					ExpressionCompiler::compileExpression($aChild->source(), $aObjectContainer->variableDeclares(),false,true)
 				) ;
 			}
 		}
