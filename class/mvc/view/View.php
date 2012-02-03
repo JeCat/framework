@@ -209,14 +209,14 @@ class View extends NamableComposite implements IView, IBean
 		
 		if($bTakeover)
 		{
-			$this->messageQueue()->addChild($object->messageQueue()) ;
+			$this->messageQueue()->addChildHolder($object) ;
 		}
 		
 		parent::add($object,$sName,$bTakeover) ;
 	}
 	public function remove($object)
 	{
-		$this->messageQueue()->removeChild($object->messageQueue()) ;
+		$this->messageQueue()->removeChildHolder($object) ;
 		
 		parent::add($object) ;
 	}
@@ -445,12 +445,17 @@ class View extends NamableComposite implements IView, IBean
 			$this->dataExchanger()->link($aWidget->id(), $sExchangeName) ;
 		}
 		
+		$this->messageQueue()->addChildHolder($aWidget) ;
+		
 		return $aWidget ;
 	}
 	
 	public function removeWidget(IViewWidget $aWidget)
 	{
 		$this->widgits()->remove($aWidget->id()) ;
+		
+		$this->messageQueue()->removeChildHolder($aWidget) ;
+		
 		$aWidget->setView(null) ;
 	}
 	
@@ -512,9 +517,9 @@ class View extends NamableComposite implements IView, IBean
 	/**
 	 * @return IMessageQueue
 	 */
-	public function messageQueue()
+	public function messageQueue($aAutoCreate=true)
 	{
-		if( !$this->aMsgQueue )
+		if( $aAutoCreate and !$this->aMsgQueue )
 		{
 			$this->aMsgQueue = new MessageQueue() ;
 		}

@@ -171,9 +171,9 @@ class Widget extends Object implements IViewWidget, IBean
 	/**
 	 * @return IMessageQueue
 	 */
-	public function messageQueue()
+	public function messageQueue($bAutoCreate=true)
 	{
-		if( !$this->aMsgQueue )
+		if( $bAutoCreate and !$this->aMsgQueue )
 		{
 			$this->aMsgQueue = new MessageQueue() ;
 		}

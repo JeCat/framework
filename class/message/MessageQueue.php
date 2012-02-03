@@ -1,6 +1,10 @@
 <?php
 namespace org\jecat\framework\message ;
 
+use org\jecat\framework\lang\Assert;
+
+use org\jecat\framework\lang\Exception;
+
 use org\jecat\framework\util\HashTable;
 use org\jecat\framework\mvc\controller\Response;
 use org\jecat\framework\io\OutputStreamBuffer;
@@ -36,24 +40,9 @@ class MessageQueue extends Object implements IMessageQueue
 		return $aMsg ;
 	}
 	
-	public function create($sType,$sMessage,$arrMessageArgs=null,$aPoster=null)
+	public function create($sType,$sMessage,$arrMessageArgs=null)
 	{
-		if($aPoster)
-		{
-			$aPoster = $aPoster ;
-		}
-		else 
-		{
-			$arrStack = debug_backtrace() ;
-			$arrCall = array_shift($arrStack) ;
-			$arrCall = array_shift($arrStack) ;
-			if( !empty($arrCall['object']) )
-			{
-				$aPoster = $arrCall['object'] ;
-			}
-		}
-		
-		return $this->add(new Message($sType,$sMessage,$arrMessageArgs,$aPoster,false)) ;
+		return $this->add(new Message($sType,$sMessage,$arrMessageArgs)) ;
 	}
 	
 	public function iterator()
@@ -63,14 +52,30 @@ class MessageQueue extends Object implements IMessageQueue
 		// for child container's children
 		if($this->arrChildren)
 		{
-			foreach($this->arrChildren as $aChildMessageQueue)
+			foreach($this->arrChildren as $aChild)
 			{
-				if(empty($aMergedIterator))
+				if( $aChild instanceof IMessageQueue )
 				{
-					$aMergedIterator = new \AppendIterator() ;
-					$aMergedIterator->append($aIterator) ;
+					$aQueue = $aChild ;
 				}
-				$aMergedIterator->append($aChildMessageQueue->iterator()) ;
+				else if( $aChild instanceof IMessageQueueHolder )
+				{
+					$aQueue = $aChild->messageQueue(false) ;
+				}
+				else 
+				{
+					Assert::wrong("未知的错误") ;
+				}
+				
+				if($aQueue)
+				{
+					if(empty($aMergedIterator))
+					{
+						$aMergedIterator = new \AppendIterator() ;
+						$aMergedIterator->append($aIterator) ;
+					}
+					$aMergedIterator->append($aQueue->iterator()) ;
+				}
 			}
 		}
 		
@@ -92,9 +97,24 @@ class MessageQueue extends Object implements IMessageQueue
 		
 		if($this->arrChildren)
 		{
-			foreach($this->arrChildren as $aMessageQueue)
+			foreach($this->arrChildren as $aChild)
 			{
-				$nCount+= $aMessageQueue->count() ;
+				if( $aChild instanceof IMessageQueue )
+				{
+					$nCount+= $aChild->count() ;
+				}
+				else if( $aChild instanceof IMessageQueueHolder )
+				{
+					if( $aQueue = $aChild->messageQueue(false) )
+					{
+						$nCount+= $aQueue->count() ;
+					}
+				}
+				else 
+				{
+					Assert::wrong("未知的错误") ;
+				}
+				
 			}
 		}
 		
@@ -144,14 +164,29 @@ class MessageQueue extends Object implements IMessageQueue
 		}
 	}
 	
-	public function addChild(self $aMessageQueue)
+	public function addChild(IMessageQueue $aMessageQueue)
 	{
-		if( !$this->arrChildren or in_array($aMessageQueue,$this->arrChildren,true) )
+		if( !$this->arrChildren or !in_array($aMessageQueue,$this->arrChildren,true) )
 		{
 			$this->arrChildren[] = $aMessageQueue ;
 		}
 	}
-	public function removeChild(self $aMessageQueue)
+	public function removeChild(IMessageQueue $aMessageQueue)
+	{
+		if( $this->arrChildren and ($pos=array_pop($aMessageQueue,$this->arrChildren,true))!==false )
+		{
+			unset($this->arrChildren[$pos]) ;
+		}
+	}
+	
+	public function addChildHolder(IMessageQueueHolder $aQueueHolder)
+	{
+		if( !$this->arrChildren or !in_array($aQueueHolder,$this->arrChildren,true) )
+		{
+			$this->arrChildren[] = $aQueueHolder ;
+		}
+	}
+	public function removeChildHolder(IMessageQueueHolder $aMessageQueue)
 	{
 		if( $this->arrChildren and ($pos=array_pop($aMessageQueue,$this->arrChildren,true))!==false )
 		{

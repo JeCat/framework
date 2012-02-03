@@ -171,12 +171,13 @@ class FormWidget extends Widget implements IViewFormWidget
 				}
 				
 			} catch (VerifyFailed $e) {
-				
-				new Message(
-					Message::error
-					, "%s无效：".$e->getMessage()
-					, array_merge(array($this->title()),$e->messageArgvs())
-				) ;
+
+				$this->messageQueue()->add(
+					new Message(
+						Message::error
+						, "%s无效：".$e->getMessage()
+						, array_merge(array($this->title()),$e->messageArgvs())
+				) ) ;
 				
 				return false ;
 			}
