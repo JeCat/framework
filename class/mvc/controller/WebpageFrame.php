@@ -41,16 +41,26 @@ class WebpageFrame extends Controller
 	{		
 		$aBeanFactory = BeanFactory::singleton() ;
     	$aModelContainer = $this->modelContainer() ;
-		
     	
-    	// 将 frameview 转换成 frameViews[frameview] 结构
-    	if(!empty($arrConfig['frameview']))
+    	foreach($arrConfig as $sKey=>&$item)
     	{
-    		$arrConfig['frameviews']['frameview'] =& $arrConfig['frameview'] ;
+    		// 将 frameView:xxxx 转换成 frameViews[] 结构
+    		if( strpos($sKey,'frameview:')===0 )
+    		{
+    			$sName = substr($sKey,11) ;
+    			if( !is_array($item) )
+    			{
+    				throw new BeanConfException("视图Bean配置的 %s 必须是一个数组",$sKey) ;
+    			}
+    			$arrConfig['frameviews'][$sName] = &$item ;
+    		}
+    		
+    		// 将 frameview 转换成 frameViews[frameview] 结构
+    		else if($sKey=='frameview')
+    		{
+    			$arrConfig['frameviews']['frameview'] =& $arrConfig[$sKey] ;
+    		}
     	}
-    	
-		// 将 frameView:xxxx 转换成 frameViews[] 结构
-		$aBeanFactory->_typeKeyStruct($arrConfig,array('frameview:'=>'frameviews')) ;
 		
 		// frameViews --------------------
 		if( !empty($arrConfig['frameviews']) )
@@ -150,6 +160,11 @@ class WebpageFrame extends Controller
     {    	
     	$this->aViewContainer = $aViewContainer ;
     }
+    
+    public function frame()
+    {
+    	return null ;
+    } 
     
     private $aViewContainer = null ;
 }
