@@ -1,6 +1,6 @@
 <?php
-
 namespace org\jecat\framework\mvc\controller ;
+
 
 use org\jecat\framework\auth\Authorizer;
 use org\jecat\framework\io\IOutputStream;
@@ -796,7 +796,8 @@ class Controller extends NamableComposite implements IController, IBean
 	    	
 	    	$this->aFrame = BeanFactory::singleton()->createBean($this->arrBeanConfig['frame'],$this->beanNamesapce(),false) ;
 	    	$this->aFrame->buildParams($this->params()) ;
-	    	$this->aFrame->buildBean($this->arrBeanConfig['frame']) ;
+	    	print_r($this->arrBeanConfig['frame']) ;
+	    	$this->aFrame->buildBean($this->arrBeanConfig['frame'],$this->sBeanNamespace) ;
     	}
     	
     	return $this->aFrame ;
