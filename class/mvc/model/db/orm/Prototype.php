@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\db\sql\Restriction;
+use org\jecat\framework\bean\BeanConfException;
 use org\jecat\framework\lang\Type;
 use org\jecat\framework\fs\FileSystem;
 use org\jecat\framework\db\sql\Statement;
@@ -629,6 +631,7 @@ class Prototype extends StatementFactory implements IBean
 	 * order array 指定依据某一列来排序,同时设置正序或反序
 	 * orderAsc string 指定依据某一列正序排序
 	 * orderDesc string 指定依据某一列反序排序
+	 * where array where条件（where的格式很有趣，是对Lisp风格的尝试）
 	 * hasOne array 配置hasone关系
 	 * belongsTo array 配置belongsTo关系
 	 * hasMany array 配置hasMany关系
@@ -723,8 +726,11 @@ class Prototype extends StatementFactory implements IBean
 				$this->criteria()->addGroupBy($sColumn);
 			}
 		}
-		// restrication
-		// foreach(array('eq'))
+		// where
+		if(!empty($arrConfig['where']))
+		{
+			$this->buildBeanRestriction($arrConfig['where'],$this->criteria()->where()) ;
+		}
 		
 		// associations
 		$aBeanFactory = BeanFactory::singleton() ;
@@ -770,6 +776,51 @@ class Prototype extends StatementFactory implements IBean
 		$this->done() ;
 		
 		$this->arrBeanConfig = $arrConfig ;
+	}
+	
+	private function buildBeanRestriction(array $arrRestrictionConfig,Restriction $aRestriction)
+	{
+		// 第一项 'and' 或 'or'
+		$sLogic = array_shift($arrRestrictionConfig) ;
+		if( $sLogic )
+		{
+			if(is_string($sLogic))
+			{
+				$aRestriction->setLogic(strtoupper($sLogic)!='or') ;
+			}
+			else 
+			{
+				array_unshift($arrRestrictionConfig,$sLogic) ;
+			}
+		}
+		
+		foreach ($arrRestrictionConfig as &$arrCondition)
+		{
+			if( !is_array($arrCondition) or count($arrCondition)>3 )
+			{
+				throw new BeanConfException('无效的orm bean config 内容：%s，做为sql条件，必须是一个数组',var_export($arrCondition,true)) ;
+			}
+			
+			$sOperator = array_shift($arrCondition) ;
+			if( !is_string($sOperator) or !method_exists($aRestriction,$sOperator))
+			{
+				throw new BeanConfException(
+						'无效的orm bean config 内容：%s，做为sql条件，数组的第一个元素必须是一个有效的表示运算符的字符串'
+						, var_export($arrCondition,true)
+				) ;
+			}
+			$sOperator = strtolower($sOperator) ;
+			
+			// 递归 条件分组
+			if( $sOperator=='restriction' )
+			{
+				$this->buildBeanRestriction($arrCondition,$aRestriction->createRestriction()) ;
+			}
+			else 
+			{
+				call_user_func_array(array($aRestriction,$sOperator),$arrCondition) ;
+			}
+		}
 	}
 	
 	public function beanConfig()
@@ -853,18 +904,18 @@ class Prototype extends StatementFactory implements IBean
 		}
 		
 		// 切分 原型名称 和 字段名称
-		$nPos = strrpos($sName,'.') ;
+		echo $sColumn = $this->getColumnByAlias($sName)?: $sName ;
+		
+		$nPos = strrpos($sColumn,'.') ;
 		if($nPos!==false)
 		{
-			$sTableName = '.'.substr($sName,0,$nPos) ;
-			$sColumn = substr($sName,$nPos+1) ;
+			$sTableName = '.'.substr($sColumn,0,$nPos) ;
+			$sColumn = substr($sColumn,$nPos+1) ;
 		}
 		else 
 		{
-			$sTableName = null ;
-			$sColumn = $sName ;
+			$sTableName = '' ;
 		}
-		$sColumn = $this->getColumnByAlias($sColumn)?: $sColumn ;
 
 		return '`'.$this->path()."{$sTableName}`.`{$sColumn}`" ;
 	}
