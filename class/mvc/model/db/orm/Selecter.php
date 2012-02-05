@@ -292,6 +292,7 @@ class Selecter extends OperationStrategy
 						, $aAssoc->fromKeys()
 						, $aAssoc->toKeys()
 						, $aPrototype->statementFactory()
+						, $aAssoc->joinType()
 				) ;
 				
 				// 记录 TablesJoin 对象
@@ -309,6 +310,7 @@ class Selecter extends OperationStrategy
 						, $aAssoc->fromKeys()
 						, $aAssoc->toBridgeKeys()
 						, $aPrototype->statementFactory()
+						, $aAssoc->joinType()
 				) ;
 				
 				// 记录中间表的 TablesJoin 对象
@@ -322,6 +324,7 @@ class Selecter extends OperationStrategy
 						, $aAssoc->fromBridgeKeys()
 						, $aAssoc->toKeys()
 						, $aPrototype->statementFactory()
+						, $aAssoc->joinType()
 				) ;
 			
 				// 在桥接表上加入自定义的 join on 条件
@@ -347,10 +350,10 @@ class Selecter extends OperationStrategy
 		}
 	}
 	
-	static private function joinTwoTables( $aFromTable,Table $aTable,array $arrFromKeys,$arrToKeys,StatementFactory $aSqlFactory)
+	static private function joinTwoTables( $aFromTable,Table $aTable,array $arrFromKeys,$arrToKeys,StatementFactory $aSqlFactory,$sJoinType)
 	{
 		// create table join
-		$aTablesJoin = $aSqlFactory->createTablesJoin() ;
+		$aTablesJoin = $aSqlFactory->createTablesJoin($sJoinType) ;
 		
 		$aTablesJoinOn = $aSqlFactory->createRestriction() ;
 		self::makeResrictionForForeignKey($aFromTable->alias(),$aTable->alias(),$arrFromKeys,$arrToKeys,$aTablesJoinOn) ;

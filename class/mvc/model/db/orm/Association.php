@@ -253,6 +253,11 @@ class Association implements IBean
 		$this->aTablesJoin = $aTablesJoin ;
 	}
 	
+	public function joinType()
+	{
+		return $this->sJoinType ;
+	}
+	
 	// implements IBean
 	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
@@ -335,6 +340,15 @@ class Association implements IBean
 				call_user_func_array(array($aRestriction,$sMethod),$items) ;
 			}
 		}
+		if(!empty($arrConfig['join']))
+		{
+			$mapTypes = array(
+				'left' => TablesJoin::JOIN_LEFT ,
+				'right' => TablesJoin::JOIN_RIGHT ,
+				'inner' => TablesJoin::JOIN_INNER ,
+			) ;
+			$this->sJoinType = isset($mapTypes[$arrConfig['join']])? $mapTypes[$arrConfig['join']]: $arrConfig['join'] ;
+		}
 		
 		$this->done() ;
 			
@@ -355,7 +369,6 @@ class Association implements IBean
 	{
 		return $this->aTablesJoin? $this->aTablesJoin->on(): null ;
 	}
-	
 	
 	// --------------
 	public function otherTableJoinOn($bAutoCreate=true)
@@ -427,6 +440,7 @@ class Association implements IBean
 	private $arrToBridgeKeys = array();
 	private $arrFromBridgeKeys = array();
 	private $aTablesJoin = null ;
+	private $sJoinType = TablesJoin::JOIN_LEFT ;
 	
 	private $arrBeanConfig ;
 	
