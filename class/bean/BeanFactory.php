@@ -71,6 +71,11 @@ class BeanFactory extends Object implements \Serializable
 	 */
 	public function createBean(array &$arrConfig,$sNamespace='*',$bAutoBuild=true) 
 	{
+		if( $sNamespace=='*' and !empty($arrConfig['namespace']) )
+		{
+			$sNamespace = $arrConfig['namespace'] ;
+		}
+		
 		// ins 
 		if( !empty($arrConfig['ins']) or !empty($arrConfig['instance']) )
 		{

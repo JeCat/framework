@@ -327,17 +327,11 @@ class Controller extends NamableComposite implements IController, IBean
     	}
     	
     	$this->arrBeanConfig = $arrConfig ;
-    	$this->sBeanNamespace = $sNamespace ;
     }
     
 	public function beanConfig()
 	{
 		return $this->arrBeanConfig ;
-	}
-	
-	public function beanNamesapce()
-	{
-		return $this->sBeanNamespace ;
 	}
 	
     public function createModel($prototype,array $arrProperties=array(),$bAgg=false,$sName=null,$sClass='org\\jecat\\framework\\mvc\\model\\db\\Model')
@@ -794,10 +788,10 @@ class Controller extends NamableComposite implements IController, IBean
 	    		$this->arrBeanConfig['frame'] = $arrDefaultFrameConfig ;
 	    	}
 	    	
-	    	$this->aFrame = BeanFactory::singleton()->createBean($this->arrBeanConfig['frame'],$this->beanNamesapce(),false) ;
+	    	$this->aFrame = BeanFactory::singleton()->createBean($this->arrBeanConfig['frame'],'*',false) ;
 	    	$this->aFrame->buildParams($this->params()) ;
-	    	print_r($this->arrBeanConfig['frame']) ;
-	    	$this->aFrame->buildBean($this->arrBeanConfig['frame'],$this->sBeanNamespace) ;
+
+	    	$this->aFrame->buildBean($this->arrBeanConfig['frame']) ;
     	}
     	
     	return $this->aFrame ;
@@ -996,8 +990,6 @@ class Controller extends NamableComposite implements IController, IBean
     private $aFrame = null ;
     
     private $arrBeanConfig ;
-    
-    private $sBeanNamespace = '*' ;
     
     private $sId ;
     
