@@ -195,15 +195,21 @@ class Selecter extends OperationStrategy
 			throw new ORMException("关联对象没有TablesJoin对象") ;
 		}
 		
+		// 设置查询条件
 		$aSelect->criteria()->where()->add($aRestraction) ;
+		
+		// 设置 order by
+		$aOriOrders = $aSelect->criteria()->orders(false) ;
+		$aSelect->criteria()->setOrders($aToPrototype->criteria()->orders(false)) ;
 			
 		// 
 		$aChildModel = $aToPrototype->createModel(true) ;
 		$aModel->addChild($aChildModel,$aToPrototype->name()) ;
 		$this->execute($aChildModel,$aSelect,null,true,$aDB) ;
 		
-		// 清理条件
+		// 清理条件 和 恢复order by
 		$aSelect->criteria()->where()->remove($aRestraction) ;
+		$aSelect->criteria()->setOrders($aOriOrders) ;
 	}
 
 	private function setGroupBy(Select $aSelect,Prototype $aPrototype)
