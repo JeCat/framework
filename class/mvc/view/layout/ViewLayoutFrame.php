@@ -45,6 +45,7 @@ class ViewLayoutFrame extends View
 	 * |无
 	 * |必须
 	 * |"v"为纵向布局,"h"为横向布局,"tab"为选项卡布局
+	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {

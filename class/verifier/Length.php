@@ -45,6 +45,7 @@ class Length extends Object implements IVerifier, IBean
 	 * |无
 	 * |可选
 	 * |字符个数下限,单位字节(px),为空即不限
+	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{

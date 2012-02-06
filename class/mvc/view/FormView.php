@@ -27,6 +27,7 @@ class FormView extends View implements IFormView
 	 * |false
 	 * |必须
 	 * |是否默认隐藏表单(form标签部分)
+	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {

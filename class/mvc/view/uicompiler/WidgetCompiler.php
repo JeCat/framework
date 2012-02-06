@@ -70,7 +70,7 @@ class WidgetCompiler extends NodeCompiler
 			
 			$aDev->write("\r\n//// ------- 创建并显示widget: {$sClassName} ---------------------") ;
 			
-			$aDev->write("\$__widget_class = \org\jecat\framework\bean\BeanFactory::singleton()->beanClassNameByAlias({$sClassName})?: $sClassName ;") ;
+			$aDev->write("\$__widget_class = \\org\\jecat\\framework\\bean\\BeanFactory::singleton()->beanClassNameByAlias({$sClassName})?: $sClassName ;") ;
 			$aDev->write("if( !class_exists(\$__widget_class) ){") ;
 			$aDev->output("缺少 widget (class:{$sClassName})") ;
 			$aDev->write("}else{") ;

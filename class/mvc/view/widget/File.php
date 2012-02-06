@@ -72,6 +72,7 @@ class File extends FormWidget
 	 * |无
 	 * |必须
 	 * |文件夹路径
+	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{

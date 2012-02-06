@@ -89,6 +89,7 @@ class Paginator extends FormWidget implements IModelChangeObserver
      * |5
      * |可选
      * |显示页码的个数
+     * |}
      */
     public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {

@@ -69,6 +69,7 @@ class FormWidget extends Widget implements IViewFormWidget
 	 * |无
 	 * |可选
 	 * |控件附带的校验器列表,每个数组元素都是一个校验器的初始化数组
+	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{

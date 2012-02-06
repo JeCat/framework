@@ -47,6 +47,7 @@ class Number extends Object implements IVerifier, IBean
 	 * |"number"
 	 * |必须
 	 * |"int" 要求校验的数据是整数,"float" 要求校验的数据是小数,"number" 要求校验的数据是数字
+	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{

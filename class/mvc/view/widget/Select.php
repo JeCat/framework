@@ -36,6 +36,7 @@ class Select extends FormWidget {
 	 * |无
 	 * |可选
 	 * |配置options的数组
+	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{

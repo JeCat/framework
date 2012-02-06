@@ -48,6 +48,7 @@ class FileSize extends Object implements IVerifier,IBean {
 	 * |无
 	 * |可选
 	 * |文件大小下限,单位字节(Byte),为空即不限
+	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{

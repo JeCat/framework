@@ -108,6 +108,7 @@ class View extends NamableComposite implements IView, IBean
 	 * |无
 	 * |可选
 	 * |用于初始化视图对象的参数,以参数名为键,参数值为值
+	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {

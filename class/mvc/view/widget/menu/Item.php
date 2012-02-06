@@ -68,6 +68,7 @@ class Item extends AbstractBase
      * |true
      * |可选
      * |设置菜单是否可用
+     * |}
      */
     public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {

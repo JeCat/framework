@@ -45,6 +45,7 @@ class Group extends FormWidget {
 	 * |无
 	 * |可选
 	 * |组控件内部包含的控件元素,每个数组元素都是一个控件的bean数组
+	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{

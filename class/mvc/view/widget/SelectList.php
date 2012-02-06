@@ -46,6 +46,7 @@ class SelectList extends Select {
 	 * |4
 	 * |必须
 	 * |同时可见的选项的数量
+	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{

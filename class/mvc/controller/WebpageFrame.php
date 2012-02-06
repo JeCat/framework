@@ -36,6 +36,7 @@ class WebpageFrame extends Controller
 	 * |无
 	 * |可选
 	 * |子框体视图
+	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{		

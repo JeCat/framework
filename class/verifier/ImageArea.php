@@ -46,6 +46,7 @@ class ImageArea extends Object implements IVerifier, IBean
 	 * |无
 	 * |可选
 	 * |面积下限,单位字节(px),为空即不限
+	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{

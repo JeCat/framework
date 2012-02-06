@@ -79,6 +79,7 @@ class Widget extends Object implements IViewWidget, IBean
 	 * |无
 	 * |可选
 	 * |指定模板文件的文件名
+	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{

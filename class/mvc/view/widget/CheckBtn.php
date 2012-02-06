@@ -55,6 +55,7 @@ class CheckBtn extends FormWidget
 	 * |无
 	 * |必须
 	 * |此项须以下列字符串为值,用来指定选项是checkbox还是radio,"checkbox" 控件以checkbox形式体现,"radio" 控件以radio形式体现
+	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{

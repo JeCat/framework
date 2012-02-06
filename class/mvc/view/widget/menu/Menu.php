@@ -46,6 +46,7 @@ class Menu extends AbstractBase
      * |无
      * |可选
      * |菜单项目列表,每个元素都是一个菜单项的配置
+     * |}
      */
     public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {
