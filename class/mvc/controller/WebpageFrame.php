@@ -47,7 +47,7 @@ class WebpageFrame extends Controller
     		// 将 frameView:xxxx 转换成 frameViews[] 结构
     		if( strpos($sKey,'frameview:')===0 )
     		{
-    			$sName = substr($sKey,11) ;
+    			$sName = substr($sKey,10) ;
     			if( !is_array($item) )
     			{
     				throw new BeanConfException("视图Bean配置的 %s 必须是一个数组",$sKey) ;
@@ -159,6 +159,9 @@ class WebpageFrame extends Controller
     public function setViewContainer(IView $aViewContainer)
     {    	
     	$this->aViewContainer = $aViewContainer ;
+    	
+    	// 记录所有的frame 视图
+    	$this->arrFrameViews[$aViewContainer->name()] = $aViewContainer ;
     }
     
     public function frame()
@@ -166,7 +169,27 @@ class WebpageFrame extends Controller
     	return null ;
     } 
     
+    public function __get($sName)
+    {
+    	// 找到 frameview
+    	if($this->arrFrameViews and isset($this->arrFrameViews[$sName]))
+    	{
+    		return $this->arrFrameViews[$sName] ;
+    	}
+    	else if( $this->arrFrameViews and strlen($sName)>4 and substr($sName,0,4)=='view' and isset($this->arrFrameViews[$sViewName=substr($sName,4)]) )
+    	{
+    		return $this->arrFrameViews[$sViewName] ;
+    	}
+    	
+    	else
+    	{
+    		return parent::__get($sName) ;
+    	}
+    }
+    
     private $aViewContainer = null ;
+    
+    private $arrFrameViews ;
 }
 
 ?>
