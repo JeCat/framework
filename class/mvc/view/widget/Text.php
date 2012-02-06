@@ -33,7 +33,7 @@ class Text extends FormWidget
 		return $aBean ;
 	}
 	/**
-	 * @wiki /mvc/视图/表单控件/文字输入框(Text)
+	 * @wiki /MVC模式/视图/表单控件/文字输入框(Text)
 	 * == Bean配置数组 ==
 	 * {|
 	 * !属性

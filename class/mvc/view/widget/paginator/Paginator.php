@@ -69,7 +69,7 @@ class Paginator extends FormWidget implements IModelChangeObserver
         }
     }
     /**
-     * @wiki /mvc/视图/控件/分页器(Paginator)
+     * @wiki /MVC模式/视图/控件/分页器(Paginator)
      * == Bean配置数组 ==
      * {|
 	 * !属性

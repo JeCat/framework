@@ -44,7 +44,7 @@ class File extends FormWidget
 		return $aBean ;
 	}
 	/**
-	 * @wiki /mvc/视图/表单控件/文件上传(File)
+	 * @wiki /MVC模式/视图/表单控件/文件上传(File)
 	 * == 使用方法 ==
 	 * 需要一个文件夹路径作为必要参数,文件最终会保存在这个参数所指的文件夹中.推荐以代码所在扩展的公共文件夹的路径作为参数的值.
 	 * 

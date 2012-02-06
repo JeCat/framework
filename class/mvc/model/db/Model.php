@@ -350,7 +350,7 @@ class Model extends AbstractModel implements IModel, IBean
 		return $aBean ;
 	}
 	/**
-	 * @wiki /mvc/模型/模型(Model)
+	 * @wiki /MVC模式/模型/模型(Model)
 	 * == Bean配置数组 ==
 	 * list boolean 设置此对象是否是其他模型对象的容器
 	 */

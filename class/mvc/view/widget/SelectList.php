@@ -32,7 +32,7 @@ class SelectList extends Select {
 		return $aBean ;
 	}
 	/**
-	 * @wiki /mvc/视图/表单控件/列表(SelectList)
+	 * @wiki /MVC模式/视图/表单控件/列表(SelectList)
 	 * == Bean配置数组 ==
 	 * {|
 	 * !属性

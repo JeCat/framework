@@ -31,7 +31,7 @@ class ViewLayoutFrame extends View
 		$this->setType($sType) ;
 	}
 	/**
-	 * @wiki /mvc/视图/布局框体(ViewLayoutFrame)
+	 * @wiki /MVC模式/视图/布局框体(ViewLayoutFrame)
 	 * == Bean配置数组 ==
 	 * {|
 	 * !属性

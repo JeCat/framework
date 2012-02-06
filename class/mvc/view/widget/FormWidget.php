@@ -25,7 +25,7 @@ class FormWidget extends Widget implements IViewFormWidget
 		return $aBean ;
 	}
 	/**
-	 * @wiki /mvc/视图/表单控件/表单控件(FormWidget)
+	 * @wiki /MVC模式/视图/表单控件/表单控件(FormWidget)
 	 * == Bean配置数组 ==
 	 * {|
 	 * !属性

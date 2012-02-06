@@ -270,7 +270,7 @@ class Association implements IBean
 		return $aBean ;
 	}
 	/**
-	 * @wiki /mvc/模型/关系(Association)
+	 * @wiki /MVC模式/模型/关系(Association)
 	 * == Bean配置数组 ==
 	 * type string 指定关系类型
 	 * fromkeys array 起始表列名

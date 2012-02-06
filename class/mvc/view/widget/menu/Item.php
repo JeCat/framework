@@ -6,7 +6,7 @@ use org\jecat\framework\resrc\HtmlResourcePool;
 use org\jecat\framework\bean\BeanFactory ;
 
 HtmlResourcePool::singleton()->addRequire('org.jecat.framework:style/widget/menu.css',HtmlResourcePool::RESRC_CSS) ;
-HtmlResourcePool::singleton()->addRequire('org.jecat.framework:js/mvc/view/widget/menu.js',HtmlResourcePool::RESRC_JS) ;
+HtmlResourcePool::singleton()->addRequire('org.jecat.framework:js/MVC模式/view/widget/menu.js',HtmlResourcePool::RESRC_JS) ;
 
 class Item extends AbstractBase
 {
@@ -28,7 +28,7 @@ class Item extends AbstractBase
     	return $aBean ;
     }
     /**
-     * @wiki /mvc/视图/控件/导航菜单项(Item)
+     * @wiki /MVC模式/视图/控件/导航菜单项(Item)
      * == Bean配置数组 ==
      * {|
 	 * !属性

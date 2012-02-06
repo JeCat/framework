@@ -41,7 +41,7 @@ class CheckBtn extends FormWidget
 		return $aBean ;
 	}
 	/**
-	 * @wiki /mvc/视图/表单控件/选项(CheckBtn)
+	 * @wiki /MVC模式/视图/表单控件/选项(CheckBtn)
 	 * == Bean配置数组 ==
 	 * {|
 	 * !属性
