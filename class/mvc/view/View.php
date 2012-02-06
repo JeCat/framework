@@ -70,7 +70,7 @@ class View extends NamableComposite implements IView, IBean
 		return $aBean ;
 	}
 	/**
-	 * @wiki /mvc/视图(View)
+	 * @wiki /MVC模式/视图(View)
 	 * == Bean配置数组 ==
 	 * {|
 	 * !属性

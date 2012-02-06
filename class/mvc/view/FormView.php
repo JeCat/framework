@@ -13,7 +13,7 @@ class FormView extends View implements IFormView
 		parent::__construct($sName,$sTemplate,$aUI) ;
 	}
 	/**
-	 * @wiki /mvc/视图/表单视图(FormView)
+	 * @wiki /MVC模式/视图/表单视图(FormView)
 	 * == Bean配置数组 ==
 	 * {|
 	 * !属性

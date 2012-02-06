@@ -31,7 +31,7 @@ class Group extends FormWidget {
 		return $aBean ;
 	}
 	/**
-	 * @wiki /mvc/视图/表单控件/组(Group)
+	 * @wiki /MVC模式/视图/表单控件/组(Group)
 	 * == Bean配置数组 ==
 	 * {|
 	 * !属性

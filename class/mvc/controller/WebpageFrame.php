@@ -22,7 +22,7 @@ class WebpageFrame extends Controller
 	}
 	
 	/**
-	 * @wiki /mvc/模型/页面框体(WebpageFrame)
+	 * @wiki /MVC模式/模型/页面框体(WebpageFrame)
 	 * == Bean配置数组 ==
 	 * {|
 	 * !属性

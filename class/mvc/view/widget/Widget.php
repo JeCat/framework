@@ -53,7 +53,7 @@ class Widget extends Object implements IViewWidget, IBean
 		return $aBean ;
 	}
 	/**
-	 * @wiki /mvc/视图/表单控件(Widget)
+	 * @wiki /MVC模式/视图/表单控件(Widget)
 	 * == Bean配置数组 ==
 	 * {|
 	 * !属性
