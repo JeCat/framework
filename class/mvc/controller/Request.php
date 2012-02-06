@@ -8,8 +8,15 @@ class Request extends DataSrc
 {
 	public function get($sName,$default=null)
 	{
-		$value = parent::get($sName);
+		$value = parent::get($sName) ;
 		
+		// 尝试转换 xxx.ooo 为 xxx_ooo
+		if( $value===null and strpos($sName,'.')!==false )
+		{
+			$value = parent::get(str_replace('.','_',$sName)) ;
+		}
+		
+		// 使用默认值
 		if( $value===null and $default!==null )
 		{
 			$value = $default ;
@@ -17,6 +24,19 @@ class Request extends DataSrc
 		}
 		
 		return $value ;
+	}
+	
+	public function has($sName)
+	{
+		if( !parent::has($sName) )
+		{
+			// 尝试转换 xxx.ooo 为 xxx_ooo
+			if( strpos($sName,'.')===false or !parent::has(str_replace('.','_',$sName)) )
+			{
+				return false ;
+			}
+		}
+		return true ;
 	}
 	
 	/**
