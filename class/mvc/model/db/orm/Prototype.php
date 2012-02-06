@@ -904,7 +904,7 @@ class Prototype extends StatementFactory implements IBean
 		}
 		
 		// 切分 原型名称 和 字段名称
-		echo $sColumn = $this->getColumnByAlias($sName)?: $sName ;
+		$sColumn = $this->getColumnByAlias($sName)?: $sName ;
 		
 		$nPos = strrpos($sColumn,'.') ;
 		if($nPos!==false)
