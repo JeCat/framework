@@ -28,7 +28,21 @@ class Response extends Object
 	 * === 控制器 响应 ===
 	 * 控制器的执行结果如何提供给控制器的客户（(^)控制器的客户(client)既可以是系统，也可以是用户），由[b]响应(Response)[/b]对像负责。
 	 * 
-	 * 在控制器的[b]请求(request)[/b]中有一些影响[b]响应(response)[/b]的特殊参数：
+	 * 在目前框架的设计中，控制器主要有三种”内容“可供输出：
+	 * * 控制器的消息队列
+	 * * 控制器的视图
+	 * * 控制器“放置”到[b]响应(Response)[/b]对像中的变量
+	 * 由[b]响应(Response)[/b]对像来决定向什么设备输出这些内容输出哪些内容。
+	 * 
+	 * [^]\
+	 * 在默认情况下，控制器会向系统提供一个 org\jecat\framework\mvc\controller\Response 对像做为[b]响应[/b]对像，它会将默认的输出管道做为控制器的输出设备；\
+	 * 并根据使用[b]请求(Request)[/b]对像中的参数决定输出策略。
+	 * 你也可以给控制器设置完全不同的[b]响应[/b]对像。\
+	 * [/^]
+	 * 
+	 * 
+	 * Controller类默认提供的Response对像，会根据[b]请求(Request)[/b]对像中的一些特殊参数来输出控制器的执行结果：
+	 * 
 	 * 
 	 * = 参数 rspn =
 	 * rspn 参数指定了控制器向[b]响应(response)[/b]对像的输出管道，以何种形式输出何种内容。rspn参数可以是以下值：
@@ -67,6 +81,7 @@ class Response extends Object
 	 * = 参数 rspn.debug.model.struct =
 	 * 打印控制器的模型结构和数据内容。
 	 * 该参数可以是一个表示指定模型的名称的字符串，或表示所有模型的”星号“（*）
+	 * 
 	 */
 	public function process(IController $aController)
 	{
