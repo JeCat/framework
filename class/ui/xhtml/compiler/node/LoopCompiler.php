@@ -52,13 +52,13 @@ class LoopCompiler extends NodeCompiler
 						" );
 		if ($aAttrs->has ( "var" ))
 		{
-			$sVarUserName = $aAttrs->get ( "var" );
-			$aDev->write ( "			\$aVariables->set( {$sVarUserName}, {$sVarAutoName} ) ;" );
+			$sVarUserName = $aAttrs->string ( "var" );
+			$aDev->write ( "			\$aVariables->{$sVarUserName} = {$sVarAutoName} ;" );
 		}
 		if ($aAttrs->has ( "idx" ))
 		{
-			$sIdxUserName = $aAttrs->get ( "idx" );
-			$aDev->write ( "			\$aVariables->set( {$sIdxUserName}, {$sIdxAutoName} ) ;
+			$sIdxUserName = $aAttrs->string ( "idx" );
+			$aDev->write ( "			\$aVariables->{$sIdxUserName} = $sIdxAutoName ;
 										{$sIdxAutoName}++;" );
 		}
 // 		$aDev->write ( '' );
