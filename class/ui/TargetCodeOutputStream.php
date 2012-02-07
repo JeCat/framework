@@ -24,6 +24,13 @@ class TargetCodeOutputStream extends OutputStreamBuffer implements IOutputStream
 		}
 	}
 	
+	public function bufferBytes($bClear=true)
+	{
+		$this->generateOutputCode() ;
+
+		return parent::bufferBytes($bClear) ;
+	}
+	
 	public function close($bStartScript=true)
 	{
 		$this->generateOutputCode() ;
@@ -58,9 +65,6 @@ class TargetCodeOutputStream extends OutputStreamBuffer implements IOutputStream
 			return ;
 		}
 		
-		// 转义 \ 和 $
-		$this->sOutputContents = addcslashes($this->sOutputContents, '\\') ;
-		$this->sOutputContents = str_replace('$','\\$',$this->sOutputContents) ;
 		
 		// 收拢纯空白字符串
 		if( !trim($this->sOutputContents) )
@@ -77,16 +81,35 @@ class TargetCodeOutputStream extends OutputStreamBuffer implements IOutputStream
 		else
 		{
 			parent::write("\r\n// output text content -------------\r\n") ;
-			parent::write("\$aDevice->write(<<<OUTPUT\r\n{$this->sOutputContents}\r\nOUTPUT\r\n) ;") ;
+			if($this->bUseHereDoc)
+			{
+				// 转义 \ 和 $
+				$this->sOutputContents = addcslashes($this->sOutputContents, '\\') ;
+				$this->sOutputContents = str_replace('$','\\$',$this->sOutputContents) ;
+				
+				parent::write("\$aDevice->write(<<<OUTPUT\r\n{$this->sOutputContents}\r\nOUTPUT\r\n) ;") ;
+			}
+			else
+			{
+				$sOutputContents = addslashes($this->sOutputContents) ;
+				parent::write("\$aDevice->write(\"{$sOutputContents}\") ;") ;
+			}
 			parent::write("") ;
 			parent::write("// ---------------------------------\r\n") ;
 		}
 		$this->sOutputContents = '' ;
 	}
 	
+	public function useHereDoc($bUseHereDoc=true)
+	{
+		$this->bUseHereDoc = $bUseHereDoc ;
+	}
+	
 	private $sOutputContents ;
 	
 	private $aCompiledWriter ;
+	
+	private $bUseHereDoc = true ;
 }
 
 ?>

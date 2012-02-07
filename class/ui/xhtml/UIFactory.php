@@ -35,7 +35,7 @@ class UIFactory extends UIFactoryBase
 				, 'if:end', 'loop:end', 'while:end', 'dowhile:end', 'double:end', 'foreach:end'
 				, 'include', 'function', 'continue', 'break', 'script'
 				, 'subtemplate', 'subtemplate:define', 'subtemplate:call'
-				, 'nl', 'clear', 'code'
+				, 'nl', 'clear', 'code', 'render:js'
 		) ;
 		
 		return $aInterpreters ;
@@ -104,6 +104,7 @@ class UIFactory extends UIFactoryBase
 			$aNodeCompiler->addSubCompiler('clear',__NAMESPACE__."\\compiler\\node\\ClearCompiler") ;
 			
 			$aNodeCompiler->addSubCompiler('code',__NAMESPACE__."\\compiler\\node\\CodeCompiler") ;
+			$aNodeCompiler->addSubCompiler('render:js',__NAMESPACE__."\\compiler\\node\\RenderJsCompiler") ;
 		}
 		
 		

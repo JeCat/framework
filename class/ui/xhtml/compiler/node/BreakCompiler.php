@@ -9,7 +9,6 @@
 namespace org\jecat\framework\ui\xhtml\compiler\node;
 
 use org\jecat\framework\ui\xhtml\compiler\ExpressionCompiler;
-
 use org\jecat\framework\ui\xhtml\Node;
 use org\jecat\framework\lang\Type;
 use org\jecat\framework\ui\ICompiler;

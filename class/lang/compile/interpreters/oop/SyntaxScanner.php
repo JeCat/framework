@@ -27,6 +27,7 @@ class SyntaxScanner extends Object implements IInterpreter
 		$this->arrParsers[] = new FunctionDefineParser() ;
 		$this->arrParsers[] = new CallFunctionParser() ;
 		$this->arrParsers[] = new ParameterParser() ;
+		//$this->arrParsers[] = new HereDocParser() ;
 		//$this->arrParsers[] = new FunctionCallParser() ;
 		//$this->arrParsers[] = new NewObjectParser() ;
 		//$this->arrParsers[] = new ThrowParser() ;
@@ -57,6 +58,10 @@ class SyntaxScanner extends Object implements IInterpreter
 		}
 	}
 	
+	public function addParser(ISyntaxParser $aParser)
+	{
+		$this->arrParsers[] = $aParser ;
+	}
 	
 	private $arrParsers ;
 	private $aPHPCodeParser ;
