@@ -3,7 +3,6 @@
 namespace org\jecat\framework\ui\xhtml\compiler ;
 
 use org\jecat\framework\ui\VariableDeclares;
-
 use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\IObject;
@@ -13,17 +12,11 @@ class ExpressionCompiler extends BaseCompiler
 {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		debug_print_backtrace() ;
 		$aDev->write(self::compileExpression($aObject->source(),$aObjectContainer->variableDeclares())) ;
 	}
 
 	static public function compileExpression($sSource,VariableDeclares $aVarDeclares,$bForceEval=false,$bAloneLine=false)
 	{
-		/*if( !$bForceEval )
-		{
-			$bReturn = false ;
-		}*/
-		
 		$sSource = trim($sSource) ;
 		if( !preg_match("/;\\s*/", $sSource) )
 		{
@@ -46,12 +39,11 @@ class ExpressionCompiler extends BaseCompiler
 				{
 					// 变量名
 					$sVarName = substr($arrOneTkn[1],1) ;
-					$sVarNameNew = '__uivar_'.$sVarName ;
+					$sVarNameNew = 'aVariables->'.$sVarName ;
 					
 					// 声明变量
 					$aVarDeclares->declareVarible($sVarName,$sVarNameNew) ;
 					
-					// $arrVarDefineLines[$sVarName] = "if(!isset(\${$sVarNameNew})){ \${$sVarNameNew}=&\$aVariables->getRef('{$sVarName}') ;}" ;
 					$sLineCode.= '$'.$sVarNameNew ;
 				}
 				else 

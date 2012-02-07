@@ -61,7 +61,6 @@ class CompilerManager extends JcObject
 		
 		// 变量声明
 		$aBuffVarsDeclare = new OutputStreamBuffer() ;
-		$aTargetCodeStream->write($aBuffVarsDeclare) ;
 		
 		// 编译正文
 		foreach($aObjectContainer->iterator() as $aObject)
@@ -71,13 +70,6 @@ class CompilerManager extends JcObject
 			{
 				$aCompiler->compile($aObject,$aObjectContainer,$aTargetCodeStream,$this) ;
 			}
-		}
-		
-		// 变量声明
-		$aBuffVarsDeclare->write("// declare ui variables -------------------\r\n") ;
-		foreach($aObjectContainer->variableDeclares()->declaredVaribles() as $sVarOriginName=>$sVarSyName)
-		{
-			$aBuffVarsDeclare->write("\${$sVarSyName} =& \$aVariables->getRef('{$sVarOriginName}') ;\r\n") ;
 		}
 
 		$aTargetCodeStream->close($bPHPTag) ;
