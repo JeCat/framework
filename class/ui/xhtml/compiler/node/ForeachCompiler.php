@@ -70,15 +70,15 @@ if(!empty({$sForAutoName})){
 		
 		if( !empty($sKeyUserName) )
 		{
-			$aDev->write ( "		\$aVariables->set({$sKeyUserName},{$sKeyAutoName}); ");
+			$aDev->write ( "		\$aVariables[{$sKeyUserName}]={$sKeyAutoName}; ");
 		}
 		if( !empty($sItemUserName) )
 		{
-			$aDev->write ( "		\$aVariables->set({$sItemUserName},{$sItemAutoName} ); ");
+			$aDev->write ( "		\$aVariables[{$sItemUserName}]={$sItemAutoName}; ");
 		}
 		if( !empty($sIdxUserName) )
 		{
-			$aDev->write ( "		\$aVariables->set({$sIdxUserName},{$sIdxAutoName} ); ");
+			$aDev->write ( "		\$aVariables[{$sIdxUserName}]={$sIdxAutoName}; ");
 		}
 							
 		//是否是单行标签?

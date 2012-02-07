@@ -33,7 +33,7 @@ use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
  *  |}
  */
 /**
- * @example /模板/标签/自定义标签:name[1]
+ * @example /模板引擎/标签/自定义标签:name[1]
  *
  *  通过if标签编译器的代码演示如何编写一个标签编译器
  */
