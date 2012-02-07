@@ -23,6 +23,7 @@ namespace org\jecat\framework\ui\xhtml\compiler\node;
 use org\jecat\framework\ui\xhtml\Node;
 use org\jecat\framework\lang\Assert;
 use org\jecat\framework\ui\ICompiler;
+use org\jecat\framework\ui\ObjectContainer;
 use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\IObject;
@@ -30,7 +31,7 @@ use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 
 class LoopCompiler extends NodeCompiler
 {
-	public function compile(IObject $aObject, TargetCodeOutputStream $aDev, CompilerManager $aCompilerManager)
+	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Assert::type ( "org\\jecat\\framework\\ui\\xhtml\\Node", $aObject, 'aObject' );
 		
