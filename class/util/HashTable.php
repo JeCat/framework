@@ -212,6 +212,14 @@ class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator, \
 		$this->sClass =& $arrData['sClass'] ;
 	}
 	
+	public function __get($sName)
+	{
+		return $this->get($sName) ;
+	}
+	public function __set($sName,$Value)
+	{
+		return $this->set($sName,$Value) ;
+	}
 	
 	protected $arrDatas = array() ;
 	

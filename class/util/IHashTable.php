@@ -14,6 +14,9 @@ interface IHashTable
 	public function clear() ;	
 	public function count() ;
 	
+	public function __get($sName) ;
+	public function __set($sName,$Value) ;
+	
 	public function end() ;
 	
 	public function nameIterator() ;
