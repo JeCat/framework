@@ -13,6 +13,14 @@ class MySQLDBReflecter extends AbStractDBReflecter
 		if($aIterResults->rowCount() == 0)
 		{
 			$this->bIsExist = false;
+			
+			/**
+			 * 当rowCount为0时，$this->arrTableNames为null,
+			 * 此时调用tableNameIterator会报一个InvalidArgumentException
+			 * Passed variable is not an array or object, using empty array instead
+			 * 因此需初始化之。
+			 */
+			$this->arrTableNames = array();
 			return ;
 		}
 		
