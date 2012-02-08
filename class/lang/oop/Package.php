@@ -173,6 +173,14 @@ class Package
 		}
 	}
 	
+	/**
+	 * @return \Iterator
+	 */
+	public function classIterator()
+	{
+		return new PackageClassIterator($this) ;
+	}
+	
 	private $sNamespace ;
 	
 	private $nNamespaceLen = 0 ;

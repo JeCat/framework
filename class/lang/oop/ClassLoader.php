@@ -191,6 +191,7 @@ class ClassLoader extends Object implements \Serializable
 						// 编译文件
 						try{
 							$this->aCompiler->compile( $aSrcClassFileReader=$aSrcClassFile->openReader(), $aCmpdClassFileReader=$aCmpdClassFile->openWriter() ) ;
+							$this->arrCompiledClasses[] = $sClassName ;
 						}
 						catch (ClassCompileException $e)
 						{
@@ -219,7 +220,7 @@ class ClassLoader extends Object implements \Serializable
 		
 	
 	/**
-	 * @return \IIterator
+	 * @return \Iterator
 	 */
 	public function namespaceIterator()
 	{
@@ -227,11 +228,19 @@ class ClassLoader extends Object implements \Serializable
 	}
 	
 	/**
-	 * @return \IIterator
+	 * @return \Iterator
 	 */
 	public function packageIterator()
 	{
 		return new \org\jecat\framework\pattern\iterate\ArrayIterator( $this->arrPackages ) ;
+	}
+	
+	/**
+	 * @return \Iterator
+	 */
+	public function classIterator()
+	{
+		return new ClassIterator( $this ) ;
 	}
 
 	/**
@@ -270,7 +279,6 @@ class ClassLoader extends Object implements \Serializable
 	{
 		$arrData = array(
 			'arrPackages' => array() ,
-			'bEnableClassCompile' => &$this->bEnableClassCompile ,
 			'arrClassPathCache' => &$this->arrClassPathCache ,
 		) ;
 		
@@ -289,7 +297,6 @@ class ClassLoader extends Object implements \Serializable
 		$this->__construct() ;
 		
 		$arrData = unserialize($serialized) ;
-		$this->bEnableClassCompile =& $arrData['bEnableClassCompile'] ;
 		$this->arrClassPathCache =& $arrData['arrClassPathCache'] ;
 		foreach($arrData['arrPackages'] as $arrPackage)
 		{
@@ -306,6 +313,11 @@ class ClassLoader extends Object implements \Serializable
 		$this->bEnableClassCache = $bEnable? true: false ;
 	}
 	
+	public function compiledClasses()
+	{
+		return $this->arrCompiledClasses ;
+	}
+	
 	private $arrPackages = array() ;
 
 	private $aCompiler = null ;
@@ -318,6 +330,8 @@ class ClassLoader extends Object implements \Serializable
 	
 	private $arrClassPathCache = array() ;
 	private $bEnableClassCache = false ;
+	
+	private $arrCompiledClasses ;
 	
 }
 
