@@ -86,15 +86,15 @@ class HttpRequest extends Request
 		}
 	}
 	
-	public function url($excludeQueryArgvs=null)
+	public function url($excludeQueryArgvs=null,$includeQueryArgvs=null)
 	{
-		if(!$excludeQueryArgvs)
+		if(!$excludeQueryArgvs and !$includeQueryArgvs)
 		{
 			return $this->sRequestUrl ;
 		}
 		else
 		{
-			return $this->urlInfo('scheme') . '://' . $this->urlInfo('host') . $this->urlInfo('path') . $this->urlQuery(true,$excludeQueryArgvs) ;
+			return $this->urlInfo('scheme') . '://' . $this->urlInfo('host') . $this->urlInfo('path') . $this->urlQuery(true,$excludeQueryArgvs,$includeQueryArgvs) ;
 		}
 	}
 
@@ -110,9 +110,9 @@ class HttpRequest extends Request
 	{
 		return $this->urlInfo('path') ;
 	}
-	public function urlQuery($bQuestionMark=false,$excludes=null)
+	public function urlQuery($bQuestionMark=false,$excludes=null,$includes=null)
 	{
-		if(!$excludes)
+		if( !$excludes and !$includes )
 		{
 			return ($bQuestionMark?'?':'').$this->urlInfo('query') ;
 		}
@@ -120,9 +120,21 @@ class HttpRequest extends Request
 		{
 			parse_str($this->urlInfo('query'),$arrQuerys) ;
 	
-			foreach((array) $excludes as $sKey)
+			foreach((array)$excludes as $sKey)
 			{
 				unset($arrQuerys[$sKey]) ;
+			}
+			
+			foreach((array)$includes as $key=>$sValue)
+			{
+				if( is_int($key) )
+				{
+					$arrQuerys[$sValue] = '1' ;
+				}
+				else
+				{
+					$arrQuerys[$key] = $sValue ;
+				}
 			}
 			
 			return ($bQuestionMark?'?':'').http_build_query($arrQuerys) ;
