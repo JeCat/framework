@@ -2,7 +2,6 @@
 namespace org\jecat\framework\ui\xhtml\weave ;
 
 use org\jecat\framework\lang\Exception;
-
 use org\jecat\framework\lang\Object;
 
 class WeaveManager extends Object
@@ -18,6 +17,12 @@ class WeaveManager extends Object
 	{
 		$aPatchSlot = $this->patchSlot($sSourceTemplateName,$sPatchSlot) ;
 		$aPatchSlot->addPatch(Patch::codePatch($sPatchCode,$sType)) ;
+	}
+	
+	public function registerFilter($sSourceTemplateName,$sPatchSlot,$fnFilter)
+	{
+		$aPatchSlot = $this->patchSlot($sSourceTemplateName,$sPatchSlot) ;
+		$aPatchSlot->addPatch(Patch::filterPatch($fnFilter)) ;
 	}
 	
 	/**

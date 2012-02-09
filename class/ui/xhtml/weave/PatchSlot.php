@@ -37,6 +37,7 @@ class PatchSlot
 			$aPatch->compile($aUi) ;
 			
 			$aPatch->apply($aObjectContainer,$aTargetObject) ;
+			
 		}
 	}
 	
