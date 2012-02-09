@@ -39,11 +39,6 @@ class UIFactory extends UIFactoryBase
 		$aNodeCompilers->addSubCompiler('msgqueue',__NAMESPACE__."\\uicompiler\\MsgQueueCompiler") ;
 		$aNodeCompilers->addSubCompiler('view:msgqueue',__NAMESPACE__."\\uicompiler\\ViewMsgQueueCompiler") ;
 		$aNodeCompilers->addSubCompiler('widget:msgqueue',__NAMESPACE__."\\uicompiler\\WidgetMsgQueueCompiler") ;
-		$aNodeCompilers->addSubCompiler('resrc',__NAMESPACE__."\\uicompiler\\LoadResourceCompiler") ;
-		$aNodeCompilers->addSubCompiler('link',__NAMESPACE__."\\uicompiler\\CssCompiler") ;
-		$aNodeCompilers->addSubCompiler('css',__NAMESPACE__."\\uicompiler\\CssCompiler") ;
-		$aNodeCompilers->addSubCompiler('script',__NAMESPACE__."\\uicompiler\\ScriptCompiler") ;
-		$aNodeCompilers->addSubCompiler('js',__NAMESPACE__."\\uicompiler\\ScriptCompiler") ;
 		
 		$aNodeCompilers->addSubCompiler('model:foreach',__NAMESPACE__."\\uicompiler\\ModelForeachCompiler") ;
 		$aNodeCompilers->addSubCompiler('model:foreach:end',"org\\jecat\\framework\\ui\\xhtml\\compiler\\node\\DoubleEndCompiler") ;

@@ -15,7 +15,10 @@ class RenderJsCompiler extends NodeCompiler {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) 
 	{
 		$aObject instanceof \org\jecat\framework\ui\xhtml\Node ;
-		$sFuncName = $aObject->attributes()->string('function') ;
+		if( !$sFuncName = $aObject->attributes()->string('function') )
+		{
+			throw new Exception("render:js 节点缺少function属性(line:%d)",$aObject->line()) ;
+		}
 		
 		$aDev->output(<<<JSCODE
 <script>
@@ -31,6 +34,8 @@ function {$sFuncName}(aVariables)
 	}
 JSCODE
 		) ;
+		
+		
 		
 		// 指定的模板文件
 		if( $aObject->attributes()->string('template') )
@@ -55,6 +60,8 @@ JSCODE
 		{
 			
 		}
+		
+		
 		
 		$aDev->output(<<<JSCODE
 
