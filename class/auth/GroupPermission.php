@@ -23,7 +23,7 @@ class GroupPermission extends PermissionBase
 				}
 			}
 		}
-		
+
 		return $bAllow ;
 	}
 	
