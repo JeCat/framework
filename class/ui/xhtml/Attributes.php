@@ -68,7 +68,16 @@ class Attributes extends HashTable
 			Type::check(array('string',__NAMESPACE__.'\\AttributeValue'),$req) ;
 		}
 	}
-	
+	/**
+	 * @wiki /MVC模式/视图/控件/控件标签附加属性
+	 * 
+	 * 在是用widget标签的时候我们可能需要传入一些值给控件对象.这一点可以通过attr.xxx属性做到.比如:
+	 * <widget id='text' attr.widgetname='textarea'/>
+	 * 这样一来控件对象就可以通过attribute方法获取widgetname的值
+	 * 我们甚至可以动态获取type的值,比如
+	 * <widget id='text' attr.widgetname='$theController->name()' attr.widgetname.type='expression'/>
+	 * 同样通过attribute方法获取widgetname的值,只是返回的正是'$theController->name()'所返回的值,这个返回值可以是任何东西,包括对象.
+	 */
 	public function get($sName)
 	{
 		$sType = $this->has($sName.'.type')? $this->string($sName.'.type'): 'string' ;

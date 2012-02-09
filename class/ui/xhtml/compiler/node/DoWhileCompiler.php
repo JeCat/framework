@@ -35,7 +35,7 @@ class DoWhileCompiler extends NodeCompiler {
 		$aDev->write ( ' do{ ' );
 		if( !empty($sIdxUserName) ){
 			$aDev->write ( " {$sIdxAutoName}++; 
-							\$aVariables->set({$sIdxUserName},{$sIdxAutoName} ); ");
+							\$aVariables[{$sIdxUserName}]={$sIdxAutoName}; ");
 		}
 		$this->compileChildren ( $aObject, $aObjectContainer, $aDev, $aCompilerManager );
 		$aDev->write ( " }while(" );

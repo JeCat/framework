@@ -49,7 +49,7 @@ class IncludeCompiler extends NodeCompiler
 
 		if( $aAttributes->has("file") )
 		{
-			$sFileName = $aAttributes->get("file") ;		
+			$sFileName = $aAttributes->string("file") ;		
 		}
 		else 
 		{
@@ -84,7 +84,7 @@ class IncludeCompiler extends NodeCompiler
 			{
 				$sVarName = '"'. addslashes($sVarName) . '"' ;
 				$sValue = ExpressionCompiler::compileExpression($aValue->source(),$aObjectContainer->variableDeclares()) ;
-				$aDev->write("\$__include_aVariables->set({$sVarName},{$sValue}) ; \r\n");
+				$aDev->write("\$__include_aVariables{$sVarName}={$sValue} ; \r\n");
 			}
 		}
 		

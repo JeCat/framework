@@ -23,7 +23,7 @@ class WhileCompiler extends NodeCompiler {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) {
 		Type::check ( "org\\jecat\\framework\\ui\\xhtml\\Node", $aObject );
 		
-		$sIdxUserName = $aObject->attributes()->has ( 'idx' ) ? $aObject->attributes()->get ( 'idx' ) : '' ;
+		$sIdxUserName = $aObject->attributes()->has ( 'idx' ) ? $aObject->attributes()->string ( 'idx' ) : '' ;
 		$sIdxAutoName = NodeCompiler::assignVariableName ( '$__while_idx_' ) ;
 		if( !empty($sIdxUserName) ){
 			$aDev->write ( "  {$sIdxAutoName} = -1;   " );
@@ -33,7 +33,7 @@ class WhileCompiler extends NodeCompiler {
 		$aDev->write ( "){  " );
 		if( !empty($sIdxUserName) ){
 			$aDev->write ( " {$sIdxAutoName}++; 
-							\$aVariables->set({$sIdxUserName},{$sIdxAutoName} );   ");
+							\$aVariables->{$sIdxUserName}={$sIdxAutoName};   ");
 		}
 		
 		if(!$aObject->headTag()->isSingle()){
