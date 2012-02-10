@@ -5,16 +5,36 @@ use org\jecat\framework\fs\FSIterator;
 
 class ClassIterator extends \ArrayIterator
 {
-	public function __construct(ClassLoader $aClassLoader)
+	public function __construct(ClassLoader $aClassLoader,$sNamespace=null)
 	{
 		$arrClasses = array() ;
 		foreach($aClassLoader->packageIterator() as $aPackage)
 		{
-			foreach($aPackage->folder()->iterator(FSIterator::CONTAIN_FILE|FSIterator::RECURSIVE_SEARCH) as $sSubPath)
+			if($sNamespace)
 			{
-				$sSubPath = preg_replace('/(.+)\.php$/i','\\1',$sSubPath) ;
-				$sClass = $aPackage->ns() . '\\' . str_replace('/','\\',$sSubPath) ;
+				$sPackageNamespace = $aPackage->ns() ;
+				if( $sNamespace == $sPackageNamespace )
+				{
+					$sSubNs = null ;
+				}
+				// 包的命名空间
+				else if( strstr($sNamespace,$sPackageNamespace.'\\')===0 )
+				{
+					$sSubNs = substr($sNamespace,strlen($sPackageNamespace)) ;
+				}
+				else 
+				{
+					continue ;
+				}
+			}
+			else
+			{
+				$sSubNs = null ;
+			}
 				
+			
+			foreach($aPackage->classIterator($sSubNs) as $sClass)
+			{
 				if( !in_array($sClass,$arrClasses) )
 				{
 					$arrClasses[] = $sClass ;
