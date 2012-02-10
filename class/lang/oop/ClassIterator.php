@@ -18,9 +18,9 @@ class ClassIterator extends \ArrayIterator
 					$sSubNs = null ;
 				}
 				// 包的命名空间
-				else if( strstr($sNamespace,$sPackageNamespace.'\\')===0 )
+				else if( strpos($sNamespace,$sPackageNamespace.'\\')===0 )
 				{
-					$sSubNs = substr($sNamespace,strlen($sPackageNamespace)) ;
+					$sSubNs = substr($sNamespace,strlen($sPackageNamespace)+1) ;
 				}
 				else 
 				{
