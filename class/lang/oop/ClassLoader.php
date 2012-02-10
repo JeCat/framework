@@ -238,9 +238,9 @@ class ClassLoader extends Object implements \Serializable
 	/**
 	 * @return \Iterator
 	 */
-	public function classIterator()
+	public function classIterator($sNamespace=null)
 	{
-		return new ClassIterator( $this ) ;
+		return new ClassIterator( $this, $sNamespace ) ;
 	}
 
 	/**

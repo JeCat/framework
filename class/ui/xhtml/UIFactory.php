@@ -95,6 +95,11 @@ class UIFactory extends UIFactoryBase
 			$aNodeCompiler->addSubCompiler('continue',__NAMESPACE__."\\compiler\\node\\ContinueCompiler") ;
 			$aNodeCompiler->addSubCompiler('break',__NAMESPACE__."\\compiler\\node\\BreakCompiler") ;
 			$aNodeCompiler->addSubCompiler('script',__NAMESPACE__."\\compiler\\node\\ScriptCompiler") ;
+			$aNodeCompiler->addSubCompiler('resrc',__NAMESPACE__."\\compiler\\node\\LoadResourceCompiler") ;
+			$aNodeCompiler->addSubCompiler('link',__NAMESPACE__."\\compiler\\node\\CssCompiler") ;
+			$aNodeCompiler->addSubCompiler('css',__NAMESPACE__."\\compiler\\node\\CssCompiler") ;
+			$aNodeCompiler->addSubCompiler('script',__NAMESPACE__."\\compiler\\node\\ScriptCompiler") ;
+			$aNodeCompiler->addSubCompiler('js',__NAMESPACE__."\\compiler\\node\\ScriptCompiler") ;
 			
 			$aNodeCompiler->addSubCompiler('subtemplate',__NAMESPACE__."\\compiler\\node\\SubTemplateDefineCompiler") ;
 			$aNodeCompiler->addSubCompiler('subtemplate:define',__NAMESPACE__."\\compiler\\node\\SubTemplateDefineCompiler") ;

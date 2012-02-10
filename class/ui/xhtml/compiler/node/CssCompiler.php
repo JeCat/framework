@@ -1,5 +1,5 @@
 <?php
-namespace org\jecat\framework\mvc\view\uicompiler ;
+namespace org\jecat\framework\ui\xhtml\compiler\node;
 
 use org\jecat\framework\ui\xhtml\compiler\node\ClearCompiler;
 use org\jecat\framework\lang\Assert;

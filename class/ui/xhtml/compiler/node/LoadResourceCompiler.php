@@ -1,5 +1,5 @@
 <?php
-namespace org\jecat\framework\mvc\view\uicompiler ;
+namespace org\jecat\framework\ui\xhtml\compiler\node;
 
 use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\CompilerManager;
@@ -11,7 +11,6 @@ class LoadResourceCompiler extends NodeCompiler
 {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		$aDev->write("\$theView = \$aVariables->get('theView') ;\r\n") ;
 		$aDev->write("\$aDevice->write(\\org\\jecat\\framework\\resrc\\HtmlResourcePool::singleton()) ;\r\n") ;
 	}
 }

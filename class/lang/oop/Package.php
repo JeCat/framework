@@ -176,9 +176,9 @@ class Package
 	/**
 	 * @return \Iterator
 	 */
-	public function classIterator()
+	public function classIterator($sSubNamespace=null)
 	{
-		return new PackageClassIterator($this) ;
+		return new PackageClassIterator($this,$sSubNamespace) ;
 	}
 	
 	private $sNamespace ;

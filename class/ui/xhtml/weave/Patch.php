@@ -20,6 +20,7 @@ class Patch
 	
 	const template = 1 ;
 	const code = 2 ;
+	const filter = 3 ;
 	
 	private function __construct()
 	{}
@@ -54,6 +55,15 @@ class Patch
 		
 		return $aPatch ;
 	}
+	static public function filterPatch($fnFilter)
+	{
+		$aPatch = new self() ;
+	
+		$aPatch->nKind = self::filter ;
+		$aPatch->fnFilter = $fnFilter ;
+		
+		return $aPatch ;
+	}
 	
 	public function compile(UI $aUi)
 	{
@@ -78,49 +88,61 @@ class Patch
 // -------------------------------------------------------------------------
 ") ;
 		}
+		
+		else if( $this->nKind==self::filter )
+		{
+			// nothing todo
+		}
 	}
 	
 	public function apply(ObjectContainer $aObjectContainer,IObject &$aTargetObject)
 	{
-		$aWeaveinObject = new WeaveinObject($this->aCompiled) ;
-		
-		switch ( $this->sType )
+		if( $this->nKind==self::filter )
 		{
-			case self::insertBefore :
-				$aTargetObject->insertAfterByPosition(0,$aWeaveinObject) ;
-				break ;
-				
-			case self::insertAfter :
-				$aTargetObject->add($aWeaveinObject) ;
-				break ;
-				
-			case self::appendBefore :
-				$aParent = $aTargetObject->parent() ;
-				if(!$aParent)
-				{
-					throw new Exception("遇到错误，无法将内容织入指定的路径") ;
-				}
-				$aParent->insertBefore($aTargetObject,$aWeaveinObject) ;
-				break ;
-				
-			case self::appendAfter :
-				$aParent = $aTargetObject->parent() ;
-				if(!$aParent)
-				{
-					throw new Exception("遇到错误，无法将内容织入指定的路径") ;
-				}
-				$aParent->insertAfter($aTargetObject,$aWeaveinObject) ;
-				break ;
-				
-			case self::replace :
-				$aParent = $aTargetObject->parent() ;
-				if(!$aParent)
-				{
-					throw new Exception("遇到错误，无法将内容织入指定的路径") ;
-				}
-				$aParent->replace($aTargetObject,$aWeaveinObject) ;
-				$aTargetObject = $aWeaveinObject ;
-				break ;
+			call_user_func_array($this->fnFilter,array($aObjectContainer,$aTargetObject)) ;
+		}
+		else
+		{
+			$aWeaveinObject = new WeaveinObject($this->aCompiled,$aTargetObject) ;
+			
+			switch ( $this->sType )
+			{
+				case self::insertBefore :
+					$aTargetObject->insertAfterByPosition(0,$aWeaveinObject) ;
+					break ;
+					
+				case self::insertAfter :
+					$aTargetObject->add($aWeaveinObject) ;
+					break ;
+					
+				case self::appendBefore :
+					$aParent = $aTargetObject->parent() ;
+					if(!$aParent)
+					{
+						throw new Exception("遇到错误，无法将内容织入指定的路径") ;
+					}
+					$aParent->insertBefore($aTargetObject,$aWeaveinObject) ;
+					break ;
+					
+				case self::appendAfter :
+					$aParent = $aTargetObject->parent() ;
+					if(!$aParent)
+					{
+						throw new Exception("遇到错误，无法将内容织入指定的路径") ;
+					}
+					$aParent->insertAfter($aTargetObject,$aWeaveinObject) ;
+					break ;
+					
+				case self::replace :
+					$aParent = $aTargetObject->parent() ;
+					if(!$aParent)
+					{
+						throw new Exception("遇到错误，无法将内容织入指定的路径") ;
+					}
+					$aParent->replace($aTargetObject,$aWeaveinObject) ;
+					$aTargetObject = $aWeaveinObject ;
+					break ;
+			}
 		}
 	}
 	
@@ -141,6 +163,8 @@ class Patch
 	private $sTemplate ;
 	
 	private $sCode ;
+	
+	private $fnFilter ;
 	
 	private $aCompiled ;
 }
