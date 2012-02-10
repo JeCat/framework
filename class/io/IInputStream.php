@@ -3,6 +3,11 @@ namespace org\jecat\framework\io ;
 
 use org\jecat\framework\util\String;
 
+/**
+ * @wiki /文件/文件内容读取
+ * 
+ * 
+ */
 interface IInputStream
 {
 	/**
