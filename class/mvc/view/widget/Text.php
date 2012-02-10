@@ -34,7 +34,7 @@ class Text extends FormWidget
 	}
 	/**
 	 * @wiki /MVC模式/视图/表单控件/文字输入框(Text)
-	 * == Bean配置数组 ==
+	 * ==Bean配置数组==
 	 * {|
 	 * !属性
 	 * !类型

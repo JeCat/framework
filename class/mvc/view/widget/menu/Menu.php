@@ -33,7 +33,7 @@ class Menu extends AbstractBase
     }
     /**
      * @wiki /MVC模式/视图/控件/导航菜单(Menu)
-     * == Bean配置数组 ==
+     * ==Bean配置数组==
      * {|
 	 * !属性
 	 * !类型

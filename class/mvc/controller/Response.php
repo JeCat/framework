@@ -22,10 +22,10 @@ class Response extends Object
 	/**
 	 * @wiki /MVC模式/请求-响应
 	 * 
-	 * === 控制器 请求 ===
+	 * ===控制器 请求===
 	 * TODO ...
 	 * 
-	 * === 控制器 响应 ===
+	 * ===控制器 响应===
 	 * 控制器的执行结果如何提供给控制器的客户（(^)控制器的客户(client)既可以是系统，也可以是用户），由[b]响应(Response)[/b]对像负责。
 	 * 
 	 * 在目前框架的设计中，控制器主要有三种”内容“可供输出：
@@ -44,7 +44,7 @@ class Response extends Object
 	 * Controller类默认提供的Response对像，会根据[b]请求(Request)[/b]对像中的一些特殊参数来输出控制器的执行结果：
 	 * 
 	 * 
-	 * = 参数 rspn =
+	 * =参数 rspn=
 	 * rspn 参数指定了控制器向[b]响应(response)[/b]对像的输出管道，以何种形式输出何种内容。rspn参数可以是以下值：
 	 * * rspn=[b]msgqueue.json[/b]
 	 * 以json格式输出控制器消息队列中的内容
@@ -72,13 +72,13 @@ class Response extends Object
 	 * (和 view.inframe 相同)
 	 * 
 	 * 
-	 * == 调式相关参数 ==
+	 * ==调式相关参数==
 	 * 还有一些用于调式的响应(Response)参数。
 	 * 
-	 * = 参数 rspn.debug.db.log =
+	 * =参数 rspn.debug.db.log=
 	 * 打印整个系统在执行过程中，数据库执行SQL的情况；只要提供这个参数，等于任何值都有效。
 	 * 
-	 * = 参数 rspn.debug.model.struct =
+	 * =参数 rspn.debug.model.struct=
 	 * 打印控制器的模型结构和数据内容。
 	 * 该参数可以是一个表示指定模型的名称的字符串，或表示所有模型的”星号“（*）
 	 * 

@@ -36,7 +36,7 @@ class FileExt extends Object implements IVerifier,IBean {
 	
 	/**
 	 * @wiki /校验器/文件类型校验器(FileExt)
-	 * == Bean配置数组 ==
+	 * ==Bean配置数组==
 	 * {|
 	 * !属性
 	 * !类型

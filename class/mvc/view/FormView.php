@@ -14,7 +14,7 @@ class FormView extends View implements IFormView
 	}
 	/**
 	 * @wiki /MVC模式/视图/表单视图(FormView)
-	 * == Bean配置数组 ==
+	 * ==Bean配置数组==
 	 * {|
 	 * !属性
 	 * !类型

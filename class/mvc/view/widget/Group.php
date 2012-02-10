@@ -32,7 +32,7 @@ class Group extends FormWidget {
 	}
 	/**
 	 * @wiki /MVC模式/视图/表单控件/组(Group)
-	 * == Bean配置数组 ==
+	 * ==Bean配置数组==
 	 * {|
 	 * !属性
 	 * !类型
