@@ -200,7 +200,9 @@ class Selecter extends OperationStrategy
 		
 		// 设置 order by
 		$aOriOrders = $aSelect->criteria()->orders(false) ;
-		$aSelect->criteria()->setOrders($aToPrototype->criteria()->orders(false)) ;
+		if($aToPrototype->criteria()->orders(false)){
+			$aSelect->criteria()->setOrders($aToPrototype->criteria()->orders(false)) ;
+		}
 			
 		// 
 		$aChildModel = $aToPrototype->createModel(true) ;
@@ -209,7 +211,9 @@ class Selecter extends OperationStrategy
 		
 		// 清理条件 和 恢复order by
 		$aSelect->criteria()->where()->remove($aRestraction) ;
-		$aSelect->criteria()->setOrders($aOriOrders) ;
+		if($aOriOrders){
+			$aSelect->criteria()->setOrders($aOriOrders) ;
+		}
 	}
 
 	private function setGroupBy(Select $aSelect,Prototype $aPrototype)
