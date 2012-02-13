@@ -34,7 +34,7 @@ class Number extends Object implements IVerifier, IBean
 	}
 	/**
 	 * @wiki /校验器/数字校验器(Number)
-	 * == Bean配置数组 ==
+	 * ==Bean配置数组==
 	 * {|
 	 * !属性
 	 * !类型

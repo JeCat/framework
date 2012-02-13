@@ -25,7 +25,7 @@ class UI extends JcObject
 	}
 	
 	/**
-	 * return IFactory
+	 * @return IFactory
 	 */
 	public function factory()
 	{
@@ -38,7 +38,7 @@ class UI extends JcObject
 	}
 	
 	/**
-	 * return SourceFolderManager
+	 * @return SourceFolderManager
 	 */
 	public function sourceFileManager()
 	{
@@ -55,7 +55,7 @@ class UI extends JcObject
 	}
 	
 	/**
-	 * return CompilerManager
+	 * @return CompilerManager
 	 */
 	public function compilers()
 	{
@@ -72,7 +72,7 @@ class UI extends JcObject
 	}
 	
 	/**
-	 * return InterpreterManager
+	 * @return InterpreterManager
 	 */
 	public function interpreters()
 	{
@@ -89,7 +89,7 @@ class UI extends JcObject
 	}
 
 	/**
-	 * return IOutputStream
+	 * @return IOutputStream
 	 */
 	public function outputStream()
 	{

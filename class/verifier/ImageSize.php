@@ -30,7 +30,7 @@ class ImageSize extends Object implements IVerifier, IBean
 	}
 	/**
 	 * @wiki /校验器/图片宽高校验器(ImageSize)
-	 * == Bean配置数组 ==
+	 * ==Bean配置数组==
 	 * {|
 	 * !属性
 	 * !类型

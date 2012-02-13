@@ -59,7 +59,7 @@ class File extends FormWidget
 	 * = 3.显示文件时 =
 	 * 一般在表单编辑时会呈现这个状态,控件的样子会有所变化,控件会显示文件的大小,下载文件的url和删除文件的checkbox.如果点选删除文件的checkbox并再次提交表单,控件会删除它所绑定的文件.
 	 * [!]使用此控件时,务必在控件所在form添加 enctype="multipart/form-data" 属性,确保文件能够上传到服务器[/!]
-	 * == Bean配置数组 ==
+	 * ==Bean配置数组==
 	 * {|
 	 * !属性
 	 * !类型
