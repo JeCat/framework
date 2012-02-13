@@ -32,7 +32,7 @@ class ViewLayoutFrame extends View
 	}
 	/**
 	 * @wiki /MVC模式/视图/布局框体(ViewLayoutFrame)
-	 * == Bean配置数组 ==
+	 * ==Bean配置数组==
 	 * {|
 	 * !属性
 	 * !类型

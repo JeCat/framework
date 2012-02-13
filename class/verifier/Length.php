@@ -26,7 +26,7 @@ class Length extends Object implements IVerifier, IBean
 	}
 	/**
 	 * @wiki /校验器/字符长度校验器(Length)
-	 * == Bean配置数组 ==
+	 * ==Bean配置数组==
 	 * {|
 	 * !属性
 	 * !类型

@@ -54,7 +54,7 @@ class Widget extends Object implements IViewWidget, IBean
 	}
 	/**
 	 * @wiki /MVC模式/视图/表单控件(Widget)
-	 * == Bean配置数组 ==
+	 * ==Bean配置数组==
 	 * {|
 	 * !属性
 	 * !类型

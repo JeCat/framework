@@ -33,7 +33,7 @@ class SelectList extends Select {
 	}
 	/**
 	 * @wiki /MVC模式/视图/表单控件/列表(SelectList)
-	 * == Bean配置数组 ==
+	 * ==Bean配置数组==
 	 * {|
 	 * !属性
 	 * !类型

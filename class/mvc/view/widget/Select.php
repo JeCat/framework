@@ -23,7 +23,7 @@ class Select extends FormWidget {
 	}
 	/**
 	 * @wiki /MVC模式/视图/表单控件/下拉菜单(Select)
-	 * == Bean配置数组 ==
+	 * ==Bean配置数组==
 	 * {|
 	 * !属性
 	 * !类型

@@ -27,7 +27,7 @@ class ImageArea extends Object implements IVerifier, IBean
 	}
 	/**
 	 * @wiki /校验器/图片面积校验器(ImageArea)
-	 * == Bean配置数组 ==
+	 * ==Bean配置数组==
 	 * {|
 	 * !属性
 	 * !类型
