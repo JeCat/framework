@@ -876,6 +876,9 @@ class Controller extends NamableComposite implements IController, IBean
     	return $this ;
     }
 
+    /**
+     * @return Response
+     */
     public function response()
     {
     	return Response::singleton() ;

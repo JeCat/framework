@@ -105,6 +105,7 @@ class Response extends Object
 		case 'var' :
 		case 'var.json' :
 			$this->printer()->write(json_encode($this->arrReturnVariables)) ;
+			
 			break ;
 			
 		case 'var.xml' :
