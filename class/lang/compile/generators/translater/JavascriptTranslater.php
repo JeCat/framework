@@ -51,12 +51,26 @@ class JavascriptTranslater extends Object implements IGenerator
 				break ;
 			
 			// 转换 foreach (js 中没有foreach)
-			case T_ENDFOREACH:
+			case T_FOREACH:
 				$this->transForeach($aTokenPool,$aObject) ;
 				break ;
+			case T_ENDFOREACH:
+				// @todo
+				break;
 		}
 	}
 	
+	/**
+	
+		foreach($arr as $key=>$value){
+			code;
+		}
+	=>
+		for( key in arr){
+			value = arr[ key ];
+			code ;
+		}
+	 */
 	private function transForeach(TokenPool $aTokenPool,Token $aObject)
 	{
 		// 定位迭代器
@@ -74,13 +88,149 @@ class JavascriptTranslater extends Object implements IGenerator
 		{
 			throw new ClassCompileException($aObject, "foreach 后没有  ( ") ;
 		}
+		$aBraceRoundOpenToken = $aToken ;
 		
 		// 找 ( 到 as 之间的表达值
 		$arrExpressions = array() ;
-		for( $aTokenIter->next(); $aToken=$aTokenIter->current() and $aToken->tokenType()!=Token::T_AS; $aTokenIter->next() )
+		for( $aTokenIter->next(); $aToken=$aTokenIter->current() and $aToken->tokenType()!=T_AS; $aTokenIter->next() )
 		{
 			$arrExpressions[] = $aToken ;
 		}
+		// 吐掉最后的空格
+		array_pop($arrExpressions);
+		
+		$aAsToken = $aToken ;
+		
+		// 吃掉as后的空格
+		$aTokenIter->next();
+		
+		// as 到 闭合 ) 之间是否有 '=>'
+		$aDoubleArrowToken = null ;
+		$arrTokenListBeforeArrow = array();
+		$arrTokenListAfterArrow = array();
+		
+		for( $aTokenIter->next() ; 
+				$aToken = $aTokenIter->current() and $aToken !== $aBraceRoundOpenToken->theOther() ; 
+				$aTokenIter->next() ){
+			if( $aToken->tokenType() === T_DOUBLE_ARROW ){
+				$aDoubleArrowToken = $aToken ;
+			}else if( null === $aDoubleArrowToken ){
+				$arrTokenListBeforeArrow [] = $aToken ;
+			}else{
+				$arrTokenListAfterArrow [] = $aToken ;
+			}
+		}
+		// 清理最后的空格
+		if( end($arrTokenListBeforeArrow) ->tokenType() === T_WHITESPACE ){
+			array_pop( $arrTokenListBeforeArrow );
+		}
+		if( end($arrTokenListAfterArrow) and end($arrTokenListAfterArrow)->tokenType() === T_WHITESPACE ){
+			array_pop( $arrTokenListAfterArrow );
+		}
+		
+		// 寻找开始的 '{'
+		// 空体for循环
+		for(
+			$aTokenIter->next() ; 
+			$aToken = $aTokenIter->current() and $aToken->tokenType() !== Token::T_BRACE_OPEN ; 
+			$aTokenIter->next() 
+		);
+		
+		$aBraceOpenToken = $aToken ;
+		
+		// 开始替换
+		// foreach 替换成 for
+		$aObject->setTargetCode('for') ;
+		
+		// arrExpressions 替换成 key
+		reset($arrExpressions);
+		if( null === $aDoubleArrowToken ){
+			$aToken = new Token(T_WHITESPACE,T_WHITESPACE);
+			$aToken->setTargetCode(__FUNCTION__.'_key');
+			$aTokenPool->insertBefore( current($arrExpressions) , $aToken );
+		}else{
+			// insert key
+			foreach($arrTokenListBeforeArrow as $aToken){
+				$aTokenPool->insertBefore( current($arrExpressions) , $aToken );
+			}
+			// insert a space
+			$aSpaceToken = new Token(T_WHITESPACE,' ');
+			$aTokenPool->insertBefore( current($arrExpressions) , $aSpaceToken );
+			
+			// remove arr
+			do{
+				$aTokenPool->remove(current($arrExpressions) );
+				next($arrExpressions) ;
+			}while( false !== current($arrExpressions) );
+		}
+		
+		// as 替换成 in
+		$aAsToken->setTargetCode('in');
+		
+		// in 后面是arr
+		// 直接插入到闭合圆括号之前
+		foreach($arrExpressions as $aToken){
+			$aCloneToken = clone $aToken ;
+			$this->generateTargetCode($aTokenPool , $aCloneToken );
+			$aTokenPool->insertBefore( $aBraceRoundOpenToken->theOther() , $aCloneToken );
+		}
+		
+		// '=>' 删掉
+		if( null !== $aDoubleArrowToken ){
+			$aDoubleArrowToken->setTargetCode('');
+		}
+		
+		
+		// '{'之后是value
+		// 先换行
+		$aToken = new Token(T_WHITESPACE,"\n");
+		$arrValueInsert = array($aToken);
+		if( null === $aDoubleArrowToken ){
+			$arrValueInsert = array_merge( $arrValueInsert , $arrTokenListBeforeArrow );
+		}else{
+			$arrValueInsert = array_merge( $arrValueInsert , $arrTokenListAfterArrow );
+		}
+		
+		// value 之后是 =arr[key];
+		// =
+		$aEqualToken = new Token(Token::T_EQUAL,'=');
+		$arrValueInsert [] = $aEqualToken ;
+		
+		// arr
+		foreach($arrExpressions as $aToken){
+			$aCloneToken = clone $aToken ;
+			$arrValueInsert [] = $aToken ;
+		}
+		
+		// [
+		$aBraceSquareOpenToken = new Token(Token::T_BRACE_SQUARE_OPEN,'[');
+		$arrValueInsert [] = $aBraceSquareOpenToken ;
+		
+		// key
+		if( null === $aDoubleArrowToken ){
+			$aToken = new Token(T_WHITESPACE,T_WHITESPACE);
+			$aToken->setTargetCode(__FUNCTION__.'_key');
+			$arrValueInsert [] = $aToken ;
+		}else{
+			// insert key
+			foreach($arrTokenListBeforeArrow as $aToken){
+				$aCloneToken = clone $aToken ;
+				$this->generateTargetCode($aTokenPool , $aCloneToken );
+				$arrValueInsert [] = $aCloneToken ;
+			}
+		}
+		
+		// ]
+		$aBraceSquareCloseToken = new Token(Token::T_BRACE_SQUARE_CLOSE,']');
+		$arrValueInsert [] = $aBraceSquareCloseToken ;
+		
+		// ;
+		$aSemicolonToken = new Token(Token::T_SEMICOLON,Token::T_SEMICOLON);
+		$arrValueInsert [] = $aSemicolonToken ;
+		
+		// insert
+		array_unshift($arrValueInsert , $aBraceOpenToken);
+		call_user_func_array(array($aTokenPool,'insertAfter'),$arrValueInsert) ;
 	}
 	
 }
