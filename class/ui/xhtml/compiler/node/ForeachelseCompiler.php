@@ -23,7 +23,7 @@ use org\jecat\framework\ui\ObjectContainer;
 class ForeachelseCompiler extends NodeCompiler 
 {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
-	{
+	{		
 		Type::check("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject) ;
 
 		$aDev->write("} 
