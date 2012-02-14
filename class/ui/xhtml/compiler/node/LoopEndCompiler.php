@@ -23,15 +23,14 @@ use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 use org\jecat\framework\ui\ObjectContainer;
 
-class DoubleEndCompiler extends NodeCompiler 
+class LoopEndCompiler extends NodeCompiler 
 {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Type::check("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject) ;
 
-		$aDev->write("
+		$aDev->write("\$aStackForLoopIsEnableToRun->out();
 						}
-					}
 					");
 	}
 }
