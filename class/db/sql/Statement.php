@@ -78,6 +78,7 @@ abstract class Statement extends Object
 	{
 		if (is_string ( $value ))
 		{
+			$value = str_replace('%', '%%', $value) ;
 			return "'" . addslashes ( $value ) . "'";
 		}
 		else if (is_numeric ( $value ))
