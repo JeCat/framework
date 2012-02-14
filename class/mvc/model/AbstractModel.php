@@ -146,11 +146,8 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	
 	public function clearData()
 	{
-		if ($this->isEmpty ())
-		{
-			return;
-		}
-		$aModel->arrDatas = null ;
+		$this->arrDatas = null ;
+		$this->arrChildren = array() ;
 		$this->clearChanged();
 	}
 	

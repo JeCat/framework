@@ -158,9 +158,9 @@ class HttpRequest extends Request
 		return $this->urlInfo('scheme') . '://' . $this->urlInfo('host') . $this->urlInfo('path') ;
 	}
 	
-	public function uri($excludeQueryArgvs=null)
+	public function uri($excludeQueryArgvs=null,$includeQueryArgvs=null)
 	{
-		if(!$excludeQueryArgvs)
+		if(!$excludeQueryArgvs and !$includeQueryArgvs)
 		{
 			if(!$this->sUri)
 			{
@@ -171,7 +171,7 @@ class HttpRequest extends Request
 		}
 		else
 		{
-			return $this->urlPath() . $this->urlQuery(true,$excludeQueryArgvs) ;
+			return $this->urlPath() . $this->urlQuery(true,$excludeQueryArgvs,$includeQueryArgvs) ;
 		}
 	}
 
