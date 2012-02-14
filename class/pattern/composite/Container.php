@@ -229,6 +229,10 @@ class Container extends Object implements IContainer, \Serializable
 		{
 			if( $this->has($aInsObject) )
 			{
+				$nHasPos = $this->search($aInsObject) ;
+				if($nHasPos <= $nPos ){
+					-- $nPos ;
+				}
 				$this->remove($aInsObject) ;
 			}
 		
@@ -281,6 +285,10 @@ class Container extends Object implements IContainer, \Serializable
 			{
 				if( $this->has($aInsObject) )
 				{
+					$nHasPos = $this->search($aInsObject) ;
+					if($nHasPos <= $nPos ){
+						-- $nPos ;
+					}
 					$this->remove($aInsObject) ;
 				}
 				

@@ -59,8 +59,9 @@ class CompilerManager extends JcObject
 		$aTargetCodeStream = new TargetCodeOutputStream ;
 		$aTargetCodeStream->open($aCompiledOutput,$bPHPTag) ;
 		
-		// 变量声明
+		// 变量声明 buffer
 		$aBuffVarsDeclare = new OutputStreamBuffer() ;
+		$aTargetCodeStream->write($aBuffVarsDeclare) ;
 		
 		// 编译正文
 		foreach($aObjectContainer->iterator() as $aObject)
@@ -71,6 +72,9 @@ class CompilerManager extends JcObject
 				$aCompiler->compile($aObject,$aObjectContainer,$aTargetCodeStream,$this) ;
 			}
 		}
+		
+		// 变量声明
+		$aObjectContainer->variableDeclares()->make($aBuffVarsDeclare) ;
 
 		$aTargetCodeStream->close($bPHPTag) ;
 	}

@@ -35,13 +35,14 @@ class Restriction extends SubStatement
 				}
 			}
 			else if(is_array($express))
-			{
+			{				
 				// 字段名
 				$n = count($express) ;
 				for($i=1;$i<$n;$i++)
 				{
 					$express[$i] = $this->transColumn($express[$i],$aState) ;
 				}
+				
 				$arrExpressions [] = call_user_func_array('sprintf',$express) ;
 			}
 			else

@@ -119,28 +119,30 @@ class ResourceManager extends Object implements \Serializable
 			'arrFolders' => array() ,
 		) ;
 		
-		foreach($this->arrFolders as $sNamespace=>$arrFolders)
+		foreach($this->arrFolders as $sNamespace=>&$arrFolders)
 		{
 			foreach($arrFolders as $aFolder)
 			{
-				$arrData['arrFolders'][$sNamespace][] = $aFolder->path() ;
+				$arrData['arrFolders'][$sNamespace][] =& $aFolder->path() ;
 			}
 		}
 		
 		return serialize($arrData) ;
 	}
-
+	
 	public function unserialize($serialized)
 	{
 		$this->__construct() ;
-		
+	
+		$aFileSystem = FileSystem::singleton() ;
 		$arrData = unserialize($serialized) ;
-		foreach($arrData['arrFolders'] as $sNamespace=>$arrFolders)
+		foreach($arrData['arrFolders'] as $sNamespace=>&$arrFolders)
 		{
-			foreach($arrFolders as $sFolderPath)
+			krsort($arrFolders) ; // <-- 颠倒序列化时的目录顺序
+	
+			foreach($arrFolders as &$sPath)
 			{
-				$aFolder = FileSystem::singleton()->findFolder($sFolderPath) ;
-				$this->addFolder($aFolder,$sNamespace) ;
+				$this->addFolder( $aFileSystem->findFolder($sPath), $sNamespace ) ;
 			}
 		}
 	}
