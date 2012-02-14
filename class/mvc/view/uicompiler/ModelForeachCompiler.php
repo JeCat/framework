@@ -26,12 +26,14 @@ class ModelForeachCompiler extends NodeCompiler
 			$aDev->write("\t\${$sIdx}=0;\r\n") ;
 		}
 		
-		$aDev->write("\tforeach(\$aForModel->childIterator() as \$__aChildModel){\r\n") ;
-		$aDev->write("\t\t\$aVariables->set('{$sItem}',\$__aChildModel) ;\r\n") ;
+		$aDev->write("\tif(\$aForModel->childrenCount()){") ;
+		
+		$aDev->write("\t\tforeach(\$aForModel->childIterator() as \$__aChildModel){\r\n") ;
+		$aDev->write("\t\t\t\$aVariables->set('{$sItem}',\$__aChildModel) ;\r\n") ;
 	
 		if($sIdx)
 		{
-			$aDev->write("\t\t\$aVariables->set('{$sIdx}',\${$sIdx}++) ;\r\n") ;
+			$aDev->write("\t\t\t\$aVariables->set('{$sIdx}',\${$sIdx}++) ;\r\n") ;
 		}
 		
 		
@@ -40,6 +42,7 @@ class ModelForeachCompiler extends NodeCompiler
 			
 			$this->compileChildren($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
 
+			$aDev->write("\t\t}") ;
 			$aDev->write("\t}\r\n}\r\n") ;
 		}
 	}
