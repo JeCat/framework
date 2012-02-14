@@ -19,7 +19,7 @@ class UIFactory extends UIFactoryBase
 		// for mvc
 		ParserStateTag::singleton()->addTagNames(
 				'views', 'view', 'widget', 'form', 'msgqueue', 'view:msgqueue', 'widget:msgqueue', 'resrc', 'link', 'css', 'script'
-				, 'js', 'model:foreach', 'model:foreach:end', 'model:data', 'data', 'template'
+				, 'js', 'model:foreach', 'model:foreach:end', 'model:data', 'data', 'template', 'model:foreach:else'
 		) ;
 		
 		return $aInterpreters ;
@@ -41,6 +41,7 @@ class UIFactory extends UIFactoryBase
 		$aNodeCompilers->addSubCompiler('widget:msgqueue',__NAMESPACE__."\\uicompiler\\WidgetMsgQueueCompiler") ;
 		
 		$aNodeCompilers->addSubCompiler('model:foreach',__NAMESPACE__."\\uicompiler\\ModelForeachCompiler") ;
+		$aNodeCompilers->addSubCompiler('model:foreach:else',"org\\jecat\\framework\\ui\\xhtml\\compiler\\node\\ForeachelseCompiler") ;
 		$aNodeCompilers->addSubCompiler('model:foreach:end',"org\\jecat\\framework\\ui\\xhtml\\compiler\\node\\DoubleEndCompiler") ;
 		$aNodeCompilers->addSubCompiler('model:data',__NAMESPACE__."\\uicompiler\\ModelDataCompiler") ;
 		$aNodeCompilers->addSubCompiler('data',__NAMESPACE__."\\uicompiler\\ModelDataCompiler") ;

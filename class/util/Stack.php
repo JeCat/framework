@@ -36,6 +36,43 @@ class Stack extends Object
 		return null ;
 	}
 	
+	public function putRef(&$element) 
+	{
+		$this->arrDataStack[] =& $element ;
+	}
+	
+	public function & outRef()
+	{
+		if(empty($this->arrDataStack))
+		{
+			$var = null ;
+		}
+		else
+		{
+			end($this->arrDataStack) ;
+			$nIdx = key($this->arrDataStack) ;
+			
+			$var =& $this->arrDataStack[$nIdx] ;
+			unset($this->arrDataStack[$nIdx]) ;
+		}
+		
+		return $var ;
+	}
+	
+	public function & getRef()
+	{
+		if(empty($this->arrDataStack))
+		{
+			$var = null ;
+			return $var ;
+		}
+		else
+		{
+			end($this->arrDataStack) ;
+			return $this->arrDataStack[key($this->arrDataStack)] ;
+		}
+	}
+	
 	public function length()
 	{
 		return count($this->arrDataStack) ;
