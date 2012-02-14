@@ -51,7 +51,8 @@ class Authorizer implements IBean
 	
 	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,BeanFactory $aBeanFactory=null)
 	{
-		$aBean = new self() ;
+		$sClass = get_called_class() ;
+		$aBean = new $sClass() ;
 		$aBean->arrBeanConfig = $arrConfig ;
 		
 		if($bBuildAtOnce)
