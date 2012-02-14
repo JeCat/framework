@@ -18,6 +18,33 @@ use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 use org\jecat\framework\ui\ObjectContainer;
+/**
+ * @wiki /模板引擎/标签
+ *
+ * {|
+ *  !<while>
+ *  !可单行
+ *  !条件流程控制，匿名属性必须是一个表达式，当表达式返回true时，执行 <if> 和 </if> 之间的内容
+ *  |---
+ *  !属性	匿名属性必须是一个表达式，当表达式返回true时，执行 <if> 和 </if> 之间的内容
+ *  !
+ *  !类型
+ *  !默认值
+ *  !说明
+ *  |---
+ *  |@匿名
+ *  |必须
+ *  |expression
+ *  |
+ *  |条件表达式
+ *  |}
+ */
+/**
+ * @author anubis
+ * @example /模板引擎/标签/自定义标签:name[1]
+ *
+ *
+ */
 
 class WhileCompiler extends NodeCompiler {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) {

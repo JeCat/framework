@@ -10,7 +10,7 @@
  * 单行写法:
  * <foreach exp />
  * 	[<foreach:else/>]
- * <foreach/>
+ * <foreach:end/>
  * 
  * 
  * for   exp 循环目标
@@ -34,7 +34,45 @@ use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 use org\jecat\framework\ui\ObjectContainer;
-
+/**
+ * @wiki /模板引擎/标签
+ *
+ * {|
+ *  !<foreach>
+ *  !可单行
+ *  !循环控制
+ *  |---
+ *  !属性
+ *  !
+ *  !类型
+ *  !默认值
+ *  !说明
+ *  |---
+ *  |for
+ *  |必须
+ *  |expression
+ *  |
+ *  |循环目标
+ *  |---
+ *  |key
+ *  |可选
+ *  |text/expression
+ *  |
+ *  |迭代元素的键名/下标,相当于php中foreach语法中的key
+ *  |---
+ *  |item
+ *  |可选
+ *  |text/expression
+ *  |
+ *  |迭代元素的变量名,相当于php中foreach语法中的value
+ *  |}
+ */
+/**
+ * @author anubis
+ * @example /模板引擎/标签/自定义标签:name[1]
+ * 
+ *  
+ */
 class ForeachCompiler extends NodeCompiler {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) {
 		

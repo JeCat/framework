@@ -1,18 +1,31 @@
 <?php 
-/**
- * 
- * else , 如果else后面跟密名参数,则当作elseif处理
- * 
- * <if exp>
- * 	[ifbody]
- * 	<else/>
- * 	[elsebody]
- * </if>
- * 
- * @author anubis
- *
- */
 namespace org\jecat\framework\ui\xhtml\compiler\node ;
+/**
+ * @wiki /模板引擎/标签
+ *
+ * {|
+ *  !<else/>
+ *  !可单行
+ *  !条件流程控制，若<if>中的判断条件为false，则实行else的语句
+ *  |---
+ *  !属性
+ *  !
+ *  !类型
+ *  !默认值
+ *  !说明
+ *  |---
+ *  |
+ *  |
+ *  |expression
+ *  |
+ *  |条件表达式
+ *  |}
+ */
+/**
+ * @example /模板引擎/标签/自定义标签:name[1]
+ *
+ *  
+ */
 
 use org\jecat\framework\ui\xhtml\compiler\ExpressionCompiler;
 use org\jecat\framework\ui\xhtml\Node;
