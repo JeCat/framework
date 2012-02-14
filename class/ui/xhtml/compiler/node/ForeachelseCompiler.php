@@ -26,8 +26,9 @@ class ForeachelseCompiler extends NodeCompiler
 	{
 		Type::check("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject) ;
 
-		$aDev->write("} 
-					}else{
+		$aDev->write("
+					} 
+					if(!\$aStackForLoopIsEnableToRun->get();)
 					{
 					");
 	}

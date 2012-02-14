@@ -38,6 +38,11 @@ use org\jecat\framework\ui\ObjectContainer;
 class ForeachCompiler extends NodeCompiler {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) {
 		
+		if( !$aObjectContainer->variableDeclares()->hasDeclared('aStackForLoopIsEnableToRun') )
+		{
+			$aObjectContainer->variableDeclares()->declareVarible('aStackForLoopIsEnableToRun','new \\org\\jecat\\framework\\util\\Stack()') ;
+		}
+		
 		Type::check("org\\jecat\\framework\\ui\\xhtml\\Node", $aObject );
 		
 		$aAttrs = $aObject->attributes();
@@ -63,10 +68,13 @@ class ForeachCompiler extends NodeCompiler {
 		$aDev->write ( "\r\n// foreach start ") ;
 		$aDev->write ( "{$sForAutoName} = {$sForUserExp};
 if(!empty({$sForAutoName})){
+\$aStackForLoopIsEnableToRun->put(false);
 	{$sIdxAutoName} = -1;
 	foreach({$sForAutoName} as {$sKeyAutoName}=>{$sItemRef}{$sItemAutoName}){");
 
-		$aDev->write ( "		{$sIdxAutoName}++;" );
+		$aDev->write ( "\$bLoopIsEnableToRun = & \$aStackForLoopIsEnableToRun->getRef();
+			\$bLoopIsEnableToRun = true;
+			{$sIdxAutoName}++;" );
 		
 		if( !empty($sKeyUserName) )
 		{
@@ -80,7 +88,7 @@ if(!empty({$sForAutoName})){
 		{
 			$aDev->write ( "		\$aVariables[{$sIdxUserName}]={$sIdxAutoName}; ");
 		}
-							
+		
 		//是否是单行标签?
 		if(!$aObject->headTag()->isSingle()){
 			//循环体，可能会包含foreach:else标签
