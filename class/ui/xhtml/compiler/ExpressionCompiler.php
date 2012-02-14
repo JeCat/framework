@@ -41,9 +41,6 @@ class ExpressionCompiler extends BaseCompiler
 					$sVarName = substr($arrOneTkn[1],1) ;
 					$sVarNameNew = 'aVariables->'.$sVarName ;
 					
-					// 声明变量
-					$aVarDeclares->declareVarible($sVarName,$sVarNameNew) ;
-					
 					$sLineCode.= '$'.$sVarNameNew ;
 				}
 				else 
