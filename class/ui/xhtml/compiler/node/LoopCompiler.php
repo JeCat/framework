@@ -72,7 +72,10 @@ class LoopCompiler extends NodeCompiler
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Assert::type ( "org\\jecat\\framework\\ui\\xhtml\\Node", $aObject, 'aObject' );
-		
+		if( !$aObjectContainer->variableDeclares()->hasDeclared('aStackForLoopIsEnableToRun') )
+		{
+			$aObjectContainer->variableDeclares()->declareVarible('aStackForLoopIsEnableToRun','new \\org\\jecat\\framework\\util\\Stack()') ;
+		}
 		$aAttrs = $aObject->attributes ();
 		$sStartValue = $aAttrs->has ( "start" ) ? $aAttrs->expression ( "start" ) : '0';
 		$sEndValue = $aAttrs->expression ( "end" );
@@ -86,6 +89,7 @@ class LoopCompiler extends NodeCompiler
 		$aDev->write ( "		{$sEndName}  = {$sEndValue} ; 
 								{$sStepName}  = {$sStepValue}  ;
 								{$sIdxAutoName} = 0;
+								\$aStackForLoopIsEnableToRun->put(false);
 								for( {$sVarAutoName} = {$sStartValue} ; {$sVarAutoName} <= {$sEndName} ; {$sVarAutoName} += {$sStepName} ){  
 						" );
 		if ($aAttrs->has ( "var" ))
@@ -99,7 +103,8 @@ class LoopCompiler extends NodeCompiler
 			$aDev->write ( "			\$aVariables->{$sIdxUserName} = $sIdxAutoName ;
 										{$sIdxAutoName}++;" );
 		}
-// 		$aDev->write ( '' );
+		$aDev->write ( "\$bLoopIsEnableToRun = & \$aStackForLoopIsEnableToRun->getRef();
+			\$bLoopIsEnableToRun = true;" );
 		
 		if(!$aObject->headTag()->isSingle()){
 			$this->compileChildren ( $aObject, $aObjectContainer, $aDev, $aCompilerManager );
@@ -107,5 +112,4 @@ class LoopCompiler extends NodeCompiler
 		}
 	}
 }
-
 ?>

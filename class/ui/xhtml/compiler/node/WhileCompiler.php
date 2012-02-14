@@ -50,14 +50,20 @@ class WhileCompiler extends NodeCompiler {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) {
 		Type::check ( "org\\jecat\\framework\\ui\\xhtml\\Node", $aObject );
 		
+		if( !$aObjectContainer->variableDeclares()->hasDeclared('aStackForLoopIsEnableToRun') )
+		{
+			$aObjectContainer->variableDeclares()->declareVarible('aStackForLoopIsEnableToRun','new \\org\\jecat\\framework\\util\\Stack()') ;
+		}
+		
 		$sIdxUserName = $aObject->attributes()->has ( 'idx' ) ? $aObject->attributes()->string ( 'idx' ) : '' ;
 		$sIdxAutoName = NodeCompiler::assignVariableName ( '$__while_idx_' ) ;
 		if( !empty($sIdxUserName) ){
-			$aDev->write ( "  {$sIdxAutoName} = -1;   " );
+			$aDev->write ( "  {$sIdxAutoName} = -1;  \$aStackForLoopIsEnableToRun->put(false); " );
 		}
 		$aDev->write ( " while(" );
 		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes ()->anonymous()->source (), $aObjectContainer->variableDeclares() ) );
-		$aDev->write ( "){  " );
+		$aDev->write ( "){  \$bLoopIsEnableToRun = & \$aStackForLoopIsEnableToRun->getRef();
+			\$bLoopIsEnableToRun = true;" );
 		if( !empty($sIdxUserName) ){
 			$aDev->write ( " {$sIdxAutoName}++; 
 							\$aVariables->{$sIdxUserName}={$sIdxAutoName};   ");
