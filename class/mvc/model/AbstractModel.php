@@ -351,9 +351,9 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 	 */
 	public function changed($sName=null)
 	{
-		if($sName)
+		if($sName===null)
 		{
-			return !empty($aModel->arrChanged[$sName]) ;
+			return !empty($this->arrChanged) ;
 		}
 		else
 		{
@@ -371,7 +371,7 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 			}
 			else
 			{
-				return $aModel->arrChanged ;
+				return isset($aModel->arrChanged[$sName]) ;
 			}
 		}
 	}
