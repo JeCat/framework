@@ -35,7 +35,7 @@ use org\jecat\framework\ui\ObjectContainer;
  *  |vars
  *  |可选
  *  |bool
- *  |true
+ *  |false
  *  |条件表达式
  *  |}
  */
