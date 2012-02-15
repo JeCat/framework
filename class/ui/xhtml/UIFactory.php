@@ -31,8 +31,8 @@ class UIFactory extends UIFactoryBase
 
 		// for ui
 		ParserStateTag::singleton()->addTagNames(
-				'if', 'else', 'if:else', 'elseif', 'loop', 'foreach', 'foreach:else', 'while', 'dowhile', 'do', 'signle:end'
-				, 'if:end', 'loop:end', 'while:end', 'dowhile:end', 'double:end', 'foreach:end'
+				'if', 'else', 'if:else', 'elseif', 'loop', 'foreach', 'foreach:else', 'while', 'dowhile', 'do', 'struct:end'
+				, 'if:end', 'loop:end', 'while:end', 'dowhile:end', 'foreach:end'
 				, 'include', 'function', 'continue', 'break', 'script'
 				, 'subtemplate', 'subtemplate:define', 'subtemplate:call'
 				, 'nl', 'clear', 'code', 'render:js'
@@ -76,19 +76,23 @@ class UIFactory extends UIFactoryBase
 			$aNodeCompiler->addSubCompiler('loop',__NAMESPACE__."\\compiler\\node\\LoopCompiler") ;
 			//foreach
 			$aNodeCompiler->addSubCompiler('foreach',__NAMESPACE__."\\compiler\\node\\ForeachCompiler") ;
-			$aNodeCompiler->addSubCompiler('foreach:else',__NAMESPACE__."\\compiler\\node\\ForeachelseCompiler") ;
+			//loopelse
+			$aNodeCompiler->addSubCompiler('foreach:else',__NAMESPACE__."\\compiler\\node\\LoopelseCompiler") ;
+			$aNodeCompiler->addSubCompiler('while:else',__NAMESPACE__."\\compiler\\node\\LoopelseCompiler") ;
+			$aNodeCompiler->addSubCompiler('dowhile:else',__NAMESPACE__."\\compiler\\node\\LoopelseCompiler") ;
+			$aNodeCompiler->addSubCompiler('do:else',__NAMESPACE__."\\compiler\\node\\LoopelseCompiler") ;
+			$aNodeCompiler->addSubCompiler('loop:else',__NAMESPACE__."\\compiler\\node\\LoopelseCompiler") ;
 			//while
 			$aNodeCompiler->addSubCompiler('while',__NAMESPACE__."\\compiler\\node\\WhileCompiler") ;
 			$aNodeCompiler->addSubCompiler('dowhile',__NAMESPACE__."\\compiler\\node\\DoWhileCompiler") ;
 			$aNodeCompiler->addSubCompiler('do',__NAMESPACE__."\\compiler\\node\\DoWhileCompiler") ;
 			//ends
-			$aNodeCompiler->addSubCompiler('signle:end',__NAMESPACE__."\\compiler\\node\\SingleEndCompiler") ;
-			$aNodeCompiler->addSubCompiler('if:end',__NAMESPACE__."\\compiler\\node\\SingleEndCompiler") ;
-			$aNodeCompiler->addSubCompiler('loop:end',__NAMESPACE__."\\compiler\\node\\SingleEndCompiler") ;
-			$aNodeCompiler->addSubCompiler('while:end',__NAMESPACE__."\\compiler\\node\\SingleEndCompiler") ;
-			$aNodeCompiler->addSubCompiler('dowhile:end',__NAMESPACE__."\\compiler\\node\\SingleEndCompiler") ;
-			$aNodeCompiler->addSubCompiler('double:end',__NAMESPACE__."\\compiler\\node\\DoubleEndCompiler") ;
-			$aNodeCompiler->addSubCompiler('foreach:end',__NAMESPACE__."\\compiler\\node\\DoubleEndCompiler") ;
+			$aNodeCompiler->addSubCompiler('struct:end',__NAMESPACE__."\\compiler\\node\\StructEndCompiler") ;
+			$aNodeCompiler->addSubCompiler('if:end',__NAMESPACE__."\\compiler\\node\\StructEndCompiler") ;
+			$aNodeCompiler->addSubCompiler('loop:end',__NAMESPACE__."\\compiler\\node\\LoopEndCompiler") ;
+			$aNodeCompiler->addSubCompiler('while:end',__NAMESPACE__."\\compiler\\node\\LoopEndCompiler") ;
+			$aNodeCompiler->addSubCompiler('dowhile:end',__NAMESPACE__."\\compiler\\node\\LoopEndCompiler") ;
+			$aNodeCompiler->addSubCompiler('foreach:end',__NAMESPACE__."\\compiler\\node\\LoopEndCompiler") ;
 			//others
 			$aNodeCompiler->addSubCompiler('include',__NAMESPACE__."\\compiler\\node\\IncludeCompiler") ;
 			$aNodeCompiler->addSubCompiler('function',__NAMESPACE__."\\compiler\\node\\FunctionCompiler") ;

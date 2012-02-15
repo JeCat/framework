@@ -41,8 +41,8 @@ class UIFactory extends UIFactoryBase
 		$aNodeCompilers->addSubCompiler('widget:msgqueue',__NAMESPACE__."\\uicompiler\\WidgetMsgQueueCompiler") ;
 		
 		$aNodeCompilers->addSubCompiler('model:foreach',__NAMESPACE__."\\uicompiler\\ModelForeachCompiler") ;
-		$aNodeCompilers->addSubCompiler('model:foreach:else',"org\\jecat\\framework\\ui\\xhtml\\compiler\\node\\ForeachelseCompiler") ;
-		$aNodeCompilers->addSubCompiler('model:foreach:end',"org\\jecat\\framework\\ui\\xhtml\\compiler\\node\\DoubleEndCompiler") ;
+		$aNodeCompilers->addSubCompiler('model:foreach:else',"org\\jecat\\framework\\ui\\xhtml\\compiler\\node\\LoopelseCompiler") ;
+		$aNodeCompilers->addSubCompiler('model:foreach:end',"org\\jecat\\framework\\ui\\xhtml\\compiler\\node\\LoopEndCompiler") ;
 		$aNodeCompilers->addSubCompiler('model:data',__NAMESPACE__."\\uicompiler\\ModelDataCompiler") ;
 		$aNodeCompilers->addSubCompiler('data',__NAMESPACE__."\\uicompiler\\ModelDataCompiler") ;
 		

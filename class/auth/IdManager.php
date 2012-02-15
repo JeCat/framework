@@ -40,6 +40,7 @@ class IdManager extends Object implements \Serializable
 		if( !$aSession->hasVariable($sSessionName) or !$aIdMgr=$aSession->variable($sSessionName) )
 		{
 			$aIdMgr = new self() ;
+			
 			$aSession->addVariable($sSessionName, $aIdMgr) ;
 		}
 		

@@ -1,10 +1,13 @@
-<?php
+<?php 
 /**
- * 当exe为假时执行的语句
  * 
- * <foreach exe>
- * 	<foreach:else/>
- * </foreach>
+ * else
+ * 
+ * <if exp>
+ * 	[ifbody]
+ * 	<else/>
+ * 	[elsebody]
+ * </if>
  * 
  * @author anubis
  *
@@ -20,15 +23,14 @@ use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 use org\jecat\framework\ui\ObjectContainer;
 
-class ForeachelseCompiler extends NodeCompiler 
+class LoopEndCompiler extends NodeCompiler 
 {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
-	{		
+	{
 		Type::check("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject) ;
 
-		$aDev->write("} 
-					}else{
-					{
+		$aDev->write("\$aStackForLoopIsEnableToRun->out();
+						}
 					");
 	}
 }
