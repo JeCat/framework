@@ -1,20 +1,19 @@
 <?php
 namespace org\jecat\framework\mvc\controller ;
 
+use org\jecat\framework\mvc\view\ViewAssemblySlot;
+use org\jecat\framework\system\ApplicationFactory;
 use org\jecat\framework\pattern\composite\IContainer;
-
 use org\jecat\framework\mvc\model\IModel;
-
 use org\jecat\framework\db\DB;
-
 use org\jecat\framework\mvc\controller\IController;
 use org\jecat\framework\util\IFilterMangeger;
 use org\jecat\framework\io\PrintStream;
 use org\jecat\framework\lang\Object ;
 
 class Response extends Object
-{	
-	public function __construct(PrintStream $aPrinter)
+{
+	public function __construct(PrintStream $aPrinter=null)
 	{
 		$this->aPrinter = $aPrinter ;
 	}
@@ -115,29 +114,26 @@ class Response extends Object
 			$this->printer()->write(var_export($this->arrReturnVariables,true)) ;
 			break ;
 			
-		// view ------------
-		case 'noframe' :
-		case 'view.noframe' :
-			$aController->renderMainView($aController->mainView()) ;
-			$aController->displayMainView($aController->mainView(),$this->printer()) ;
-			break ;
-			
+		// view ------------			
 		case 'view' :
 		case 'view.inframe' :
 		default :
-			
 			if( $aFrame = $aController->frame() )
 			{
-				$aController->renderMainView($aFrame->mainView()) ;
-				
-				$aController->displayMainView($aFrame->mainView(),$this->printer()) ;
+				$aMainView = $aFrame->mainView() ;
 			}
-			else
+			// 没有 break ，进入下面的 case 
+		case 'noframe' :
+		case 'view.noframe' :
+			
+			if(empty($aMainView))
 			{
-				$aController->renderMainView($aController->mainView()) ;
-				
-				$aController->displayMainView($aController->mainView(),$this->printer()) ;
+				$aMainView = $aController->mainView() ;
 			}
+			
+			$aController->renderMainView($aMainView) ;
+			$aMainView->assembly() ;
+			$aController->displayMainView($aMainView,$this->printer()) ;
 			
 			break ;
 		}
@@ -237,8 +233,12 @@ class Response extends Object
 	 * 
 	 * @return org\jecat\framework\io\PrintSteam
 	 */
-	public function printer()
+	public function printer($bAutoCreate=true)
 	{
+		if( !$this->aPrinter and $bAutoCreate )
+		{
+			$this->aPrinter = ApplicationFactory::singleton()->createResponseDevice() ;
+		}
 		return $this->aPrinter ;
 	}
 	

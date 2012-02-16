@@ -877,11 +877,29 @@ class Controller extends NamableComposite implements IController, IBean
     }
 
     /**
-     * @return Response
+     * @return org\jecat\framework\mvc\controller\Response
      */
     public function response()
     {
-    	return Response::singleton() ;
+    	if(!$this->aResponse)
+    	{
+    		// 补充缺省的 frame 配置
+    		if(empty($this->arrBeanConfig['rspn']))
+    		{
+    			$this->aResponse = Response::singleton() ;
+    		}
+    		else
+    		{
+    			if(!empty($this->arrBeanConfig['rspn']['class']))
+    			{
+    				$this->arrBeanConfig['rspn']['class'] = 'org\\jecat\\framework\\mvc\\controller\\Response' ;
+    				$this->aResponse = BeanFactory::singleton()->createBean($this->arrBeanConfig['rspn'],'*',false) ;
+    			}
+    		}
+    		
+    		
+    	}
+    	return $this->aResponse ;
     }
     
     protected function modelContainer()
@@ -981,6 +999,8 @@ class Controller extends NamableComposite implements IController, IBean
      * @var org\jecat\framework\util\IDataSrc
      */
     protected $params = null ;
+
+    private $aResponse = null ;
     
     private $aMainView = null ;
     

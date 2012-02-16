@@ -117,7 +117,8 @@ class WebpageFrame extends Controller
 			$sChildName = $aChild->name() ;
 		}
 		$this->viewContainer()->add( $aChild->mainView(), "mainView-".$sChildName, true )  ;
-	} 
+		$this->mainView()->add( $aChild->mainView(), $sChildName, false )  ;
+	}
 	
 	public function addFrameView(IView $aFrameView)
 	{
@@ -127,7 +128,7 @@ class WebpageFrame extends Controller
 		}
 		$aFrameView->setController($this) ;
 	
-	
+		
 		$this->viewContainer()->add( $aFrameView ) ;
 	
 		$this->setViewContainer($aFrameView) ;

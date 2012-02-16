@@ -84,6 +84,11 @@ class OutputStreamBuffer extends OutputStream implements IRedirectableStream, IB
 		}
 	}
 	
+	public function & bufferRawDatas()
+	{
+		return $this->arrBuffer ;
+	}
+	
 	public function redirect(IOutputStream $aOutputStream=null)
 	{
 		// 从原来的重定向目标设备中解除

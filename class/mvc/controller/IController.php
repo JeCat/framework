@@ -45,6 +45,11 @@ interface IController extends IMessageQueueHolder, IContainer, IContainedable
     public function clearViews() ;
     
     /**
+     * @return org\jecat\framework\mvc\view\IView
+     */
+    public function mainView() ;
+    
+    /**
      * @return org\jecat\framework\mvc\controller\IController
      */
     public function frame() ;
