@@ -11,7 +11,7 @@
  * 
  * <loop [start] end [step var]> 
  * [loopbody]
- * [<else/>]
+ * [<loop:else/>]
  * [elsebody] 
  * </loop> 
  * 
@@ -19,6 +19,44 @@
  *
  */
 namespace org\jecat\framework\ui\xhtml\compiler\node;
+/**
+ * @wiki /模板引擎/标签
+ *
+ * {|
+ *  !<loop>
+ *  !不可单行
+ *  !循环控制，匿名属性必须是一个表达式，当表达式返回true时，执行 <if> 和 </if> 之间的内容
+ *  |---
+ *  !属性
+ *  !
+ *  !类型
+ *  !默认值
+ *  !说明
+ *  |---
+ *  |start
+ *  |可选
+ *  |int/expression
+ *  |0
+ *  |开始属性,属性值必须在''之内
+ *  |---
+ *  |end
+ *  |必须
+ *  |int/expression
+ *  |
+ *  |结束属性,属性值必须在''之内
+ *  |---
+ *  |step
+ *  |必须
+ *  |int/expression
+ *  |1
+ *  |步长属性,属性值必须在''之内
+ *  |}
+ */
+/**
+ * @example /模板引擎/标签/自定义标签:name[1]
+ *
+ *  通过if标签编译器的代码演示如何编写一个标签编译器
+ */
 
 use org\jecat\framework\ui\xhtml\Node;
 use org\jecat\framework\lang\Assert;

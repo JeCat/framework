@@ -35,7 +35,7 @@ use org\jecat\framework\ui\ObjectContainer;
  *  |vars
  *  |可选
  *  |bool
- *  |true
+ *  |false
  *  |条件表达式
  *  |}
  */
@@ -49,7 +49,7 @@ class IncludeCompiler extends NodeCompiler
 
 		if( $aAttributes->has("file") )
 		{
-			$sFileName = $aAttributes->string("file") ;		
+			$sFileName = '"'.addslashes($aAttributes->string("file")).'"' ;		
 		}
 		else 
 		{

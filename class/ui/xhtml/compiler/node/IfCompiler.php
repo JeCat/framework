@@ -74,7 +74,6 @@ class IfCompiler extends NodeCompiler {
 		
 		if (!$aObject->headTag()->isSingle()) {
 			$this->compileChildren ( $aObject, $aObjectContainer, $aDev, $aCompilerManager );
-			//如果是单行格式,那么if就在这里结尾
 			$aDev->write ( "} " );
 		}
 	}
