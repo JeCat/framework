@@ -407,7 +407,7 @@ class Controller extends NamableComposite implements IController, IBean
      * 
      * 把一个控制器B做为”子控制器“添加给另一个控制器A的时候，B的主视图，会自动成为A的一个普通视图。这样一来，当控制器组合到一起的时候，他们的视图也自动完成了组合。
      * 
-     * 主视图是一个特殊的视图类 org\jecat\framework\mvc\view\TransparentViewContainer，它在视图的组合结构中，是透明存在的。
+     * [s]主视图是一个特殊的视图类 org\jecat\framework\mvc\view\TransparentViewContainer，它在视图的组合结构中，是透明存在的。[/s]
      * 
      * @return IView
      */
@@ -415,7 +415,7 @@ class Controller extends NamableComposite implements IController, IBean
     {
     	if( !$this->aMainView )
     	{
-    		$this->setMainView( new TransparentViewContainer('mainView-'.$this->name(),null) ) ;
+    		$this->setMainView( new View('mainView-'.$this->name(),null) ) ;
     	}
 
     	return $this->aMainView ;
@@ -556,8 +556,10 @@ class Controller extends NamableComposite implements IController, IBean
 			throw new Exception("名称为：%s 的子控制器在控制器 %s 中已经存在，无法添加同名的子控制器",array($sName,$this->name())) ;
 		}
 		
+		// 接管子类的视图
 		$this->takeOverView($object,$sName) ;
 
+		// 子类继承父类的 数据
 		if( $bTakeover and $object->params()!==$this->params())
 		{
 			$object->params()->addChild($this->params()) ;
@@ -571,11 +573,7 @@ class Controller extends NamableComposite implements IController, IBean
 	 */
 	protected function takeOverView(IController $aChild,$sChildName=null)
 	{
-		if($sChildName===null)
-		{
-			$sChildName = $aChild->name() ;
-		}
-		$this->mainView()->add( $aChild->mainView(), "mainView-".$sChildName, true )  ;
+		$this->mainView()->add( $aChild->mainView(), $sChildName?:$aChild->name(), true )  ;
 	} 
 	
 	public function remove($object)
