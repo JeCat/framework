@@ -58,7 +58,15 @@ class String extends Object
 		if(!$bByChar){
 			return strlen($this->sText) ;
 		}else{
-			return strlen($this->sText) ;
+			$nBitLength=strlen($this->sText);
+			$nLength = 0;
+			for($i=0;$i<$nBitLength;$i++){
+				if(ord($this->sText[$i])>127){
+					$i+=2;
+				}
+				$nLength++;
+			}
+			return $nLength ;
 		}
 	}
 	
