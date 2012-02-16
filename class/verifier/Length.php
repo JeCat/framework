@@ -10,10 +10,11 @@ use org\jecat\framework\lang\Object;
 
 class Length extends Object implements IVerifier, IBean
 {
-	public function __construct($nMinLen=-1,$nMaxLen=-1)
+	public function __construct($nMinLen=-1,$nMaxLen=-1,$bByByte=true)
 	{
 		$this->nMinLen = $nMinLen ;
 		$this->nMaxLen = $nMaxLen ;
+		$this->bByByte = $bByByte;
 	}
 	
 	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
