@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\util ;
 
+use org\jecat\framework\ui\InterpreterManager;
+
 use org\jecat\framework\fs\IFile ;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\Object;
@@ -45,9 +47,19 @@ class String extends Object
 		$this->sText = substr_replace($this->sText,$sText,$nPos,0) ;
 	}
 
-	public function length()
+	/**
+	 * 计算字符长度
+	 * 
+	 * @param $bByChar bool 为true按字符计算(中文占3个字节),为false按字节计算,默认false
+	 * @return Inter
+	 */
+	public function length($bByChar = false)
 	{
-		return strlen($this->sText) ;
+		if(!$bByChar){
+			return strlen($this->sText) ;
+		}else{
+			return strlen($this->sText) ;
+		}
 	}
 	
 	public function clear()
