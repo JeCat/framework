@@ -2,6 +2,8 @@
 
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\lang\Exception;
+
 use org\jecat\framework\lang\Object;
 use org\jecat\framework\db\DB;
 use org\jecat\framework\mvc\model\db\IModel ;
@@ -35,12 +37,57 @@ class Inserter extends OperationStrategy
 		
 		// -----------------------------------
 		// insert 当前model
-		foreach($aModel->dataNameIterator() as $sClmName)
-		{
-			$aInsert->setData('`'.$sClmName.'`',$aModel->data($sClmName)) ;
-		}
+		$bTableLocked = false ;
+		$sTableName = $aPrototype->tableName() ;
+		$e = null ;
+		try{
+			// 检查/自动生成 主键值
+			if( $arrKey = $aPrototype->keys() )
+			{
+				foreach($arrKey as $sKeyName)
+				{
+					if( $aModel->data($sKeyName)===null )
+					{
+						$aClmRef = $aPrototype->columnReflecter($sKeyName) ;
+						if( !$aClmRef->isAutoIncrement() )
+						{
+							// 锁表
+							if(!$bTableLocked)
+							{
+								$aDB->execute("LOCK TABLES `{$sTableName}` WRITE ;") ;
+								$bTableLocked = true ;
+							}
+							
+							// 生成并设置主键值
+							$keyValue = AutoPrimaryGenerator::singleton()->generate($aClmRef,$sTableName,$aDB) ;
+							$aModel->setData($sKeyName,$keyValue) ;
+						}
+					}
+					
+				}
+			}
+			
+			// 设置数据
+			foreach($aModel->dataNameIterator() as $sClmName)
+			{
+				$aInsert->setData('`'.$sClmName.'`',$aModel->data($sClmName)) ;
+			}
+			
+			// 执行 insert
+			$aDB->execute( $aInsert ) ;
+			
+		}catch (\Exception $e)
+		{}
 		
-		$aDB->execute( $aInsert ) ;
+		// 解锁后再抛出异常
+		if($bTableLocked)
+		{
+			$aDB->execute("UNLOCK TABLES ;") ;
+		}
+		if($e)
+		{
+			throw $e ;
+		}
 		
 		// 自增形主键
 		if( $sDevicePrimaryKey=$aPrototype->devicePrimaryKey() and $aModel->data($sDevicePrimaryKey)===null )
