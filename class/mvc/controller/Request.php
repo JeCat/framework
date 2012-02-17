@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\controller ;
 
+use org\jecat\framework\util\IDataSrc;
+
 use org\jecat\framework\util\IFilterMangeger;
 use org\jecat\framework\util\DataSrc ;
 
@@ -51,6 +53,13 @@ class Request extends DataSrc
 	{
 		$this->aFilters = $aFilters ;
 	}
+	
+	static public function isUserRequest(IDataSrc $aRequest)
+	{
+		return $aRequest->bool(self::DATANAME_USERCALL) ;
+	}
+	
+	const DATANAME_USERCALL = '.data-name-is-user-call' ;
 	
 	/**
 	 * Enter description here ...

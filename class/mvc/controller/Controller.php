@@ -242,7 +242,7 @@ class Controller extends NamableComposite implements IController, IBean
     	{
     		$arrConfig['models']['model'] =& $arrConfig['model'] ;
     	}
-    	if( !empty($arrConfig['view']) and is_array($arrConfig['view']) and empty($arrConfig['views']['view']) )
+    	if( array_key_exists('view',$arrConfig) and is_array($arrConfig['view']) )
     	{
     		$arrConfig['views']['view'] =& $arrConfig['view'] ;
     	}
@@ -440,34 +440,29 @@ class Controller extends NamableComposite implements IController, IBean
      * 
      * @see IController::mainRun()
      */
-    public function mainRun (ExecuteState $aExecuteState=null)
+    public function mainRun ()
     {
-    	if(!$aExecuteState)
-    	{
-    		$aExecuteState = ExecuteState::flyweight(array(true),true) ;
-    	}
-    	
-		self::processController($this,$aExecuteState) ;
+		self::processController($this) ;
 			
 		// 处理 frame
 		// （先执行自己，后执行 frame）
     	if( $aFrame=$this->frame() )
     	{    		
-    		self::processController($aFrame,$aExecuteState) ;
+    		self::processController($aFrame) ;
     	}
     	
-    	$this->response()->process($this,$aExecuteState) ;
+    	$this->response()->process($this) ;
     }
     
-    static protected function processController(IController $aController,ExecuteState $aExecuteState)
+    static protected function processController(IController $aController)
     {
 		foreach($aController->iterator() as $aChild)
 		{
-			self::processController($aChild,$aExecuteState) ;
+			self::processController($aChild) ;
 		}
     		
     	try{
-    		$aController->process($aExecuteState) ;
+    		$aController->process() ;
     	}
     	catch(_ExceptionRelocation $e)
     	{}
@@ -807,6 +802,7 @@ class Controller extends NamableComposite implements IController, IBean
     public function removeModel(IModel $aModel)
     {
     	$this->modelContainer()->remove($aModel) ;
+    	return $this ;
     }
     /**
 	 * @return org\jecat\framework\mvc\model\IModel
@@ -826,6 +822,7 @@ class Controller extends NamableComposite implements IController, IBean
     public function clearModels()
     {
     	$this->modelContainer()->clear() ;
+    	return $this ;
     }
     
     
@@ -843,21 +840,23 @@ class Controller extends NamableComposite implements IController, IBean
     {
     	$aView->setController(null) ;
     	$this->mainView()->remove($aView) ;
+    	return $this ;
     }
     /**
 	 * @return org\jecat\framework\mvc\view\IView
      */
     public function viewByName($sName)
     {
-    	$this->mainView()->getByName($sName) ;
+    	return $this->mainView()->getByName($sName) ;
     }
     public function viewIterator()
     {
-    	$this->mainView()->iterator() ;
+    	return $this->mainView()->iterator() ;
     }
     public function clearViews()
     {
     	$this->mainView()->clear() ;
+    	return $this ;
     }
     
     /**
