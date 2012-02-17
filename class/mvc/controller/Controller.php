@@ -227,6 +227,14 @@ class Controller extends NamableComposite implements IController, IBean
     	{
     		$this->setKeywords($arrConfig['keywords']) ;
     	}
+		
+		if( isset($arrConfig['param.exclude']) ){
+			if(!$this->params)
+			{
+				$this->params = new DataSrc() ;
+			}
+			$this->params->setExclude($arrConfig['param.exclude'] ) ;
+		}
     	
     	$aBeanFactory = BeanFactory::singleton() ;
     	
