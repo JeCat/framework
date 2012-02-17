@@ -29,7 +29,7 @@ class HttpRequest extends Request
 	public function __construct(Application $aApp=null)
 	{
 		parent::__construct() ;
-		
+				
 		foreach(self::$arrDataSources as $sVarName)
 		{
 			if( isset($GLOBALS[$sVarName]) )
@@ -49,6 +49,8 @@ class HttpRequest extends Request
 		
 		// 
 		$this->sRequestUrl = (empty($_SERVER['HTTPS'])?'http://':'https://').$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'] ;
+		
+		$this->set(parent::DATANAME_USERCALL, true) ;
 	}
 	
 	public function exportToArray(array &$arrToArray)

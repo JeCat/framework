@@ -305,18 +305,18 @@ class View extends NamableComposite implements IView, IBean
 	}
 	
 	/**
-	 * @return org\jecat\framework\io\IRedirectableStream
+	 * @return org\jecat\framework\io\OutputStreamBuffer
 	 */
-	public function outputStream()
+	public function outputStream($bAutoCreate=true)
 	{
-		if(!$this->aOutputStream)
+		if(!$this->aOutputStream and $bAutoCreate)
 		{
 			$this->aOutputStream = new OutputStreamBuffer() ;
 		}
 		
 		return $this->aOutputStream ;
 	}
-	public function setOutputStream(IRedirectableStream $aDev)
+	public function setOutputStream(OutputStreamBuffer $aDev)
 	{
 		$this->aOutputStream = $aDev ;
 	}
@@ -331,7 +331,11 @@ class View extends NamableComposite implements IView, IBean
 		return !$this->aOutputStream or !$this->aOutputStream->redirectionDev() ;
 	}
 	
-	public function render($bRerender=true)
+	/**
+	 * 渲染视图，渲染后的结果(html)可以通过 outputStream() 取得
+	 * @see org\jecat\framework\mvc\view.IView::render()
+	 */
+	public function render($bRerender=false)
 	{
 		if(!$this->bEnable)
 		{
@@ -348,6 +352,9 @@ class View extends NamableComposite implements IView, IBean
 		{
 			$this->renderTemplate($sTemplate) ;
 		}
+		
+		// 用于收容”流浪“视图的槽
+		$this->outputStream()->write(new ViewAssemblySlot()) ;
 		
 		// render child view
 		$this->renderChildren($bRerender) ;
@@ -374,25 +381,18 @@ class View extends NamableComposite implements IView, IBean
 		foreach($this->iterator() as $aChildView)
 		{
 			$aChildView->render($bRerender) ;
-			
-			// 显示下级“流浪”视图
-			if( $aChildView->isVagrant() )
-			{
-				if(empty($aLayoutFrame))
-				{
-					$aLayoutFrame = new ViewLayoutFrame(null,'vagranters') ;
-					$aLayoutFrame->outputStream()->redirect($this->outputStream()) ;
-					$this->add($aLayoutFrame) ;
-				}
-				$aLayoutFrame->add($aChildView) ;
-			}
-		}
-		if(!empty($aLayoutFrame))
-		{
-			$aLayoutFrame->render() ;
 		}
 	}
 	
+	public function assembly()
+	{
+		ViewAssemblySlot::assembly($this) ;
+	}
+	
+	/**
+	 * 输出视图。
+	 * @see org\jecat\framework\mvc\view.IView::display()
+	 */
 	public function display(IOutputStream $aDevice=null)
 	{
 		if(!$this->bEnable)
@@ -415,6 +415,8 @@ class View extends NamableComposite implements IView, IBean
 	public function show()
 	{
 		$this->render() ;
+		
+		$this->assembly() ;
 		
 		$this->display() ;
 	}

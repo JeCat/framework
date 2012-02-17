@@ -6,6 +6,12 @@ use org\jecat\framework\fs\FileSystem;
 
 class HttpAppFactory extends ApplicationFactory
 {
+	public function __construct()
+	{
+		// 向客户端发送有效的编码
+		header("Content-type: text/html; charset=UTF-8");
+	}
+	
 	public function createRequest(Application $aApp)
 	{
 		require_once \org\jecat\framework\PATH."/class/util/IHashTable.php" ;
@@ -21,13 +27,9 @@ class HttpAppFactory extends ApplicationFactory
 		return $aReq ;
 	}
 	
-	public function createResponse(Application $aApp)
+	public function createResponseDevice()
 	{
-		// 向客户端发送有效的编码
-		header("Content-type: text/html; charset=UTF-8");
-		$aRespn = parent::createResponse($aApp,new \org\jecat\framework\io\HtmlPrintStream()) ;
-		
-		return $aRespn ;
+		return new \org\jecat\framework\io\HtmlPrintStream() ;
 	}
 }
 

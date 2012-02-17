@@ -16,15 +16,11 @@ class CLAppFactory extends ApplicationFactory
 		$aReq->setApplication($aApp) ;
 		
 		return $aReq ;
-	}
+	}	
 	
-	public function createResponse(Application $aApp)
+	public function createResponseDevice()
 	{
-		$aPrinter = new \org\jecat\framework\io\ShellPrintStream() ;
-		$aPrinter->setApplication($aApp) ;
-		
-		$aRespn = parent::createResponse($aApp,$aPrinter) ;
-		return $aRespn ;
+		return new \org\jecat\framework\io\ShellPrintStream() ;
 	}
 }
 

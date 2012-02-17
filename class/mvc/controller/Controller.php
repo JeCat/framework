@@ -227,6 +227,14 @@ class Controller extends NamableComposite implements IController, IBean
     	{
     		$this->setKeywords($arrConfig['keywords']) ;
     	}
+		
+		if( isset($arrConfig['param.exclude']) ){
+			if(!$this->params)
+			{
+				$this->params = new DataSrc() ;
+			}
+			$this->params->setExclude($arrConfig['param.exclude'] ) ;
+		}
     	
     	$aBeanFactory = BeanFactory::singleton() ;
     	
@@ -242,7 +250,7 @@ class Controller extends NamableComposite implements IController, IBean
     	{
     		$arrConfig['models']['model'] =& $arrConfig['model'] ;
     	}
-    	if( !empty($arrConfig['view']) and is_array($arrConfig['view']) and empty($arrConfig['views']['view']) )
+    	if( array_key_exists('view',$arrConfig) and is_array($arrConfig['view']) )
     	{
     		$arrConfig['views']['view'] =& $arrConfig['view'] ;
     	}
@@ -407,7 +415,7 @@ class Controller extends NamableComposite implements IController, IBean
      * 
      * 把一个控制器B做为”子控制器“添加给另一个控制器A的时候，B的主视图，会自动成为A的一个普通视图。这样一来，当控制器组合到一起的时候，他们的视图也自动完成了组合。
      * 
-     * 主视图是一个特殊的视图类 org\jecat\framework\mvc\view\TransparentViewContainer，它在视图的组合结构中，是透明存在的。
+     * [s]主视图是一个特殊的视图类 org\jecat\framework\mvc\view\TransparentViewContainer，它在视图的组合结构中，是透明存在的。[/s]
      * 
      * @return IView
      */
@@ -415,7 +423,7 @@ class Controller extends NamableComposite implements IController, IBean
     {
     	if( !$this->aMainView )
     	{
-    		$this->setMainView( new TransparentViewContainer('mainView-'.$this->name(),null) ) ;
+    		$this->setMainView( new View('mainView-'.$this->name(),null) ) ;
     	}
 
     	return $this->aMainView ;
@@ -447,9 +455,7 @@ class Controller extends NamableComposite implements IController, IBean
 		// 处理 frame
 		// （先执行自己，后执行 frame）
     	if( $aFrame=$this->frame() )
-    	{
-    		$aFrame->takeOverView($this) ;
-    		
+    	{    		
     		self::processController($aFrame) ;
     	}
     	
@@ -556,8 +562,10 @@ class Controller extends NamableComposite implements IController, IBean
 			throw new Exception("名称为：%s 的子控制器在控制器 %s 中已经存在，无法添加同名的子控制器",array($sName,$this->name())) ;
 		}
 		
+		// 接管子类的视图
 		$this->takeOverView($object,$sName) ;
 
+		// 子类继承父类的 数据
 		if( $bTakeover and $object->params()!==$this->params())
 		{
 			$object->params()->addChild($this->params()) ;
@@ -571,11 +579,7 @@ class Controller extends NamableComposite implements IController, IBean
 	 */
 	protected function takeOverView(IController $aChild,$sChildName=null)
 	{
-		if($sChildName===null)
-		{
-			$sChildName = $aChild->name() ;
-		}
-		$this->mainView()->add( $aChild->mainView(), "mainView-".$sChildName, true )  ;
+		$this->mainView()->add( $aChild->mainView(), $sChildName?:$aChild->name(), true )  ;
 	} 
 	
 	public function remove($object)
@@ -792,6 +796,8 @@ class Controller extends NamableComposite implements IController, IBean
 	    	$this->aFrame->buildParams($this->params()) ;
 
 	    	$this->aFrame->buildBean($this->arrBeanConfig['frame']) ;
+	    	
+    		$this->aFrame->takeOverView($this) ;
     	}
     	
     	return $this->aFrame ;
@@ -804,6 +810,7 @@ class Controller extends NamableComposite implements IController, IBean
     public function removeModel(IModel $aModel)
     {
     	$this->modelContainer()->remove($aModel) ;
+    	return $this ;
     }
     /**
 	 * @return org\jecat\framework\mvc\model\IModel
@@ -823,6 +830,7 @@ class Controller extends NamableComposite implements IController, IBean
     public function clearModels()
     {
     	$this->modelContainer()->clear() ;
+    	return $this ;
     }
     
     
@@ -840,21 +848,23 @@ class Controller extends NamableComposite implements IController, IBean
     {
     	$aView->setController(null) ;
     	$this->mainView()->remove($aView) ;
+    	return $this ;
     }
     /**
 	 * @return org\jecat\framework\mvc\view\IView
      */
     public function viewByName($sName)
     {
-    	$this->mainView()->getByName($sName) ;
+    	return $this->mainView()->getByName($sName) ;
     }
     public function viewIterator()
     {
-    	$this->mainView()->iterator() ;
+    	return $this->mainView()->iterator() ;
     }
     public function clearViews()
     {
     	$this->mainView()->clear() ;
+    	return $this ;
     }
     
     /**
@@ -877,11 +887,29 @@ class Controller extends NamableComposite implements IController, IBean
     }
 
     /**
-     * @return Response
+     * @return org\jecat\framework\mvc\controller\Response
      */
     public function response()
     {
-    	return Response::singleton() ;
+    	if(!$this->aResponse)
+    	{
+    		// 补充缺省的 frame 配置
+    		if(empty($this->arrBeanConfig['rspn']))
+    		{
+    			$this->aResponse = Response::singleton() ;
+    		}
+    		else
+    		{
+    			if(!empty($this->arrBeanConfig['rspn']['class']))
+    			{
+    				$this->arrBeanConfig['rspn']['class'] = 'org\\jecat\\framework\\mvc\\controller\\Response' ;
+    				$this->aResponse = BeanFactory::singleton()->createBean($this->arrBeanConfig['rspn'],'*',false) ;
+    			}
+    		}
+    		
+    		
+    	}
+    	return $this->aResponse ;
     }
     
     protected function modelContainer()
@@ -981,6 +1009,8 @@ class Controller extends NamableComposite implements IController, IBean
      * @var org\jecat\framework\util\IDataSrc
      */
     protected $params = null ;
+
+    private $aResponse = null ;
     
     private $aMainView = null ;
     

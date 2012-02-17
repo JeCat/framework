@@ -3,6 +3,7 @@ namespace org\jecat\framework\util ;
 
 use org\jecat\framework\lang\Factory;
 use org\jecat\framework\lang\Object;
+use org\jecat\framework\lang\Type;
 
 /**
  * 
@@ -81,6 +82,11 @@ class DataSrc extends HashTable implements IDataSrc, \ArrayAccess, \Iterator
 		if( parent::has($sName) )
 		{
 			return true ;
+		}
+		
+		// 在 exclude中的数据，不向 childs中寻找
+		if(in_array($sName,$this->arrExclude)){
+			return false ;
 		}
 		
 		// 从 Childs 中找数据
@@ -317,9 +323,16 @@ class DataSrc extends HashTable implements IDataSrc, \ArrayAccess, \Iterator
 		}
 	}
 	
+	public function setExclude($exclude){
+		Type::toArray($exclude) ;
+		$this->arrExclude = $exclude ;
+	}
+	
 	protected $arrChildren = array() ;
 	
 	private $arrDisables ;
+	
+	private $arrExclude = array () ;
 }
 
 ?>

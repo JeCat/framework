@@ -69,9 +69,6 @@ abstract class ApplicationFactory extends Object
 		// Request
 		Request::setSingleton( $this->createRequest($aApp) ) ;
 		
-		// Response
-		Response::setSingleton( $this->createResponse($aApp) ) ;
-		
 		// setting
 		Setting::setSingleton($this->createSetting($aApp)) ;
 		
@@ -121,13 +118,15 @@ abstract class ApplicationFactory extends Object
 	abstract public function createRequest(Application $aApp) ;
 
 	
-	public function createResponse(Application $aApp,PrintStream $aPrinter)
+	public function createResponse(Application $aApp)
 	{
-		$aRespn = new Response($aPrinter) ;
+		$aRespn = new Response($this->createResponseDevice()) ;
 		$aRespn->setFilters(StdOutputFilterMgr::singleton()) ;
 		
 		return $aRespn ;
 	}
+	
+	abstract public function createResponseDevice() ;
 	
 	/**
 	 * @return use org\jecat\framework\setting\Setting;

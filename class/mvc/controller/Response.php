@@ -1,20 +1,21 @@
 <?php
 namespace org\jecat\framework\mvc\controller ;
 
+use org\jecat\framework\mvc\view\View;
+
+use org\jecat\framework\mvc\view\ViewAssemblySlot;
+use org\jecat\framework\system\ApplicationFactory;
 use org\jecat\framework\pattern\composite\IContainer;
-
 use org\jecat\framework\mvc\model\IModel;
-
 use org\jecat\framework\db\DB;
-
 use org\jecat\framework\mvc\controller\IController;
 use org\jecat\framework\util\IFilterMangeger;
 use org\jecat\framework\io\PrintStream;
 use org\jecat\framework\lang\Object ;
 
 class Response extends Object
-{	
-	public function __construct(PrintStream $aPrinter)
+{
+	public function __construct(PrintStream $aPrinter=null)
 	{
 		$this->aPrinter = $aPrinter ;
 	}
@@ -70,6 +71,12 @@ class Response extends Object
 	 * 在 控制器提供的frame的视图 中显示控制器的视图，这是 rspn参数的缺省值
 	 * * rspn=[b]inframe[/b]			
 	 * (和 view.inframe 相同)
+	 * * rspn=[b]view （默认）[/b]			
+	 * (和 view.inframe 相同)
+	 * * rspn=[b]disable[/b]			
+	 * 禁止输出任何内容（但不会禁止 rspn.debug.* 相关的内容）
+	 * 
+	 * [^]如果控制器中没有视图(或视图都被禁用)，在 view.* 模式下，系统会输出控制器的消息队列[/^]
 	 * 
 	 * 
 	 * ==调式相关参数==
@@ -115,30 +122,49 @@ class Response extends Object
 			$this->printer()->write(var_export($this->arrReturnVariables,true)) ;
 			break ;
 			
-		// view ------------
-		case 'noframe' :
-		case 'view.noframe' :
-			$aController->renderMainView($aController->mainView()) ;
-			$aController->displayMainView($aController->mainView(),$this->printer()) ;
-			break ;
-			
+		// view ------------	
+		default :
 		case 'view' :
 		case 'view.inframe' :
-		default :
-			
 			if( $aFrame = $aController->frame() )
 			{
-				$aController->renderMainView($aFrame->mainView()) ;
-				
-				$aController->displayMainView($aFrame->mainView(),$this->printer()) ;
+				$aMainView = $aFrame->mainView() ;
 			}
-			else
+			// 没有 break ，进入下面的 case 
+		case 'noframe' :
+		case 'view.noframe' :
+			
+			if(empty($aMainView))
 			{
-				$aController->renderMainView($aController->mainView()) ;
-				
-				$aController->displayMainView($aController->mainView(),$this->printer()) ;
+				$aMainView = $aController->mainView() ;
 			}
 			
+			$aController->renderMainView($aMainView) ;
+			
+			// 控制器没有有效视图
+			$nValidViews = 0 ;
+			foreach($aController->viewIterator() as $aView)
+			{
+				if($aView->isEnable())
+				{
+					$nValidViews ++ ;
+				}
+			}
+			if(!$nValidViews)
+			{
+				// 临时提供一个仅显示消息队列的视图
+				$aTmpView = new View() ;
+				$aController->addView($aTmpView,'tmp_view_for_msgqueue') ;
+				$aController->messageQueue()->display(null,$aTmpView->outputStream()) ;
+			}
+			
+			$aMainView->assembly() ;
+			$aController->displayMainView($aMainView,$this->printer()) ;
+			
+			break ;
+			
+		case 'disable' :
+			// nothing todo
 			break ;
 		}
 		
@@ -237,8 +263,12 @@ class Response extends Object
 	 * 
 	 * @return org\jecat\framework\io\PrintSteam
 	 */
-	public function printer()
+	public function printer($bAutoCreate=true)
 	{
+		if( !$this->aPrinter and $bAutoCreate )
+		{
+			$this->aPrinter = ApplicationFactory::singleton()->createResponseDevice() ;
+		}
 		return $this->aPrinter ;
 	}
 	
