@@ -440,31 +440,34 @@ class Controller extends NamableComposite implements IController, IBean
      * 
      * @see IController::mainRun()
      */
-    public function mainRun ()
+    public function mainRun (ExecuteState $aExecuteState=null)
     {
-		self::processController($this) ;
+    	if(!$aExecuteState)
+    	{
+    		$aExecuteState = ExecuteState::flyweight(array(true),true) ;
+    	}
+    	
+		self::processController($this,$aExecuteState) ;
 			
 		// 处理 frame
 		// （先执行自己，后执行 frame）
     	if( $aFrame=$this->frame() )
-    	{
-    		$aFrame->takeOverView($this) ;
-    		
-    		self::processController($aFrame) ;
+    	{    		
+    		self::processController($aFrame,$aExecuteState) ;
     	}
     	
-    	$this->response()->process($this) ;
+    	$this->response()->process($this,$aExecuteState) ;
     }
     
-    static protected function processController(IController $aController)
+    static protected function processController(IController $aController,ExecuteState $aExecuteState)
     {
 		foreach($aController->iterator() as $aChild)
 		{
-			self::processController($aChild) ;
+			self::processController($aChild,$aExecuteState) ;
 		}
     		
     	try{
-    		$aController->process() ;
+    		$aController->process($aExecuteState) ;
     	}
     	catch(_ExceptionRelocation $e)
     	{}
@@ -790,6 +793,8 @@ class Controller extends NamableComposite implements IController, IBean
 	    	$this->aFrame->buildParams($this->params()) ;
 
 	    	$this->aFrame->buildBean($this->arrBeanConfig['frame']) ;
+	    	
+    		$this->aFrame->takeOverView($this) ;
     	}
     	
     	return $this->aFrame ;
