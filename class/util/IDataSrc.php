@@ -22,6 +22,12 @@ interface IDataSrc extends IHashTable
 	public function clearDisabled() ;
 	
 	public function toUrlQuery() ;
+	
+	/**
+	 * @brief 禁止向child搜索相关参数
+	 * @params $exclude array or string
+	 */
+	public function setExclude($exclude);
 }
 
 ?>
