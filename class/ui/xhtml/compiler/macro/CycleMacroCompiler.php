@@ -8,6 +8,34 @@ use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\IObject;
 
+/**
+ * @wiki /模板引擎/宏
+ *
+ * {|
+ *  !{@ }
+ *  !
+ *  !{@ }中的内容被顺序的使用，每次只能使用一个,循环
+ *  |---
+ *  !使用方法
+ *  !
+ *  !说明
+ *  !
+ *  !
+ *  |---
+ *  |{@ 1,2}
+ *  |
+ *  |每次只显示一个数字
+ *  |
+ *  |
+ *  |}
+ */
+/**
+ * @author anubis
+ * @example /模板引擎/宏/自定义标签:name[1]
+ *
+ *  通过{@ }标签编译器的代码演示如何编写一个标签编译器
+ */
+
 class CycleMacroCompiler extends MacroCompiler
 {
 	public function compile(IObject $aObject, TargetCodeOutputStream $aDev, CompilerManager $aCompilerManager)
