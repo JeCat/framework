@@ -425,7 +425,7 @@ class Prototype extends StatementFactory implements IBean
 	}
 	
 	/**
-	 * @return org\jecat\framework\db\reflecter\AbstractReflecterFactory
+	 * @return org\jecat\framework\db\reflecter\AbStractTableReflecter
 	 */
 	public function tableReflecter()
 	{
@@ -437,6 +437,23 @@ class Prototype extends StatementFactory implements IBean
 		}
 		
 		return $aTableReflecter ;
+	}
+	
+	/**
+	 * @return org\jecat\framework\db\reflecter\AbStractColumnReflecter
+	 */
+	public function columnReflecter($sColumn)
+	{
+		$sColumn = $this->getColumnByAlias($sColumn)?: $sColumn ;
+		
+		$aColumnReflecter = $this->db()->reflecterFactory()->columnReflecter($this->sTableName,$sColumn) ;
+		
+		if( !$aColumnReflecter->isExist() )
+		{
+			throw new Exception('ORM原型(%s)的数据表字段无效：%s.%s',array($this->path(),$this->tableName(),$sColumn)) ;
+		}
+		
+		return $aColumnReflecter ;
 	}
 	
 	// for sql statement
