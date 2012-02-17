@@ -19,6 +19,16 @@
  *
  */
 namespace org\jecat\framework\ui\xhtml\compiler\node;
+
+use org\jecat\framework\ui\xhtml\Node;
+use org\jecat\framework\lang\Assert;
+use org\jecat\framework\ui\ICompiler;
+use org\jecat\framework\ui\ObjectContainer;
+use org\jecat\framework\ui\TargetCodeOutputStream;
+use org\jecat\framework\ui\CompilerManager;
+use org\jecat\framework\ui\IObject;
+use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
+
 /**
  * @wiki /模板引擎/标签
  *
@@ -55,17 +65,8 @@ namespace org\jecat\framework\ui\xhtml\compiler\node;
 /**
  * @example /模板引擎/标签/自定义标签:name[1]
  *
- *  通过if标签编译器的代码演示如何编写一个标签编译器
+ *  通过loop标签编译器的代码演示如何编写一个标签编译器
  */
-
-use org\jecat\framework\ui\xhtml\Node;
-use org\jecat\framework\lang\Assert;
-use org\jecat\framework\ui\ICompiler;
-use org\jecat\framework\ui\ObjectContainer;
-use org\jecat\framework\ui\TargetCodeOutputStream;
-use org\jecat\framework\ui\CompilerManager;
-use org\jecat\framework\ui\IObject;
-use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 
 class LoopCompiler extends NodeCompiler
 {
@@ -90,7 +91,9 @@ class LoopCompiler extends NodeCompiler
 								{$sStepName}  = {$sStepValue}  ;
 								{$sIdxAutoName} = 0;
 								\$aStackForLoopIsEnableToRun->put(false);
-								for( {$sVarAutoName} = {$sStartValue} ; {$sVarAutoName} <= {$sEndName} ; {$sVarAutoName} += {$sStepName} ){  
+								for( {$sVarAutoName} = {$sStartValue} ; {$sVarAutoName} <= {$sEndName} ; {$sVarAutoName} += {$sStepName} ){
+								\$bLoopIsEnableToRun = & \$aStackForLoopIsEnableToRun->getRef();
+								\$bLoopIsEnableToRun = true;  
 						" );
 		if ($aAttrs->has ( "var" ))
 		{
@@ -103,8 +106,8 @@ class LoopCompiler extends NodeCompiler
 			$aDev->write ( "			\$aVariables->{$sIdxUserName} = $sIdxAutoName ;
 										{$sIdxAutoName}++;" );
 		}
-		$aDev->write ( "\$bLoopIsEnableToRun = & \$aStackForLoopIsEnableToRun->getRef();
-			\$bLoopIsEnableToRun = true;" );
+// 		$aDev->write ( "\$bLoopIsEnableToRun = & \$aStackForLoopIsEnableToRun->getRef();
+// 			\$bLoopIsEnableToRun = true;" );
 		
 		if(!$aObject->headTag()->isSingle()){
 			$this->compileChildren ( $aObject, $aObjectContainer, $aDev, $aCompilerManager );

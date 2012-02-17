@@ -24,32 +24,32 @@ use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 use org\jecat\framework\ui\ObjectContainer;
 
 /**
-* @wiki /模板引擎/标签
-*
-* {
-	|
-	*  !<dowhile>
-	*  !可单行
-	*  !条件流程控制，匿名属性必须是一个表达式，当表达式返回true时，执行 <dowhile> 和 </dowhile> 之间的内容
-	*  |---
-	*  !属性
-	*  !
-	*  !类型
-	*  !默认值
-	*  !说明
-	*  |---
-	*  |@匿名
-	*  |必须
-	*  |expression
-	*  |
-	*  |条件表达式
-	*  |}
-	*/
-	/**
-	* @example /模板引擎/标签/自定义标签:name[1]
-	*
-	*  
-*/
+ * @wiki /模板引擎/标签
+ *
+ * {|
+ *  !<dowhile>
+ *  !可单行
+ *  !条件流程控制，匿名属性必须是一个表达式，当表达式返回true时，执行 <dowhile> 和 </dowhile> 之间的内容
+ *  |---
+ *  !属性
+ *  !
+ *  !类型
+ *  !默认值
+ *  !说明
+ *  |---
+ *  |@匿名
+ *  |必须
+ *  |expression
+ *  |
+ *  |条件表达式
+ *  |}
+ */
+/**
+ * @author anubis
+ * @example /模板引擎/标签/自定义标签:name[1]
+ *
+ *  通过dowhile标签编译器的代码演示如何编写一个标签编译器
+ */
 
 class DoWhileCompiler extends NodeCompiler {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) {

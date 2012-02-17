@@ -23,10 +23,10 @@ use org\jecat\framework\ui\ObjectContainer;
  *
  * {|
  *  !<while>
- *  !可单行
- *  !条件流程控制，匿名属性必须是一个表达式，当表达式返回true时，执行 <if> 和 </if> 之间的内容
+ *  !不可单行
+ *  !条件流程控制，匿名属性必须是一个表达式
  *  |---
- *  !属性	匿名属性必须是一个表达式，当表达式返回true时，执行 <if> 和 </if> 之间的内容
+ *  !属性
  *  !
  *  !类型
  *  !默认值
@@ -42,8 +42,8 @@ use org\jecat\framework\ui\ObjectContainer;
 /**
  * @author anubis
  * @example /模板引擎/标签/自定义标签:name[1]
- *
- *
+ * 
+ *	通过while标签编译器的代码演示如何编写一个标签编译器
  */
 
 class WhileCompiler extends NodeCompiler {

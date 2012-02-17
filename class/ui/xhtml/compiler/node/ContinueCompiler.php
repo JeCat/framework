@@ -43,7 +43,7 @@ use org\jecat\framework\ui\ObjectContainer;
 /**
  * @example /模板引擎/标签/自定义标签:name[1]
  *
- *  
+ *  通过continue标签编译器的代码演示如何编写一个标签编译器
  */
 
 class ContinueCompiler extends NodeCompiler {

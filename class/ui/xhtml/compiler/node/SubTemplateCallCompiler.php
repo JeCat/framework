@@ -12,6 +12,38 @@ use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 use org\jecat\framework\ui\ObjectContainer;
 
+/**
+ * @wiki /模板引擎/标签
+ *
+ * {|
+ *  !<sutemplate:call>
+ *  !不可单行
+ *  !定义一个模版
+ *  |---
+ *  !属性
+ *  !
+ *  !类型
+ *  !默认值
+ *  !说明
+ *  |---
+ *  |name
+ *  |必须
+ *  |expression
+ *  |
+ *  |---
+ *  |vars
+ *  |可选
+ *  |bool
+ *  |false
+ *  |是否调用模版中的变量，true为调用，false为不调用
+ *  |}
+ */
+/**
+ * @example /模板引擎/标签/自定义标签:name[1]
+ *
+ *  通过sutemplatedefine标签编译器的代码演示如何编写一个标签编译器
+ */
+
 class SubTemplateCallCompiler extends NodeCompiler
 {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)

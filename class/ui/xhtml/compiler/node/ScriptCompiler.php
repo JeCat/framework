@@ -10,6 +10,45 @@ use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 use org\jecat\framework\ui\ObjectContainer;
 
+/**
+ * @wiki /模板引擎/标签
+ *
+ * {|
+ *  !<scirpt>
+ *  !可单行
+ *  !javascript脚本的使用标签
+ *  |---
+ *  !属性
+ *  !
+ *  !类型
+ *  !默认值
+ *  !说明
+ *  |---
+ *  |type
+ *  |可选
+ *  |expression
+ *  |
+ *  |
+ *  |---
+ *  |src
+ *  |可选
+ *  |expression
+ *  |
+ *  |必须要配合<resrc/>这个标签一起使用
+ *  |---
+ *  |ignore
+ *  |可选
+ *  |expression
+ *  |false
+ *  |当ignore为true时，不考虑蜂巢模版的src搜寻url的问题,传统的src的功能恢复
+ *  |}
+ */
+/**
+ * @example /模板引擎/标签/自定义标签:name[1]
+ *
+ *  通过script标签编译器的代码演示如何编写一个标签编译器
+ */
+
 class ScriptCompiler extends NodeCompiler
 {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)

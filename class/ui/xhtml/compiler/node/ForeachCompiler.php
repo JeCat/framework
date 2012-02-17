@@ -71,7 +71,7 @@ use org\jecat\framework\ui\ObjectContainer;
  * @author anubis
  * @example /模板引擎/标签/自定义标签:name[1]
  * 
- *  
+ * 通过while标签编译器的代码演示如何编写一个标签编译器 
  */
 class ForeachCompiler extends NodeCompiler {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) {

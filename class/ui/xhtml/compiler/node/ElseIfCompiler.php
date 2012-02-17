@@ -5,7 +5,7 @@
  * {|
  *  !<elseif exp>
  *  !不可单行
- *  !条件流程控制，若<if>中的判断条件为false，则实行else的语句
+ *  !条件流程控制，若<if>中的判断条件为false，则实行elseif的语句
  *  |---
  *  !属性
  *  !
@@ -23,7 +23,7 @@
 /**
  * @example /模板引擎/标签/自定义标签:name[1]
  *
- *  
+ *	通过elseif标签编译器的代码演示如何编写一个标签编译器  
  */
 namespace org\jecat\framework\ui\xhtml\compiler\node;
 

@@ -31,7 +31,7 @@ class UIFactory extends UIFactoryBase
 
 		// for ui
 		ParserStateTag::singleton()->addTagNames(
-				'if', 'else', 'if:else', 'elseif', 'loop', 'foreach', 'foreach:else', 'while', 'dowhile', 'do', 'struct:end'
+				'if', 'else', 'if:else', 'elseif', 'loop', 'foreach', 'foreach:else','while:else','dowhile:else','do:else','loop:else' ,'while', 'dowhile', 'do', 'struct:end'
 				, 'if:end', 'loop:end', 'while:end', 'dowhile:end', 'foreach:end'
 				, 'include', 'function', 'continue', 'break', 'script'
 				, 'subtemplate', 'subtemplate:define', 'subtemplate:call'
@@ -102,7 +102,6 @@ class UIFactory extends UIFactoryBase
 			$aNodeCompiler->addSubCompiler('resrc',__NAMESPACE__."\\compiler\\node\\LoadResourceCompiler") ;
 			$aNodeCompiler->addSubCompiler('link',__NAMESPACE__."\\compiler\\node\\CssCompiler") ;
 			$aNodeCompiler->addSubCompiler('css',__NAMESPACE__."\\compiler\\node\\CssCompiler") ;
-			$aNodeCompiler->addSubCompiler('script',__NAMESPACE__."\\compiler\\node\\ScriptCompiler") ;
 			$aNodeCompiler->addSubCompiler('js',__NAMESPACE__."\\compiler\\node\\ScriptCompiler") ;
 			
 			$aNodeCompiler->addSubCompiler('subtemplate',__NAMESPACE__."\\compiler\\node\\SubTemplateDefineCompiler") ;

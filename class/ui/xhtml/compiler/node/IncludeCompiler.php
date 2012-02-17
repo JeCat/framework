@@ -39,7 +39,12 @@ use org\jecat\framework\ui\ObjectContainer;
  *  |条件表达式
  *  |}
  */
-
+/**
+ * @author anubis
+ * @example /模板引擎/标签/自定义标签:name[1]
+ *
+ * 通过include标签编译器的代码演示如何编写一个标签编译器
+ */
 class IncludeCompiler extends NodeCompiler 
 {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)

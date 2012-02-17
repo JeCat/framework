@@ -1,14 +1,4 @@
 <?php
-/**
- * 当exe为假时执行的语句
- * 
- * <foreach exe>
- * 	<foreach:else/>
- * </foreach>
- * 
- * @author anubis
- *
- */
 namespace org\jecat\framework\ui\xhtml\compiler\node ;
 
 use org\jecat\framework\ui\xhtml\Node;
@@ -19,6 +9,32 @@ use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 use org\jecat\framework\ui\ObjectContainer;
+
+/**
+ * @wiki /模板引擎/标签
+ *
+ * {|
+ *  !<loop:else/>
+ *  !可单行
+ *  !循环控制 
+ *  |---
+ *  !属性
+ *  !
+ *  !类型
+ *  !默认值
+ *  !说明
+ *  |---
+ *  |
+ *  |
+ *  |
+ *  |
+ *  |}
+ */
+/**
+ * @example /模板引擎/标签/自定义标签:name[1]
+ *
+ *  通过loop:else标签编译器的代码演示如何编写一个标签编译器
+ */
 
 class LoopelseCompiler extends NodeCompiler 
 {
