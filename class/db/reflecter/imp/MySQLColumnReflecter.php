@@ -3,9 +3,6 @@ namespace org\jecat\framework\db\reflecter\imp;
 
 use org\jecat\framework\db\reflecter\AbStractColumnReflecter;
 
-
-use org\jecat\framework\db\reflecter\AbStractColumnReflecter;
-
 class MySQLColumnReflecter extends AbStractColumnReflecter
 {
 	function __construct($aDBReflecterFactory, $sTable, $sColumn, $sDBName = null)
@@ -15,38 +12,21 @@ class MySQLColumnReflecter extends AbStractColumnReflecter
 		
 		if($aIterColumn->rowCount() == 0)
 		{
-			$this->bIsExist = false;
+			$this->bIsExist = false ;
 			return ;
 		}
 		
-		$sTypeAndLength = $aIterColumn->field ( 'Type', 0 );
-		
-		if ($nBracket = stripos ( $sTypeAndLength, '(' ))
+		$this->sType = strtoupper( $aIterColumn->field('Type',0) ) ;
+		if( preg_match('/^(\w+)\((\d+)\)$/',$this->sType,$arrRes) )
 		{
-			$this->sType = substr ( $sTypeAndLength, 0, $nBracket - 1 );
-			$this->nLength = ( int ) substr ( $sTypeAndLength, $nBracket + 1, strlen ( $sTypeAndLength ) - 1 );
-		}
-		else
-		{
-			$this->sType = $sTypeAndLength;
+			$this->sType = $arrRes[1] ;
+			$this->nLength = (int)$arrRes[2] ;
 		}
 		
-		if (in_array ( $this->sType, $this->arrInt ))
-		{
-			$this->bIsInt = true;
-		}
-		if (in_array ( $this->sType, $this->arrBool ))
-		{
-			$this->bIsBool = true;
-		}
-		if (in_array ( $this->sType, $this->arrFloat ))
-		{
-			$this->bIsFloat = true;
-		}
-		if (in_array ( $this->sType, $this->arrString ))
-		{
-			$this->bIsString = true;
-		}
+		$this->bIsInt = in_array ( $this->sType, self::$arrInt ) ;
+		$this->bIsBool = in_array ( $this->sType, self::$arrBool ) ;
+		$this->bIsFloat = in_array ( $this->sType, self::$arrFloat ) ;
+		$this->bIsString = in_array ( $this->sType, self::$arrString ) ;
 		
 		if ($aIterColumn->field ( 'Null', 0 ) !== 'NO')
 		{
@@ -58,8 +38,8 @@ class MySQLColumnReflecter extends AbStractColumnReflecter
 		{
 			$this->defaultValue = $sDefaultValue;
 		}
-		
-		if ($aIterColumn->field ( 'Extra', 0 ) !== 'auto_increment')
+
+		if ($aIterColumn->field ( 'Extra', 0 ) == 'auto_increment')
 		{
 			$this->bIsAutoIncrement = true;
 		}
@@ -130,7 +110,7 @@ class MySQLColumnReflecter extends AbStractColumnReflecter
 	
 	public function isExist()
 	{
-		return $this->bISExist;
+		return $this->bIsExist;
 	}
 	
 	private $sType;

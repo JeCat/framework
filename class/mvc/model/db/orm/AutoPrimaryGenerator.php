@@ -16,11 +16,11 @@ class AutoPrimaryGenerator extends Object
 		}
 		else if( $aClmRfl->isInts() or $aClmRfl->isFloat() )
 		{
-			return $this->generateCharValue($aDB,$sTable,$aClmRfl->name(),$nMinLen) ;
+			return $this->generateNumValue($aDB,$sTable,$aClmRfl->name(),$nMinLen) ;
 		}
 		else 
 		{
-			throw new Exception("无法为数据表字段：%s.%s自动生成主键值，只接受字符或数值类型。") ;
+			throw new Exception("无法为数据表字段：%s.%s自动生成主键值，只接受字符或数值类型。",array($sTable,$aClmRfl->name())) ;
 		}
 	}
 	
@@ -31,7 +31,7 @@ class AutoPrimaryGenerator extends Object
 		{
 			$sValue.= $this->randChar() ;
 		}
-		
+		 ;
 		while($nLen<=$nMaxLen)
 		{
 			// 检查表中的值是否存在
