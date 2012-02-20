@@ -134,7 +134,7 @@ class Model extends AbstractModel implements IModel, IBean
 		) ;
 	}
 	
-	public function save()
+	public function save($bForceCreate=false)
 	{
 		if( $this->isList() )
 		{
@@ -150,7 +150,7 @@ class Model extends AbstractModel implements IModel, IBean
 		else
 		{
 			// update
-			if( $this->hasSerialized() )
+			if( !$bForceCreate and $this->hasSerialized() )
 			{
 				return $this->update() ;
 			}

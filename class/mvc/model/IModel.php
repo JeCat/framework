@@ -11,7 +11,7 @@ interface IModel extends \ArrayAccess, \Iterator
 	
 	public function load() ;
 	
-	public function save() ;
+	public function save($bForceCreate=false) ;
 	
 	public function delete() ;
 	
