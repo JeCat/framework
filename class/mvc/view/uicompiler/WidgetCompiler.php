@@ -75,10 +75,6 @@ class WidgetCompiler extends NodeCompiler
 			$aDev->output("缺少 widget (class:{$sClassName})") ;
 			$aDev->write("}else{") ;
 			$aDev->write("	{$sWidgetVarName} = new \$__widget_class ;") ;
-			
-			$aDev->write("	if( \$theView ){") ;
-			$aDev->write("		\$theView->addWidget({$sWidgetVarName}) ;") ;
-			$aDev->write("	}") ;
 		}
 		else 
 		{
