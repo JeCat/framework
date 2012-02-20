@@ -119,12 +119,12 @@ class Paginator extends FormWidget implements IModelChangeObserver
     }
     
     public function setPerPageCount($iCount){
-        $this->iCount=(int)$iCount;
+        $this->setAttribute('count',$iCount ) ;
         $this->updatePaginal();
     }
     
     public function perPageCount(){
-        return $this->iCount;
+        return (int)$this->attribute('count',10);
     }
     
     public function totalPageCount(){
@@ -222,7 +222,6 @@ class Paginator extends FormWidget implements IModelChangeObserver
 	    if( $aView ) $this->onModelChanging($aView);
 	}
     
-    private $iCount;
     private $iCurrentPageNum;
     private $aPaginal;
     private $iShowWidth;
