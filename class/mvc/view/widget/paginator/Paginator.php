@@ -221,6 +221,15 @@ class Paginator extends FormWidget implements IModelChangeObserver
 	    $aView -> addModelObserver($this);
 	    if( $aView ) $this->onModelChanging($aView);
 	}
+	
+	public function setAttribute($sName,$value)
+	{
+		$sName = strtolower($sName) ;
+		if( 'count' === $sName ){
+			$this->setPerPageCount($value);
+		}
+		parent::setAttribute($sName,$value) ;
+	}
     
     private $iCount;
     private $iCurrentPageNum;

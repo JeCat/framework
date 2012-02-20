@@ -1,5 +1,5 @@
 <div class="coresystem-listfoot">
-<if "{=$theWidget->attributeBool('showtotal',true)} and $theWidget->totalPageCount() >=1" >
+<if "$theWidget->attributeBool('showtotal',true) and $theWidget->totalPageCount() >=1" >
     <span class="coresystem-pagetatal">共{=$theWidget->totalPageCount()}页</span>
 </if>
 <if "$theWidget->attributeBool('showfirst',true) and $theWidget->totalPageCount() >=1" >
@@ -8,17 +8,17 @@
 <if "$theWidget->attributeBool('showpre',true) && $theWidget->currentPageNum() > 1" >
     <a class="coresystem-pagepre" href="{=$theWidget->pageUrl($theWidget->currentPageNum() -1 )}"{=($theWidget->attribute("onclick",null)===null?'':('onclick='."'".$theWidget->attribute("onclick",null)."'") ) }>上一页</a>
 </if>
-<foreach for='{=$theWidget->pageNumList()}' item='index'>
-    <if "{= ($index == $theWidget->currentPageNum() )}" >
+<foreach for='$theWidget->pageNumList()' item='index'>
+    <if "$index == $theWidget->currentPageNum()" >
         <a class="coresystem-pagecurrent">{=$index}</a>
 	<else />
 	    <a class="coresystem-page" href="{=$theWidget->pageUrl($index)}"{=($theWidget->attribute("onclick",null)===null?'':('onclick='."'".$theWidget->attribute("onclick",null)."'") ) }>{=$index}</a>
 	</if>
 </foreach>
-<if "{=$theWidget->attributeBool('shownext',true) && $theWidget->currentPageNum() < $theWidget->totalPageCount() }" >
+<if "$theWidget->attributeBool('shownext',true) && $theWidget->currentPageNum() < $theWidget->totalPageCount()" >
     <a class="coresystem-pagenext" href="{=$theWidget->pageUrl($theWidget->currentPageNum() +1 )}"{=($theWidget->attribute("onclick",null)===null?'':('onclick='."'".$theWidget->attribute("onclick",null)."'") ) }>下一页</a>
 </if>
-<if "{=$theWidget->attributeBool('showlast',true)} and $theWidget->totalPageCount() >=1" >
+<if "$theWidget->attributeBool('showlast',true) and $theWidget->totalPageCount() >=1" >
     <a class="coresystem-pagelast" href="{=$theWidget->pageUrl($theWidget->totalPageCount()  )}"{=($theWidget->attribute("onclick",null)===null?'':('onclick='."'".$theWidget->attribute("onclick",null)."'") ) }>最后一页</a>
 </if>
 </div>
