@@ -11,6 +11,7 @@ use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\ObjectContainer;
+use org\jecat\framework\ui\xhtml\Attributes ;
 
 /**
  * 
@@ -114,23 +115,19 @@ class WidgetCompiler extends NodeCompiler
 			}
 		}
 		
-		$sOldWidgetVarVarName = '$' . parent::assignVariableName('_aOldWidgetVar') ;
-		
-		// 使用 <widget> 节点内部的模板内容
-		if( $aTemplate=$aObject->getChildNodeByTagName('template') )
-		{
-			$aDev->write("	{$sOldWidgetVarVarName}=\$aVariables->get('theWidget') ;") ;
-			$aDev->write("	\$aVariables->set('theWidget',{$sWidgetVarName}) ;") ;
-		
-			$this->compileChildren($aTemplate,$aObjectContainer,$aDev,$aCompilerManager) ;
+		// template
+		if( $aTemplate=$aObject->getChildNodeByTagName('template') ){
+			$sFunName = md5(rand()) ;
+			$aAttributes = new Attributes;
 			
-			$aDev->write("	\$aVariables->set('theWidget',{$sOldWidgetVarVarName}) ;") ;
+			$aAttributes->set('name' , $sFunName ) ;
+			$aTemplate->headTag()->setAttributes($aAttributes) ;
+			
+			$this->compileChildren($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
 		}
+		$aDev->write("	{$sWidgetVarName}->setSubTemplateName('__subtemplate_{$sFunName}') ;") ;
 		
-		else
-		{
-			$aDev->write("	{$sWidgetVarName}->display(\$this,new \\org\\jecat\\framework\\util\\DataSrc(),\$aDevice) ;") ;
-		}
+		$aDev->write("	{$sWidgetVarName}->display(\$this,new \\org\\jecat\\framework\\util\\DataSrc(),\$aDevice) ;") ;
 		
 		$aDev->write("}") ;
 		$aDev->write("//// ---------------------------------------------------\r\n") ;
