@@ -11,7 +11,6 @@ use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\ObjectContainer;
-use org\jecat\framework\ui\xhtml\Attributes ;
 
 /**
  * 
@@ -116,16 +115,26 @@ class WidgetCompiler extends NodeCompiler
 		}
 		
 		// template
+		if($aAttrs->has('subtemplate') ){
+			$sFunName = $aAttrs->string('subtemplate') ;
+			$aDev->write("	{$sWidgetVarName}->setSubTemplateName('__subtemplate_{$sFunName}') ;") ;
+		}
 		if( $aTemplate=$aObject->getChildNodeByTagName('template') ){
-			$sFunName = md5(rand()) ;
-			$aAttributes = new Attributes;
+			$aAttributes = $aTemplate->headTag()->attributes();
+			
+			if($aAttributes->has('name') ){
+				$sFunName = $aAttributes->get('name');
+			}else{
+				$sFunName = md5(rand()) ;
+			}
 			
 			$aAttributes->set('name' , $sFunName ) ;
 			$aTemplate->headTag()->setAttributes($aAttributes) ;
 			
 			$this->compileChildren($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
+			
+			$aDev->write("	{$sWidgetVarName}->setSubTemplateName('__subtemplate_{$sFunName}') ;") ;
 		}
-		$aDev->write("	{$sWidgetVarName}->setSubTemplateName('__subtemplate_{$sFunName}') ;") ;
 		
 		$aDev->write("	{$sWidgetVarName}->display(\$this,new \\org\\jecat\\framework\\util\\DataSrc(),\$aDevice) ;") ;
 		
