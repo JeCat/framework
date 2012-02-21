@@ -115,6 +115,19 @@ class WidgetCompiler extends NodeCompiler
 			}
 		}
 		
+		// bean
+		if( $aBean = $aObject->getChildNodeByTagName('bean') ){
+			$arrBean = BeanConfXml::singleton()->xmlSourceToArray( $aBean->source() ) ;
+			$strVarExport = var_export($arrBean,true);
+			
+			$aDev->write("	\$arrFormer = {$sWidgetVarName}->beanConfig(); ");
+			$aDev->write("	\$arrBean = $strVarExport ;");
+			$aDev->write("	\\org\\jecat\\framework\\bean\\BeanFactory::mergeConfig(\$arrFormer, \$arrBean); ");
+			$aDev->write("	{$sWidgetVarName}->buildBean( \$arrFormer ); ");
+			
+			$aObject->remove($aBean);
+		}
+		
 		// template
 		if($aAttrs->has('subtemplate') ){
 			$sFunName = $aAttrs->string('subtemplate') ;
@@ -135,16 +148,6 @@ class WidgetCompiler extends NodeCompiler
 			$this->compileChildren($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
 			
 			$aDev->write("	{$sWidgetVarName}->setSubTemplateName('__subtemplate_{$sFunName}') ;") ;
-		}
-		
-		// bean
-		if( $aBean = $aObject->getChildNodeByTagName('bean') ){
-			$arrBean = BeanConfXml::singleton()->xmlSourceToArray( $aBean->source() ) ;
-			$strVarExport = var_export($arrBean,true);
-			$aDev->write("	\$arrFormer = {$sWidgetVarName}->beanConfig(); ");
-			$aDev->write("	\$arrBean = $strVarExport ;");
-			$aDev->write("	\\org\\jecat\\framework\\bean\\BeanFactory::mergeConfig(\$arrFormer, \$arrBean); ");
-			$aDev->write("	{$sWidgetVarName}->buildBean( \$arrFormer ); ");
 		}
 		
 		$aDev->write("	{$sWidgetVarName}->display(\$this,new \\org\\jecat\\framework\\util\\DataSrc(),\$aDevice) ;") ;
