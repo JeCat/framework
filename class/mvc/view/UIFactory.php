@@ -20,6 +20,7 @@ class UIFactory extends UIFactoryBase
 		ParserStateTag::singleton()->addTagNames(
 				'views', 'view', 'widget', 'form', 'msgqueue', 'view:msgqueue', 'widget:msgqueue', 'resrc', 'link', 'css', 'script'
 				, 'js', 'model:foreach', 'model:foreach:end', 'model:data', 'data', 'template', 'model:foreach:else'
+				, 'bean' 
 		) ;
 		
 		return $aInterpreters ;
