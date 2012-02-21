@@ -63,10 +63,10 @@ class WidgetCompiler extends NodeCompiler
 			$aDev->write("}else{") ;
 		}
 		
-		// 通过 class 属性现场创建 widget 对像
-		else if( $sInstanceExpress=$aAttrs->expression('class') )
+		// 通过 new 属性现场创建 widget 对象
+		else if( $sInstanceExpress=$aAttrs->expression('new') )
 		{
-			$sClassName = $aAttrs->get('class') ;
+			$sClassName = $aAttrs->get('new') ;
 			
 			$aDev->write("\r\n//// ------- 创建并显示widget: {$sClassName} ---------------------") ;
 			
@@ -136,7 +136,7 @@ class WidgetCompiler extends NodeCompiler
 			$aAttributes = $aTemplate->headTag()->attributes();
 			
 			if($aAttributes->has('name') ){
-				$sFunName = $aAttributes->get('name');
+				$sFunName = $aAttributes->string('name');
 			}else{
 				$sFunName = md5(rand()) ;
 			}
