@@ -38,6 +38,10 @@ class ObjectContainer extends Object
 		}
 		return $this->aDeclareVariables ;
 	}
+	public function setVariableDeclares(VariableDeclares $aDeclareVariables)
+	{
+		$this->aDeclareVariables = $aDeclareVariables ;
+	}
 	
 	private $aDeclareVariables ;
 	

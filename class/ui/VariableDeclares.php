@@ -30,5 +30,12 @@ class VariableDeclares
 		}
 	}
 	
+	public function variableNameIterator()
+	{print_r(array_keys($this->arrDeclareVariables)) ;
+		return $this->arrDeclareVariables?
+					new \ArrayIterator(array_keys($this->arrDeclareVariables)) :
+					new \EmptyIterator() ;
+	}
+	
 	private $arrDeclareVariables = array() ;
 }
