@@ -2,7 +2,6 @@
 namespace org\jecat\framework\mvc\view\uicompiler ;
 
 use org\jecat\framework\ui\xhtml\Node;
-
 use org\jecat\framework\ui\xhtml\compiler\ExpressionCompiler;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 use org\jecat\framework\lang\Exception;
@@ -150,7 +149,11 @@ class WidgetCompiler extends NodeCompiler
 			$aDev->write("	{$sWidgetVarName}->setSubTemplateName('__subtemplate_{$sFunName}') ;") ;
 		}
 		
-		$aDev->write("	{$sWidgetVarName}->display(\$this,new \\org\\jecat\\framework\\util\\DataSrc(),\$aDevice) ;") ;
+		// display
+		if( !$aAttrs->has('display') 
+			or $aAttrs->bool('display') ){
+			$aDev->write("	{$sWidgetVarName}->display(\$this,new \\org\\jecat\\framework\\util\\DataSrc(),\$aDevice) ;") ;
+		}
 		
 		$aDev->write("}") ;
 		$aDev->write("//// ---------------------------------------------------\r\n") ;
