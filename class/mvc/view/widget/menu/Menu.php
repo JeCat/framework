@@ -11,7 +11,7 @@ use org\jecat\framework\util\IHashTable;
 
 
 HtmlResourcePool::singleton()->addRequire('org.jecat.framework:style/widget/menu.css',HtmlResourcePool::RESRC_CSS) ;
-HtmlResourcePool::singleton()->addRequire('org.jecat.framework:js/MVC模式/view/widget/menu.js',HtmlResourcePool::RESRC_JS) ;
+HtmlResourcePool::singleton()->addRequire('org.jecat.framework:js/mvc/view/widget/menu.js',HtmlResourcePool::RESRC_JS) ;
 
 class Menu extends AbstractBase
 {
@@ -52,7 +52,12 @@ class Menu extends AbstractBase
 	{
 		parent::buildBean($arrConfig,$sNamespace);
 		foreach($arrConfig as $key=>$value){
-			if(preg_match('`^item:(.*)$`',$key,$arrMatch)){
+			if(
+				preg_match('`^item:(.*)$`',$key,$arrMatch) 
+				
+				// 用xml配置bean的时候不能使用冒号，只能用减号代替
+				or preg_match('`^item-(.*)$`',$key,$arrMatch)
+			){
 				$sItemName = $arrMatch[1] ;
 				
 				if( is_array( $value ) ){
