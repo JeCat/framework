@@ -1,8 +1,8 @@
-<ul id='{=$theWidget->id()}' {=$theWidget->getStyleString()} {=$theWidget->getCssClassString()}>
+<ul id='{=$theWidget->id()}' {=$theWidget->getStyleString()} {=$theWidget->getCssClassString()} tearoff="{=$theWidget->isTearoff()?'on':'off'}">
 <foreach for='$theWidget->itemIterator()' item='aItem'>
 	<widget instance='$aItem' />
 </foreach>
 <li class="clear"></li>
 </ul>
 
-<!--script>{= $theWidget->generateJsCode() }</script-->
+<script>{= $theWidget->generateJsCode() }</script>

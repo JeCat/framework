@@ -156,3 +156,89 @@ jc.mvc.view.widget.menu.base.jsobject.objectlist={};
 jc.mvc.view.widget.menu.base.jsobject.getObjectById=function(id){
 	return this.objectlist[id];
 }
+
+// functions
+jc.mvc.view.widget.menu.fun = {
+	onload : {
+		addOnLoad : function(fun){
+			this.loadList.push(fun);
+		},
+		loadOnLoad : function(){
+			var i;
+			for(i=0;i<this.loadList.length;++i){
+				var fun = this.loadList[i] ;
+				fun() ;
+			}
+		},
+		loadList : [] ,
+	},
+} ;
+
+window.onload = function(){
+	jc.mvc.view.widget.menu.fun.onload.loadOnLoad() ;
+}
+
+jc.mvc.view.widget.menu.fun.onload.addOnLoad(function(){
+	console.log('71');
+});
+jc.mvc.view.widget.menu.fun.onload.addOnLoad(function(){
+	console.log('82');
+});
+
+// object list
+jc.mvc.view.widget.menu.objectList = {
+	itemList : [] ,
+	menuList : [] ,
+};
+
+// add all item
+var sItemClassName = 'jc-widget-menu-item' ;
+var sMenuClassName = 'jc-widget-menu' ;
+jc.mvc.view.widget.menu.fun.onload.addOnLoad(function(){
+	var lilist = document.getElementsByTagName('li');
+	var i;
+	var j;
+	for(i=0;i<lilist.length;++i){
+		var li = lilist[i] ;
+		for(j=0;j<li.classList.length;++j){
+			if( sItemClassName == li.classList[j] ){
+				// jc.mvc.view.widget.menu.objectList.itemList.push( li ) ;
+				li.isItem = true ;
+				
+				li.onmouseover = function(){
+					console.log('onmouseover');
+					jc.mvc.view.widget.menu.base.item_onmouseover(this);
+				} ;
+				li.onmouseout = function(){jc.mvc.view.widget.menu.base.item_onmouseout(this)} ;
+				break;
+			}
+		}
+	}
+	
+	var ulList = document.getElementsByTagName('ul');
+	for( i=0 ; i<ulList.length ; ++i ){
+		var ul = ulList[i] ;
+		for( j=0 ; j<ul.classList.length ; ++j ){
+			var sClassName = ul.classList[j] ;
+			if( sMenuClassName == sClassName ){
+				ul.getAttr = function(sName){
+					var k ;
+					for( k=0 ; k<this.attributes.length ; ++k ){
+						if( sName == this.attributes[k].name ){
+							return this.attributes[k].value ;
+						}
+					}
+				}
+				
+				if( ul.getAttr('tearoff') == 'on' ){
+					ul.style.display = 'none' ;
+				}
+				if( ! ul.parentNode.isItem ){
+					console.log(ul);
+					jc.mvc.view.widget.menu.objectList.menuList.push( ul ) ;
+				}
+			}
+		}
+	}
+	console.log(jc.mvc.view.widget.menu.objectList ) ;
+});
