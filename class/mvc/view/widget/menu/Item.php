@@ -75,7 +75,7 @@ class Item extends AbstractBase
 		parent::buildBean($arrConfig,$sNamespace);
 		
 		if( !empty($arrConfig['menu'])){
-			$this->buildSubMenu($arrConfig['menu']);
+			$this->buildSubMenu($arrConfig);
 		}
 		
 		if( !empty( $arrConfig['link'])){
