@@ -107,6 +107,7 @@ class UIFactory extends UIFactoryBase
 			$aNodeCompiler->addSubCompiler('subtemplate',__NAMESPACE__."\\compiler\\node\\SubTemplateDefineCompiler") ;
 			$aNodeCompiler->addSubCompiler('subtemplate:define',__NAMESPACE__."\\compiler\\node\\SubTemplateDefineCompiler") ;
 			$aNodeCompiler->addSubCompiler('subtemplate:call',__NAMESPACE__."\\compiler\\node\\SubTemplateCallCompiler") ;
+			$aNodeCompiler->addSubCompiler('template',__NAMESPACE__."\\compiler\\node\\SubTemplateDefineCompiler") ;
 			
 			$aNodeCompiler->addSubCompiler('nl',__NAMESPACE__."\\compiler\\node\\NlCompiler") ;
 			$aNodeCompiler->addSubCompiler('clear',__NAMESPACE__."\\compiler\\node\\ClearCompiler") ;

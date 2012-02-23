@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\db\sql\Order;
+
 use org\jecat\framework\db\sql\Restriction;
 use org\jecat\framework\bean\BeanConfException;
 use org\jecat\framework\lang\Type;
@@ -636,23 +638,121 @@ class Prototype extends StatementFactory implements IBean
 	/**
 	 * @wiki /MVC模式/模型/原型(Prototype)
 	 * ==Bean配置数组==
-	 * model-class string 用哪个类来实现模型对象
-	 * table string 对应的数据库表
-	 * name string 在原型关系中的名字,用来区分不同的原型
-	 * columns array 需要表中哪些列的数据
-	 * keys array 指定表中哪些列为主键,若指定了主键则使用这里的主键而忽略数据库主键,如果未指定则使用数据库指定的主键
-	 * alias string 别名
-	 * limit int 设置读取条目数目的上限,下限为0
-	 * limitLen int 设置读取条目数目的上限
-	 * limitFrom int 设置读取条目数目的下限
-	 * order array 指定依据某一列来排序,同时设置正序或反序
-	 * orderAsc string 指定依据某一列正序排序
-	 * orderDesc string 指定依据某一列反序排序
-	 * where array where条件（where的格式很有趣，是对Lisp风格的尝试）
-	 * hasOne array 配置hasone关系
-	 * belongsTo array 配置belongsTo关系
-	 * hasMany array 配置hasMany关系
-	 * hasAndBelongsToMany array 配置hasAndBelongsToMany关系
+	 * {|
+	 * !属性
+	 * !类型
+	 * !默认值
+	 * !可选
+	 * !说明
+	 * |-- --
+	 * |model-class
+	 * |string
+	 * |无
+	 * |可选
+	 * |用哪个类来实现模型对象
+	 * |-- --
+	 * |table
+	 * |string
+	 * |无
+	 * |可选
+	 * |对应的数据库表
+	 * |-- --
+	 * |name
+	 * |string
+	 * |无
+	 * |可选
+	 * |在原型关系中的名字,用来区分不同的原型
+	 * |-- --
+	 * |columns
+	 * |array
+	 * |无
+	 * |可选
+	 * |需要表中哪些列的数据
+	 * |-- --
+	 * |keys
+	 * |array
+	 * |无
+	 * |可选
+	 * |指定表中哪些列为主键,若指定了主键则使用这里的主键而忽略数据库主键,如果未指定则使用数据库指定的主键
+	 * |-- --
+	 * |alias
+	 * |string
+	 * |无
+	 * |可选
+	 * |别名
+	 * |-- --
+	 * |limit
+	 * |int
+	 * |无
+	 * |可选
+	 * |设置读取条目数目的上限,下限为0
+	 * |-- --
+	 * |limitLen
+	 * |int
+	 * |无
+	 * |可选
+	 * |设置读取条目数目的上限
+	 * |-- --
+	 * |limitFrom
+	 * |int
+	 * |无
+	 * |可选
+	 * |设置读取条目数目的下限
+	 * |-- --
+	 * |order
+	 * |array
+	 * |无
+	 * |可选
+	 * |指定依据某一列来排序,同时设置正序排列
+	 * |-- --
+	 * |orderAsc
+	 * |string
+	 * |无
+	 * |可选
+	 * |指定依据某一列正序排序
+	 * |-- --
+	 * |orderDesc
+	 * |string
+	 * |无
+	 * |可选
+	 * |指定依据某一列反序排序
+	 * |-- --
+	 * |orderRand
+	 * |bool
+	 * |无
+	 * |可选
+	 * |随机排列结果
+	 * |-- --
+	 * |where
+	 * |array
+	 * |无
+	 * |可选
+	 * |where条件（where的格式很有趣，是对Lisp风格的尝试）
+	 * |-- --
+	 * |hasOne
+	 * |array
+	 * |无
+	 * |可选
+	 * |配置hasone关系
+	 * |-- --
+	 * |belongsTo
+	 * |array
+	 * |无
+	 * |可选
+	 * |配置belongsTo关系
+	 * |-- --
+	 * |hasMany
+	 * |array
+	 * |无
+	 * |可选
+	 * |配置hasMany关系
+	 * |-- --
+	 * |hasAndBelongsToMany
+	 * |array
+	 * |无
+	 * |可选
+	 * |配置hasAndBelongsToMany关系
+	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
@@ -734,6 +834,11 @@ class Prototype extends StatementFactory implements IBean
 			{
 				$this->criteria()->orders()->add($sColumn,true) ;
 			}
+		}
+		// orderRand
+		if( !empty($arrConfig['orderRand']) && $arrConfig['orderRand']=true )
+		{
+			$this->criteria()->orders()->add(null,Order::rand) ;
 		}
 		// groupby
 		if( !empty($arrConfig['groupby']) )

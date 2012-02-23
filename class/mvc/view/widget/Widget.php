@@ -140,20 +140,41 @@ class Widget extends Object implements IViewWidget, IBean
 		$this->sId = $sId ;
 	}
 
+	const TEMPLATETYPE_Template = 0x981 ;
+	const TEMPLATETYPE_Function = 0x982 ;
 	public function templateName()
 	{
-		return $this->sTemplateName ;
+		if( self::TEMPLATETYPE_Template === $this->nTemplateType ){
+			return $this->sTemplateName ;
+		}else{
+			return null ;
+		}
 	}
 
 	public function setTemplateName($sTemplateName)
 	{
 		$this->sTemplateName = $sTemplateName ;
+		$this->nTemplateType = self::TEMPLATETYPE_Template ;
+	}
+	
+	public function subTemplateName(){
+		if( self::TEMPLATETYPE_Function === $this->nTemplateType ){
+			return $this->sSubTemplateName ;
+		}else{
+			return null ;
+		}
+	}
+	
+	public function setSubTemplateName($sSubTemplateName){
+		$this->sSubTemplateName = $sSubTemplateName ;
+		$this->nTemplateType = self::TEMPLATETYPE_Function ;
 	}
 
 	public function display(UI $aUI,IHashTable $aVariables=null,IOutputStream $aDevice=null)
 	{
 		$sTemplateName = $this->templateName() ;
-		if(!$sTemplateName)
+		$sSubTemplateName = $this->subTemplateName() ;
+		if(!$sTemplateName and !$sSubTemplateName )
 		{
 			throw new Exception("显示UI控件时遇到错误，UI控件尚未设置模板文件",$this->id()) ;
 		}
@@ -165,7 +186,22 @@ class Widget extends Object implements IViewWidget, IBean
 
 		$oldWidget=$aVariables->get('theWidget');
 		$aVariables->set('theWidget',$this);
-		$aUI->display($sTemplateName,$aVariables,$aDevice) ;	
+		
+		if($sTemplateName){
+			$aUI->display($sTemplateName,$aVariables,$aDevice) ;
+		}else{
+			if( !function_exists( $sSubTemplateName ) ){
+				throw new Exception(
+					"正在调用无效的子模板：%s %s",
+					array(
+						$sSubTemplateName ,
+						$this->id() 
+					)
+				);
+			}
+			call_user_func_array( $sSubTemplateName , array( $aVariables ,$aDevice) ) ;
+		}
+		
 		$aVariables->set('theWidget',$oldWidget);
 	}
 
@@ -260,6 +296,8 @@ class Widget extends Object implements IViewWidget, IBean
 	private $sId ;
 	
 	private $sTemplateName ;
+	private $sSubTemplateName ;
+	private $nTemplateType ;
 	
 	private $aMsgQueue ;
 

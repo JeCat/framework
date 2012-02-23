@@ -2,7 +2,6 @@
 namespace org\jecat\framework\mvc\view\uicompiler ;
 
 use org\jecat\framework\ui\xhtml\Node;
-
 use org\jecat\framework\ui\xhtml\compiler\ExpressionCompiler;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 use org\jecat\framework\lang\Exception;
@@ -11,6 +10,7 @@ use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\ObjectContainer;
+use org\jecat\framework\bean\BeanConfXml ;
 
 /**
  * 
@@ -63,10 +63,10 @@ class WidgetCompiler extends NodeCompiler
 			$aDev->write("}else{") ;
 		}
 		
-		// 通过 class 属性现场创建 widget 对像
-		else if( $sInstanceExpress=$aAttrs->expression('class') )
+		// 通过 new 属性现场创建 widget 对象
+		else if( $sInstanceExpress=$aAttrs->expression('new') )
 		{
-			$sClassName = $aAttrs->get('class') ;
+			$sClassName = $aAttrs->get('new') ;
 			
 			$aDev->write("\r\n//// ------- 创建并显示widget: {$sClassName} ---------------------") ;
 			
@@ -114,21 +114,44 @@ class WidgetCompiler extends NodeCompiler
 			}
 		}
 		
-		$sOldWidgetVarVarName = '$' . parent::assignVariableName('_aOldWidgetVar') ;
-		
-		// 使用 <widget> 节点内部的模板内容
-		if( $aTemplate=$aObject->getChildNodeByTagName('template') )
-		{
-			$aDev->write("	{$sOldWidgetVarVarName}=\$aVariables->get('theWidget') ;") ;
-			$aDev->write("	\$aVariables->set('theWidget',{$sWidgetVarName}) ;") ;
-		
-			$this->compileChildren($aTemplate,$aObjectContainer,$aDev,$aCompilerManager) ;
+		// bean
+		if( $aBean = $aObject->getChildNodeByTagName('bean') ){
+			$arrBean = BeanConfXml::singleton()->xmlSourceToArray( $aBean->source() ) ;
+			$strVarExport = var_export($arrBean,true);
 			
-			$aDev->write("	\$aVariables->set('theWidget',{$sOldWidgetVarVarName}) ;") ;
+			$aDev->write("	\$arrFormer = {$sWidgetVarName}->beanConfig(); ");
+			$aDev->write("	\$arrBean = $strVarExport ;");
+			$aDev->write("	\\org\\jecat\\framework\\bean\\BeanFactory::mergeConfig(\$arrFormer, \$arrBean); ");
+			$aDev->write("	{$sWidgetVarName}->buildBean( \$arrFormer ); ");
+			
+			$aObject->remove($aBean);
 		}
 		
-		else
-		{
+		// template
+		if($aAttrs->has('subtemplate') ){
+			$sFunName = $aAttrs->string('subtemplate') ;
+			$aDev->write("	{$sWidgetVarName}->setSubTemplateName('__subtemplate_{$sFunName}') ;") ;
+		}
+		if( $aTemplate=$aObject->getChildNodeByTagName('template') ){
+			$aAttributes = $aTemplate->headTag()->attributes();
+			
+			if($aAttributes->has('name') ){
+				$sFunName = $aAttributes->string('name');
+			}else{
+				$sFunName = md5(rand()) ;
+			}
+			
+			$aAttributes->set('name' , $sFunName ) ;
+			$aTemplate->headTag()->setAttributes($aAttributes) ;
+			
+			$this->compileChildren($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
+			
+			$aDev->write("	{$sWidgetVarName}->setSubTemplateName('__subtemplate_{$sFunName}') ;") ;
+		}
+		
+		// display
+		if( !$aAttrs->has('display') 
+			or $aAttrs->bool('display') ){
 			$aDev->write("	{$sWidgetVarName}->display(\$this,new \\org\\jecat\\framework\\util\\DataSrc(),\$aDevice) ;") ;
 		}
 		

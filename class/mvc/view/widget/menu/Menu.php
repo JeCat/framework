@@ -11,7 +11,7 @@ use org\jecat\framework\util\IHashTable;
 
 
 HtmlResourcePool::singleton()->addRequire('org.jecat.framework:style/widget/menu.css',HtmlResourcePool::RESRC_CSS) ;
-HtmlResourcePool::singleton()->addRequire('org.jecat.framework:js/MVC模式/view/widget/menu.js',HtmlResourcePool::RESRC_JS) ;
+HtmlResourcePool::singleton()->addRequire('org.jecat.framework:js/mvc/view/widget/menu.js',HtmlResourcePool::RESRC_JS) ;
 
 class Menu extends AbstractBase
 {
@@ -48,27 +48,36 @@ class Menu extends AbstractBase
      * |菜单项目列表,每个元素都是一个菜单项的配置
      * |}
      */
-    public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
-    {
-    	parent::buildBean($arrConfig,$sNamespace);
-    	if( !empty($arrConfig['items']) && is_array($arrConfig['items'])){
-    		foreach($arrConfig['items'] as $key =>$item){
-    			$this->buildItems($item,$key);
-    		}
-    	}
-    	if(!empty($arrConfig['direction'])){
-    		$this->setDirection($arrConfig['direction']);
-    	}
-    	if(!empty($arrConfig['top'])){
-    		$this->setPosTop($arrConfig['top']);
-    	}
-    	if(!empty($arrConfig['left'])){
-    		$this->setPosLeft($arrConfig['left']);
-    	}
-    	if( array_key_exists('tearoff',$arrConfig) ){
-    		$this->setTearoff($arrConfig['tearoff']);
-    	}
-    }
+	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
+	{
+		parent::buildBean($arrConfig,$sNamespace);
+		foreach($arrConfig as $key=>$value){
+			if(
+				preg_match('`^item:(.*)$`',$key,$arrMatch) 
+				
+				// 用xml配置bean的时候不能使用冒号，只能用减号代替
+				or preg_match('`^item-(.*)$`',$key,$arrMatch)
+			){
+				$sItemName = $arrMatch[1] ;
+				
+				if( is_array( $value ) ){
+					$this->buildItemFromBean( $value , $sItemName );
+				}
+			}
+		}
+		if(!empty($arrConfig['direction'])){
+			$this->setDirection($arrConfig['direction']);
+		}
+		if(!empty($arrConfig['top'])){
+			$this->setPosTop($arrConfig['top']);
+		}
+		if(!empty($arrConfig['left'])){
+			$this->setPosLeft($arrConfig['left']);
+		}
+		if( array_key_exists('tearoff',$arrConfig) ){
+			$this->setTearoff($arrConfig['tearoff']);
+		}
+	}
     
     
     public function view()
@@ -211,6 +220,18 @@ class Menu extends AbstractBase
 			
 			$aItem->buildBean($configItems) ;
 		}
+	}
+	
+	private function buildItemFromBean(array $arrItemBean , $id=null ){
+		$arrItemBean['class']=__NAMESPACE__.'\Item';
+		if(empty($arrItemBean['id']) && !is_int($id) ){
+			$arrItemBean['id'] = $id;
+		}
+		
+		$aItem = BeanFactory::singleton()->createBean($arrItemBean,'*',false) ;
+		$this->addItem($aItem);
+		
+		$aItem->buildBean($arrItemBean) ;
 	}
 	
 	public function setPos($left,$top){
