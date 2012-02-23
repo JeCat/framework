@@ -5,9 +5,6 @@ use org\jecat\framework\util\DataSrc;
 use org\jecat\framework\resrc\HtmlResourcePool;
 use org\jecat\framework\bean\BeanFactory ;
 
-HtmlResourcePool::singleton()->addRequire('org.jecat.framework:style/widget/menu.css',HtmlResourcePool::RESRC_CSS) ;
-HtmlResourcePool::singleton()->addRequire('org.jecat.framework:js/MVC模式/view/widget/menu.js',HtmlResourcePool::RESRC_JS) ;
-
 class Item extends AbstractBase
 {
 	public function __construct($sTitle='',$sId =null , IView $aView = null)

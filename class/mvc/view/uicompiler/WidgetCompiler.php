@@ -78,7 +78,7 @@ class WidgetCompiler extends NodeCompiler
 		}
 		else 
 		{
-			$aDev->write("\$aDevice->write(\$this->locale()->trans('&lt;widget&gt;标签缺少必要属性:id,instance 或 class')) ;") ;
+			$aDev->write("\$aDevice->write(\$this->locale()->trans('&lt;widget&gt;标签缺少必要属性:id,instance 或 new')) ;") ;
 			return ;
 		}
 		
@@ -101,7 +101,7 @@ class WidgetCompiler extends NodeCompiler
 		}
 		
 		// html attribute
-		$aDev->write("	{$sWidgetVarName}->clearAttribute() ;") ;
+		// $aDev->write("	{$sWidgetVarName}->clearAttribute() ;") ;
 		
 		$arrInputAttrs = array() ; 
 		foreach($aAttrs as $sName=>$aValue)
