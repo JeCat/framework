@@ -338,7 +338,7 @@ class Menu extends AbstractBase
 		
 		else
 		{
-			if($this->showDepths()!=0)
+			if($this->showDepths()!=0 || $this->isRenderAll() )
 			{
 				parent::display($aUI,$aVariables,$aDevice) ;
 			}
@@ -374,6 +374,20 @@ class Menu extends AbstractBase
 		}
 		
 		return false ;
+	}
+	
+	public function isRenderAll(){
+		$aParentMenu = $this->parentMenu() ;
+		if($aParentMenu){
+			$b = $aParentMenu->isRenderAll() ;
+			return  $b ;
+		}
+		$b = $this->attributeBool('renderall' , false ) ;
+		return $b ;
+	}
+	
+	public function isShowOnMouseOver(){
+		return $this->showDepths() > 0 ;
 	}
 	
 	public function generateJsCode()

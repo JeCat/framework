@@ -1,4 +1,4 @@
-<ul id='{=$theWidget->id()}' {=$theWidget->getStyleString()} {=$theWidget->getCssClassString()} tearoff="{=$theWidget->isTearoff()?'on':'off'}" direction="{=$theWidget->getDirection()}">
+<ul id='{=$theWidget->id()}' {=$theWidget->getStyleString()} {=$theWidget->getCssClassString()} tearoff="{=$theWidget->isTearoff()?'on':'off'}" direction="{=$theWidget->getDirection()}" showOnMouseOver="{=$theWidget->isShowOnMouseOver()?'on':'off'}" >
 <foreach for='$theWidget->itemIterator()' item='aItem'>
 	<widget instance='$aItem' />
 </foreach>

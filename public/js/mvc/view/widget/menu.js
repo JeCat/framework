@@ -95,7 +95,7 @@ jc.mvc.view.widget.menu.fun.onload.addOnLoad(function(){
 				var childlist = this.childNodes;
 				for(var i=0;i<childlist.length;++i){
 					o = childlist[i] ;
-					if( typeof(o.show) != 'undefined' ){
+					if( typeof(o.show) != 'undefined' && o.getAttr('showonmouseover') == 'on' ){
 						o.show();
 					}
 				}
@@ -111,7 +111,6 @@ jc.mvc.view.widget.menu.fun.onload.addOnLoad(function(){
 					}
 				}
 			};
-			
 			
 			li.onmouseover = function(){
 				clearTimeout(jc.mvc.view.widget.menu.base.timer);
@@ -160,7 +159,7 @@ jc.mvc.view.widget.menu.fun.onload.addOnLoad(function(){
 				}
 			}
 			
-			if( ul.getAttr('tearoff') == 'on' ){
+			if( ul.getAttr('tearoff') == 'on' || ul.getAttr('showonmouseover') != 'on' ){
 				ul.style.display = 'none' ;
 			}
 			ul.show = function(){
@@ -190,6 +189,8 @@ jc.mvc.view.widget.menu.fun.onload.addOnLoad(function(){
 			if( ! ul.parentNode.isItem ){
 				jc.mvc.view.widget.menu.objectList.menuList.push( ul ) ;
 			}
+			
+			console.log(ul.getAttr('showonmouseover'));
 		}
 	}
 	
