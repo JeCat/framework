@@ -87,10 +87,6 @@ class ViewAssemblySlot extends OutputStreamBuffer implements \Serializable
 				{
 					$this->pullinOneView($aFoundView) ;
 				}
-				else
-				{
-					echo 'not found view:',$sXPath,', container is ', $aViewContainer->name(),'<br />' ;
-				}
 			}
 		}
 		else
