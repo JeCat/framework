@@ -164,6 +164,7 @@ jc.mvc.view.widget.menu.fun.onload.addOnLoad(function(){
 				ul.style.display = 'none' ;
 			}
 			ul.show = function(){
+				if( 'on' != this.getAttr('tearoff') ) return ;
 				this.parentNode.style.position="relative";
 				this.style.position="absolute";
 				
@@ -183,6 +184,7 @@ jc.mvc.view.widget.menu.fun.onload.addOnLoad(function(){
 				this.style.display="block";
 			};
 			ul.hide = function(){
+				if( 'on' != this.getAttr('tearoff') ) return ;
 				this.style.display='none';
 			}
 			if( ! ul.parentNode.isItem ){
