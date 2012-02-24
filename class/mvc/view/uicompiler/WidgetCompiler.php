@@ -11,6 +11,7 @@ use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\ObjectContainer;
 use org\jecat\framework\bean\BeanConfXml ;
+use org\jecat\framework\ui\xhtml\Attributes ;
 
 /**
  * 
@@ -19,15 +20,41 @@ class WidgetCompiler extends NodeCompiler
 {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
+		$this->checkType( $aObject ) ;
+		$this->writeTheWidget($aDev) ;
+		$sWidgetVarName = $this->getVarName() ;
+		$aAttrs = $this->getAttrs($aObject) ;
+		if( false === $this->writeObject($aAttrs , $aDev , $sWidgetVarName) ){
+			return false;
+		}
+		$this->writeHtmlAttr($aAttrs , $aDev , $sWidgetVarName);
+		$this->writeWidgetAttr($aAttrs , $aDev , $sWidgetVarName);
+		$this->writeWidgetAttr($aAttrs ,  $aDev , $sWidgetVarName);
+		$this->writeBean($aObject ,  $aDev , $sWidgetVarName) ;
+		$this->writeTemplate($aObject , $aAttrs ,  $aDev , $sWidgetVarName) ;
+		$this->writeDisplay($aAttrs , $aDev , $sWidgetVarName) ;
+		$this->writeEnd($aDev);
+	}
+	
+	protected function checkType(IObject $aObject){
 		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject,'aObject') ;
-		
-
-		$aAttrs = $aObject->attributes() ;
-			
-		$sWidgetVarName = '$' . parent::assignVariableName('_aWidget') ;
+	}
+	
+	protected function writeTheWidget(TargetCodeOutputStream $aDev){
 		$aDev->write("\$theView = \$aVariables->get('theView') ;") ;
-		
-		
+	}
+	
+	protected function getVarName(){
+		$sWidgetVarName = '$' . parent::assignVariableName('_aWidget') ;
+		return $sWidgetVarName ;
+	}
+	
+	protected function getAttrs(IObject $aObject){
+		$aAttrs = $aObject->attributes() ;
+		return $aAttrs ;
+	}
+	
+	protected function writeObject(Attributes $aAttrs , TargetCodeOutputStream $aDev , $sWidgetVarName){
 		// 通过 表达式 取得 widget 对象
 		if( $sInstanceExpress=$aAttrs->expression('ins') or $sInstanceExpress=$aAttrs->expression('instance')  )
 		{
@@ -79,10 +106,12 @@ class WidgetCompiler extends NodeCompiler
 		else 
 		{
 			$aDev->write("\$aDevice->write(\$this->locale()->trans('&lt;widget&gt;标签缺少必要属性:id,instance 或 new')) ;") ;
-			return ;
+			return false;
 		}
-		
-		
+		return true ;
+	}
+	
+	protected function writeHtmlAttr(Attributes $aAttrs , TargetCodeOutputStream $aDev , $sWidgetVarName){
 		// 常规 html attr
 		foreach(array('css'=>'class','name','title','style') as $sInputName=>$sName)
 		{
@@ -99,10 +128,9 @@ class WidgetCompiler extends NodeCompiler
 			$sValue = $aAttrs->get($sInputName) ;
 			$aDev->write("	{$sWidgetVarName}->setAttribute({$sVarName},{$sValue}) ;") ;
 		}
-		
-		// html attribute
-		// $aDev->write("	{$sWidgetVarName}->clearAttribute() ;") ;
-		
+	}
+	
+	protected function writeWidgetAttr(Attributes $aAttrs , TargetCodeOutputStream $aDev , $sWidgetVarName){
 		$arrInputAttrs = array() ; 
 		foreach($aAttrs as $sName=>$aValue)
 		{
@@ -113,7 +141,9 @@ class WidgetCompiler extends NodeCompiler
 				$aDev->write("	{$sWidgetVarName}->setAttribute({$sVarName},{$sValue}) ;") ;
 			}
 		}
-		
+	}
+	
+	protected function writeBean(IObject $aObject , TargetCodeOutputStream $aDev , $sWidgetVarName){
 		// bean
 		if( $aBean = $aObject->getChildNodeByTagName('bean') ){
 			$arrBean = BeanConfXml::singleton()->xmlSourceToArray( $aBean->source() ) ;
@@ -126,7 +156,9 @@ class WidgetCompiler extends NodeCompiler
 			
 			$aObject->remove($aBean);
 		}
-		
+	}
+	
+	protected function writeTemplate(IObject $aObject ,Attributes $aAttrs , TargetCodeOutputStream $aDev , $sWidgetVarName){
 		// template
 		if($aAttrs->has('subtemplate') ){
 			$sFunName = $aAttrs->string('subtemplate') ;
@@ -148,17 +180,20 @@ class WidgetCompiler extends NodeCompiler
 			
 			$aDev->write("	{$sWidgetVarName}->setSubTemplateName('__subtemplate_{$sFunName}') ;") ;
 		}
-		
+	}
+	
+	protected function writeDisplay(Attributes $aAttrs , TargetCodeOutputStream $aDev , $sWidgetVarName){
 		// display
 		if( !$aAttrs->has('display') 
 			or $aAttrs->bool('display') ){
 			$aDev->write("	{$sWidgetVarName}->display(\$this,new \\org\\jecat\\framework\\util\\DataSrc(),\$aDevice) ;") ;
 		}
-		
-		$aDev->write("}") ;
-		$aDev->write("//// ---------------------------------------------------\r\n") ;
 	}
-
+	
+	protected function writeEnd(TargetCodeOutputStream $aDev){
+		$aDev->write("}") ;
+		$aDev->write("//// ---------------xxx------------------------------------\r\n") ;
+	}
 }
 
 ?>
