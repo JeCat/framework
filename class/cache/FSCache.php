@@ -77,7 +77,7 @@ class FSCache implements ICache
 	function delete($sDataPath)
 	{
 		self::trimPath($sDataPath) ;
-		
+
 		// 所有
 		if( empty($sDataPath) )
 		{
