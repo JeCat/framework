@@ -401,6 +401,16 @@ class Model extends AbstractModel implements IModel, IBean
 		return Selecter::singleton()->hasExists($this) ;
 	}
 	
+	
+	
+	// ---------------------------------------------
+	public function serializableProperties()
+	{
+		$arrProps = parent::serializableProperties() ;
+		$arrProps[__CLASS__] = array('aPrototype') ;
+		return $arrProps ;
+	}
+	
 	private $nTotalCount = -1 ;
 	
 	/**
@@ -412,4 +422,3 @@ class Model extends AbstractModel implements IModel, IBean
 	private $arrBeanConfig ;
 }
 
-?>

@@ -1,8 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm;
 
-use org\jecat\framework\db\sql\Order;
-
+use org\jecat\framework\util\serialize\IIncompleteSerializable;
+use org\jecat\framework\util\serialize\ShareObjectSerializer;
 use org\jecat\framework\db\sql\Restriction;
 use org\jecat\framework\bean\BeanConfException;
 use org\jecat\framework\lang\Type;
@@ -20,7 +20,7 @@ use org\jecat\framework\lang\Exception;
 use org\jecat\framework\db\DB;
 use org\jecat\framework\db\sql\StatementFactory;
 
-class Prototype extends StatementFactory implements IBean
+class Prototype extends StatementFactory implements IBean, \Serializable, IIncompleteSerializable
 {
 	const youKnow = null ;
 	
@@ -887,9 +887,11 @@ class Prototype extends StatementFactory implements IBean
 			{
 				$item['class'] = 'association' ;
 			}
-			$item['fromPrototype'] = $this ;
 			
+			$item['fromPrototype'] = $this ;
 			$aAssociation = $aBeanFactory->createBean($item,$sNamespace,$aBeanFactory) ;
+			unset($item['fromPrototype']) ;
+			
 			$aAssociation->setDB($this->db()) ;
 			
 			$this->arrAssociations[] = $aAssociation ;
@@ -1042,6 +1044,34 @@ class Prototype extends StatementFactory implements IBean
 		return '`'.$this->path()."{$sTableName}`.`{$sColumn}`" ;
 	}
 	
+	// -----------------------------------------------
+	public function serializableProperties()
+	{
+		return array(
+			__CLASS__ => array(
+				'sName' ,
+				'sTableName' ,
+				'arrColumns' ,
+				'arrColumnAliases' ,
+				'arrKeys' ,
+				'sDevicePrimaryKey' ,
+				'sModelClass' ,
+				'aCriteria' ,
+				'aAssociationBy' ,
+				'arrAssociations' ,
+				'arrBeanConfig' ,
+			)
+		) ;
+	}
+	public function serialize ()
+	{
+		return ShareObjectSerializer::singleton()->serialize($this) ;
+	}
+	public function unserialize ($serialized)
+	{
+		ShareObjectSerializer::singleton()->unserialize($serialized,$this) ;
+	}
+	
 	// constructor
 	public function __construct(){}
 
@@ -1088,4 +1118,3 @@ class Prototype extends StatementFactory implements IBean
 	private $aStatementUpdate ;
 	
 }
-?>
