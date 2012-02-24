@@ -104,7 +104,7 @@ class Menu extends AbstractBase
 		if($item instanceof Item){
 			return $this->addItemPrivate($item);
 		}else if(is_string($item)){
-			$aItem = new Item($item);
+			$aItem = new Item($item , $item);
 			return $this->addItemPrivate($aItem);
 		}else if(is_array($item)){
 			foreach($item as $i){
@@ -148,7 +148,7 @@ class Menu extends AbstractBase
 	}
 	
 	private function addItemPrivate(Item $aItem){
-		$this->arrItems[]=$aItem;
+		$this->arrItems[$aItem->id()]=$aItem;
 		$aItem->setParentMenu($this);
 		
 		if(!$aItem->view())
@@ -228,10 +228,8 @@ class Menu extends AbstractBase
 			$arrItemBean['id'] = $id;
 		}
 		
-		$aItem = BeanFactory::singleton()->createBean($arrItemBean,'*',false) ;
+		$aItem = BeanFactory::singleton()->createBean($arrItemBean,'*',true) ;
 		$this->addItem($aItem);
-		
-		$aItem->buildBean($arrItemBean) ;
 	}
 	
 	public function setPos($left,$top){
@@ -338,7 +336,7 @@ class Menu extends AbstractBase
 		
 		else
 		{
-			if($this->showDepths()!=0)
+			if($this->showDepths()!=0 || $this->isRenderAll() )
 			{
 				parent::display($aUI,$aVariables,$aDevice) ;
 			}
@@ -356,7 +354,7 @@ class Menu extends AbstractBase
 			}
 			else
 			{
-				return -1 ;
+				return 10000 ;
 			}
 		}
 		
@@ -374,6 +372,20 @@ class Menu extends AbstractBase
 		}
 		
 		return false ;
+	}
+	
+	public function isRenderAll(){
+		$aParentMenu = $this->parentMenu() ;
+		if($aParentMenu){
+			$b = $aParentMenu->isRenderAll() ;
+			return  $b ;
+		}
+		$b = $this->attributeBool('renderall' , false ) ;
+		return $b ;
+	}
+	
+	public function isShowOnMouseOver(){
+		return $this->showDepths() > 0 ;
 	}
 	
 	public function generateJsCode()
