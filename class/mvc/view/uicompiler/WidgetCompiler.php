@@ -131,7 +131,6 @@ class WidgetCompiler extends NodeCompiler
 	}
 	
 	protected function writeWidgetAttr(Attributes $aAttrs , TargetCodeOutputStream $aDev , $sWidgetVarName){
-		$arrInputAttrs = array() ; 
 		foreach($aAttrs as $sName=>$aValue)
 		{
 			if( substr($sName,0,5)=='attr.' and $sVarName=substr($sName,5) )

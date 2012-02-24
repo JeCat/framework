@@ -189,8 +189,6 @@ jc.mvc.view.widget.menu.fun.onload.addOnLoad(function(){
 			if( ! ul.parentNode.isItem ){
 				jc.mvc.view.widget.menu.objectList.menuList.push( ul ) ;
 			}
-			
-			console.log(ul.getAttr('showonmouseover'));
 		}
 	}
 	
