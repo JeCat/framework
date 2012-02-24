@@ -6,6 +6,7 @@ use org\jecat\framework\ui\ObjectContainer;
 use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\xhtml\Attributes ;
+use org\jecat\framework\ui\xhtml\AttributeValue ;
 use org\jecat\framework\ui\xhtml\Node ;
 
 class MenuCompiler extends WidgetCompiler
@@ -20,10 +21,9 @@ class MenuCompiler extends WidgetCompiler
 		}
 		$this->writeHtmlAttr($aAttrs , $aDev , $sWidgetVarName);
 		$this->writeWidgetAttr($aAttrs , $aDev , $sWidgetVarName);
-		$this->writeWidgetAttr($aAttrs ,  $aDev , $sWidgetVarName);
 		$this->writeBean($aObject ,  $aDev , $sWidgetVarName) ;
 		$this->writeTemplate($aObject , $aAttrs ,  $aDev , $sWidgetVarName) ;
-		$this->writeItem($aObject ,  $aDev , $sWidgetVarName  , '') ;
+		$this->writeSubMenu($aObject , $aObjectContainer , $aDev , $aCompilerManager , $sWidgetVarName ) ;
 		$this->writeDisplay($aAttrs , $aDev , $sWidgetVarName) ;
 		$this->writeEnd($aDev);
 	}
@@ -31,45 +31,39 @@ class MenuCompiler extends WidgetCompiler
 	/**
 	 * @param sPath string 前后都没有/
 	 */
-	protected function writeItem(IObject $aObject , TargetCodeOutputStream $aDev , $sWidgetVarName , $sPath ){
-		$sTagName = 'item' ;
+	protected function writeSubMenu(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager , $sWidgetVarName  ){
+		$arrTagName = array('menu','item') ;
+		
+		if( !$aObjectContainer->variableDeclares()->hasDeclared('aStack') )
+		{
+			$aObjectContainer->variableDeclares()->declareVarible('aStack','new \\org\\jecat\\framework\\util\\Stack()') ;
+		}
+		$aDev->write("	\$aStack->put({$sWidgetVarName});");
+		$aDev->write("	\$aVariables->aStack = \$aStack;");
 		
 		foreach($aObject->childElementsIterator() as $aChild)
 		{
-			if( ($aChild instanceof Node) and ($aChild->tagName()==$sTagName) )
+			if( $aChild instanceof Node and in_array( $aChild->tagName() , $arrTagName) )
 			{
 				$aItemNode = $aChild ;
 				$aItemAttrs = $aItemNode->attributes() ;
 				if( $aItemAttrs->has('id') ){
 					$sItemId = $aItemAttrs->string('id');
 					
-					// itemPath
-					$sItemPath = '';
-					if( empty( $sPath ) ){
-						$sItemPath = $sItemId ;
-					}else{
-						$sItemPath = $sPath.'/'.$sItemId ;
-					}
+					$aAttrValue = AttributeValue::createInstance ('instance' , " \$aStack->get()->getMenuByPath( '$sItemId' ) ");
+					$aItemAttrs->add($aAttrValue);
+					$aAttrValue->setParent($aObjectContainer) ;
 					
-					$aDev->write("	if( \$aItem = {$sWidgetVarName}->getMenuByPath( '$sItemPath' ) ){");
-					
-					foreach($aItemAttrs as $sName=>$aValue)
-					{
-						if( substr($sName,0,5)=='attr.' and $sVarName=substr($sName,5) )
-						{
-							$sVarName = '"'. addslashes($sVarName) . '"' ;
-							$sValue = $aItemAttrs->get($sName) ;
-							$aDev->write("	\$aItem->setAttribute({$sVarName},{$sValue}) ;") ;
-						}
-					}
-		
-					$aDev->write("	}");
-					
-					$this->writeItem( $aItemNode , $aDev , $sWidgetVarName , $sItemPath );
+					$aAttrValue = AttributeValue::createInstance ('display' , false);
+					$aItemAttrs->add($aAttrValue);
+					$aAttrValue->setParent($aObjectContainer) ;
 				}else{
 					// @todo for add
 				}
 			}
 		}
+		
+		$this->compileChildren($aObject, $aObjectContainer, $aDev, $aCompilerManager) ;
+		$aDev->write("	\$aStack->out();");
 	}
 }

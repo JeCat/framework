@@ -48,6 +48,7 @@ class UIFactory extends UIFactoryBase
 		$aNodeCompilers->addSubCompiler('data',__NAMESPACE__."\\uicompiler\\ModelDataCompiler") ;
 		
 		$aNodeCompilers->addSubCompiler('menu',__NAMESPACE__."\\uicompiler\\MenuCompiler") ;
+		$aNodeCompilers->addSubCompiler('item',__NAMESPACE__."\\uicompiler\\MenuCompiler") ;
 		
 		return $aNodeCompilers ;
 	}

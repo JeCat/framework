@@ -29,7 +29,6 @@ class WidgetCompiler extends NodeCompiler
 		}
 		$this->writeHtmlAttr($aAttrs , $aDev , $sWidgetVarName);
 		$this->writeWidgetAttr($aAttrs , $aDev , $sWidgetVarName);
-		$this->writeWidgetAttr($aAttrs ,  $aDev , $sWidgetVarName);
 		$this->writeBean($aObject ,  $aDev , $sWidgetVarName) ;
 		$this->writeTemplate($aObject , $aAttrs ,  $aDev , $sWidgetVarName) ;
 		$this->writeDisplay($aAttrs , $aDev , $sWidgetVarName) ;

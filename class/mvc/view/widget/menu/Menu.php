@@ -104,7 +104,7 @@ class Menu extends AbstractBase
 		if($item instanceof Item){
 			return $this->addItemPrivate($item);
 		}else if(is_string($item)){
-			$aItem = new Item($item);
+			$aItem = new Item($item , $item);
 			return $this->addItemPrivate($aItem);
 		}else if(is_array($item)){
 			foreach($item as $i){
@@ -148,7 +148,7 @@ class Menu extends AbstractBase
 	}
 	
 	private function addItemPrivate(Item $aItem){
-		$this->arrItems[]=$aItem;
+		$this->arrItems[$aItem->id()]=$aItem;
 		$aItem->setParentMenu($this);
 		
 		if(!$aItem->view())
@@ -228,10 +228,8 @@ class Menu extends AbstractBase
 			$arrItemBean['id'] = $id;
 		}
 		
-		$aItem = BeanFactory::singleton()->createBean($arrItemBean,'*',false) ;
+		$aItem = BeanFactory::singleton()->createBean($arrItemBean,'*',true) ;
 		$this->addItem($aItem);
-		
-		$aItem->buildBean($arrItemBean) ;
 	}
 	
 	public function setPos($left,$top){
