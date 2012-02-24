@@ -356,7 +356,7 @@ class Menu extends AbstractBase
 			}
 			else
 			{
-				return -1 ;
+				return 10000 ;
 			}
 		}
 		
