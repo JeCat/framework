@@ -158,32 +158,35 @@ class File extends FormWidget
 			return null;
 		}
 		
-		if (empty ( $this->aStoreFolder ))
+		if($this->isFullPath())
 		{
-			throw new Exception ( "非法的路径属性,无法依赖此路径属性创建对应的文件夹对象" );
-		}
-		
-		if (! $this->aStoreFolder->exists ())
-		{
-			$this->aStoreFolder = $this->aStoreFolder->create ();
-		}
-		
-		$sStorePath = $this->aStoreFolder->path ();
-		$nStorePathLen = strlen ( $sStorePath );
-		$sFilePath = $aFile->path ();
-		
-		if($this->isFullPath()){
-			$sFilePath = $this->aStoreFolder->path() . $sFilePath;
-		}
-		
-		// 文件在存储目录内
-		if (substr ( $sFilePath, 0, $nStorePathLen ) == $sStorePath)
-		{
-			return substr ( $sFilePath, $nStorePathLen + 1 );
+			return $aFile->path() ;
 		}
 		else
 		{
-			return $sFilePath;
+			if (empty ( $this->aStoreFolder ))
+			{
+				throw new Exception ( "非法的路径属性,无法依赖此路径属性创建对应的文件夹对象" );
+			}
+			
+			if (! $this->aStoreFolder->exists ())
+			{
+				$this->aStoreFolder = $this->aStoreFolder->create ();
+			}
+			
+			$sStorePath = $this->aStoreFolder->path ();
+			$nStorePathLen = strlen ( $sStorePath );
+			$sFilePath = $aFile->path ();
+			
+			// 文件在存储目录内
+			if (substr ( $sFilePath, 0, $nStorePathLen ) == $sStorePath)
+			{
+				return substr ( $sFilePath, $nStorePathLen + 1 );
+			}
+			else
+			{
+				return $sFilePath;
+			}
 		}
 	}
 	
