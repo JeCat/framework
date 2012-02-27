@@ -72,6 +72,12 @@ class File extends FormWidget
 	 * |无
 	 * |必须
 	 * |文件夹路径
+	 * |-- --
+	 * |fullpath
+	 * |bool
+	 * |无
+	 * |可选
+	 * |数据保存时保存完整的文件路径还是忽略参数提供的路径部分, true 完整的文件路径, false 不带参数所指的文件夹路径
 	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
@@ -81,6 +87,10 @@ class File extends FormWidget
 		if (array_key_exists ( 'folder', $arrConfig ))
 		{
 			$this->aStoreFolder = FileSystem::singleton()->findFolder($arrConfig['folder'],FileSystem::FIND_AUTO_CREATE);
+		}
+		if (array_key_exists ( 'fullpath', $arrConfig ))
+		{
+			$this->setFullPath($arrConfig['fullpath']);
 		}
 	}
 	
@@ -103,6 +113,14 @@ class File extends FormWidget
 			return '';
 		}
 		return $this->aAchiveStrategy->restoreOriginalFilename ( $this->value () );
+	}
+	
+	public function isFullPath(){
+		return $this->bFullPath;
+	}
+	
+	public function setFullPath($bFullPath){
+		$this->bFullPath = (bool)$bFullPath;
 	}
 	
 	public function getFileUrl()
@@ -134,7 +152,6 @@ class File extends FormWidget
 	
 	public function valueToString()
 	{
-		
 		$aFile = $this->value ();
 		if (! $aFile)
 		{
@@ -173,6 +190,15 @@ class File extends FormWidget
 	public function file()
 	{
 		return $this->value ();
+	}
+	
+	public function value()
+	{
+		if($this->isFullPath()){
+			return $this->aStoreFolder->path() . $this->value ;
+		}else{
+			return $this->value ;
+		}
 	}
 	
 	public function moveToStoreFolder()
@@ -292,6 +318,10 @@ class File extends FormWidget
 	 * @var	org\jecat\framework\fs\IFile
 	 */
 	private $aUploadedFile;
+	/**
+	 * @var	boolean
+	 */
+	private $bFullPath;
 }
 
 ?>
