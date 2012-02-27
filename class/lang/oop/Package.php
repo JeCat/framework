@@ -24,10 +24,10 @@ class Package implements \Serializable
 		// $this->addClassFilenameWrapper(function ($sClassName){ return "class.{$sClassName}.php" ; }) ;
 	}
 	
-	public function findFolder($sPath)
+	public function findFolder($sPath,$bAutoCreate=false)
 	{
 		$aFs = FileSystem::singleton() ;
-		if( !$aSourceFolder=$aFs->findFolder($sPath,FileSystem::FIND_AUTO_CREATE) )
+		if( !$aSourceFolder=$aFs->findFolder($sPath,$bAutoCreate?FileSystem::FIND_AUTO_CREATE:0) )
 		{
 			throw new Exception(
 					"注册 class package 时，提供的class源文件目录不存在：%s"
