@@ -25,10 +25,13 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 	const youKnow = null ;
 	
 	const MODEL_IMPLEMENT_CLASS_NS = 'org\\jecat\\framework\\mvc\\model\\db\\imp' ;
-	const PROTOTYPE_IMPLEMENT_CLASS_NS = 'org\\jecat\\framework\\mvc\\model\\db\\prototype' ;
-	
+	const MODEL_IMPLEMENT_CLASS_BASE = 'org\\jecat\\framework\\mvc\\model\\db\\Model' ;
 	static public $sModelImpPackage = '/data/class/db/model' ;
+	
+	const PROTOTYPE_IMPLEMENT_CLASS_NS = 'org\\jecat\\framework\\mvc\\model\\db\\prototype' ;
+	const PROTOTYPE_IMPLEMENT_CLASS_BASE = __CLASS__ ;
 	static public $sPrototypeImpPackage = '/data/class/db/prototype' ;
+	
 	
 	// static creator
 	/**
@@ -483,102 +486,8 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		{
 			$sModelShortClass = '_'.preg_replace('[^\w_]','_',$this->tableName()) ;
 			$this->sModelClass = self::MODEL_IMPLEMENT_CLASS_NS .'\\'. $sModelShortClass ;
-			
-			// 生成模型类
-			self::buildShadowClass($this->sModelClass,$sModelShortClass,self::MODEL_IMPLEMENT_CLASS_NS, 'org\\jecat\\framework\\mvc\\model\\db\\Model',self::$sModelImpPackage) ;
 		}
 		return $this->sModelClass ;
-	}
-	
-	static function buildShadowClass($sClass,$sShortClass,$sNamespace,$sParentClass,$sPackageFolder)
-	{
-		if(!class_exists($sClass))
-		{
-			$sClassSource = self::generateShadowlClass($sShortClass,$sNamespace,$sParentClass) ;
-			
-			$sClassFilePath = $sPackageFolder.'/'.$sShortClass.'.php' ;
-			if( !$aClassFile = FileSystem::singleton()->findFile($sClassFilePath,FileSystem::FIND_AUTO_CREATE) )
-			{
-				throw new Exception("无法自动创建影子类 %s 的类文件：%s",array($sClass,$sClassFilePath)) ;
-			}
-			
-			$aWriter = $aClassFile->openWriter() ;
-			$aWriter->write($sClassSource) ;
-			$aWriter->close() ;
-		}
-	} 
-	
-	static function & generateShadowlClass($sShortClass,$sNamespace,$sParentClass)
-	{
-		$aClassRef = new \ReflectionClass($sParentClass) ;
-		
-		$sClassSource = "<?php " ;
-		$sClassSource.= "namespace {$sNamespace};\r\n" ;
-		$sClassSource.= "class ".basename(str_replace('\\','/',$sNamespace.'\\'.$sShortClass))." extends \\{$sParentClass}\r\n" ;
-		$sClassSource.= "{\r\n" ;
-		
-		foreach($aClassRef->getMethods() as $aMethodRef)
-		{
-			if( $aMethodRef->isFinal() or $aMethodRef->isAbstract() or $aMethodRef->isPrivate() )
-			{
-				continue ;
-			}
-			
-			$sMethodName = $aMethodRef->getName() ;
-			
-			$sClassSource.= "\t" ;
-			if( $aMethodRef->isStatic() )
-			{
-				$sClassSource.= 'static ' ;
-			}
-			$sClassSource.= $aMethodRef->isPublic()? 'public ': 'protected ' ;
-			$sClassSource.= 'function ' ;
-			if( $aMethodRef->returnsReference() )
-			{
-				$sClassSource.= ' & ' ;
-			}
-			$sClassSource.= $sMethodName .'( ' ;
-			$sCallParams = '' ;
-			
-			// 参数
-			foreach($aMethodRef->getParameters() as $aParamRef)
-			{
-				if($aParamRef->getPosition())
-				{
-					$sClassSource.= ', ' ;
-					$sCallParams.= ',' ;
-				}
-				// 参数类型
-				if($aParamClass=$aParamRef->getClass())
-				{
-					$sClassSource.= '\\'.$aParamClass->getName().' ' ;
-				}
-				else if($aParamRef->isArray())
-				{
-					$sClassSource.= 'array ' ;
-				}
-				// 引用传递
-				if($aParamRef->isPassedByReference())
-				{
-					$sClassSource.= '&' ;
-				}
-				// 参数名称/默认值
-				$sClassSource.= '$'.$aParamRef->getName() ;
-				if($aParamRef->isDefaultValueAvailable())
-				{
-					$sClassSource.= '=' . var_export($aParamRef->getDefaultValue(),true) ;
-				}
-				$sCallParams.= '$'.$aParamRef->getName() ;
-			}
-			$sClassSource.= " )\r\n" ;
-			$sClassSource.= "\t{\r\n" ;
-			$sClassSource.= "\t\treturn parent::{$sMethodName}({$sCallParams}) ;\r\n" ;
-			$sClassSource.= "\t}\r\n" ;  
-		}
-		
-		$sClassSource.= "}" ;
-		
-		return $sClassSource ;
 	}
 	
 	// criteria setter
@@ -623,9 +532,6 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 			
 			$sShortClass = '_'.preg_replace('[^\w_]','_',$arrConfig['table']) ;
 			$sClass = $sClassNamespace .'\\'. $sShortClass ;
-			
-			// 生成模型类
-			self::buildShadowClass($sClass,$sShortClass,$sClassNamespace,get_called_class(),$sPackageFolder) ;
 		}
 		
 		$aBean = new $sClass() ;

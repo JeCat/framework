@@ -4,8 +4,9 @@ namespace org\jecat\framework\lang\oop ;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\fs\IFile;
 use org\jecat\framework\fs\IFolder;
+use org\jecat\framework\fs\FileSystem;
 
-class Package 
+class Package implements \Serializable
 {		
 	public function __construct($sNamespace,IFolder $aFolder=null)
 	{
@@ -14,13 +15,26 @@ class Package
 		$this->aFolder = $aFolder ;
 		
 		// OOXX.php
-		$this->addClassFilenameWrapper(function ($sClassName){ return "{$sClassName}.php" ; }) ;		
+		$this->addClassFilenameWrapper(array(__CLASS__,'classFilenameWrapper')) ;		
 		
 		// OOXX.class.php
 		// $this->addClassFilenameWrapper(function ($sClassName){ return "{$sClassName}.class.php" ; }) ;
 		
 		// class.OOXX.php
 		// $this->addClassFilenameWrapper(function ($sClassName){ return "class.{$sClassName}.php" ; }) ;
+	}
+	
+	public function findFolder($sPath)
+	{
+		$aFs = FileSystem::singleton() ;
+		if( !$aSourceFolder=$aFs->findFolder($sPath) )
+		{
+			throw new Exception(
+					"注册 class package 时，提供的class源文件目录不存在：%s"
+					, array($sPath)
+			) ;
+		}
+		return $aSourceFolder ;
 	}
 
 	/**
@@ -58,7 +72,7 @@ class Package
 			}
 		}
 		
-		$this->sNamespace = $sNamespace.'\\' ;
+		$this->sNamespace = substr($sNamespace,-1)=='\\'? $sNamespace: ($sNamespace.'\\') ;
 		$this->nNamespaceLen = strlen($this->sNamespace) ;
 	}
 
@@ -179,6 +193,28 @@ class Package
 	public function classIterator($sSubNamespace=null)
 	{
 		return new PackageClassIterator($this,$sSubNamespace) ;
+	}
+	
+	static public function classFilenameWrapper($sClassName)
+	{
+		return $sClassName.'.php' ;
+	}
+	
+	public function serialize()
+	{
+		$arrData = array(
+				'sNamespace' => &$this->sNamespace ,
+				'nNamespaceLen' => &$this->nNamespaceLen ,
+				'sFolderPath' => $this->aFolder? $this->aFolder->path(): null ,
+		) ;
+		return serialize($arrData) ;
+	}
+	
+	public function unserialize($serialized)
+	{
+		$arrData = unserialize($serialized) ;
+		
+		$this->__construct($arrData['sNamespace'],$arrData['sFolderPath']? self::findFolder($arrData['sFolderPath']): null) ;
 	}
 	
 	private $sNamespace ;

@@ -200,6 +200,10 @@ class ShareObjectSerializer extends Object
 	{
 		if( !$aRef=Object::flyweight($sClassName,false,'ReflectionClass') )
 		{
+			/*if( !class_exists($sClassName,true) )
+			{
+				throw new Exception("ShareObjectSerializer 在序列化时遇到无法加载的类：%s",$sClassName) ;
+			}*/
 			$aRef = new \ReflectionClass($sClassName) ;
 			Object::setFlyweight($aRef,$sClassName,'ReflectionClass') ;
 		}

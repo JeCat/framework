@@ -5,7 +5,6 @@ use org\jecat\framework\system\Application;
 use org\jecat\framework\fs\IFile;
 use org\jecat\framework\lang\Object;
 use org\jecat\framework\lang\compile\ClassCompileException;
-use org\jecat\framework\fs\FileSystem;
 use org\jecat\framework\io\OutputStream;
 use org\jecat\framework\io\InputStream;
 use org\jecat\framework\lang\compile\CompilerFactory;
@@ -40,19 +39,16 @@ class ClassLoader extends Object implements \Serializable
 	 */
 	public function addPackage($sNamespace,$sSourceFolder=null) 
 	{
-		$aFs = FileSystem::singleton() ;
-		
-		$aSourceFolder = null ;
-		if( $sSourceFolder and !$aSourceFolder=$aFs->findFolder($sSourceFolder) )
+		if( $sNamespace instanceof Package )
 		{
-			throw new Exception(
-					"注册 class package (%s)时，提供的class源文件目录不存在：%s"
-					, array($sNamespace,$sSourceFolder)
-			) ;
+			$aPackage = $sNamespace ;
 		}
-		
-		$aPackage = new Package($sNamespace,$aSourceFolder) ;
-		$this->arrPackages[$sNamespace] = $aPackage ;
+		else
+		{
+			$aPackage = new Package($sNamespace,Package::findFolder($sSourceFolder)) ;
+		}
+
+		$this->arrPackages[$aPackage->ns()] = $aPackage ;
 		return $aPackage ;
 	}
 	
@@ -280,14 +276,8 @@ class ClassLoader extends Object implements \Serializable
 		$arrData = array(
 			'arrPackages' => array() ,
 			'arrClassPathCache' => &$this->arrClassPathCache ,
+			'arrPackages' => &$this->arrPackages ,
 		) ;
-		
-		foreach($this->arrPackages as $aPackage)
-		{
-			$arrData['arrPackages'][] = array(
-				$aPackage->ns(), $aPackage->folder()->path()
-			) ;
-		}
 		
 		return serialize($arrData) ;
 	}
@@ -298,10 +288,7 @@ class ClassLoader extends Object implements \Serializable
 		
 		$arrData = unserialize($serialized) ;
 		$this->arrClassPathCache =& $arrData['arrClassPathCache'] ;
-		foreach($arrData['arrPackages'] as $arrPackage)
-		{
-			$this->addPackage($arrPackage[0],$arrPackage[1]) ;
-		}
+		$this->arrPackages =& $arrData['arrPackages'] ;
 	}
 	
 	public function enableClassCache()
