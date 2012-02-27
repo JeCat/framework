@@ -94,25 +94,6 @@ class Menu extends AbstractBase
     
     	return null ;
     }
-    
-	/**
-	 * @brief 添加一个item。
-	 *
-	 * 接受一个Item对象、一个包含Item对象的数组或一个字符串（item的title）。
-	 */
-	public function addItem($item){
-		if($item instanceof Item){
-			return $this->addItemPrivate($item);
-		}else if(is_string($item)){
-			$aItem = new Item($item , $item);
-			return $this->addItemPrivate($aItem);
-		}else if(is_array($item)){
-			foreach($item as $i){
-				$rtn = $this->addItem($i);
-			}
-			return $rtn;
-		}
-	}
 	
 	public function getMenuByPath($arrPath){
 		if(is_string($arrPath)){
@@ -200,27 +181,6 @@ class Menu extends AbstractBase
 			return $this->parentItem()->depth() +1;
 		}
     }
-    
-	private function buildItems($configItems,$id=null){
-		if($configItems instanceof Item){
-			if(!is_int($id)) $configItems->setId($id);
-			$this->addItem($configItems);
-		}else if(is_string($configItems)){
-			if(is_int($id)) $id=null;
-			$aItem = new Item($configItems,$id);
-			$this->addItem($aItem);
-		}else if(is_array($configItems)){
-			$configItems['class']=__NAMESPACE__.'\Item';
-			if(empty($configItems['id']) && !is_int($id) ){
-				$configItems['id'] = $id;
-			}
-			
-			$aItem = BeanFactory::singleton()->createBean($configItems,'*',false) ;
-			$this->addItem($aItem);
-			
-			$aItem->buildBean($configItems) ;
-		}
-	}
 	
 	private function buildItemFromBean(array $arrItemBean , $id=null ){
 		$arrItemBean['class']=__NAMESPACE__.'\Item';
@@ -229,12 +189,16 @@ class Menu extends AbstractBase
 		}
 		
 		$aItem = BeanFactory::singleton()->createBean($arrItemBean,'*',false) ;
+		
+		// 在BuildBean中，通过query设置active需要先获得知道view()对象
 		if(!$aItem->view())
 		{
 			$aItem->setView($this->view()) ;
 		}
 		$aItem->buildBean($arrItemBean);
-		$this->addItem($aItem);
+		
+		// addItem时，为了避免重复，需要先知道id值，所以只能放在buildBean之后
+		$this->addItemPrivate($aItem);
 	}
 	
 	public function setPos($left,$top){
