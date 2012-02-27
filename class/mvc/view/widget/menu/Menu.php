@@ -228,7 +228,12 @@ class Menu extends AbstractBase
 			$arrItemBean['id'] = $id;
 		}
 		
-		$aItem = BeanFactory::singleton()->createBean($arrItemBean,'*',true) ;
+		$aItem = BeanFactory::singleton()->createBean($arrItemBean,'*',false) ;
+		if(!$aItem->view())
+		{
+			$aItem->setView($this->view()) ;
+		}
+		$aItem->buildBean($arrItemBean);
 		$this->addItem($aItem);
 	}
 	
