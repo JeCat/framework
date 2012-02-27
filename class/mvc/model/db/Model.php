@@ -141,7 +141,6 @@ class Model extends AbstractModel implements IModel, IBean
 		) ;
 	}
 	
-<<<<<<< HEAD
 	/**
 	 * @wiki /MVC模式/模型/模型(Model)
 	 *
@@ -149,11 +148,7 @@ class Model extends AbstractModel implements IModel, IBean
 	 *  | 向数据库表插入或者更新数据的Model方法
 	 *  |}
 	 */
-	
-	public function save()
-=======
 	public function save($bForceCreate=false)
->>>>>>> 92c2dfe97de19d5b51dd32d56a5ef0bd8a118a16
 	{
 		if( $this->isList() )
 		{
