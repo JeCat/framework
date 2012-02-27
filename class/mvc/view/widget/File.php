@@ -75,7 +75,7 @@ class File extends FormWidget
 	 * |-- --
 	 * |fullpath
 	 * |bool
-	 * |无
+	 * |true
 	 * |可选
 	 * |数据保存时保存完整的文件路径还是忽略参数提供的路径部分, true 完整的文件路径, false 不带参数所指的文件夹路径
 	 * |}
@@ -172,6 +172,10 @@ class File extends FormWidget
 		$nStorePathLen = strlen ( $sStorePath );
 		$sFilePath = $aFile->path ();
 		
+		if($this->isFullPath()){
+			$sFilePath = $this->aStoreFolder->path() . $sFilePath;
+		}
+		
 		// 文件在存储目录内
 		if (substr ( $sFilePath, 0, $nStorePathLen ) == $sStorePath)
 		{
@@ -190,15 +194,6 @@ class File extends FormWidget
 	public function file()
 	{
 		return $this->value ();
-	}
-	
-	public function value()
-	{
-		if($this->isFullPath()){
-			return $this->aStoreFolder->path() . $this->value ;
-		}else{
-			return $this->value ;
-		}
 	}
 	
 	public function moveToStoreFolder()
@@ -321,7 +316,7 @@ class File extends FormWidget
 	/**
 	 * @var	boolean
 	 */
-	private $bFullPath;
+	private $bFullPath = true;
 }
 
 ?>
