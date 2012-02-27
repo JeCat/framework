@@ -27,7 +27,7 @@ class Package implements \Serializable
 	public function findFolder($sPath)
 	{
 		$aFs = FileSystem::singleton() ;
-		if( !$aSourceFolder=$aFs->findFolder($sPath) )
+		if( !$aSourceFolder=$aFs->findFolder($sPath,FileSystem::FIND_AUTO_CREATE) )
 		{
 			throw new Exception(
 					"注册 class package 时，提供的class源文件目录不存在：%s"
