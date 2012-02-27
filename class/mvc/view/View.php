@@ -425,7 +425,7 @@ class View extends NamableComposite implements IView, IBean
 	/**
 	 * @return HashTable
 	 */
-	protected function widgits()
+	protected function widgets()
 	{
 		if( !$this->aWidgets )
 		{
@@ -440,7 +440,7 @@ class View extends NamableComposite implements IView, IBean
 	 */
 	public function addWidget(IViewWidget $aWidget,$sExchangeName=null)
 	{
-		$this->widgits()->set($aWidget->id(),$aWidget) ;
+		$this->widgets()->set($aWidget->id(),$aWidget) ;
 		$aWidget->setView($this) ;
 		
 		if( $sExchangeName )
@@ -455,7 +455,7 @@ class View extends NamableComposite implements IView, IBean
 	
 	public function removeWidget(IViewWidget $aWidget)
 	{
-		$this->widgits()->remove($aWidget->id()) ;
+		$this->widgets()->remove($aWidget->id()) ;
 		
 		$this->messageQueue()->removeChildHolder($aWidget) ;
 		
@@ -472,7 +472,7 @@ class View extends NamableComposite implements IView, IBean
 	
 	public function hasWidget(IViewWidget $aWidget)
 	{
-		return $this->widgits()->hasValue($aWidget) ;
+		return $this->widgets()->hasValue($aWidget) ;
 	}
 	
 	/**
@@ -480,7 +480,7 @@ class View extends NamableComposite implements IView, IBean
 	 */
 	public function widget($sId)
 	{
-		return $this->widgits()->get($sId) ;
+		return $this->widgets()->get($sId) ;
 	}
 	
 	/**
@@ -488,7 +488,7 @@ class View extends NamableComposite implements IView, IBean
 	 */
 	public function widgitIterator()
 	{
-		return $this->widgits()->valueIterator() ;
+		return $this->widgets()->valueIterator() ;
 	}
 	
 	/**
@@ -557,7 +557,7 @@ class View extends NamableComposite implements IView, IBean
     public function __get($sName)
     {
     	// widget
-    	if($aWidget=$this->widgits()->get($sName))
+    	if($aWidget=$this->widgets()->get($sName))
     	{
     		return $aWidget ;
     	}
@@ -581,7 +581,7 @@ class View extends NamableComposite implements IView, IBean
     	else if( $nNameLen>6 and strpos($sName,'widget')===0 )
     	{
     		$sWidgetName = substr($sName,6) ;
-    		return $this->widgits()->get($sWidgetName)?: $this->widgits()->get(lcfirst($sWidgetName)) ;
+    		return $this->widgets()->get($sWidgetName)?: $this->widgets()->get(lcfirst($sWidgetName)) ;
     	}
     	
 		throw new Exception("正在访问视图 %s 中不存在的属性: %s",array($this->name(),$sName)) ;

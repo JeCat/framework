@@ -32,6 +32,13 @@ class Prototype extends StatementFactory implements IBean
 	/**
 	 * @return Prototype
 	 */
+	/**
+	 * @wiki /MVC模式/模型/模型(Model)
+	 *
+	 * {| ==原型创建==
+	 *  | 原型的创建方法
+	 *  |}
+	 */
 	static public function create( $sTableName, $keys=self::youKnow, $columns=self::youKnow , $aDB = self::youKnow )
 	{
 		$aPrototype = new Prototype ;
@@ -115,6 +122,13 @@ class Prototype extends StatementFactory implements IBean
 	
 	/**
 	 * @return org\jecat\framework\db\sql\Criteria
+	 */
+	/**
+	 * @wiki /MVC模式/模型/模型(Model)
+	 *
+	 * {| ==原型属性的获得==
+	 *  | 通过criteria（）对原型的属性进行设置，例如where
+	 *  |}
 	 */
 	public function criteria($bCreate=true)
 	{

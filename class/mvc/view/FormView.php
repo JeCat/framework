@@ -41,7 +41,7 @@ class FormView extends View implements IFormView
 	
 	public function loadWidgets(IDataSrc $aDataSrc)
 	{
-		foreach($this->widgits() as $aWidget)
+		foreach($this->widgets() as $aWidget)
 		{
 			$aWidget->setDataFromSubmit($aDataSrc) ;
 		}
@@ -60,7 +60,7 @@ class FormView extends View implements IFormView
 	{
 		$bRet = true ;
 		
-		foreach($this->widgits() as $aWidget)
+		foreach($this->widgets() as $aWidget)
 		{
 			if( ($aWidget instanceof IViewFormWidget) and !$aWidget->verifyData() )
 			{

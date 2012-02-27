@@ -34,6 +34,13 @@ class Model extends AbstractModel implements IModel, IBean
 	/**
 	 * @return IModel
 	 */
+	/**
+	 * @wiki /MVC模式/模型/模型(Model)
+	 *
+	 * {| ==IModel==
+	 *  |  返回IModel
+	 *  |}
+	 */
 	public function child($sName,$bCreateByAssoc=true)
 	{
 		$aChild = parent::child($sName) ;
@@ -133,6 +140,14 @@ class Model extends AbstractModel implements IModel, IBean
 			$this , null , self::buildCriteria($this->prototype(),$values,$keys), $this->isList(), $this->db()
 		) ;
 	}
+	
+	/**
+	 * @wiki /MVC模式/模型/模型(Model)
+	 *
+	 * {| ==save方法==
+	 *  | 向数据库表插入或者更新数据的Model方法
+	 *  |}
+	 */
 	
 	public function save()
 	{
@@ -351,8 +366,10 @@ class Model extends AbstractModel implements IModel, IBean
 	}
 	/**
 	 * @wiki /MVC模式/模型/模型(Model)
-	 * ==Bean配置数组==
-	 * list boolean 设置此对象是否是其他模型对象的容器
+	 * 
+	 * {| ==Bean配置数组==
+	 *  | list boolean 设置此对象是否是其他模型对象的容器
+	 *  |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
