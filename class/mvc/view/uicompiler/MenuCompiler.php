@@ -22,7 +22,7 @@ class MenuCompiler extends WidgetCompiler
 		$this->writeHtmlAttr($aAttrs , $aDev , $sWidgetVarName);
 		$this->writeWidgetAttr($aAttrs , $aDev , $sWidgetVarName);
 		$this->writeBean($aObject ,  $aDev , $sWidgetVarName) ;
-		$this->writeTemplate($aObject , $aAttrs ,  $aDev , $sWidgetVarName) ;
+		$this->writeTemplate($aObject , $aAttrs , $aObjectContainer , $aDev , $aCompilerManager , $sWidgetVarName) ;
 		$this->writeSubMenu($aObject , $aObjectContainer , $aDev , $aCompilerManager , $sWidgetVarName ) ;
 		$this->writeDisplay($aAttrs , $aDev , $sWidgetVarName) ;
 		$this->writeEnd($aDev);

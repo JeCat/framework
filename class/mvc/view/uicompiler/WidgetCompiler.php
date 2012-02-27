@@ -30,7 +30,7 @@ class WidgetCompiler extends NodeCompiler
 		$this->writeHtmlAttr($aAttrs , $aDev , $sWidgetVarName);
 		$this->writeWidgetAttr($aAttrs , $aDev , $sWidgetVarName);
 		$this->writeBean($aObject ,  $aDev , $sWidgetVarName) ;
-		$this->writeTemplate($aObject , $aAttrs ,  $aDev , $sWidgetVarName) ;
+		$this->writeTemplate($aObject , $aAttrs , $aObjectContainer , $aDev , $aCompilerManager , $sWidgetVarName) ;
 		$this->writeDisplay($aAttrs , $aDev , $sWidgetVarName) ;
 		$this->writeEnd($aDev);
 	}
@@ -156,12 +156,15 @@ class WidgetCompiler extends NodeCompiler
 		}
 	}
 	
-	protected function writeTemplate(IObject $aObject ,Attributes $aAttrs , TargetCodeOutputStream $aDev , $sWidgetVarName){
+	protected function writeTemplate(IObject $aObject ,Attributes $aAttrs ,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager , $sWidgetVarName){
 		// template
 		if($aAttrs->has('subtemplate') ){
 			$sFunName = $aAttrs->string('subtemplate') ;
 			$aDev->write("	{$sWidgetVarName}->setSubTemplateName('__subtemplate_{$sFunName}') ;") ;
-		}
+		}else if($aAttrs->has('template') ){
+			$sTemplateName = $aAttrs->string('template');
+			$aDev->write("	{$sWidgetVarName}->setTemplateName('{$sTemplateName}') ;") ;
+		}else
 		if( $aTemplate=$aObject->getChildNodeByTagName('template') ){
 			$aAttributes = $aTemplate->headTag()->attributes();
 			
