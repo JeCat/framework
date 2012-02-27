@@ -132,7 +132,7 @@ class ShadowClassPackage extends Package implements \Serializable
 		$this->__construct(
 				$arrData['sParentClass']
 				, $arrData['sNamespace']
-				, $arrData['sFolderPath']? self::findFolder($arrData['sFolderPath']): null
+				, $arrData['sFolderPath']? self::findFolder($arrData['sFolderPath'],true): null
 		) ;
 	}
 	

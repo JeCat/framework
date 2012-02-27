@@ -1,6 +1,7 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\db\sql\Order;
 use org\jecat\framework\util\serialize\IIncompleteSerializable;
 use org\jecat\framework\util\serialize\ShareObjectSerializer;
 use org\jecat\framework\db\sql\Restriction;
