@@ -32,6 +32,7 @@ require_once CLASSPATH."/lang/Object.php" ;
 require_once CLASSPATH."/lang/IException.php" ;
 require_once CLASSPATH."/lang/Exception.php" ;
 require_once CLASSPATH."/lang/oop/Package.php" ;
+require_once CLASSPATH."/lang/oop/ShadowClassPackage.php" ;
 require_once CLASSPATH."/lang/oop/ClassLoader.php" ;
 require_once CLASSPATH."/system/Application.php" ;
 require_once CLASSPATH."/system/ApplicationFactory.php" ;

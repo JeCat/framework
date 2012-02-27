@@ -1,8 +1,9 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\util\serialize\IIncompleteSerializable;
+use org\jecat\framework\util\serialize\ShareObjectSerializer;
 use org\jecat\framework\lang\Type;
-
 use org\jecat\framework\db\sql\StatementState;
 use org\jecat\framework\db\sql\Statement;
 use org\jecat\framework\db\sql\Restriction;
@@ -13,7 +14,7 @@ use org\jecat\framework\db\sql\TablesJoin;
 use org\jecat\framework\db\DB;
 use org\jecat\framework\mvc\model\db\orm\Prototype;
 
-class Association implements IBean
+class Association implements IBean, \Serializable, IIncompleteSerializable
 {
 	const youKnow = null ;
 	
@@ -154,6 +155,10 @@ class Association implements IBean
 	 * @return Prototype
 	 */
 	public function fromPrototype()
+	{
+		return $this->aFromPrototype;
+	}
+	public function setFromPrototype(Prototype $aPrototype)
 	{
 		return $this->aFromPrototype;
 	}
@@ -428,6 +433,32 @@ class Association implements IBean
 			, $aStatement, $sState
 		) ;
 	}
+	// ----------------------------------
+	public function serializableProperties()
+	{
+		return array(
+			__CLASS__ => array(
+				'nType' ,
+				'arrFromKeys' ,
+				'arrToKeys' ,
+				'sBridgeTable' ,
+				'arrToBridgeKeys' ,
+				'arrFromBridgeKeys' ,
+				'sJoinType' ,
+				'arrBeanConfig' ,
+				'aToPrototype' ,
+			)
+		) ;
+	}
+	public function serialize ()
+	{
+		return ShareObjectSerializer::singleton()->serialize($this) ;
+	}
+	public function unserialize ($serialized)
+	{
+		ShareObjectSerializer::singleton()->unserialize($serialized,$this) ;
+	}
+	
 	
 	// private data
 	private $aDB = null ;
@@ -447,4 +478,3 @@ class Association implements IBean
 	private $aOtherTableJoinOn ;
 	
 }
-?>

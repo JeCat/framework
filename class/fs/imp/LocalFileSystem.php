@@ -56,7 +56,7 @@ class LocalFileSystem extends FileSystem
 		
 		else 
 		{
-			$sDirPath = $this->sLocalPath.'/'.$sPath ;
+			$sDirPath = $this->sLocalPath.$sPath ;
 			
 			if( !$hDir = opendir($sDirPath) )
 			{

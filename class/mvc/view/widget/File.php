@@ -72,6 +72,12 @@ class File extends FormWidget
 	 * |无
 	 * |必须
 	 * |文件夹路径
+	 * |-- --
+	 * |fullpath
+	 * |bool
+	 * |true
+	 * |可选
+	 * |数据保存时保存完整的文件路径还是忽略参数提供的路径部分, true 完整的文件路径, false 不带参数所指的文件夹路径
 	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
@@ -81,6 +87,10 @@ class File extends FormWidget
 		if (array_key_exists ( 'folder', $arrConfig ))
 		{
 			$this->aStoreFolder = FileSystem::singleton()->findFolder($arrConfig['folder'],FileSystem::FIND_AUTO_CREATE);
+		}
+		if (array_key_exists ( 'fullpath', $arrConfig ))
+		{
+			$this->setFullPath($arrConfig['fullpath']);
 		}
 	}
 	
@@ -103,6 +113,14 @@ class File extends FormWidget
 			return '';
 		}
 		return $this->aAchiveStrategy->restoreOriginalFilename ( $this->value () );
+	}
+	
+	public function isFullPath(){
+		return $this->bFullPath;
+	}
+	
+	public function setFullPath($bFullPath){
+		$this->bFullPath = (bool)$bFullPath;
 	}
 	
 	public function getFileUrl()
@@ -134,35 +152,41 @@ class File extends FormWidget
 	
 	public function valueToString()
 	{
-		
 		$aFile = $this->value ();
 		if (! $aFile)
 		{
 			return null;
 		}
 		
-		if (empty ( $this->aStoreFolder ))
+		if($this->isFullPath())
 		{
-			throw new Exception ( "非法的路径属性,无法依赖此路径属性创建对应的文件夹对象" );
-		}
-		
-		if (! $this->aStoreFolder->exists ())
-		{
-			$this->aStoreFolder = $this->aStoreFolder->create ();
-		}
-		
-		$sStorePath = $this->aStoreFolder->path ();
-		$nStorePathLen = strlen ( $sStorePath );
-		$sFilePath = $aFile->path ();
-		
-		// 文件在存储目录内
-		if (substr ( $sFilePath, 0, $nStorePathLen ) == $sStorePath)
-		{
-			return substr ( $sFilePath, $nStorePathLen + 1 );
+			return $aFile->path() ;
 		}
 		else
 		{
-			return $sFilePath;
+			if (empty ( $this->aStoreFolder ))
+			{
+				throw new Exception ( "非法的路径属性,无法依赖此路径属性创建对应的文件夹对象" );
+			}
+			
+			if (! $this->aStoreFolder->exists ())
+			{
+				$this->aStoreFolder = $this->aStoreFolder->create ();
+			}
+			
+			$sStorePath = $this->aStoreFolder->path ();
+			$nStorePathLen = strlen ( $sStorePath );
+			$sFilePath = $aFile->path ();
+			
+			// 文件在存储目录内
+			if (substr ( $sFilePath, 0, $nStorePathLen ) == $sStorePath)
+			{
+				return substr ( $sFilePath, $nStorePathLen + 1 );
+			}
+			else
+			{
+				return $sFilePath;
+			}
 		}
 	}
 	
@@ -292,6 +316,10 @@ class File extends FormWidget
 	 * @var	org\jecat\framework\fs\IFile
 	 */
 	private $aUploadedFile;
+	/**
+	 * @var	boolean
+	 */
+	private $bFullPath = true;
 }
 
 ?>

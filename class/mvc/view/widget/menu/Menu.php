@@ -11,7 +11,7 @@ use org\jecat\framework\util\IHashTable;
 
 
 HtmlResourcePool::singleton()->addRequire('org.jecat.framework:style/widget/menu.css',HtmlResourcePool::RESRC_CSS) ;
-HtmlResourcePool::singleton()->addRequire('org.jecat.framework:js/MVC模式/view/widget/menu.js',HtmlResourcePool::RESRC_JS) ;
+HtmlResourcePool::singleton()->addRequire('org.jecat.framework:js/mvc/view/widget/menu.js',HtmlResourcePool::RESRC_JS) ;
 
 class Menu extends AbstractBase
 {
@@ -48,27 +48,36 @@ class Menu extends AbstractBase
      * |菜单项目列表,每个元素都是一个菜单项的配置
      * |}
      */
-    public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
-    {
-    	parent::buildBean($arrConfig,$sNamespace);
-    	if( !empty($arrConfig['items']) && is_array($arrConfig['items'])){
-    		foreach($arrConfig['items'] as $key =>$item){
-    			$this->buildItems($item,$key);
-    		}
-    	}
-    	if(!empty($arrConfig['direction'])){
-    		$this->setDirection($arrConfig['direction']);
-    	}
-    	if(!empty($arrConfig['top'])){
-    		$this->setPosTop($arrConfig['top']);
-    	}
-    	if(!empty($arrConfig['left'])){
-    		$this->setPosLeft($arrConfig['left']);
-    	}
-    	if( array_key_exists('tearoff',$arrConfig) ){
-    		$this->setTearoff($arrConfig['tearoff']);
-    	}
-    }
+	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
+	{
+		parent::buildBean($arrConfig,$sNamespace);
+		foreach($arrConfig as $key=>$value){
+			if(
+				preg_match('`^item:(.*)$`',$key,$arrMatch) 
+				
+				// 用xml配置bean的时候不能使用冒号，只能用减号代替
+				or preg_match('`^item-(.*)$`',$key,$arrMatch)
+			){
+				$sItemName = $arrMatch[1] ;
+				
+				if( is_array( $value ) ){
+					$this->buildItemFromBean( $value , $sItemName );
+				}
+			}
+		}
+		if(!empty($arrConfig['direction'])){
+			$this->setDirection($arrConfig['direction']);
+		}
+		if(!empty($arrConfig['top'])){
+			$this->setPosTop($arrConfig['top']);
+		}
+		if(!empty($arrConfig['left'])){
+			$this->setPosLeft($arrConfig['left']);
+		}
+		if( array_key_exists('tearoff',$arrConfig) ){
+			$this->setTearoff($arrConfig['tearoff']);
+		}
+	}
     
     
     public function view()
@@ -85,25 +94,6 @@ class Menu extends AbstractBase
     
     	return null ;
     }
-    
-	/**
-	 * @brief 添加一个item。
-	 *
-	 * 接受一个Item对象、一个包含Item对象的数组或一个字符串（item的title）。
-	 */
-	public function addItem($item){
-		if($item instanceof Item){
-			return $this->addItemPrivate($item);
-		}else if(is_string($item)){
-			$aItem = new Item($item);
-			return $this->addItemPrivate($aItem);
-		}else if(is_array($item)){
-			foreach($item as $i){
-				$rtn = $this->addItem($i);
-			}
-			return $rtn;
-		}
-	}
 	
 	public function getMenuByPath($arrPath){
 		if(is_string($arrPath)){
@@ -139,7 +129,7 @@ class Menu extends AbstractBase
 	}
 	
 	private function addItemPrivate(Item $aItem){
-		$this->arrItems[]=$aItem;
+		$this->arrItems[$aItem->id()]=$aItem;
 		$aItem->setParentMenu($this);
 		
 		if(!$aItem->view())
@@ -191,26 +181,24 @@ class Menu extends AbstractBase
 			return $this->parentItem()->depth() +1;
 		}
     }
-    
-	private function buildItems($configItems,$id=null){
-		if($configItems instanceof Item){
-			if(!is_int($id)) $configItems->setId($id);
-			$this->addItem($configItems);
-		}else if(is_string($configItems)){
-			if(is_int($id)) $id=null;
-			$aItem = new Item($configItems,$id);
-			$this->addItem($aItem);
-		}else if(is_array($configItems)){
-			$configItems['class']=__NAMESPACE__.'\Item';
-			if(empty($configItems['id']) && !is_int($id) ){
-				$configItems['id'] = $id;
-			}
-			
-			$aItem = BeanFactory::singleton()->createBean($configItems,'*',false) ;
-			$this->addItem($aItem);
-			
-			$aItem->buildBean($configItems) ;
+	
+	private function buildItemFromBean(array $arrItemBean , $id=null ){
+		$arrItemBean['class']=__NAMESPACE__.'\Item';
+		if(empty($arrItemBean['id']) && !is_int($id) ){
+			$arrItemBean['id'] = $id;
 		}
+		
+		$aItem = BeanFactory::singleton()->createBean($arrItemBean,'*',false) ;
+		
+		// 在BuildBean中，通过query设置active需要先获得知道view()对象
+		if(!$aItem->view())
+		{
+			$aItem->setView($this->view()) ;
+		}
+		$aItem->buildBean($arrItemBean);
+		
+		// addItem时，为了避免重复，需要先知道id值，所以只能放在buildBean之后
+		$this->addItemPrivate($aItem);
 	}
 	
 	public function setPos($left,$top){
@@ -317,7 +305,7 @@ class Menu extends AbstractBase
 		
 		else
 		{
-			if($this->showDepths()!=0)
+			if($this->showDepths()!=0 || $this->isRenderAll() )
 			{
 				parent::display($aUI,$aVariables,$aDevice) ;
 			}
@@ -335,7 +323,7 @@ class Menu extends AbstractBase
 			}
 			else
 			{
-				return -1 ;
+				return 10000 ;
 			}
 		}
 		
@@ -353,6 +341,20 @@ class Menu extends AbstractBase
 		}
 		
 		return false ;
+	}
+	
+	public function isRenderAll(){
+		$aParentMenu = $this->parentMenu() ;
+		if($aParentMenu){
+			$b = $aParentMenu->isRenderAll() ;
+			return  $b ;
+		}
+		$b = $this->attributeBool('renderall' , false ) ;
+		return $b ;
+	}
+	
+	public function isShowOnMouseOver(){
+		return $this->showDepths() > 0 ;
 	}
 	
 	public function generateJsCode()

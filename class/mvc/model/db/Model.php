@@ -141,6 +141,7 @@ class Model extends AbstractModel implements IModel, IBean
 		) ;
 	}
 	
+<<<<<<< HEAD
 	/**
 	 * @wiki /MVC模式/模型/模型(Model)
 	 *
@@ -150,6 +151,9 @@ class Model extends AbstractModel implements IModel, IBean
 	 */
 	
 	public function save()
+=======
+	public function save($bForceCreate=false)
+>>>>>>> 92c2dfe97de19d5b51dd32d56a5ef0bd8a118a16
 	{
 		if( $this->isList() )
 		{
@@ -165,7 +169,7 @@ class Model extends AbstractModel implements IModel, IBean
 		else
 		{
 			// update
-			if( $this->hasSerialized() )
+			if( !$bForceCreate and $this->hasSerialized() )
 			{
 				return $this->update() ;
 			}
@@ -418,6 +422,16 @@ class Model extends AbstractModel implements IModel, IBean
 		return Selecter::singleton()->hasExists($this) ;
 	}
 	
+	
+	
+	// ---------------------------------------------
+	public function serializableProperties()
+	{
+		$arrProps = parent::serializableProperties() ;
+		$arrProps[__CLASS__] = array('aPrototype') ;
+		return $arrProps ;
+	}
+	
 	private $nTotalCount = -1 ;
 	
 	/**
@@ -429,4 +443,3 @@ class Model extends AbstractModel implements IModel, IBean
 	private $arrBeanConfig ;
 }
 
-?>

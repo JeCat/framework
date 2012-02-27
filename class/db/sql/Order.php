@@ -4,15 +4,19 @@ namespace org\jecat\framework\db\sql;
 
 class Order extends SubStatement
 {
+	const asc = 'ASC' ;
+	const desc = 'DESC' ;
+	const rand = 'RAND' ; //'随机抽取'函数
+	
 	/**
 	 * 生成OrderBy的类
 	 * @param string $sColumn 列名
-	 * @param boolean $bOrderType true代表ASC , false代表DESC ，默认为true
+	 * @param boolean $bOrderType true代表ASC , false代表DESC ，默认为true , 也可填写字符串 ,可识别"ASC","DESC","RAND"三种
 	 */
-	public function __construct($sColumn=null , $bDesc=true){
+	public function __construct($sColumn=null , $desc=true){
 		if($sColumn)
 		{
-			$this->add($sColumn,$bDesc) ;
+			$this->add($sColumn,$desc) ;
 		}
 	}
 	
@@ -32,17 +36,31 @@ class Order extends SubStatement
 	static public function decs($sColumn){
 		return new self($sColumn,true);
 	}
+	/**
+	 * 获得一个order实例,按照所给参数生成OrderBy语句,随机
+	 * @return self 
+	 */
+	static public function rand(){
+		return new self(null,true);
+	}
 	
 	/**
 	 * 增加一个需要排序的列
 	 * @param string $sColumn 列名
-	 * @param boolen $bOrderType 排序方式,true代表ASC , false代表DESC ，默认为true
+	 * @param boolen $bOrderType 排序方式,true代表ASC , false代表DESC ，默认为true , 也可填写字符串 ,可识别"ASC","DESC","RAND"三种
 	 */
-	public function add($sColumn , $bDesc=true) {
+	public function add($sColumn , $desc=true) {
+		if($desc === true){
+			$desc = 'DESC';
+		}else if($desc === false){
+			$desc = 'ASC';
+		}else if($desc === self::rand){
+			$sColumn = 0;
+		}
 		if($sColumn === null){
 			return;
 		}
-		$this->arrOrderBys[$sColumn] = $bDesc?'DESC':'ASC';
+		$this->arrOrderBys[$sColumn] = $desc;
 		return $this ;
 	}
 	
@@ -76,7 +94,11 @@ class Order extends SubStatement
 		}
 		//sql中有Order部分的情况
 		foreach ($this->arrOrderBys as $sColumn=>&$sOrder){
-			$arrOrderBys[] = $this->transColumn($sColumn,$aState) . ' ' . $sOrder ;
+			if($sOrder== 'RAND'){
+				$arrOrderBys[] = ' rand() ';
+			}else{
+				$arrOrderBys[] = $this->transColumn($sColumn,$aState) . ' ' . $sOrder ;
+			}
 		}
 		return ' ORDER BY ' . implode(', ' , $arrOrderBys) ;
 	}

@@ -36,14 +36,7 @@ class Object implements IObject, ISingletonable, IFlyweightable
 	 */
 	public function application($bDefaultGlobal=true)
 	{
-		if($this->aApplication)
-		{
-			return $this->aApplication ;
-		}
-		else 
-		{
-			return $bDefaultGlobal? Application::singleton(): null ;
-		}
+		return Application::singleton() ;
 	}
 	
 	/**
@@ -53,7 +46,7 @@ class Object implements IObject, ISingletonable, IFlyweightable
 	 */
 	public function setApplication(Application $aApp)
 	{
-		$this->aApplication = $aApp ;
+		// nothing todo ... 
 	}
 	
 
@@ -320,7 +313,7 @@ class Object implements IObject, ISingletonable, IFlyweightable
 	static private $arrGlobalInstancs = array() ;
 	static private $arrFlyweightInstancs = array() ;
 	
-	private $aApplication ;
+	// private $aApplication ;
     
     private $aProperties ;
 }

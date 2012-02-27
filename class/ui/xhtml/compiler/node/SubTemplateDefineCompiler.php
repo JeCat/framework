@@ -1,6 +1,10 @@
 <?php
 namespace org\jecat\framework\ui\xhtml\compiler\node;
 
+use org\jecat\framework\io\OutputStreamBuffer;
+
+use org\jecat\framework\ui\VariableDeclares;
+
 use org\jecat\framework\lang\Exception;
 
 use org\jecat\framework\ui\xhtml\AttributeValue;
@@ -67,7 +71,21 @@ class SubTemplateDefineCompiler extends NodeCompiler
 		$aDev->write("\r\n\r\n// -- subtemplate start ----------------------") ;
 		$aDev->write("function __subtemplate_{$sSubTemplateName}(\$aVariables,\$aDevice){ ") ;
 		
+		// 准备 VariableDeclares
+		$aOldVars = $aObjectContainer->variableDeclares() ;
+		$aDeclareVariables = new VariableDeclares() ;
+		$aObjectContainer->setVariableDeclares($aDeclareVariables) ;
+		$aBuff = new OutputStreamBuffer() ;
+		$aDev->write($aBuff) ;
+		
+		// 编译子对像
 		$this->compileChildren($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
+		
+		// 声明用到的变量
+		$aDeclareVariables->make($aBuff) ;
+		$aObjectContainer->setVariableDeclares($aOldVars) ;
+		
+		
 		
 		$aDev->write("}// -- subtemplate end ----------------------\r\n\r\n") ;
 	}

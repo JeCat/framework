@@ -128,8 +128,18 @@ class Paginator extends FormWidget implements IModelChangeObserver
     }
     
     public function totalPageCount(){
-        if( null === $this->aPaginal ) return 1;
-        return (int) ( ($this->aPaginal->totalCount()+$this->perPageCount()-1)/$this->perPageCount() );
+        $nTotalCount = $this->totalCount() ;
+        $nPerPageCount = $this->perPageCount() ;
+        
+        return (int) ( ( $nTotalCount + $nPerPageCount - 1 ) / $nPerPageCount );
+    }
+    
+    public function totalCount(){
+        if( $this->aPaginal ){
+            return (int) $this->aPaginal->totalCount() ;
+        }else{
+            return 0 ;
+        }
     }
     
     public function setCurrentPageNum($iNum){
@@ -220,6 +230,15 @@ class Paginator extends FormWidget implements IModelChangeObserver
 	    parent::setView($aView);
 	    $aView -> addModelObserver($this);
 	    if( $aView ) $this->onModelChanging($aView);
+	}
+	
+	public function setAttribute($sName,$value)
+	{
+		$sName = strtolower($sName) ;
+		if( 'count' === $sName ){
+			$this->setPerPageCount($value);
+		}
+		parent::setAttribute($sName,$value) ;
 	}
     
     private $iCount;

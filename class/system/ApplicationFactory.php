@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\system ;
 
+use org\jecat\framework\lang\oop\ShadowClassPackage;
+
 use org\jecat\framework\mvc\controller\Response;
 use org\jecat\framework\mvc\model\db\orm\Prototype;
 use org\jecat\framework\fs\imp\LocalFileSystem;
@@ -95,12 +97,21 @@ abstract class ApplicationFactory extends Object
 		// 将 jecat 加入到 class loader 中
 		$aClassLoader->addPackage( 'org\\jecat\\framework', '/framework/class' ) ;
 			
-		// 将保存数据表实现类的临时目录加入到 class loader 中
-		FileSystem::singleton()->findFolder(Prototype::$sModelImpPackage,FileSystem::FIND_AUTO_CREATE) ;
-		$aClassLoader->addPackage( Prototype::MODEL_IMPLEMENT_CLASS_NS , Prototype::$sModelImpPackage ) ;
+		// 将保存 数据表 实现类的临时目录加入到 class loader 中
+		$aPackage = new ShadowClassPackage(
+				Prototype::MODEL_IMPLEMENT_CLASS_BASE
+				, Prototype::MODEL_IMPLEMENT_CLASS_NS
+				, FileSystem::singleton()->findFolder(Prototype::$sModelImpPackage,FileSystem::FIND_AUTO_CREATE)
+		) ;
+		$aClassLoader->addPackage( $aPackage ) ;
 		
-		FileSystem::singleton()->findFolder(Prototype::$sPrototypeImpPackage,FileSystem::FIND_AUTO_CREATE) ;
-		$aClassLoader->addPackage( Prototype::PROTOTYPE_IMPLEMENT_CLASS_NS , Prototype::$sPrototypeImpPackage ) ;
+		// 将保存 数据表原型 实现类的临时目录加入到 class loader 中
+		$aPackage = new ShadowClassPackage(
+				Prototype::PROTOTYPE_IMPLEMENT_CLASS_BASE
+				, Prototype::PROTOTYPE_IMPLEMENT_CLASS_NS
+				, FileSystem::singleton()->findFolder(Prototype::$sPrototypeImpPackage,FileSystem::FIND_AUTO_CREATE)
+		) ;
+		$aClassLoader->addPackage( $aPackage ) ;
 
 		return $aClassLoader ;
 	}

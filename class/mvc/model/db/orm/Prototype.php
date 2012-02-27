@@ -1,6 +1,9 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\db\sql\Order;
+use org\jecat\framework\util\serialize\IIncompleteSerializable;
+use org\jecat\framework\util\serialize\ShareObjectSerializer;
 use org\jecat\framework\db\sql\Restriction;
 use org\jecat\framework\bean\BeanConfException;
 use org\jecat\framework\lang\Type;
@@ -18,15 +21,18 @@ use org\jecat\framework\lang\Exception;
 use org\jecat\framework\db\DB;
 use org\jecat\framework\db\sql\StatementFactory;
 
-class Prototype extends StatementFactory implements IBean
+class Prototype extends StatementFactory implements IBean, \Serializable, IIncompleteSerializable
 {
 	const youKnow = null ;
 	
 	const MODEL_IMPLEMENT_CLASS_NS = 'org\\jecat\\framework\\mvc\\model\\db\\imp' ;
-	const PROTOTYPE_IMPLEMENT_CLASS_NS = 'org\\jecat\\framework\\mvc\\model\\db\\prototype' ;
-	
+	const MODEL_IMPLEMENT_CLASS_BASE = 'org\\jecat\\framework\\mvc\\model\\db\\Model' ;
 	static public $sModelImpPackage = '/data/class/db/model' ;
+	
+	const PROTOTYPE_IMPLEMENT_CLASS_NS = 'org\\jecat\\framework\\mvc\\model\\db\\prototype' ;
+	const PROTOTYPE_IMPLEMENT_CLASS_BASE = __CLASS__ ;
 	static public $sPrototypeImpPackage = '/data/class/db/prototype' ;
+	
 	
 	// static creator
 	/**
@@ -495,102 +501,8 @@ class Prototype extends StatementFactory implements IBean
 		{
 			$sModelShortClass = '_'.preg_replace('[^\w_]','_',$this->tableName()) ;
 			$this->sModelClass = self::MODEL_IMPLEMENT_CLASS_NS .'\\'. $sModelShortClass ;
-			
-			// 生成模型类
-			self::buildShadowClass($this->sModelClass,$sModelShortClass,self::MODEL_IMPLEMENT_CLASS_NS, 'org\\jecat\\framework\\mvc\\model\\db\\Model',self::$sModelImpPackage) ;
 		}
 		return $this->sModelClass ;
-	}
-	
-	static function buildShadowClass($sClass,$sShortClass,$sNamespace,$sParentClass,$sPackageFolder)
-	{
-		if(!class_exists($sClass))
-		{
-			$sClassSource = self::generateShadowlClass($sShortClass,$sNamespace,$sParentClass) ;
-			
-			$sClassFilePath = $sPackageFolder.'/'.$sShortClass.'.php' ;
-			if( !$aClassFile = FileSystem::singleton()->findFile($sClassFilePath,FileSystem::FIND_AUTO_CREATE) )
-			{
-				throw new Exception("无法自动创建影子类 %s 的类文件：%s",array($sClass,$sClassFilePath)) ;
-			}
-			
-			$aWriter = $aClassFile->openWriter() ;
-			$aWriter->write($sClassSource) ;
-			$aWriter->close() ;
-		}
-	} 
-	
-	static function & generateShadowlClass($sShortClass,$sNamespace,$sParentClass)
-	{
-		$aClassRef = new \ReflectionClass($sParentClass) ;
-		
-		$sClassSource = "<?php " ;
-		$sClassSource.= "namespace {$sNamespace};\r\n" ;
-		$sClassSource.= "class ".basename(str_replace('\\','/',$sNamespace.'\\'.$sShortClass))." extends \\{$sParentClass}\r\n" ;
-		$sClassSource.= "{\r\n" ;
-		
-		foreach($aClassRef->getMethods() as $aMethodRef)
-		{
-			if( $aMethodRef->isFinal() or $aMethodRef->isAbstract() or $aMethodRef->isPrivate() )
-			{
-				continue ;
-			}
-			
-			$sMethodName = $aMethodRef->getName() ;
-			
-			$sClassSource.= "\t" ;
-			if( $aMethodRef->isStatic() )
-			{
-				$sClassSource.= 'static ' ;
-			}
-			$sClassSource.= $aMethodRef->isPublic()? 'public ': 'protected ' ;
-			$sClassSource.= 'function ' ;
-			if( $aMethodRef->returnsReference() )
-			{
-				$sClassSource.= ' & ' ;
-			}
-			$sClassSource.= $sMethodName .'( ' ;
-			$sCallParams = '' ;
-			
-			// 参数
-			foreach($aMethodRef->getParameters() as $aParamRef)
-			{
-				if($aParamRef->getPosition())
-				{
-					$sClassSource.= ', ' ;
-					$sCallParams.= ',' ;
-				}
-				// 参数类型
-				if($aParamClass=$aParamRef->getClass())
-				{
-					$sClassSource.= '\\'.$aParamClass->getName().' ' ;
-				}
-				else if($aParamRef->isArray())
-				{
-					$sClassSource.= 'array ' ;
-				}
-				// 引用传递
-				if($aParamRef->isPassedByReference())
-				{
-					$sClassSource.= '&' ;
-				}
-				// 参数名称/默认值
-				$sClassSource.= '$'.$aParamRef->getName() ;
-				if($aParamRef->isDefaultValueAvailable())
-				{
-					$sClassSource.= '=' . var_export($aParamRef->getDefaultValue(),true) ;
-				}
-				$sCallParams.= '$'.$aParamRef->getName() ;
-			}
-			$sClassSource.= " )\r\n" ;
-			$sClassSource.= "\t{\r\n" ;
-			$sClassSource.= "\t\treturn parent::{$sMethodName}({$sCallParams}) ;\r\n" ;
-			$sClassSource.= "\t}\r\n" ;  
-		}
-		
-		$sClassSource.= "}" ;
-		
-		return $sClassSource ;
 	}
 	
 	// criteria setter
@@ -635,9 +547,6 @@ class Prototype extends StatementFactory implements IBean
 			
 			$sShortClass = '_'.preg_replace('[^\w_]','_',$arrConfig['table']) ;
 			$sClass = $sClassNamespace .'\\'. $sShortClass ;
-			
-			// 生成模型类
-			self::buildShadowClass($sClass,$sShortClass,$sClassNamespace,get_called_class(),$sPackageFolder) ;
 		}
 		
 		$aBean = new $sClass() ;
@@ -650,23 +559,121 @@ class Prototype extends StatementFactory implements IBean
 	/**
 	 * @wiki /MVC模式/模型/原型(Prototype)
 	 * ==Bean配置数组==
-	 * model-class string 用哪个类来实现模型对象
-	 * table string 对应的数据库表
-	 * name string 在原型关系中的名字,用来区分不同的原型
-	 * columns array 需要表中哪些列的数据
-	 * keys array 指定表中哪些列为主键,若指定了主键则使用这里的主键而忽略数据库主键,如果未指定则使用数据库指定的主键
-	 * alias string 别名
-	 * limit int 设置读取条目数目的上限,下限为0
-	 * limitLen int 设置读取条目数目的上限
-	 * limitFrom int 设置读取条目数目的下限
-	 * order array 指定依据某一列来排序,同时设置正序或反序
-	 * orderAsc string 指定依据某一列正序排序
-	 * orderDesc string 指定依据某一列反序排序
-	 * where array where条件（where的格式很有趣，是对Lisp风格的尝试）
-	 * hasOne array 配置hasone关系
-	 * belongsTo array 配置belongsTo关系
-	 * hasMany array 配置hasMany关系
-	 * hasAndBelongsToMany array 配置hasAndBelongsToMany关系
+	 * {|
+	 * !属性
+	 * !类型
+	 * !默认值
+	 * !可选
+	 * !说明
+	 * |-- --
+	 * |model-class
+	 * |string
+	 * |无
+	 * |可选
+	 * |用哪个类来实现模型对象
+	 * |-- --
+	 * |table
+	 * |string
+	 * |无
+	 * |可选
+	 * |对应的数据库表
+	 * |-- --
+	 * |name
+	 * |string
+	 * |无
+	 * |可选
+	 * |在原型关系中的名字,用来区分不同的原型
+	 * |-- --
+	 * |columns
+	 * |array
+	 * |无
+	 * |可选
+	 * |需要表中哪些列的数据
+	 * |-- --
+	 * |keys
+	 * |array
+	 * |无
+	 * |可选
+	 * |指定表中哪些列为主键,若指定了主键则使用这里的主键而忽略数据库主键,如果未指定则使用数据库指定的主键
+	 * |-- --
+	 * |alias
+	 * |string
+	 * |无
+	 * |可选
+	 * |别名
+	 * |-- --
+	 * |limit
+	 * |int
+	 * |无
+	 * |可选
+	 * |设置读取条目数目的上限,下限为0
+	 * |-- --
+	 * |limitLen
+	 * |int
+	 * |无
+	 * |可选
+	 * |设置读取条目数目的上限
+	 * |-- --
+	 * |limitFrom
+	 * |int
+	 * |无
+	 * |可选
+	 * |设置读取条目数目的下限
+	 * |-- --
+	 * |order
+	 * |array
+	 * |无
+	 * |可选
+	 * |指定依据某一列来排序,同时设置正序排列
+	 * |-- --
+	 * |orderAsc
+	 * |string
+	 * |无
+	 * |可选
+	 * |指定依据某一列正序排序
+	 * |-- --
+	 * |orderDesc
+	 * |string
+	 * |无
+	 * |可选
+	 * |指定依据某一列反序排序
+	 * |-- --
+	 * |orderRand
+	 * |bool
+	 * |无
+	 * |可选
+	 * |随机排列结果
+	 * |-- --
+	 * |where
+	 * |array
+	 * |无
+	 * |可选
+	 * |where条件（where的格式很有趣，是对Lisp风格的尝试）
+	 * |-- --
+	 * |hasOne
+	 * |array
+	 * |无
+	 * |可选
+	 * |配置hasone关系
+	 * |-- --
+	 * |belongsTo
+	 * |array
+	 * |无
+	 * |可选
+	 * |配置belongsTo关系
+	 * |-- --
+	 * |hasMany
+	 * |array
+	 * |无
+	 * |可选
+	 * |配置hasMany关系
+	 * |-- --
+	 * |hasAndBelongsToMany
+	 * |array
+	 * |无
+	 * |可选
+	 * |配置hasAndBelongsToMany关系
+	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
@@ -749,6 +756,11 @@ class Prototype extends StatementFactory implements IBean
 				$this->criteria()->orders()->add($sColumn,true) ;
 			}
 		}
+		// orderRand
+		if( !empty($arrConfig['orderRand']) && $arrConfig['orderRand']=true )
+		{
+			$this->criteria()->orders()->add(null,Order::rand) ;
+		}
 		// groupby
 		if( !empty($arrConfig['groupby']) )
 		{
@@ -796,9 +808,11 @@ class Prototype extends StatementFactory implements IBean
 			{
 				$item['class'] = 'association' ;
 			}
-			$item['fromPrototype'] = $this ;
 			
+			$item['fromPrototype'] = $this ;
 			$aAssociation = $aBeanFactory->createBean($item,$sNamespace,$aBeanFactory) ;
+			unset($item['fromPrototype']) ;
+			
 			$aAssociation->setDB($this->db()) ;
 			
 			$this->arrAssociations[] = $aAssociation ;
@@ -951,6 +965,34 @@ class Prototype extends StatementFactory implements IBean
 		return '`'.$this->path()."{$sTableName}`.`{$sColumn}`" ;
 	}
 	
+	// -----------------------------------------------
+	public function serializableProperties()
+	{
+		return array(
+			__CLASS__ => array(
+				'sName' ,
+				'sTableName' ,
+				'arrColumns' ,
+				'arrColumnAliases' ,
+				'arrKeys' ,
+				'sDevicePrimaryKey' ,
+				'sModelClass' ,
+				'aCriteria' ,
+				'aAssociationBy' ,
+				'arrAssociations' ,
+				'arrBeanConfig' ,
+			)
+		) ;
+	}
+	public function serialize ()
+	{
+		return ShareObjectSerializer::singleton()->serialize($this) ;
+	}
+	public function unserialize ($serialized)
+	{
+		ShareObjectSerializer::singleton()->unserialize($serialized,$this) ;
+	}
+	
 	// constructor
 	public function __construct(){}
 
@@ -997,4 +1039,3 @@ class Prototype extends StatementFactory implements IBean
 	private $aStatementUpdate ;
 	
 }
-?>

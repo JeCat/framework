@@ -1,11 +1,13 @@
 <?php
 namespace org\jecat\framework\mvc\model;
 
+use org\jecat\framework\util\serialize\IIncompleteSerializable;
+use org\jecat\framework\util\serialize\ShareObjectSerializer;
 use org\jecat\framework\mvc\controller\Response;
 use org\jecat\framework\io\IOutputStream;
 use org\jecat\framework\lang\Object;
 
-abstract class AbstractModel extends Object implements IModel, \Serializable
+abstract class AbstractModel extends Object implements IModel, \Serializable, IIncompleteSerializable
 {
 	public function __construct($bList)
 	{
@@ -408,24 +410,23 @@ abstract class AbstractModel extends Object implements IModel, \Serializable
 			unset($aModel->arrChanged[$sName]) ;
 		}
 	}
-
+	
+	public function serializableProperties()
+	{
+		return array(
+				__CLASS__ => array( 'arrDatas','arrChildren','arrChanged' )
+		) ;
+	}
 	public function serialize ()
 	{
-		return serialize( array(
-				'arrDatas' => &$this->arrDatas ,
-				'arrChildren' => &$this->arrChildren ,
-				'arrChanged' => &$this->arrChanged ,
-		) ) ;
+		return ShareObjectSerializer::singleton()->serialize($this) ;
 	}
-
-	public function unserialize ($sSerialized)
+	public function unserialize ($serialized)
 	{
-		$arrData = unserialize($sSerialized) ;
-		
-		$this->arrDatas =& $arrData['arrDatas'] ;
-		$this->arrChildren =& $arrData['arrChildren'] ;
-		$this->arrChanged =& $arrData['arrChanged'] ;
+		ShareObjectSerializer::singleton()->unserialize($serialized,$this) ;
 	}
+	
+	
 	protected function _data(&$sName)
 	{
 		return isset($this->arrDatas[$sName])?  $this->arrDatas[$sName]: null ;
