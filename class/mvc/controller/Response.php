@@ -172,10 +172,24 @@ class Response extends Object
 		{
 			$this->printer()->write( '<hr /><h3>数据库执行记录：</h3>' ) ;
 			
-			foreach(DB::singleton()->executeLog(false) as $arrLog)
+			// 按执行时间排序
+			$arrLogs = DB::singleton()->executeLog(false) ;
+			usort($arrLogs,function($a,$b){
+				if($a['time']==$b['time'])
+				{
+					return 0 ; 
+				}
+				return $a['time']<$b['time'] ? -1: 1 ;
+			}) ;
+			
+			$fTotal = 0 ;
+			foreach($arrLogs as $arrLog)
 			{
+				$fTotal += $arrLog['time'] ;
 				$this->printer()->write( "<div style='padding-top:10px'>[耗时:{$arrLog['time']}] <pre>{$arrLog['sql']}</pre></div>" ) ;
 			}
+			$this->printer()->write( "\r\n<br />DB总计时间：{$fTotal}\r\n<hr />" ) ;
+			
 		}
 		
 		// 打印模型结构
