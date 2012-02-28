@@ -2,7 +2,6 @@
 namespace org\jecat\framework\mvc\controller ;
 
 use org\jecat\framework\mvc\view\View;
-
 use org\jecat\framework\mvc\view\ViewAssemblySlot;
 use org\jecat\framework\system\ApplicationFactory;
 use org\jecat\framework\pattern\composite\IContainer;
@@ -191,7 +190,7 @@ class Response extends Object
 				foreach($aController->modelNameIterator() as $sModelName)
 				{
 					$this->printer()->write( '<hr /><h3>控制器'.$aController->name().'的模型数据结构：</h3>' ) ;
-					$this->printDebugModelStruct($this,$sModelName) ;
+					$this->printDebugModelStruct($aController,$sModelName) ;
 				}
 				
 				// 子控制器的模型
@@ -207,12 +206,12 @@ class Response extends Object
 			else
 			{
 				$this->printer()->write( '<hr /><h3>控制器'.$aController->name().'的模型数据结构：</h3>' ) ;
-				$this->printDebugModelStruct($this,$sModelName) ;
+				$this->printDebugModelStruct($aController,$sModelName) ;
 			}
 		}
 	}
 	
-	private function printDebugModelStruct(IContainer $aController,$sModelName)
+	private function printDebugModelStruct(IController $aController,$sModelName)
 	{
 		$this->printer()->write( "<div style='padding-top:10px'><h4>[模型：{$sModelName}]</h4>" ) ;
 		if( $aModel=$aController->modelByName($sModelName) )
