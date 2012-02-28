@@ -131,6 +131,9 @@ class Model extends AbstractModel implements IModel, IBean
 	
 	public function load($values=null,$keys=null)
 	{
+		// load 前 清理数据
+		$this->clearData() ;
+		
 		if($this->isList())
 		{
 			$this->nTotalCount = -1 ;
