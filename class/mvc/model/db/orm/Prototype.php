@@ -831,7 +831,7 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		{
 			if(is_string($sLogic))
 			{
-				$aRestriction->setLogic(strtoupper($sLogic)!='or') ;
+				$aRestriction->setLogic( strtolower($sLogic)!='or' ) ;
 			}
 			else 
 			{
@@ -841,28 +841,34 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		
 		foreach ($arrRestrictionConfig as &$arrCondition)
 		{
-			if( !is_array($arrCondition) or count($arrCondition)>3 )
+			if( !is_array($arrCondition) )
 			{
 				throw new BeanConfException('无效的orm bean config 内容：%s，做为sql条件，必须是一个数组',var_export($arrCondition,true)) ;
 			}
 			
 			$sOperator = array_shift($arrCondition) ;
-			if( !is_string($sOperator) or !method_exists($aRestriction,$sOperator))
-			{
-				throw new BeanConfException(
-						'无效的orm bean config 内容：%s，做为sql条件，数组的第一个元素必须是一个有效的表示运算符的字符串'
-						, var_export($arrCondition,true)
-				) ;
-			}
 			$sOperator = strtolower($sOperator) ;
 			
 			// 递归 条件分组
-			if( $sOperator=='restriction' )
+			if($sOperator=='restriction')
 			{
+				$sOperator = 'and' ;
+			}
+			if( $sOperator=='and' or $sOperator=='or' )
+			{
+				array_unshift($arrCondition,$sOperator) ;
 				$this->buildBeanRestriction($arrCondition,$aRestriction->createRestriction()) ;
 			}
+			// 处理条件
 			else 
 			{
+				if( !is_string($sOperator) or !method_exists($aRestriction,$sOperator))
+				{
+					throw new BeanConfException(
+							'无效的orm bean config 内容：%s，做为sql条件，数组的第一个元素必须是一个有效的表示运算符的字符串'
+							, var_export($arrCondition,true)
+					) ;
+				}
 				call_user_func_array(array($aRestriction,$sOperator),$arrCondition) ;
 			}
 		}
