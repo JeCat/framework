@@ -157,7 +157,7 @@ class Model extends AbstractModel implements IModel, IBean
 		{
 			foreach($this->childIterator() as $aChildModel)
 			{
-				if( !$aChildModel->save() )
+				if( !$aChildModel->save($bForceCreate) )
 				{
 					return false ;
 				}
@@ -169,25 +169,25 @@ class Model extends AbstractModel implements IModel, IBean
 			// update
 			if( !$bForceCreate and $this->hasSerialized() )
 			{
-				return $this->update() ;
+				return $this->update($bForceCreate) ;
 			}
 			
 			// insert
 			else 
 			{
-				return $this->insert() ;
+				return $this->insert($bForceCreate) ;
 			}
 		}
 	}
 
-	protected function insert()
+	protected function insert($bChildForceCreate=false)
 	{
-		return Inserter::singleton()->execute($this->db(), $this) ;
+		return Inserter::singleton()->execute($this->db(), $this, $bChildForceCreate) ;
 	}
 	
-	protected function update()
+	protected function update($bForceCreate)
 	{
-		return Updater::singleton()->execute($this->db(), $this) ;
+		return Updater::singleton()->execute($this->db(), $this, $bChildForceCreate) ;
 	}
 	
 	public function delete()
