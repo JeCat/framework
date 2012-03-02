@@ -31,6 +31,7 @@ class WidgetCompiler extends NodeCompiler
 		$this->writeWidgetAttr($aAttrs , $aDev , $sWidgetVarName);
 		$this->writeBean($aObject ,  $aDev , $sWidgetVarName) ;
 		$this->writeTemplate($aObject , $aAttrs , $aObjectContainer , $aDev , $aCompilerManager , $sWidgetVarName) ;
+		$this->compileChildren($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
 		$this->writeDisplay($aAttrs , $aDev , $sWidgetVarName) ;
 		$this->writeEnd($aDev);
 	}
@@ -176,9 +177,6 @@ class WidgetCompiler extends NodeCompiler
 			
 			$aAttributes->set('name' , $sFunName ) ;
 			$aTemplate->headTag()->setAttributes($aAttributes) ;
-			
-			$this->compileChildren($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
-			
 			$aDev->write("	{$sWidgetVarName}->setSubTemplateName('__subtemplate_{$sFunName}') ;") ;
 		}
 	}
@@ -187,7 +185,7 @@ class WidgetCompiler extends NodeCompiler
 		// display
 		if( !$aAttrs->has('display') 
 			or $aAttrs->bool('display') ){
-			$aDev->write("	{$sWidgetVarName}->display(\$this,new \\org\\jecat\\framework\\util\\DataSrc(),\$aDevice) ;") ;
+			$aDev->write("	{$sWidgetVarName}->display(\$aVariables->theUI,new \\org\\jecat\\framework\\util\\DataSrc(),\$aDevice) ;") ;
 		}
 	}
 	

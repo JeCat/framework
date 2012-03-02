@@ -33,14 +33,6 @@ class MenuCompiler extends WidgetCompiler
 	 */
 	protected function writeSubMenu(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager , $sWidgetVarName  ){
 		$arrTagName = array('menu','item') ;
-		
-		if( !$aObjectContainer->variableDeclares()->hasDeclared('aStack') )
-		{
-			$aObjectContainer->variableDeclares()->declareVarible('aStack','new \\org\\jecat\\framework\\util\\Stack()') ;
-		}
-		$aDev->write("	\$aStack->put({$sWidgetVarName});");
-		$aDev->write("	\$aVariables->aStack = \$aStack;");
-		
 		foreach($aObject->childElementsIterator() as $aChild)
 		{
 			if( $aChild instanceof Node and in_array( $aChild->tagName() , $arrTagName) )
@@ -63,6 +55,12 @@ class MenuCompiler extends WidgetCompiler
 			}
 		}
 		
+		if( !$aObjectContainer->variableDeclares()->hasDeclared('aStack') )
+		{
+			$aObjectContainer->variableDeclares()->declareVarible('aStack','new \\org\\jecat\\framework\\util\\Stack()') ;
+		}
+		$aDev->write("	\$aStack->put({$sWidgetVarName});");
+		$aDev->write("	\$aVariables->aStack = \$aStack;");
 		$this->compileChildren($aObject, $aObjectContainer, $aDev, $aCompilerManager) ;
 		$aDev->write("	\$aStack->out();");
 	}
