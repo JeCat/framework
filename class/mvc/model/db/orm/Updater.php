@@ -8,7 +8,7 @@ use org\jecat\framework\mvc\model\db\IModel ;
 use org\jecat\framework\db\sql\StatementFactory ;
 
 class Updater extends Object{
-    public function execute(DB $aDB, IModel $aModel, $bChildForceCreate=false){
+    public function execute(DB $aDB, IModel $aModel){
         $aPrototype = $aModel->prototype();
         $aUpdate = StatementFactory::singleton()->createUpdate($aPrototype->tableName()) ;
         
@@ -18,7 +18,7 @@ class Updater extends Object{
         		if( !$aAssociatedModel = $aModel->child( $aAssociation->name() ) ){
         			continue;
         		}
-        		if( !$aAssociatedModel->save($bChildForceCreate) ){
+        		if( !$aAssociatedModel->save() ){
         			return false;
         		}
         		$this->setAssociatedModelData($aAssociatedModel,$aModel,$aAssociation->toKeys(),$aAssociation->fromKeys());
@@ -61,7 +61,7 @@ class Updater extends Object{
 			switch($aAssociation->type()){
 			case Association::hasOne :
 				$this->setAssociatedModelData($aModel,$aAssociatedModel,$aAssociation->fromKeys(),$aAssociation->toKeys());
-				if(!$aAssociatedModel->save($bChildForceCreate)){
+				if(!$aAssociatedModel->save()){
 					return false;
 				}
 				break;
@@ -72,13 +72,13 @@ class Updater extends Object{
 				
 			case Association::hasMany :
 				$this->setAssociatedModelData($aModel,$aAssociatedModel,$aAssociation->fromKeys(),$aAssociation->toKeys());
-				if(!$aAssociatedModel->save($bChildForceCreate)){
+				if(!$aAssociatedModel->save()){
 					return false;
 				}
 				break;
 				
 			case Association::hasAndBelongsToMany :
-				if(!$aAssociatedModel->save($bChildForceCreate)){
+				if(!$aAssociatedModel->save()){
 					return false;
 				}
 				// update bridge table
