@@ -11,7 +11,7 @@ use org\jecat\framework\db\sql\StatementFactory ;
 
 class Inserter extends OperationStrategy
 {
-    public function execute(DB $aDB, IModel $aModel, $bChildForceCreate=false)
+    public function execute(DB $aDB, IModel $aModel)
 	{
 		$aPrototype = $aModel->prototype() ;
 		$aInsert = $aPrototype->statementFactory()->createInsert($aPrototype->tableName()) ;
@@ -26,7 +26,7 @@ class Inserter extends OperationStrategy
 					continue ;
 				}
 				
-				if( !$aAssocModel->save($bChildForceCreate) )
+				if( !$aAssocModel->save() )
 				{
 					return false ;
 				}
@@ -111,7 +111,7 @@ class Inserter extends OperationStrategy
 		
 				$this->setAssocModelData($aModel,$aAssocModel,$aAssociation->fromKeys(),$aAssociation->toKeys()) ;
 				
-				if( !$aAssocModel->save($bChildForceCreate) )
+				if( !$aAssocModel->save() )
 				{
 					return false ;
 				}
@@ -125,7 +125,7 @@ class Inserter extends OperationStrategy
 			case Association::hasMany :
 		
 				$this->setAssocModelData($aModel,$aAssocModel,$aAssociation->fromKeys(),$aAssociation->toKeys()) ;
-				if( !$aAssocModel->save($bChildForceCreate) )
+				if( !$aAssocModel->save() )
 				{
 					return false ;
 				}
@@ -134,7 +134,7 @@ class Inserter extends OperationStrategy
 				
 			case Association::hasAndBelongsToMany :
 				
-				if( !$aAssocModel->save($bChildForceCreate) )
+				if( !$aAssocModel->save() )
 				{
 					return false ;
 				}

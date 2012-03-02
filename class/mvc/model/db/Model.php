@@ -169,25 +169,25 @@ class Model extends AbstractModel implements IModel, IBean
 			// update
 			if( !$bForceCreate and $this->hasSerialized() )
 			{
-				return $this->update($bForceCreate) ;
+				return $this->update() ;
 			}
 			
 			// insert
 			else 
 			{
-				return $this->insert($bForceCreate) ;
+				return $this->insert() ;
 			}
 		}
 	}
 
-	protected function insert($bChildForceCreate=false)
+	protected function insert()
 	{
-		return Inserter::singleton()->execute($this->db(), $this, $bChildForceCreate) ;
+		return Inserter::singleton()->execute($this->db(), $this) ;
 	}
 	
-	protected function update($bForceCreate)
+	protected function update()
 	{
-		return Updater::singleton()->execute($this->db(), $this, $bChildForceCreate) ;
+		return Updater::singleton()->execute($this->db(), $this) ;
 	}
 	
 	public function delete()
