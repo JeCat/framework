@@ -213,9 +213,17 @@ class Model extends AbstractModel implements IModel, IBean
 	/**
 	 * @return org\jecat\framework\db\sql\Criteria
 	 */
-	public function createCriteria()
+	public function createCriteria(Restriction $aRestriction=null)
 	{
-		return $this->prototype()->statementFactory()->createCriteria() ;
+		return $this->prototype()->statementFactory()->createCriteria($aRestriction) ;
+	}
+	
+	/**
+	 * @return org\jecat\framework\db\sql\Restriction
+	 */
+	public function createWhere($bLogic=true)
+	{
+		return $this->prototype()->statementFactory()->createRestriction($bLogic) ;
 	}
 	
 	static public function buildCriteria(Prototype $aPrototype,$values=null,$keys=null)
