@@ -127,14 +127,13 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 	}
 	
 	/**
-	 * @return org\jecat\framework\db\sql\Criteria
-	 */
-	/**
 	 * @wiki /MVC模式/模型/模型(Model)
 	 *
 	 * {| ==原型属性的获得==
 	 *  | 通过criteria（）对原型的属性进行设置，例如where
 	 *  |}
+	 *  
+	 * @return org\jecat\framework\db\sql\Criteria
 	 */
 	public function criteria($bCreate=true)
 	{
