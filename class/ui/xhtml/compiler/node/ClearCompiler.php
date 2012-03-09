@@ -13,12 +13,11 @@ use org\jecat\framework\ui\ObjectContainer;
 
 /**
  * @wiki /模板引擎/标签
- *
+ * @wiki 速查/模板引擎/标签
+ * ==<clear/>==
+ * 
+ *  可单行,清除html页面中的空格和换行
  * {|
- *  !<clear/>
- *  !可单行
- *  !清除空格和换行
- *  |---
  *  !属性
  *  !
  *  !类型
@@ -31,12 +30,7 @@ use org\jecat\framework\ui\ObjectContainer;
  *  |
  *  |
  *  |}
- */
-/**
- * @author anubis
- * @example /模板引擎/标签/自定义标签:name[1]
- *
- *  通过clear标签编译器的代码演示如何编写一个标签编译器
+ *  [example php frameworktest template/test-template/node/ClearCase.html 1 4]
  */
 
 class ClearCompiler extends NodeCompiler

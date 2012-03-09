@@ -8,6 +8,34 @@ use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 use org\jecat\framework\ui\ObjectContainer;
 
+/**
+ * @wiki /MVC模式/视图/模板标签
+ * @wiki 速查/模板引擎/标签
+ * ==<model:foreach>==
+ * 
+ *  可单行,遍历view的预定义变量theModel.
+ * {|
+ *  !属性
+ *  !
+ *  !类型
+ *  !默认值
+ *  !说明
+ *  |---
+ *  |name
+ *  |必须
+ *  |expression
+ *  |
+ *  |属性name为model的数据表名称
+ *  |}
+ *  [example php frameworktest template/test-mvc/testview/ViewNode.html 32 35]
+ */
+/**
+ * @author anubis
+ * @example /MVC模式/视图/模板标签
+ *
+ *
+ */
+
 class ModelForeachCompiler extends NodeCompiler
 {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)

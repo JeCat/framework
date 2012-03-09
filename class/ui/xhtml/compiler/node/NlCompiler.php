@@ -12,12 +12,11 @@ use org\jecat\framework\ui\ObjectContainer;
 
 /**
  * @wiki /模板引擎/标签
+ * @wiki 速查/模板引擎/标签
+ * ==<nl>==
  *
+ *  可单行,空格回车
  * {|
- *  !<nl/>
- *  !可单行
- *  !空格回车
- *  |---
  *  !属性
  *  !
  *  !类型
@@ -30,11 +29,7 @@ use org\jecat\framework\ui\ObjectContainer;
  *  |
  *  |与<pre>标签配合使用
  *  |}
- */
-/**
- * @example /模板引擎/标签/自定义标签:name[1]
- *
- *  通过nl标签编译器的代码演示如何编写一个标签编译器
+ *  [example php frameworktest template/test-template/node/NlCase.html 1 6]
  */
 
 class NlCompiler extends NodeCompiler

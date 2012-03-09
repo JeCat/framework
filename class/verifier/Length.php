@@ -28,8 +28,9 @@ class Length extends Object implements IVerifier, IBean
 		return $aBean ;
 	}
 	/**
-	 * @wiki /校验器/字符长度校验器(Length)
-	 * ==Bean配置数组==
+	 * @wiki /MVC模式/数据交换和数据校验/数据校验
+	 * ==字符长度校验器(Length)==
+	 * =Bean配置数组=
 	 * {|
 	 * !属性
 	 * !类型

@@ -21,6 +21,17 @@ use org\jecat\framework\lang\Exception;
 use org\jecat\framework\db\DB;
 use org\jecat\framework\db\sql\StatementFactory;
 
+/**
+ * 
+ * @author qusong
+ * @wiki /MVC模式/数据库模型/数据表原型
+ * ==数据表原型(ProtoType)==
+ * 
+ * 蜂巢充分的利用面向对象的思想，这里原型就是将数据表抽象为对象，对数据表进行封装，用户可以直接通过对原型对象的操作，来对数据进行操作。
+ * 所有的Model的创建方法的实现都是原型创建出来的，原型是和数据表结合最近的环节。
+ *
+ */
+
 class Prototype extends StatementFactory implements IBean, \Serializable, IIncompleteSerializable
 {
 	const youKnow = null ;
@@ -39,11 +50,12 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 	 * @return Prototype
 	 */
 	/**
-	 * @wiki /MVC模式/模型/模型(Model)
-	 *
-	 * {| ==原型创建==
-	 *  | 原型的创建方法
-	 *  |}
+	 * @wiki /MVC模式/数据库模型/数据表原型
+	 *	==原型的创建==
+	 *	
+	 *  原型的创建方式有两种.
+	 *  1.通过原型的静态方法create直接创建ProtoType对象,这种方法会通过对传入的参数(数据表名,字段名,)来构造一个ProtoType,这个ProtoTpe对象是有血有肉的。
+	 *  2.通过new Prototype创建一个ProtoType对象,这种方法则不会对构造出的ProtoType对象,这个ProtoType对象没有制定哪个数据表,相对于create的创建方法，这个ProtoType对象，如同一个躯壳。
 	 */
 	static public function create( $sTableName, $keys=self::youKnow, $columns=self::youKnow , $aDB = self::youKnow )
 	{
@@ -127,14 +139,9 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 	}
 	
 	/**
-	 * @wiki /MVC模式/模型/模型(Model)
-	 *
-	 * {| ==原型属性的获得==
-	 *  | 通过criteria（）对原型的属性进行设置，例如where
-	 *  |}
-	 *  
 	 * @return org\jecat\framework\db\sql\Criteria
 	 */
+
 	public function criteria($bCreate=true)
 	{
 		if( !$this->aCriteria and $bCreate )
@@ -259,25 +266,51 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 	
 	/**
 	 * @return Association
+	 * @wiki /MVC模式/数据库模型/数据表关联
+	 * ==hasOne==
+	 * 
+	 * 一对一关系,当两个模型创建为一对一关系时，对于一个数据表的操作，也会影响到另一个数据表.打个比方，假如有两个Model，一个为主Model，一个为从Model。
+	 * 当主Model向从Model建立hasOne关系后，如果设置了关联的字段，当对主Model的数据进行操作时，从Model也会发生相应的改变。
 	 */
+	
 	public function hasOne($toTable,$fromKeys=self::youKnow,$toKeys=self::youKnow){
 		return $this->createAssociation(Association::hasOne,$toTable,$fromKeys,$toKeys);
 	}
+
 	/**
 	 * @return Association
+	 * @wiki /MVC模式/数据库模型/数据表关联
+	 * ==hasMany==
+	 *
+	 * 一对多关系,当两个模型创建为一对多关系时，假如说主表是唯一，从表是主表的附属关系，也就是主表为一，从表为多，当设置关键字段时，主表的增，删，改都会直接影响到从表.
 	 */
+	
 	public function hasMany($toTable,$fromKeys=self::youKnow,$toKeys=self::youKnow){
 		return $this->createAssociation(Association::hasMany,$toTable,$fromKeys,$toKeys);
 	}
+
 	/**
 	 * @return Association
+	 * @wiki /MVC模式/数据库模型/数据表关联
+	 * ==belongsTo==
+	 *
+	 * 一对一关系,belongsTo有别于hasOne，只有当查询数据时候，belongsTo才是一对一关系，当对数据修改，或者删除的时候，被belongsTo的从Model是不会受到影响的。
 	 */
+	 
 	public function belongsTo($toTable,$fromKeys=self::youKnow,$toKeys=self::youKnow){
 		return $this->createAssociation(Association::belongsTo,$toTable,$fromKeys,$toKeys);
 	}
+	
 	/**
 	 * @return Association
+	 * @wiki /MVC模式/数据库模型/数据表关联
+	 * ==hasAndBelongsToMany==
+	 *
+	 * 多对多关系。这里举一个简单的例子，一个作家会有很多个作品，一个作品有时候往往会有多个作家一起编写，这就产生了多对多的关系。
+	 * 多对多的关系的建立要有一个中间的表，这里我们吧中间表称为桥接表,桥接表一方面记录着作家的关键字段，另一方面又记录着作品的关键字段
+	 * 通过对桥接表的关联，来对数据进行操作。
 	 */
+	
 	public function hasAndBelongsToMany($toTable,$sBridgeTableName,$fromKeys=self::youKnow,$toBridgeKeys=self::youKnow,$fromBridgeKeys=self::youKnow,$toKeys=self::youKnow){
 		return $this->createAssociation(Association::hasAndBelongsToMany,$toTable,$fromKeys,$toKeys,$sBridgeTableName,$toBridgeKeys,$fromBridgeKeys);
 	}
@@ -556,8 +589,12 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		return $aBean ;
 	}
 	/**
-	 * @wiki /MVC模式/模型/原型(Prototype)
-	 * ==Bean配置数组==
+ 	 * @wiki /MVC模式/数据库模型/模型的基本操作(新建、保存、删除、加载)
+	 * ==模型的创建==
+	 * 模型的创建有两中方式，基于bean的创建以及基于原型(ProtoType)的直接创建,两中方式的创建原理其实都是基于原型的创建.
+	 * 
+	 * 
+	 * =Bean配置数组=
 	 * {|
 	 * !属性
 	 * !类型
@@ -673,6 +710,7 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 	 * |可选
 	 * |配置hasAndBelongsToMany关系
 	 * |}
+	 * [example title="/MVC模式/数据库模型/模型的基本操作(新建、保存、删除、加载)/新建(Bean)"]
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{

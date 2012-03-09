@@ -36,7 +36,7 @@ use org\jecat\framework\mvc\controller\HttpRequest;
             $this->viewTryPaginator->addWidget( $aPaginator );
             $aModel = new Model('electronicnewspaper_newspaper',true);
             $aPaginator -> setPerPageCount(2);
-            $this->viewTryPaginator->setModel($aModel);
+            $this->viewTryPaginator->setModel==Bean配置数组==($aModel);
             $aPaginator -> setPerPageCount(3);
             $aModel->load();
             $arrTitle = array();
@@ -69,7 +69,9 @@ class Paginator extends FormWidget implements IModelChangeObserver
         }
     }
     /**
-     * @wiki /MVC模式/视图/控件/分页器(Paginator)
+     * @wiki /MVC模式/视图窗体(控件)/分页控件
+     * ==使用方法==
+     *  与model一起组合使用,单独使用无效
      * ==Bean配置数组==
      * {|
 	 * !属性
@@ -90,6 +92,51 @@ class Paginator extends FormWidget implements IModelChangeObserver
      * |可选
      * |显示页码的个数
      * |}
+     * ==模板属性配置==
+     * {|
+	 * !属性
+	 * !类型
+	 * !默认值
+	 * !可选
+	 * !说明
+	 * |-- --
+     * |attr.showFirst
+     * |mixed
+     * |true
+     * |可选
+     * |是否显示“第一页”
+     * |-- --
+     * |attr.showLast
+     * |mixed
+     * |true
+     * |可选
+     * |是否显示“最后一页”
+     * |-- --
+     * |attr.showTotal
+     * |mixed
+     * |true
+     * |可选
+     * |是否显示“共*页”
+     * |-- --
+     * |attr.showPre
+     * |mixed
+     * |true
+     * |可选
+     * |是否显示“上一页”
+     * |-- --
+     * |attr.showNext
+     * |mixed
+     * |true
+     * |可选
+     * |是否显示“下一页”
+     * |-- --
+     * |attr.strategy
+     * |mixed
+     * |middle
+     * |可选
+     * |显示策略（显示哪些页码），可以是一个字符串（表示类名）或者一个对象（需要设置type为expression） new \org\jecat\framework\mvc\view\widget\paginatorstrategy\Middle
+     * |}
+     * [example php frameworktest template/test-mvc/testviewwindow/TestPaginaterWidget.html 15 16]
      */
     public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {

@@ -31,12 +31,11 @@ use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 
 /**
  * @wiki /模板引擎/标签
- *
+ * @wiki 速查/模板引擎/标签
+ * ==<loop>==
+ * 
+ *  不可单行,循环控制.
  * {|
- *  !<loop>
- *  !不可单行
- *  !循环控制，匿名属性必须是一个表达式，当表达式返回true时，执行 <if> 和 </if> 之间的内容
- *  |---
  *  !属性
  *  !
  *  !类型
@@ -61,11 +60,7 @@ use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
  *  |1
  *  |步长属性,属性值必须在''之内
  *  |}
- */
-/**
- * @example /模板引擎/标签/自定义标签:name[1]
- *
- *  通过loop标签编译器的代码演示如何编写一个标签编译器
+ *  [example php frameworktest template/test-template/node/LoopCase.html 1 12]
  */
 
 class LoopCompiler extends NodeCompiler

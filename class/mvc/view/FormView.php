@@ -13,7 +13,9 @@ class FormView extends View implements IFormView
 		parent::__construct($sName,$sTemplate,$aUI) ;
 	}
 	/**
-	 * @wiki /MVC模式/视图/表单视图(FormView)
+	 * @wiki /MVC模式/视图/表单视图
+	 * 
+	 * view视图分为两种，一种视图，显示模板内容。还有一种就是表单视图(formview)，可以动态的进行数据的交互。
 	 * ==Bean配置数组==
 	 * {|
 	 * !属性

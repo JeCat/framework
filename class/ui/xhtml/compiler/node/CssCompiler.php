@@ -11,12 +11,11 @@ use org\jecat\framework\ui\ObjectContainer;
 
 /**
  * @wiki /模板引擎/标签
- *
+ * @wiki 速查/模板引擎/标签
+ * ==<css/>/<link/>==
+ * 
+ *  可单行,CSS的定义和引入标签 属性href为引入CSS文件的url
  * {|
- *  !<css/><link/>
- *  !可单行
- *  !CSS的定义和引入标签 属性href为引入CSS文件的url
- *  |---
  *  !属性
  *  !
  *  !类型
@@ -47,13 +46,8 @@ use org\jecat\framework\ui\ObjectContainer;
  *  |false
  *  |当ignore为true时,不考虑蜂巢模版的href搜索问题,
  *  |}
- *  
+ *  [example php frameworktest template/test-template/node/CssCase.html 2 12]
  *  [^]有时候ignore只能在link标签中使用[/^]
- */
-/**
- * @example /模板引擎/标签/自定义标签:name[1]
- *
- *  通过<css/><link/>标签编译器的代码演示如何编写一个标签编译器
  */
 
 class CssCompiler extends NodeCompiler

@@ -1,12 +1,11 @@
 <?php
 /**
  * @wiki /模板引擎/标签
- *
+ * @wiki 速查/模板引擎/标签
+ * ==<elseif>==
+ * 
+ *  不可单行,条件流程控制，若<if>中的判断条件为false，则实行elseif的语句
  * {|
- *  !<elseif exp>
- *  !不可单行
- *  !条件流程控制，若<if>中的判断条件为false，则实行elseif的语句
- *  |---
  *  !属性
  *  !
  *  !类型
@@ -19,12 +18,9 @@
  *  |
  *  |条件表达式
  *  |}
+ *  [example php frameworktest template/test-template/node/IfCase.html 12 17]
  */
-/**
- * @example /模板引擎/标签/自定义标签:name[1]
- *
- *	通过elseif标签编译器的代码演示如何编写一个标签编译器  
- */
+
 namespace org\jecat\framework\ui\xhtml\compiler\node;
 
 use org\jecat\framework\ui\xhtml\compiler\ExpressionCompiler;

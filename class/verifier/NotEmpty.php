@@ -22,6 +22,12 @@ class NotEmpty extends Object implements IVerifier,IBean {
 		return $aBean ;
 	}
 	
+	/**
+	 * @wiki /MVC模式/数据交换和数据校验/数据校验
+	 * ==校验内容为空(notempty)==
+	 * 检查输入的内容是否为空，为空则有信息提示
+	 */
+	
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
 		$this->arrBeanConfig = $arrConfig;
