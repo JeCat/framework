@@ -9,6 +9,46 @@ use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 use org\jecat\framework\ui\ObjectContainer;
 
+/**
+ * @wiki /MVC模式/视图/模板标签
+ * @wiki 速查/模板引擎/标签
+ *	==<model:data>==
+ *
+ *  可单行,model数据获取标签,获取model对应的字段的value
+ * {|
+ *  !属性
+ *  !
+ *  !类型
+ *  !默认值
+ *  !说明
+ *  |---
+ *  |name
+ *  |必须
+ *  |expression
+ *  |
+ *  |属性name为model的数据表字段名称
+ *  |}
+ *  [example php frameworktest template/test-mvc/testview/ViewNode.html 37 38]
+ *  
+ *  ==<data>==
+ *  
+ *  可单行,model数据获取标签,获取model对应的字段的value
+ * {|
+ *  !属性
+ *  !
+ *  !类型
+ *  !默认值
+ *  !说明
+ *  |---
+ *  |name
+ *  |必须
+ *  |expression
+ *  |
+ *  |属性name为model的数据表字段名称
+ *  |}
+ *  [example php frameworktest template/test-mvc/testview/ViewNode.html 40 41]
+ */
+
 class ModelDataCompiler extends NodeCompiler
 {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)

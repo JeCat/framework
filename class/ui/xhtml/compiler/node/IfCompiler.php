@@ -13,12 +13,12 @@ use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 
 /**
  * @wiki /模板引擎/标签
- *
+ * @wiki 速查/模板引擎/标签
+ * ==<if>==
+ * 
+ *  不可单行,条件流程控制，匿名属性必须是一个表达式.
+ *  当表达式返回true时，执行 <if> 和 </if> 之间的内容
  * {|
- *  !<if>
- *  !不可单行
- *  !条件流程控制，匿名属性必须是一个表达式，当表达式返回true时，执行 <if> 和 </if> 之间的内容
- *  |---
  *  !属性
  *  !
  *  !类型
@@ -31,6 +31,7 @@ use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
  *  |
  *  |条件表达式
  *  |}
+ *  [example php frameworktest template/test-template/node/IfCase.html 1 17]
  */
 /**
  * @author anubis
@@ -50,7 +51,7 @@ class IfCompiler extends NodeCompiler {
 	 * 			(bool)$nTrue
 	 * $aDev 输出设备,一般指网页
 	 * $aCompilerManager 编译管理器
-	*/
+	 */
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) {
 		//确保传入的$aObject参数是node对象
 		Type::check ( "org\\jecat\\framework\\ui\\xhtml\\Node", $aObject );

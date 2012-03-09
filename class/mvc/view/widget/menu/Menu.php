@@ -32,8 +32,9 @@ class Menu extends AbstractBase
     	return $aBean ;
     }
     /**
-     * @wiki /MVC模式/视图/控件/导航菜单(Menu)
-     * ==Bean配置数组==
+     * @wiki /MVC模式/视图窗体(控件)/菜单控件
+     * ==Menu==
+     * =Bean配置数组=
      * {|
 	 * !属性
 	 * !类型
@@ -41,12 +42,37 @@ class Menu extends AbstractBase
 	 * !可选
 	 * !说明
 	 * |-- --
-     * |items
+     * |item
      * |array
      * |无
      * |可选
      * |菜单项目列表,每个元素都是一个菜单项的配置
+	 * |-- --
+     * |menu
+     * |mixed
+     * |无
+     * |可选
+     * |menu设置为1，含有子菜单，设置为0，不含有子菜单
+     * |-- --
+     * |tearoff
+     * |mixed
+     * |无
+     * |可选
+     * |tearoff设置为1，菜单弹出显示，设置为0，菜单列表显示
+     * |-- --
+     * |showDepths
+     * |mixed
+     * |无
+     * |可选
+     * |菜单项目列表显示层级数量
+     * |-- --
+     * |link
+     * |mixed
+     * |无
+     * |可选
+     * |菜单项目列表的链接
      * |}
+     * [example php frameworktest template/test-mvc/testviewwindow/TestMenuTemplate.html 8 40]
      */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{

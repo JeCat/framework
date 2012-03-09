@@ -275,7 +275,7 @@ class Association implements IBean, \Serializable, IIncompleteSerializable
 		return $aBean ;
 	}
 	/**
-	 * @wiki /MVC模式/模型/关系(Association)
+	 * @wiki /MVC模式/数据库模型/数据表关联
 	 * ==Bean配置数组==
 	 * type string 指定关系类型
 	 * fromkeys array 起始表列名

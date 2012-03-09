@@ -9,15 +9,14 @@ use org\jecat\framework\ui\ObjectContainer;
 
 /**
  * @wiki /模板引擎/宏
- *
+ * @wiki 速查/模板引擎/宏
+ * =={/}==
+ *  
+ *  可以在宏内使用*.url/*.uri，显示出url地址
  * {|
- *  !{/}
- *  !
- *  !{/ }可以在宏内使用*.url/*.uri，显示出url地址
- *  |---
  *  !使用方法
+ *  !说明
  *  !
- *  !作用
  *  !
  *  !
  *  |---
@@ -56,14 +55,9 @@ use org\jecat\framework\ui\ObjectContainer;
  *  |
  *  |
  *  |}
+ *  [example php frameworktest template/test-template/macro/PathMacroCase.html 1 6]
  *  
- *  [^]注意，url和rui的不同[/^]
- */
-/**
- * @author anubis
- * @example /模板引擎/宏/自定义标签:name[1]
- *
- *  通过{/ }标签编译器的代码演示如何编写一个标签编译器
+ *  [^]注意，url和uri的不同[/^]
  */
 
 class PathMacroCompiler extends MacroCompiler

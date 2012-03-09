@@ -15,11 +15,17 @@ class Email extends Object implements IVerifier ,IBean{
 		$sClass = get_called_class() ;
 		$aBean = new $sClass() ;
 		if($bBuildAtOnce)
-		{
+		{	
 			$aBean->buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
 		}
 		return $aBean ;
 	}
+	
+	/**
+	 * @wiki /MVC模式/数据交换和数据校验/数据校验
+	 * ==Email格式校验==
+	 * 验证输入的Email格式的正确性
+	 */
 	
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{

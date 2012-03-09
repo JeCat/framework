@@ -70,7 +70,7 @@ class View extends NamableComposite implements IView, IBean
 		return $aBean ;
 	}
 	/**
-	 * @wiki /MVC模式/视图(View)
+	 * @wiki /MVC模式/视图/视图的Bean配置数组
 	 * ==Bean配置数组==
 	 * {|
 	 * !属性
@@ -190,6 +190,15 @@ class View extends NamableComposite implements IView, IBean
 	{
 		return $this->arrBeanConfig ;
 	}
+	
+	/**
+	 *
+	 * @param unknown_type $sTemplate
+	 * @wiki /MVC模式/视图/视图的组合模式
+	 * 
+	 * view可以是一个，也可以是多个，也就是说view可以是一个容易，是多个view的集合，通过<views/>标签，可以将view遍历显示出来.
+	 *
+	 */
 	
  	public function add($object,$sName=null,$bTakeover=true)
 	{
@@ -362,6 +371,17 @@ class View extends NamableComposite implements IView, IBean
 		$this->bRendered = true ;
 	}
 		
+	/**
+	 * 
+	 * @param unknown_type $sTemplate
+	 * @wiki /MVC模式/视图/绑定模型
+	 * ==绑定模型==
+	 * 
+	 * view的Bean创建数组中的属性model，view通过model属性指定的model名称，实现绑定模型。
+	 * 绑定模型的实现其实是通过variables实现的。
+	 * 
+	 */
+	
 	protected function renderTemplate($sTemplate)
 	{
 		$aVars = $this->variables() ;

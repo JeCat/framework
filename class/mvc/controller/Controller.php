@@ -61,9 +61,6 @@ use org\jecat\framework\pattern\composite\NamableComposite ;
  * 。。。
  */
 
-/**
- * @wiki /MVC模式/控制器
- */
 class Controller extends NamableComposite implements IController, IBean
 {
     function __construct ($params=null,$sName=null,$bBuildAtonce=true)
@@ -124,7 +121,7 @@ class Controller extends NamableComposite implements IController, IBean
     }
     
     /**
-     * @wiki /MVC模式/控制器(Controller)
+     * @wiki /MVC模式/控制器/控制器的Bean配置数组
      * ==Bean配置数组==
      * {|
      * 	!属性
@@ -195,7 +192,7 @@ class Controller extends NamableComposite implements IController, IBean
      *  |frame
      *  |可选
      *  |array
-     *  |frame控制器配置
+     *  |frame控制器配置,指定控制器的frame，jecat默认情况下有自己的默认frame。
      *  |--- ---
      *  |process
      *  |可选
@@ -409,7 +406,7 @@ class Controller extends NamableComposite implements IController, IBean
     }
 
     /**
-     * @wiki /MVC模式/控制器/主视图
+     * @wiki /MVC模式/控制器/主视图(mainView)
      * 
      * 每个控制器都有一个”隐藏“的主视图(main view)，控制器所拥有的视图，实际上都存放在这个主视图里（[see /MVC模式/视图/视图的组合模式]），它是管理控制器所有视图的”容器“。
      * 
@@ -549,6 +546,11 @@ class Controller extends NamableComposite implements IController, IBean
     		$this->doActions() ;
     	}
     }
+    
+    /**
+     * @wiki /MVC模式/控制器/控制器的组合模式 
+     * 多个控制器可以组合起来，几项简单的工作可以组合成一项更复杂的工作。JeCat的控制器可以自由组合，控制器之间互不干扰、各自独立工作，又可以彼此配合，浑然一体。
+     */
     
 	public function add($object,$sName=null,$bTakeover=true)
 	{

@@ -9,6 +9,34 @@ use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 use org\jecat\framework\ui\ObjectContainer;
 
+/**
+ * @wiki /MVC模式/视图/模板标签
+ * @wiki 速查/模板引擎/标签
+ * ==<widget:msgqueue>==
+ * 
+ *  可单行,显示widget的所有信息 
+ * {|
+ *  !属性
+ *  !
+ *  !类型
+ *  !默认值
+ *  !说明
+ *  |---
+ *  |id
+ *  |
+ *  |expression
+ *  |
+ *  |区分不同的widget
+ *  |}
+ *  [example php frameworktest template/test-mvc/testview/ViewNode.html 49 50]
+ */
+/**
+ * @author anubis
+ * @example /MVC模式/视图/模板标签
+ *
+ *
+ */
+
 class WidgetMsgQueueCompiler extends NodeCompiler
 {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)

@@ -10,12 +10,11 @@ use org\jecat\framework\ui\ObjectContainer;
 
 /**
  * @wiki /模板引擎/宏
+ * @wiki 速查/模板引擎/宏
+ * =={? }==
  *
+ *  {? }可以使用宏内的表达式或者value
  * {|
- *  !{? }
- *  !
- *  !{? }可以使用宏内的表达式或者value
- *  |---
  *  !使用方法
  *  !
  *  !说明
@@ -28,12 +27,7 @@ use org\jecat\framework\ui\ObjectContainer;
  *  |
  *  |
  *  |}
- */
-/**
- * @author anubis
- * @example /模板引擎/宏/自定义标签:name[1]
- *
- *  通过{? }标签编译器的代码演示如何编写一个标签编译器
+ *  [example php frameworktest template/test-template/macro/EvalMacroCase.html 1 2]
  */
 
 class EvalMacroCompiler extends MacroCompiler
