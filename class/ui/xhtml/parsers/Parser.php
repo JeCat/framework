@@ -2,7 +2,7 @@
 namespace org\jecat\framework\ui\xhtml\parsers ;
 
 use org\jecat\framework\ui\UI;
-use org\jecat\framework\fs\IFile;
+use org\jecat\framework\fs\File;
 use org\jecat\framework\io\OutputStreamBuffer;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\ui\ObjectContainer ;

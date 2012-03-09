@@ -28,7 +28,7 @@ class CompilingStatus
 	}
 	
 	/**
-	 * @return IFile
+	 * @return File
 	 */
 	public function sourceFile()
 	{
@@ -36,7 +36,7 @@ class CompilingStatus
 	}
 	
 	/**
-	 * @return IFile
+	 * @return File
 	 */
 	public function compiledFile()
 	{

@@ -1,27 +1,24 @@
 <?php
 namespace org\jecat\framework\setting\imp ;
 
-use org\jecat\framework\fs\IFolder;
-
-use org\jecat\framework\fs\FileSystem;
-
+use org\jecat\framework\fs\Folder;
 use org\jecat\framework\fs\FSIterator;
-use org\jecat\framework\fs\IFile;
+use org\jecat\framework\fs\File;
 use org\jecat\framework\setting\Key;
 
 class FsKey extends Key implements \Serializable
 {
 	const itemFilename = 'items.php' ;
 	
-	public function __construct(IFolder $aFolder)
+	public function __construct(Folder $aFolder)
 	{
 		$this->aKeyFolder = $aFolder ;
 		$this->readItemFile();
 	}
 	
-	static public function createKey(IFolder $aFolder)
+	static public function createKey(Folder $aFolder)
 	{
-		$sFlyweightKey = $aFolder->url();
+		$sFlyweightKey = $aFolder->path();
 		if( !$aKey=FsKey::flyweight($sFlyweightKey,false) )
 		{
 			$aKey = new FsKey($aFolder) ;
@@ -43,7 +40,7 @@ class FsKey extends Key implements \Serializable
 	
 	public function save()
 	{
-		if( $aItemFile = $this->aKeyFolder->findFile(self::itemFilename,FileSystem::FIND_AUTO_CREATE)){
+		if( $aItemFile = $this->aKeyFolder->findFile(self::itemFilename,Folder::FIND_AUTO_CREATE)){
 			$aWriter = $aItemFile->openWriter() ;
 			$aWriter->write(
 				"<?php\r\nreturn ".var_export($this->arrItems,true)." ;"
@@ -66,12 +63,12 @@ class FsKey extends Key implements \Serializable
 	 */
 	public function unserialize ($serialized)
 	{
-		$this->aKeyFolder = FileSystem::singleton()->findFolder($serialized,FileSystem::FIND_AUTO_CREATE) ;
+		$this->aKeyFolder = Folder::singleton()->findFolder($serialized,Folder::FIND_AUTO_CREATE) ;
 	}
 	
 	/**
 	 * 这不是 IKey 接口中的方法
-	 * @return IFolder
+	 * @return Folder
 	 */
 	public function folder()
 	{
@@ -84,7 +81,7 @@ class FsKey extends Key implements \Serializable
 		
 		if( $aFolder = $this->folder() )
 		{
-			FsKey::setFlyweight(null,$aFolder->url()) ;
+			FsKey::setFlyweight(null,$aFolder->path()) ;
 			
 			$aFolder->delete(true,true) ;
 			$this->bDataChanged = false ;
@@ -106,7 +103,7 @@ class FsKey extends Key implements \Serializable
 	}
 	
 	/**
-	 * @var org\jecat\framework\fs\IFolder
+	 * @var org\jecat\framework\fs\Folder
 	 */
 	private $aKeyFolder ;
 }

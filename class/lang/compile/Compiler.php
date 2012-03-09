@@ -3,7 +3,7 @@
 namespace org\jecat\framework\lang\compile ;
 
 use org\jecat\framework\lang\oop\Package;
-use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\fs\Folder;
 use org\jecat\framework\system\Application;
 use org\jecat\framework\lang\compile\object\TokenPool;
 use org\jecat\framework\lang\oop\ClassLoader;
@@ -29,7 +29,7 @@ class Compiler extends JcObject
 		if(!$this->aCompiledPackage)
 		{
 			$sFolderPath = $this->sCompiledFolderPath.'/'.$this->strategySignature() ;
-			$aFolder = FileSystem::singleton()->findFolder($sFolderPath,FileSystem::FIND_AUTO_CREATE) ;
+			$aFolder = Folder::singleton()->findFolder($sFolderPath,Folder::FIND_AUTO_CREATE) ;
 			$this->aCompiledPackage = new Package('',$aFolder) ;
 		}
 		

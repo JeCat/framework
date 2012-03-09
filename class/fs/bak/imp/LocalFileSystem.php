@@ -1,7 +1,7 @@
 <?php
 namespace org\jecat\framework\fs\imp ;
 
-use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\fs\Folder;
 
 class LocalFileSystem extends FileSystem
 {

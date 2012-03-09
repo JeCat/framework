@@ -7,7 +7,7 @@ use org\jecat\framework\util\serialize\ShareObjectSerializer;
 use org\jecat\framework\db\sql\Restriction;
 use org\jecat\framework\bean\BeanConfException;
 use org\jecat\framework\lang\Type;
-use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\fs\Folder;
 use org\jecat\framework\db\sql\Statement;
 use org\jecat\framework\db\sql\StatementState;
 use org\jecat\framework\db\sql\name\NameTransferFactory;

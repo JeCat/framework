@@ -2,7 +2,7 @@
 namespace org\jecat\framework\system ;
 
 use org\jecat\framework\mvc\controller\HttpRequest;
-use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\fs\Folder;
 
 class HttpAppFactory extends ApplicationFactory
 {
@@ -22,7 +22,7 @@ class HttpAppFactory extends ApplicationFactory
 		$aReq = new HttpRequest() ;
 		
 		// 访问入口
-		FileSystem::singleton()->find('/')->setHttpUrl( dirname($aReq->urlPath()) ) ;
+		Folder::singleton()->find('/')->setHttpUrl( dirname($aReq->urlPath()) ) ;
 		
 		return $aReq ;
 	}

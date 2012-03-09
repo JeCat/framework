@@ -1,12 +1,10 @@
 <?php
-namespace org\jecat\framework\fs\imp ;
+namespace org\jecat\framework\fs ;
 
-use org\jecat\framework\fs\FSIterator;
-use org\jecat\framework\fs\FileSystem;
 use org\jecat\framework\lang\Exception ;
 
 class LocalFolderIterator extends FSIterator{
-	public function __construct (LocalFolder $aFolder,$nFlags = self::FLAG_DEFAULT){
+	public function __construct (Folder $aFolder,$nFlags = self::FLAG_DEFAULT){
 		parent::__construct($aFolder,$nFlags);
 		if( $nFlags & self::RECURSIVE_BREADTH_FIRST ){
 			throw new Exception('unfinished flag : RECURSIVE_BREADTH_FIRST');

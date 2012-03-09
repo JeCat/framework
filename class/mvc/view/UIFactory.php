@@ -1,7 +1,7 @@
 <?php
 namespace org\jecat\framework\mvc\view ;
 
-use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\fs\Folder;
 
 use org\jecat\framework\ui\xhtml\parsers\ParserStateTag;
 
@@ -59,7 +59,7 @@ class UIFactory extends UIFactoryBase
 	public function newSourceFileManager()
 	{
 		$aSrcMgr = parent::newSourceFileManager() ;
-		$aSrcMgr->addFolder(FileSystem::singleton()->findFolder('/framework/template/'),null,'org\\jecat\\framework') ;
+		$aSrcMgr->addFolder(Folder::singleton()->findFolder('/framework/template/'),null,'org\\jecat\\framework') ;
 		
 		return $aSrcMgr ;
 	}

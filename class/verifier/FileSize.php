@@ -9,7 +9,7 @@ use org\jecat\framework\message\Message;
 
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\Object;
-use org\jecat\framework\fs\IFile;
+use org\jecat\framework\fs\File;
 
 class FileSize extends Object implements IVerifier,IBean {
 	public function __construct($nMinSize,$nMaxSize) {
@@ -88,8 +88,8 @@ class FileSize extends Object implements IVerifier,IBean {
 		return $this->verifyFile($data, $bThrowException);
 	}
 	
-	public function verifyFile(IFile $file, $bThrowException) {
-		if (! $file instanceof IFile) {
+	public function verifyFile(File $file, $bThrowException) {
+		if (! $file instanceof File) {
 			throw new Exception ( __CLASS__ . "的" . __METHOD__ . "传入了错误的data参数(得到的参数是%s类型)", array ( Type::detectType($file) ) );
 		}
 		$nDataSize = $file->length() ;

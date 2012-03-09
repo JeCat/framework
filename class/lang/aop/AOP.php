@@ -2,7 +2,7 @@
 namespace org\jecat\framework\lang\aop ;
 
 use org\jecat\framework\lang\compile\IStrategySummary;
-use org\jecat\framework\fs\IFSO;
+use org\jecat\framework\fs\FSO;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\oop\Package;
 use org\jecat\framework\lang\compile\CompilerFactory;

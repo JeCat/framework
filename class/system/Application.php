@@ -6,7 +6,7 @@ use org\jecat\framework\resrc\ResourceManager;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\setting\imp\FsSetting;
 use org\jecat\framework\fs\imp\LocalFileSystem;
-use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\fs\Folder;
 
 /**
  * @wiki /目录(草稿)
@@ -158,7 +158,7 @@ class Application extends Object implements \Serializable
 		if( !$this->aPublicFolders )
 		{
 			$this->aPublicFolders = new ResourceManager() ;
-			if( !$aFolder=FileSystem::singleton()->find('/framework/public') )
+			if( !$aFolder=Folder::singleton()->find('/framework/public') )
 			{
 				throw new Exception("目录 /framework/public 丢失，无法提供该目录下的文件") ;
 			}

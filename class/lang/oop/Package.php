@@ -2,13 +2,12 @@
 namespace org\jecat\framework\lang\oop ;
 
 use org\jecat\framework\lang\Exception;
-use org\jecat\framework\fs\IFile;
-use org\jecat\framework\fs\IFolder;
-use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\fs\File;
+use org\jecat\framework\fs\Folder;
 
 class Package implements \Serializable
 {		
-	public function __construct($sNamespace,IFolder $aFolder=null)
+	public function __construct($sNamespace,Folder $aFolder=null)
 	{
 		$this->setNamespace($sNamespace) ;
 		
@@ -26,8 +25,8 @@ class Package implements \Serializable
 	
 	public function findFolder($sPath,$bAutoCreate=false)
 	{
-		$aFs = FileSystem::singleton() ;
-		if( !$aSourceFolder=$aFs->findFolder($sPath,$bAutoCreate?FileSystem::FIND_AUTO_CREATE:0) )
+		$aFs = Folder::singleton() ;
+		if( !$aSourceFolder=$aFs->findFolder($sPath,$bAutoCreate?Folder::FIND_AUTO_CREATE:0) )
 		{
 			throw new Exception(
 					"注册 class package 时，提供的class源文件目录不存在：%s"
@@ -38,14 +37,14 @@ class Package implements \Serializable
 	}
 
 	/**
-	 * @return org\jecat\framework\fs\IFolder
+	 * @return org\jecat\framework\fs\Folder
 	 */
 	public function folder()
 	{
 		return $this->aFolder ;
 	}
 	
-	public function setFolder(IFolder $aFolder)
+	public function setFolder(Folder $aFolder)
 	{
 		$this->aFolder = $aFolder ;
 	}
@@ -94,7 +93,7 @@ class Package implements \Serializable
 	}
 	
 	/**
-	 * @return js\fs\IFile
+	 * @return js\fs\File
 	 */
 	public function searchClassEx($sSubFolder,$sShortClassName)
 	{
@@ -109,7 +108,7 @@ class Package implements \Serializable
 			
 			$sClassFilePath = $sSubFolder? ($sSubFolder . '/' . $sClassFilename): $sClassFilename ;
 			
-			if( $aFile=$this->aFolder->findFile($sClassFilePath) and $aFile instanceof IFile )
+			if( $aFile=$this->aFolder->findFile($sClassFilePath) and $aFile instanceof File )
 			{
 				return $aFile ;
 			}
@@ -171,7 +170,7 @@ class Package implements \Serializable
 				$sClassPath = $sInnerPath.'/'.$sClassPath ;
 			}
 			
-			if( !$aClassFile=$this->aFolder->createFile($sClassPath) )
+			if( !$aClassFile=$this->aFolder->createChildFile($sClassPath) )
 			{
 				throw new Exception(
 					"无法在以下路径上创建类%s的编译文件：%s",array($sClassFullName,$sClassCompilePath)

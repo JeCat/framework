@@ -2,13 +2,11 @@
 namespace org\jecat\framework\cache ;
 
 use org\jecat\framework\util\String;
-
-use org\jecat\framework\fs\FileSystem;
-use org\jecat\framework\fs\IFolder;
+use org\jecat\framework\fs\Folder;
 
 class FSCache implements ICache
 {
-	public function __construct(IFolder $aFolder)
+	public function __construct(Folder $aFolder)
 	{
 		$this->aFolder = $aFolder ;
 	}
@@ -25,7 +23,7 @@ class FSCache implements ICache
 		// 尝试 .data
 		if( $aFile = $this->aFolder->findFile($sDataPath.'.data') )
 		{
-			return unserialize(file_get_contents($aFile->url()) ) ;
+			return unserialize(file_get_contents($aFile->path()) ) ;
 		}
 
 		return null ;
@@ -37,7 +35,7 @@ class FSCache implements ICache
 		
 		if( is_object($data) )
 		{
-			if( !$aFile=$this->aFolder->findFile($sDataPath.'.data',FileSystem::FIND_AUTO_CREATE) )
+			if( !$aFile=$this->aFolder->findFile($sDataPath.'.data',Folder::FIND_AUTO_CREATE) )
 			{
 				return false ;
 			}
@@ -45,7 +43,7 @@ class FSCache implements ICache
 		}
 		else 
 		{
-			if( !$aFile=$this->aFolder->findFile($sDataPath.'.php',FileSystem::FIND_AUTO_CREATE) )
+			if( !$aFile=$this->aFolder->findFile($sDataPath.'.php',Folder::FIND_AUTO_CREATE) )
 			{
 				return false ;
 			}
@@ -61,7 +59,7 @@ class FSCache implements ICache
 		{
 			$fCreateTimeMicroSec = microtime(true) ;
 		}
-		if( !$aFile=$this->aFolder->findFile($sDataPath.'.time',FileSystem::FIND_AUTO_CREATE) )
+		if( !$aFile=$this->aFolder->findFile($sDataPath.'.time',Folder::FIND_AUTO_CREATE) )
 		{
 			return false ;
 		}

@@ -1,7 +1,7 @@
 <?php
 namespace org\jecat\framework\lang\oop ;
 
-use org\jecat\framework\fs\IFolder;
+use org\jecat\framework\fs\Folder;
 
 
 /**
@@ -13,7 +13,7 @@ use org\jecat\framework\fs\IFolder;
  */
 class ShadowClassPackage extends Package implements \Serializable
 {
-	public function __construct($sParentClass,$sNamespace,IFolder $aFolder=null)
+	public function __construct($sParentClass,$sNamespace,Folder $aFolder=null)
 	{
 		$this->sParentClass = $sParentClass ;
 		
@@ -21,7 +21,7 @@ class ShadowClassPackage extends Package implements \Serializable
 	} 
 	
 	/**
-	 * @return js\fs\IFile
+	 * @return js\fs\File
 	 */
 	public function searchClassEx($sSubFolder,$sShortClassName)
 	{
@@ -34,7 +34,7 @@ class ShadowClassPackage extends Package implements \Serializable
 	
 	public function generateShadowlClass($sShortClass)
 	{
-		if( !$aClassFile = $this->folder()->createFile($sShortClass.'.php') )
+		if( !$aClassFile = $this->folder()->createChildFile($sShortClass.'.php') )
 		{
 			throw new Exception("无法自动创建影子类 %s 的类文件：%s",array($sClass,$sClassFilePath)) ;
 		}

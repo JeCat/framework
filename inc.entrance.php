@@ -20,7 +20,7 @@ header("Content-Type: text/html; charset=UTF-8") ;
 // 关闭魔术引用
 set_magic_quotes_runtime(false) ;
 
-define( __NAMESPACE__."\\VERSION", '0.6.1' ) ;
+define( __NAMESPACE__."\\VERSION", '0.7.0' ) ;
 define( __NAMESPACE__."\\PATH", __DIR__ ) ;
 define( __NAMESPACE__."\\CLASSPATH", __DIR__.'/class' ) ;
 
@@ -29,6 +29,7 @@ require_once CLASSPATH."/pattern/ISingletonable.php" ;
 require_once CLASSPATH."/pattern/IFlyweightable.php" ;
 require_once CLASSPATH."/lang/IObject.php" ;
 require_once CLASSPATH."/lang/Object.php" ;
+require_once CLASSPATH."/lang/Type.php" ;
 require_once CLASSPATH."/lang/IException.php" ;
 require_once CLASSPATH."/lang/Exception.php" ;
 require_once CLASSPATH."/lang/oop/Package.php" ;
@@ -37,15 +38,9 @@ require_once CLASSPATH."/lang/oop/ClassLoader.php" ;
 require_once CLASSPATH."/system/Application.php" ;
 require_once CLASSPATH."/system/ApplicationFactory.php" ;
 
-require_once CLASSPATH."/fs/FileSystem.php" ;
-require_once CLASSPATH."/fs/IFSO.php" ;
-require_once CLASSPATH."/fs/IFile.php" ;
-require_once CLASSPATH."/fs/IFolder.php" ;
 require_once CLASSPATH."/fs/FSO.php" ;
-require_once CLASSPATH."/fs/imp/LocalFSO.php" ;
-require_once CLASSPATH."/fs/imp/LocalFile.php" ;
-require_once CLASSPATH."/fs/imp/LocalFolder.php" ;
-require_once CLASSPATH."/fs/imp/LocalFileSystem.php" ;
+require_once CLASSPATH."/fs/Folder.php" ;
+require_once CLASSPATH."/fs/File.php" ;
 
 require_once CLASSPATH."/lang//compile/IStrategySummary.php" ;
 require_once CLASSPATH."/lang/aop/AOP.php" ;

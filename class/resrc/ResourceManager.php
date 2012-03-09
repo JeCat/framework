@@ -1,14 +1,12 @@
 <?php
 namespace org\jecat\framework\resrc ;
 
-use org\jecat\framework\fs\FileSystem;
-
-use org\jecat\framework\fs\IFolder;
+use org\jecat\framework\fs\Folder;
 use org\jecat\framework\lang\Object;
 
 class ResourceManager extends Object implements \Serializable
 {
-	public function addFolder(IFolder $aFolder,$sNamespace='*')
+	public function addFolder(Folder $aFolder,$sNamespace='*')
 	{
 		if(!isset($this->arrFolders[$sNamespace]))
 		{
@@ -21,7 +19,7 @@ class ResourceManager extends Object implements \Serializable
 		}
 	}
 	
-	public function removeFolder(IFolder $aFolder,$sNamespace='*')
+	public function removeFolder(Folder $aFolder,$sNamespace='*')
 	{
 		if(!isset($this->arrFolders[$sNamespace]))
 		{
@@ -41,7 +39,7 @@ class ResourceManager extends Object implements \Serializable
 	}
 	
 	/**
-	 * @return org\jecat\framework\fs\IFile
+	 * @return org\jecat\framework\fs\File
 	 */
 	public function find($sFilename,$sNamespace='*')
 	{
@@ -134,7 +132,7 @@ class ResourceManager extends Object implements \Serializable
 	{
 		$this->__construct() ;
 	
-		$aFileSystem = FileSystem::singleton() ;
+		$aFileSystem = Folder::singleton() ;
 		$arrData = unserialize($serialized) ;
 		foreach($arrData['arrFolders'] as $sNamespace=>&$arrFolders)
 		{

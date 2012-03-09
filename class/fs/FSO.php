@@ -1,35 +1,27 @@
 <?php
 namespace org\jecat\framework\fs ;
 
-use org\jecat\framework\fs\FileSystem;
 use org\jecat\framework\lang\Object;
 
-abstract class FSO extends Object implements IFSO
+abstract class FSO extends Object
 {
+	const file =	0100000 ;
+	const folder = 0200000 ;
+	const unknow = 0 ;
+	const type = 0300000 ;
+	
+	const CLEAN_PATH = 0400000 ;
+	
 	/**
 	 * Enter description here ...
 	 * 
 	 * @return void
 	 */
-	public function __construct(FileSystem $aFileSystem, $sInnerPath='')
+	public function __construct($sPath,$nFlag=0)
 	{
-		$this->aFileSystem = $aFileSystem ;
-		$this->sInnerPath = $sInnerPath ;
+		$this->sPath = ($nFlag&self::CLEAN_PATH)? $sPath: self::tidyPath($sPath) ;
 	}
-	
-	/**
-	 * @return FileSystem
-	 */
-	public function fileSystem()
-	{
-		return $this->aFileSystem ;
-	}
-	
-	public function setFileSystem(FileSystem $aFileSystem)
-	{
-		$this->aFileSystem = $aFileSystem ;
-	}
-	
+		
 	/**
 	 * Enter description here ...
 	 * 
@@ -37,18 +29,7 @@ abstract class FSO extends Object implements IFSO
 	 */
 	public function path()
 	{
-		$sFsMountedPath = $this->aFileSystem->mountedPath() ;
-		return $sFsMountedPath=='/'? $this->sInnerPath: ($sFsMountedPath.$this->sInnerPath) ;
-	}
-
-	public function innerPath()
-	{
-		return $this->sInnerPath ;
-	}
-	
-	public function setInnerPath($sInnerPath)
-	{
-		$this->sInnerPath = $sInnerPath ;
+		return $this->sPath ;
 	}
 
 	public function dirPath()
@@ -90,11 +71,11 @@ abstract class FSO extends Object implements IFSO
 	 */
 	public function delete($bRecurse=false,$bIgnoreError=false)
 	{
-		return $this->fileSystem()->delete($this->path(),$bRecurse,$bIgnoreError) ;
+		// return $this->fileSystem()->delete($this->path(),$bRecurse,$bIgnoreError) ;
 	}
 	
 	/**
-	 * @return IFolder
+	 * @return Folder
 	 */
 	public function directory()
 	{
@@ -123,39 +104,173 @@ abstract class FSO extends Object implements IFSO
 		return ($nDotIdx===false)? $sFilename: substr($sFilename,0,$nDotIdx) ;
 	}
 	
+	protected function fsoFlyweightKey($sPath)
+	{
+		return $this->isCaseSensitive()? strtolower($sPath): $sPath ;
+	}
+	
+	public function isCaseSensitive()
+	{
+		return $this->bCaseSensitive ;
+	}
+	
+	public function setCaseSensitive($bCaseSensitive=true)
+	{
+		return $this->bCaseSensitive = $bCaseSensitive ;
+	}
+	
 	/**
-	 * (non-PHPdoc)
-	 * @see org\jecat\framework\fs.IFSO::httpUrl()
+	 * 整理路径，清理路径中出现的 .. 和 .
+	 */
+	static public function tidyPath(& $sPath)
+	{
+		// 统一、合并斜线
+		$sPath = preg_replace('|[/\\\\]+|', '/', $sPath) ;
+	
+		// 处理 .. , .
+		if( preg_match('`[/^](..|.)[/$]`',$sPath) )
+		{
+			$arrFolders = explode('/', $sPath) ;
+		
+			$arrFoldersStack = array() ;
+			foreach($arrFolders as $nIdx=>$sFolderName)
+			{
+				if( $sFolderName=='.' )
+				{
+					continue ;
+				}
+		
+				if($sFolderName=='..')
+				{
+					$sParentFoldre = array_pop($arrFoldersStack) ;
+		
+					// windows 盘符
+					if( preg_match("|^[a-z]:$|i",$sParentFoldre) )
+					{
+						// 放回去
+						array_push($arrFoldersStack,$sFolderName) ;
+					}
+		
+					continue ;
+				}
+		
+				array_push($arrFoldersStack,$sFolderName) ;
+			}
+		
+			$sPath = implode('/', $arrFoldersStack) ;
+		}
+		
+		return $sPath ;
+	}
+	
+	/**
+	 * 格式化路径，清理路径中重复的斜线，删除路径末尾的 / ,补充路径开头的 /
+	 */
+	static public function formatPath(& $sPath,$bAbs=true)
+	{
+		if(!$sPath)
+		{
+			return '' ;
+		}
+		
+		// 统一、合并斜线
+		$sPath = preg_replace('|[/\\\\]+|', '/', $sPath) ;
+	
+		// 补充开头的 /
+		if( $bAbs and substr($sPath,0,1)!='/' ) 
+		{
+			$sPath = '/'.$sPath ;
+		}
+		
+		// 清理末尾的斜线
+		if( substr($sPath,-1)!='/' ) 
+		{
+			$sPath = substr($sPath,0,-1) ;
+		}
+		
+		return $sPath ;
+	}
+	
+	/**
+	 * Enter description here ...
+	 *
+	 * @return bool
+	 */
+	public function canRead()
+	{
+		return is_readable($this->sPath) ;
+	}
+	
+	/**
+	 * Enter description here ...
+	 *
+	 * @return bool
+	 */
+	public function canWrite()
+	{
+		return is_writeable($this->sPath) ;
+	}
+	
+	/**
+	 * Enter description here ...
+	 *
+	 * @return bool
+	 */
+	public function canExecute()
+	{
+		return is_executable($this->sPath) ;
+	}
+	
+	/**
+	 * Enter description here ...
+	 *
+	 * @return int
+	 */
+	public function perms()
+	{
+		return fileperms($this->sPath) ;
+	}
+	
+	/**
+	 * Enter description here ...
+	 *
+	 * @return bool
+	 */
+	public function setPerms($nMode)
+	{
+		$nOldMark = umask(0) ;
+		$bRes = chmod($this->sPath,$nMode) ;
+		umask($nOldMark) ;
+	
+		return $bRes ;
+	}
+	
+	public function createTime()
+	{
+		return filectime($this->sPath) ;
+	}
+	
+	public function modifyTime()
+	{
+		return filemtime($this->sPath) ;
+	}
+	
+	public function accessTime()
+	{
+		return fileatime($this->sPath) ;
+	}
+	
+	public function isHidden()
+	{
+		return false ;
+	}
+	
+	/**
+	 * 返回能够通过http访问该文件对象的url——如果该文将对象可以在http上被访问的话
 	 */
 	public function httpUrl()
 	{
-		if($this->sHttpUrl)
-		{
-			return $this->sHttpUrl ;
-		}
-		
-		if( !$aDir=$this->directory() )
-		{
-			return null ;
-		}
-		
-		if( !$sDirHttpUrl = $aDir->httpUrl() )
-		{
-			return null ;
-		}
-		
-		if( !$sName = $this->name() )
-		{
-			return $sDirHttpUrl ;
-		}
-		else 
-		{
-			if(substr($sDirHttpUrl,strlen($sDirHttpUrl)-1,1)!='/')
-			{
-				$sDirHttpUrl.= '/' ;
-			}
-			return $sDirHttpUrl. $sName ;
-		}
+		return $this->sHttpUrl ;
 	}
 	
 	public function setHttpUrl($sHttpUrl)
@@ -163,82 +278,11 @@ abstract class FSO extends Object implements IFSO
 		$this->sHttpUrl = $sHttpUrl ;
 	}
 	
-	/**
-	 * 将当前FSO对象拷贝到$to的位置。
-	 * 如果目标位置已存在，则会抛出异常'复制目标已存在，无法复制'。
-	 * @param $to 复制目标。可以是一个实际文件不存在的FSO对象，或者是一个字符串，表示复制目标的虚拟文件系统路径。
-	 * @return 如果复制成功，返回一个FSO对象，表示复制的目标；如果复制失败，返回null。
-	 */
-	public function copy($to)
-	{
-		if ( ( is_string($to) and $this->fileSystem()->rootFileSystem()->exists($to) ) 
-				or ( ( $to instanceof IFile or $to instanceof IFolder) and $to->exists() ) ){
-			throw new \org\jecat\framework\lang\Exception('复制目标已存在，无法复制');
-		}
-		if ( is_string($to) ){
-			if( $this instanceof IFile ){
-				$to = $this->fileSystem()->rootFileSystem()->createFile($to) ;
-			}else if( $this instanceof IFolder ){
-				$to = $this->fileSystem()->rootFileSystem()->createFolder($to) ;
-			}else{
-				throw new \org\jecat\framework\lang\Exception('this即不是IFile也不是IFolder');
-			}
-		}
-		if( $this instanceof IFile ){
-			if ( $to instanceof IFile ){
-				$aSrcReader = $this->openReader();
-				$aToWriter = $to->openWriter();
-				$iBlockSize = 8*1024;
-				while( !$aSrcReader -> isEnd() ){
-					$str = $aSrcReader->read($iBlockSize);
-					$aToWriter -> write( $str );
-				}
-				return $to;
-			}else{
-				throw new \org\jecat\framework\lang\Exception('this是IFile而to不是IFile，无法将一个文件复制成其它类型');
-			}
-		}else if ( $this instanceof IFolder ){
-			if( $to instanceof IFolder ){
-				throw new \org\jecat\framework\lang\Exception('暂时还没实现将一个目录递归复制到另一个位置');
-			}else{
-				throw new \org\jecat\framework\lang\Exception('this是IFolder而to不是IFolder，无法将一个目录复制成其它类型');
-			}
-		}else{
-				throw new \org\jecat\framework\lang\Exception('this即不是IFile也不是IFolder');
-		}
-	}
+	private $sPath ;
 	
-	/**
-	 * 将当前FSO对象移动到$to的位置。
-	 * 如果目标位置已存在，则会抛出异常'复制目标已存在，无法复制'。
-	 * @param $to 移动目标。可以是一个实际文件不存在的FSO对象，或者是一个字符串，表示移动目标的虚拟文件系统路径。
-	 * @return 如果移动成功，返回一个FSO对象，表示移动的目标；如果移动失败，返回null。
-	 */
-	public function move($to){
-		$ret = copy($to);
-		$this->delete();
-		return $ret;
-	}
-	
-	
-	public function property($sName)
-	{
-		return ($this->arrProperties and isset($this->arrProperties[$sName]))? $this->arrProperties[$sName]: null ; 
-	}
-	
-	public function setProperty($sName,$value)
-	{
-		$this->arrProperties[$sName] = $value ;
-	}
-	
-	private $sInnerPath = "" ;
-	private $aFileSystem ;
-	private $sName = "" ;
-	private $sTitle = "" ;
-	private $sExtname = "" ;
+	private $bCaseSensitive = true ;
 	
 	private $sHttpUrl ;
 	
-	private $arrProperties ;
 }
 ?>

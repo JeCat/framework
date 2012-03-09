@@ -1,7 +1,7 @@
 <?php
 namespace org\jecat\framework\fs\imp ;
 
-use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\fs\Folder;
 
 class UploadFile extends LocalFile
 {
@@ -57,7 +57,7 @@ class UploadFile extends LocalFile
 		return self::$arrErrorMessage[$this->nError] ;
 	}
 	/**
-	 * @return org\jecat\framework\fs\IFile
+	 * @return org\jecat\framework\fs\File
 	 */
 	public function file()
 	{

@@ -2,7 +2,7 @@
 namespace org\jecat\framework\lang\oop ;
 
 use org\jecat\framework\system\Application;
-use org\jecat\framework\fs\IFile;
+use org\jecat\framework\fs\File;
 use org\jecat\framework\lang\Object;
 use org\jecat\framework\lang\compile\ClassCompileException;
 use org\jecat\framework\io\OutputStream;
@@ -87,7 +87,7 @@ class ClassLoader extends Object implements \Serializable
 		try{
 			if( $aClassFile=$this->searchClass($sClassName) )
 			{
-				$this->arrClassPathCache[$sClassName] = $aClassFile->url() ;
+				$this->arrClassPathCache[$sClassName] = $aClassFile->path() ;
 				
 				$aClassFile->includeFile(false,true) ;
 			}
@@ -97,7 +97,7 @@ class ClassLoader extends Object implements \Serializable
 			echo $e->message(). " <br />\r\n" ;
 			if( $aClassSource=$e->classSouce() )
 			{
-				echo "class source file :" . $aClassSource->url(). " <br />\r\n" ;
+				echo "class source file :" . $aClassSource->path(). " <br />\r\n" ;
 			}
 			if( $aToken=$e->causeToken() )
 			{
