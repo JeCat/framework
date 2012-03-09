@@ -107,13 +107,9 @@ class Compiler extends JcObject
 	public function interpret(TokenPool $aTokenPool)
 	{		
 		// 解析
-		foreach($this->arrInterpreters as $interpreter)
+		foreach($this->arrInterpreters as $name=>$v)
 		{
-			if( is_string($interpreter) )
-			{
-				$interpreter = $this->interpreter($interpreter) ;
-			}
-			
+			$interpreter = $this->interpreter($name) ;
 			$interpreter->analyze($aTokenPool) ;
 		}
 		
@@ -144,17 +140,27 @@ class Compiler extends JcObject
 	
 	public function registerInterpreter($sInterpreterClass)
 	{
-		if( !in_array($sInterpreterClass,$this->arrInterpreters) )
-		{
-			$this->arrInterpreters[] = $sInterpreterClass ;
+		if( is_string( $sInterpreterClass ) ){
+			if( !isset($this->arrInterpreters[$sInterpreterClass] ) )
+			{
+				$this->arrInterpreters[$sInterpreterClass] = null ;
+			}
+		}else if(is_object( $sInterpreterClass ) ) {
+			$aObject = $sInterpreterClass ;
+			$sInterpreterClass = get_class($aObject);
+			
+			if( !isset($this->arrInterpreters[$sInterpreterClass] ) )
+			{
+				$this->arrInterpreters[$sInterpreterClass] = $aObject ;
+			}
 		}
 	}
 
 	public function unregisterInterpreter($sInterpreterClass)
 	{
-		if( $nIdx=array_search($sInterpreterClass,$this->arrInterpreters) )
+		if( isset($this->arrInterpreters[$sInterpreterClass] ) )
 		{
-			unset($this->arrInterpreters[$nIdx]) ;
+			unset($this->arrInterpreters[$sInterpreterClass]);
 		}
 	}
 	
