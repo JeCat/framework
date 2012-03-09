@@ -32,8 +32,8 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		// 反射父类的所有方法
 		$arrParentMethodNames = array() ;
 		$aRefParentClass = null ;
-		if( $sParentClass = $aObject->parentClassName() )
-		{
+		if( $aObject->isClass() ){
+			foreach( $aObject->parentClassNameIterator() as $sParentClass){
 			if( !class_exists($sParentClass) )	// << 这里可能会触发对父类的编译
 			{
 				throw new ClassCompileException(null,$aObject,"编译class时遇到错误，class %s 的父类 %s 不存在 ",array($sTargetClassName,$sParentClass)) ;
@@ -46,7 +46,7 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 					$arrParentMethodNames[$aRefParentMethod->getName()] = $aRefParentMethod ;
 				}
 			}
-		}
+		}}
 		
 		// 需要编入的方法
 		$arrNeedWeaveMethods = array() ;

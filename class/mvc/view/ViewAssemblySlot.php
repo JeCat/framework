@@ -2,7 +2,6 @@
 namespace org\jecat\framework\mvc\view ;
 
 use org\jecat\framework\io\IOutputStream;
-
 use org\jecat\framework\io\IRedirectableStream;
 use org\jecat\framework\io\OutputStreamBuffer;
 
@@ -15,13 +14,17 @@ class ViewAssemblySlot extends OutputStreamBuffer implements \Serializable
 	const container_use_controller = 'controller' ;
 	const container_use_view = 'view' ;
 	
+	const layout_vertical = 'v' ;
+	const layout_horizontal = 'h' ;
+	// const layout_tab = 'tab' ;
+	
 	static private $arrModeName = array(
 			'soft' => self::soft ,
 			'hard' => self::hard ,
 			'xhard' => self::xhard ,
 	) ;
 			
-	public function __construct($priority=self::soft,array $arrXPaths=null,$nContainerFor=self::container_use_controller)
+	public function __construct($priority=self::soft,array $arrXPaths=null,$sLayout=self::layout_vertical,$sContainerFor=self::container_use_controller)
 	{
 		if( isset(self::$arrModeName[$priority]) )
 		{
@@ -33,7 +36,7 @@ class ViewAssemblySlot extends OutputStreamBuffer implements \Serializable
 		}
 		
 		$this->arrXPaths = $arrXPaths ;
-		$this->nContainerFor = $nContainerFor ;
+		$this->sContainerFor = $sContainerFor ;
 	}
 	
 	/**
@@ -61,7 +64,7 @@ class ViewAssemblySlot extends OutputStreamBuffer implements \Serializable
 	{
 		if($this->arrXPaths)
 		{
-			if( $this->nContainerFor==self::container_use_controller )
+			if( $this->sContainerFor==self::container_use_controller )
 			{
 				// 视图还没有添加给控制器
 				if( !$aView->controller() )
@@ -70,13 +73,13 @@ class ViewAssemblySlot extends OutputStreamBuffer implements \Serializable
 				}
 				$aViewContainer = $aView->controller()->mainView() ;
 			}
-			else if( $this->nContainerFor==self::container_use_view )
+			else if( $this->sContainerFor==self::container_use_view )
 			{
 				$aViewContainer = $aView ;
 			}
 			else
 			{
-				$this->write("<view>标签遇到无效的container类型：".$this->nContainerFor) ;
+				$this->write("<view>标签遇到无效的container类型：".$this->sContainerFor) ;
 				return ;
 			}
 			
@@ -124,9 +127,69 @@ class ViewAssemblySlot extends OutputStreamBuffer implements \Serializable
 		}		
 	}
 	
+	public function write($content,$nLen=null,$bFlush=false)
+	{
+		if( $content instanceof OutputStreamBuffer
+				and $aProperties=$content->properties(true)
+				and $aView=$aProperties->get('_view')
+				and $aView instanceof IView )
+		{
+			$this->arrBuffer[ $aView->id() ] = $content ;
+		}
+		else
+		{
+			return parent::write($content,$nLen,$bFlush) ;
+		}
+	}
+	
+	public function bufferBytes($bClear=true)
+	{
+		$sBytes = '' ;
+	
+		if(!empty($this->arrBuffer))
+		{
+			$sBytes.= '<div class="jc-view-layout-frame">' ;
+		
+			foreach ($this->arrBuffer as $sViewId=>$contents)
+			{
+				if($contents instanceof OutputStreamBuffer)
+				{
+					// id
+					$sViewId = 'layout-item-' . $sViewId ;
+					// class/style
+					$sClass = ($contents instanceof self)? 'jc-view-layout-frame': 'jc-view-layout-item' ;
+					$sStyle = $this->sLayout==self::layout_horizontal? " style='float:left;'": null ;
+					
+					$sBytes.= "<div id='{$sViewId}' class='{$sClass}'{$sStyle}>" ;
+					$sBytes.= strval($contents) ;
+					$sBytes.= '</div>' ;
+				}
+				
+				else
+				{
+					$sBytes.= strval($contents) ;
+				}
+			}
+			
+			$sBytes.= '<div class="jc-view-layout-end-item"></div></div>' ;
+		}
+	
+		if($bClear)
+		{
+			$this->clear() ;
+		}
+	
+		return $sBytes ;
+	}
+	
 	public function priority()
 	{
 		return $this->nPriority ;
+	}
+	
+	public function layout()
+	{
+		return $this->sLayout ;
 	}
 	
 	public function serialize()
@@ -146,8 +209,10 @@ class ViewAssemblySlot extends OutputStreamBuffer implements \Serializable
 	
 	private $arrXPaths ;
 	
-	private $nContainerFor ;
+	private $sContainerFor ;
 	
 	private $nPriority = 0 ;
+	
+	private $sLayout ;	
 	
 }
