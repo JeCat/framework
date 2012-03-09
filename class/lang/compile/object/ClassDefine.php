@@ -25,13 +25,24 @@ class ClassDefine extends StructDefine
 		}
 	}
 	
-	public function setParentClassName($sParentClassName)
-	{
-		$this->sParentClassName = $sParentClassName ;
+	public function addParentClassName($sName){
+		$this->arrParentClassNameList [] = $sName ;
 	}
-	public function parentClassName()
-	{
-		return $this->sParentClassName ;
+	public function parentClassNameIterator(){
+		return
+			new \org\jecat\framework\pattern\iterate\ArrayIterator(
+				$this->arrParentClassNameList
+			);
+	}
+	
+	public function addImplementsInterfaceName($sName){
+		$this->arrImplementsInterfaceNameList [] = $sName ;
+	}
+	public function implementsInterfaceNameIterator(){
+		return
+			new \org\jecat\framework\pattern\iterate\ArrayIterator(
+				$this->arrImplementsInterfaceNameList
+			);
 	}
 	
 	public function isAbstract(){
@@ -39,10 +50,18 @@ class ClassDefine extends StructDefine
 	}
 	public function setAbstract($bAbstract){
 		$this->bAbstract = $bAbstract ;
-	} 
+	}
+	
+	public function isInterface(){
+		return $this->tokenType() === T_INTERFACE ;
+	}
+	public function isClass(){
+		return $this->tokenType() === T_CLASS ;
+	}
 	
 	private $aTokenName ;
-	private $sParentClassName ;
+	private $arrParentClassNameList=array() ;
+	private $arrImplementsInterfaceNameList=array() ;
 	private $aTokenBody ;
 	private $bAbstract = false ;
 }
