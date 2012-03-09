@@ -42,7 +42,11 @@ class MenuCompiler extends WidgetCompiler
 				if( $aItemAttrs->has('id') ){
 					$sItemId = $aItemAttrs->string('id');
 					
-					$aAttrValue = AttributeValue::createInstance ('instance' , " \$aStack->get()->getMenuByPath( '$sItemId' ) ");
+					if( $aChild->tagName() === 'menu'){
+						$aAttrValue = AttributeValue::createInstance ('instance' , " \$aStack->get()->getMenuByPath( '$sItemId' ) ");
+					}else{
+						$aAttrValue = AttributeValue::createInstance ('instance' , " \$aStack->get()->getItemByPath( '$sItemId' ) ");
+					}
 					$aItemAttrs->add($aAttrValue);
 					$aAttrValue->setParent($aObjectContainer) ;
 					
