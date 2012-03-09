@@ -160,11 +160,7 @@ class Model extends AbstractModel implements IModel, IBean
 			$this , null , self::buildCriteria($this->prototype(),$values,$keys), $this->isList(), $this->db()
 		) ;
 	}
-<<<<<<< HEAD
-	
-=======
-	
->>>>>>> 405e0f93193f080ed40ad689694a74c0adde8929
+
 	/**
  	 * @wiki /MVC模式/数据库模型/模型的基本操作(新建、保存、删除、加载)
 	 *  ==模型的保存(save)==
