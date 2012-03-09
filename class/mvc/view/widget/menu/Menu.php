@@ -141,6 +141,26 @@ class Menu extends AbstractBase
 		return null;
 	}
 	
+	public function getItemByPath($arrPath){
+		if(is_string($arrPath)){
+			$arrPath = explode('/',$arrPath);
+		}
+		
+		$id = array_shift($arrPath);
+		foreach($this->itemIterator() as $item){
+			if($id === $item->id()){
+				if( empty( $arrPath) ){
+					return $item ;
+				}else if($item->subMenu() === null){
+					return null;
+				}else{
+					return $item->subMenu()->getItemByPath($arrPath);
+				}
+			}
+		}
+		return null;
+	}
+	
 	public function getFirstItemByTitle($sTitle){
 		foreach($this->itemIterator() as $aItem){
 			if($aItem->title() === $sTitle){

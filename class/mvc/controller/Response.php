@@ -2,7 +2,6 @@
 namespace org\jecat\framework\mvc\controller ;
 
 use org\jecat\framework\mvc\view\View;
-
 use org\jecat\framework\mvc\view\ViewAssemblySlot;
 use org\jecat\framework\system\ApplicationFactory;
 use org\jecat\framework\pattern\composite\IContainer;
@@ -173,10 +172,24 @@ class Response extends Object
 		{
 			$this->printer()->write( '<hr /><h3>数据库执行记录：</h3>' ) ;
 			
-			foreach(DB::singleton()->executeLog(false) as $arrLog)
+			// 按执行时间排序
+			$arrLogs = DB::singleton()->executeLog(false) ;
+			usort($arrLogs,function($a,$b){
+				if($a['time']==$b['time'])
+				{
+					return 0 ; 
+				}
+				return $a['time']<$b['time'] ? -1: 1 ;
+			}) ;
+			
+			$fTotal = 0 ;
+			foreach($arrLogs as $arrLog)
 			{
+				$fTotal += $arrLog['time'] ;
 				$this->printer()->write( "<div style='padding-top:10px'>[耗时:{$arrLog['time']}] <pre>{$arrLog['sql']}</pre></div>" ) ;
 			}
+			$this->printer()->write( "\r\n<br />DB总计时间：{$fTotal}\r\n<hr />" ) ;
+			
 		}
 		
 		// 打印模型结构
@@ -191,7 +204,7 @@ class Response extends Object
 				foreach($aController->modelNameIterator() as $sModelName)
 				{
 					$this->printer()->write( '<hr /><h3>控制器'.$aController->name().'的模型数据结构：</h3>' ) ;
-					$this->printDebugModelStruct($this,$sModelName) ;
+					$this->printDebugModelStruct($aController,$sModelName) ;
 				}
 				
 				// 子控制器的模型
@@ -207,12 +220,12 @@ class Response extends Object
 			else
 			{
 				$this->printer()->write( '<hr /><h3>控制器'.$aController->name().'的模型数据结构：</h3>' ) ;
-				$this->printDebugModelStruct($this,$sModelName) ;
+				$this->printDebugModelStruct($aController,$sModelName) ;
 			}
 		}
 	}
 	
-	private function printDebugModelStruct(IContainer $aController,$sModelName)
+	private function printDebugModelStruct(IController $aController,$sModelName)
 	{
 		$this->printer()->write( "<div style='padding-top:10px'><h4>[模型：{$sModelName}]</h4>" ) ;
 		if( $aModel=$aController->modelByName($sModelName) )

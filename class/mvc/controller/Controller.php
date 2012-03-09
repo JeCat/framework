@@ -420,7 +420,7 @@ class Controller extends NamableComposite implements IController, IBean
     {
     	if( !$this->aMainView )
     	{
-    		$this->setMainView( new View('mainView-'.$this->name(),null) ) ;
+    		$this->setMainView( new TransparentViewContainer('mainView-'.$this->name(),null) ) ;
     	}
 
     	return $this->aMainView ;
@@ -1038,3 +1038,4 @@ class Controller extends NamableComposite implements IController, IBean
 
 class _ExceptionRelocation extends \Exception
 {}
+

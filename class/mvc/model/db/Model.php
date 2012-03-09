@@ -148,6 +148,9 @@ class Model extends AbstractModel implements IModel, IBean
 	
 	public function load($values=null,$keys=null)
 	{
+		// load 前 清理数据
+		$this->clearData() ;
+		
 		if($this->isList())
 		{
 			$this->nTotalCount = -1 ;
@@ -157,7 +160,11 @@ class Model extends AbstractModel implements IModel, IBean
 			$this , null , self::buildCriteria($this->prototype(),$values,$keys), $this->isList(), $this->db()
 		) ;
 	}
+<<<<<<< HEAD
 	
+=======
+	
+>>>>>>> 405e0f93193f080ed40ad689694a74c0adde8929
 	/**
  	 * @wiki /MVC模式/数据库模型/模型的基本操作(新建、保存、删除、加载)
 	 *  ==模型的保存(save)==
@@ -173,7 +180,7 @@ class Model extends AbstractModel implements IModel, IBean
 		{
 			foreach($this->childIterator() as $aChildModel)
 			{
-				if( !$aChildModel->save() )
+				if( !$aChildModel->save($bForceCreate) )
 				{
 					return false ;
 				}
@@ -232,6 +239,22 @@ class Model extends AbstractModel implements IModel, IBean
 		{
 			return Deleter::singleton()->execute($this->db(), $this) ;
 		}
+	}
+	
+	/**
+	 * @return org\jecat\framework\db\sql\Criteria
+	 */
+	public function createCriteria(Restriction $aRestriction=null)
+	{
+		return $this->prototype()->statementFactory()->createCriteria($aRestriction) ;
+	}
+	
+	/**
+	 * @return org\jecat\framework\db\sql\Restriction
+	 */
+	public function createWhere($bLogic=true)
+	{
+		return $this->prototype()->statementFactory()->createRestriction($bLogic) ;
 	}
 	
 	static public function buildCriteria(Prototype $aPrototype,$values=null,$keys=null)

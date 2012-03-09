@@ -321,6 +321,7 @@ class View extends NamableComposite implements IView, IBean
 		if(!$this->aOutputStream and $bAutoCreate)
 		{
 			$this->aOutputStream = new OutputStreamBuffer() ;
+			$this->aOutputStream->properties(true)->set('_view',$this) ;
 		}
 		
 		return $this->aOutputStream ;
@@ -712,4 +713,3 @@ class View extends NamableComposite implements IView, IBean
     static private $nAssignedId = 0 ;
 }
 
-?>

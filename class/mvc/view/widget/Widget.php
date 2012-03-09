@@ -186,6 +186,7 @@ class Widget extends Object implements IViewWidget, IBean
 
 		$oldWidget=$aVariables->get('theWidget');
 		$aVariables->set('theWidget',$this);
+		$aVariables->set('theUI',$aUI);
 		
 		if($sTemplateName){
 			$aUI->display($sTemplateName,$aVariables,$aDevice) ;

@@ -192,7 +192,8 @@ class UI extends JcObject
 		{
 			$aVariables->set('theRequest',Request::singleton()) ;
 		}
-		$aVariables->set('theDevice',$aDevice) ;		
+		$aVariables->set('theDevice',$aDevice) ;
+		$aVariables->set('theUI',$this);
 		
 		include $aCompiledFile->url()  ;
 	}

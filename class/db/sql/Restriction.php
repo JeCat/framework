@@ -318,6 +318,30 @@ class Restriction extends SubStatement
 	}
 	
 	/**
+	 * 添加一个条件语句,判断指定字段的值是否和期望值相反
+	 * @param string $sClmName 需检验的字段名
+	 * @param mix $value 期望值
+	 * @return self 
+	 */
+	public function notLike($sClmName, $value)
+	{
+		$this->arrExpressions[] = array("%s NOT LIKE ".$this->transValue($value),$sClmName) ;
+		return $this;
+	}
+	
+	/**
+	 * 添加一个条件语句,判断指定字段的值是否符合正则
+	 * @param string $sClmName 需检验的字段名
+	 * @param mix $value 正则
+	 * @return self 
+	 */
+	public function regexp($sClmName, $value)
+	{
+		$this->arrExpressions[] = array("%s REGEXP ".$this->transValue($value),$sClmName) ;
+		return $this;
+	}
+	
+	/**
 	 * 添加一个条件语句,判断指定字段的值是否和指定数组中的某个元素的值相等 
 	 * @param string $sClmName 需要检验的字段名
 	 * @param array $arrValues 比照数组
@@ -330,6 +354,22 @@ class Restriction extends SubStatement
 			$v = $this->transValue($v);
 		}
 		$this->arrExpressions[] = array("%s IN (".implode(",",$arrValues).")",$sClmName) ;
+		return $this;
+	}
+	
+	/**
+	 * 添加一个条件语句,判断指定字段的值是否和指定数组中的某个元素的值相反 
+	 * @param string $sClmName 需要检验的字段名
+	 * @param array $arrValues 比照数组
+	 * @return self 
+	 */
+	public function notIn($sClmName, array $arrValues )
+	{
+		foreach($arrValues as $v)
+		{
+			$v = $this->transValue($v);
+		}
+		$this->arrExpressions[] = array("%s NOT IN (".implode(",",$arrValues).")",$sClmName) ;
 		return $this;
 	}
 	
