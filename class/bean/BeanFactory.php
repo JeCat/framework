@@ -290,11 +290,11 @@ class BeanFactory extends Object implements \Serializable
 		{
 			foreach($arrFolderPaths as $sPath)
 			{
-				if(!$aFolder=Folder::singleton()->findFolder($sPath))
+				if(!is_dir($sPath))
 				{
 					throw new BeanConfException("恢复BeanFactory时无法找到Bean目录:%s; 只有挂载到系统目录下的目录才能正确序列/反序列化") ;
 				}
-				$this->beanFolders()->addFolder( $aFolder, $sNamespace ) ;
+				$this->beanFolders()->addFolder( new Folder($sPath), $sNamespace ) ;
 			}
 		}
 	}

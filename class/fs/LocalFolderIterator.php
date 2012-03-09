@@ -10,9 +10,9 @@ class LocalFolderIterator extends FSIterator{
 			throw new Exception('unfinished flag : RECURSIVE_BREADTH_FIRST');
 		}
 		if( $nFlags & self::RECURSIVE_SEARCH ){
-			$this->aIterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($aFolder->localPath()),\RecursiveIteratorIterator::SELF_FIRST) ;
+			$this->aIterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($aFolder->path()),\RecursiveIteratorIterator::SELF_FIRST) ;
 		}else{
-			$this->aIterator = new \DirectoryIterator($aFolder->localPath());
+			$this->aIterator = new \DirectoryIterator($aFolder->path());
 		}
 	}
 	
@@ -22,7 +22,7 @@ class LocalFolderIterator extends FSIterator{
 		}else{
 			$sAbsolutePath = $this->aIterator->getPathname();
 		}
-		$sRelativePath = FileSystem::relativePath($this->aParentFolder->localPath(),$sAbsolutePath);
+		$sRelativePath = FSO::relativePath($this->aParentFolder->path(),$sAbsolutePath);
 		if( $this->nFlags & self::RETURN_FSO ){
 			if($this->aIterator->isDir()){
 				return $this->aParentFolder->findFolder($sRelativePath) ;

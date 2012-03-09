@@ -23,17 +23,16 @@ class Package implements \Serializable
 		// $this->addClassFilenameWrapper(function ($sClassName){ return "class.{$sClassName}.php" ; }) ;
 	}
 	
-	public function findFolder($sPath,$bAutoCreate=false)
+	static public function findFolder($sPath,$bAutoCreate=false)
 	{
-		$aFs = Folder::singleton() ;
-		if( !$aSourceFolder=$aFs->findFolder($sPath,$bAutoCreate?Folder::FIND_AUTO_CREATE:0) )
+		if( !is_dir($sPath) and !$bAutoCreate )
 		{
 			throw new Exception(
 					"注册 class package 时，提供的class源文件目录不存在：%s"
 					, array($sPath)
 			) ;
 		}
-		return $aSourceFolder ;
+		return new Folder($sPath) ;
 	}
 
 	/**
@@ -203,8 +202,8 @@ class Package implements \Serializable
 	{
 		$arrData = array(
 				'sNamespace' => &$this->sNamespace ,
-				'nNamespaceLen' => &$this->nNamespaceLen ,
-				'sFolderPath' => $this->aFolder? $this->aFolder->path(): null ,
+				// 'nNamespaceLen' => &$this->nNamespaceLen ,
+				'aFolder' => $this->aFolder ,
 		) ;
 		return serialize($arrData) ;
 	}
@@ -213,7 +212,7 @@ class Package implements \Serializable
 	{
 		$arrData = unserialize($serialized) ;
 		
-		$this->__construct($arrData['sNamespace'],$arrData['sFolderPath']? self::findFolder($arrData['sFolderPath']): null) ;
+		$this->__construct($arrData['sNamespace'],$arrData['aFolder']) ;
 	}
 	
 	private $sNamespace ;

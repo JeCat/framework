@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\resrc ;
 
+use org\jecat\framework\fs\File;
+
 use org\jecat\framework\fs\Folder;
 use org\jecat\framework\lang\Object;
 
@@ -43,6 +45,20 @@ class ResourceManager extends Object implements \Serializable
 	 */
 	public function find($sFilename,$sNamespace='*')
 	{
+		list($aFolder,$sFilename)=$this->findEx($sFilename,$sNamespace) ;
+		if( !$sFilename )
+		{
+			return null ;
+		}
+		
+		return new File($aFolder->path().'/'.$sFilename) ;
+	}
+	
+	/**
+	 * @return array(org\jecat\framework\fs\Folder,string)
+	 */
+	public function findEx($sFilename,$sNamespace='*')
+	{
 		if( strstr($sFilename,':')!==false )
 		{
 			list($sNamespace,$sFilename) = explode(':', $sFilename, 2) ;
@@ -50,33 +66,33 @@ class ResourceManager extends Object implements \Serializable
 		
 		if( empty($this->arrFolders[$sNamespace]) )
 		{
-			return ;
+			return array(null,null) ;
 		}
 		
 		foreach($this->arrFolders[$sNamespace] as $aFolder)
 		{
 			if( empty($this->arrFilenameWrappers) )
 			{
-				if( $aFile=$aFolder->findFile($sFilename) )
+				if( is_file($aFolder->path().'/'.$sFilename) )
 				{
-					return $aFile ;
+					return array($aFolder,$sFilename) ;
 				}
 			}
-			else 
+			else
 			{
 				foreach ($this->arrFilenameWrappers as $funcFilenameWrapper)
 				{
 					$sWrapedFilename = call_user_func_array($funcFilenameWrapper, array($sFilename)) ;
 					
-					if( $aFile=$aFolder->findFile($sFilename) )
+					if( is_file($aFolder->path().'/'.$sWrapedFilename) )
 					{
-						return $aFile ;
+						return array($aFolder,$sWrapedFilename) ;
 					}
 				}
 			}
 		}
 		
-		return null ;
+		return array(null,null) ;
 	}
 
 	public function addFilenameWrapper($func)
@@ -113,36 +129,13 @@ class ResourceManager extends Object implements \Serializable
 
 	public function serialize()
 	{
-		$arrData = array(
-			'arrFolders' => array() ,
-		) ;
-		
-		foreach($this->arrFolders as $sNamespace=>&$arrFolders)
-		{
-			foreach($arrFolders as $aFolder)
-			{
-				$arrData['arrFolders'][$sNamespace][] =& $aFolder->path() ;
-			}
-		}
-		
-		return serialize($arrData) ;
+		return serialize($this->arrFolders) ;
 	}
 	
 	public function unserialize($serialized)
 	{
 		$this->__construct() ;
-	
-		$aFileSystem = Folder::singleton() ;
-		$arrData = unserialize($serialized) ;
-		foreach($arrData['arrFolders'] as $sNamespace=>&$arrFolders)
-		{
-			krsort($arrFolders) ; // <-- 颠倒序列化时的目录顺序
-	
-			foreach($arrFolders as &$sPath)
-			{
-				$this->addFolder( $aFileSystem->findFolder($sPath), $sNamespace ) ;
-			}
-		}
+		$this->arrFolders = unserialize($serialized) ;
 	}
 
 	public function folderNamespacesIterator()

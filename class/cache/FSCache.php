@@ -13,8 +13,6 @@ class FSCache implements ICache
 	
 	function item($sDataPath)
 	{
-		self::trimPath($sDataPath) ;
-		
 		// 尝试 .php
 		if( $aFile = $this->aFolder->findFile($sDataPath.'.php') )
 		{
@@ -31,8 +29,6 @@ class FSCache implements ICache
 	
 	function setItem($sDataPath,$data,$fCreateTimeMicroSec=-1)
 	{
-		self::trimPath($sDataPath) ;
-		
 		if( is_object($data) )
 		{
 			if( !$aFile=$this->aFolder->findFile($sDataPath.'.data',Folder::FIND_AUTO_CREATE) )
@@ -74,8 +70,6 @@ class FSCache implements ICache
 	 */
 	function delete($sDataPath)
 	{
-		self::trimPath($sDataPath) ;
-
 		// 所有
 		if( empty($sDataPath) )
 		{
@@ -112,8 +106,6 @@ class FSCache implements ICache
 	 */
 	function createTime($sDataPath)
 	{
-		self::trimPath($sDataPath) ;
-		
 		if( !$aFile = $this->aFolder->findFile($sDataPath.'.time') )
 		{
 			return 0 ;
@@ -122,10 +114,6 @@ class FSCache implements ICache
 		return (float)$aFile->includeFile(false,false) ;
 	}
 	
-	static public function trimPath(&$sPath)
-	{
-		$sPath = preg_replace('`^\\s*/+`','',$sPath) ;
-	}
 	
 	/**
 	 * @var org\jecat\framework\fs\FsFolder

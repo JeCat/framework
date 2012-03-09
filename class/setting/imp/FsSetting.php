@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\setting\imp;
 
+use org\jecat\framework\fs\FSO;
+
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\pattern\iterate\ReverseIterator;
 use org\jecat\framework\fs\FSIterator;
@@ -98,8 +100,8 @@ class FsSetting extends Setting implements \Serializable
 	}
 	
 	public function serialize ()
-	{		
-		return $this->aRootFolder->path() ;
+	{
+		return FSO::tidyPath($this->aRootFolder->path()) ;
 	}
 
 	/**
@@ -107,7 +109,7 @@ class FsSetting extends Setting implements \Serializable
 	 */
 	public function unserialize ($serialized)
 	{
-		$this->aRootFolder = Folder::singleton()->findFolder($serialized,Folder::FIND_AUTO_CREATE) ;
+		$this->aRootFolder = new Folder($serialized,Folder::FIND_AUTO_CREATE) ;
 	}
 	
 	/**

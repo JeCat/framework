@@ -3,7 +3,7 @@ namespace org\jecat\framework\fs ;
 
 use org\jecat\framework\lang\Object;
 
-abstract class FSO extends Object
+abstract class FSO extends Object implements \Serializable
 {
 	const file =	0100000 ;
 	const folder = 0200000 ;
@@ -104,11 +104,6 @@ abstract class FSO extends Object
 		return ($nDotIdx===false)? $sFilename: substr($sFilename,0,$nDotIdx) ;
 	}
 	
-	protected function fsoFlyweightKey($sPath)
-	{
-		return $this->isCaseSensitive()? strtolower($sPath): $sPath ;
-	}
-	
 	public function isCaseSensitive()
 	{
 		return $this->bCaseSensitive ;
@@ -183,7 +178,7 @@ abstract class FSO extends Object
 		}
 		
 		// 清理末尾的斜线
-		if( substr($sPath,-1)!='/' ) 
+		if( substr($sPath,-1)=='/' ) 
 		{
 			$sPath = substr($sPath,0,-1) ;
 		}
@@ -278,7 +273,73 @@ abstract class FSO extends Object
 		$this->sHttpUrl = $sHttpUrl ;
 	}
 	
+	/**
+	 * 计算两个路径之间的相对路径
+	 * in : FSO object or string
+	 * return : string
+	 */
+	static public function relativePath($sFromPath,$sToPath)
+	{
+		if($sFromPath instanceof IFSO){
+			$sFromPath = $sFromPath->path();
+		}
+		if($sToPath instanceof IFSO){
+			$sToPath = $sToPath->path();
+		}
+		// 大致算法就是:  根据‘/’把路径拆分放进数组，然后从第一个开始比较，相同的忽略掉，直到遇到不同的为止。
+		//拆分路径放进数组:
+		$arrFromPath = explode('/', $sFromPath);
+		$arrToPath = explode('/', $sToPath);
+	
+		//开始比对数组，存下不同的部分:
+		$remainFromPath = array_diff($arrFromPath, $arrToPath);
+		$remainToPath = array_diff($arrToPath, $arrFromPath);
+	
+		//算出$a路径的剩余深度
+		$count = count($remainFromPath);
+	
+		//算出$b剩余路径，再合并成路径形式:
+		$relative_ToPath = join('/', $remainToPath);
+	
+		$new = '';
+		//计算相对路径前缀
+		for($i = 0; $i < $count-1; $i++)
+		{
+			$new .= '../';
+		}
+		$_path = $new . $relative_ToPath;
+		return $_path;
+	}
+	
+	public function serialize()
+	{
+		$arrData = array(
+				'sPath' =>& $this->sPath ,
+				'sName' =>& $this->sName ,
+				'sTitle' =>& $this->sTitle ,
+				'sExtname' =>& $this->sExtname ,
+				'bCaseSensitive' =>& $this->bCaseSensitive ,
+				'sHttpUrl' =>& $this->sHttpUrl ,
+		) ;	
+		return serialize($arrData) ;
+	}
+	
+	public function unserialize($serialized)
+	{	
+		$arrData = unserialize($serialized) ;
+		
+		$this->sPath =& $arrData['sPath'] ;
+		$this->sName =& $arrData['sName'] ;
+		$this->sTitle =& $arrData['sTitle'] ;
+		$this->sExtname =& $arrData['sExtname'] ;
+		$this->bCaseSensitive =& $arrData['bCaseSensitive'] ;
+		$this->sHttpUrl =& $arrData['sHttpUrl'] ;
+	}
+	
 	private $sPath ;
+	private $sName ;
+	private $sTitle ;
+	private $sExtname ;
 	
 	private $bCaseSensitive = true ;
 	

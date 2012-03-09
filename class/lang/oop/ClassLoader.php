@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\lang\oop ;
 
+use org\jecat\framework\fs\Folder;
+
 use org\jecat\framework\system\Application;
 use org\jecat\framework\fs\File;
 use org\jecat\framework\lang\Object;
@@ -37,15 +39,19 @@ class ClassLoader extends Object implements \Serializable
 	/**
 	 * @return Package
 	 */
-	public function addPackage($sNamespace,$sSourceFolder=null) 
+	public function addPackage($sNamespace,$folder=null) 
 	{
 		if( $sNamespace instanceof Package )
 		{
 			$aPackage = $sNamespace ;
 		}
+		else if( $folder instanceof Folder )
+		{
+			$aPackage = new Package($sNamespace,$folder) ;
+		}
 		else
 		{
-			$aPackage = new Package($sNamespace,Package::findFolder($sSourceFolder)) ;
+			$aPackage = new Package($sNamespace,Package::findFolder($folder)) ;
 		}
 
 		$this->arrPackages[$aPackage->ns()] = $aPackage ;
@@ -87,7 +93,7 @@ class ClassLoader extends Object implements \Serializable
 		try{
 			if( $aClassFile=$this->searchClass($sClassName) )
 			{
-				$this->arrClassPathCache[$sClassName] = $aClassFile->path() ;
+				// $this->arrClassPathCache[$sClassName] = $aClassFile->path() ;
 				
 				$aClassFile->includeFile(false,true) ;
 			}
@@ -274,8 +280,7 @@ class ClassLoader extends Object implements \Serializable
 	public function serialize()
 	{
 		$arrData = array(
-			'arrPackages' => array() ,
-			'arrClassPathCache' => &$this->arrClassPathCache ,
+			//'arrClassPathCache' => &$this->arrClassPathCache ,
 			'arrPackages' => &$this->arrPackages ,
 		) ;
 		
@@ -287,7 +292,7 @@ class ClassLoader extends Object implements \Serializable
 		$this->__construct() ;
 		
 		$arrData = unserialize($serialized) ;
-		$this->arrClassPathCache =& $arrData['arrClassPathCache'] ;
+		//$this->arrClassPathCache =& $arrData['arrClassPathCache'] ;
 		$this->arrPackages =& $arrData['arrPackages'] ;
 	}
 	
@@ -322,4 +327,3 @@ class ClassLoader extends Object implements \Serializable
 	
 }
 
-?>

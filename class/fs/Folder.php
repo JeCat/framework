@@ -21,34 +21,29 @@ class Folder extends FSO
 		if( !($nFlag&FSO::CLEAN_PATH) )
 		{
 			$sPath = $this->path() . '/' . $sPath  ;
-			FSO::tidyPath($sPath,true) ;
+			// FSO::tidyPath($sPath,true) ;
 		}
 		
-		$sFlyweightKey = $this->fsoFlyweightKey($sPath) ;
-		if( !$aInstance=FSO::flyweight($sFlyweightKey,false) )
+		$nType = $nFlag&FSO::type ;
+		
+		// 是一个文件
+		if( is_file($sPath) and ($nType==self::unknow or $nType&self::file) )
 		{
-			$nType = $nFlag&FSO::type ;
-			
-			// 是一个文件
-			if( is_file($sPath) and ($nType==self::unknow or $nType&self::file) )
-			{
-				$aInstance = new File($sPath,self::CLEAN_PATH) ;
-			}
-
-			// 是一个目录
-			else if(is_dir($sPath) and ($nType==self::unknow or $nType&self::folder) )
-			{
-				$aInstance = new Folder($sPath,self::CLEAN_PATH) ;
-			}
-			
-			// 路径不存在 或 路径的类型和指定的不一致
-			else
-			{
-				return null;
-			}
-				
-			FSO::setFlyweight($aInstance,$sFlyweightKey) ;
+			$aInstance = new File($sPath,self::CLEAN_PATH) ;
 		}
+
+		// 是一个目录
+		else if(is_dir($sPath) and ($nType==self::unknow or $nType&self::folder) )
+		{
+			$aInstance = new Folder($sPath,self::CLEAN_PATH) ;
+		}
+		
+		// 路径不存在 或 路径的类型和指定的不一致
+		else
+		{
+			return null;
+		}
+				
 	
 		return $aInstance ;
 	}
@@ -61,7 +56,7 @@ class Folder extends FSO
 		if( !($nFlag&FSO::CLEAN_PATH) )
 		{
 			$sPath = $this->path() . '/' . $sPath  ;
-			FSO::tidyPath($sPath,true) ;
+			// FSO::tidyPath($sPath,true) ;
 		}
 		
 		$aFile =  $this->find($sPath,FSO::file|FSO::CLEAN_PATH) ;
@@ -88,7 +83,7 @@ class Folder extends FSO
 		if( !($nFlag&FSO::CLEAN_PATH) )
 		{
 			$sPath = $this->path() . '/' . $sPath  ;
-			FSO::tidyPath($sPath,true) ;
+			// FSO::tidyPath($sPath,true) ;
 		}
 		
 		$aFolder =  $this->find($sPath,FSO::folder|FSO::CLEAN_PATH) ;
@@ -125,65 +120,53 @@ class Folder extends FSO
 		if( !($nFlag&FSO::CLEAN_PATH) )
 		{
 			$sPath = $this->path() . '/' . $sPath  ;
-			FSO::tidyPath($sPath,true) ;
+			// FSO::tidyPath($sPath,true) ;
 		}
 		
-		$sFlyweightKey = $this->fsoFlyweightKey($sPath) ;
-		if( !$aFile=FSO::flyweight($sFlyweightKey,false) or ! $aFile instanceof File )
+		if( is_dir($sPath) )
 		{
-			if( is_dir($sPath) )
+			throw new Exception('试图创建File，但由于存在同名folder无法创建: %s',$sPath);
+		}
+		else
+		{
+			$aFile = new File($sPath,self::CLEAN_PATH) ;
+			
+			// 如果文件不存在，且没有要求 self::CREATE_ONLY_OBJECT ，则创建之
+			if( !($nFlag&self::CREATE_ONLY_OBJECT) and !$aFile->exists())
 			{
-				throw new Exception('试图创建File，但由于存在同名folder无法创建: %s',$sPath);
-			}
-			else
-			{
-				$aFile = new File($sPath,self::CLEAN_PATH) ;
-				
-				// 如果文件不存在，且没有要求 self::CREATE_ONLY_OBJECT ，则创建之
-				if( !($nFlag&self::CREATE_ONLY_OBJECT) and !$aFile->exists())
+				if( !$aFile->create( $nFlag ) )
 				{
-					if( !$aFile->create( $nFlag ) )
-					{
-						throw new Exception('无法创建文件:%s',$sPath) ;
-					}
+					throw new Exception('无法创建文件:%s',$sPath) ;
 				}
-				
-				FSO::setFlyweight($aFile,$this->fsoFlyweightKey($sPath)) ;
 			}
 		}
 		
 		return $aFile ;
 	}
 	
-	public function createChildFolder($sPath,$nMode=Folder::CREATE_FOLDER_DEFAULT)
+	public function createChildFolder($sPath,$nFlag=Folder::CREATE_FOLDER_DEFAULT)
 	{
 		if( !($nFlag&FSO::CLEAN_PATH) )
 		{
 			$sPath = $this->path() . '/' . $sPath  ;
-			FSO::tidyPath($sPath,true) ;
+			// FSO::tidyPath($sPath,true) ;
 		}
 		
-		$sFlyweightKey = $this->fsoFlyweightKey($sPath) ;
-		if( !$aFolder=FSO::flyweight($sFlyweightKey,false) or ! $aFolder instanceof File )
+		if( is_file($sPath) )
 		{
-			if( is_file($sPath) )
+			throw new Exception('试图创建folder，但由于存在同名file无法创建: %s',$sPath);
+		}
+		else
+		{
+			$aFolder = new Folder($sPath,self::CLEAN_PATH) ;
+			
+			// 如果文件不存在，且没有要求 self::CREATE_ONLY_OBJECT ，则创建之
+			if( !($nFlag&self::CREATE_ONLY_OBJECT) and !$aFolder->exists())
 			{
-				throw new Exception('试图创建folder，但由于存在同名file无法创建: %s',$sPath);
-			}
-			else
-			{
-				$aFolder = new Folder($sPath,self::CLEAN_PATH) ;
-				
-				// 如果文件不存在，且没有要求 self::CREATE_ONLY_OBJECT ，则创建之
-				if( !($nFlag&self::CREATE_ONLY_OBJECT) and !$aFolder->exists())
+				if( !$aFolder->create( $nFlag ) )
 				{
-					if( !$aFolder->create( $nFlag ) )
-					{
-						throw new Exception('无法创建目录:%s',$sPath) ;
-					}
+					throw new Exception('无法创建目录:%s',$sPath) ;
 				}
-	
-				FSO::setFlyweight($aFolder,$this->fsoFlyweightKey($sPath)) ;
 			}
 		}
 		
@@ -302,13 +285,11 @@ class Folder extends FSO
 	
 	
 	/**
-	 * @return FSO
+	 * @return Folder
 	 */
 	static public function singleton($bCreateNew=true,$createArgvs=null,$sClass=null)
 	{
 		return parent::singleton($bCreateNew,$createArgvs,$sClass?:__CLASS__) ;
 	}
 } 
-
-
 
