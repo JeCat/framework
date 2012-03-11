@@ -9,14 +9,16 @@ class Folder extends FSO
 	
 	const CREATE_DEFAULT = 020775 ; 			// CREATE_RECURSE_DIR | 0775
 	
+	const FIND_RETURN_PATH = 4 ;				// find() 文件时，返回路径字符串，而不是FSO对像
 	const FIND_AUTO_CREATE = 1 ;				// 如果找不到文件，自动创建文件
 	const FIND_AUTO_CREATE_OBJECT = 2 ;		// 如果找不到文件，自动创建一个文件对象（没有实际创建文件）
-	
+	const FIND_DEFAULT = FSO::unknow ;			// FSO::unknow
+		
 	/**
 	 * @return FSO
 	 * @retval $type参数		不存在	存在为File	存在为Folder
 	 */
-	public function find($sPath,$nFlag=self::unknow)
+	public function find($sPath,$nFlag=self::FIND_DEFAULT)
 	{
 		if( !($nFlag&FSO::CLEAN_PATH) )
 		{
@@ -29,13 +31,13 @@ class Folder extends FSO
 		// 是一个文件
 		if( is_file($sPath) and ($nType==self::unknow or $nType&self::file) )
 		{
-			$aInstance = new File($sPath,self::CLEAN_PATH) ;
+			return ($nFlag&self::FIND_RETURN_PATH)? $sPath: new File($sPath,self::CLEAN_PATH) ;
 		}
 
 		// 是一个目录
 		else if(is_dir($sPath) and ($nType==self::unknow or $nType&self::folder) )
 		{
-			$aInstance = new Folder($sPath,self::CLEAN_PATH) ;
+			return ($nFlag&self::FIND_RETURN_PATH)? $sPath: new Folder($sPath,self::CLEAN_PATH) ;
 		}
 		
 		// 路径不存在 或 路径的类型和指定的不一致
@@ -43,9 +45,6 @@ class Folder extends FSO
 		{
 			return null;
 		}
-				
-	
-		return $aInstance ;
 	}
 	
 	/**

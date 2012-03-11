@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\lang\aop ;
 
+use org\jecat\framework\fs\File;
+
 use org\jecat\framework\lang\compile\IStrategySummary;
 use org\jecat\framework\fs\FSO;
 use org\jecat\framework\lang\Exception;
@@ -163,11 +165,12 @@ class AOP extends Object implements IStrategySummary, \Serializable
 	
 	private function parseAspectClass($sAspectClass)
 	{
-		if( !$aClassFile = ClassLoader::singleton()->searchClass($sAspectClass,ClassLoader::SEARCH_SOURCE) )
+		if( !$sClassFile = ClassLoader::singleton()->searchClass($sAspectClass,ClassLoader::compiled-1) )
 		{
 			throw new Exception("注册到AOP中的Aspace(%s)不存在; Aspace必须是一个有效的类",$sAspectClass) ;
 		}
 	
+		$aClassFile = new File($sClassFile) ;
 		$aClassCompiler = CompilerFactory::singleton()->create() ;
 		$aTokenPool = $aClassCompiler->scan($aClassFile->openReader()) ;
 		$aClassCompiler->interpret($aTokenPool) ;

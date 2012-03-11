@@ -1,12 +1,18 @@
 <?php
 namespace org\jecat\framework\lang\oop ;
 
+use org\jecat\framework\fs\FSO;
 use org\jecat\framework\lang\Exception;
-use org\jecat\framework\fs\File;
 use org\jecat\framework\fs\Folder;
 
 class Package implements \Serializable
 {		
+	const source = 1 ;
+	const encode = 5 ;
+	const compiled = 9 ;
+	const all = 100 ;
+	
+	
 	public function __construct($sNamespace,Folder $aFolder=null)
 	{
 		$this->setNamespace($sNamespace) ;
@@ -91,9 +97,6 @@ class Package implements \Serializable
 		}
 	}
 	
-	/**
-	 * @return js\fs\File
-	 */
 	public function searchClassEx($sSubFolder,$sShortClassName)
 	{
 		if(!$this->aFolder)
@@ -107,9 +110,9 @@ class Package implements \Serializable
 			
 			$sClassFilePath = $sSubFolder? ($sSubFolder . '/' . $sClassFilename): $sClassFilename ;
 			
-			if( $aFile=$this->aFolder->findFile($sClassFilePath) and $aFile instanceof File )
+			if( $sFilepath=$this->aFolder->find($sClassFilePath,FSO::file|Folder::FIND_RETURN_PATH) )
 			{
-				return $aFile ;
+				return $sFilepath ;
 			}
 		}
 		
