@@ -122,7 +122,7 @@ class Package implements \Serializable
 	
 	public function parsePath($sClassName)
 	{
-		if( $this->nNamespaceLen===0 )
+		if( $this->nNamespaceLen===1 and $this->sNamespace==='\\' )
 		{
 			$sPath = $sClassName ;
 		}

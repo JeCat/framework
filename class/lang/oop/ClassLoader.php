@@ -117,15 +117,15 @@ class ClassLoader extends Object implements \Serializable
 	}
 	
 	public function searchClass($sClassName,$nPriority=Package::all)
-	{
-		foreach($this->arrPackages as $nPackagePriority=>&$arrPackages)
+	{		
+		for(end($this->arrPackages); $arrPackages=&current($this->arrPackages); prev($this->arrPackages))
 		{
-			if($nPackagePriority>$nPriority)
+			if( !(key($this->arrPackages) & $nPriority) )
 			{
-				break ;
+				continue ;
 			}
 			
-			foreach($arrPackages as $aPackage)
+			for(end($arrPackages); $aPackage=current($arrPackages); prev($arrPackages))
 			{
 				if($sFilepath=$aPackage->searchClass($sClassName))
 				{
