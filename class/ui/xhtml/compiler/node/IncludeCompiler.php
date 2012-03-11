@@ -14,12 +14,11 @@ use org\jecat\framework\ui\ObjectContainer;
 
 /**
  * @wiki /模板引擎/标签
+ * @wiki 速查/模板引擎/标签
+ * ==<include>==
  *
+ *  可单行,所在位置嵌入模板文件
  * {|
- * 	!<include>
- *  !可单行
- *  !在所在位置载入另一个模板文件
- *  |--- ---
  *  !属性
  *  !
  *  !类型
@@ -38,13 +37,9 @@ use org\jecat\framework\ui\ObjectContainer;
  *  |false
  *  |条件表达式
  *  |}
+ *  [example php frameworktest template/test-template/node/IncludeCase.html 1 6]
  */
-/**
- * @author anubis
- * @example /模板引擎/标签/自定义标签:name[1]
- *
- * 通过include标签编译器的代码演示如何编写一个标签编译器
- */
+
 class IncludeCompiler extends NodeCompiler 
 {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)

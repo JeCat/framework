@@ -4,6 +4,19 @@ namespace org\jecat\framework\mvc\view ;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\Object;
 
+/**
+ * @wiki /MVC模式/数据交换和数据校验/数据交换
+ * ==数据交换(Data Exchage)==
+ * JeCat 提供一种机制，用于模型和视图窗体之间的数据自动交换。
+ * 1.MODEL_TO_WIDGET:从模型数据到ui窗体
+ * 2.WIDGET_TO_MODEL：从ui窗体到模型控件
+ * 3.WIDGET和MODEL之间的数据交换的设置
+ * 	*设置widget的属性exchange,属性值为Model所对应的数据表的字段
+ * 	*调用数据的交换方法exchangeData,方法的参数有MODEL_TO_WIDGET和WIDGET_TO_MODEL两种
+ * @author qusong
+ *
+ */
+
 class DataExchanger
 {
 	const MODEL_TO_WIDGET = 1 ;

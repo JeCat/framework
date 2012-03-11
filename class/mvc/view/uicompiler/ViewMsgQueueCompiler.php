@@ -9,6 +9,37 @@ use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 use org\jecat\framework\ui\ObjectContainer;
 
+/**
+ * @wiki /MVC模式/视图/模板标签
+ * @wiki 速查/模板引擎/标签
+ * ==<view:msgqueue>==
+ *
+ * {|
+ *  !<view:msgqueue/>
+ *  !可单行
+ *  !显示view的所有信息,包括成功的信息，错误的信息
+ *  |---
+ *  !属性
+ *  !
+ *  !类型
+ *  !默认值
+ *  !说明
+ *  |---
+ *  |
+ *  |
+ *  |
+ *  |
+ *  |
+ *  |}
+ *  [example php frameworktest template/test-mvc/testview/ViewNode.html 46 47]
+ */
+/**
+ * @author anubis
+ * @example /MVC模式/视图/模板标签
+ *
+ *
+ */
+
 class ViewMsgQueueCompiler extends NodeCompiler
 {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)

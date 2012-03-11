@@ -20,7 +20,7 @@ class Response extends Object
 	}
 	
 	/**
-	 * @wiki /MVC模式/请求-响应
+	 * @wiki /MVC模式/控制器/请求-回应(request-response)
 	 * 
 	 * ===控制器 请求===
 	 * TODO ...

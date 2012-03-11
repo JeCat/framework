@@ -2,12 +2,11 @@
 namespace org\jecat\framework\ui\xhtml\compiler\node;
 /**
  * @wiki /模板引擎/标签
- *
+ * @wiki 速查/模板引擎/标签
+ * ==<break>==
+ * 
+ *  可单行,循环控制，退出当前循环语句
  * {|
- *  !<break>
- *  !可单行
- *  !循环控制，退出当前循环语句
- *  |---
  *  !属性
  *  !
  *  !类型
@@ -20,12 +19,7 @@ namespace org\jecat\framework\ui\xhtml\compiler\node;
  *  |
  *  |
  *  |}
- */
-/**
- * @author anubis
- * @example /模板引擎/标签/自定义标签:name[1]
- *
- *  通过break标签编译器的代码演示如何编写一个标签编译器
+ *  [example php frameworktest template/test-template/node/BreakCase.html 4 7]
  */
 
 use org\jecat\framework\ui\xhtml\compiler\ExpressionCompiler;

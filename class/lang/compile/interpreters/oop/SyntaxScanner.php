@@ -17,16 +17,17 @@ use org\jecat\framework\lang\Object;
 
 class SyntaxScanner extends Object implements IInterpreter
 {
-	public function __construct()
+	public function __construct($bAddParsers = true)
 	{
 		$this->aPHPCodeParser = new PHPCodeParser() ;
-		
-		$this->arrParsers[] = new NamespaceDeclareParser() ;
-		$this->arrParsers[] = new UseDeclareParser() ;
-		$this->arrParsers[] = new ClassDefineParser() ;
-		$this->arrParsers[] = new FunctionDefineParser() ;
-		$this->arrParsers[] = new CallFunctionParser() ;
-		$this->arrParsers[] = new ParameterParser() ;
+		if( $bAddParsers ){
+			$this->arrParsers[] = new NamespaceDeclareParser() ;
+			$this->arrParsers[] = new UseDeclareParser() ;
+			$this->arrParsers[] = new ClassDefineParser() ;
+			$this->arrParsers[] = new FunctionDefineParser() ;
+			$this->arrParsers[] = new CallFunctionParser() ;
+			$this->arrParsers[] = new ParameterParser() ;
+		}
 		//$this->arrParsers[] = new HereDocParser() ;
 		//$this->arrParsers[] = new FunctionCallParser() ;
 		//$this->arrParsers[] = new NewObjectParser() ;
@@ -64,7 +65,7 @@ class SyntaxScanner extends Object implements IInterpreter
 	}
 	
 	private $arrParsers ;
-	private $aPHPCodeParser ;
+	private $aPHPCodeParser = array();
 }
 
 ?>

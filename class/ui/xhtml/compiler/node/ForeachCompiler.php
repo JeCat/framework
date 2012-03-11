@@ -36,12 +36,11 @@ use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 use org\jecat\framework\ui\ObjectContainer;
 /**
  * @wiki /模板引擎/标签
- *
+ * @wiki 速查/模板引擎/标签
+ * ==<foreach>
+ * 
+ *  可单行,循环控制语句，循环访问集合以获取所需信息，遍历信息的功能
  * {|
- *  !<foreach>
- *  !可单行
- *  !循环控制
- *  |---
  *  !属性
  *  !
  *  !类型
@@ -66,13 +65,9 @@ use org\jecat\framework\ui\ObjectContainer;
  *  |
  *  |迭代元素的变量名,相当于php中foreach语法中的value
  *  |}
+ *  [example php frameworktest template/test-template/node/ForeachElseCase.html 1 5]
  */
-/**
- * @author anubis
- * @example /模板引擎/标签/自定义标签:name[1]
- * 
- * 通过while标签编译器的代码演示如何编写一个标签编译器 
- */
+
 class ForeachCompiler extends NodeCompiler {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) {
 		

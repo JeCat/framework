@@ -9,6 +9,47 @@ use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 use org\jecat\framework\ui\ObjectContainer;
 
+/**
+ * @wiki /MVC模式/视图/模板标签
+ * @wiki 速查/模板引擎/标签
+ * ==<msgqueue>==
+ * 
+ *  可单行,显示controller的所有信息,例如错误或者成功的信息.
+ *  controller的消息队列包含controller自身,view以及widget的消息队列
+ * {|
+ *  !属性
+ *  !
+ *  !类型
+ *  !默认值
+ *  !说明
+ *  |---
+ *  |for
+ *  |可选
+ *  |table
+ *  |
+ *  |
+ *  |---
+ *  |template
+ *  |可选
+ *  |expression
+ *  |
+ *  |
+ *  |---
+ *  |mode
+ *  |可选
+ *  |expression
+ *  |soft
+ *  |三种状态，hard，soft，force
+ *  |}
+ *  [example php frameworktest template/test-mvc/testview/ViewNode.html 43 44]
+ */
+/**
+ * @author anubis
+ * @example /MVC模式/视图/模板标签
+ *
+ *
+ */
+
 class MsgQueueCompiler extends NodeCompiler
 {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)

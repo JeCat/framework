@@ -18,12 +18,11 @@ use org\jecat\framework\ui\ObjectContainer;
 
 /**
  * @wiki /模板引擎/标签
- *
+ * @wiki 速查/模板引擎/标签
+ * ==<subtemplatedefine>==
+ * 
+ *  不可单行,定义一个模版
  * {|
- *  !<sutemplatedefine>
- *  !不可单行
- *  !定义一个模版
- *  |---
  *  !属性
  *  !
  *  !类型
@@ -36,11 +35,7 @@ use org\jecat\framework\ui\ObjectContainer;
  *  |
  *  |
  *  |}
- */
-/**
- * @example /模板引擎/标签/自定义标签:name[1]
- *
- *  通过sutemplatedefine标签编译器的代码演示如何编写一个标签编译器
+ *  [example php frameworktest template/test-template/node/SubTemplateDefineCase.html 1 3]
  */
 
 class SubTemplateDefineCompiler extends NodeCompiler

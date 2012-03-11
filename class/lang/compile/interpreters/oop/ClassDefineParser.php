@@ -33,11 +33,12 @@ class ClassDefineParser implements ISyntaxParser
 		// 
 		else 
 		{
-			if( $aOriToken->tokenType()!=T_CLASS )
+			if( T_INTERFACE !== $aOriToken->tokenType() 
+					&& T_CLASS !== $aOriToken->tokenType() )
 			{
 				return ;
 			}
-				
+			
 			$aTokenPoolIter = clone $aTokenPoolIter ;
 			$aNewToken = new ClassDefine($aOriToken) ;
 			
@@ -72,61 +73,76 @@ class ClassDefineParser implements ISyntaxParser
 						break(2);
 				}
 			}
+			
+			// init extends implements body
+			$sState = 'init' ;
+			
 			// parent/body
 			$aClassBodyToken = $aParentNameToken = null ;
-			$bFoundExtendsKeyword = $bParentClassNameOver = false ;
-			for( $aTokenPoolIter->next(); $aToken=$aTokenPoolIter->current(); $aTokenPoolIter->next() )
-			{
-				if($aToken->tokenType()==Token::T_BRACE_OPEN)
-				{
+			
+			for( $aTokenPoolIter->next() ; $aToken = $aTokenPoolIter->current(); $aTokenPoolIter->next() ){
+				// 控制触发 addParentClassName 操作
+				$sAddParentClassName = false ;
+				
+				// 分析 tokenType
+				switch( $aToken->tokenType() ){
+				case Token::T_BRACE_OPEN:
 					$aClassBodyToken = $aToken ;
-					if($aParentNameToken)
-					{
-						$bParentClassNameOver = true ;
-					}
-					break ;
-				}
-				else if($aToken->tokenType()==T_EXTENDS)
-				{
-					$bFoundExtendsKeyword = true ;
-				}
-				else if( $bFoundExtendsKeyword and !$bParentClassNameOver )
-				{
-					$type = $aToken->tokenType() ; 
-					if(!$aParentNameToken)
-					{
-						$aParentNameToken = new NamespaceString(0,'') ;
-						$aParentNameToken->setBelongsNamespace($aState->currentNamespace()) ;
-					}
-					else if( $type==T_STRING or $type==T_NS_SEPARATOR )
-					{
+					$sAddParentClassName = $sState ;
+					$sState = 'body' ;
+					break(2) ;
+				case T_EXTENDS:
+					$sAddParentClassName = $sState ;
+					$sState = 'extends' ;
+					break;
+				case T_IMPLEMENTS:
+					$sAddParentClassName = $sState ;
+					$sState = 'implements' ;
+					break;
+				case T_STRING:
+				case T_NS_SEPARATOR:
+					switch($sState){
+					case 'extends':
+					case 'implements':
+						if(!$aParentNameToken)
+						{
+							$aParentNameToken = new NamespaceString(0,'') ;
+							$aParentNameToken->setBelongsNamespace($aState->currentNamespace()) ;
+						}
 						$aParentNameToken->addNameToken($aToken) ;
+						break;
 					}
-					else if( $type==T_WHITESPACE ) // 遇到空白字符结束
-					{ }
-					else
-					{
-						$bParentClassNameOver = true ;
+					break;
+				case Token::T_COLON:
+				case T_WHITESPACE:
+					$sAddParentClassName = $sState ;
+					break;
+				}
+				
+				// addParentClassName
+				if( $sAddParentClassName && $aParentNameToken ){
+					switch($sAddParentClassName){
+					case 'init':
+						break;
+					case 'extends':
+						$aNewToken->addParentClassName( $aParentNameToken->findRealName($aTokenPool) ) ;
+						$aParentNameToken = null ;
+						break;
+					case 'implements':
+						$aNewToken->addImplementsInterfaceName( $aParentNameToken->findRealName($aTokenPool) ) ;
+						$aParentNameToken = null ;
+						break;
+					case 'body':
+						break;
 					}
 				}
 			}
 			
 			if(!$aClassBodyToken)
 			{
-				throw new ClassCompileException($aOriToken,"编译class: %s时遇到了错误，class没有body",$aNewToken->name()) ;
+				throw new ClassCompileException(null,$aOriToken,"编译class: %s时遇到了错误，class没有body",$aNewToken->name()) ;
 			}
 			$aNewToken->setBodyToken($aClassBodyToken) ;
-			
-			if($bFoundExtendsKeyword)
-			{
-				if( !$aParentNameToken or !$bParentClassNameOver )
-				{
-					throw new ClassCompileException(null,$aToken,"编译class: %s时遇到了错误，extends 关键词后没有找到 parent class name",$aNewToken->name()) ;
-				}
-				$aNewToken->setParentClassName( $aParentNameToken->findRealName($aTokenPool) ) ;
-			}
-	
-			$aParentNameToken ;
 			
 			// 完成
 			$aTokenPool->replace($aOriToken,$aNewToken) ;

@@ -25,8 +25,9 @@ class Item extends AbstractBase
     	return $aBean ;
     }
     /**
-     * @wiki /MVC模式/视图/控件/导航菜单项(Item)
-     * ==Bean配置数组==
+     * @wiki /MVC模式/视图窗体(控件)/菜单控件
+     * ==Item==
+     * =Bean配置数组=
      * {|
 	 * !属性
 	 * !类型

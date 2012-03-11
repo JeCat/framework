@@ -2,12 +2,11 @@
 namespace org\jecat\framework\ui\xhtml\compiler\node ;
 /**
  * @wiki /模板引擎/标签
- *
+ * @wiki 速查/模板引擎/标签
+ * ==<else/>==
+ * 
+ *  可单行,当前提条件为false时，执行<else/>之后的代码
  * {|
- *  !<else/>
- *  !可单行
- *  !条件流程控制，若<if>中的判断条件为false，则实行else的语句
- *  |---
  *  !属性
  *  !
  *  !类型
@@ -20,11 +19,7 @@ namespace org\jecat\framework\ui\xhtml\compiler\node ;
  *  |
  *  |条件表达式
  *  |}
- */
-/**
- * @example /模板引擎/标签/自定义标签:name[1]
- *
- *  通过else标签编译器的代码演示如何编写一个标签编译器
+ *  [example php frameworktest template/test-template/node/IfCase.html 7 11]
  */
 
 use org\jecat\framework\ui\xhtml\compiler\ExpressionCompiler;

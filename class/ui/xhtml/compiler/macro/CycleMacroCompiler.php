@@ -10,12 +10,11 @@ use org\jecat\framework\ui\IObject;
 
 /**
  * @wiki /模板引擎/宏
+ * @wiki 速查/模板引擎/宏
+ * =={@ }==
  *
+ *  {@ }中的内容被顺序的显示，每次只能显示一个,循环显示，直到循环结束
  * {|
- *  !{@ }
- *  !
- *  !{@ }中的内容被顺序的使用，每次只能使用一个,循环
- *  |---
  *  !使用方法
  *  !
  *  !说明
@@ -28,12 +27,7 @@ use org\jecat\framework\ui\IObject;
  *  |
  *  |
  *  |}
- */
-/**
- * @author anubis
- * @example /模板引擎/宏/自定义标签:name[1]
- *
- *  通过{@ }标签编译器的代码演示如何编写一个标签编译器
+ *  [example php frameworktest template/test-template/macro/CycleMacroCase.html 2 6]
  */
 
 class CycleMacroCompiler extends MacroCompiler

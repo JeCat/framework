@@ -9,6 +9,28 @@ use org\jecat\framework\ui\xhtml\Attributes ;
 use org\jecat\framework\ui\xhtml\AttributeValue ;
 use org\jecat\framework\ui\xhtml\Node ;
 
+/**
+ * @wiki /MVC模式/视图/模板标签
+ * @wiki 速查/模板引擎/标签
+ *	==<menu>菜单标签==
+ *  
+ *  可单行,菜单项目列表标签,以菜单的方式显示内容，其内容为item标签表示
+ * {|
+ *  !属性
+ *  !
+ *  !类型
+ *  !默认值
+ *  !说明
+ *  |---
+ *  |id
+ *  |必须
+ *  |expression
+ *  |
+ *  |menu本身也是一个widget
+ *  |}
+ *  [example php frameworktest template/test-mvc/testview/ViewNode.html 26 30]
+ */
+
 class MenuCompiler extends WidgetCompiler
 {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager){
@@ -42,7 +64,11 @@ class MenuCompiler extends WidgetCompiler
 				if( $aItemAttrs->has('id') ){
 					$sItemId = $aItemAttrs->string('id');
 					
-					$aAttrValue = AttributeValue::createInstance ('instance' , " \$aStack->get()->getMenuByPath( '$sItemId' ) ");
+					if( $aChild->tagName() === 'menu'){
+						$aAttrValue = AttributeValue::createInstance ('instance' , " \$aStack->get()->getMenuByPath( '$sItemId' ) ");
+					}else{
+						$aAttrValue = AttributeValue::createInstance ('instance' , " \$aStack->get()->getItemByPath( '$sItemId' ) ");
+					}
 					$aItemAttrs->add($aAttrValue);
 					$aAttrValue->setParent($aObjectContainer) ;
 					

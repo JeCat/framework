@@ -26,8 +26,9 @@ class ImageArea extends Object implements IVerifier, IBean
 		return $aBean ;
 	}
 	/**
-	 * @wiki /校验器/图片面积校验器(ImageArea)
-	 * ==Bean配置数组==
+	 * @wiki /MVC模式/数据交换和数据校验/数据校验
+	 * ==图片面积校验器(ImageArea)==
+	 * =Bean配置数组=
 	 * {|
 	 * !属性
 	 * !类型

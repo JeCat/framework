@@ -20,12 +20,11 @@ use org\jecat\framework\ui\xhtml\compiler\NodeCompiler;
 use org\jecat\framework\ui\ObjectContainer;
 /**
  * @wiki /模板引擎/标签
- *
+ * @wiki 速查/模板引擎/标签
+ * ==<while>==
+ * 
+ *  不可单行,条件流程控制，匿名属性必须是一个表达式
  * {|
- *  !<while>
- *  !不可单行
- *  !条件流程控制，匿名属性必须是一个表达式
- *  |---
  *  !属性
  *  !
  *  !类型
@@ -38,12 +37,7 @@ use org\jecat\framework\ui\ObjectContainer;
  *  |
  *  |条件表达式
  *  |}
- */
-/**
- * @author anubis
- * @example /模板引擎/标签/自定义标签:name[1]
- * 
- *	通过while标签编译器的代码演示如何编写一个标签编译器
+ *  [example php frameworktest template/test-template/node/WhileCase.html 1 12]
  */
 
 class WhileCompiler extends NodeCompiler {

@@ -69,7 +69,6 @@ use org\jecat\framework\fs\Folder;
  * 		模型的基本操作(新建、保存、删除、加载)
  * 		模型列表(ModelList)
  * 		模型加载的条件
- * 		模型的组合模式
  * 		模型的Bean配置数组
  * 	视图
  * 		绑定模型

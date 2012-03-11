@@ -32,8 +32,13 @@ class SelectList extends Select {
 		return $aBean ;
 	}
 	/**
-	 * @wiki /MVC模式/视图/表单控件/列表(SelectList)
-	 * ==Bean配置数组==
+	 * @wiki /MVC模式/视图窗体(控件)/表单控件
+	 * ==selectlist==
+	 * 有别于select，可以复选。
+	 * 
+	 * =使用方法=
+	 * calss属性设置为list
+	 * =Bean配置数组=
 	 * {|
 	 * !属性
 	 * !类型

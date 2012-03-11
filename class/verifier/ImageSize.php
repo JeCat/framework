@@ -29,8 +29,9 @@ class ImageSize extends Object implements IVerifier, IBean
 		return $aBean ;
 	}
 	/**
-	 * @wiki /校验器/图片宽高校验器(ImageSize)
-	 * ==Bean配置数组==
+	 * @wiki /MVC模式/数据交换和数据校验/数据校验
+	 * ==图片宽高校验器(ImageSize)==
+	 * =Bean配置数组=
 	 * {|
 	 * !属性
 	 * !类型

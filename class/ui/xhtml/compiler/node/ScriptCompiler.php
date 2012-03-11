@@ -12,12 +12,11 @@ use org\jecat\framework\ui\ObjectContainer;
 
 /**
  * @wiki /模板引擎/标签
- *
+ * @wiki 速查/模板引擎/标签
+ * ==<script>==
+ * 
+ *  可单行,javascript脚本的使用标签
  * {|
- *  !<scirpt>
- *  !可单行
- *  !javascript脚本的使用标签
- *  |---
  *  !属性
  *  !
  *  !类型
@@ -42,11 +41,7 @@ use org\jecat\framework\ui\ObjectContainer;
  *  |false
  *  |当ignore为true时，不考虑蜂巢模版的src搜寻url的问题,传统的src的功能恢复
  *  |}
- */
-/**
- * @example /模板引擎/标签/自定义标签:name[1]
- *
- *  通过script标签编译器的代码演示如何编写一个标签编译器
+ *  [example php frameworktest template/test-template/node/ScriptCase.html 2 28]
  */
 
 class ScriptCompiler extends NodeCompiler

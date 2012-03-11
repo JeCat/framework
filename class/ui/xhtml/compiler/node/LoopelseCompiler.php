@@ -12,12 +12,11 @@ use org\jecat\framework\ui\ObjectContainer;
 
 /**
  * @wiki /模板引擎/标签
- *
+ * @wiki 速查/模板引擎/标签
+ * ==<loop:else>==
+ * 
+ *  可单行,循环控制 
  * {|
- *  !<loop:else/>
- *  !可单行
- *  !循环控制 
- *  |---
  *  !属性
  *  !
  *  !类型
@@ -29,11 +28,7 @@ use org\jecat\framework\ui\ObjectContainer;
  *  |
  *  |
  *  |}
- */
-/**
- * @example /模板引擎/标签/自定义标签:name[1]
- *
- *  通过loop:else标签编译器的代码演示如何编写一个标签编译器
+ *  [example php frameworktest template/test-template/node/LoopElseCase.html 1 6]
  */
 
 class LoopelseCompiler extends NodeCompiler 

@@ -33,8 +33,9 @@ class Number extends Object implements IVerifier, IBean
 		return $aBean ;
 	}
 	/**
-	 * @wiki /校验器/数字校验器(Number)
-	 * ==Bean配置数组==
+	 * @wiki /MVC模式/数据交换和数据校验/数据校验
+	 * ==数字校验器(Number)==
+	 * =Bean配置数组=
 	 * {|
 	 * !属性
 	 * !类型
@@ -90,6 +91,7 @@ class Number extends Object implements IVerifier, IBean
 	
 	public function verify($data, $bThrowException)
 	{
+		
 		if (! is_numeric ( $data ))
 		{
 			if ($bThrowException)

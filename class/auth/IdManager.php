@@ -82,6 +82,20 @@ class IdManager extends Object implements \Serializable
 	{
 		return $this->aCurrentId ;
 	}
+	
+	public function currentUserId(){
+		if($aId = $this->currentId()){
+			return $aId->userId();
+		}
+		return '';
+	}
+	
+	public function currentUserName(){
+		if($aId = $this->currentId()){
+			return $aId->userName();
+		}
+		return '';
+	}
 
 	public function setCurrentId(IIdentity $aId=null)
 	{

@@ -19,17 +19,21 @@ class FileSize extends Object implements IVerifier,IBean {
 	
 	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
+		var_dump($arrConfig);
 		$sClass = get_called_class() ;
+		echo $sClass."ddd";
 		$aBean = new $sClass() ;
-		if($bBuildAtOnce)
+		var_dump($aBean);
+		if(true)
 		{
 			$aBean->buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
 		}
 		return $aBean ;
 	}
 	/**
-	 * @wiki /校验器/文件大小校验器(FileSize)
-	 * ==Bean配置数组==
+	 * @wiki /MVC模式/数据交换和数据校验/数据校验
+	 * ==文件大小校验器(FileSize)==
+	 * =Bean配置数组=
 	 * {|
 	 * !属性
 	 * !类型
@@ -52,6 +56,7 @@ class FileSize extends Object implements IVerifier,IBean {
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
+		echo "bulidBeandddddddddddddddddddddddddddddddddddddddddddddddddddddddd";
 		if (! empty ( $arrConfig ['nMaxSize'] ))
 		{
 			$this->setMaxSize($arrConfig ['nMaxSize']);
@@ -72,7 +77,7 @@ class FileSize extends Object implements IVerifier,IBean {
 		if( $nMaxSize == -1 || $nMaxSize > 0){
 			$this->nMaxSize = $nMaxSize;
 		}else{
-			throw new Exception ( __CLASS__ . "的" . __METHOD__ . "传入了错误的nMaxSize参数(得到的参数是%s类型)", array ( (String)$nMaxSize ) );
+			throw new Exception ( __CLASS__ . "的" . __METHOD__ . "传入了错误的nMaxSize参数(得到的参数是%s)", array ( (String)$nMaxSize ) );
 		}
 	}
 	

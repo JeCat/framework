@@ -21,12 +21,12 @@ use org\jecat\framework\ui\ObjectContainer;
 
 /**
  * @wiki /模板引擎/标签
- *
+ * @wiki 速查/模板引擎/标签
+ * ==<continue>==
+ * 
+ *  可单行，循环控制，匿名属性必须是一个表达式。
+ *  当表达式返回true时，跳出当前循环,继续执行
  * {|
- *  !<continue>
- *  !不可单行
- *  !循环控制，匿名属性必须是一个表达式，当表达式返回true时，跳出当前循环,继续执行
- *  |---
  *  !属性
  *  !
  *  !类型
@@ -39,13 +39,8 @@ use org\jecat\framework\ui\ObjectContainer;
  *  |
  *  |条件表达式
  *  |}
+ *  [example php frameworktest template/test-template/node/ContinueCase.html 1 10]
  */
-/**
- * @example /模板引擎/标签/自定义标签:name[1]
- *
- *  通过continue标签编译器的代码演示如何编写一个标签编译器
- */
-
 class ContinueCompiler extends NodeCompiler {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) {
 		Type::check ( "org\\jecat\\framework\\ui\\xhtml\\Node", $aObject );

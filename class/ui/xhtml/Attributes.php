@@ -69,7 +69,8 @@ class Attributes extends HashTable
 		}
 	}
 	/**
-	 * @wiki /MVC模式/视图/控件/控件标签附加属性
+	 * @wiki /MVC模式/视图/模板标签
+	 * ==控件标签附加属性==
 	 * 
 	 * 在是用widget标签的时候我们可能需要传入一些值给控件对象.这一点可以通过attr.xxx属性做到.比如:
 	 * <widget id='text' attr.widgetname='textarea'/>

@@ -25,6 +25,13 @@ class Same extends Object implements IVerifier ,IBean{
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{}
 	
+	/**
+	 * @wiki /MVC模式/数据交换和数据校验/数据校验
+	 * ==内容一致性效验(same)==
+	 * 通常都是对输入密码和密码再次输入，两次输入是否一致的使用。
+	 * [example title="/MVC模式/数据交换和数据校验/数据校验/内容一致性效验(same)"]
+	 */
+	
 	public function beanConfig()
 	{
 		return array() ;

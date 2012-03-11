@@ -191,6 +191,5 @@ jc.mvc.view.widget.menu.fun.onload.addOnLoad(function(){
 			}
 		}
 	}
-	
-	console.log(jc.mvc.view.widget.menu.objectList);
+	//console.log(jc.mvc.view.widget.menu.objectList);
 });
