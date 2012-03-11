@@ -95,6 +95,7 @@ class Pointcut extends NamedObject
 				if( $aJointPoint instanceof JointPoint )
 				{
 					$aPointcut->jointPoints()->add($aJointPoint) ;
+					$aJointPoint->setPointcut($aPointcut) ;
 				}
 				
 				else 
@@ -137,9 +138,40 @@ class Pointcut extends NamedObject
 		return $this->aAdvices ;
 	}
 	
+	public function serialize ()
+	{
+		return serialize( $this->aJointPoints ) ;
+	}
+	
+	/**
+	 * @param serialized
+	 */
+	public function unserialize ($serialized)
+	{
+		$this->aJointPoints = unserialize($serialized) ;		
+		if($this->aJointPoints)
+		{
+			foreach($this->aJointPoints->iterator() as $aJointPoints)
+			{
+				$aJointPoints->setPointcut($this) ;
+			}
+		}
+	}
+	
+	public function setAspect(Aspect $aAspect)
+	{
+		$this->aDefineAspect = $aAspect ;
+	}
+	public function aspect()
+	{
+		return $this->aDefineAspect ;
+	}
+	
 	private $aAdvices ;
 	
 	private $aJointPoints ;
+	
+	private $aDefineAspect ;
 }
 
 ?>

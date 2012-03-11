@@ -19,10 +19,10 @@ class JointPointMethodDefine extends JointPoint
 	
 	public function matchExecutionPoint(Token $aToken)
 	{		
-		$aIsPattern = $this->weaveMethodIsPattern() ;
+		$bIsPattern = $this->weaveMethodIsPattern() ;
 		
 		// 模糊匹配每个方法
-		if( $aIsPattern and ($aToken instanceof FunctionDefine) )
+		if( $bIsPattern and ($aToken instanceof FunctionDefine) )
 		{
 			// 必须是一个类方法
 			if( !$aClass=$aToken->belongsClass() )
@@ -39,7 +39,7 @@ class JointPointMethodDefine extends JointPoint
 		}
 		
 		// 精确匹配 class token
-		else if( !$aIsPattern and ($aToken instanceof ClosureToken) )
+		else if( !$bIsPattern and ($aToken instanceof ClosureToken) )
 		{
 			// 必须是一个 "}" , 并且成对
 			if( $aToken->tokenType()!=Token::T_BRACE_CLOSE or !$aToken->theOther() )

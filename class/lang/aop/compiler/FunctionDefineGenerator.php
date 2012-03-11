@@ -1,6 +1,7 @@
 <?php
 namespace org\jecat\framework\lang\aop\compiler ;
 
+use org\jecat\framework\lang\compile\generators\CompiledValidableCheck;
 use org\jecat\framework\lang\aop\jointpoint\JointPointMethodDefine;
 use org\jecat\framework\lang\Type;
 use org\jecat\framework\lang\compile\ClassCompileException;
@@ -50,99 +51,102 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		
 		// 需要编入的方法
 		$arrNeedWeaveMethods = array() ;
-		foreach($this->aop()->pointcutIterator() as $aPointcut)
+		foreach($this->aop()->aspects()->iterator() as $aAspect)
 		{
-			foreach($aPointcut->jointPoints()->iterator() as $aJointPoint)
+			foreach($aAspect->pointcuts()->iterator() as $aPointcut)
 			{
-				if( !($aJointPoint instanceof JointPointMethodDefine) )
+				foreach($aPointcut->jointPoints()->iterator() as $aJointPoint)
 				{
-					continue ;
-				}
-				
-				// 模糊匹配函数名 -----------------------
-				if( $aJointPoint->weaveMethodIsPattern() )
-				{
-					foreach( $aTokenPool->functionIterator($aObject->fullName()) as $aMethodToken )
-					{
-						// bingo !
-						if( $aJointPoint->matchExecutionPoint($aMethodToken) )
-						{
-							$sMethodName = $aMethodToken->name() ;
-							if( empty($arrNeedWeaveMethods[$sMethodName]) )
-							{
-								$arrNeedWeaveMethods[$sMethodName] = new GenerateStat($aTokenPool,$aMethodToken) ;
-							}
-							
-							$arrNeedWeaveMethods[$sMethodName]->addAdvices($aPointcut->advices()->iterator()) ;
-						}
-					}
-				}
-				
-				// 精确匹配函数名 -----------------------
-				else
-				{
-					if($aJointPoint->weaveClass()!=$sTargetClassName)
+					if( !($aJointPoint instanceof JointPointMethodDefine) )
 					{
 						continue ;
 					}
 					
-					$sFuncName = $aJointPoint->weaveMethod() ;
+					// 模糊匹配函数名 -----------------------
+					if( $aJointPoint->weaveMethodIsPattern() )
+					{
+						foreach( $aTokenPool->functionIterator($aObject->fullName()) as $aMethodToken )
+						{
+							// bingo !
+							if( $aJointPoint->matchExecutionPoint($aMethodToken) )
+							{
+								$sMethodName = $aMethodToken->name() ;
+								if( empty($arrNeedWeaveMethods[$sMethodName]) )
+								{
+									$arrNeedWeaveMethods[$sMethodName] = new GenerateStat($aTokenPool,$aMethodToken) ;
+								}
+								
+								$arrNeedWeaveMethods[$sMethodName]->addAdvices($aPointcut->advices()->iterator()) ;
+							}
+						}
+					}
 					
-					if( empty($arrNeedWeaveMethods[$sFuncName]) )
-					{
-						$arrNeedWeaveMethods[$sFuncName] = new GenerateStat($aTokenPool) ;
-					}
-					$arrNeedWeaveMethods[$sFuncName]->addAdvices($aPointcut->advices()->iterator()) ;
-					
-					// 目标类的方法
-					if( $aMethodToken=$aTokenPool->findFunction($sFuncName,$sTargetClassName) )
-					{
-						$arrNeedWeaveMethods[$sFuncName]->aExecutePoint = $aMethodToken ;
-					}
-					// 目标类的父类的方法
-					else if( isset($arrParentMethodNames[$sFuncName]) )
-					{
-						$aMethodRef = $arrParentMethodNames[$sFuncName] ;
-						$aMethodRef instanceof \ReflectionMethod ;
-						
-						// 产生函数定义和函数调用的参数表
-						$this->generateArgvsByReflection($arrNeedWeaveMethods[$sFuncName],$aMethodRef) ;
-						
-						if( $aMethodRef->isPublic() )
-						{
-							$sAccess = 'public' ;
-						}
-						else if( $aMethodRef->isProtected() )
-						{
-							$sAccess = 'protected' ;
-						}
-						else if( $aMethodRef->isPrivate() )
-						{
-							$sAccess = 'private' ;
-						}
-						
-						// 创建一个覆盖父类的方法用于 aop
-						$aMethodToken = $this->createMethod($sFuncName,$arrNeedWeaveMethods[$sFuncName]->sAdviceDefineArgvsLit,$sAccess,$aMethodRef->isStatic(),$aTokenPool,$aClassEnd,'insertBefore') ;
-						$aMethodToken->setBelongsClass($aObject) ;
-						$aMethodToken->setBelongsNamespace($aObject->belongsNamespace()) ;
-						$arrNeedWeaveMethods[$sFuncName]->aExecutePoint = $aMethodToken ;
-
-						// 创建函数内容
-						$aTokenPool->insertAfter($aMethodToken->bodyToken(),new Token(T_STRING,"
-		// 调用父类方法
-		return parent::{$sFuncName}({$arrNeedWeaveMethods[$sFuncName]->sAdviceCallArgvsLit}) ;
-	")) ;
-					}
-					// 不存在的方法
+					// 精确匹配函数名 -----------------------
 					else
 					{
-						// 创建一个全新的方法用于 aop
-						$aMethodToken = $this->createMethod($sFuncName,$arrNeedWeaveMethods[$sFuncName]->sAdviceDefineArgvsLit,'private',false,$aTokenPool,$aClassEnd,'insertBefore') ;
-						$aMethodToken->setBelongsClass($aObject) ;
-						$aMethodToken->setBelongsNamespace($aObject->belongsNamespace()) ;
-						$arrNeedWeaveMethods[$sFuncName]->aExecutePoint = $aMethodToken ;
+						if($aJointPoint->weaveClass()!=$sTargetClassName)
+						{
+							continue ;
+						}
 						
-						$aTokenPool->insertAfter($aMethodToken->bodyToken(),new Token(T_STRING," // 这只是一个影子方法 ")) ;
+						$sFuncName = $aJointPoint->weaveMethod() ;
+						
+						if( empty($arrNeedWeaveMethods[$sFuncName]) )
+						{
+							$arrNeedWeaveMethods[$sFuncName] = new GenerateStat($aTokenPool) ;
+						}
+						$arrNeedWeaveMethods[$sFuncName]->addAdvices($aPointcut->advices()->iterator()) ;
+						
+						// 目标类的方法
+						if( $aMethodToken=$aTokenPool->findFunction($sFuncName,$sTargetClassName) )
+						{
+							$arrNeedWeaveMethods[$sFuncName]->aExecutePoint = $aMethodToken ;
+						}
+						// 目标类的父类的方法
+						else if( isset($arrParentMethodNames[$sFuncName]) )
+						{
+							$aMethodRef = $arrParentMethodNames[$sFuncName] ;
+							$aMethodRef instanceof \ReflectionMethod ;
+							
+							// 产生函数定义和函数调用的参数表
+							$this->generateArgvsByReflection($arrNeedWeaveMethods[$sFuncName],$aMethodRef) ;
+							
+							if( $aMethodRef->isPublic() )
+							{
+								$sAccess = 'public' ;
+							}
+							else if( $aMethodRef->isProtected() )
+							{
+								$sAccess = 'protected' ;
+							}
+							else if( $aMethodRef->isPrivate() )
+							{
+								$sAccess = 'private' ;
+							}
+							
+							// 创建一个覆盖父类的方法用于 aop
+							$aMethodToken = $this->createMethod($sFuncName,$arrNeedWeaveMethods[$sFuncName]->sAdviceDefineArgvsLit,$sAccess,$aMethodRef->isStatic(),$aTokenPool,$aClassEnd,'insertBefore') ;
+							$aMethodToken->setBelongsClass($aObject) ;
+							$aMethodToken->setBelongsNamespace($aObject->belongsNamespace()) ;
+							$arrNeedWeaveMethods[$sFuncName]->aExecutePoint = $aMethodToken ;
+		
+							// 创建函数内容
+							$aTokenPool->insertAfter($aMethodToken->bodyToken(),new Token(T_STRING,"
+			// 调用父类方法
+			return parent::{$sFuncName}({$arrNeedWeaveMethods[$sFuncName]->sAdviceCallArgvsLit}) ;
+		")) ;
+						}
+						// 不存在的方法
+						else
+						{
+							// 创建一个全新的方法用于 aop
+							$aMethodToken = $this->createMethod($sFuncName,$arrNeedWeaveMethods[$sFuncName]->sAdviceDefineArgvsLit,'private',false,$aTokenPool,$aClassEnd,'insertBefore') ;
+							$aMethodToken->setBelongsClass($aObject) ;
+							$aMethodToken->setBelongsNamespace($aObject->belongsNamespace()) ;
+							$arrNeedWeaveMethods[$sFuncName]->aExecutePoint = $aMethodToken ;
+							
+							$aTokenPool->insertAfter($aMethodToken->bodyToken(),new Token(T_STRING," // 这只是一个影子方法 ")) ;
+						}
 					}
 				}
 			}

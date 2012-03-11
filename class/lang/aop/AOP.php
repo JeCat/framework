@@ -181,7 +181,7 @@ class AOP extends Object implements IStrategySummary, \Serializable
 			) ;
 		}
 	
-		$this->aspects()->add(Aspect::createFromToken($aClassToken,$aTokenPool)) ;
+		$this->aspects()->add(Aspect::createFromToken($aClassToken,$aClassFile->path())) ;
 	}
 	
 	/**

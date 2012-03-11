@@ -11,9 +11,9 @@ use org\jecat\framework\lang\compile\DocComment;
 use org\jecat\framework\pattern\composite\Container;
 use org\jecat\framework\pattern\composite\NamedObject;
 
-class Aspect extends NamedObject
+class Aspect extends NamedObject implements \Serializable
 {	
-	static public function createFromToken(ClassDefine $aClassToken)
+	static public function createFromToken(ClassDefine $aClassToken,$sAspectFilepath=null)
 	{
 		$sAspectName = $aClassToken->fullName() ;
 		$aTokenPool = $aClassToken->parent() ;
@@ -46,25 +46,13 @@ class Aspect extends NamedObject
 			
 			if( $aDocComment->hasItem('advice') )
 			{
-				$aAdvice = Advice::createFromToken($aMethodToken) ;
-				
-				foreach($aDocComment->itemIterator('for') as $sPointcutName)
-				{
-					if(!$aPointcut = $aAspect->pointcuts()->getByName($sPointcutName))
-					{
-						throw new Exception("定义Aspect %s 的 Advice %s 时，申明了一个不存在的 Pointcut: %s 。",array(
-							$sAspectName
-							, $aAdvice->name()
-							, $sPointcutName
-						)) ;
-					}
-					
-					$aPointcut->advices()->add($aAdvice) ;
-				}
+				$aAdvice = Advice::createFromToken($aMethodToken,$aAspect) ;
+				$aAspect->addAdvice($aAdvice) ;
 			}
 		}
 		
 		$aAspect->sAspectName = $sAspectName ;
+		$aAspect->sAspectFilepath = $sAspectFilepath ;
 		
 		return $aAspect ;
 	}
@@ -101,6 +89,22 @@ class Aspect extends NamedObject
 			}
 		}
 	}
+	
+	public function addAdvice(Advice $aAdvice)
+	{
+		if(!$this->advices()->has($aAdvice))
+		{
+			$this->advices()->add($aAdvice) ;
+		}
+		
+		foreach($aAdvice->forPointcuts() as $sPointcutName)
+		{
+			if( $aPointcut=$this->pointcuts()->getByName($sPointcutName) )
+			{
+				$aPointcut->advices()->add($aAdvice) ;
+			}
+		}
+	}
 		
 	/**
 	 * @return org\jecat\framework\pattern\composite\IContainer
@@ -115,14 +119,74 @@ class Aspect extends NamedObject
 		return $this->aPointcuts ;
 	}
 	
+	/**
+	 * @return org\jecat\framework\pattern\composite\IContainer
+	 */
+	public function advices()
+	{
+		if( !$this->aAdvices )
+		{
+			$this->aAdvices = new Container('org\\jecat\\framework\\lang\\aop\\Advice') ;
+		}
+	
+		return $this->aAdvices ;
+	}
+	
 	public function aspectName()
 	{
 		return $this->sAspectName ;
 	}
 	
+	public function aspectFilepath()
+	{
+		return $this->sAspectFilepath ;
+	}
+	
+	public function serialize ()
+	{
+		return serialize( array(
+				'aPointcuts' => & $this->aPointcuts ,
+				'aAdvices' => & $this->aAdvices ,
+				'sAspectName' => & $this->sAspectName ,
+				'sAspectFilepath' => & $this->sAspectFilepath ,
+		) ) ;
+	}
+	
+	/**
+	 * @param serialized
+	 */
+	public function unserialize ($serialized)
+	{
+		$arrData = unserialize($serialized) ;
+	
+		$this->aPointcuts =& $arrData['aPointcuts'] ;
+		$this->aAdvices =& $arrData['aAdvices'] ;
+		$this->sAspectName =& $arrData['sAspectName'] ;
+		$this->sAspectFilepath =& $arrData['sAspectFilepath'] ;
+		
+		if($this->aPointcuts)
+		{
+			foreach($this->aPointcuts->iterator() as $aPointcut)
+			{
+				$aPointcut->setAspect($this) ;
+			}
+		}
+		if($this->aAdvices)
+		{
+			foreach($this->aAdvices->iterator() as $aAdvice)
+			{
+				$this->addAdvice($aAdvice) ;
+			}
+		}
+	}
+	
 	private $aPointcuts ;
 	
+	private $aAdvices ;
+	
 	private $sAspectName ;
+	
+	private $sAspectFilepath ;
 	
 }
 

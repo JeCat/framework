@@ -2,7 +2,6 @@
 namespace org\jecat\framework\lang\aop\compiler ;
 
 use org\jecat\framework\lang\compile\ClassCompileException;
-
 use org\jecat\framework\lang\compile\object\ClosureToken;
 use org\jecat\framework\util\Stack;
 use org\jecat\framework\lang\Exception;
@@ -52,7 +51,7 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 
 	protected function weave(GenerateStat $aStat)
 	{
-			$pos = $aStat->aTokenPool->search($aStat->aExecutePoint) ;
+		$pos = $aStat->aTokenPool->search($aStat->aExecutePoint) ;
 		if( $aStat->aExecutePoint and !$aStat->aExecutePoint->belongsClass() )
 		{
 			throw new Exception("AOP织入遇到错误：正在对一段全局代码进行织入操作，只能对类方法进行织入。") ;

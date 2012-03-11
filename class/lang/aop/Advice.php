@@ -5,7 +5,7 @@ use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\compile\object\FunctionDefine;
 use org\jecat\framework\pattern\composite\NamedObject;
 
-class Advice extends NamedObject
+class Advice extends NamedObject implements \Serializable
 {
 	const around = 'around' ;
 	const before = 'before' ;
@@ -55,7 +55,7 @@ class Advice extends NamedObject
 		}
 	}
 
-	static public function createFromToken(FunctionDefine $aFunctionDefine)
+	static public function createFromToken(FunctionDefine $aFunctionDefine,Aspect $aAspect)
 	{
 		if( !$aClassDefine=$aFunctionDefine->belongsClass() )
 		{
@@ -84,7 +84,24 @@ class Advice extends NamedObject
 			$sPosition = self::after ;
 		}
 
-		return new self($aFunctionDefine->name(),$aFunctionDefine->bodySource(),$sPosition,$aFunctionDefine) ;
+		$aAdvice = new self($aFunctionDefine->name(),$aFunctionDefine->bodySource(),$sPosition,$aFunctionDefine) ;
+		$aAdvice->aDefineAspect = $aAspect ;
+		
+		// for pointcut
+		foreach($aDocComment->itemIterator('for') as $sPointcutName)
+		{
+			if(!$aPointcut = $aAspect->pointcuts()->getByName($sPointcutName))
+			{
+				throw new Exception("定义Aspect %s 的 Advice %s 时，申明了一个不存在的 Pointcut: %s 。",array(
+						$sAspectName
+						, $aAdvice->name()
+						, $sPointcutName
+				)) ;
+			}
+			$aAdvice->arrForPointcuts[] = $sPointcutName ;
+		}
+		
+		return $aAdvice ;
 	}
 	
 	public function position()
@@ -117,6 +134,47 @@ class Advice extends NamedObject
 		return $this->sSigntrue ;
 	}
 	
+	public function setAspect(Aspect $aAspect)
+	{
+		$this->aDefineAspect = $aAspect ;
+	}
+	public function aspect()
+	{
+		return $this->aDefineAspect ;
+	}
+	
+	public function forPointcuts()
+	{
+		return $this->arrForPointcuts ;
+	}
+	
+	public function serialize ()
+	{
+		return serialize( array(
+			'sSource' => & $this->sSource ,
+			'sPosition' => & $this->sPosition ,
+			'sAccess' => & $this->sAccess ,
+			'bStatic' => & $this->bStatic ,
+			'sSigntrue' => & $this->sSigntrue ,
+			'arrForPointcuts' => & $this->arrForPointcuts ,
+		) ) ;
+	}
+	
+	/**
+	 * @param serialized
+	 */
+	public function unserialize ($serialized)
+	{
+		$arrData = unserialize($serialized) ;
+		
+		$this->sSource =& $arrData['sSource'] ;
+		$this->sPosition =& $arrData['sPosition'] ;
+		$this->sAccess =& $arrData['sAccess'] ;
+		$this->bStatic =& $arrData['bStatic'] ;
+		$this->sSigntrue =& $arrData['sSigntrue'] ;
+		$this->arrForPointcuts =& $arrData['arrForPointcuts'] ;
+	}
+	
 	private $sSource ;
 	
 	private $sPosition ;
@@ -126,6 +184,10 @@ class Advice extends NamedObject
 	private $bStatic = false ;
 	
 	private $sSigntrue ;
+	
+	private $aDefineAspect ;
+
+	private $arrForPointcuts = array() ;
 }
 
 ?>
