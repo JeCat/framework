@@ -65,7 +65,7 @@ class Object implements IObject, ISingletonable, IFlyweightable
 	 * 
 	 * @return Object
 	 */
-	static public function createInstance($argvs=null,Application $aApp=null,$sClassName=null)
+	static public function createInstance($argvs=null,$sClassName=null)
 	{
 		if($argvs===null)
 		{
@@ -92,15 +92,7 @@ class Object implements IObject, ISingletonable, IFlyweightable
 		{
 			throw new Exception("无法创建抽象类:%s的实例",$sClassName) ;
 		}
-		$aObject = $aRefClass->newInstanceArgs($argvs) ;
-		
-		// set application
-		if( $aApp and $aObject instanceof IObject )
-		{
-			$aObject->setApplication($aApp) ;
-		}
-		
-		return $aObject ;
+		return $aRefClass->newInstanceArgs($argvs) ;
 	}
 	
 	/**
