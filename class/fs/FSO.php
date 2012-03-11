@@ -119,6 +119,11 @@ abstract class FSO extends Object implements \Serializable
 	 */
 	static public function tidyPath(& $sPath)
 	{
+			if(!is_string($sPath))
+			{
+				debug_print_backtrace() ;
+				exit() ;
+			}
 		// 统一、合并斜线
 		$sPath = preg_replace('|[/\\\\]+|', '/', $sPath) ;
 	

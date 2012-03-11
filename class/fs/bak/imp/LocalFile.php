@@ -26,7 +26,7 @@ class LocalFile extends LocalFSO implements IFile
 			return null ;
 		}
 		
-		return InputStream::createInstance($hHandle,$this->application()) ;
+		return InputStream::createInstance($hHandle) ;
 	}
 	
 	/**
@@ -40,7 +40,7 @@ class LocalFile extends LocalFSO implements IFile
 			return null ;
 		}
 		
-		return OutputStream::createInstance($hHandle,$this->application()) ;
+		return OutputStream::createInstance($hHandle) ;
 	}
 
 	public function length()

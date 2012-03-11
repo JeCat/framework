@@ -18,7 +18,7 @@ class ZipFile extends ZipFSO implements File{
 			return null ;
 		}
 		
-		return InputStream::createInstance($hHandle,$this->application()) ;
+		return InputStream::createInstance($hHandle) ;
 	}
 	
 	public function openWriter($bAppend=false){

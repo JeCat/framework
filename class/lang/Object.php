@@ -109,7 +109,7 @@ class Object implements IObject, ISingletonable, IFlyweightable
 		{
 			if($bCreateNew)
 			{
-				self::$arrGlobalInstancs[$sClass] = self::createInstance($createArgvs,null,$sClass) ;
+				self::$arrGlobalInstancs[$sClass] = self::createInstance($createArgvs,$sClass) ;
 			}
 			else 
 			{
@@ -231,7 +231,7 @@ class Object implements IObject, ISingletonable, IFlyweightable
 		
 		if( !$aIns and $bCreateNew )
 		{
-			return $bCreateNew? ($aIns=self::createInstance($keys,null,$sClassName)): null ;
+			return $bCreateNew? ($aIns=self::createInstance($keys,$sClassName)): null ;
 		}
 		else
 		{
