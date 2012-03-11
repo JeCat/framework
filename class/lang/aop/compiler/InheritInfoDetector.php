@@ -55,8 +55,17 @@ class InheritInfoDetector extends Object{
 			$arrUseMap[$key] = $value ;
 		}
 		
+		// use with as
+		preg_match_all('`use\s*([a-zA-Z0-9\\\\]*)\s*as\s*([a-zA-Z0-9]*)\s*;`',$sContent,$arrMatch);
+		for($i=0;$i<count($arrMatch[0]);++$i){
+			$key = $arrMatch[2][$i];
+			$value = $arrMatch[1][$i];
+			
+			$arrUseMap[$key] = $value ;
+		}
+		
 		// class
-		preg_match_all('`class\s*([a-zA-Z0-9]+)(\s*extends\s*([a-zA-Z0-9]+))?(\s*implements\s*([a-zA-Z0-9,\s]+))?{`',$sContent,$arrMatch);
+		preg_match_all('`class\s*([a-zA-Z0-9]+)(\s*extends\s*([a-zA-Z0-9]+))?(\s*implements\s*([a-zA-Z0-9,\\\\\s]+))?\s*{`',$sContent,$arrMatch);
 		$arrClassInfoList = array() ;
 		for($i=0;$i<count($arrMatch[0]);++$i){
 			$aClassInfo = new ClassInfo;
@@ -86,7 +95,7 @@ class InheritInfoDetector extends Object{
 		}
 		
 		// interface
-		preg_match_all('`interface ([a-zA-Z0-9]+)( extends ([a-zA-Z0-9,\s]+))?{`',$sContent,$arrMatch);
+		preg_match_all('`interface ([a-zA-Z0-9]+)( extends ([a-zA-Z0-9,\s]+))?\s*{`',$sContent,$arrMatch);
 		for($i=0;$i<count($arrMatch[0]);++$i){
 			$aClassInfo = new ClassInfo;
 			$aClassInfo->setName($arrMatch[1][$i]);
