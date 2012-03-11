@@ -169,19 +169,18 @@ class AOP extends Object implements IStrategySummary, \Serializable
 			throw new Exception("注册到AOP中的Aspace(%s)不存在; Aspace必须是一个有效的类",$sAspectClass) ;
 		}
 	
-		$aClassFile = new File($sClassFile) ;
 		$aClassCompiler = CompilerFactory::singleton()->create() ;
-		$aTokenPool = $aClassCompiler->scan($aClassFile->openReader()) ;
+		$aTokenPool = $aClassCompiler->scan($sClassFile) ;
 		$aClassCompiler->interpret($aTokenPool) ;
 	
 		if( !$aClassToken=$aTokenPool->findClass($sAspectClass) )
 		{
 			throw new Exception("根据 class path 搜索到class的定义文件：%s，但是该文件中没有定义：%s",
-					array($sAspectClass,$aClassFile->path(),$sAspectClass)
+					array($sAspectClass,$sClassFile,$sAspectClass)
 			) ;
 		}
 	
-		$this->aspects()->add(Aspect::createFromToken($aClassToken,$aClassFile->path())) ;
+		$this->aspects()->add(Aspect::createFromToken($aClassToken,$sClassFile)) ;
 	}
 	
 	/**

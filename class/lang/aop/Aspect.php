@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\lang\aop ;
 
+use org\jecat\framework\fs\FSO;
+
 use org\jecat\framework\io\InputStreamCache;
 
 use org\jecat\framework\lang\compile\CompilerFactory;
@@ -52,7 +54,10 @@ class Aspect extends NamedObject implements \Serializable
 		}
 		
 		$aAspect->sAspectName = $sAspectName ;
-		$aAspect->sAspectFilepath = $sAspectFilepath ;
+		if($sAspectFilepath)
+		{
+			$aAspect->sAspectFilepath = FSO::tidyPath($sAspectFilepath) ;
+		}
 		
 		return $aAspect ;
 	}

@@ -45,8 +45,6 @@ class GenerateStat
 	public $aExecutePoint ;
 	
 	public $arrAdvices ;
-
-	public $arrAspects ;
 	
 	/**
 	 * @var	org\jecat\framework\lang\compile\object\TokenPool
