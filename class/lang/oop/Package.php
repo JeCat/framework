@@ -8,9 +8,10 @@ use org\jecat\framework\fs\Folder;
 class Package implements \Serializable
 {		
 	const source = 1 ;
-	const encode = 5 ;
-	const compiled = 9 ;
-	const all = 100 ;
+	const encode = 8 ;
+	const compiled = 64 ;
+	const nocompiled = 63 ;
+	const all = 255 ;
 	
 	
 	public function __construct($sNamespace,Folder $aFolder=null)

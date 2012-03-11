@@ -2,7 +2,6 @@
 namespace org\jecat\framework\lang\aop ;
 
 use org\jecat\framework\fs\File;
-
 use org\jecat\framework\lang\compile\IStrategySummary;
 use org\jecat\framework\fs\FSO;
 use org\jecat\framework\lang\Exception;
@@ -97,10 +96,10 @@ class AOP extends Object implements IStrategySummary, \Serializable
 			$sBeWeavedClass = $aJointPoint->weaveClass() ;
 			if( !in_array($sBeWeavedClass,$arrBeWeavedClasses) )
 			{				
-				$aSrcClassFile = $aClassLoader->searchClass($sBeWeavedClass,ClassLoader::SEARCH_COMPILED) ;
-				$aCmpdClassFile = $aClassLoader->searchClass($sBeWeavedClass,ClassLoader::SEARCH_COMPILED) ;
+				$sSrcClassFile = $aClassLoader->searchClass($sBeWeavedClass,Package::nocompiled) ;
+				$sCmpdClassFile = $aClassLoader->searchClass($sBeWeavedClass,Package::compiled) ;
 				
-				if( !$aSrcClassFile )
+				if( !$sSrcClassFile )
 				{
 					throw new Exception(
 						"AOP 无法将目标代码织入到 JointPoint %s 中：没有找到类 %s 的源文件。"
@@ -108,7 +107,7 @@ class AOP extends Object implements IStrategySummary, \Serializable
 					) ;
 				}
 				
-				if( !$aCmpdClassFile )
+				if( !$sCmpdClassFile )
 				{
 					throw new Exception(
 						"AOP 无法将目标代码织入到 JointPoint %s 中：没有找到类 %s 的编译文件。"
@@ -121,7 +120,7 @@ class AOP extends Object implements IStrategySummary, \Serializable
 					$aCompiler = $this->createClassCompiler() ;
 				}
 				
-				$aCompiler->compile( $aSrcClassFile->openReader(), $aCmpdClassFile->openWriter() ) ;
+				$aCompiler->compile( File::createInstance($sSrcClassFile)->openReader(), File::createInstance($sCmpdClassFile)->openWriter() ) ;
 				
 				$arrBeWeavedClasses[] = $sBeWeavedClass ;
 			}
@@ -165,7 +164,7 @@ class AOP extends Object implements IStrategySummary, \Serializable
 	
 	private function parseAspectClass($sAspectClass)
 	{
-		if( !$sClassFile = ClassLoader::singleton()->searchClass($sAspectClass,ClassLoader::compiled-1) )
+		if( !$sClassFile = ClassLoader::singleton()->searchClass($sAspectClass,Package::nocompiled) )
 		{
 			throw new Exception("注册到AOP中的Aspace(%s)不存在; Aspace必须是一个有效的类",$sAspectClass) ;
 		}
