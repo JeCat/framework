@@ -68,6 +68,9 @@ class ClassLoader extends Object implements \Serializable
 		}
 
 		$this->arrPackages[$nPriority][$aPackage->ns()] = $aPackage ;
+		
+		$this->sPackagesSignature = null ;
+		
 		return $aPackage ;
 	}
 	
@@ -81,6 +84,8 @@ class ClassLoader extends Object implements \Serializable
 				unset($arrPackages[$nIdx]) ;
 			}
 		}
+		
+		$this->sPackagesSignature = null ;
 	}
 		
 	/**
@@ -178,9 +183,13 @@ class ClassLoader extends Object implements \Serializable
 
 	public function serialize()
 	{
+		// 计算 signature 
+		$this->signature() ;
+		
 		$arrData = array(
 			//'arrClassPathCache' => &$this->arrClassPathCache ,
 			'arrPackages' => &$this->arrPackages ,
+			'sPackagesSignature' => &$this->sPackagesSignature ,
 		) ;
 		
 		return serialize($arrData) ;
@@ -192,6 +201,7 @@ class ClassLoader extends Object implements \Serializable
 		
 		$arrData = unserialize($serialized) ;
 		//$this->arrClassPathCache =& $arrData['arrClassPathCache'] ;
+		$this->sPackagesSignature =& $arrData['sPackagesSignature'] ;
 		$this->arrPackages =& $arrData['arrPackages'] ;
 	}
 	
@@ -204,7 +214,27 @@ class ClassLoader extends Object implements \Serializable
 		$this->bEnableClassCache = $bEnable? true: false ;
 	}
 	
+	public function signature()
+	{
+		if(!$this->sPackagesSignature)
+		{
+			$sSignature = '' ;
+			foreach($this->arrPackages as &$arrPackages)
+			{
+				foreach($arrPackages as $aPackage)
+				{
+					$sSignature.= $aPackage->signature() ;
+				}
+			}
+			$this->sPackagesSignature = md5($sSignature) ;
+		}
+		
+		return $this->sPackagesSignature ;
+	}
+	
 	private $arrPackages = array() ;
+	
+	private $sPackagesSignature ;
 
 	//private $aCompiler = null ;
 	

@@ -219,6 +219,11 @@ class Package implements \Serializable
 		$this->__construct($arrData['sNamespace'],$arrData['aFolder']) ;
 	}
 	
+	public function signature()
+	{
+		return md5( $this->sNamespace . ':' . $this->aFolder->path() ) ;
+	}
+	
 	private $sNamespace ;
 	
 	private $nNamespaceLen = 0 ;
