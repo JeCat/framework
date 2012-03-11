@@ -5,7 +5,7 @@ use org\jecat\framework\io\IInputStream ;
 use org\jecat\framework\lang\Object ;
 use org\jecat\framework\lang\Exception ;
 
-class InheritInfoDetector{
+class InheritInfoDetector extends Object{
 	public function detect(IInputStream $aSourceStream){
 		$sContent = $aSourceStream->read() ;
 		
