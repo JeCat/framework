@@ -9,7 +9,7 @@ use org\jecat\framework\pattern\composite\NamedObject;
 use org\jecat\framework\pattern\iterate\ArrayIterator;
 use org\jecat\framework\lang\Object;
 
-class Pointcut extends NamedObject
+class Pointcut extends NamedObject implements \Serializable
 {
 	static public function createFromToken(FunctionDefine $aFunctionDefine)
 	{

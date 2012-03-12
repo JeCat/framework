@@ -186,7 +186,7 @@ class AOP extends Object implements IStrategySummary, \Serializable
 	/**
 	 * @return org\jecat\framework\pattern\composite\IContainer
 	 */
-	protected function aspects()
+	public function aspects()
 	{
 		if( !$this->aAspects )
 		{
