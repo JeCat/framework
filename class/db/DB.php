@@ -1,12 +1,11 @@
 <?php 
 namespace org\jecat\framework\db ;
 
+use org\jecat\framework\db\sql\StatementState;
+use org\jecat\framework\db\reflecter\imp\MySQLReflecterFactory;
 use org\jecat\framework\lang\Exception;
-
 use org\jecat\framework\mvc\controller\Response;
-
 use org\jecat\framework\system\Application;
-
 use org\jecat\framework\db\driver\IDriver;
 use org\jecat\framework\db\sql\Select;
 use org\jecat\framework\lang\Object;
@@ -14,43 +13,122 @@ use org\jecat\framework\db\sql\Statement;
 
 class DB extends Object
 {
-	public function __construct(IDriver $aDriver=null)
+	public function __construct($sDsn, $sUsername, $sPasswd, array $arrOptions=null)
 	{
-		$this->aDriver = $aDriver ;
+		$this->sPDODsn =& $sDsn ;
+		$this->sPDOUsername =& $sUsername ;
+		$this->sPDOPassword =& $sPasswd ;
+		$this->arrPDOOptions =& $arrOptions ;
 	}
 	
-	/**
-	 * @return IDriver
-	 */
-	public function driver($bRequire=false)
+	public function connect($sDsn=null, $sUsername=null, $sPasswd=null, array $arrOptions=null,$bReconnect=false)
 	{
-		if( $bRequire and !$this->aDriver )
+		if( !$this->aPDO or $bReconnect )
 		{
-			throw new Exception("DB对像缺少Driver配置") ;
+			$sDsn = $sDsn?:$this->sPDODsn ;
+			
+			$this->aPDO = new \PDO(
+					$sDsn
+					, $sUsername?:$this->sPDOUsername
+					, $sPasswd?:$this->sPDOPassword
+					, $arrOptions?:$this->arrPDOOptions
+			) ;
+			
+			if( preg_match('/dbname=(.+?)(;|$)/i',$sDsn,$arrRes) )
+			{
+				$this->sCurrentDBName = $arrRes[1] ;
+			}
 		}
-		return $this->aDriver ;
+		return $this->aPDO ;
 	}
-	public function setDriver(IDriver $aDriver)
+	
+	public function disconnect()
 	{
-		$this->aDriver = $aDriver ;
+		$this->aPDO = null ;
+	}
+	
+	public function hasConnected()
+	{
+		return $this->aPDO? true: false ;
 	}
 	
 	/**
-	 * @return org\jecat\framework\db\recordset\IRecordSet
+	 * @return \PDO
+	 */
+	public function pdo($bAutoConnect=true)
+	{
+		if( !$this->aPDO and $bAutoConnect )
+		{
+			$this->connect() ;
+		}
+		return $this->aPDO ;
+	}
+	
+	public function error()
+	{
+		$arrErr = $this->pdo()->errorInfo() ;
+		return isset($arrErr[1])? $arrErr[1]: 0 ;
+	}
+	
+	public function errorMessage()
+	{
+		$arrErr = $this->pdo()->errorInfo() ;
+		return isset($arrErr[2])? $arrErr[2]: '' ;
+	}
+	
+	public function errorSQLState()
+	{
+		$arrErr = $this->pdo()->errorInfo() ;
+		return isset($arrErr[0])? $arrErr[0]: 0 ;
+	}
+	
+	public function lastInsertId($sName=null)
+	{
+		return $this->pdo()->lastInsertId($sName) ;
+	}
+	
+	/**
+	 * @return org\jecat\framework\db\sql\StatementState
+	 */
+	public function sharedStatementState()
+	{
+		if(!$this->aSharedStatementState)
+		{
+			$this->aSharedStatementState = new StatementState() ;
+		}
+		return $this->aSharedStatementState ;
+	}
+	
+	/**
+	 * @return \PDOStatement
 	 */
 	public function query($sql)
 	{
-		return $this->driver(true)->query($sql) ;
-	}
+		$arrLog['sql'] = ($sql instanceof Statement)?
+				$sql->makeStatement($this->sharedStatementState()): strval($sql) ;
 	
-	public function execute($sql)
-	{
-		return $this->driver(true)->execute($sql) ;
+		$fBefore = microtime(true) ;
+		$result = $this->pdo()->query($arrLog['sql'],\PDO::FETCH_ASSOC) ;
+		$arrLog['time'] = microtime(true) - $fBefore ;
+	
+		$this->arrExecuteLog[] = $arrLog ;
+	
+		if( !$result )
+		{
+			throw new ExecuteException(
+					$this
+					, $arrLog['sql']
+					, $this->error()
+					, $this->errorMessage()
+			) ;
+		}
+	
+		return $result ;
 	}
 	
 	public function queryCount(Select $aSelect,$sColumn='*')
 	{		
-		$aRecords = $this->query( $aSelect->makeStatementForCount('rowCount',$sColumn,$this->driver(true)->sharedStatementState()) ) ;
+		$aRecords = $this->query( $aSelect->makeStatementForCount('rowCount',$sColumn,$this->sharedStatementState()) ) ;
 		
 		if( $aRecords )
 		{
@@ -61,6 +139,71 @@ class DB extends Object
 		{
 			return 0 ;
 		}
+	}
+	
+	public function execute($sql)
+	{
+		$arrLog['sql'] = ($sql instanceof Statement)?
+		$sql->makeStatement($this->sharedStatementState()): strval($sql) ;
+	
+		$fBefore = microtime(true) ;
+		$ret = $this->pdo()->exec($arrLog['sql']) ;
+		$arrLog['time'] = microtime(true) - $fBefore ;
+	
+		if( $ret===false )
+		{
+			$this->arrExecuteLog[] = $arrLog ;
+	
+			throw new ExecuteException(
+					$this
+					, $arrLog['sql']
+					, $this->error()
+					, $this->errorMessage()
+			) ;
+		}
+	
+		$arrLog['affected'] = $ret ;
+		$this->arrExecuteLog[] = $arrLog ;
+	
+		return $arrLog['affected'] ;
+	}
+	
+	public function selectDB($sName)
+	{
+		$this->execute("USE {$sName} ;") ;
+	
+		$this->sCurrentDBName = $sName ;
+	}
+	
+	public function currentDBName()
+	{
+		return $this->sCurrentDBName ;
+	}
+	
+	/**
+	 * @return org\jecat\framework\db\sql\reflecter\AbstractReflecterFactory
+	 */
+	public function reflecterFactory()
+	{
+		// 自动链接到数据库
+		if( !$this->hasConnected() )
+		{
+			try{
+				$this->connect() ;
+			} catch (\Exception $e) {
+				return null ;
+			}
+		}
+		
+		//识别数据库的名称(mysql,oracle)
+		$sDBType = substr($this->sPDODsn, 0 ,stripos($this->sPDODsn, ':') );
+		//如果是mysql,创建mysql的工厂
+		if($sDBType == 'mysql')
+		{
+			return new MySQLReflecterFactory($this);
+		}
+	
+		return null;
 	}
 	
 	/**
@@ -86,30 +229,13 @@ class DB extends Object
 		if($bPrint)
 		{
 			Response::singleton()->printer()->write(
-				"<pre>\r\n".print_r($this->driver(true)->executeLog(),true)."\r\n</pre>"
+				"<pre>\r\n".print_r($this->arrExecuteLog,true)."\r\n</pre>"
 			) ;
 		}
 		else
 		{
-			return $this->driver(true)->executeLog() ;
+			return $this->arrExecuteLog ;
 		}
-	}
-	
-	public function lastInsertId()
-	{
-		if(!$this->aDriver)
-		{
-			throw new Exception("DB对像缺少Driver配置") ;
-		}
-		return $this->driver(true)->lastInsertId() ;
-	}
-	
-	/**
-	 * @return org\jecat\framework\db\sql\reflecter\AbstractReflecterFactory 
-	 */
-	public function reflecterFactory()
-	{
-		return $this->driver(true)->reflecterFactory($this);
 	}
 	
 	/**
@@ -120,7 +246,16 @@ class DB extends Object
 		return parent::singleton($bCreateNew,$createArgvs,$sClass?:__CLASS__) ;
 	}
 	
-	private $aDriver ;
+	private $aPDO ;
+	private $sPDODsn ;
+	private $sPDOUsername ;
+	private $sPDOPassword ;
+	private $arrPDOOptions ;
+	
+	private $sCurrentDBName ;
+	private $arrExecuteLog ;
+	private $aSharedStatementState ;
+	
 }
 
 ?>
