@@ -158,11 +158,15 @@ class ClassLoader extends Object implements \Serializable
 	/**
 	 * @return \Iterator
 	 */
-	public function packageIterator()
+	public function packageIterator($nPriority=Package::all)
 	{
 		$arrAllPackages = array() ;
-		foreach($this->arrPackages as &$arrPackages)
+		foreach($this->arrPackages as $key => &$arrPackages)
 		{
+			if( !($key & $nPriority) )
+			{
+				continue ;
+			}
 			$arrAllPackages = array_merge( $arrAllPackages, array_values($arrPackages) ) ;
 		}
 		return new \org\jecat\framework\pattern\iterate\ArrayIterator( $arrAllPackages ) ;
@@ -171,9 +175,9 @@ class ClassLoader extends Object implements \Serializable
 	/**
 	 * @return \Iterator
 	 */
-	public function classIterator($sNamespace=null)
+	public function classIterator($nPriority=Package::all,$sNamespace=null)
 	{
-		return new ClassIterator( $this, $sNamespace ) ;
+		return new ClassIterator( $this, $nPriority , $sNamespace ) ;
 	}
 	
 	public function totalLoadTime()

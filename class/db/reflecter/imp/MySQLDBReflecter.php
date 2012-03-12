@@ -24,9 +24,10 @@ class MySQLDBReflecter extends AbStractDBReflecter
 			return ;
 		}
 		
+		$sKey = 'Tables_in_'.$sDBName ;
 		foreach ( $aIterResults as $aResult )
 		{
-			$this->arrTableNames [] = $aResult;
+			$this->arrTableNames [] = $aResult[$sKey];
 		}
 		$this->sName = $sDBName;
 	}
