@@ -9,9 +9,12 @@ class CompilerFactory extends Object
 	/**
 	 * return Compiler
 	 */
-	public function create()
+	public function create(Compiler $aCompiler=null)
 	{
-		$aCompiler = new Compiler() ;
+		if(!$aCompiler)
+		{
+			$aCompiler = new Compiler() ;
+		}
 
 		//--------------------
 		// interpreter
