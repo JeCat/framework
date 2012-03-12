@@ -172,7 +172,7 @@ class Folder extends FSO
 		return $aFolder ;
 	}
 	
-	public function delete($sPath,$bRecurse=false,$bIgnoreError=false)
+	public function delete($bRecurse=false,$bIgnoreError=false)
 	{		
 		// 删除下级
 		if($bRecurse)
@@ -242,7 +242,7 @@ class Folder extends FSO
 			if( is_dir($sFilePath) )
 			{
 				// 递归删除子目录
-				$sSubPath = $sPath.'/'.$sFilename ;
+				$sSubPath = $sFilePath ;
 				if( !$this->deleteAllChildren($sSubPath,$bIgnoreError) )
 				{
 					if(!$bIgnoreError)

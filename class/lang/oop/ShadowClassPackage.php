@@ -111,7 +111,7 @@ class ShadowClassPackage extends Package implements \Serializable
 		$aWriter->write( "}\r\n"  ) ;
 		$aWriter->close() ;
 		
-		return $aClassFile ;
+		return $aClassFile->path() ;
 	}
 	
 	
