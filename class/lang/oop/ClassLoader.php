@@ -165,7 +165,7 @@ class ClassLoader extends Object implements \Serializable
 		{
 			$arrAllPackages = array_merge( $arrAllPackages, array_values($arrPackages) ) ;
 		}
-		return new \org\jecat\framework\pattern\iterate\ArrayIterator( $arrPackages ) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator( $arrAllPackages ) ;
 	}
 	
 	/**

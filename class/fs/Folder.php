@@ -1,6 +1,7 @@
 <?php
 namespace org\jecat\framework\fs ;
 
+use org\jecat\framework\lang\Exception ;
 
 class Folder extends FSO
 {
@@ -174,6 +175,15 @@ class Folder extends FSO
 	
 	public function delete($bRecurse=false,$bIgnoreError=false)
 	{		
+		if(!is_bool($bRecurse)){
+			throw new Exception(
+				'%s 的第一个参数必须是boolean : %s',
+				array(
+					__METHOD__,
+					$bRecurse
+				)
+			);
+		}
 		// 删除下级
 		if($bRecurse)
 		{

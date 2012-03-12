@@ -15,6 +15,10 @@ class InheritInfoDetector extends Object{
 		// 删除双引号 字符串;
 		$sContent = preg_replace('`"(.*?)[^\\\\](\\\\\\\\)*"`','',$sContent);
 		
+		// 删除<<<字符串
+		$sPreg = '`<<<(.*)[\n\r]+((.|\n|\r)*)\\1`';
+		$sContent = preg_replace($sPreg,'',$sContent);
+		
 		// 单行注释
 		$sContent = preg_replace('`//(.*)($|\r|\n)`','',$sContent);
 		
@@ -41,7 +45,10 @@ class InheritInfoDetector extends Object{
 			$sNs = $arrMatch[1][0] ;
 			break;
 		default:
-			throw new Exception('暂时不支持一个文件中定义多个namespace');
+			throw new Exception(
+				'暂时不支持一个文件中定义多个namespace : %s',
+				$sContent
+				);
 			break;
 		}
 		
