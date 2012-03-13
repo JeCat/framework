@@ -59,7 +59,7 @@ class Folder extends FSO
 			// FSO::tidyPath($sPath,true) ;
 		}
 		
-		$aFile =  $this->find($sPath,FSO::file|FSO::CLEAN_PATH) ;
+		$aFile =  $this->find($sPath,$nFlag&(~FSO::type)|FSO::file|FSO::CLEAN_PATH) ;
 		
 		if( !$aFile and ($nFlag&self::FIND_AUTO_CREATE)==self::FIND_AUTO_CREATE )
 		{
@@ -86,7 +86,7 @@ class Folder extends FSO
 			// FSO::tidyPath($sPath,true) ;
 		}
 		
-		$aFolder =  $this->find($sPath,FSO::folder|FSO::CLEAN_PATH) ;
+		$aFolder =  $this->find($sPath,$nFlag&(~FSO::type)|FSO::folder|FSO::CLEAN_PATH) ;
 		
 		if( !$aFolder and ($nFlag&self::FIND_AUTO_CREATE) == self::FIND_AUTO_CREATE )
 		{
@@ -144,7 +144,7 @@ class Folder extends FSO
 		return $aFile ;
 	}
 	
-	public function createChildFolder($sPath,$nFlag=Folder::CREATE_FOLDER_DEFAULT)
+	public function createChildFolder($sPath,$nFlag=Folder::CREATE_DEFAULT)
 	{
 		if( !($nFlag&FSO::CLEAN_PATH) )
 		{

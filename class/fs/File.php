@@ -89,7 +89,7 @@ class File extends FSO
 	}
 	
 
-	public function create($nMode=Folder::CREATE_FOLDER_DEFAULT)
+	public function create($nMode=Folder::CREATE_DEFAULT)
 	{
 		$sLocalPath = $this->path() ;
 		
