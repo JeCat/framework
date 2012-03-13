@@ -76,7 +76,7 @@ class ClassLoader extends Object implements \Serializable
 	
 	public function removePackage($aPackage)
 	{
-		foreach($this->arrPackages[$nPriority] as &$arrPackages)
+		foreach($this->arrPackages as $nPriority=> &$arrPackages)
 		{
 			$nIdx = array_search($aPackage,$arrPackages,true) ;
 			if( $nIdx!==false )
@@ -175,9 +175,9 @@ class ClassLoader extends Object implements \Serializable
 	/**
 	 * @return \Iterator
 	 */
-	public function classIterator($nPriority=Package::all,$sNamespace=null)
+	public function classIterator($sNamespace=null,$nPriority=Package::all)
 	{
-		return new ClassIterator( $this, $nPriority , $sNamespace ) ;
+		return new ClassIterator( $this, $sNamespace , $nPriority ) ;
 	}
 	
 	public function totalLoadTime()

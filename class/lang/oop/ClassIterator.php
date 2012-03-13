@@ -5,7 +5,7 @@ use org\jecat\framework\fs\FSIterator;
 
 class ClassIterator extends \ArrayIterator
 {
-	public function __construct(ClassLoader $aClassLoader,$nPriority ,$sNamespace=null)
+	public function __construct(ClassLoader $aClassLoader,$sNamespace=null,$nPriority=Package::all)
 	{
 		$arrClasses = array() ;
 		foreach($aClassLoader->packageIterator($nPriority) as $aPackage)
