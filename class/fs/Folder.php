@@ -174,7 +174,14 @@ class Folder extends FSO
 	}
 	
 	public function delete($bRecurse=false,$bIgnoreError=false)
-	{		
+	{
+		/**
+		 * @todo clean
+		 * 此函数用于删除自己，
+		 * 但以前的接口用于删除自己的子目录／子文件
+		 * 现在删除自己的子目录／子文件改用deleteChild方法
+		 * 为了将不兼容的代码及时发现出来，此处做类型检查并抛出异常
+		 */
 		if(!is_bool($bRecurse)){
 			throw new Exception(
 				'%s 的第一个参数必须是boolean : %s',
@@ -229,6 +236,7 @@ class Folder extends FSO
 				return rmdir($sPath) ;
 			}
 		}
+		return true;
 	}
 	
 	private function deleteAllChildren($sDirPath,$bIgnoreError)
@@ -261,6 +269,7 @@ class Folder extends FSO
 					}
 					$bReturn = true ;
 				}
+				rmdir($sSubPath);
 			}
 			else
 			{
@@ -277,6 +286,8 @@ class Folder extends FSO
 		}
 		
 		closedir($hDir) ;
+		
+		return $bReturn;
 	}
 	
 	/**
