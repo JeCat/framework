@@ -15,7 +15,7 @@ class Category extends Object
 	const top = 1 ;
 	const end = null ;
 	
-	public function __construct(IModel $aModel)
+	public function __construct(Model $aModel)
 	{
 		$this->aModel = $aModel ;
 	}
@@ -23,7 +23,7 @@ class Category extends Object
 	/**
 	 * 将自己插入到 $aCategory 后面，与 $aCategory 同等层级
 	 */
-	public function insertBefore(IModel $aCategoryModel=null)
+	public function insertBefore(Model $aCategoryModel=null)
 	{
 		$this->insertCategoryToPoint(
 			$aCategoryModel===self::end?  self::end: self::rightPoint($aCategoryModel)+1
@@ -33,7 +33,7 @@ class Category extends Object
 	/**
 	 * 将自己做为 $aCategory 的下级分类，插入到 $aCategory 的末尾
 	 */
-	public function insertEndOf(IModel $aCategoryModel)
+	public function insertEndOf(Model $aCategoryModel)
 	{
 		$this->insertCategoryToPoint( self::rightPoint($aCategoryModel) ) ;
 	}
@@ -163,18 +163,6 @@ class Category extends Object
 		
 		$this->moveFeet($aUpdate,$sLftClm,-$nMove,$nOriLft) ;
 		$this->moveFeet($aUpdate,$sRgtClm,-$nMove,$nOriLft) ;
-		
-		
-		// Unserialize
-		$fnSetUnserialize = function(Category $aCategory,$fnSetUnserialize)
-		{
-			foreach($aCategory->childCategoryIterator() as $aChildCategory)
-			{
-				$fnSetUnserialize($aChildCategory,$fnSetUnserialize) ;
-			}
-		} ;
-		
-		$fnSetUnserialize($this,$fnSetUnserialize) ;
 	}
 	
 	/**
@@ -184,7 +172,7 @@ class Category extends Object
 	 * 改造参数$aModelList中的元素,将元素间的关系保存在元素的属性中,$aModelList的迭代顺序依然不变
 	 * 如果 $bReturnTopModels=true 则返回一个包含所有 第一层分类的数组
 	 */
-	static public function buildTree(IModel $aModelList,$bReturnTopModels=false)
+	static public function buildTree(ModelList $aModelList,$bReturnTopModels=false)
 	{
 		$aParentStack = new Stack() ;
 		if($bReturnTopModels)
@@ -192,31 +180,37 @@ class Category extends Object
 			$arrTopCategories = array() ;
 		}
 		
-		$arrAllCategories = array() ;
-		foreach($aModelList->childIterator() as $aModel)
-		{
-			$arrAllCategories[ self::leftPoint($aModel) ] = $aModel ;
-		}
-		
 		// 按照 lft 排序
-		ksort($arrAllCategories) ;
-		$aModelList->clearChildren() ;
-		
-		foreach($arrAllCategories as $aModel)
-		{
-			$aModelList->addChild($aModel) ;
-
-			for(; $aParent=$aParentStack->get(); $aParentStack->out() )
+		$aModelList->sortChildren( function (Model $aModelA,Model $aModelB) {
+			
+			if( $aModelA->lft > $aModelB->lft )
 			{
-				if( $aParent->lft < $aModel->lft and $aParent->rgt > $aModel->rgt )
+				return 1 ;
+			}
+			else if( $aModelA->lft==$aModelB->lft )
+			{
+				return 0 ;
+			}
+			else
+			{
+				return -1 ;
+			}
+			
+		} ) ;
+		
+		foreach($aModelList as $nIdx=>$aModel)
+		{
+			for(; ($nParentIdx=$aParentStack->get())!==false; $aParentStack->out() )
+			{
+				if( $aModelList->data('lft',$nParentIdx) < $aModel->lft and $aModelList->data('rgt',$nParentIdx) > $aModel->rgt )
 				{
 					break ;
 				}
 			}
 			
-			if($aParent)
+			if($nParentIdx!==false)
 			{
-				self::addChildCategory($aParent,$aModel) ;
+				self::addChildCategory($aModelList,$nParentIdx,$nIdx) ;
 			}
 			else
 			{
@@ -225,21 +219,21 @@ class Category extends Object
 				if($bReturnTopModels)
 				
 				{
-					$arrTopCategories[] = $aModel ;
+					$arrTopCategories[] = $nIdx ;
 				}
 			}
-			$aParentStack->put($aModel) ;
+			$aParentStack->put($nIdx) ;
 		}
 		
-		return $bReturnTopModels? $arrTopCategories: null ;
+		return $bReturnTopModels? new ModelListIterator($aModelList,$arrTopCategories): null ;
 	}
 	
 	/**
 	 * 加载原型中的所有分类,
 	 * 返回的迭代器的元素中不包含他们之间的关系,如果需要分类间的关系,使用本类的buildTree方法
-	 * @return IModel
+	 * @return Model
 	 */
-	static public function load(IModel $aModelList)
+	static public function load(Model $aModelList)
 	{		
 		$aCriteria = clone $aModelList->prototype()->criteria() ;
 		$aCriteria->addOrderBy('lft',false) ;
@@ -262,7 +256,7 @@ class Category extends Object
 			throw new CategoryPointException("尚未为临接表模型设置原型，无法完成操作") ;
 		}
 		
-		$aCategoryList = new Model($aOrmPrototype,true) ;
+		$aCategoryList = new ModelList($aOrmPrototype) ;
 		
 		$aCriteria = clone $aOrmPrototype->criteria() ;
 		$aCriteria->addOrderBy('lft',false)
@@ -275,7 +269,7 @@ class Category extends Object
 			return ;
 		}
 		
-		self::buildTree($aCategoryList->childIterator(),$this->aModel) ;
+		self::buildTree($aCategoryList) ;
 	}
 	
 	/**
@@ -283,37 +277,35 @@ class Category extends Object
 	 */
 	public function childCategoryIterator()
 	{
-		$aChildren = self::categoryChildren($this->model(),false) ;
-		return $aChildren? new \ArrayIterator($aChildren): new \EmptyIterator() ;
+		return new ModelListIterator(
+				ModelList::belongsModelList($this->model())
+				, $this->model()->data('__category_children')?: array()
+		) ;
 	}
 	
-	static public function depth(IModel $aModel)
+	static public function depth(Model $aModel)
 	{
 		return (int) $aModel->data('__category_depth') ;
 	}
-	static public function setDepth(IModel $aModel,$nDepth)
+	static public function setDepth(Model $aModel,$nDepth)
 	{
 		$aModel->setData('__category_depth',(int)$nDepth) ;
 	}
 	
-	
-	/**
-	 * @return IModel
-	 */
-	static public function categoryChildren(IModel $aParentModel,$bAutoCreate=true)
-	{
-		if( !$aChildren=$aParentModel->child('__category_children') )
+	static private function addChildCategory(ModelList $aModelList,$nParentModelIndex,$nChildModelIndex)
+	{		
+		$arrChildren = $aModelList->data('__category_children',$nParentModelIndex)?: array() ;
+		if(!in_array($nChildModelIndex,$arrChildren))
 		{
-			$aChildren = new Model(null,true) ;
-			$aParentModel->addChild($aChildren,'__category_children') ;
+			$arrChildren[] = $nChildModelIndex ;
 		}
-		return $aChildren ;
-	}
-	
-	static private function addChildCategory(IModel $aParentModel,IModel $aChildModel)
-	{
-		self::categoryChildren($aParentModel)->addChild($aChildModel) ;
-		self::setDepth($aChildModel,self::depth($aParentModel)+1) ;
+		$aModelList->setData('__category_children',$arrChildren,$nParentModelIndex) ;
+		
+		$aModelList->setData(
+				'__category_depth'
+				, $aModelList->data('__category_depth',$nParentModelIndex)+1
+				, $nChildModelIndex
+		) ;
 	}
 	
 	private function endRightFoot(Prototype $aPrototype,$sRightColumn=null)
@@ -404,11 +396,11 @@ class Category extends Object
 		}
 	}
 	
-	static public function leftPoint(IModel $aModel)
+	static public function leftPoint(Model $aModel)
 	{
 		return (int)$aModel->data('lft') ;
 	}
-	static public function rightPoint(IModel $aModel)
+	static public function rightPoint(Model $aModel)
 	{
 		return (int)$aModel->data('rgt') ;
 	}
@@ -423,7 +415,7 @@ class Category extends Object
 	}
 	
 	/**
-	 * @return IModel
+	 * @return Model
 	 */
 	public function model()
 	{
@@ -431,7 +423,7 @@ class Category extends Object
 	}
 	
 	/**
-	 * @var IModel
+	 * @var Model
 	 */
 	private $aModel ;
 	// private $arrChildCategories = array() ;

@@ -33,8 +33,6 @@ interface IModel extends \ArrayAccess, \Iterator
 	
 	public function childNameIterator() ;
 	
-	public function createChild($bAdd=true);
-	
 	// for data ///////////////////////////////
 	public function data($sName) ;
 	

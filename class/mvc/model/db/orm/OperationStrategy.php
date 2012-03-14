@@ -1,6 +1,7 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm ;
 
+use org\jecat\framework\mvc\model\db\Recordset;
 use org\jecat\framework\mvc\model\db\Model;
 use org\jecat\framework\db\sql\IDataSettableStatement;
 use org\jecat\framework\mvc\model\IModel;
@@ -9,7 +10,7 @@ use org\jecat\framework\lang\Object;
 
 abstract class OperationStrategy extends Object
 {
-	protected function makeResrictionForAsscotion(Model $aModel,array $arrFromKeys,$sToTableName=null,array $arrToKeys, StatementFactory $aSqlFactory)
+	protected function makeResrictionForAsscotion(array & $arrDataRow,$sFromTableName=null,array $arrFromKeys,$sToTableName=null,array $arrToKeys, StatementFactory $aSqlFactory)
 	{
 		if($sToTableName)
 		{
@@ -20,7 +21,11 @@ abstract class OperationStrategy extends Object
 		
 		foreach($arrFromKeys as $nIdx=>$sFromKey)
 		{
-			$aRestriction->eq( "{$sToTableName}`{$arrToKeys[$nIdx]}`", $aModel->data($sFromKey) ) ;
+			if($sFromTableName)
+			{
+				$sFromKey = $sFromTableName.'.'.$sFromKey ;
+			}
+			$aRestriction->eq( "{$sToTableName}`{$arrToKeys[$nIdx]}`", $arrDataRow[$sFromKey] ) ;
 		}
 		
 		return $aRestriction ;

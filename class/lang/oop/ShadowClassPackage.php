@@ -25,11 +25,11 @@ class ShadowClassPackage extends Package implements \Serializable
 	 */
 	public function searchClassEx($sSubFolder,$sShortClassName)
 	{
-		if( !$aClassFile = parent::searchClassEx($sSubFolder,$sShortClassName) )
+		if( !$sClassFile = parent::searchClassEx($sSubFolder,$sShortClassName) )
 		{
-			$aClassFile = $this->generateShadowlClass($sShortClassName) ;
+			$sClassFile = $this->generateShadowlClass($sShortClassName) ;
 		}
-		return $aClassFile ;
+		return $sClassFile ;
 	}
 	
 	public function generateShadowlClass($sShortClass)
@@ -111,7 +111,7 @@ class ShadowClassPackage extends Package implements \Serializable
 		$aWriter->write( "}\r\n"  ) ;
 		$aWriter->close() ;
 		
-		return $aClassFile ;
+		return $aClassFile->path() ;
 	}
 	
 	

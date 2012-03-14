@@ -2,13 +2,13 @@
 
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\mvc\model\db\Model;
 use org\jecat\framework\lang\Object;
 use org\jecat\framework\db\DB;
-use org\jecat\framework\mvc\model\db\IModel ;
 use org\jecat\framework\db\sql\StatementFactory ;
 
 class Updater extends Object{
-    public function execute(DB $aDB, IModel $aModel){
+    public function execute(DB $aDB, Model $aModel){
         $aPrototype = $aModel->prototype();
         $aUpdate = StatementFactory::singleton()->createUpdate($aPrototype->tableName()) ;
         
@@ -31,23 +31,37 @@ class Updater extends Object{
         
 		// update当前model
         $aUpdate->clearData() ;
+        
+        // 处理主键
+        foreach( $aPrototype->keys() as $sKey)
+        {
+        	//主键发生修改
+	        if($aModel->changed($sKey))
+	        {
+	        	throw new ORMException('org\jecat\framework\mvc\model\db\orm\Updater : Key 有修改，无法进行Update操作');
+	        }
+	        
+	        //用主键作为查询条件
+	        else
+	       {
+	        	$aCriteria->where()->eq($sKey,$aModel->data($sKey)) ;
+	        }        	
+        }
+        
 		$bFlagChanged = false;//当前表是否有修改
-		foreach($aModel->dataNameIterator() as $sClmName)
+		foreach($aPrototype->columns() as $sClmName)
 		{
-			if(in_array($sClmName,$aPrototype->keys())){//是主键
-				if($aModel->changed($sClmName)){//主键发生修改
-					throw new ORMException('org\jecat\framework\mvc\model\db\orm\Updater : Key 有修改，无法进行Update操作');
-				}else{//用主键作为查询条件
-					$aCriteria->where()->eq($sClmName,$aModel->data($sClmName));
-				}
-			}else{//主键以外的项
-				if($aModel->changed($sClmName)){//只update发生修改的项
-					$aUpdate->setData($sClmName,$aModel->data($sClmName));
-					$bFlagChanged = true;
-				}
+			//只update发生修改的项
+			if($aModel->changed($sClmName))
+			{
+				$aUpdate->setData($sClmName,$aModel->data($sClmName));
+				$bFlagChanged = true;
 			}
 		}
-		if($bFlagChanged){//只有当有修改的时候才发生更新
+		
+		//只有当有修改的时候才发生更新
+		if($bFlagChanged)
+		{
 			$aDB->execute($aUpdate);
 		}
 		
@@ -100,7 +114,7 @@ class Updater extends Object{
     	// nothing to do ...
     }
     
-    private function setAssociatedModelData(IModel $aModel,IModel $aChildModel,array $arrFromKeys,array $arrToKeys){
+    private function setAssociatedModelData(Model $aModel,Model $aChildModel,array $arrFromKeys,array $arrToKeys){
     	foreach($arrToKeys as $nIdx=>$sKey){
     		if($aChildModel->isList()){
     			$value = $aModel->data($arrFromKeys[$nIdx]);

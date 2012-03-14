@@ -1,13 +1,17 @@
 <?php
+
 namespace org\jecat\framework\mvc\model\db ;
 
+use org\opencomb\friendlyerror\__HighterActiver;
+use org\jecat\framework\io\IOutputStream;
+use org\jecat\framework\mvc\controller\Response;
 use org\jecat\framework\bean\BeanConfException;
 use org\jecat\framework\pattern\composite\INamable;
 use org\jecat\framework\bean\BeanFactory;
 use org\jecat\framework\bean\IBean;
 use org\jecat\framework\db\sql\Restriction;
 use org\jecat\framework\lang\Exception;
-use org\jecat\framework\mvc\model\db\orm\Deleter;
+use org\jecat\framework\mvc\model\db\orm;
 use org\jecat\framework\mvc\model\db\orm\Selecter;
 use org\jecat\framework\mvc\model\db\orm\Inserter;
 use org\jecat\framework\mvc\model\db\orm\Updater;
@@ -18,6 +22,8 @@ use org\jecat\framework\mvc\model\db\orm\Association;
 use org\jecat\framework\mvc\model\AbstractModel ;
 use org\jecat\framework\mvc\model\db\orm\Prototype;
 
+define('org\\jecat\\framework\\mvc\\model\\db\\Recordset\\KEY_MARK_CHAR','*') ;
+
 /**
  * @wiki /MVC模式/数据库模型/模型的基本操作(新建、保存、删除、加载)
  *  ==模型的克隆(clone)==
@@ -26,7 +32,7 @@ use org\jecat\framework\mvc\model\db\orm\Prototype;
  *  [example title="/MVC模式/数据库模型/模型的基本操作(新建、保存、删除、加载)模型的克隆"]
  */
 
-class Model extends AbstractModel implements IModel, IBean
+class Model extends AbstractModel implements IBean
 {
 	/**
 	 *  @wiki /MVC模式/数据库模型/模型列表(ModelList)
@@ -38,33 +44,13 @@ class Model extends AbstractModel implements IModel, IBean
 	 */
 	public function __construct(Prototype $aPrototype=null,$bList=false)
 	{
-	    parent::__construct($bList);
-	    $this->setPrototype($aPrototype);
+	    parent::__construct($bList) ;
+	    $this->setPrototype($aPrototype) ;	    
 	}
 	
 	public function name()
 	{
 		return $this->aPrototype? $this->aPrototype->name(): null ; 
-	}
-		
-	/**
-	 * @return IModel
-	 */
-
-	public function child($sName,$bCreateByAssoc=true)
-	{
-		$aChild = parent::child($sName) ;
-		if( !$aChild and $bCreateByAssoc )
-		{
-			// 根据 原型 自动创建子模型
-			if( $aAssoc=$this->prototype()->associationByName($sName) )
-			{
-				$aChild = $aAssoc->toPrototype()->createModel( !$aAssoc->isType(Association::oneToOne) ) ;
-				$this->addChild($aChild,$sName) ;
-			}
-		}
-		
-		return $aChild ;
 	}
 	
 	/**
@@ -79,63 +65,10 @@ class Model extends AbstractModel implements IModel, IBean
 	{
 		$this->aPrototype = $aPrototype ;
 	}
-
-	public function loadData( IRecordSet $aRecordSet )
+	
+	public function isEmpty()
 	{
-		// Model List ------------------------
-		if($this->isList())
-		{
-			$aPrototype = $this->prototype() ;
-			
-			for( ;$aRecordSet->valid(); $aRecordSet->next() )
-			{
-				if( $aPrototype )
-				{
-					$aModel = $aPrototype->createModel(false) ;
-				}
-				else
-				{
-					$aModel = new Model() ;
-				}
-			
-				$this->addChild($aModel) ;
-			
-				$aModel->loadData($aRecordSet) ;
-			}
-		}
-		
-		// Model ------------------------
-		else
-		{
-			// 通过 prototype 加载各字段数据
-			if( $aPrototype=$this->prototype() )
-			{
-				$arrColumns = array_merge($aPrototype->columns(),$aPrototype->keys());
-				foreach( $arrColumns as $sClm )
-				{
-					$this->setData( $sClm, $aRecordSet->field($aPrototype->sqlColumnAlias($sClm)) ,false) ;
-				}
-				
-				// 加载所有单属关系的子模型
-				foreach($aPrototype->associations() as $aAssoc)
-				{
-					if( $aAssoc->isType(Association::oneToOne) )
-					{
-						$this->child($aAssoc->name())->loadData($aRecordSet) ;					
-					}
-				}
-			}
-			
-			// 通过 数据集 加载各字段数据
-			else 
-			{
-				$arrRow = $aRecordSet->current() ;
-				foreach ($arrRow as $sClmName=>&$sValue)
-				{
-					$this->setData($sClmName,$sValue,false) ;
-				}
-			}
-		}
+		return empty($this->arrDataSheet[$this->nDataRow]) ;
 	}
 	
 	/**
@@ -145,19 +78,13 @@ class Model extends AbstractModel implements IModel, IBean
 	 *  模型通过加载(load)对数据进行读取,如果不写加载条件，则会对数据表整个进行读取.
 	 *  [example title="/MVC模式/数据库模型/模型的基本操作(新建、保存、删除、加载)/加载"]
 	 */
-	
 	public function load($values=null,$keys=null)
 	{
-		// load 前 清理数据
 		$this->clearData() ;
 		
-		if($this->isList())
-		{
-			$this->nTotalCount = -1 ;
-		}
-		
+		$this->nDataRow = 0 ;
 		return Selecter::singleton()->execute(
-			$this , null , self::buildCriteria($this->prototype(),$values,$keys), $this->isList(), $this->db()
+			$this->prototype() , $this->recordset(), null , self::buildCriteria($this->prototype(),$values,$keys), $this->isList(), $this->db()
 		) ;
 	}
 
@@ -169,33 +96,18 @@ class Model extends AbstractModel implements IModel, IBean
 	 *  当数据被Model加载过之后，save会自动判断使用update方法，对数据进行更新.当数据没有被Model加载过，save会自动判断使用insert方法,新添加一个数据
 	 *  [example title="/MVC模式/数据库模型/模型的基本操作(新建、保存、删除、加载)/保存(update)"]
 	 */
-	
 	public function save($bForceCreate=false)
 	{
-		if( $this->isList() )
+		// update
+		if( !$bForceCreate and $this->hasSerialized() )
 		{
-			foreach($this->childIterator() as $aChildModel)
-			{
-				if( !$aChildModel->save($bForceCreate) )
-				{
-					return false ;
-				}
-			}
-			return true ;
+			return $this->update() ;
 		}
-		else
+		
+		// insert
+		else 
 		{
-			// update
-			if( !$bForceCreate and $this->hasSerialized() )
-			{
-				return $this->update() ;
-			}
-			
-			// insert
-			else 
-			{
-				return $this->insert() ;
-			}
+			return $this->insert() ;
 		}
 	}
 
@@ -216,25 +128,9 @@ class Model extends AbstractModel implements IModel, IBean
 	 *  数据的删除，由模型的删除(delete)方法完成.删除数据之前，通过对Model的加载(load)锁定要删除的数据行,这里加载相当与sql中的where的过滤条件
 	 *  [example title="/MVC模式/数据库模型/模型的基本操作(新建、保存、删除、加载)/删除"]
 	 */
-	
 	public function delete()
 	{
-		if( $this->isList() )
-		{
-			foreach($this->childIterator() as $aChildModel)
-			{
-				if( !$aChildModel->delete() )
-				{
-					return false ;
-				}
-			}
-			return true ;
-		}
-		
-		else
-		{
-			return Deleter::singleton()->execute($this->db(), $this) ;
-		}
+		return Deleter::singleton()->execute($this->db(), $this) ;
 	}
 	
 	/**
@@ -286,70 +182,6 @@ class Model extends AbstractModel implements IModel, IBean
 		}
 	}
 	
-	public function loadChild($values=null,$keys=null)
-	{
-		$aChild = $this->createChild(false,true) ;
-		
-		$arrArgvs = func_get_args() ;
-		call_user_func_array( array($aChild,'load'), $arrArgvs ) ;
-
-		if( $aChild->hasSerialized() )
-		{
-			$this->addChild($aChild) ;
-			return $aChild ;
-		}
-		else
-		{
-			return null ;
-		}
-	}
-	
-	public function findChildBy($values,$keys=null)
-	{
-		if(!$keys)
-		{
-			$keys = $this->prototype()->primaryKeys() ;
-		}
-		$keys = (array)$keys ;
-		$values = (array)$values ;
-		
-		$keys = array_values($keys) ;
-		$values = array_values($values) ;
-		
-		foreach( $this->childIterator() as $aChild )
-		{
-			foreach($values as $nIdx=>$sValue)
-			{
-				if( isset($keys[$nIdx]) and $aChild->data($keys[$nIdx])!=$sValue )
-				{
-					continue(2) ;
-				}
-			}
-			return $aChild ;
-		}
-		
-		return null ;
-	}
-	
-	public function buildChild($values=null,$keys=null)
-	{
-		if( !$aChildModel=$this->findChildBy($values,$keys) and !$aChildModel=$this->loadChild($values,$keys) )
-		{
-			$aChildModel = $this->createChild(true,true) ;
-			
-			if( $keys )
-			{
-				$values = (array) $values ;
-				foreach((array) $keys as $i=>$sKey)
-				{
-					$aChildModel->setData($sKey,$values[$i]) ;
-				}
-			}
-		}
-		
-		return $aChildModel ;
-	}
-	
 	public function setPagination($iPerPage,$iPageNum){
 	    $this->prototype()->criteria()->setLimit( $iPerPage, $iPerPage*($iPageNum-1) ) ;
 	}
@@ -359,7 +191,7 @@ class Model extends AbstractModel implements IModel, IBean
 	 * 覆盖父类方法，实现 prototype 字段别名
 	 */
 	protected function findDataByPath(&$sDataName,&$aModel,&$bDataExist)
-	{
+	{/*
 		// 原型中的别名
 		if( $aPrototype = $this->prototype() )
 		{
@@ -370,7 +202,7 @@ class Model extends AbstractModel implements IModel, IBean
 			}
 		}
 		
-		return parent::findDataByPath($sDataName,$aModel,$bDataExist) ;
+		return parent::findDataByPath($sDataName,$aModel,$bDataExist) ;*/
 	}
 	
 	// implements IBean
@@ -537,7 +369,7 @@ class Model extends AbstractModel implements IModel, IBean
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
-		$this->setList(!empty($arrConfig['list'])) ;
+		parent::setList(!empty($arrConfig['list'])) ;
 		$this->arrBeanConfig = $arrConfig ;
 	}
 	
@@ -551,31 +383,6 @@ class Model extends AbstractModel implements IModel, IBean
 		return DB::singleton() ;
 	}
 	
-	public function createChild($bAdd=true)
-	{
-		if( !$this->prototype() )
-		{
-			throw new Exception("模型没有缺少对应的原型，无法为其创建子模型") ;
-		}
-	
-		$aChild = $this->prototype()->createModel(false) ;
-	
-		if($bAdd)
-		{
-			$this->addChild($aChild) ;
-		}
-	
-		return $aChild ;
-	}
-	
-	public function totalCount()
-	{
-		if($this->nTotalCount<0)
-		{
-			$this->nTotalCount =Selecter::singleton()->totalCount(DB::singleton(),$this->prototype()) ;
-		}
-		return $this->nTotalCount ;
-	}
 	
 	public function hasSerialized()
 	{
@@ -587,12 +394,263 @@ class Model extends AbstractModel implements IModel, IBean
 	// ---------------------------------------------
 	public function serializableProperties()
 	{
-		$arrProps = parent::serializableProperties() ;
-		$arrProps[__CLASS__] = array('aPrototype') ;
+		$arrProps['org\\jecat\\framework\\mvc\\model\\AbstractModel'] = array('arrChildren') ;
+		$arrProps[__CLASS__] = array('aPrototype','arrDataSheet','nDataRow') ;
 		return $arrProps ;
 	}
 	
-	private $nTotalCount = -1 ;
+	
+	
+	
+	
+	// ------------------------------
+	
+	public function data($sName)
+	{
+		$this->transDataName($sName) ;
+		return isset($this->arrDataSheet[$this->nDataRow][$sName])?
+			$this->arrDataSheet[$this->nDataRow][$sName]: null ;
+	}
+	
+	public function setData($sName,$value, $bChanged=true)
+	{
+		$this->transDataName($sName) ;
+		
+		$sOriData = isset($this->arrDataSheet[$this->nDataRow][$sName])?
+			$this->arrDataSheet[$this->nDataRow][$sName]: null ;
+	
+		if( $bChanged and $value!=$sOriData )
+		{
+			$this->arrDataSheet[$this->nDataRow][Recordset\KEY_MARK_CHAR.'_changed'][$sName] = $sOriData ;
+			$this->arrDataSheet[$this->nDataRow][$sName] = $value ;
+		}
+		
+		return $this ;
+	}
+	
+	public function hasData($sName)
+	{
+		$this->transDataName($sName) ;
+		
+		return is_array($this->arrDataSheet)
+			and isset($this->arrDataSheet[$this->nDataRow])
+			and is_array($this->arrDataSheet[$this->nDataRow])
+			and key_exists($sName,$this->arrDataSheet[$this->nDataRow]) ;
+	}
+	
+	public function removeData($sName)
+	{
+		$this->transDataName($sName) ;
+		
+		unset(
+			$this->arrDataSheet[$this->nDataRow][Recordset\KEY_MARK_CHAR.'_changed'][$sName]
+			, $this->arrDataSheet[$this->nDataRow][$sName]
+		) ;
+		
+		return $this ;
+	}
+	
+	public function clearData()
+	{
+		$this->arrDataSheet[$this->nDataRow] = array() ;
+	}
+	
+	/**
+	 * @param string $sName	$sName=null返回一个数组，或返回指定数据项的“是否变化”状态
+	 */
+	public function changed($sName=null)
+	{
+		if($sName===null)
+		{
+			return !empty($this->arrDataSheet[$this->nDataRow][Recordset\KEY_MARK_CHAR.'_changed']) ;
+		}
+		else
+		{
+			$this->transDataName($sName) ;
+			return 
+				array_key_exists(Recordset\KEY_MARK_CHAR.'_changed',$this->arrDataSheet[$this->nDataRow])
+					and array_key_exists($sName, $this->arrDataSheet[$this->nDataRow][Recordset\KEY_MARK_CHAR.'_changed']) ;
+		}
+	}
+	
+	public function clearChanged()
+	{
+		unset($this->arrDataSheet[$this->nDataRow][Recordset\KEY_MARK_CHAR.'_changed']) ;
+	}
+	
+	private function _dataIterator($bForDataName=false)
+	{
+		if( !$aPrototype=$this->prototype() )
+		{
+			return ;
+		}
+		if( !is_array($this->arrDataSheet) or !isset($this->arrDataSheet[$this->nDataRow]) or !is_array($this->arrDataSheet[$this->nDataRow]) )
+		{
+			return new \EmptyIterator() ;
+		}
+		
+		$arrOwnData = array() ;
+		foreach($aPrototype->columns(true) as $sDataName)
+		{
+			$arrOwnData[] = $bForDataName? $sDataName: $this->data($sDataName) ;
+		}
+		return new \ArrayIterator($arrOwnData) ;
+	}
+	public function dataIterator($bForDataName=false)
+	{
+		return $this->_dataIterator(false) ;
+	}
+	public function dataNameIterator()
+	{
+		return $this->_dataIterator(true) ;
+	}
+	
+	protected function & transDataName(& $sName)
+	{
+		return $sName = $this->prototype()->path().'.'.$sName ;
+	}
+	
+	/**
+	 * @return Recordset
+	 */
+	private function & recordset()
+	{
+		if($this->arrDataSheet===null)
+		{
+			$this->arrDataSheet = array() ;
+		}
+		return $this->arrDataSheet ;
+	}
+	
+	/**
+	 * @return Model
+	 */
+	public function child($sName)
+	{
+		if( !$aChild=parent::child($sName) and $this->aPrototype and $aAssociation=$this->aPrototype->associationByName($sName) )
+		{
+			$aChildPrototype = $aAssociation->toPrototype() ;
+			$bIsList = !$aAssociation->isType(Association::oneToOne) ;
+			
+			$aChild = $aChildPrototype->createModel( $bIsList ) ;
+			$this->segmentalizeChild( $aChild, $bIsList, $sName ) ;
+			
+			parent::addChild($aChild,$sName) ;
+		}
+		
+		return $aChild ;
+	}
+	
+	protected function segmentalizeChild(Model $aChild,$bIsList=false,$sName=null)
+	{
+		if($bIsList)
+		{
+			$aChild->arrDataSheet =& self::dataSheet($this->arrDataSheet,$this->nDataRow,$sName,true) ;
+			$aChild->nDataRow = 0 ;
+		}
+		
+		else
+		{
+			$aChild->arrDataSheet =& $this->arrDataSheet ;
+			
+			// 按引用传递，完全和 parent model 一致，当 parent 的 DataRow 在 DataSheet 中移动时，将会影响 child model
+			$aChild->nDataRow =& $this->nDataRow ;
+		}
+		
+		return $aChild ;
+	}
+	
+	/**
+	 * @return IIterator
+	 */
+	public function childIterator()
+	{
+		foreach( $this->childNameIterator() as $sName )
+		{
+			// 建立子模型
+			$this->child($sName) ;
+		}
+		
+		return parent::childIterator() ;
+	}
+	
+	/**
+	 * @return IIterator
+	 */
+	public function childNameIterator()
+	{
+		if( !$aPrototype = $this->prototype() )
+		{
+			return new \EmptyIterator() ;
+		}
+
+		$arrChildNames = array() ;
+		foreach( $aPrototype->associationIterator() as $aAssociation )
+		{
+			$arrChildNames[] = $aAssociation->toPrototype()->name() ;
+		}
+		return new \ArrayIterator ( $arrChildNames ) ;
+	}
+	
+	public function printStruct(IOutputStream $aOutput = null, $nDepth = 0, $sDisplayTitle=null )
+	{
+		if (! $aOutput)
+		{
+			$aOutput = Response::singleton()->printer();
+		}
+		
+		$aOutput->write ( "<pre>\r\n" );
+		
+		$aOutput->write ( str_repeat ( "\t", $nDepth ) ) ;
+		if( $sDisplayTitle===null )
+		{
+			$sDisplayTitle = "[Model] ".$this->name() ;
+		}
+		$aOutput->write ( $sDisplayTitle."\r\n") ;
+				
+		$aPrototype = $this->prototype() ;
+		foreach( $aPrototype->columns() as $sDataName )
+		{
+			$aOutput->write ( str_repeat ( "\t", $nDepth+1 ) . "{$sDataName}: " . $this->data($sDataName) . "\r\n" );
+		}
+		
+		// 子模型
+		foreach ( $this->childIterator () as $aChild )
+		{
+			$aChild->printStruct ( $aOutput, $nDepth + 1 );
+		}
+		
+		$aOutput->write ( "</pre>" );
+		
+		return ;
+	}
+	
+	public function isList()
+	{
+		return false ;
+	}
+	
+	static public function & dataSheet(array & $parentSheet,$nRow,$sSheetName,$bAutoCreate=false)
+	{
+		$sKey = Recordset\KEY_MARK_CHAR.'_sheet'.Recordset\KEY_MARK_CHAR ;
+		if( !isset($parentSheet[$nRow][$sKey][$sSheetName]) )
+		{
+			if(!$bAutoCreate)
+			{
+				$null = null ;
+				return $null ;
+			}
+			else
+			{
+				$parentSheet[$nRow][$sKey][$sSheetName] = array() ;
+			}
+		}
+	
+		return $parentSheet[$nRow][$sKey][$sSheetName] ;
+	}
+	
+	protected $arrDataSheet = array() ;
+	protected $nDataRow = 0 ;
 	
 	/**
 	 * @var org\jecat\framework\mvc\model\db\orm\Prototype
@@ -601,5 +659,9 @@ class Model extends AbstractModel implements IModel, IBean
 	private $aCriteria ;
 	
 	private $arrBeanConfig ;
+	
+	
 }
+
+
 

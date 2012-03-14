@@ -3,15 +3,14 @@
 namespace org\jecat\framework\mvc\model\db\orm;
 
 use org\jecat\framework\lang\Exception;
-
 use org\jecat\framework\lang\Object;
 use org\jecat\framework\db\DB;
-use org\jecat\framework\mvc\model\db\IModel ;
+use org\jecat\framework\mvc\model\db\Model ;
 use org\jecat\framework\db\sql\StatementFactory ;
 
 class Inserter extends OperationStrategy
 {
-    public function execute(DB $aDB, IModel $aModel)
+    public function execute(DB $aDB, Model $aModel)
 	{
 		$aPrototype = $aModel->prototype() ;
 		$aInsert = $aPrototype->statementFactory()->createInsert($aPrototype->tableName()) ;
@@ -155,13 +154,14 @@ class Inserter extends OperationStrategy
 		
 	protected function buildBridge(DB $aDB,Association $aAssociation,IModel $aFromModel,IModel $aToModel)
 	{
-		$aStatementFactory = $aAssociation->fromPrototype()->statementFactory() ;
+		$aFromPrototype = $aAssociation->fromPrototype() ;
+		$aStatementFactory = $aFromPrototype->statementFactory() ;
 		$aSelect = $aStatementFactory->createSelect($aAssociation->bridgeTableName()) ;
 		$aSelect->criteria()->where()->add(
-			$this->makeResrictionForAsscotion($aFromModel,$aAssociation->fromKeys(),null,$aAssociation->toBridgeKeys(),$aStatementFactory)
+			$this->makeResrictionForAsscotion($aFromModel,$aFromPrototype->path(),$aAssociation->fromKeys(),null,$aAssociation->toBridgeKeys(),$aStatementFactory)
 		) ;
 		$aSelect->criteria()->where()->add(
-			$this->makeResrictionForAsscotion($aToModel,$aAssociation->toKeys(),null,$aAssociation->fromBridgeKeys(),$aStatementFactory)
+			$this->makeResrictionForAsscotion($aToModel,$aAssociation->toPrototype()->path(),$aAssociation->toKeys(),null,$aAssociation->fromBridgeKeys(),$aStatementFactory)
 		) ;
 		
 		// 检查对应的桥接表记录是否存在

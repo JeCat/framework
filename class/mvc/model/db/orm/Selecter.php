@@ -1,26 +1,21 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\mvc\model\db\Recordset;
 use org\jecat\framework\db\sql\Restriction;
 use org\jecat\framework\mvc\model\db\Model;
 use org\jecat\framework\db\sql\Table;
 use org\jecat\framework\db\sql\Select;
 use org\jecat\framework\lang\Object;
 use org\jecat\framework\db\DB;
-use org\jecat\framework\mvc\model\db\IModel ;
 use org\jecat\framework\db\sql\StatementFactory ;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\db\sql\Criteria;
 
 class Selecter extends OperationStrategy
 {
-	public function execute(IModel $aModel,Select $aSelect=null,Criteria $aCriteria=null,$bList=false,DB $aDB=null)
-	{
-		if( !$aPrototype = $aModel->prototype() )
-		{
-			throw new ORMException("传入了无效的 IModel 对象，\$aModel的 prototype() 方法返回null") ;	
-		}
-		
+	public function execute(Prototype $aPrototype,array & $arrDataSheet,Select $aSelect=null,Criteria $aCriteria=null,$bList=false,DB $aDB=null)
+	{		
 		if(!$aDB)
 		{
 			$aDB = DB::singleton() ;
@@ -57,30 +52,33 @@ class Selecter extends OperationStrategy
 		$this->setGroupBy($aSelect,$aPrototype) ;
 		
 		// query
-		if( !$aRecordset=$aDB->query($aSelect) or !$aRecordset->rowCount() )
+		$aDB->pdo()->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES,1) ;
+		try{
+			$aPdoRecordset=$aDB->query($aSelect) ;
+		}catch (\Exception $e){
+			$aDB->pdo()->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES,0) ;
+			throw $e ;
+		}
+		$aDB->pdo()->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES,0) ;
+		
+		if( !$aPdoRecordset or !$aPdoRecordset->rowCount() )
 		{
 			return false ;
 		}
-		$aModel->loadData($aRecordset,true) ;
 		
-		$aModel->clearChanged() ;
-
+		// load data
+		$arrDataSheet = $aPdoRecordset->fetchAll(\PDO::FETCH_ASSOC) ;
+		
 		// -----------------
 		// step 2. query alonely for multiterm associated prototype 
-		if($bList)
-		{
-			$modelIter = $aModel->childIterator() ;
-		}
-		else 
-		{
-			$modelIter = array($aModel) ;
-		}
-		foreach($modelIter as $aModel)
+		$nTotalRows = count($arrDataSheet) ;
+		for($nRowIdx=0;$nRowIdx<$nTotalRows;$nRowIdx++)
 		{
 			foreach($arrMultitermAssociations as $aMultitermAssoc)
 			{
-				$this->queryForMultitermAssoc($aDB,$aMultitermAssoc,$aModel,$aSelect) ;
+				$this->queryForMultitermAssoc($aDB,$aMultitermAssoc,$arrDataSheet,$nRowIdx,$aSelect) ;
 			}
+			
 		}
 
 		return true ;
@@ -114,7 +112,7 @@ class Selecter extends OperationStrategy
 		return $aDB->queryCount($aSelect,$sKey) ;
 	}
 	
-	public function hasExists(IModel $aModel,Prototype $aPrototype=null,Select $aSelect=null,DB $aDB=null)
+	public function hasExists(Model $aModel,Prototype $aPrototype=null,Select $aSelect=null,DB $aDB=null)
 	{
 		if(!$aPrototype)
 		{
@@ -142,33 +140,20 @@ class Selecter extends OperationStrategy
 		return $aDB->queryCount($aSelect)>0 ;
 	}
 	
-	private function queryForMultitermAssoc(DB $aDB,Association $aMultitermAssoc,IModel $aModel,Select $aSelect)
+	private function queryForMultitermAssoc(DB $aDB,Association $aMultitermAssoc,array & $arrDataSheet,$nRowIdx,Select $aSelect)
 	{
 		$aToPrototype = $aMultitermAssoc->toPrototype() ;
 		$aFromPrototype = $aMultitermAssoc->fromPrototype() ;
 		
 		// 清理一些 select 状态
 		$aSelect->clearColumns() ;
-		
-		// 被直接关联的model
-			$aFromModel = $aModel ;/*
-		if( $aFromPrototype->associatedBy() )
-		{
-			if( !$aFromModel = $aModel->child($aFromPrototype->path(false)) )
-			{
-				throw new Exception("系统遇到意外的错误：查询多属关联子模型的时候，缺失被关联模型。") ;
-			}
-		}
-		else
-		{
-			$aFromModel = $aModel* ;
-		}*/
 
 		// 根据上一轮查询设置条件
 		if( $aMultitermAssoc->isType(Association::hasMany) )				// hasMany
-		{
+		{			
 			$aRestraction = $this->makeResrictionForAsscotion(
-					$aFromModel
+					$arrDataSheet[$nRowIdx]
+					, $aFromPrototype->path()
 					, $aMultitermAssoc->fromKeys()
 					, $aToPrototype->sqlTableAlias()
 					, $aMultitermAssoc->toKeys()
@@ -178,7 +163,8 @@ class Selecter extends OperationStrategy
 		else if( $aMultitermAssoc->isType(Association::hasAndBelongsToMany) )	// hasAndBelongsTo
 		{
 			$aRestraction = $this->makeResrictionForAsscotion(
-					$aFromModel
+					$arrDataSheet[$nRowIdx]
+					, $aFromPrototype->path()
 					, $aMultitermAssoc->fromKeys()
 					, $aMultitermAssoc->bridgeSqlTableAlias()
 					, $aMultitermAssoc->toBridgeKeys()
@@ -203,11 +189,10 @@ class Selecter extends OperationStrategy
 		if($aToPrototype->criteria()->orders(false)){
 			$aSelect->criteria()->setOrders($aToPrototype->criteria()->orders(false)) ;
 		}
-			
-		// 
-		$aChildModel = $aToPrototype->createModel(true) ;
-		$aModel->addChild($aChildModel,$aToPrototype->name()) ;
-		$this->execute($aChildModel,$aSelect,null,true,$aDB) ;
+
+		// 新建的一个记录表
+		$sheet =& Model::dataSheet($arrDataSheet,$nRowIdx,$aToPrototype->name(),true) ;
+		$this->execute($aToPrototype,$sheet,$aSelect,null,true,$aDB) ;
 		
 		// 清理条件 和 恢复order by
 		$aSelect->criteria()->where()->remove($aRestraction) ;
@@ -235,7 +220,7 @@ class Selecter extends OperationStrategy
 		{
 			$aSelect->addColumn(
 				'`'.$aPrototype->sqlTableAlias().'`.`'.$sColumnName.'`'
-				, $aPrototype->sqlColumnAlias($sColumnName)
+				// , $aPrototype->sqlColumnAlias($sColumnName)
 			) ;
 		}
 
@@ -257,6 +242,7 @@ class Selecter extends OperationStrategy
 		}
 	}
 
+	
 	
 
 	// -- Select for Prototype ------------------------------------------------------

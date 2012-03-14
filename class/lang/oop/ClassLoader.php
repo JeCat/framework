@@ -122,7 +122,7 @@ class ClassLoader extends Object implements \Serializable
 	}
 	
 	public function searchClass($sClassName,$nPriority=Package::all)
-	{		
+	{
 		for(end($this->arrPackages); $arrPackages=&current($this->arrPackages); prev($this->arrPackages))
 		{
 			if( !(key($this->arrPackages) & $nPriority) )

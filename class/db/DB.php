@@ -132,7 +132,7 @@ class DB extends Object
 		
 		if( $aRecords )
 		{
-			return intval($aRecords->field('rowCount',0)) ;
+			return intval($aRecords->fetchColumn(0)) ;
 		}
 		
 		else 

@@ -9,7 +9,7 @@ class MySQLColumnReflecter extends AbStractColumnReflecter
 	{
 		$aDB = $aDBReflecterFactory->db();
 		
-		if( $aResult=$aDB->query($this->makeColumnSql($sTable, $sColumn, $sDBName)) or $aResult->rowCount()==0 )
+		if( !$aResult=$aDB->query($this->makeColumnSql($sTable, $sColumn, $sDBName)) or $aResult->rowCount()==0 )
 		{
 			$this->bIsExist = false ;
 			return ;

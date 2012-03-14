@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\mvc\model\db\ModelList;
+
 use org\jecat\framework\db\sql\Order;
 use org\jecat\framework\util\serialize\IIncompleteSerializable;
 use org\jecat\framework\util\serialize\ShareObjectSerializer;
@@ -524,8 +526,15 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 	 */
 	public function createModel($bList=false)
 	{
-		$sModelClass = $this->modelClass() ;
-		return new $sModelClass($this,$bList) ;
+		if($bList)
+		{
+			return new ModelList($this) ;			
+		}
+		else 
+		{
+			$sModelClass = $this->modelClass() ;
+			return new $sModelClass($this)  ;
+		}
 	}
 	public function modelClass()
 	{
