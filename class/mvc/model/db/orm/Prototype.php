@@ -793,7 +793,7 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		{
 			foreach((array)$arrConfig['order'] as $sColumn)
 			{
-				$this->criteria()->orders()->add($sColumn,false) ;
+				$this->criteria()->orders()->add($sColumn,true) ;
 			}
 		}
 		// orderDesc
@@ -801,7 +801,7 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		{
 			foreach((array)$arrConfig['orderDesc'] as $sColumn)
 			{
-				$this->criteria()->orders()->add($sColumn,false) ;
+				$this->criteria()->orders()->add($sColumn,true) ;
 			}
 		}
 		// orderAsc
@@ -809,7 +809,7 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		{
 			foreach((array)$arrConfig['orderAsc'] as $sColumn)
 			{
-				$this->criteria()->orders()->add($sColumn,true) ;
+				$this->criteria()->orders()->add($sColumn,false) ;
 			}
 		}
 		// orderRand

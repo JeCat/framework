@@ -11,7 +11,7 @@ class Order extends SubStatement
 	/**
 	 * 生成OrderBy的类
 	 * @param string $sColumn 列名
-	 * @param boolean $bOrderType true代表ASC , false代表DESC ，默认为true , 也可填写字符串 ,可识别"ASC","DESC","RAND"三种
+	 * @param boolean $bOrderType true代表DESC , false代表ASC ，默认为true , 也可填写字符串 ,可识别"ASC","DESC","RAND"三种
 	 */
 	public function __construct($sColumn=null , $desc=true){
 		if($sColumn)
@@ -47,7 +47,7 @@ class Order extends SubStatement
 	/**
 	 * 增加一个需要排序的列
 	 * @param string $sColumn 列名
-	 * @param boolen $bOrderType 排序方式,true代表ASC , false代表DESC ，默认为true , 也可填写字符串 ,可识别"ASC","DESC","RAND"三种
+	 * @param boolen $bOrderType 排序方式,true代表DESC , false代表ASC ，默认为true , 也可填写字符串 ,可识别"ASC","DESC","RAND"三种
 	 */
 	public function add($sColumn , $desc=true) {
 		if($desc === true){
