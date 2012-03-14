@@ -51,9 +51,9 @@ class Order extends SubStatement
 	 */
 	public function add($sColumn , $desc=true) {
 		if($desc === true){
-			$desc = 'DESC';
-		}else if($desc === false){
 			$desc = 'ASC';
+		}else if($desc === false){
+			$desc = 'DESC';
 		}else if($desc === self::rand){
 			$sColumn = 0;
 		}
