@@ -76,7 +76,7 @@ class ClassLoader extends Object implements \Serializable
 	
 	public function removePackage($aPackage)
 	{
-		foreach($this->arrPackages[$nPriority] as &$arrPackages)
+		foreach($this->arrPackages as $nPriority=> &$arrPackages)
 		{
 			$nIdx = array_search($aPackage,$arrPackages,true) ;
 			if( $nIdx!==false )
@@ -158,22 +158,26 @@ class ClassLoader extends Object implements \Serializable
 	/**
 	 * @return \Iterator
 	 */
-	public function packageIterator()
+	public function packageIterator($nPriority=Package::all)
 	{
 		$arrAllPackages = array() ;
-		foreach($this->arrPackages as &$arrPackages)
+		foreach($this->arrPackages as $key => &$arrPackages)
 		{
+			if( !($key & $nPriority) )
+			{
+				continue ;
+			}
 			$arrAllPackages = array_merge( $arrAllPackages, array_values($arrPackages) ) ;
 		}
-		return new \org\jecat\framework\pattern\iterate\ArrayIterator( $arrPackages ) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator( $arrAllPackages ) ;
 	}
 	
 	/**
 	 * @return \Iterator
 	 */
-	public function classIterator($sNamespace=null)
+	public function classIterator($sNamespace=null,$nPriority=Package::all)
 	{
-		return new ClassIterator( $this, $sNamespace ) ;
+		return new ClassIterator( $this, $sNamespace , $nPriority ) ;
 	}
 	
 	public function totalLoadTime()

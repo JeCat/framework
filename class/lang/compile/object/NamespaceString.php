@@ -58,6 +58,10 @@ class NamespaceString extends Token
 		}
 	}
 	
+	public function endToken(){
+		return end($this->arrNameAndSlashes);
+	}
+	
 	protected $arrNameAndSlashes ;
 }
 

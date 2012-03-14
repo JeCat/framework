@@ -546,6 +546,16 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		return $this->sModelClass ;
 	}
 	
+	static public function modelShadowClassName($sTableName){
+		$sModelShortClass = '_'.preg_replace('[^\w_]','_',$sTableName) ;
+		return self::MODEL_IMPLEMENT_CLASS_NS .'\\'. $sModelShortClass ;
+	}
+	
+	static public function prototypeShadowClassName($sTableName){
+		$sShortClass = '_'.preg_replace('[^\w_]','_',$sTableName) ;
+		return self::PROTOTYPE_IMPLEMENT_CLASS_NS .'\\'. $sShortClass ;
+	}
+	
 	// criteria setter
 	/**
 	 * @return Prototype

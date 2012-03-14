@@ -14,11 +14,6 @@ class HttpAppFactory extends ApplicationFactory
 	
 	public function createRequest(Application $aApp)
 	{
-		require_once \org\jecat\framework\PATH."/class/util/IHashTable.php" ;
-		require_once \org\jecat\framework\PATH."/class/util/IDataSrc.php" ;
-		require_once \org\jecat\framework\PATH."/class/util/HashTable.php" ;
-		require_once \org\jecat\framework\PATH."/class/util/DataSrc.php" ;
-		
 		$aReq = new HttpRequest() ;
 		
 		// 访问入口

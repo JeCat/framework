@@ -41,14 +41,24 @@ class JointPointMethodDefine extends JointPoint
 		// 精确匹配 class token
 		else if( !$bIsPattern and ($aToken instanceof ClosureToken) )
 		{
-			// 必须是一个 "}" , 并且成对
-			if( $aToken->tokenType()!=Token::T_BRACE_CLOSE or !$aToken->theOther() )
+			// 必须是一个 "}" 
+			if( $aToken->tokenType()!=Token::T_BRACE_CLOSE)
 			{
 				return false ;
 			}
 			
+			// 必须成对
+			if( !$aToken->theOther() ){
+				return false;
+			}
+			
+			$aClass=$aToken->theOther()->belongsClass();
+			if( null === $aClass ){
+				return false;
+			}
+			
 			// 必须做为 class 的结束边界
-			if( $aClass=$aToken->belongsClass() or $aToken->theOther()!==$aClass->bodyToken() )
+			if($aToken->theOther()!==$aClass->bodyToken() )
 			{
 				return false ;
 			}

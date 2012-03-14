@@ -1,6 +1,7 @@
 <?php
 namespace org\jecat\framework\fs ;
 
+use org\jecat\framework\lang\Exception ;
 
 class Folder extends FSO
 {
@@ -58,7 +59,7 @@ class Folder extends FSO
 			// FSO::tidyPath($sPath,true) ;
 		}
 		
-		$aFile =  $this->find($sPath,FSO::file|FSO::CLEAN_PATH) ;
+		$aFile =  $this->find($sPath,$nFlag&(~FSO::type)|FSO::file|FSO::CLEAN_PATH) ;
 		
 		if( !$aFile and ($nFlag&self::FIND_AUTO_CREATE)==self::FIND_AUTO_CREATE )
 		{
@@ -85,7 +86,7 @@ class Folder extends FSO
 			// FSO::tidyPath($sPath,true) ;
 		}
 		
-		$aFolder =  $this->find($sPath,FSO::folder|FSO::CLEAN_PATH) ;
+		$aFolder =  $this->find($sPath,$nFlag&(~FSO::type)|FSO::folder|FSO::CLEAN_PATH) ;
 		
 		if( !$aFolder and ($nFlag&self::FIND_AUTO_CREATE) == self::FIND_AUTO_CREATE )
 		{
@@ -143,7 +144,7 @@ class Folder extends FSO
 		return $aFile ;
 	}
 	
-	public function createChildFolder($sPath,$nFlag=Folder::CREATE_FOLDER_DEFAULT)
+	public function createChildFolder($sPath,$nFlag=Folder::CREATE_DEFAULT)
 	{
 		if( !($nFlag&FSO::CLEAN_PATH) )
 		{
@@ -172,8 +173,24 @@ class Folder extends FSO
 		return $aFolder ;
 	}
 	
-	public function delete($sPath,$bRecurse=false,$bIgnoreError=false)
-	{		
+	public function delete($bRecurse=false,$bIgnoreError=false)
+	{
+		/**
+		 * @todo clean
+		 * 此函数用于删除自己，
+		 * 但以前的接口用于删除自己的子目录／子文件
+		 * 现在删除自己的子目录／子文件改用deleteChild方法
+		 * 为了将不兼容的代码及时发现出来，此处做类型检查并抛出异常
+		 */
+		if(!is_bool($bRecurse)){
+			throw new Exception(
+				'%s 的第一个参数必须是boolean : %s',
+				array(
+					__METHOD__,
+					$bRecurse
+				)
+			);
+		}
 		// 删除下级
 		if($bRecurse)
 		{
@@ -219,6 +236,7 @@ class Folder extends FSO
 				return rmdir($sPath) ;
 			}
 		}
+		return true;
 	}
 	
 	private function deleteAllChildren($sDirPath,$bIgnoreError)
@@ -242,7 +260,7 @@ class Folder extends FSO
 			if( is_dir($sFilePath) )
 			{
 				// 递归删除子目录
-				$sSubPath = $sPath.'/'.$sFilename ;
+				$sSubPath = $sFilePath ;
 				if( !$this->deleteAllChildren($sSubPath,$bIgnoreError) )
 				{
 					if(!$bIgnoreError)
@@ -251,6 +269,7 @@ class Folder extends FSO
 					}
 					$bReturn = true ;
 				}
+				rmdir($sSubPath);
 			}
 			else
 			{
@@ -267,6 +286,8 @@ class Folder extends FSO
 		}
 		
 		closedir($hDir) ;
+		
+		return $bReturn;
 	}
 	
 	/**

@@ -157,10 +157,12 @@ class Application extends Object implements \Serializable
 		if( !$this->aPublicFolders )
 		{
 			$this->aPublicFolders = new ResourceManager() ;
-			if( !$aFolder=Folder::singleton()->find('/framework/public') )
+			$sPath = '/framework/public' ;
+			if( !$aFolder=Folder::singleton()->find($sPath) )
 			{
 				throw new Exception("目录 /framework/public 丢失，无法提供该目录下的文件") ;
 			}
+			$aFolder->setHttpUrl($sPath);
 			$this->aPublicFolders->addFolder($aFolder,'org.jecat.framework') ;
 		}
 		return $this->aPublicFolders ;
