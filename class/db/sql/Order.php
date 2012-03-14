@@ -26,7 +26,7 @@ class Order extends SubStatement
 	 * @return self 
 	 */
 	static public function asc($sColumn){
-		return new self($sColumn,false);
+		return new self($sColumn,true);
 	}
 	/**
 	 * 获得一个order实例,按照所给参数生成OrderBy语句,降序
@@ -34,7 +34,7 @@ class Order extends SubStatement
 	 * @return self 
 	 */
 	static public function decs($sColumn){
-		return new self($sColumn,true);
+		return new self($sColumn,false);
 	}
 	/**
 	 * 获得一个order实例,按照所给参数生成OrderBy语句,随机
