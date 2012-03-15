@@ -28,6 +28,12 @@ class AOP extends Object implements IStrategySummary, \Serializable
 		$this->aJointPointIterator = null ;
 	}
 	
+	public function unregister(Aspect $aAspect)
+	{
+		unset( $this->arrAspectClasses[ $aAspect->aspectName() ] ) ;
+		$this->aspects()->remove($aAspect) ;
+	}
+	
 	/**
 	 * @return \Iterator
 	 */
@@ -194,6 +200,19 @@ class AOP extends Object implements IStrategySummary, \Serializable
 		}
 	
 		return $this->aAspects ;
+	}
+	
+	public function refresh()
+	{
+		foreach( $this->aspectIterator() as $aAspect )
+		{
+			if( !$aAspect->isValid() )
+			{
+				// 移除 aspect
+				$this->unregister($aAspect) ;
+				$this->register($aAspect->aspectName()) ;
+			}
+		}
 	}
 	
 	public function serialize()

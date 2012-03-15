@@ -2,11 +2,8 @@
 namespace org\jecat\framework\lang\aop ;
 
 use org\jecat\framework\fs\FSO;
-
 use org\jecat\framework\io\InputStreamCache;
-
 use org\jecat\framework\lang\compile\CompilerFactory;
-
 use org\jecat\framework\lang\compile\object\ClassDefine;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\compile\DocComment;
@@ -57,6 +54,7 @@ class Aspect extends NamedObject implements \Serializable
 		if($sAspectFilepath)
 		{
 			$aAspect->sAspectFilepath = FSO::tidyPath($sAspectFilepath) ;
+			$aAspect->nAspectFilemtime = filemtime($aAspect->sAspectFilepath) ;
 		}
 		
 		return $aAspect ;
@@ -147,6 +145,15 @@ class Aspect extends NamedObject implements \Serializable
 		return $this->sAspectFilepath ;
 	}
 	
+	public function isValid()
+	{
+		if( $this->sAspectFilepath and $this->nAspectFilemtime )
+		{
+			return is_file($this->sAspectFilepath) and filemtime($this->sAspectFilepath) <= $this->nAspectFilemtime ;
+		}
+		return true ;
+	}
+	
 	public function serialize ()
 	{
 		return serialize( array(
@@ -154,6 +161,7 @@ class Aspect extends NamedObject implements \Serializable
 				'aAdvices' => & $this->aAdvices ,
 				'sAspectName' => & $this->sAspectName ,
 				'sAspectFilepath' => & $this->sAspectFilepath ,
+				'nAspectFilemtime' => & $this->nAspectFilemtime ,
 		) ) ;
 	}
 	
@@ -168,6 +176,7 @@ class Aspect extends NamedObject implements \Serializable
 		$this->aAdvices =& $arrData['aAdvices'] ;
 		$this->sAspectName =& $arrData['sAspectName'] ;
 		$this->sAspectFilepath =& $arrData['sAspectFilepath'] ;
+		$this->nAspectFilemtime =& $arrData['nAspectFilemtime'] ;
 		
 		if($this->aPointcuts)
 		{
@@ -180,6 +189,7 @@ class Aspect extends NamedObject implements \Serializable
 		{
 			foreach($this->aAdvices->iterator() as $aAdvice)
 			{
+				$aAdvice->setAspect($this) ;
 				$this->addAdvice($aAdvice) ;
 			}
 		}
@@ -192,6 +202,8 @@ class Aspect extends NamedObject implements \Serializable
 	private $sAspectName ;
 	
 	private $sAspectFilepath ;
+
+	private $nAspectFilemtime = 0 ;
 	
 }
 
