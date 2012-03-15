@@ -267,19 +267,27 @@ class ModelList extends Model implements \Iterator
 			$aOutput = Response::singleton()->printer();
 		}
 	
-		$aOutput->write ( "<pre>\r\n" );
+		$aOutput->write ( "<pre>\r\n\r\n" );
 	
 		$aOutput->write ( str_repeat ( "\t", $nDepth ) ) ;
 		if( $sDisplayTitle===null )
 		{
-			$sDisplayTitle = "[Model List] ".$this->name() ;
+			$sDisplayTitle = "<b>[Model List] ".$this->name().'</b>' ;
 		}
 		$aOutput->write ( $sDisplayTitle."\r\n") ;
 		
 		// 模型
-		foreach ( $this as $nIdx=>$aChildModel )
+		if($this->childrenCount())
 		{
-			$aChildModel->printStruct ( $aOutput, $nDepth+1, "[{$nIdx}] => " );
+			foreach ( $this as $nIdx=>$aChildModel )
+			{
+				$aChildModel->printStruct ( $aOutput, $nDepth+1, "<b>[{$nIdx}] => </b>" );
+			}
+		}
+		else
+		{
+			$aOutput->write ( str_repeat ( "\t", $nDepth+1 ) ) ;
+			$aOutput->write ( "&lt; empty &gt;\r\n") ;
 		}
 	
 		$aOutput->write ( "</pre>" );

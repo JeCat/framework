@@ -599,12 +599,12 @@ class Model extends AbstractModel implements IBean
 			$aOutput = Response::singleton()->printer();
 		}
 		
-		$aOutput->write ( "<pre>\r\n" );
+		$aOutput->write ( "<pre>\r\n\r\n" );
 		
 		$aOutput->write ( str_repeat ( "\t", $nDepth ) ) ;
 		if( $sDisplayTitle===null )
 		{
-			$sDisplayTitle = "[Model] ".$this->name() ;
+			$sDisplayTitle = "<b>[Model] ".$this->name().'</b>' ;
 		}
 		$aOutput->write ( $sDisplayTitle."\r\n") ;
 				
