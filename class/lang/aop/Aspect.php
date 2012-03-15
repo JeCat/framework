@@ -145,6 +145,11 @@ class Aspect extends NamedObject implements \Serializable
 		return $this->sAspectFilepath ;
 	}
 	
+	public function aspectFilemtime()
+	{
+		return $this->nAspectFilemtime ;
+	}
+	
 	public function isValid()
 	{
 		if( $this->sAspectFilepath and $this->nAspectFilemtime )
