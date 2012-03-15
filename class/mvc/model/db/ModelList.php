@@ -14,7 +14,7 @@ class ModelList extends Model implements \Iterator
 {
 	public function load($values=null,$keys=null)
 	{
-		$this->nTotalCount = 0 ;
+		$this->nTotalCount = -1 ;
 		
 		return parent::load($values,$keys) ;
 	}

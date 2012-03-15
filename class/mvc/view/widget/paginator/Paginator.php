@@ -232,7 +232,7 @@ class Paginator extends FormWidget implements IModelChangeObserver
         if( $aRequest instanceof HttpRequest )
         {
             $str=$aRequest -> urlQuery();
-            if(!empty($str)) $arrQuery = explode('&',$str);
+            $arrQuery = explode('&',$str);
             $strKeyName = $this->formName();
             $bFlag =  false;
             $arrQuery1 = array_map( function( $str) use($strKeyName,&$bFlag,$iPageNum) {

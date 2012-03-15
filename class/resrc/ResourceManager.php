@@ -43,7 +43,7 @@ class ResourceManager extends Object implements \Serializable
 	/**
 	 * @return org\jecat\framework\fs\File
 	 */
-	public function find($sFilename,$sNamespace='*')
+	public function find($sFilename,$sNamespace='*',$bHttpUrl=false)
 	{
 		list($aFolder,$sFilename)=$this->findEx($sFilename,$sNamespace) ;
 		if( !$sFilename )
@@ -51,7 +51,9 @@ class ResourceManager extends Object implements \Serializable
 			return null ;
 		}
 		
-		return new File($aFolder->path().'/'.$sFilename) ;
+		return $bHttpUrl ?
+			$aFolder->httpUrl().'/'.$sFilename :
+			new File($aFolder->path().'/'.$sFilename) ;
 	}
 	
 	/**
