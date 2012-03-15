@@ -29,7 +29,14 @@ class File extends FSO
 	 */
 	public function openWriter($bAppend=false)
 	{
-		$hHandle = fopen($this->path(),$bAppend?'a':'w') ;
+		$sLocalPath = $this->path() ;
+		
+		if( !$this->makeParentFolder($sLocalPath,true) )
+		{
+			return false ;
+		}
+		
+		$hHandle = fopen($sLocalPath,$bAppend?'a':'w') ;
 		if( !$hHandle )
 		{
 			return null ;
@@ -88,15 +95,12 @@ class File extends FSO
 		}
 	}
 	
-
-	public function create($nMode=Folder::CREATE_DEFAULT)
+	private function makeParentFolder($sLocalPath,$bCreate=true)
 	{
-		$sLocalPath = $this->path() ;
-		
 		$sLocalDirPath = dirname($sLocalPath) ;
 		if( !is_dir($sLocalDirPath) )
 		{
-			if( $nMode & Folder::CREATE_RECURSE_DIR )
+			if( $bCreate )
 			{
 				$nOldMark = umask(0) ;
 				if( !mkdir($sLocalDirPath,Folder::CREATE_DEFAULT&0777,true) )
@@ -106,10 +110,21 @@ class File extends FSO
 				}
 				umask($nOldMark) ;
 			}
-			else 
+			else
 			{
 				return false ;
 			}
+		}
+		return true ;
+	}
+
+	public function create($nMode=Folder::CREATE_DEFAULT)
+	{
+		$sLocalPath = $this->path() ;
+		
+		if( !$this->makeParentFolder($sLocalPath,$nMode & Folder::CREATE_RECURSE_DIR) )
+		{
+			return false ;
 		}
 		
 		if( !$hHandle=fopen($sLocalPath,'w') )
