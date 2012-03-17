@@ -132,7 +132,8 @@ class DB extends Object
 		
 		if( $aRecords )
 		{
-			return intval($aRecords->fetchColumn(0)) ;
+			$arrRow = $aRecords->fetch(\PDO::FETCH_ASSOC) ;
+			return intval($arrRow['rowCount']) ;
 		}
 		
 		else 

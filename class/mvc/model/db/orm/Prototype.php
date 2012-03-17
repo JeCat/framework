@@ -68,7 +68,7 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		$aPrototype->arrColumns = $columns ;
 		$aPrototype->arrKeys = self::youKnow ;
 		
-		$aPrototype->aDB = $aDB ;
+		$aPrototype->aDB = $aDB===self::youKnow? DB::singleton(): $aDB ;
 		
 		return $aPrototype;
 	}
