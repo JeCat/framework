@@ -23,7 +23,7 @@ class Deleter extends Object{
 				if($aModel->changed($sClmName)){//主键发生修改
 					throw new ORMException('org\jecat\framework\mvc\model\db\orm\Updater : Key 有修改，无法进行Delete操作');
 				}else{//用主键作为查询条件
-					$aDelete->criteria()->where()->eq($sClmName,$aModel->data($sClmName));
+					$aDelete->criteria()->where()->eq('`'.$sClmName.'`',$aModel->data($sClmName));
 				}
 			}
         }

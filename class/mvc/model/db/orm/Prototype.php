@@ -809,7 +809,7 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		// where
 		if(!empty($arrConfig['where']))
 		{
-			$this->buildBeanRestriction($arrConfig['where'],$this->criteria()->where()) ;
+			self::buildBeanRestriction($arrConfig['where'],$this->criteria()->where()) ;
 		}
 		
 		// associations
@@ -860,7 +860,7 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		$this->arrBeanConfig = $arrConfig ;
 	}
 	
-	private function buildBeanRestriction(array $arrRestrictionConfig,Restriction $aRestriction)
+	static public function buildBeanRestriction(array $arrRestrictionConfig,Restriction $aRestriction)
 	{
 		// 第一项 'and' 或 'or'
 		$sLogic = array_shift($arrRestrictionConfig) ;
@@ -894,7 +894,7 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 			if( $sOperator=='and' or $sOperator=='or' )
 			{
 				array_unshift($arrCondition,$sOperator) ;
-				$this->buildBeanRestriction($arrCondition,$aRestriction->createRestriction()) ;
+				self::buildBeanRestriction($arrCondition,$aRestriction->createRestriction()) ;
 			}
 			// 处理条件
 			else 
