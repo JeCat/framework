@@ -111,14 +111,9 @@ class ClassLoader extends Object implements \Serializable
 			}
 		}
 		
-		$arrClasses = get_declared_classes() ;
 		// 搜索类
 		if( $sClassFile=$this->searchClass($sClassName) )
 		{
-			if( $sClassName=='org\\jecat\\framework\\mvc\\controller\\Controller')
-			{
-				$arrClasses = get_declared_classes() ;
-			}
 			// $this->arrClassPathCache[$sClassName] = $sClassFile ;
 			require ($sClassFile) ;
 		}
