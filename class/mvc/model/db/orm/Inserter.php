@@ -70,7 +70,11 @@ class Inserter extends OperationStrategy
 			// 设置数据
 			foreach($aModel->dataNameIterator() as $sClmName)
 			{
-				$aInsert->setData('`'.$sClmName.'`',$aModel->data($sClmName)) ;
+				$value = $aModel->data($sClmName) ;
+				if($value!==null)
+				{
+					$aInsert->setData('`'.$sClmName.'`',$value) ;
+				}
 			}
 			
 			// 执行 insert
