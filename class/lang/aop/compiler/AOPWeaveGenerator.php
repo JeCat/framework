@@ -283,7 +283,7 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 		// 没有 around advice， 直接调用原始函数
 		else 
 		{
-			$this->weaveAroundAdviceCall($aStat,$aStat->sOriginJointCode."(/*----------*/{$aStat->sAdviceCallArgvsLit})") ;
+			$this->weaveAroundAdviceCall($aStat,$aStat->sOriginJointCode."({$aStat->sOriginCallArgvsLit})",true) ;
 		}
 	}
 	
@@ -335,7 +335,7 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 			// 调用下一个advice
 			if( $aNextAroundAdvice )
 			{
-			$sCallType = $this->generateAdviceCalltype($aStat,$aNextAroundAdvice) ;
+				$sCallType = $this->generateAdviceCalltype($aStat,$aNextAroundAdvice) ;
 				$sSource = str_ireplace(
 						'aop_call_origin'
 						, $sCallType.$this->generateAdviceWeavedFunctionName($aStat,$aNextAroundAdvice)
@@ -347,6 +347,8 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 			{
 				$sSource = str_ireplace('aop_call_origin',$aStat->sOriginJointCode,$sSource) ;
 			}
+			
+			$sSource = preg_replace('/aop_calling_state\\s*\\(\\s*\\)/is', 'end(func_get_args())', $sSource) ;
 		}
 		
 		$sCode.= $sSource ;

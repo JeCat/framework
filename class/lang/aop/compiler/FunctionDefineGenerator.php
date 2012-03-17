@@ -162,41 +162,6 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		}
 	}
 	
-	protected function generateArgvsByReflection(GenerateStat $aStat,\ReflectionMethod $aMethodRef)
-	{
-		$aStat->sAdviceCallArgvsLit = array() ;
-		$aStat->sAdviceDefineArgvsLit = array() ;
-		
-		foreach($aMethodRef->getParameters() as $aParamRef)
-		{
-			$aStat->sAdviceCallArgvsLit[] = '$'.$aParamRef->getName() ;
-			
-			$sDefineArgv = '' ;
-			if($aParamRef->isArray())
-			{
-				$sDefineArgv.= 'array ' ;
-			}
-			if($aParamClsRef=$aParamRef->getClass())
-			{
-				$sDefineArgv.= '\\'.$aParamClsRef->getName().' ' ;
-			}
-			if($aParamRef->isPassedByReference())
-			{
-				$sDefineArgv.= '& ' ;
-			}
-			$sDefineArgv.= '$'.$aParamRef->getName() ;
-			
-			if($aParamRef->isDefaultValueAvailable())
-			{
-				$defaultValue = $aParamRef->getDefaultValue() ;
-				$sDefineArgv.= '=' . var_export($defaultValue,true) ;
-			}
-			$aStat->sAdviceDefineArgvsLit[] = $sDefineArgv ;
-		}
-		
-		$aStat->sAdviceCallArgvsLit = implode(',',$aStat->sAdviceCallArgvsLit) ;
-		$aStat->sAdviceDefineArgvsLit = implode(',',$aStat->sAdviceDefineArgvsLit) ;
-	}
 	
 	/**
 	 * 创建并织入一个用于集中调用各个advice的函数
@@ -270,7 +235,22 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		$aStat->aAdvicesDispatchFunc->setBodyToken($aBodyStart) ;
 			
 		$aStat->aTokenPool->insertBefore($aOriFuncStart,$aBodyStart) ;
-		$aStat->aTokenPool->insertBefore($aOriFuncStart,$aBodyEnd) ;	
+		$aStat->aTokenPool->insertBefore($aOriFuncStart,$aBodyEnd) ;
+		
+		// init call state 对像
+		$sLines = "\r\n" ;
+		$sLines.= "\t\t\$_apo_aCallState = new \\org\jecat\\framework\\lang\\aop\\AdviceCallState() ;\r\n" ;
+		if( !$aStat->aExecutePoint->staticToken() )
+		{
+			$sLines.= "\t\t\$_apo_aCallState->aOriginObject = \$this ;\r\n" ;
+		}
+		$sLines.= "\t\t\$_apo_aCallState->sOriginClass = '".addslashes($aStat->aAdvicesDispatchFunc->belongsClass()->fullName())."';\r\n" ;
+		$sLines.= "\t\t\$_apo_aCallState->sOriginMethod = '".$aStat->aAdvicesDispatchFunc->name()."' ;\r\n" ;
+		foreach( $this->parseArgvs($aStat->aTokenPool,$aStat->aAdvicesDispatchFunc) as $sArgvName=>$sArgv)
+		{
+			$sLines.= "\t\t\$_apo_aCallState->arrAvgvs['{$sArgvName}'] =& \${$sArgvName} ;\r\n" ;
+		}
+		$aStat->aTokenPool->insertAfter($aBodyStart,new Token(T_WHITESPACE,$sLines)) ;
 		
 		// 换行
 		$aStat->aTokenPool->insertBefore($aOriFuncStart,new Token(T_WHITESPACE,"\r\n\r\n\t")) ;
@@ -281,13 +261,13 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		parent::weaveAdvices($aStat) ;
 		
 		// 添加函数的返回值
-		$aStat->aTokenPool->insertBefore($aStat->aAdvicesDispatchFunc->endToken(),new Token(T_WHITESPACE,"\r\n\t\treturn \$__function_return_of_around_advices__ ;\r\n\t")) ;
+		$aStat->aTokenPool->insertBefore($aStat->aAdvicesDispatchFunc->endToken(),new Token(T_WHITESPACE,"\r\n\t\treturn \$_apo_aCallState->returnValue ;\r\n\t")) ;
 	}
 	
 	protected function weaveAroundAdviceCall(GenerateStat $aStat,$sAdviceCallCode)
 	{
 		$aBodyEnd = $aStat->aAdvicesDispatchFunc->endToken() ;
-		$aStat->aTokenPool->insertBefore($aBodyEnd,new Token(T_STRING,"\r\n\r\n\t\t\$__function_return_of_around_advices__ =& {$sAdviceCallCode} ;\r\n")) ;
+		$aStat->aTokenPool->insertBefore($aBodyEnd,new Token(T_STRING,"\r\n\r\n\t\t\$_apo_aCallState->returnValue =& {$sAdviceCallCode} ;\r\n")) ;
 	}
 
 	protected function replaceOriginExecutePoint(GenerateStat $aStat)
@@ -343,8 +323,45 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		return $arrNewTokens ;
 	}
 	
-	private function generateArgvs(TokenPool $aTokenPool,FunctionDefine $aOriFunctionDefine)
-	{		
+	protected function generateArgvsByReflection(GenerateStat $aStat,\ReflectionMethod $aMethodRef)
+	{
+		$arrAdviceCallArgvsLit = array() ;	
+		foreach($aMethodRef->getParameters() as $aParamRef)
+		{
+			$arrAdviceCallArgvsLit[] = '$'.$aParamRef->getName() ;
+	
+			$sDefineArgv = '' ;
+			if($aParamRef->isArray())
+			{
+				$sDefineArgv.= 'array ' ;
+			}
+			if($aParamClsRef=$aParamRef->getClass())
+			{
+				$sDefineArgv.= '\\'.$aParamClsRef->getName().' ' ;
+			}
+			if($aParamRef->isPassedByReference())
+			{
+				$sDefineArgv.= '& ' ;
+			}
+			$sDefineArgv.= '$'.$aParamRef->getName() ;
+	
+			if($aParamRef->isDefaultValueAvailable())
+			{
+				$defaultValue = $aParamRef->getDefaultValue() ;
+				$sDefineArgv.= '=' . var_export($defaultValue,true) ;
+			}
+			$aStat->sAdviceDefineArgvsLit[] = $sDefineArgv ;
+		}
+		$aStat->sAdviceDefineArgvsLit[] = '\\org\\jecat\\framework\\lang\\aop\\AdviceCallState $_apo_aCallState' ;
+		
+		$aStat->sOriginCallArgvsLit = implode(',',$arrAdviceCallArgvsLit) ;
+		$arrAdviceCallArgvsLit[] = '$_apo_aCallState' ;
+		$aStat->sAdviceCallArgvsLit = implode(',',$arrAdviceCallArgvsLit) ;
+		$aStat->sAdviceDefineArgvsLit = '\\org\\jecat\\framework\\lang\\aop\\AdviceCallState $_apo_aCallState' ;
+	}
+	
+	private function parseArgvs(TokenPool $aTokenPool,FunctionDefine $aOriFunctionDefine)
+	{
 		$aArgLstStart = $aOriFunctionDefine->argListToken() ;
 		$aArgLstEnd = $aArgLstStart->theOther() ;
 		
@@ -377,30 +394,42 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 					
 			if( $aToken->tokenType()===T_VARIABLE )
 			{
-				$arrArgvs[] = $aToken->targetCode() ;
+				$sArgv = $aToken->targetCode() ;
+				$sArgvName = substr($sArgv,0,1)=='$'? @substr($sArgv,1): $sArgv ;
+				$arrArgvs[$sArgvName] = $sArgv ;
 			}
 			
 			$aIter->next() ;
 		}
 		
-		return implode(', ', $arrArgvs) ;
+		return $arrArgvs ;
 	}
-
+	
 	protected function generateAdviceArgvs(GenerateStat $aStat)
 	{
 		if(!$aStat->sAdviceDefineArgvsLit)
 		{
 			$aStat->sAdviceDefineArgvsLit = '' ;
-			foreach($this->cloneFunctionArgvLst($aStat->aTokenPool, $aStat->aExecutePoint) as $aToken)
+			$arrArgvDeclareTokens = $this->cloneFunctionArgvLst($aStat->aTokenPool, $aStat->aExecutePoint) ;
+			if($arrArgvDeclareTokens)
 			{
-				$aStat->sAdviceDefineArgvsLit.= $aToken->targetCode() ;
+				foreach($arrArgvDeclareTokens as $aToken)
+				{
+					$aStat->sAdviceDefineArgvsLit.= $aToken->targetCode() ;
+				}
+				$aStat->sAdviceDefineArgvsLit.= ',' ;
 			}
+			$aStat->sAdviceDefineArgvsLit.= '\\org\\jecat\\framework\\lang\\aop\\AdviceCallState $_apo_aCallState' ;
 		}
 		
 		// advice 调用参数
 		if(!$aStat->sAdviceCallArgvsLit)
 		{
-			$aStat->sAdviceCallArgvsLit = $this->generateArgvs($aStat->aTokenPool,$aStat->aExecutePoint) ;
+			$arrArgvs=$this->parseArgvs($aStat->aTokenPool,$aStat->aExecutePoint) ;
+			$aStat->sOriginCallArgvsLit = implode(',',$arrArgvs) ;
+			
+			$arrArgvs[] = '$_apo_aCallState' ;			
+			$aStat->sAdviceCallArgvsLit = implode(',',$arrArgvs) ;
 		}
 	}
 	
