@@ -7,9 +7,9 @@ use org\jecat\framework\lang\compile\object\Token ;
 
 class JointPointMethodDefine extends JointPoint
 {
-	public function __construct($sClassName,$sMethodNamePattern='*')
+	public function __construct($sClassName,$sMethodNamePattern='*',$bMatchDerivedClass=false)
 	{
-		parent::__construct($sClassName,$sMethodNamePattern) ;
+		parent::__construct($sClassName,$sMethodNamePattern,$bMatchDerivedClass) ;
 	}
 	
 	public function exportDeclare($bWithClass=true)
@@ -30,7 +30,7 @@ class JointPointMethodDefine extends JointPoint
 				return false ;
 			}
 			
-			if( $aClass->fullName()!=$this->weaveClass() )
+			if( !$this->matchClass($aClass->fullName()) )
 			{
 				return false ;
 			}
@@ -63,7 +63,7 @@ class JointPointMethodDefine extends JointPoint
 				return false ;
 			}
 			
-			if( $aClass->fullName()!=$this->weaveClass() )
+			if( !$this->matchClass($aClass->fullName()) )
 			{
 				return false ;
 			}

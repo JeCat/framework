@@ -273,7 +273,7 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 			while($aAdvice=$aAdvices->out())
 			{	
 				// 生成advice定义代码
-				$aAdviceDefine = $this->generateAdviceDefine($aAdvice,$aStat,$aAdvices->get()) ;
+				$aAdviceDefine = $this->generateAdviceDefine($aAdvice,$aStat,$aAdvices->get()?:null) ;
 				
 				// 织入advice定义代码
 				$aStat->aTokenPool->insertAfter($aBodyEnd,$aAdviceDefine) ;
@@ -298,7 +298,7 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 		$aStat->aTokenPool->insertBefore($aBodyEnd,new Token(T_STRING,"\t\t{$sAdviceCallCode}) ;\r\n")) ;
 	}
 
-	private function generateAdviceWeavedFunctionName(GenerateStat $aStat,Advice $aAdvice)
+	protected function generateAdviceWeavedFunctionName(GenerateStat $aStat,Advice $aAdvice)
 	{
 		return $aStat->aExecutePoint->belongsFunction()->name().'_cut_'.$aAdvice->position().'_'.md5(
 			spl_object_hash($aStat->aExecutePoint) . '<<' . $aAdvice->signtrue()
@@ -326,36 +326,23 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 		
 		// body
 		$sCode.= "\t{\r\n" ;
+		$sCode.= $this->compileAdviceCode($aStat,$aAdvice,$aNextAroundAdvice) ;
+		$sCode.= "\r\n\t}" ;
 		
+		return new Token(T_STRING,"\r\n\r\n\t".$sCode) ;
+	}
+	
+	protected function compileAdviceCode(GenerateStat $aStat,Advice $aAdvice,Advice $aNextAroundAdvice=null)
+	{
 		$sSource = $aAdvice->source() ;
 		
 		// 针对 around 位置的 advice 的特殊处理
 		if( $aAdvice->position()==Advice::around )
 		{
-			// 调用下一个advice
-			if( $aNextAroundAdvice )
-			{
-				$sCallType = $this->generateAdviceCalltype($aStat,$aNextAroundAdvice) ;
-				$sSource = str_ireplace(
-						'aop_call_origin'
-						, $sCallType.$this->generateAdviceWeavedFunctionName($aStat,$aNextAroundAdvice)
-						, $sSource) ;
-			}
-			
-			// 调用原始函数
-			else
-			{
-				$sSource = str_ireplace('aop_call_origin',$aStat->sOriginJointCode,$sSource) ;
-			}
-			
-			$sSource = preg_replace('/aop_calling_state\\s*\\(\\s*\\)/is', 'end(func_get_args())', $sSource) ;
+			$sSource = preg_replace('/aop_calling_state\\s*\\(\\s*\\)/is', 'current(func_get_args())', $sSource) ;
 		}
 		
-		$sCode.= $sSource ;
-		
-		$sCode.= "\r\n\t}" ;
-		
-		return new Token(T_STRING,"\r\n\r\n\t".$sCode) ;
+		return $sSource ;
 	}
 	
 	
