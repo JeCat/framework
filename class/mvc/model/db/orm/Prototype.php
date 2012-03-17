@@ -393,6 +393,18 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		$this->arrAssociations=array();
 		return $this;
 	}
+	public function associationNames($nType=Association::total)
+	{
+		$arrAssocNames = array();
+		foreach($this->arrAssociations as $ass)
+		{
+			if( $nType==Association::total or $ass->isType($nType) )
+			{
+				$arrAssocNames[] = $ass->toPrototype()->name() ;
+			}
+		}
+		return $arrAssocNames ;		
+	}
 	public function associationIterator($nType=Association::total)
 	{
 		$arrAssocs = array();
