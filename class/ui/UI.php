@@ -188,9 +188,14 @@ class UI extends JcObject
 		}
 		
 		// 模板变量
+		$aRequest = Request::singleton() ;
 		if( !$aVariables->has('theRequest') )
 		{
-			$aVariables->set('theRequest',Request::singleton()) ;
+			$aVariables->set('theRequest',$aRequest) ;
+		}
+		if( !$aVariables->has('theParams') )
+		{
+			$aVariables->set('theParams',Request::singleton()) ;
 		}
 		$aVariables->set('theDevice',$aDevice) ;
 		$aVariables->set('theUI',$this);
