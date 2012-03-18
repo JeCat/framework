@@ -260,22 +260,12 @@ class ModelList extends Model implements \Iterator
 		return $this->nTotalCount ;
 	}
 	
-	public function printStruct(IOutputStream $aOutput = null, $nDepth = 0, $sDisplayTitle=null )
+	protected function printStructData(IOutputStream $aOutput = null, $nDepth = 0)
 	{
-		if (! $aOutput)
-		{
-			$aOutput = Response::singleton()->printer();
-		}
-	
-		$aOutput->write ( "<pre>\r\n\r\n" );
-	
-		$aOutput->write ( str_repeat ( "\t", $nDepth ) ) ;
-		if( $sDisplayTitle===null )
-		{
-			$sDisplayTitle = "<b>[Model List] ".$this->name().'</b>' ;
-		}
-		$aOutput->write ( $sDisplayTitle."\r\n") ;
-		
+		// nothing todo
+	}
+	protected function printStructChildren(IOutputStream $aOutput = null, $nDepth = 0)
+	{
 		// 模型
 		if($this->childrenCount())
 		{
@@ -289,10 +279,6 @@ class ModelList extends Model implements \Iterator
 			$aOutput->write ( str_repeat ( "\t", $nDepth+1 ) ) ;
 			$aOutput->write ( "&lt; empty &gt;\r\n") ;
 		}
-	
-		$aOutput->write ( "</pre>" );
-	
-		return ;
 	}
 	
 	// implements \Iterator ----------------------------------
@@ -361,6 +347,16 @@ class ModelList extends Model implements \Iterator
 	public function isList()
 	{
 		return true ;
+	}
+	
+	public function __clone()
+	{
+		$this->aShareModel = null ;
+		
+		$arrDataSheet = array() ;
+		$nDataRow = 0 ;
+		$this->arrDataSheet =& $arrDataSheet ;
+		$this->nDataRow =& $nDataRow ;
 	}
 	
 	private $aShareModel ;

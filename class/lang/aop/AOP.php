@@ -204,6 +204,7 @@ class AOP extends Object implements IStrategySummary, \Serializable
 	
 	public function refresh()
 	{
+		$bHasReload = false ;
 		foreach( $this->aspectIterator() as $aAspect )
 		{
 			if( !$aAspect->isValid() )
@@ -211,8 +212,11 @@ class AOP extends Object implements IStrategySummary, \Serializable
 				// 移除 aspect
 				$this->unregister($aAspect) ;
 				$this->register($aAspect->aspectName()) ;
+				
+				$bHasReload = true ;
 			}
 		}
+		return $bHasReload ;
 	}
 	
 	public function serialize()

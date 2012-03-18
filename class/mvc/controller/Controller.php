@@ -65,15 +65,6 @@ class Controller extends NamableComposite implements IController, IBean
 {
     function __construct ($params=null,$sName=null,$bBuildAtonce=true)
     {
-    	if($sName===null)
-    	{
-    		$sName = get_class($this) ;
-    		if( ($nLastSlashPos=strrpos($sName,"\\"))!==false )
-    		{
-    			$sName = substr($sName,$nLastSlashPos+1) ;
-    		}
-    	}
-    	
     	$this->setName($sName) ;
     	
 		parent::__construct("org\\jecat\\framework\\mvc\\controller\\IController") ;
@@ -87,6 +78,20 @@ class Controller extends NamableComposite implements IController, IBean
     	}
     	
 		$this->init() ;
+    }
+    
+    public function name()
+    {
+    	if(($sName=parent::name())===null)
+    	{
+    		$sName = get_class($this) ;
+    		if( ($nLastSlashPos=strrpos($sName,"\\"))!==false )
+    		{
+    			$sName = substr($sName,$nLastSlashPos+1) ;
+    		}
+    		parent::setName($sName) ;
+    	}
+    	return $sName;
     }
     
     protected function init()

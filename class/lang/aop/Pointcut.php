@@ -87,6 +87,7 @@ class Pointcut extends NamedObject implements \Serializable
 		}
 		
 		$aPointcut = new self($aFunctionDefine->name()) ;
+		$aPointcut->sDefineMethod = $aFunctionDefine->name() ;
 		
 		if( is_array($arrJointPoints) )
 		{
@@ -140,7 +141,11 @@ class Pointcut extends NamedObject implements \Serializable
 	
 	public function serialize ()
 	{
-		return serialize( $this->aJointPoints ) ;
+		$arrData = array(
+			'sDefineMethod' =>& $this->sDefineMethod ,
+			'aJointPoints' => $this->aJointPoints ,
+		) ;
+		return serialize( $arrData ) ;
 	}
 	
 	/**
@@ -148,7 +153,9 @@ class Pointcut extends NamedObject implements \Serializable
 	 */
 	public function unserialize ($serialized)
 	{
-		$this->aJointPoints = unserialize($serialized) ;		
+		$arrData = unserialize($serialized) ;
+		$this->sDefineMethod =& $arrData['sDefineMethod'] ;
+		$this->aJointPoints = $arrData['aJointPoints'] ;
 		if($this->aJointPoints)
 		{
 			foreach($this->aJointPoints->iterator() as $aJointPoints)
@@ -172,6 +179,8 @@ class Pointcut extends NamedObject implements \Serializable
 	private $aJointPoints ;
 	
 	private $aDefineAspect ;
+	
+	private $sDefineMethod ;
 }
 
 ?>

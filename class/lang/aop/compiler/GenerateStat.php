@@ -64,6 +64,7 @@ class GenerateStat
 	 * advice 函数调用 的参数表
 	 */
 	public $sAdviceCallArgvsLit = '' ;
+	public $sOriginCallArgvsLit = '' ;
 	
 	public $sOriginJointCode = '' ;
 

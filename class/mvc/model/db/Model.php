@@ -2,6 +2,8 @@
 
 namespace org\jecat\framework\mvc\model\db ;
 
+use org\jecat\framework\mvc\model\IModel;
+
 use org\opencomb\friendlyerror\__HighterActiver;
 use org\jecat\framework\io\IOutputStream;
 use org\jecat\framework\mvc\controller\Response;
@@ -22,7 +24,7 @@ use org\jecat\framework\mvc\model\db\orm\Association;
 use org\jecat\framework\mvc\model\AbstractModel ;
 use org\jecat\framework\mvc\model\db\orm\Prototype;
 
-define('org\\jecat\\framework\\mvc\\model\\db\\Recordset\\KEY_MARK_CHAR','*') ;
+define('org\\jecat\\framework\\mvc\\model\\db\\Recordset\\KEY_MARK_CHAR',chr(0)) ;
 
 /**
  * @wiki /MVC模式/数据库模型/模型的基本操作(新建、保存、删除、加载)
@@ -427,6 +429,15 @@ class Model extends AbstractModel implements IBean
 		
 		return $this ;
 	}
+	public function __get($sName)
+	{
+		return $this->data ( $sName );
+	}
+	
+	public function __set($sName, $value)
+	{
+		$this->setData ( $sName, $value );
+	}
 	
 	public function hasData($sName)
 	{
@@ -522,12 +533,28 @@ class Model extends AbstractModel implements IBean
 		return $this->arrDataSheet ;
 	}
 	
+	protected function & childrenContainer($bCreate=true)
+	{
+		$sContainerKey = Recordset\KEY_MARK_CHAR.'_children_'.$this->prototype()->path() ;
+		if( !isset($this->arrDataSheet[$this->nDataRow][$sContainerKey]) )
+		{
+			$this->arrDataSheet[$this->nDataRow][$sContainerKey] = $bCreate? array(): null ;
+		}
+
+		return $this->arrDataSheet[$this->nDataRow][$sContainerKey] ;
+	}
+	
 	/**
 	 * @return Model
 	 */
 	public function child($sName)
 	{
-		if( !$aChild=parent::child($sName) and $this->aPrototype and $aAssociation=$this->aPrototype->associationByName($sName) )
+		$arrChildrenContainer =& $this->childrenContainer() ;
+		
+		$aChild = isset($arrChildrenContainer[$sName])?
+						$arrChildrenContainer[$sName]: null ;
+		
+		if( !$aChild and $this->aPrototype and $aAssociation=$this->aPrototype->associationByName($sName) )
 		{
 			$aChildPrototype = $aAssociation->toPrototype() ;
 			$bIsList = !$aAssociation->isType(Association::oneToOne) ;
@@ -535,11 +562,78 @@ class Model extends AbstractModel implements IBean
 			$aChild = $aChildPrototype->createModel( $bIsList ) ;
 			$this->segmentalizeChild( $aChild, $bIsList, $sName ) ;
 			
-			parent::addChild($aChild,$sName) ;
+			$arrChildrenContainer[$sName] = $aChild ;
 		}
 		
 		return $aChild ;
 	}
+	
+	public function addChild(IModel $aModel, $sName = null)
+	{
+		if( $sName===null )
+		{
+			$sName = $aModel->name() ;
+		}
+		$arrChildrenContainer =& $this->childrenContainer() ;
+		$arrChildrenContainer[$sName] = $aModel ;
+	}
+	
+	public function removeChild(IModel $aModel)
+	{
+		$arrChildrenContainer =& $this->childrenContainer() ;
+		unset ( $arrChildrenContainer[$aModel->name()] );
+	}
+	
+	public function clearChildren()
+	{
+		$arrChildrenContainer =& $this->childrenContainer() ;
+		$arrChildrenContainer = null ;
+	}
+	
+	public function childrenCount()
+	{
+		$arrChildrenContainer =& $this->childrenContainer() ;
+		return $arrChildrenContainer? count($arrChildrenContainer): 0 ; 
+	}
+	
+	/**
+	 * @return IIterator
+	 */
+	public function childIterator()
+	{
+		$arrChildrenContainer = $this->childrenContainer() ;
+		
+		foreach( $this->prototype()->associationNames() as $sAssociationName)
+		{
+			if(!array_key_exists($sAssociationName,$arrChildrenContainer))
+			{
+				$arrChildrenContainer[] = $this->child($sAssociationName) ;
+			}
+		}
+		
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator($arrChildrenContainer) ;
+	}
+	
+	/**
+	 * @return IIterator
+	 */
+	public function childNameIterator()
+	{
+		$arrChildrenContainer =& $this->childrenContainer() ;
+		$arrChildNames = $arrChildrenContainer? array_keys($arrChildrenContainer): array() ;
+		
+		foreach( $this->prototype()->associationNames() as $sAssociationName)
+		{
+			if(!in_array($sAssociationName,$arrChildNames))
+			{
+				$arrChildNames[] = $sAssociationName ;
+			}
+		}
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator($arrChildNames) ;
+	}
+	
+	
+	
 	
 	protected function segmentalizeChild(Model $aChild,$bIsList=false,$sName=null)
 	{
@@ -559,39 +653,7 @@ class Model extends AbstractModel implements IBean
 		
 		return $aChild ;
 	}
-	
-	/**
-	 * @return IIterator
-	 */
-	public function childIterator()
-	{
-		foreach( $this->childNameIterator() as $sName )
-		{
-			// 建立子模型
-			$this->child($sName) ;
-		}
 		
-		return parent::childIterator() ;
-	}
-	
-	/**
-	 * @return IIterator
-	 */
-	public function childNameIterator()
-	{
-		if( !$aPrototype = $this->prototype() )
-		{
-			return new \EmptyIterator() ;
-		}
-
-		$arrChildNames = array() ;
-		foreach( $aPrototype->associationIterator() as $aAssociation )
-		{
-			$arrChildNames[] = $aAssociation->toPrototype()->name() ;
-		}
-		return new \ArrayIterator ( $arrChildNames ) ;
-	}
-	
 	public function printStruct(IOutputStream $aOutput = null, $nDepth = 0, $sDisplayTitle=null )
 	{
 		if (! $aOutput)
@@ -607,22 +669,32 @@ class Model extends AbstractModel implements IBean
 			$sDisplayTitle = "<b>[Model] ".$this->name().'</b>' ;
 		}
 		$aOutput->write ( $sDisplayTitle."\r\n") ;
-				
+
+		// 数据
+		$this->printStructData($aOutput,$nDepth) ;
+		
+		// 子模型
+		$this->printStructChildren($aOutput,$nDepth) ;
+		
+		$aOutput->write ( "</pre>" );
+		
+		return ;
+	}
+	
+	protected function printStructData(IOutputStream $aOutput = null, $nDepth = 0)
+	{
 		$aPrototype = $this->prototype() ;
 		foreach( $aPrototype->columns() as $sDataName )
 		{
 			$aOutput->write ( str_repeat ( "\t", $nDepth+1 ) . "{$sDataName}: " . $this->data($sDataName) . "\r\n" );
 		}
-		
-		// 子模型
+	}
+	protected function printStructChildren(IOutputStream $aOutput = null, $nDepth = 0)
+	{
 		foreach ( $this->childIterator () as $aChild )
 		{
 			$aChild->printStruct ( $aOutput, $nDepth + 1 );
-		}
-		
-		$aOutput->write ( "</pre>" );
-		
-		return ;
+		}	
 	}
 	
 	public function isList()

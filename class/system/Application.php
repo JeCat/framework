@@ -38,7 +38,7 @@ use org\jecat\framework\fs\Folder;
  * 
  * 系统配置
  * 	基于文件存储的系统配置
- * 	高速IO的系统配置方案
+ * 	高速IO的系统配置方案(存目)
  * 会话
  *
  *	数据库

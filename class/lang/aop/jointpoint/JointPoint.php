@@ -1,6 +1,7 @@
 <?php
 namespace org\jecat\framework\lang\aop\jointpoint ;
 
+use org\jecat\framework\lang\aop\compiler\ClassInfoLibrary;
 use org\jecat\framework\bean\IBean;
 use org\jecat\framework\lang\aop\Pointcut;
 use org\jecat\framework\lang\Object;
@@ -17,9 +18,9 @@ abstract class JointPoint extends Object implements \Serializable, IBean
 	/**
 	 * @return JointPoint
 	 */
-	static public function createDefineMethod($sClassName,$sMethodNamePattern='*')
+	static public function createDefineMethod($sClassName,$sMethodNamePattern='*',$bMatchDerivedClass=false)
 	{
-		return new JointPointMethodDefine($sClassName,$sMethodNamePattern) ;
+		return new JointPointMethodDefine($sClassName,$sMethodNamePattern,$bMatchDerivedClass=false) ;
 	}
 	
 	/**
@@ -70,10 +71,11 @@ abstract class JointPoint extends Object implements \Serializable, IBean
 	
 	//////////////////////////////////////////////////////////////////
 	
-	public function __construct($sWeaveClass=null,$sWeaveMethod='*')
+	public function __construct($sWeaveClass=null,$sWeaveMethod='*',$bMatchDerivedClass=false)
 	{
 		$this->setWeaveClass($sWeaveClass) ;
 		$this->setWeaveMethod($sWeaveMethod) ;
+		$this->bMatchDerivedClass = $bMatchDerivedClass ;
 	}
 	
 	abstract public function exportDeclare($bWithClass=true) ;
@@ -129,6 +131,18 @@ abstract class JointPoint extends Object implements \Serializable, IBean
 	
 	abstract public function matchExecutionPoint(Token $aToken) ;
 	
+	public function matchClass($sTargetClass)
+	{
+		if( $this->bMatchDerivedClass )
+		{
+			return ClassInfoLibrary::singleton()->isA($sTargetClass,$this->weaveClass()) ;
+		}
+		else
+		{
+			return $this->weaveClass() == $sTargetClass ; 
+		}
+	}
+	
 	public function setPointcut(Pointcut $aPointcut)
 	{
 		$this->aPointcut = $aPointcut ;
@@ -159,6 +173,7 @@ abstract class JointPoint extends Object implements \Serializable, IBean
 		$this->sWeaveMethodNameRegexp =& $arrData['sWeaveMethodNameRegexp'] ;
 	}
 	
+<<<<<<< HEAD
 	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,BeanFactory $aBeanFactory=null)
 	{
 		$sClass = get_called_class() ;
@@ -174,9 +189,16 @@ abstract class JointPoint extends Object implements \Serializable, IBean
 	public function beanConfig()
 	{
 		$this->arrBeanConfig ;
+=======
+	public function isMatchDerivedClass()
+	{
+		$this->bMatchDerivedClass ;
+>>>>>>> 2d39a4cc4df74a9890f3da84a5cec43307f23621
 	}
 	
 	private $sWeaveClass ;
+
+	private $bMatchDerivedClass = false ;
 	
 	private $sWeaveMethod ;
 	
