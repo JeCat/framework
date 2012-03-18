@@ -4,10 +4,11 @@ namespace org\jecat\framework\lang\aop\jointpoint ;
 use org\jecat\framework\lang\compile\object\ClosureToken;
 use org\jecat\framework\lang\compile\object\FunctionDefine;
 use org\jecat\framework\lang\compile\object\Token ;
+use org\jecat\framework\bean\BeanFactory;
 
 class JointPointMethodDefine extends JointPoint
 {
-	public function __construct($sClassName,$sMethodNamePattern='*')
+	public function __construct($sClassName=null,$sMethodNamePattern='*')
 	{
 		parent::__construct($sClassName,$sMethodNamePattern) ;
 	}
@@ -71,5 +72,15 @@ class JointPointMethodDefine extends JointPoint
 			return true ;
 		}
 	}
+	
+	public function buildBean(array & $arrConfig,$sNamespace='*',BeanFactory $aBeanFactory=null)
+	{
+		$sTarget = str_replace('(','',$arrConfig['target']) ;
+		$sTarget = str_replace(')','',$sTarget) ;
+		list($sClass,$sMethod) = explode('::',$sTarget) ;
+		$this->setWeaveClass(trim($sClass)) ;
+		$this->setWeaveMethod(trim($sMethod)) ;
+		
+		// empty($arrConfig['derived'])? false: true ;
+	}
 }
-?>

@@ -4,6 +4,7 @@ namespace org\jecat\framework\lang\aop ;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\compile\object\FunctionDefine;
 use org\jecat\framework\pattern\composite\NamedObject;
+use org\jecat\framework\bean\BeanFactory;
 
 class Advice extends NamedObject implements \Serializable
 {
@@ -175,9 +176,52 @@ class Advice extends NamedObject implements \Serializable
 		$this->arrForPointcuts =& $arrData['arrForPointcuts'] ;
 	}
 	
+	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,BeanFactory $aBeanFactory=null)
+	{
+		$sClass = get_called_class() ;
+		$aBean = new $sClass ;
+		if($bBuildAtOnce)
+		{
+			$aBean->buildBean($arrConfig,$sNamespace) ;
+		}
+		return $aBean ;
+	}
+	
+	public function buildBean(array & $arrConfig,$sNamespace='*',BeanFactory $aBeanFactory=null)
+	{
+		foreach($arrConfig as $sKey=>&$item)
+		{
+			if( is_string($item) and in_array($item,array(self::before,self::around,self::after)) and array_key_exists('position',$arrConfig) )
+			{
+				$arrConfig['position'] = $item ;
+			}
+			else if( is_callable($item,true) )
+			{
+				//\ReflectionFunction::
+			}
+		}
+		
+		if( isset($arrConfig['position']) )
+		{
+			$this->sPosition = 'around' ;
+		}
+		if( isset($arrConfig['access']) )
+		{
+			$this->sAccess = $arrConfig['access'] ;
+		}
+		$this->bStatic = empty($arrConfig['static'])? false: true ;
+		
+		$aBean->arrBeanConfig = $arrConfig ;
+	}
+	
+	public function beanConfig()
+	{
+		$this->arrBeanConfig ;
+	}
+	
 	private $sSource ;
 	
-	private $sPosition ;
+	private $sPosition = self::around ;
 	
 	private $sAccess = 'private' ;
 	
@@ -188,6 +232,8 @@ class Advice extends NamedObject implements \Serializable
 	private $aDefineAspect ;
 
 	private $arrForPointcuts = array() ;
+	
+	protected $arrBeanConfig ;
 }
 
 ?>

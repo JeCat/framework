@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\lang\aop ;
 
+use org\jecat\framework\bean\BeanFactory;
+use org\jecat\framework\bean\IBean;
 use org\jecat\framework\fs\FSO;
 use org\jecat\framework\io\InputStreamCache;
 use org\jecat\framework\lang\compile\CompilerFactory;
@@ -10,7 +12,7 @@ use org\jecat\framework\lang\compile\DocComment;
 use org\jecat\framework\pattern\composite\Container;
 use org\jecat\framework\pattern\composite\NamedObject;
 
-class Aspect extends NamedObject implements \Serializable
+class Aspect extends NamedObject implements \Serializable, IBean
 {	
 	static public function createFromToken(ClassDefine $aClassToken,$sAspectFilepath=null)
 	{
@@ -193,6 +195,57 @@ class Aspect extends NamedObject implements \Serializable
 				$this->addAdvice($aAdvice) ;
 			}
 		}
+	}
+	
+	// IBean
+	
+	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,BeanFactory $aBeanFactory=null)
+	{
+		$aBean = new self() ;
+		if($bBuildAtOnce)
+		{
+			$aBean->buildBean($arrConfig,$sNamespace) ;
+		}
+		return $aBean ;
+	}
+	
+	public function buildBean(array & $arrConfig,$sNamespace='*',BeanFactory $aBeanFactory=null)
+	{
+		$aPointcut = new Pointcut() ;
+		$aPointcut->setAspect($this) ;
+		$this->pointcuts()->add($aPointcut) ;
+		
+		if( !empty($arrConfig['jointpoints']) and is_array($arrConfig['jointpoints']) )
+		{
+			foreach($arrConfig['jointpoints'] as $arrJointpointConfig)
+			{
+				$aJointPoint = $aBeanFactory->createBean($arrJointpointConfig,$sNamespace,true) ;
+				$aPointcut->jointPoints()->add($aJointPoint) ;
+				$aJointPoint->setPointcut($aPointcut) ;
+			}
+		}
+		
+		if( !empty($arrConfig['advices']) and is_array($arrConfig['advices']) )
+		{
+			foreach($arrConfig['advices'] as $arrAdviceConfig)
+			{
+				if(empty($arrAdviceConfig['class']))
+				{
+					$arrAdviceConfig['class'] = 'org\\jecat\\framework\\lang\\aop\\Advice' ;
+				}
+				$aAdvice = $aBeanFactory->createBean($arrAdviceConfig,$sNamespace,true) ;
+				$this->advices()->add($aAdvice) ;
+				$aAdvice->setAspect($this) ;
+				$aPointcut->advices()->add($aAdvice) ;
+			}
+		}
+		
+		$this->arrBeanConfig =& $arrConfig ;
+	}
+	
+	public function beanConfig()
+	{
+		return $this->arrBeanConfig ;
 	}
 	
 	private $aPointcuts ;

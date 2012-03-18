@@ -1,12 +1,14 @@
 <?php
 namespace org\jecat\framework\lang\aop\jointpoint ;
 
+use org\jecat\framework\bean\IBean;
 use org\jecat\framework\lang\aop\Pointcut;
 use org\jecat\framework\lang\Object;
 use org\jecat\framework\lang\compile\object\Token;
 use org\jecat\framework\lang\Exception;
+use org\jecat\framework\bean\BeanFactory;
 
-abstract class JointPoint extends Object implements \Serializable
+abstract class JointPoint extends Object implements \Serializable, IBean
 {
 	const ACCESS_SET = 'set' ;
 	const ACCESS_GET = 'get' ;
@@ -68,7 +70,7 @@ abstract class JointPoint extends Object implements \Serializable
 	
 	//////////////////////////////////////////////////////////////////
 	
-	public function __construct($sWeaveClass,$sWeaveMethod='*')
+	public function __construct($sWeaveClass=null,$sWeaveMethod='*')
 	{
 		$this->setWeaveClass($sWeaveClass) ;
 		$this->setWeaveMethod($sWeaveMethod) ;
@@ -157,6 +159,22 @@ abstract class JointPoint extends Object implements \Serializable
 		$this->sWeaveMethodNameRegexp =& $arrData['sWeaveMethodNameRegexp'] ;
 	}
 	
+	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,BeanFactory $aBeanFactory=null)
+	{
+		$sClass = get_called_class() ;
+		$aBean = new $sClass ;
+		if($bBuildAtOnce)
+		{
+			$aBean->buildBean($arrConfig,$sNamespace) ;
+			$aBean->arrBeanConfig = $arrConfig ;
+		}
+		return $aBean ;
+	}
+	
+	public function beanConfig()
+	{
+		$this->arrBeanConfig ;
+	}
 	
 	private $sWeaveClass ;
 	
@@ -165,6 +183,8 @@ abstract class JointPoint extends Object implements \Serializable
 	private $sWeaveMethodNameRegexp ;
 	
 	private $aPointcut ;
+	
+	protected $arrBeanConfig ;
 }
 
 ?>
