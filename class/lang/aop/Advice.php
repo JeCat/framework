@@ -1,10 +1,10 @@
 <?php
 namespace org\jecat\framework\lang\aop ;
 
+use org\jecat\framework\lang\compile\DocComment;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\compile\object\FunctionDefine;
 use org\jecat\framework\pattern\composite\NamedObject;
-use org\jecat\framework\bean\BeanFactory;
 
 class Advice extends NamedObject implements \Serializable
 {
@@ -124,10 +124,26 @@ class Advice extends NamedObject implements \Serializable
 	{
 		return $this->bStatic ;
 	}
+	public function setStatic($bStatic)
+	{
+		$this->bStatic = $bStatic ;		
+	} 
+	
+	public function addUseDeclare($sUseDclare)
+	{
+		if( !in_array($sUseDclare,$this->arrUseDeclares) )
+		{
+			$this->arrUseDeclares[] = $sUseDclare ;
+		}
+	}
 	
 	public function access()
 	{
 		return $this->sAccess ;
+	}
+	public function setAccess($sAccess)
+	{
+		$this->sAccess = $sAccess ;
 	}
 	
 	public function signtrue()
@@ -144,9 +160,26 @@ class Advice extends NamedObject implements \Serializable
 		return $this->aDefineAspect ;
 	}
 	
+	public function defineFile()
+	{
+		return $this->sDefineFile ;
+	}
+	public function setDefineFile($sDefineFile)
+	{
+		$this->sDefineFile = $sDefineFile ;
+		$this->nDefineFilemtime = filemtime($sDefineFile) ;
+	}
+	
 	public function forPointcuts()
 	{
 		return $this->arrForPointcuts ;
+	}
+	public function addPointcutName($sPointcutName)
+	{
+		if(!in_array($sPointcutName,$this->arrForPointcuts))
+		{
+			$this->arrForPointcuts[] = $sPointcutName ;
+		}
 	}
 	
 	public function serialize ()
@@ -158,6 +191,9 @@ class Advice extends NamedObject implements \Serializable
 			'bStatic' => & $this->bStatic ,
 			'sSigntrue' => & $this->sSigntrue ,
 			'arrForPointcuts' => & $this->arrForPointcuts ,
+			'sDefineFile' => & $this->sDefineFile ,
+			'nDefineFilemtime' => & $this->nDefineFilemtime ,
+			'sName' => $this->name() ,
 		) ) ;
 	}
 	
@@ -174,54 +210,25 @@ class Advice extends NamedObject implements \Serializable
 		$this->bStatic =& $arrData['bStatic'] ;
 		$this->sSigntrue =& $arrData['sSigntrue'] ;
 		$this->arrForPointcuts =& $arrData['arrForPointcuts'] ;
+		$this->sDefineFile =& $arrData['sDefineFile'] ;
+		$this->nDefineFilemtime =& $arrData['nDefineFilemtime'] ;
+		$this->setName($arrData['sName']) ;
 	}
 	
-	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,BeanFactory $aBeanFactory=null)
+	public function isValid()
 	{
-		$sClass = get_called_class() ;
-		$aBean = new $sClass ;
-		if($bBuildAtOnce)
+		if( $this->sDefineFile and $this->nDefineFilemtime )
 		{
-			$aBean->buildBean($arrConfig,$sNamespace) ;
+			return is_file($this->sDefineFile) and filemtime($this->sDefineFile) <= $this->nDefineFilemtime ;
 		}
-		return $aBean ;
+		return true ;
 	}
 	
-	public function buildBean(array & $arrConfig,$sNamespace='*',BeanFactory $aBeanFactory=null)
-	{
-		foreach($arrConfig as $sKey=>&$item)
-		{
-			if( is_string($item) and in_array($item,array(self::before,self::around,self::after)) and array_key_exists('position',$arrConfig) )
-			{
-				$arrConfig['position'] = $item ;
-			}
-			else if( is_callable($item,true) )
-			{
-				//\ReflectionFunction::
-			}
-		}
-		
-		if( isset($arrConfig['position']) )
-		{
-			$this->sPosition = 'around' ;
-		}
-		if( isset($arrConfig['access']) )
-		{
-			$this->sAccess = $arrConfig['access'] ;
-		}
-		$this->bStatic = empty($arrConfig['static'])? false: true ;
-		
-		$aBean->arrBeanConfig = $arrConfig ;
-	}
-	
-	public function beanConfig()
-	{
-		$this->arrBeanConfig ;
-	}
+	private $arrUseDeclares = array() ;
 	
 	private $sSource ;
 	
-	private $sPosition = self::around ;
+	private $sPosition = Advice::after ;
 	
 	private $sAccess = 'private' ;
 	
@@ -230,6 +237,10 @@ class Advice extends NamedObject implements \Serializable
 	private $sSigntrue ;
 	
 	private $aDefineAspect ;
+	
+	private $sDefineFile ;
+
+	private $nDefineFilemtime ;
 
 	private $arrForPointcuts = array() ;
 	

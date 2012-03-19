@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\lang\aop ;
 
+use org\jecat\framework\lang\aop\jointpoint\JointPointMethodDefine;
+
 use org\jecat\framework\bean\BeanFactory;
 use org\jecat\framework\bean\IBean;
 use org\jecat\framework\fs\FSO;
@@ -55,8 +57,7 @@ class Aspect extends NamedObject implements \Serializable, IBean
 		$aAspect->sAspectName = $sAspectName ;
 		if($sAspectFilepath)
 		{
-			$aAspect->sAspectFilepath = FSO::tidyPath($sAspectFilepath) ;
-			$aAspect->nAspectFilemtime = filemtime($aAspect->sAspectFilepath) ;
+			$aAspect->setAspectFilepath(FSO::tidyPath($sAspectFilepath)) ;
 		}
 		
 		return $aAspect ;
@@ -146,6 +147,11 @@ class Aspect extends NamedObject implements \Serializable, IBean
 	{
 		return $this->sAspectFilepath ;
 	}
+	public function setAspectFilepath($sFilepath)
+	{
+		$this->sAspectFilepath = $sFilepath ;
+		$this->nAspectFilemtime = filemtime($sFilepath) ;
+	}
 	
 	public function aspectFilemtime()
 	{
@@ -156,7 +162,18 @@ class Aspect extends NamedObject implements \Serializable, IBean
 	{
 		if( $this->sAspectFilepath and $this->nAspectFilemtime )
 		{
-			return is_file($this->sAspectFilepath) and filemtime($this->sAspectFilepath) <= $this->nAspectFilemtime ;
+			if( !is_file($this->sAspectFilepath) or filemtime($this->sAspectFilepath)>$this->nAspectFilemtime )
+			{
+				return false ;
+			}
+		}
+		
+		foreach( $this->advices()->iterator() as $aAdvice )
+		{
+			if( !$aAdvice->isValid() )
+			{
+				return false ;
+			}
 		}
 		return true ;
 	}
@@ -216,34 +233,104 @@ class Aspect extends NamedObject implements \Serializable, IBean
 	
 	public function buildBean(array & $arrConfig,$sNamespace='*',BeanFactory $aBeanFactory=null)
 	{
-		$aPointcut = new Pointcut() ;
+		$aPointcut = new Pointcut('default_pointcut') ;
 		$aPointcut->setAspect($this) ;
 		$this->pointcuts()->add($aPointcut) ;
 		
-		if( !empty($arrConfig['jointpoints']) and is_array($arrConfig['jointpoints']) )
+		$nAdviceIdx = 0 ;
+		foreach($arrConfig as $key=>&$item)
 		{
-			foreach($arrConfig['jointpoints'] as $arrJointpointConfig)
+			if(!is_int($key))
 			{
-				$aJointPoint = $aBeanFactory->createBean($arrJointpointConfig,$sNamespace,true) ;
-				$aPointcut->jointPoints()->add($aJointPoint) ;
-				$aJointPoint->setPointcut($aPointcut) ;
+				continue ;
 			}
-		}
-		
-		if( !empty($arrConfig['advices']) and is_array($arrConfig['advices']) )
-		{
-			foreach($arrConfig['advices'] as $arrAdviceConfig)
+			// jointpoint
+			if( is_string($item) )
 			{
-				if(empty($arrAdviceConfig['class']))
+				foreach( array('JointPointMethodDefine','JointPointCallFunction','JointPointNewObject') as $sJointpointClass )
 				{
-					$arrAdviceConfig['class'] = 'org\\jecat\\framework\\lang\\aop\\Advice' ;
-				}
-				$aAdvice = $aBeanFactory->createBean($arrAdviceConfig,$sNamespace,true) ;
-				$this->advices()->add($aAdvice) ;
-				$aAdvice->setAspect($this) ;
-				$aPointcut->advices()->add($aAdvice) ;
+					if( $aJointPoint=call_user_func(array(__NAMESPACE__.'\\jointpoint\\'.$sJointpointClass,'createFromDeclare'),$item) )
+					{
+						$aPointcut->jointPoints()->add($aJointPoint) ;
+						$aJointPoint->setPointcut($aPointcut) ;
+						break ;
+					}
+				}				
 			}
-		}
+			
+			// advice
+			else if( is_callable($item,true) )
+			{
+				$aRefFunc = is_array($item)? new \ReflectionMethod($item[0],$item[1]): new \ReflectionFunction($item) ;
+				
+				// 源文
+				$arrSourceLines = file($aRefFunc->getFileName()) ;
+				$nStartLine = $aRefFunc->getStartLine()+1-1 ;
+				$nEndLine = $aRefFunc->getEndLine() ;
+				$nEndLine = $aRefFunc->getEndLine()-1-1 ;
+				$arrFunctionLines = array_slice($arrSourceLines, $nStartLine, $nEndLine-$nStartLine+1) ;
+				$sSource = implode('',$arrFunctionLines) ;
+				$sSource = trim($sSource) ;
+				$sSource = preg_replace('/(^\\{)/', '', $sSource) ;
+				
+				// 函数定义时声明的 access 和 static
+				if( $aRefFunc instanceof \ReflectionMethod )
+				{
+					if( $aRefFunc->isPrivate() )
+					{
+						$sAccess = 'private' ;
+					}
+					else if( $aRefFunc->isProtected() )
+					{
+						$sAccess = 'protected' ;
+					}
+					else if( $aRefFunc->isPublic() )
+					{
+						$sAccess = 'public' ;
+					}
+				
+					$bStatic = $aRefFunc->isStatic() ;					
+					$sAdviceName = $aRefFunc->getName() ;
+				}
+				else
+				{
+					$sAdviceName = 'nameless_' . $nAdviceIdx++ ;
+					$sAccess = 'private' ;
+					$bStatic = false ;
+				}
+								
+				// 函数定义 注释中的 @use 和 @advice
+				$arrUseDeclare = array() ;
+				if( $sComment=$aRefFunc->getDocComment() )
+				{
+					$aDocComment = new DocComment($sComment) ;
+					
+					// @use
+					$arrUseDeclare = $aDocComment->items('use')?: array() ;
+					
+					// @advice
+					$sPosition = $aDocComment->item('advice')?: Advice::after ;
+				}
+				else
+				{
+					$sPosition = Advice::after ;
+				}
+				
+				$aAdvice = new Advice($sAdviceName,$sSource,$sPosition) ;
+				$aAdvice->addPointcutName($aPointcut->name()) ;
+				$aAdvice->setDefineFile($aRefFunc->getFileName()) ;
+				$aAdvice->setAccess($sAccess) ;
+				$aAdvice->setStatic($bStatic) ;
+				foreach($arrUseDeclare as &$sUseDclare)
+				{
+					$aAdvice->addUseDeclare($sUseDclare) ;
+				}
+				
+				$aPointcut->advices()->add($aAdvice) ;
+				$this->advices()->add($aAdvice) ;
+				$aAdvice->setAspect($this) ;				
+			}
+		}		
 		
 		$this->arrBeanConfig =& $arrConfig ;
 	}

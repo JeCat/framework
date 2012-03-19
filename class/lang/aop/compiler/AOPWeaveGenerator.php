@@ -333,16 +333,8 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 	}
 	
 	protected function compileAdviceCode(GenerateStat $aStat,Advice $aAdvice,Advice $aNextAroundAdvice=null)
-	{
-		$sSource = $aAdvice->source() ;
-		
-		// 针对 around 位置的 advice 的特殊处理
-		if( $aAdvice->position()==Advice::around )
-		{
-			$sSource = preg_replace('/aop_calling_state\\s*\\(\\s*\\)/is', 'current(func_get_args())', $sSource) ;
-		}
-		
-		return $sSource ;
+	{		
+		return $aAdvice->source() ;
 	}
 	
 	

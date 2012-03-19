@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\lang\aop ;
 
+use org\jecat\framework\bean\BeanFactory;
+
 use org\jecat\framework\fs\File;
 use org\jecat\framework\lang\compile\IStrategySummary;
 use org\jecat\framework\fs\FSO;
@@ -26,6 +28,21 @@ class AOP extends Object implements IStrategySummary, \Serializable
 		$this->parseAspectClass($sAspectClass) ;
 		$this->aPointcutIterator = null ;
 		$this->aJointPointIterator = null ;
+	}
+	
+	public function registerBean(array $arrConfig,$sAspectDefineFile)
+	{
+		if( empty($arrConfig['class']) )
+		{
+			$arrConfig['class'] = 'aspect' ;
+		}
+		
+		$aAspect = BeanFactory::singleton()->createBean($arrConfig) ;
+		if($sAspectDefineFile)
+		{
+			$aAspect->setAspectFilepath(FSO::tidyPath($sAspectDefineFile)) ;
+		}
+		$this->aspects()->add($aAspect) ;
 	}
 	
 	public function unregister(Aspect $aAspect)
@@ -202,21 +219,16 @@ class AOP extends Object implements IStrategySummary, \Serializable
 		return $this->aAspects ;
 	}
 	
-	public function refresh()
+	public function isValid()
 	{
-		$bHasReload = false ;
 		foreach( $this->aspectIterator() as $aAspect )
 		{
 			if( !$aAspect->isValid() )
 			{
-				// 移除 aspect
-				$this->unregister($aAspect) ;
-				$this->register($aAspect->aspectName()) ;
-				
-				$bHasReload = true ;
+				return false ;
 			}
 		}
-		return $bHasReload ;
+		return true ;
 	}
 	
 	public function serialize()

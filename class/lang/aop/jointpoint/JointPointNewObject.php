@@ -16,9 +16,13 @@ class JointPointNewObject extends JointPoint
 		$this->setNewObjectRegexp( self::transRegexp($sNewObjectPattern) );
 	}
 	
+	static public function createFromDeclare($sDeclare)
+	{
+		
+	}
 	public function exportDeclare($bWithClass=true)
 	{
-		return '[new object]new '.($bWithClass?$this->weaveClass():'').'() ;' ;
+		return 'new '.($bWithClass?$this->weaveClass():'') ;
 	}
 	
 	public function matchExecutionPoint(Token $aToken)

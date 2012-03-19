@@ -13,9 +13,18 @@ class JointPointMethodDefine extends JointPoint
 		parent::__construct($sClassName,$sMethodNamePattern,$bMatchDerivedClass) ;
 	}
 	
+	static public function createFromDeclare($sDeclare)
+	{
+		if( !preg_match('/^([\\w\\\\_]+)::([\\w_]+)(\[derived\])?$/i',$sDeclare,$arrRes) )
+		{
+			return null ;
+		}
+		return new self( $arrRes[1], $arrRes[2], @$arrRes[3]?true:false ) ;
+	}
+	
 	public function exportDeclare($bWithClass=true)
 	{
-		return '[define method]'.($bWithClass?$this->weaveClass():'')."::".$this->weaveMethod().'() ;' ;
+		return ($bWithClass?$this->weaveClass():'')."::".$this->weaveMethod() ;
 	}
 	
 	public function matchExecutionPoint(Token $aToken)
@@ -73,14 +82,4 @@ class JointPointMethodDefine extends JointPoint
 		}
 	}
 	
-	public function buildBean(array & $arrConfig,$sNamespace='*',BeanFactory $aBeanFactory=null)
-	{
-		$sTarget = str_replace('(','',$arrConfig['target']) ;
-		$sTarget = str_replace(')','',$sTarget) ;
-		list($sClass,$sMethod) = explode('::',$sTarget) ;
-		$this->setWeaveClass(trim($sClass)) ;
-		$this->setWeaveMethod(trim($sMethod)) ;
-		
-		// empty($arrConfig['derived'])? false: true ;
-	}
 }

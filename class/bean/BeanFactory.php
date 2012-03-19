@@ -59,6 +59,10 @@ class BeanFactory extends Object implements \Serializable
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\auth\\CallbackPermission",'perm.callback') ;
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\auth\\GroupPermission",'perm.group') ;
 			
+			// aop
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\lang\\aop\\Aspect",'aspect') ;
+			
+			
 			self::setSingleton($aSingleton,__CLASS__) ;
 		}
 

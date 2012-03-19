@@ -289,6 +289,15 @@ class Object implements IObject, ISingletonable, IFlyweightable
 		return $arrPool[$sLastKey]['ins'] ;
 	}
 	
+	static public function shareObjectMemento()
+	{
+		return array(self::$arrGlobalInstancs,self::$arrFlyweightInstancs) ;
+	}
+	static public function setShareObjectMemento(array $arrMemento)
+	{
+		self::$arrGlobalInstancs = $arrMemento[0] ;
+		self::$arrFlyweightInstancs = $arrMemento[1] ;
+	}
 	
 	/**
 	 * @return org\jecat\framework\util\IHashTable

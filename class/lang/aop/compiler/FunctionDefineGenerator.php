@@ -447,6 +447,14 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		// 针对 around 位置的 advice 的特殊处理
 		if( $aAdvice->position()==Advice::around )
 		{
+			// --------------------------
+			// aop_calling_state() 
+			$sSource = preg_replace('/aop_calling_state\\s*\\(\\s*\\)/is', 'current(func_get_args())', $sSource) ;
+			
+			
+			// --------------------------
+			// aop_call_origin()
+			
 			// 调用下一个advice
 			if( $aNextAroundAdvice )
 			{

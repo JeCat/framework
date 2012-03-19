@@ -2,14 +2,13 @@
 namespace org\jecat\framework\lang\aop\jointpoint ;
 
 use org\jecat\framework\lang\aop\compiler\ClassInfoLibrary;
-use org\jecat\framework\bean\IBean;
 use org\jecat\framework\lang\aop\Pointcut;
 use org\jecat\framework\lang\Object;
 use org\jecat\framework\lang\compile\object\Token;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\bean\BeanFactory;
 
-abstract class JointPoint extends Object implements \Serializable, IBean
+abstract class JointPoint extends Object implements \Serializable
 {
 	const ACCESS_SET = 'set' ;
 	const ACCESS_GET = 'get' ;
@@ -77,6 +76,8 @@ abstract class JointPoint extends Object implements \Serializable, IBean
 		$this->setWeaveMethod($sWeaveMethod) ;
 		$this->bMatchDerivedClass = $bMatchDerivedClass ;
 	}
+	
+	abstract static public function createFromDeclare($sDeclare) ;
 	
 	abstract public function exportDeclare($bWithClass=true) ;
 		
@@ -173,27 +174,9 @@ abstract class JointPoint extends Object implements \Serializable, IBean
 		$this->sWeaveMethodNameRegexp =& $arrData['sWeaveMethodNameRegexp'] ;
 	}
 	
-<<<<<<< HEAD
-	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,BeanFactory $aBeanFactory=null)
-	{
-		$sClass = get_called_class() ;
-		$aBean = new $sClass ;
-		if($bBuildAtOnce)
-		{
-			$aBean->buildBean($arrConfig,$sNamespace) ;
-			$aBean->arrBeanConfig = $arrConfig ;
-		}
-		return $aBean ;
-	}
-	
-	public function beanConfig()
-	{
-		$this->arrBeanConfig ;
-=======
 	public function isMatchDerivedClass()
 	{
 		$this->bMatchDerivedClass ;
->>>>>>> 2d39a4cc4df74a9890f3da84a5cec43307f23621
 	}
 	
 	private $sWeaveClass ;
