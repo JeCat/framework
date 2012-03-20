@@ -2,7 +2,6 @@
 namespace org\jecat\framework\mvc\model\db\orm;
 
 use org\jecat\framework\mvc\model\db\ModelList;
-
 use org\jecat\framework\db\sql\Order;
 use org\jecat\framework\util\serialize\IIncompleteSerializable;
 use org\jecat\framework\util\serialize\ShareObjectSerializer;
@@ -40,11 +39,9 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 	
 	const MODEL_IMPLEMENT_CLASS_NS = 'org\\jecat\\framework\\mvc\\model\\db\\imp' ;
 	const MODEL_IMPLEMENT_CLASS_BASE = 'org\\jecat\\framework\\mvc\\model\\db\\Model' ;
-	static public $sModelImpPackage = '/data/class/db/model' ;
 	
 	const PROTOTYPE_IMPLEMENT_CLASS_NS = 'org\\jecat\\framework\\mvc\\model\\db\\prototype' ;
 	const PROTOTYPE_IMPLEMENT_CLASS_BASE = __CLASS__ ;
-	static public $sPrototypeImpPackage = '/data/class/db/prototype' ;
 	
 	
 	// static creator
@@ -604,12 +601,9 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 	{
 		// 根据 table 自动生成影子class
 		if( !empty($arrConfig['table']) )
-		{
-			$sClassNamespace = self::PROTOTYPE_IMPLEMENT_CLASS_NS ;
-			$sPackageFolder = self::$sPrototypeImpPackage ;
-			
+		{			
 			$sShortClass = '_'.preg_replace('[^\w_]','_',$arrConfig['table']) ;
-			$sClass = $sClassNamespace .'\\'. $sShortClass ;
+			$sClass = self::PROTOTYPE_IMPLEMENT_CLASS_NS .'\\'. $sShortClass ;
 		}
 		
 		$aBean = new $sClass() ;
