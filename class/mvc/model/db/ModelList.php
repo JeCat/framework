@@ -1,6 +1,7 @@
 <?php
 namespace org\jecat\framework\mvc\model\db ;
 
+use org\jecat\framework\pattern\iterate\IReversableIterator;
 use org\jecat\framework\db\DB;
 use org\jecat\framework\mvc\model\db\orm\Selecter;
 use org\jecat\framework\mvc\model\IModel ;
@@ -8,7 +9,7 @@ use org\jecat\framework\lang\Exception;
 use org\jecat\framework\io\IOutputStream;
 use org\jecat\framework\mvc\controller\Response;
 
-class ModelList extends Model implements \Iterator
+class ModelList extends Model implements \SeekableIterator, IReversableIterator
 {
 	public function isEmpty()
 	{
@@ -335,6 +336,32 @@ class ModelList extends Model implements \Iterator
 			$aShareModel->nDataRow = 0 ;
 		}
 	}
+	
+	public function seek ($position)
+	{
+		$aShareModel->nDataRow = $position ;
+	}
+	
+	public function prev()
+	{
+		if( $aShareModel = $this->shareModel() )
+		{
+			$aShareModel->nDataRow -- ;
+		}
+	}
+	
+	public function last()
+	{
+		if( $aShareModel = $this->shareModel() )
+		{
+			$aShareModel->nDataRow = count($this->arrDataSheet)-1 ;
+			if($aShareModel->nDataRow<0)
+			{
+				$aShareModel->nDataRow = 0 ; 
+			}
+		}
+	}
+	
 	
 	/**
 	 * @return ModelList
