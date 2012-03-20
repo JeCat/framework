@@ -156,7 +156,7 @@ class Inserter extends OperationStrategy
 		return true ;
 	}
 		
-	protected function buildBridge(DB $aDB,Association $aAssociation,IModel $aFromModel,IModel $aToModel)
+	protected function buildBridge(DB $aDB,Association $aAssociation,Model $aFromModel,Model $aToModel)
 	{
 		$aFromPrototype = $aAssociation->fromPrototype() ;
 		$aStatementFactory = $aFromPrototype->statementFactory() ;
@@ -183,7 +183,7 @@ class Inserter extends OperationStrategy
 		}
 	}
 
-	private function setAssocModelData(IModel $aModel,IModel $aChildModel,array $arrFromKeys,array $arrToKeys)
+	private function setAssocModelData(Model $aModel,Model $aChildModel,array $arrFromKeys,array $arrToKeys)
 	{
 		foreach($arrToKeys as $nIdx=>$sKey)
 		{

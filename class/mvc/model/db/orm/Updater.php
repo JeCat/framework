@@ -110,7 +110,7 @@ class Updater extends Object{
      * 所以无法找到桥接表上需要修改的是哪一行。
      * 所以这个函数什么也不做。
      */
-    protected function buildBridge(DB $aDB,Association $aAssociation,IModel $aFromModel,IModel $aToModel){
+    protected function buildBridge(DB $aDB,Association $aAssociation,Model $aFromModel,Model $aToModel){
     	// nothing to do ...
     }
     

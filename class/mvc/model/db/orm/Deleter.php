@@ -3,11 +3,11 @@ namespace org\jecat\framework\mvc\model\db\orm;
 
 use org\jecat\framework\lang\Object;
 use org\jecat\framework\db\DB;
-use org\jecat\framework\mvc\model\db\IModel ;
+use org\jecat\framework\mvc\model\db\Model ;
 use org\jecat\framework\db\sql\StatementFactory ;
 
 class Deleter extends Object{
-    public function execute(DB $aDB, IModel $aModel){
+    public function execute(DB $aDB, Model $aModel){
         $aPrototype = $aModel->prototype();
         $aDelete = StatementFactory::singleton()->createDelete($aPrototype ->tableName());
         
@@ -66,7 +66,7 @@ class Deleter extends Object{
 		return true;
     }
     
-    protected function deleteBridge(DB $aDB,Association $aAssociation,IModel $aFromModel,IModel $aToModel){
+    protected function deleteBridge(DB $aDB,Association $aAssociation,Model $aFromModel,Model $aToModel){
     	$aStatementFactory = $aAssociation->fromPrototype()->statementFactory() ;
     	$aDeleteForBridge = $aStatementFactory->createDelete($aAssociation->bridgeTableName());
     	$aDeleteForBridge->criteria()->where()->add(
@@ -75,7 +75,7 @@ class Deleter extends Object{
     	$aDB->execute($aDeleteForBridge);
     }
     
-    private function setAssociatedModelData(IModel $aModel,IModel $aChildModel,array $arrFromKeys,array $arrToKeys){
+    private function setAssociatedModelData(Model $aModel,Model $aChildModel,array $arrFromKeys,array $arrToKeys){
     	foreach($arrToKeys as $nIdx=>$sKey){
     		if($aChildModel->isList()){
     			$value = $aModel->data($arrFromKeys[$nIdx]);

@@ -2,9 +2,7 @@
 namespace org\jecat\framework\mvc\model\db ;
 
 use org\jecat\framework\db\DB;
-
 use org\jecat\framework\mvc\model\db\orm\Selecter;
-
 use org\jecat\framework\mvc\model\IModel ;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\io\IOutputStream;

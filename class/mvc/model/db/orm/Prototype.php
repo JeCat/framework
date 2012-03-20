@@ -534,7 +534,7 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 	}
 	
 	/**
-	 * @return org\jecat\framework\mvc\model\db\IModel
+	 * @return org\jecat\framework\mvc\model\db\Model
 	 */
 	public function createModel($bList=false)
 	{
