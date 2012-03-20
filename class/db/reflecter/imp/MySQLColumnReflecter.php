@@ -17,7 +17,7 @@ class MySQLColumnReflecter extends AbStractColumnReflecter
 		
 		$arrColumnInfo = $aResult->fetch(\PDO::FETCH_ASSOC) ;
 		$this->sType = strtoupper( $arrColumnInfo['Type'] ) ;
-		if( preg_match('/^(\w+)\((\d+)\)$/',$this->sType,$arrRes) )
+		if( preg_match('/^(\w+)\((\d+)\)( UNSIGNED)?$/',$this->sType,$arrRes) )
 		{
 			$this->sType = $arrRes[1] ;
 			$this->nLength = (int)$arrRes[2] ;

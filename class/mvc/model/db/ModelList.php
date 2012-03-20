@@ -11,6 +11,11 @@ use org\jecat\framework\mvc\controller\Response;
 
 class ModelList extends Model implements \SeekableIterator, IReversableIterator
 {
+	public function isEmpty()
+	{
+		return count($this->arrDataSheet)==0 ;
+	}
+	
 	public function load($values=null,$keys=null)
 	{
 		$this->nTotalCount = -1 ;
@@ -129,9 +134,21 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator
 		return is_array($this->arrDataSheet)? count($this->arrDataSheet): 0 ;	
 	}
 	
-	public function childIterator()
+	public function childIterator($bAloneIterator=false)
 	{
-		return $this ;
+		if(!$bAloneIterator)
+		{
+			return $this ;
+		}
+		else
+		{
+			$aNewIter = clone $this ;
+						
+			// 共享 数据集
+			$aNewIter->arrDataSheet =& $this->arrDataSheet ;
+			
+			return $aNewIter ;
+		}
 	}
 	
 	public function sortChildren($callback,$bDesc=false)
@@ -380,9 +397,10 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator
 	{
 		$this->aShareModel = null ;
 		
-		$arrDataSheet = array() ;
-		$nDataRow = 0 ;
+		$arrDataSheet = $this->arrDataSheet ;
 		$this->arrDataSheet =& $arrDataSheet ;
+		
+		$nDataRow = $this->nDataRow ;
 		$this->nDataRow =& $nDataRow ;
 	}
 	

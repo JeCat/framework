@@ -24,7 +24,7 @@ use org\jecat\framework\mvc\model\db\orm\Association;
 use org\jecat\framework\mvc\model\AbstractModel ;
 use org\jecat\framework\mvc\model\db\orm\Prototype;
 
-define('org\\jecat\\framework\\mvc\\model\\db\\Recordset\\KEY_MARK_CHAR',chr(0)) ;
+define('org\\jecat\\framework\\mvc\\model\\db\\Recordset\\KEY_MARK_CHAR','*') ;
 
 /**
  * @wiki /MVC模式/数据库模型/模型的基本操作(新建、保存、删除、加载)
@@ -424,8 +424,9 @@ class Model extends AbstractModel implements IBean
 		if( $bChanged and $value!=$sOriData )
 		{
 			$this->arrDataSheet[$this->nDataRow][Recordset\KEY_MARK_CHAR.'_changed'][$sName] = $sOriData ;
-			$this->arrDataSheet[$this->nDataRow][$sName] = $value ;
 		}
+
+		$this->arrDataSheet[$this->nDataRow][$sName] = $value ;
 		
 		return $this ;
 	}
@@ -463,7 +464,7 @@ class Model extends AbstractModel implements IBean
 	
 	public function clearData()
 	{
-		$this->arrDataSheet[$this->nDataRow] = array() ;
+		$this->arrDataSheet = array() ;
 	}
 	
 	/**

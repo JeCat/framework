@@ -45,7 +45,12 @@ class Selecter extends OperationStrategy
 		}
 		else
 		{
-			$aSelect->criteria()->setLimit( $aPrototype->criteria()->limitLen(), $aPrototype->criteria()->limitFrom() ) ;
+			/**
+			 * 考虑到 criteria 可能是为了不影响 prototype 的情况下临时产生的对象，
+			 * 这里不可以用 prototype 的 limit 覆盖掉 criteria 中已有的 criteria 参数。
+			 * 因此这行删除。
+			 */
+			// $aSelect->criteria()->setLimit( $aPrototype->criteria()->limitLen(), $aPrototype->criteria()->limitFrom() ) ;
 		}
 		
 		// set group by

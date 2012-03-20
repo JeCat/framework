@@ -4,7 +4,6 @@ namespace org\jecat\framework\mvc\model\db\orm ;
 use org\jecat\framework\mvc\model\db\Recordset;
 use org\jecat\framework\mvc\model\db\Model;
 use org\jecat\framework\db\sql\IDataSettableStatement;
-use org\jecat\framework\mvc\model\IModel;
 use org\jecat\framework\db\sql\StatementFactory;
 use org\jecat\framework\lang\Object;
 
@@ -31,7 +30,7 @@ abstract class OperationStrategy extends Object
 		return $aRestriction ;
 	}
 
-	protected function setValue(IDataSettableStatement $aStatement,$keys,$names=null,IModel $aDataSource,$sTableName=null)
+	protected function setValue(IDataSettableStatement $aStatement,$keys,$names=null,Model $aDataSource,$sTableName=null)
 	{
 		$keys = array_values((array)$keys) ;
 		if($names)

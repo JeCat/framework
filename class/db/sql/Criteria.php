@@ -80,7 +80,7 @@ class Criteria extends SubStatement
 	}
 	
 	public function setLimitFrom($sLimitFrom) {
-		$this->sLimitFrom = (int)$sLimitFrom;
+		$this->sLimitFrom = $sLimitFrom;
 		return $this ;
 	}
 	public function limitFrom()

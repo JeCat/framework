@@ -90,12 +90,12 @@ abstract class ApplicationFactory extends Object
 		
 		// 将 jecat 加入到 class loader 中
 		$aClassLoader->addPackage( 'org\\jecat\\framework', $aFolder->findFolder('framework/class') ) ;
-			
+		
 		// 将保存 数据表 实现类的临时目录加入到 class loader 中
 		$aPackage = new ShadowClassPackage(
 				Prototype::MODEL_IMPLEMENT_CLASS_BASE
 				, Prototype::MODEL_IMPLEMENT_CLASS_NS
-				, $aFolder->findFolder(Prototype::$sModelImpPackage,Folder::FIND_AUTO_CREATE)
+				, $aFolder->findFolder('/data/class/db/model',Folder::FIND_AUTO_CREATE)
 		) ;
 		$aClassLoader->addPackage( $aPackage ) ;
 		
@@ -103,7 +103,7 @@ abstract class ApplicationFactory extends Object
 		$aPackage = new ShadowClassPackage(
 				Prototype::PROTOTYPE_IMPLEMENT_CLASS_BASE
 				, Prototype::PROTOTYPE_IMPLEMENT_CLASS_NS
-				, $aFolder->findFolder(Prototype::$sPrototypeImpPackage,Folder::FIND_AUTO_CREATE)
+				, $aFolder->findFolder('/data/class/db/prototype',Folder::FIND_AUTO_CREATE)
 		) ;
 		$aClassLoader->addPackage( $aPackage ) ;
 

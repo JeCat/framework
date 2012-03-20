@@ -159,6 +159,7 @@ abstract class JointPoint extends Object implements \Serializable
 				'sWeaveClass' => & $this->sWeaveClass ,
 				'sWeaveMethod' => & $this->sWeaveMethod ,
 				'sWeaveMethodNameRegexp' => & $this->sWeaveMethodNameRegexp ,
+				'bMatchDerivedClass' => & $this->bMatchDerivedClass ,
 		) ) ;
 	}
 	
@@ -172,11 +173,12 @@ abstract class JointPoint extends Object implements \Serializable
 		$this->sWeaveClass =& $arrData['sWeaveClass'] ;
 		$this->sWeaveMethod =& $arrData['sWeaveMethod'] ;
 		$this->sWeaveMethodNameRegexp =& $arrData['sWeaveMethodNameRegexp'] ;
+		$this->bMatchDerivedClass =& $arrData['bMatchDerivedClass'] ;
 	}
 	
 	public function isMatchDerivedClass()
 	{
-		$this->bMatchDerivedClass ;
+		return $this->bMatchDerivedClass ;
 	}
 	
 	private $sWeaveClass ;
