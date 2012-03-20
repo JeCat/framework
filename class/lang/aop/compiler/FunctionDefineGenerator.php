@@ -125,7 +125,7 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 							}
 							
 							// 创建一个覆盖父类的方法用于 aop
-							$aMethodToken = $this->createMethod($sFuncName,$arrNeedWeaveMethods[$sFuncName]->sAdviceDefineArgvsLit,$sAccess,$aMethodRef->isStatic(),$aTokenPool,$aClassEnd,'insertBefore') ;
+							$aMethodToken = $this->createMethod($sFuncName,$arrNeedWeaveMethods[$sFuncName]->sOriginCallArgvsLit,$sAccess,$aMethodRef->isStatic(),$aTokenPool,$aClassEnd,'insertBefore') ;
 							$aMethodToken->setBelongsClass($aObject) ;
 							$aMethodToken->setBelongsNamespace($aObject->belongsNamespace()) ;
 							$arrNeedWeaveMethods[$sFuncName]->aExecutePoint = $aMethodToken ;
@@ -133,7 +133,7 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 							// 创建函数内容
 							$aTokenPool->insertAfter($aMethodToken->bodyToken(),new Token(T_STRING,"
 			// 调用父类方法
-			return parent::{$sFuncName}({$arrNeedWeaveMethods[$sFuncName]->sAdviceCallArgvsLit}) ;
+			return parent::{$sFuncName}({$arrNeedWeaveMethods[$sFuncName]->sOriginCallArgvsLit}) ;
 		")) ;
 						}
 						// 不存在的方法
@@ -354,10 +354,10 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 			$arrAdviceDefineArgvsLit[] = $sDefineArgv ;
 		}
 		
-		$arrAdviceDefineArgvsLit[] = '\\org\\jecat\\framework\\lang\\aop\\AdviceCallState $__apo_aCallState' ;
-		$aStat->sAdviceDefineArgvsLit = implode(',',$arrAdviceDefineArgvsLit) ;
-		
 		$aStat->sOriginCallArgvsLit = implode(',',$arrAdviceCallArgvsLit) ;
+		
+		array_unshift($arrAdviceDefineArgvsLit, '\\org\\jecat\\framework\\lang\\aop\\AdviceCallState $__apo_aCallState') ;
+		$aStat->sAdviceDefineArgvsLit = implode(',',$arrAdviceDefineArgvsLit) ;
 		
 		array_unshift($arrAdviceCallArgvsLit,'$__apo_aCallState') ;
 		$aStat->sAdviceCallArgvsLit = implode(',',$arrAdviceCallArgvsLit) ;
