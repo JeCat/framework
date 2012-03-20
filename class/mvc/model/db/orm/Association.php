@@ -447,6 +447,7 @@ class Association implements IBean, \Serializable, IIncompleteSerializable
 				'sJoinType' ,
 				'arrBeanConfig' ,
 				'aToPrototype' ,
+				'aFromPrototype' ,
 			)
 		) ;
 	}
