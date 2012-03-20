@@ -1,13 +1,11 @@
 <?php
 namespace org\jecat\framework\system ;
 
+use org\jecat\framework\fs\Folder;
 use org\jecat\framework\lang\oop\ShadowClassPackage;
-
 use org\jecat\framework\mvc\controller\Response;
 use org\jecat\framework\mvc\model\db\orm\Prototype;
-use org\jecat\framework\fs\imp\LocalFileSystem;
 use org\jecat\framework\setting\Setting;
-use org\jecat\framework\fs\FileSystem;
 use org\jecat\framework\setting\imp\FsSetting;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\locale\LocaleManager;
@@ -57,7 +55,7 @@ abstract class ApplicationFactory extends Object
 		$aOriApp = Application::switchSingleton($aApp) ;		
 		
 		// filesystem
-		FileSystem::setSingleton($this->createFileSystem($aApp,$sApplicationRootPath)) ;
+		Folder::setSingleton($this->createFileSystem($aApp,$sApplicationRootPath)) ;
 		
 		// 初始化 class loader
 		ClassLoader::setSingleton($this->createClassLoader($aApp)) ;
@@ -82,26 +80,22 @@ abstract class ApplicationFactory extends Object
 	
 	public function createFileSystem(Application $aApp,$sRootPath)
 	{
-		$aFileSystem = new LocalFileSystem($sRootPath) ;
-		
-		// 将 jc framework 挂载到 /framework 目录下
-		$aFileSystem->mount( '/framework', LocalFileSystem::flyweight(\org\jecat\framework\PATH) ) ;
-		
-		return $aFileSystem ;
+		return new Folder($sRootPath) ;
 	}
 
 	public function createClassLoader(Application $aApp)
 	{		
-		$aClassLoader = new ClassLoader( FileSystem::singleton()->findFile("/classpath.php") ) ;
+		$aClassLoader = new ClassLoader( Folder::singleton()->findFile("classpath.php") ) ;
+		$aFolder = Folder::singleton() ;
 		
 		// 将 jecat 加入到 class loader 中
-		$aClassLoader->addPackage( 'org\\jecat\\framework', '/framework/class' ) ;
+		$aClassLoader->addPackage( 'org\\jecat\\framework', $aFolder->findFolder('framework/class') ) ;
 			
 		// 将保存 数据表 实现类的临时目录加入到 class loader 中
 		$aPackage = new ShadowClassPackage(
 				Prototype::MODEL_IMPLEMENT_CLASS_BASE
 				, Prototype::MODEL_IMPLEMENT_CLASS_NS
-				, FileSystem::singleton()->findFolder(Prototype::$sModelImpPackage,FileSystem::FIND_AUTO_CREATE)
+				, $aFolder->findFolder(Prototype::$sModelImpPackage,Folder::FIND_AUTO_CREATE)
 		) ;
 		$aClassLoader->addPackage( $aPackage ) ;
 		
@@ -109,7 +103,7 @@ abstract class ApplicationFactory extends Object
 		$aPackage = new ShadowClassPackage(
 				Prototype::PROTOTYPE_IMPLEMENT_CLASS_BASE
 				, Prototype::PROTOTYPE_IMPLEMENT_CLASS_NS
-				, FileSystem::singleton()->findFolder(Prototype::$sPrototypeImpPackage,FileSystem::FIND_AUTO_CREATE)
+				, $aFolder->findFolder(Prototype::$sPrototypeImpPackage,Folder::FIND_AUTO_CREATE)
 		) ;
 		$aClassLoader->addPackage( $aPackage ) ;
 
@@ -144,7 +138,7 @@ abstract class ApplicationFactory extends Object
 	 */
 	public function createSetting()
 	{
-		if( !$aSettingFolder=FileSystem::singleton()->findFolder("/settings",FileSystem::FIND_AUTO_CREATE) )
+		if( !$aSettingFolder=Folder::singleton()->findFolder("/settings",Folder::FIND_AUTO_CREATE) )
 		{
 			throw new Exception("无法在目录 /setting 中建立系统配置") ;
 		}

@@ -1,20 +1,18 @@
 <?php
-namespace org\jecat\framework\fs\imp ;
+namespace org\jecat\framework\fs ;
 
-use org\jecat\framework\fs\FSIterator;
-use org\jecat\framework\fs\FileSystem;
 use org\jecat\framework\lang\Exception ;
 
 class LocalFolderIterator extends FSIterator{
-	public function __construct (LocalFolder $aFolder,$nFlags = self::FLAG_DEFAULT){
+	public function __construct (Folder $aFolder,$nFlags = self::FLAG_DEFAULT){
 		parent::__construct($aFolder,$nFlags);
 		if( $nFlags & self::RECURSIVE_BREADTH_FIRST ){
 			throw new Exception('unfinished flag : RECURSIVE_BREADTH_FIRST');
 		}
 		if( $nFlags & self::RECURSIVE_SEARCH ){
-			$this->aIterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($aFolder->localPath()),\RecursiveIteratorIterator::SELF_FIRST) ;
+			$this->aIterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($aFolder->path()),\RecursiveIteratorIterator::SELF_FIRST) ;
 		}else{
-			$this->aIterator = new \DirectoryIterator($aFolder->localPath());
+			$this->aIterator = new \DirectoryIterator($aFolder->path());
 		}
 	}
 	
@@ -24,7 +22,7 @@ class LocalFolderIterator extends FSIterator{
 		}else{
 			$sAbsolutePath = $this->aIterator->getPathname();
 		}
-		$sRelativePath = FileSystem::relativePath($this->aParentFolder->localPath(),$sAbsolutePath);
+		$sRelativePath = FSO::relativePath($this->aParentFolder->path(),$sAbsolutePath);
 		if( $this->nFlags & self::RETURN_FSO ){
 			if($this->aIterator->isDir()){
 				return $this->aParentFolder->findFolder($sRelativePath) ;

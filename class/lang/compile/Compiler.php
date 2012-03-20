@@ -2,8 +2,10 @@
 
 namespace org\jecat\framework\lang\compile ;
 
+use org\jecat\framework\fs\File;
+
 use org\jecat\framework\lang\oop\Package;
-use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\fs\Folder;
 use org\jecat\framework\system\Application;
 use org\jecat\framework\lang\compile\object\TokenPool;
 use org\jecat\framework\lang\oop\ClassLoader;
@@ -29,7 +31,7 @@ class Compiler extends JcObject
 		if(!$this->aCompiledPackage)
 		{
 			$sFolderPath = $this->sCompiledFolderPath.'/'.$this->strategySignature() ;
-			$aFolder = FileSystem::singleton()->findFolder($sFolderPath,FileSystem::FIND_AUTO_CREATE) ;
+			$aFolder = Folder::singleton()->findFolder($sFolderPath,Folder::FIND_AUTO_CREATE) ;
 			$this->aCompiledPackage = new Package('',$aFolder) ;
 		}
 		
@@ -46,10 +48,10 @@ class Compiler extends JcObject
 		$this->sCompiledFolderPath = $sFolderPath ;
 	}
 	
-	public function compile(IInputStream $aSourceStream,IOutputStream $aCompiledStream)
-	{
+	public function compile($sSourceFile,$sCompiledFile)
+	{		
 		// 扫描 tokens
-		$aTokenPool = $this->scan($aSourceStream) ;
+		$aTokenPool = $this->scan($sSourceFile) ;
 		
 		// 解释
 		$this->interpret($aTokenPool) ;
@@ -58,6 +60,8 @@ class Compiler extends JcObject
 		$this->generate($aTokenPool) ;
 		
 		// 编译结果写入文件
+		$aCompiledFile = new File($sCompiledFile) ;
+		$aCompiledStream = $aCompiledFile->openWriter() ;
 		foreach($aTokenPool->iterator() as $aObject)
 		{
 			$aCompiledStream->write($aObject->targetCode()) ;
@@ -67,12 +71,14 @@ class Compiler extends JcObject
 	/**
 	 * @return org\jecat\framework\lang\compile\object\TokenPool
 	 */
-	public function scan(IInputStream $aSourceStream)
+	public function scan($sSourceFile)
 	{
-		$aTokenPool = $this->createTokenPool() ;
-	
 		$aSource = new String() ;
-		$aSourceStream->readInString($aSource) ;
+		$aSourceFile = new File($sSourceFile) ;
+		$aSourceStream = $aSourceFile->openReader()->readInString($aSource) ;
+		
+		$aTokenPool = $this->createTokenPool($sSourceFile) ;
+	
 		$nLine = 1 ;
 		$nPosition = 1 ;
 		
@@ -254,9 +260,9 @@ class Compiler extends JcObject
 		$this->arrStrategySummaries[] = $summay ;
 	}
 	
-	public function createTokenPool()
+	public function createTokenPool($sSourceFilepath)
 	{
-		return new TokenPool('org\\jecat\\framework\\lang\\compile\\object\\AbstractObject') ;
+		return new TokenPool($sSourceFilepath) ;
 	}
 	
 	

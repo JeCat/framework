@@ -41,9 +41,13 @@ class JointPointCallFunction extends JointPoint
 		$this->sCallFunctionNamePattern = $sCallFunctionNamePattern;
 	}
 	
+	static public function createFromDeclare($sDeclare)
+	{
+		
+	}
 	public function exportDeclare($bWithClass=true)
 	{
-		return '[call function]'.($bWithClass?$this->weaveClass():'')."::".$this->weaveMethod().'() ;' ;
+		return ($bWithClass?$this->weaveClass():'')."::".$this->weaveMethod().'()' ;
 	}
 	
 	private $sCallFunctionNamePattern ;

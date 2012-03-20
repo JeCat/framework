@@ -2,9 +2,8 @@
 
 namespace org\jecat\framework\ui ;
 
-use org\jecat\framework\fs\FileSystem;
-use org\jecat\framework\fs\IFile;
-use org\jecat\framework\fs\IFolder;
+use org\jecat\framework\fs\Folder;
+use org\jecat\framework\fs\File;
 use org\jecat\framework\resrc\ResourceManager;
 
 class SourceFileManager extends ResourceManager
@@ -18,7 +17,7 @@ class SourceFileManager extends ResourceManager
 		return $this->sCompiledFolderPath ;
 	}
 	
-	public function isCompiledValid(IFile $aSourceFile,IFile $aCompiledFile)
+	public function isCompiledValid(File $aSourceFile,File $aCompiledFile)
 	{
 		if($this->bForceCompile)
 		{
@@ -29,12 +28,12 @@ class SourceFileManager extends ResourceManager
 	}
 
 	/**
-	 * @return org\jecat\framework\fs\IFile
+	 * @return org\jecat\framework\fs\File
 	 */
 	public function findCompiled($sSourceFile,$sNamespace,$bAutoCreate=false)
 	{
 		$sPath = $this->compiledFolderPath() . '/' . $this->compileStrategySignture() . '/' . $sNamespace . '/' . $sSourceFile . '.php' ; 
-		return FileSystem::singleton()->findFile($sPath,$bAutoCreate?FileSystem::FIND_AUTO_CREATE:0) ;
+		return Folder::singleton()->findFile($sPath,$bAutoCreate?Folder::FIND_AUTO_CREATE:0) ;
 	}
 	
 	public function setCompileStrategySignture($sCompileStrategySignture)

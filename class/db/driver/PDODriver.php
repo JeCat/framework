@@ -58,7 +58,7 @@ class PDODriver extends \PDO implements IDriver
 	}
 
 	/**
-	 * @return org\jecat\framework\db\recordset\IRecordSet
+	 * @return \PDOStatement
 	 */
 	public function query($sql)
 	{
@@ -81,7 +81,7 @@ class PDODriver extends \PDO implements IDriver
 			) ;
 		}
 		
-		return new PDORecordSet($result) ;
+		return $result ;
 	}
 	
 	public function execute($sql)

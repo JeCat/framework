@@ -1,8 +1,11 @@
 <?php
 namespace org\jecat\framework\lang\aop ;
 
+use org\jecat\framework\bean\BeanFactory;
+
+use org\jecat\framework\fs\File;
 use org\jecat\framework\lang\compile\IStrategySummary;
-use org\jecat\framework\fs\IFSO;
+use org\jecat\framework\fs\FSO;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\oop\Package;
 use org\jecat\framework\lang\compile\CompilerFactory;
@@ -25,6 +28,27 @@ class AOP extends Object implements IStrategySummary, \Serializable
 		$this->parseAspectClass($sAspectClass) ;
 		$this->aPointcutIterator = null ;
 		$this->aJointPointIterator = null ;
+	}
+	
+	public function registerBean(array $arrConfig,$sAspectDefineFile)
+	{
+		if( empty($arrConfig['class']) )
+		{
+			$arrConfig['class'] = 'aspect' ;
+		}
+		
+		$aAspect = BeanFactory::singleton()->createBean($arrConfig) ;
+		if($sAspectDefineFile)
+		{
+			$aAspect->setAspectFilepath(FSO::tidyPath($sAspectDefineFile)) ;
+		}
+		$this->aspects()->add($aAspect) ;
+	}
+	
+	public function unregister(Aspect $aAspect)
+	{
+		unset( $this->arrAspectClasses[ $aAspect->aspectName() ] ) ;
+		$this->aspects()->remove($aAspect) ;
 	}
 	
 	/**
@@ -95,10 +119,10 @@ class AOP extends Object implements IStrategySummary, \Serializable
 			$sBeWeavedClass = $aJointPoint->weaveClass() ;
 			if( !in_array($sBeWeavedClass,$arrBeWeavedClasses) )
 			{				
-				$aSrcClassFile = $aClassLoader->searchClass($sBeWeavedClass,ClassLoader::SEARCH_COMPILED) ;
-				$aCmpdClassFile = $aClassLoader->searchClass($sBeWeavedClass,ClassLoader::SEARCH_COMPILED) ;
+				$sSrcClassFile = $aClassLoader->searchClass($sBeWeavedClass,Package::nocompiled) ;
+				$sCmpdClassFile = $aClassLoader->searchClass($sBeWeavedClass,Package::compiled) ;
 				
-				if( !$aSrcClassFile )
+				if( !$sSrcClassFile )
 				{
 					throw new Exception(
 						"AOP 无法将目标代码织入到 JointPoint %s 中：没有找到类 %s 的源文件。"
@@ -106,7 +130,7 @@ class AOP extends Object implements IStrategySummary, \Serializable
 					) ;
 				}
 				
-				if( !$aCmpdClassFile )
+				if( !$sCmpdClassFile )
 				{
 					throw new Exception(
 						"AOP 无法将目标代码织入到 JointPoint %s 中：没有找到类 %s 的编译文件。"
@@ -119,7 +143,7 @@ class AOP extends Object implements IStrategySummary, \Serializable
 					$aCompiler = $this->createClassCompiler() ;
 				}
 				
-				$aCompiler->compile( $aSrcClassFile->openReader(), $aCmpdClassFile->openWriter() ) ;
+				$aCompiler->compile( File::createInstance($sSrcClassFile)->openReader(), File::createInstance($sCmpdClassFile)->openWriter() ) ;
 				
 				$arrBeWeavedClasses[] = $sBeWeavedClass ;
 			}
@@ -163,29 +187,29 @@ class AOP extends Object implements IStrategySummary, \Serializable
 	
 	private function parseAspectClass($sAspectClass)
 	{
-		if( !$aClassFile = ClassLoader::singleton()->searchClass($sAspectClass,ClassLoader::SEARCH_SOURCE) )
+		if( !$sClassFile = ClassLoader::singleton()->searchClass($sAspectClass,Package::nocompiled) )
 		{
 			throw new Exception("注册到AOP中的Aspace(%s)不存在; Aspace必须是一个有效的类",$sAspectClass) ;
 		}
 	
 		$aClassCompiler = CompilerFactory::singleton()->create() ;
-		$aTokenPool = $aClassCompiler->scan($aClassFile->openReader()) ;
+		$aTokenPool = $aClassCompiler->scan($sClassFile) ;
 		$aClassCompiler->interpret($aTokenPool) ;
 	
 		if( !$aClassToken=$aTokenPool->findClass($sAspectClass) )
 		{
 			throw new Exception("根据 class path 搜索到class的定义文件：%s，但是该文件中没有定义：%s",
-					array($sAspectClass,$aClassFile->path(),$sAspectClass)
+					array($sAspectClass,$sClassFile,$sAspectClass)
 			) ;
 		}
 	
-		$this->aspects()->add(Aspect::createFromToken($aClassToken,$aTokenPool)) ;
+		$this->aspects()->add(Aspect::createFromToken($aClassToken,$sClassFile)) ;
 	}
 	
 	/**
 	 * @return org\jecat\framework\pattern\composite\IContainer
 	 */
-	protected function aspects()
+	public function aspects()
 	{
 		if( !$this->aAspects )
 		{
@@ -193,6 +217,18 @@ class AOP extends Object implements IStrategySummary, \Serializable
 		}
 	
 		return $this->aAspects ;
+	}
+	
+	public function isValid()
+	{
+		foreach( $this->aspectIterator() as $aAspect )
+		{
+			if( !$aAspect->isValid() )
+			{
+				return false ;
+			}
+		}
+		return true ;
 	}
 	
 	public function serialize()

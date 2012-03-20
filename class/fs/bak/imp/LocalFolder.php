@@ -2,7 +2,7 @@
 namespace org\jecat\framework\fs\imp ;
 
 use org\jecat\framework\fs\IFolder;
-use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\fs\Folder;
 use org\jecat\framework\fs\FSIterator ;
 
 class LocalFolder extends LocalFSO implements IFolder

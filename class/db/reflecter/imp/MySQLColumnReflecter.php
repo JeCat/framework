@@ -8,15 +8,15 @@ class MySQLColumnReflecter extends AbStractColumnReflecter
 	function __construct($aDBReflecterFactory, $sTable, $sColumn, $sDBName = null)
 	{
 		$aDB = $aDBReflecterFactory->db();
-		$aIterColumn = $aDB->query ( $this->makeColumnSql($sTable, $sColumn, $sDBName) );
 		
-		if($aIterColumn->rowCount() == 0)
+		if( !$aResult=$aDB->query($this->makeColumnSql($sTable, $sColumn, $sDBName)) or $aResult->rowCount()==0 )
 		{
 			$this->bIsExist = false ;
 			return ;
 		}
 		
-		$this->sType = strtoupper( $aIterColumn->field('Type',0) ) ;
+		$arrColumnInfo = $aResult->fetch(\PDO::FETCH_ASSOC) ;
+		$this->sType = strtoupper( $arrColumnInfo['Type'] ) ;
 		if( preg_match('/^(\w+)\((\d+)\)$/',$this->sType,$arrRes) )
 		{
 			$this->sType = $arrRes[1] ;
@@ -28,25 +28,23 @@ class MySQLColumnReflecter extends AbStractColumnReflecter
 		$this->bIsFloat = in_array ( $this->sType, self::$arrFloat ) ;
 		$this->bIsString = in_array ( $this->sType, self::$arrString ) ;
 		
-		if ($aIterColumn->field ( 'Null', 0 ) !== 'NO')
+		if( $arrColumnInfo['Null'] !== 'NO' )
 		{
 			$this->bAllowNull = true;
 		}
 		
-		$sDefaultValue = $aIterColumn->field ( 'Default', 0 );
+		$sDefaultValue = $arrColumnInfo['Default'] ;
 		if ($sDefaultValue !== 'NULL')
 		{
 			$this->defaultValue = $sDefaultValue;
 		}
 
-		if ($aIterColumn->field ( 'Extra', 0 ) == 'auto_increment')
+		if ( $arrColumnInfo['Extra'] == 'auto_increment')
 		{
 			$this->bIsAutoIncrement = true;
 		}
 		
 		$this->sName = $sColumn;
-	
-		//$this->sComment = $aIterColumn->field ( 'COLUMN_COMMENT', 0 );
 	}
 	
 	private function makeColumnSql($sTable, $sColumn, $sDBName)

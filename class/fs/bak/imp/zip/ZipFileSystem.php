@@ -1,7 +1,7 @@
 <?php
 namespace org\jecat\framework\fs\imp\zip ;
 
-use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\fs\Folder;
 use org\jecat\framework\fs\imp\LocalFile;
 use org\jecat\framework\lang\Exception;
 
@@ -9,7 +9,7 @@ class ZipFileSystem extends FileSystem{
 	public function __construct( LocalFile $aZipFileFSO ){
 		$this->aZipArchive = new \ZipArchive ;
 		$this->aFileForZip = $aZipFileFSO ;
-		$sFilePath = $aZipFileFSO->url(false) ;
+		$sFilePath = $aZipFileFSO->path() ;
 		
 		$nRstOpen = $this->aZipArchive->open($sFilePath) ;
 		if( TRUE !== $nRstOpen ){
@@ -35,7 +35,7 @@ class ZipFileSystem extends FileSystem{
 	}
 	
 	public function url(){
-		return 'zip://' . $this->aFileForZip->url(false) ;
+		return 'zip://' . $this->aFileForZip->path() ;
 	}
 	
 	/////////////////////////////////////////////////////////////////////////
@@ -102,7 +102,7 @@ class ZipFileSystem extends FileSystem{
 	}
 	
 	
-	// IFile
+	// File
 	private $aFileForZip = null ;
 	// \ ZipArchive
 	private $aZipArchive = null ;

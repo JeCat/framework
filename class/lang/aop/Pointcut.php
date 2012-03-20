@@ -9,7 +9,7 @@ use org\jecat\framework\pattern\composite\NamedObject;
 use org\jecat\framework\pattern\iterate\ArrayIterator;
 use org\jecat\framework\lang\Object;
 
-class Pointcut extends NamedObject
+class Pointcut extends NamedObject implements \Serializable
 {
 	static public function createFromToken(FunctionDefine $aFunctionDefine)
 	{
@@ -87,6 +87,7 @@ class Pointcut extends NamedObject
 		}
 		
 		$aPointcut = new self($aFunctionDefine->name()) ;
+		$aPointcut->sDefineMethod = $aFunctionDefine->name() ;
 		
 		if( is_array($arrJointPoints) )
 		{
@@ -95,6 +96,7 @@ class Pointcut extends NamedObject
 				if( $aJointPoint instanceof JointPoint )
 				{
 					$aPointcut->jointPoints()->add($aJointPoint) ;
+					$aJointPoint->setPointcut($aPointcut) ;
 				}
 				
 				else 
@@ -137,9 +139,48 @@ class Pointcut extends NamedObject
 		return $this->aAdvices ;
 	}
 	
+	public function serialize ()
+	{
+		$arrData = array(
+			'sDefineMethod' =>& $this->sDefineMethod ,
+			'aJointPoints' => $this->aJointPoints ,
+		) ;
+		return serialize( $arrData ) ;
+	}
+	
+	/**
+	 * @param serialized
+	 */
+	public function unserialize ($serialized)
+	{
+		$arrData = unserialize($serialized) ;
+		$this->sDefineMethod =& $arrData['sDefineMethod'] ;
+		$this->aJointPoints = $arrData['aJointPoints'] ;
+		if($this->aJointPoints)
+		{
+			foreach($this->aJointPoints->iterator() as $aJointPoints)
+			{
+				$aJointPoints->setPointcut($this) ;
+			}
+		}
+	}
+	
+	public function setAspect(Aspect $aAspect)
+	{
+		$this->aDefineAspect = $aAspect ;
+	}
+	public function aspect()
+	{
+		return $this->aDefineAspect ;
+	}
+	
 	private $aAdvices ;
 	
 	private $aJointPoints ;
+	
+	private $aDefineAspect ;
+	
+	private $sDefineMethod ;
 }
 
 ?>

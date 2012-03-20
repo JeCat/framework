@@ -50,7 +50,7 @@ class LocaleManager extends Object
 	}
 	
 	
-	public function loadSentenceFolder(IFolder $aFolder)
+	public function loadSentenceFolder(Folder $aFolder)
 	{
 		$aIter = $aFolder->iterator() ;
 		for($aIter->rewind();$aIter->valid();$aIter->next())

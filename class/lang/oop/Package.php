@@ -1,14 +1,20 @@
 <?php
 namespace org\jecat\framework\lang\oop ;
 
+use org\jecat\framework\fs\FSO;
 use org\jecat\framework\lang\Exception;
-use org\jecat\framework\fs\IFile;
-use org\jecat\framework\fs\IFolder;
-use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\fs\Folder;
 
 class Package implements \Serializable
 {		
-	public function __construct($sNamespace,IFolder $aFolder=null)
+	const source = 1 ;
+	const encode = 8 ;
+	const compiled = 64 ;
+	const nocompiled = 63 ;
+	const all = 255 ;
+	
+	
+	public function __construct($sNamespace,Folder $aFolder=null)
 	{
 		$this->setNamespace($sNamespace) ;
 		
@@ -24,28 +30,27 @@ class Package implements \Serializable
 		// $this->addClassFilenameWrapper(function ($sClassName){ return "class.{$sClassName}.php" ; }) ;
 	}
 	
-	public function findFolder($sPath,$bAutoCreate=false)
+	static public function findFolder($sPath,$bAutoCreate=false)
 	{
-		$aFs = FileSystem::singleton() ;
-		if( !$aSourceFolder=$aFs->findFolder($sPath,$bAutoCreate?FileSystem::FIND_AUTO_CREATE:0) )
+		if( !is_dir($sPath) and !$bAutoCreate )
 		{
 			throw new Exception(
 					"注册 class package 时，提供的class源文件目录不存在：%s"
 					, array($sPath)
 			) ;
 		}
-		return $aSourceFolder ;
+		return new Folder($sPath) ;
 	}
 
 	/**
-	 * @return org\jecat\framework\fs\IFolder
+	 * @return org\jecat\framework\fs\Folder
 	 */
 	public function folder()
 	{
 		return $this->aFolder ;
 	}
 	
-	public function setFolder(IFolder $aFolder)
+	public function setFolder(Folder $aFolder)
 	{
 		$this->aFolder = $aFolder ;
 	}
@@ -93,9 +98,6 @@ class Package implements \Serializable
 		}
 	}
 	
-	/**
-	 * @return js\fs\IFile
-	 */
 	public function searchClassEx($sSubFolder,$sShortClassName)
 	{
 		if(!$this->aFolder)
@@ -109,9 +111,9 @@ class Package implements \Serializable
 			
 			$sClassFilePath = $sSubFolder? ($sSubFolder . '/' . $sClassFilename): $sClassFilename ;
 			
-			if( $aFile=$this->aFolder->findFile($sClassFilePath) and $aFile instanceof IFile )
+			if( $sFilepath=$this->aFolder->find($sClassFilePath,FSO::file|Folder::FIND_RETURN_PATH) )
 			{
-				return $aFile ;
+				return $sFilepath ;
 			}
 		}
 		
@@ -120,7 +122,7 @@ class Package implements \Serializable
 	
 	public function parsePath($sClassName)
 	{
-		if( $this->nNamespaceLen===0 )
+		if( $this->nNamespaceLen===1 and $this->sNamespace==='\\' )
 		{
 			$sPath = $sClassName ;
 		}
@@ -171,7 +173,7 @@ class Package implements \Serializable
 				$sClassPath = $sInnerPath.'/'.$sClassPath ;
 			}
 			
-			if( !$aClassFile=$this->aFolder->createFile($sClassPath) )
+			if( !$aClassFile=$this->aFolder->createChildFile($sClassPath) )
 			{
 				throw new Exception(
 					"无法在以下路径上创建类%s的编译文件：%s",array($sClassFullName,$sClassCompilePath)
@@ -204,8 +206,8 @@ class Package implements \Serializable
 	{
 		$arrData = array(
 				'sNamespace' => &$this->sNamespace ,
-				'nNamespaceLen' => &$this->nNamespaceLen ,
-				'sFolderPath' => $this->aFolder? $this->aFolder->path(): null ,
+				// 'nNamespaceLen' => &$this->nNamespaceLen ,
+				'aFolder' => $this->aFolder ,
 		) ;
 		return serialize($arrData) ;
 	}
@@ -214,7 +216,12 @@ class Package implements \Serializable
 	{
 		$arrData = unserialize($serialized) ;
 		
-		$this->__construct($arrData['sNamespace'],$arrData['sFolderPath']? self::findFolder($arrData['sFolderPath']): null) ;
+		$this->__construct($arrData['sNamespace'],$arrData['aFolder']) ;
+	}
+	
+	public function signature()
+	{
+		return md5( $this->sNamespace . ':' . $this->aFolder->path() ) ;
 	}
 	
 	private $sNamespace ;

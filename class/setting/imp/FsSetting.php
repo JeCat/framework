@@ -1,11 +1,12 @@
 <?php
 namespace org\jecat\framework\setting\imp;
 
+use org\jecat\framework\fs\FSO;
+
 use org\jecat\framework\lang\Exception;
-use org\jecat\framework\fs\FileSystem;
 use org\jecat\framework\pattern\iterate\ReverseIterator;
 use org\jecat\framework\fs\FSIterator;
-use org\jecat\framework\fs\IFolder;
+use org\jecat\framework\fs\Folder;
 use org\jecat\framework\setting\IKey;
 use org\jecat\framework\setting\Setting;
 
@@ -14,9 +15,9 @@ class FsSetting extends Setting implements \Serializable
 	
 	/**
 	 * 
-	 * @param IFolder $aRootFolder
+	 * @param Folder $aRootFolder
 	 */
-	public function __construct(IFolder $aRootFolder)
+	public function __construct(Folder $aRootFolder)
 	{
 		$this->aRootFolder = $aRootFolder;
 	}
@@ -27,11 +28,11 @@ class FsSetting extends Setting implements \Serializable
 	public function key($sPath,$bAutoCreate=false)
 	{
 		$sKeyPath = self::transPath($sPath,false) ;
-		$sFlyweightKey = $this->aRootFolder->url() . '/' . $sKeyPath ;
+		$sFlyweightKey = $this->aRootFolder->path() . '/' . $sKeyPath ;
 		
 		if( !$aKey=FsKey::flyweight($sFlyweightKey,false) )
 		{
-			if( !$aFolder=$this->aRootFolder->findFolder($sKeyPath,$bAutoCreate?FileSystem::FIND_AUTO_CREATE:0) )
+			if( !$aFolder=$this->aRootFolder->findFolder($sKeyPath,$bAutoCreate?Folder::FIND_AUTO_CREATE:0) )
 			{
 				return null ;
 			}
@@ -94,13 +95,13 @@ class FsSetting extends Setting implements \Serializable
 	public function separate($sPath)
 	{
 		$sPath = self::transPath($sPath,false) ;
-		$aNewSettingFolder = $this->aRootFolder->findFolder($sPath,FileSystem::FIND_AUTO_CREATE) ;
+		$aNewSettingFolder = $this->aRootFolder->findFolder($sPath,Folder::FIND_AUTO_CREATE) ;
 		return new self($aNewSettingFolder) ;
 	}
 	
 	public function serialize ()
-	{		
-		return $this->aRootFolder->path() ;
+	{
+		return FSO::tidyPath($this->aRootFolder->path()) ;
 	}
 
 	/**
@@ -108,11 +109,11 @@ class FsSetting extends Setting implements \Serializable
 	 */
 	public function unserialize ($serialized)
 	{
-		$this->aRootFolder = FileSystem::singleton()->findFolder($serialized,FileSystem::FIND_AUTO_CREATE) ;
+		$this->aRootFolder = new Folder($serialized,Folder::FIND_AUTO_CREATE) ;
 	}
 	
 	/**
-	 * @var org\jecat\framework\fs\IFolder
+	 * @var org\jecat\framework\fs\Folder
 	 */
 	private $aRootFolder;
 }

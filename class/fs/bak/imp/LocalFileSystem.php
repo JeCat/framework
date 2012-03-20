@@ -1,7 +1,7 @@
 <?php
 namespace org\jecat\framework\fs\imp ;
 
-use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\fs\Folder;
 
 class LocalFileSystem extends FileSystem
 {
@@ -117,12 +117,12 @@ class LocalFileSystem extends FileSystem
 	
 	protected function createFileObject(&$sPath)
 	{
-		return LocalFile::createInstance( array($this,$sPath,$this->sLocalPath.$sPath), $this->application() ) ;
+		return LocalFile::createInstance( array($this,$sPath,$this->sLocalPath.$sPath) ) ;
 	}
 	
 	protected function createFolderObject(&$sPath)
 	{
-		return LocalFolder::createInstance( array($this,$sPath,$this->sLocalPath.$sPath), $this->application() ) ;
+		return LocalFolder::createInstance( array($this,$sPath,$this->sLocalPath.$sPath) ) ;
 	}
 	
 	private $sLocalPath ;

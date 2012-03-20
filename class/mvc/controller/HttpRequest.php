@@ -5,7 +5,7 @@ use org\jecat\framework\system\Application;
 use org\jecat\framework\fs\imp\UploadFile;
 use org\jecat\framework\fs\imp\LocalFileSystem;
 use org\jecat\framework\util\DataSrc ;
-use org\jecat\framework\fs\FileSystem ;
+use org\jecat\framework\fs\Folder ;
 
 class HttpRequest extends Request
 {
@@ -224,7 +224,7 @@ class HttpRequest extends Request
 			return ;
 		}
 		
-		$aFs = FileSystem::singleton() ;
+		$aFs = Folder::singleton() ;
 		$this->mountUploadTmp($aFs) ;
 		
 		$aDataSrc = new DataSrc() ;
@@ -240,7 +240,7 @@ class HttpRequest extends Request
 	{
 		if( !$aFs->exists(self::$sUploadTmpPath) )
 		{
-			$aFs->mount(self::$sUploadTmpPath,LocalFileSystem::createInstance(UploadFile::uploadTempDir())) ;
+			$aFs->mount(self::$sUploadTmpPath,LocalFolder::createInstance(UploadFile::uploadTempDir())) ;
 		}
 	}
 	

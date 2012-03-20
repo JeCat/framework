@@ -5,8 +5,6 @@ use org\jecat\framework\db\reflecter\DBStructReflecter;
 
 abstract class AbStractIndexReflecter extends DBStructReflecter
 {
-	abstract function __construct($aDBReflecterFactory, $sTable, $sIndexName, $sDBName = null);
-	
 	abstract public function isPrimary();
 	
 	abstract public function isUnique();

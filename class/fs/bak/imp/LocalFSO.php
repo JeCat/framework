@@ -5,7 +5,7 @@ namespace org\jecat\framework\fs\imp ;
 use org\jecat\framework\fs\IFolder;
 use org\jecat\framework\fs\IFile;
 use org\jecat\framework\lang\Type;
-use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\fs\Folder;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\fs\FSO;
 

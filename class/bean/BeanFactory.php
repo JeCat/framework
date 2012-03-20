@@ -1,7 +1,7 @@
 <?php
 namespace org\jecat\framework\bean ;
 
-use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\fs\Folder;
 
 use org\jecat\framework\resrc\ResourceManager;
 use org\jecat\framework\lang\Type;
@@ -58,6 +58,10 @@ class BeanFactory extends Object implements \Serializable
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\auth\\LoginedPermission",'perm.logined') ;
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\auth\\CallbackPermission",'perm.callback') ;
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\auth\\GroupPermission",'perm.group') ;
+			
+			// aop
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\lang\\aop\\Aspect",'aspect') ;
+			
 			
 			self::setSingleton($aSingleton,__CLASS__) ;
 		}
@@ -156,7 +160,7 @@ class BeanFactory extends Object implements \Serializable
 		$arrConfigFile = $aFile->includeFile(false,false) ;
 		if( !is_array($arrConfigFile) )
 		{
-			throw new BeanConfException("Bean对象配置文件内容无效: %s，文件必须返回一个 bean 配置数组",$aFile->url()) ;
+			throw new BeanConfException("Bean对象配置文件内容无效: %s，文件必须返回一个 bean 配置数组",$aFile->path()) ;
 		}
 			
 		return $arrConfigFile ;
@@ -290,11 +294,11 @@ class BeanFactory extends Object implements \Serializable
 		{
 			foreach($arrFolderPaths as $sPath)
 			{
-				if(!$aFolder=FileSystem::singleton()->findFolder($sPath))
+				if(!is_dir($sPath))
 				{
 					throw new BeanConfException("恢复BeanFactory时无法找到Bean目录:%s; 只有挂载到系统目录下的目录才能正确序列/反序列化") ;
 				}
-				$this->beanFolders()->addFolder( $aFolder, $sNamespace ) ;
+				$this->beanFolders()->addFolder( new Folder($sPath), $sNamespace ) ;
 			}
 		}
 	}

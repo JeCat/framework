@@ -6,9 +6,9 @@ use org\jecat\framework\lang\Exception as JcException ;
 
 class ExecuteException extends JcException
 {
-	public function __construct( IDriver $aDevice, $sSql, $nDeviceErrorNo, $sDeviceErrorMsg, \Exception $aCause=null )
+	public function __construct( DB $aDB, $sSql, $nDeviceErrorNo, $sDeviceErrorMsg, \Exception $aCause=null )
 	{
-		$this->aDevice = $aDevice ;
+		$this->aDevice = $aDB ;
 		$this->sSql = $sSql ;
 		$this->nDeviceErrorNo = $nDeviceErrorNo ;
 		$this->sDeviceErrorMsg = $sDeviceErrorMsg ;

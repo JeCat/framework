@@ -174,6 +174,10 @@ class Response extends Object
 			
 			// 按执行时间排序
 			$arrLogs = DB::singleton()->executeLog(false) ;
+			foreach($arrLogs as $nIdx=>&$arrOneLog)
+			{
+				$arrOneLog['idx'] = $nIdx ;
+			}
 			usort($arrLogs,function($a,$b){
 				if($a['time']==$b['time'])
 				{
@@ -186,9 +190,9 @@ class Response extends Object
 			foreach($arrLogs as $arrLog)
 			{
 				$fTotal += $arrLog['time'] ;
-				$this->printer()->write( "<div style='padding-top:10px'>[耗时:{$arrLog['time']}] <pre>{$arrLog['sql']}</pre></div>" ) ;
+				$this->printer()->write( "<div style='padding-top:10px'>[{$arrLog['idx']}]=>耗时:{$arrLog['time']} <pre>{$arrLog['sql']}</pre></div>" ) ;
 			}
-			$this->printer()->write( "\r\n<br />DB总计时间：{$fTotal}\r\n<hr />" ) ;
+			$this->printer()->write( "\r\n<br />DB共执行了 ".count($arrLogs)." 条SQL，总计时间：{$fTotal}\r\n<hr />" ) ;
 			
 		}
 		

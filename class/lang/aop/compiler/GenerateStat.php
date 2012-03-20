@@ -11,11 +11,17 @@ use org\jecat\framework\lang\aop\Pointcut;
 
 class GenerateStat 
 {
-	public function __construct(TokenPool $aTokenPool,Token $aToken=null,array &$arrAdvices=array())
+	public function __construct(TokenPool $aTokenPool,Token $aToken=null,array &$arrAdvices=array(),array &$arrAspects=array())
 	{
 		$this->aTokenPool = $aTokenPool ;
 		$this->aExecutePoint = $aToken ;
 		$this->arrAdvices =& $arrAdvices ;
+		$this->arrAspects =& $arrAspects ;
+		
+		// 在 TokenPool 中记录 GenerateStat
+		$arrAopWeavedStats = $aTokenPool->properties()->get('arrAopWeavedStats')?: array() ;
+		$arrAopWeavedStats[] = $this ;
+		$aTokenPool->properties()->set('arrAopWeavedStats',$arrAopWeavedStats) ;
 	}
 	
 	public function addAdvice(Advice $aAdvice)
@@ -58,6 +64,7 @@ class GenerateStat
 	 * advice 函数调用 的参数表
 	 */
 	public $sAdviceCallArgvsLit = '' ;
+	public $sOriginCallArgvsLit = '' ;
 	
 	public $sOriginJointCode = '' ;
 

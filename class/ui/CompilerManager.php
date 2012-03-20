@@ -7,7 +7,7 @@ use org\jecat\framework\io\IOutputStream;
 
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\Object as JcObject;
-use org\jecat\framework\fs\IFile;
+use org\jecat\framework\fs\File;
 
 class CompilerManager extends JcObject
 {
@@ -79,14 +79,14 @@ class CompilerManager extends JcObject
 		$aTargetCodeStream->close($bPHPTag) ;
 	}
 	
-	public function createCompiledFile(IFile $aCompiledFile)
+	public function createCompiledFile(File $aCompiledFile)
 	{
 		$aCompiledsDir = $aCompiledFile->directory() ;
 		if( !$aCompiledsDir->exists() )
 		{
 			if( !$aCompiledsDir->create() )
 			{
-				throw new Exception("无法创建编译文件目录：%s",$aCompiledsDir->url()) ;
+				throw new Exception("无法创建编译文件目录：%s",$aCompiledsDir->path()) ;
 			}
 		}
 

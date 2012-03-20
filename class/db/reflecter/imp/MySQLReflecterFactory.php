@@ -21,9 +21,5 @@ class MySQLReflecterFactory extends AbstractReflecterFactory
 	{
 		return new MySQLColumnReflecter ( $this, $sTable, $sColumn , $sDBName);
 	}
-	public function createIndexReflecter($sTable, $sIndexName, $sDBName = null)
-	{
-		return new MySQLIndexReflecter ( $this, $sTable, $sIndexName , $sDBName);
-	}
 }
 ?>

@@ -7,7 +7,7 @@ use org\jecat\framework\mvc\controller\Response;
 use org\jecat\framework\mvc\controller\Request;
 use org\jecat\framework\system\Application;
 use org\jecat\framework\io\IInputStream;
-use org\jecat\framework\fs\IFile;
+use org\jecat\framework\fs\File;
 use org\jecat\framework\resrc\ResourceManager;
 use org\jecat\framework\lang\Assert;
 use org\jecat\framework\lang\Exception;
@@ -119,7 +119,7 @@ class UI extends JcObject
 	}
 	
 	/**
-	 * @return org\jecat\framework\fs\IFile
+	 * @return org\jecat\framework\fs\File
 	 */
 	public function compileSourceFile($sSourceFile)
 	{
@@ -140,7 +140,7 @@ class UI extends JcObject
 			{
 				if( !$aCompiledFile = $this->sourceFileManager()->findCompiled($sSourceFile,$sNamespace,true) )
 				{
-					throw new Exception("UI引擎在编译模板文件时遇到了错误，无法创建编译文件：%s",$aSourceFile->url()) ;
+					throw new Exception("UI引擎在编译模板文件时遇到了错误，无法创建编译文件：%s",$aSourceFile->path()) ;
 				}
 			}
 			
@@ -151,7 +151,7 @@ class UI extends JcObject
 			}
 			catch (\Exception $e)
 			{
-				throw new Exception("UI引擎在编译模板文件时遇到了错误: %s",$aSourceFile->url(),$e) ;
+				throw new Exception("UI引擎在编译模板文件时遇到了错误: %s",$aSourceFile->path(),$e) ;
 			}
 		}
 		
@@ -172,7 +172,7 @@ class UI extends JcObject
 		$this->compilers()->compile($aObjectContainer,$aCompiledOutput,$bPHPTag) ;
 	}
 	
-	public function render(IFile $aCompiledFile,IHashTable $aVariables=null,IOutputStream $aDevice=null)
+	public function render(File $aCompiledFile,IHashTable $aVariables=null,IOutputStream $aDevice=null)
 	{
 		if(!$aVariables)
 		{
@@ -188,14 +188,19 @@ class UI extends JcObject
 		}
 		
 		// 模板变量
+		$aRequest = Request::singleton() ;
 		if( !$aVariables->has('theRequest') )
 		{
-			$aVariables->set('theRequest',Request::singleton()) ;
+			$aVariables->set('theRequest',$aRequest) ;
+		}
+		if( !$aVariables->has('theParams') )
+		{
+			$aVariables->set('theParams',Request::singleton()) ;
 		}
 		$aVariables->set('theDevice',$aDevice) ;
 		$aVariables->set('theUI',$this);
 		
-		include $aCompiledFile->url()  ;
+		include $aCompiledFile->path()  ;
 	}
 	
 	public function display($sSourceFile,$aVariables=null,IOutputStream $aDevice=null)

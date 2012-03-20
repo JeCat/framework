@@ -1,7 +1,7 @@
 <?php
 namespace org\jecat\framework\mvc\view\widget;
 
-use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\fs\Folder;
 
 use org\jecat\framework\message\Message;
 use org\jecat\framework\mvc\view\DataExchanger;
@@ -13,13 +13,13 @@ use org\jecat\framework\mvc\view\widgetIViewFormWidget;
 use org\jecat\framework\util\IDataSrc;
 use org\jecat\framework\fs\archive\IAchiveStrategy;
 use org\jecat\framework\fs\archive\DateAchiveStrategy;
-use org\jecat\framework\fs\IFile;
-use org\jecat\framework\fs\IFolder;
+use org\jecat\framework\fs\File;
+use org\jecat\framework\fs\Folder;
 
 class File extends FormWidget
 {
 	
-	public function __construct($sId = null, $sTitle = null, IFolder $aFolder = null, IAchiveStrategy $aAchiveStrategy = null, IView $aView = null)
+	public function __construct($sId = null, $sTitle = null, Folder $aFolder = null, IAchiveStrategy $aAchiveStrategy = null, IView $aView = null)
 	{
 		$this->aStoreFolder = $aFolder;
 		if ($aAchiveStrategy == null)
@@ -87,7 +87,7 @@ class File extends FormWidget
 		
 		if (array_key_exists ( 'folder', $arrConfig ))
 		{
-			$this->aStoreFolder = FileSystem::singleton()->findFolder($arrConfig['folder'],FileSystem::FIND_AUTO_CREATE);
+			$this->aStoreFolder = Folder::singleton()->findFolder($arrConfig['folder'],Folder::FIND_AUTO_CREATE);
 		}
 		if (array_key_exists ( 'fullpath', $arrConfig ))
 		{
@@ -126,7 +126,7 @@ class File extends FormWidget
 	
 	public function getFileUrl()
 	{
-		if ($this->value () instanceof IFile)
+		if ($this->value () instanceof File)
 		{
 			return $this->value ()->httpURL ();
 		}
@@ -147,7 +147,7 @@ class File extends FormWidget
 	
 	public function setValue($data = null)
 	{
-		Type::check ( "org\\jecat\\framework\\fs\\IFile", $data );
+		Type::check ( "org\\jecat\\framework\\fs\\File", $data );
 		parent::setValue ( $data );
 	}
 	
@@ -216,9 +216,9 @@ class File extends FormWidget
 		$aSavedFile = $this->aAchiveStrategy->makeFilePath ( $this->aUploadedFile, $this->aStoreFolder );
 		
 		// 创建保存目录
-		if (! $aFolderOfSavedFile = FileSystem::singleton()->findFolder ( $aSavedFile ))
+		if (! $aFolderOfSavedFile = Folder::singleton()->findFolder ( $aSavedFile ))
 		{
-			if (! FileSystem::singleton()->createFolder ( $aSavedFile ))
+			if (! Folder::singleton()->createChildFolder ( $aSavedFile ))
 			{
 				throw new Exception ( __CLASS__ . "的" . __METHOD__ . "在创建路径\"%s\"时出错", array ($this->aStoreFolder->path () ) );
 			}
@@ -260,9 +260,9 @@ class File extends FormWidget
 	{
 		if ($this->aUploadedFile = $aDataSrc->get ( $this->formName () ))
 		{
-			if (! $this->aUploadedFile instanceof IFile)
+			if (! $this->aUploadedFile instanceof File)
 			{
-				throw new Exception ( __METHOD__ . "() %s数据必须是一个 org\\jecat\\framework\\fs\\IFile 对象，提供的是%s类型", array ($this->formName (), Type::detectType ( $this->aUploadedFile ) ) );
+				throw new Exception ( __METHOD__ . "() %s数据必须是一个 org\\jecat\\framework\\fs\\File 对象，提供的是%s类型", array ($this->formName (), Type::detectType ( $this->aUploadedFile ) ) );
 			}
 		}
 		
@@ -309,12 +309,12 @@ class File extends FormWidget
 	private $aAchiveStrategy;
 	
 	/**
-	 * @var	org\jecat\framework\fs\IFolder
+	 * @var	org\jecat\framework\fs\Folder
 	 */
 	private $aStoreFolder;
 	
 	/**
-	 * @var	org\jecat\framework\fs\IFile
+	 * @var	org\jecat\framework\fs\File
 	 */
 	private $aUploadedFile;
 	/**

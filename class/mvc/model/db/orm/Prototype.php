@@ -1,13 +1,15 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\mvc\model\db\ModelList;
+
 use org\jecat\framework\db\sql\Order;
 use org\jecat\framework\util\serialize\IIncompleteSerializable;
 use org\jecat\framework\util\serialize\ShareObjectSerializer;
 use org\jecat\framework\db\sql\Restriction;
 use org\jecat\framework\bean\BeanConfException;
 use org\jecat\framework\lang\Type;
-use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\fs\Folder;
 use org\jecat\framework\db\sql\Statement;
 use org\jecat\framework\db\sql\StatementState;
 use org\jecat\framework\db\sql\name\NameTransferFactory;
@@ -66,7 +68,7 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		$aPrototype->arrColumns = $columns ;
 		$aPrototype->arrKeys = self::youKnow ;
 		
-		$aPrototype->aDB = $aDB ;
+		$aPrototype->aDB = $aDB===self::youKnow? DB::singleton(): $aDB ;
 		
 		return $aPrototype;
 	}
@@ -391,6 +393,18 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		$this->arrAssociations=array();
 		return $this;
 	}
+	public function associationNames($nType=Association::total)
+	{
+		$arrAssocNames = array();
+		foreach($this->arrAssociations as $ass)
+		{
+			if( $nType==Association::total or $ass->isType($nType) )
+			{
+				$arrAssocNames[] = $ass->toPrototype()->name() ;
+			}
+		}
+		return $arrAssocNames ;		
+	}
 	public function associationIterator($nType=Association::total)
 	{
 		$arrAssocs = array();
@@ -524,8 +538,15 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 	 */
 	public function createModel($bList=false)
 	{
-		$sModelClass = $this->modelClass() ;
-		return new $sModelClass($this,$bList) ;
+		if($bList)
+		{
+			return new ModelList($this) ;			
+		}
+		else 
+		{
+			$sModelClass = $this->modelClass() ;
+			return new $sModelClass($this)  ;
+		}
 	}
 	public function modelClass()
 	{
@@ -535,6 +556,16 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 			$this->sModelClass = self::MODEL_IMPLEMENT_CLASS_NS .'\\'. $sModelShortClass ;
 		}
 		return $this->sModelClass ;
+	}
+	
+	static public function modelShadowClassName($sTableName){
+		$sModelShortClass = '_'.preg_replace('[^\w_]','_',$sTableName) ;
+		return self::MODEL_IMPLEMENT_CLASS_NS .'\\'. $sModelShortClass ;
+	}
+	
+	static public function prototypeShadowClassName($sTableName){
+		$sShortClass = '_'.preg_replace('[^\w_]','_',$sTableName) ;
+		return self::PROTOTYPE_IMPLEMENT_CLASS_NS .'\\'. $sShortClass ;
 	}
 	
 	// criteria setter
