@@ -292,6 +292,15 @@ abstract class FSO extends Object implements \Serializable
 			$sToPath = $sToPath->path();
 		}
 		
+		if( substr($sFromPath,0,1)!=='/' and substr($sFromPath,1,1)!==':' )
+		{
+			$sFromPath = getcwd() .'/' . $sFromPath ;
+		}
+		if( substr($sToPath,0,1)!=='/' and substr($sToPath,1,1)!==':' )
+		{
+			$sToPath = getcwd() .'/' . $sToPath ;
+		}
+		
 		// 大致算法就是:  根据‘/’把路径拆分放进数组，然后从第一个开始比较，相同的忽略掉，直到遇到不同的为止。
 		//拆分路径放进数组:
 		$arrFromPath = explode('/', $sFromPath);
