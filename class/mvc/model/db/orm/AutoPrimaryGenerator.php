@@ -35,8 +35,8 @@ class AutoPrimaryGenerator extends Object
 		while($nLen<=$nMaxLen)
 		{
 			// 检查表中的值是否存在
-			$aRecord = $aDB->query("select count(*) as cnt from `{$sTable}` where `{$sColumn}`='{$sValue}' ;") ;
-			if( $aRecord->field('cnt')=='0' )
+			$arrRow = $aDB->query("select count(*) as cnt from `{$sTable}` where `{$sColumn}`='{$sValue}' ;")->fetch(\PDO::FETCH_ASSOC) ; 
+			if( $arrRow['cnt']=='0' )
 			{
 				return $sValue ;
 			}
@@ -67,8 +67,8 @@ class AutoPrimaryGenerator extends Object
 	
 	private function generateNumValue(DB $aDB,$sTable,$sColumn,$nMinVal)
 	{
-		$aRecord = $aDB->query("select max(`$sColumn`) as maxval from `{$sTable}` ;") ;
-		$maxVal = (int)$aRecord->field('maxval') ;
+		$arrRow = $aDB->query("select max(`$sColumn`) as maxval from `{$sTable}` ;")->fetch(\PDO::FETCH_ASSOC) ;
+		$maxVal = (int)$arrRow['maxval'] ;
 		return $maxVal<(int)$nMinVal? $nMinVal: $maxVal+1 ;
 	}
 }
