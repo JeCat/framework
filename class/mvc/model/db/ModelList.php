@@ -10,6 +10,11 @@ use org\jecat\framework\mvc\controller\Response;
 
 class ModelList extends Model implements \Iterator
 {
+	public function isEmpty()
+	{
+		return count($this->arrDataSheet)==0 ;
+	}
+	
 	public function load($values=null,$keys=null)
 	{
 		$this->nTotalCount = -1 ;
