@@ -140,7 +140,7 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 						else
 						{
 							// 创建一个全新的方法用于 aop
-							$aMethodToken = $this->createMethod($sFuncName,$arrNeedWeaveMethods[$sFuncName]->sAdviceDefineArgvsLit,'private',false,$aTokenPool,$aClassEnd,'insertBefore') ;
+							$aMethodToken = $this->createMethod($sFuncName,$arrNeedWeaveMethods[$sFuncName]->sOriginCallArgvsLit,'private',false,$aTokenPool,$aClassEnd,'insertBefore') ;
 							$aMethodToken->setBelongsClass($aObject) ;
 							$aMethodToken->setBelongsNamespace($aObject->belongsNamespace()) ;
 							$arrNeedWeaveMethods[$sFuncName]->aExecutePoint = $aMethodToken ;
