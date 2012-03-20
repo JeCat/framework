@@ -292,23 +292,18 @@ abstract class FSO extends Object implements \Serializable
 			$sToPath = $sToPath->path();
 		}
 		
-		if( substr($sFromPath,0,1)!=='/' or substr($sFromPath,1,1)!==':' )
-		{
-			$sFromPath = getcwd() .'/' . $sFromPath ;
-		}
-		if( substr($sToPath,0,1)!=='/' or substr($sToPath,1,1)!==':' )
-		{
-			$sToPath = getcwd() .'/' . $sToPath ;
-		}
-		
 		// 大致算法就是:  根据‘/’把路径拆分放进数组，然后从第一个开始比较，相同的忽略掉，直到遇到不同的为止。
 		//拆分路径放进数组:
 		$arrFromPath = explode('/', $sFromPath);
 		$arrToPath = explode('/', $sToPath);
-	
 		//开始比对数组，存下不同的部分:
-		$remainFromPath = array_diff($arrFromPath, $arrToPath);
-		$remainToPath = array_diff($arrToPath, $arrFromPath);
+		for($i=0;$i<count($arrFromPath) && $i<count($arrToPath) ; ++$i){
+			if( $arrFromPath[$i] != $arrToPath[$i] ){
+				break ;
+			}
+		}
+		$remainFromPath = array_slice($arrFromPath,$i) ;
+		$remainToPath = array_slice($arrToPath,$i) ;
 	
 		//算出$a路径的剩余深度
 		$count = count($remainFromPath);
