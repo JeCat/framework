@@ -463,7 +463,7 @@ class Model extends AbstractModel implements IBean
 	
 	public function clearData()
 	{
-		$this->arrDataSheet[$this->nDataRow] = array() ;
+		$this->arrDataSheet = array() ;
 	}
 	
 	/**
