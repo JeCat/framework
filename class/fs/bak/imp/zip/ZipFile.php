@@ -1,11 +1,11 @@
 <?php
 namespace org\jecat\framework\fs\imp\zip ;
 
-use org\jecat\framework\fs\IFile;
+use org\jecat\framework\fs\File;
 use org\jecat\framework\io\OutputStream;
 use org\jecat\framework\io\InputStream;
 
-class ZipFile extends ZipFSO implements IFile{
+class ZipFile extends ZipFSO implements File{
 	public function __construct(ZipFileSystem $aFileSystem,$sPath){
 		$this->sZipInnerPath = ZipFileSystem::removePrefixLash($sPath);
 		parent::__construct($aFileSystem,$sPath ) ;
@@ -18,7 +18,7 @@ class ZipFile extends ZipFSO implements IFile{
 			return null ;
 		}
 		
-		return InputStream::createInstance($hHandle,$this->application()) ;
+		return InputStream::createInstance($hHandle) ;
 	}
 	
 	public function openWriter($bAppend=false){

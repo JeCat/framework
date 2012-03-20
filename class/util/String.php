@@ -3,7 +3,7 @@ namespace org\jecat\framework\util ;
 
 use org\jecat\framework\ui\InterpreterManager;
 
-use org\jecat\framework\fs\IFile ;
+use org\jecat\framework\fs\File ;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\Object;
 use org\jecat\framework\util\match\RegExp;
@@ -75,7 +75,7 @@ class String extends Object
 		$this->sText = '' ;
 	}
 	
-	public function loadFile(IFile $aFile)
+	public function loadFile(File $aFile)
 	{
 		$aReader = $aFile->openReader() ;
 		$nBytes = $aReader->readInString($this) ;
@@ -87,7 +87,7 @@ class String extends Object
 	/**
 	 * @return String
 	 */
-	static public function createFromFile(IFile $aFile)
+	static public function createFromFile(File $aFile)
 	{
 		$aString = new self() ;
 		$aString->loadFile($aFile) ;

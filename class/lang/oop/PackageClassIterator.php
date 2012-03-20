@@ -21,7 +21,11 @@ class PackageClassIterator extends \ArrayIterator
 		{
 			foreach($aFolder->iterator(FSIterator::CONTAIN_FILE|FSIterator::RECURSIVE_SEARCH) as $sSubPath)
 			{
-				$sSubPath = preg_replace('/(.+)\.php$/i','\\1',$sSubPath) ;
+				if( !preg_match('/(.+)\.php$/i',$sSubPath,$arrRes) )
+				{
+					continue ;
+				}
+				$sSubPath = $arrRes[1] ;
 				
 				if($sSubNs)
 				{

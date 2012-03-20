@@ -48,7 +48,7 @@ abstract class AbstractReflecterFactory
 	{
 		if(!$sDBName)
 		{
-			$sDBName = $this->db()->driver()->currentDBName();
+			$sDBName = $this->db()->currentDBName();
 		}
 		
 		$aCache = $this->cache();
@@ -81,7 +81,7 @@ abstract class AbstractReflecterFactory
 	{
 		if(!$sDBName)
 		{
-			$sDBName = $this->db()->driver()->currentDBName();
+			$sDBName = $this->db()->currentDBName();
 		}
 		
 		if($aCache = $this->cache())
@@ -106,37 +106,7 @@ abstract class AbstractReflecterFactory
 	 * @return org\jecat\framework\db\sql\reflecter\AbStractColumnReflecter
 	 */
 	abstract public function createColumnReflecter($sTable, $sColumn, $sDBName = null) ;
-	
-	public function indexReflecter($sTable, $sIndexName, $sDBName = null)
-	{
-		if(!$sDBName)
-		{
-			$sDBName = $this->db()->driver()->currentDBName();
-		}
 		
-		if($aCache = $this->cache())
-		{
-			$sCachePath = self::indexCachePath($sTable, $sDBName, $sIndexName);
-			$aCacheData = $aCache->item($sCachePath);
-			
-			if(!$aCacheData)
-			{
-				$aCacheData = $this->createIndexReflecter($sTable, $sIndexName , $sDBName) ;
-				$aCache->setItem($sCachePath, $aCacheData);
-			}
-		}
-		else
-		{
-			$aCacheData = $this->createIndexReflecter($sTable, $sIndexName , $sDBName) ;
-		}
-		
-		return $aCacheData;
-	}
-	/**
-	 * @return org\jecat\framework\db\sql\reflecter\AbStractIndexReflecter
-	 */
-	abstract public function createIndexReflecter($sTable, $sIndexName, $sDBName = null) ;
-	
 	/**
 	 * 
 	 * @return ICache or null when cache didn't set

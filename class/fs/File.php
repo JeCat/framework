@@ -1,32 +1,27 @@
 <?php
-namespace org\jecat\framework\fs\imp ;
-
-use org\jecat\framework\fs\FileSystem;
+namespace org\jecat\framework\fs ;
 
 use org\jecat\framework\lang\Type;
-
 use org\jecat\framework\lang\Exception;
-
-use org\jecat\framework\fs\IFolder;
-
-use org\jecat\framework\fs\IFile;
 use org\jecat\framework\io\OutputStream;
 use org\jecat\framework\io\InputStream;
 
-class LocalFile extends LocalFSO implements IFile
-{	
+class File extends FSO
+{
+	const CREATE_DEFAULT = 020664 ; 	// CREATE_RECURSE_DIR | 0664
+	
 	/**
 	 * @return io\IInputStream
 	 */
 	public function openReader()
 	{
-		$hHandle = fopen($this->localPath(),'r') ;
+		$hHandle = fopen($this->path(),'r') ;
 		if( !$hHandle )
 		{
 			return null ;
 		}
 		
-		return InputStream::createInstance($hHandle,$this->application()) ;
+		return InputStream::createInstance($hHandle) ;
 	}
 	
 	/**
@@ -34,23 +29,30 @@ class LocalFile extends LocalFSO implements IFile
 	 */
 	public function openWriter($bAppend=false)
 	{
-		$hHandle = fopen($this->localPath(),$bAppend?'a':'w') ;
+		$sLocalPath = $this->path() ;
+		
+		if( !$this->makeParentFolder($sLocalPath,true) )
+		{
+			return false ;
+		}
+		
+		$hHandle = fopen($sLocalPath,$bAppend?'a':'w') ;
 		if( !$hHandle )
 		{
 			return null ;
 		}
 		
-		return OutputStream::createInstance($hHandle,$this->application()) ;
+		return OutputStream::createInstance($hHandle) ;
 	}
 
 	public function length()
 	{
-		return filesize($this->localPath()) ;
+		return filesize($this->path()) ;
 	}
 	
 	public function delete()
 	{
-		if( file_exists($sLocalPath=$this->localPath()) )
+		if( file_exists($sLocalPath=$this->path()) )
 		{
 			return unlink($sLocalPath) ;
 		}
@@ -63,7 +65,7 @@ class LocalFile extends LocalFSO implements IFile
 	
 	public function hash()
 	{
-		return md5($this->localPath()) ;
+		return md5($this->path()) ;
 	}
 	
 	public function includeFile($bOnce=false,$bRequire=false)
@@ -72,11 +74,11 @@ class LocalFile extends LocalFSO implements IFile
 		{
 			if($bOnce)
 			{
-				return include_once $this->localPath() ;
+				return include_once $this->path() ;
 			}
 			else 
 			{
-				return include $this->localPath() ;
+				return include $this->path() ;
 			}
 		}
 		
@@ -84,36 +86,45 @@ class LocalFile extends LocalFSO implements IFile
 		{
 			if($bOnce)
 			{
-				return require_once $this->localPath() ;
+				return require_once $this->path() ;
 			}
 			else 
 			{
-				return require $this->localPath() ;
+				return require $this->path() ;
 			}
 		}
 	}
 	
-	public function create($nMode=FileSystem::CREATE_FOLDER_DEFAULT)
+	private function makeParentFolder($sLocalPath,$bCreate=true)
 	{
-		$sLocalPath = $this->localPath() ;
-		
 		$sLocalDirPath = dirname($sLocalPath) ;
 		if( !is_dir($sLocalDirPath) )
 		{
-			if( $nMode & FileSystem::CREATE_RECURSE_DIR )
+			if( $bCreate )
 			{
 				$nOldMark = umask(0) ;
-				if( !mkdir($sLocalDirPath,FileSystem::CREATE_FOLDER_DEFAULT&FileSystem::CREATE_PERM_BITS,true) )
+				if( !mkdir($sLocalDirPath,Folder::CREATE_DEFAULT&0777,true) )
 				{
 					umask($nOldMark) ;
 					return false ;
 				}
 				umask($nOldMark) ;
 			}
-			else 
+			else
 			{
 				return false ;
 			}
+		}
+		return true ;
+	}
+
+	public function create($nMode=Folder::CREATE_DEFAULT)
+	{
+		$sLocalPath = $this->path() ;
+		
+		if( !$this->makeParentFolder($sLocalPath,$nMode & Folder::CREATE_RECURSE_DIR) )
+		{
+			return false ;
 		}
 		
 		if( !$hHandle=fopen($sLocalPath,'w') )
@@ -123,10 +134,11 @@ class LocalFile extends LocalFSO implements IFile
 		
 		fclose($hHandle) ;
 		
-		if( $this->perms()!=$nMode&FileSystem::CREATE_PERM_BITS and $this->canWrite() )
+		$nMask = $nMode&0777 ;
+		if( $this->perms()!=$nMask and $this->canWrite() )
 		{
 			$nOldMark = umask(0) ;
-			chmod( $sLocalPath, $nMode&FileSystem::CREATE_PERM_BITS ) ;
+			chmod( $sLocalPath, $nMask ) ;
 			umask($nOldMark) ;
 		}
 		
@@ -135,7 +147,7 @@ class LocalFile extends LocalFSO implements IFile
 
 	public function exists()
 	{
-		return is_file($this->localPath());
+		return is_file($this->path());
 	}
 }
 ?>

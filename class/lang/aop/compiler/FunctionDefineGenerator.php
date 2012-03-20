@@ -1,6 +1,7 @@
 <?php
 namespace org\jecat\framework\lang\aop\compiler ;
 
+use org\jecat\framework\lang\compile\generators\CompiledValidableCheck;
 use org\jecat\framework\lang\aop\jointpoint\JointPointMethodDefine;
 use org\jecat\framework\lang\Type;
 use org\jecat\framework\lang\compile\ClassCompileException;
@@ -50,99 +51,102 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		
 		// 需要编入的方法
 		$arrNeedWeaveMethods = array() ;
-		foreach($this->aop()->pointcutIterator() as $aPointcut)
+		foreach($this->aop()->aspects()->iterator() as $aAspect)
 		{
-			foreach($aPointcut->jointPoints()->iterator() as $aJointPoint)
+			foreach($aAspect->pointcuts()->iterator() as $aPointcut)
 			{
-				if( !($aJointPoint instanceof JointPointMethodDefine) )
+				foreach($aPointcut->jointPoints()->iterator() as $aJointPoint)
 				{
-					continue ;
-				}
-				
-				// 模糊匹配函数名 -----------------------
-				if( $aJointPoint->weaveMethodIsPattern() )
-				{
-					foreach( $aTokenPool->functionIterator($aObject->fullName()) as $aMethodToken )
-					{
-						// bingo !
-						if( $aJointPoint->matchExecutionPoint($aMethodToken) )
-						{
-							$sMethodName = $aMethodToken->name() ;
-							if( empty($arrNeedWeaveMethods[$sMethodName]) )
-							{
-								$arrNeedWeaveMethods[$sMethodName] = new GenerateStat($aTokenPool,$aMethodToken) ;
-							}
-							
-							$arrNeedWeaveMethods[$sMethodName]->addAdvices($aPointcut->advices()->iterator()) ;
-						}
-					}
-				}
-				
-				// 精确匹配函数名 -----------------------
-				else
-				{
-					if($aJointPoint->weaveClass()!=$sTargetClassName)
+					if( !($aJointPoint instanceof JointPointMethodDefine) )
 					{
 						continue ;
 					}
 					
-					$sFuncName = $aJointPoint->weaveMethod() ;
+					// 模糊匹配函数名 -----------------------
+					if( $aJointPoint->weaveMethodIsPattern() )
+					{
+						foreach( $aTokenPool->functionIterator($aObject->fullName()) as $aMethodToken )
+						{
+							// bingo !
+							if( $aJointPoint->matchExecutionPoint($aMethodToken) )
+							{
+								$sMethodName = $aMethodToken->name() ;
+								if( empty($arrNeedWeaveMethods[$sMethodName]) )
+								{
+									$arrNeedWeaveMethods[$sMethodName] = new GenerateStat($aTokenPool,$aMethodToken) ;
+								}
+								
+								$arrNeedWeaveMethods[$sMethodName]->addAdvices($aPointcut->advices()->iterator()) ;
+							}
+						}
+					}
 					
-					if( empty($arrNeedWeaveMethods[$sFuncName]) )
-					{
-						$arrNeedWeaveMethods[$sFuncName] = new GenerateStat($aTokenPool) ;
-					}
-					$arrNeedWeaveMethods[$sFuncName]->addAdvices($aPointcut->advices()->iterator()) ;
-					
-					// 目标类的方法
-					if( $aMethodToken=$aTokenPool->findFunction($sFuncName,$sTargetClassName) )
-					{
-						$arrNeedWeaveMethods[$sFuncName]->aExecutePoint = $aMethodToken ;
-					}
-					// 目标类的父类的方法
-					else if( isset($arrParentMethodNames[$sFuncName]) )
-					{
-						$aMethodRef = $arrParentMethodNames[$sFuncName] ;
-						$aMethodRef instanceof \ReflectionMethod ;
-						
-						// 产生函数定义和函数调用的参数表
-						$this->generateArgvsByReflection($arrNeedWeaveMethods[$sFuncName],$aMethodRef) ;
-						
-						if( $aMethodRef->isPublic() )
-						{
-							$sAccess = 'public' ;
-						}
-						else if( $aMethodRef->isProtected() )
-						{
-							$sAccess = 'protected' ;
-						}
-						else if( $aMethodRef->isPrivate() )
-						{
-							$sAccess = 'private' ;
-						}
-						
-						// 创建一个覆盖父类的方法用于 aop
-						$aMethodToken = $this->createMethod($sFuncName,$arrNeedWeaveMethods[$sFuncName]->sAdviceDefineArgvsLit,$sAccess,$aMethodRef->isStatic(),$aTokenPool,$aClassEnd,'insertBefore') ;
-						$aMethodToken->setBelongsClass($aObject) ;
-						$aMethodToken->setBelongsNamespace($aObject->belongsNamespace()) ;
-						$arrNeedWeaveMethods[$sFuncName]->aExecutePoint = $aMethodToken ;
-
-						// 创建函数内容
-						$aTokenPool->insertAfter($aMethodToken->bodyToken(),new Token(T_STRING,"
-		// 调用父类方法
-		return parent::{$sFuncName}({$arrNeedWeaveMethods[$sFuncName]->sAdviceCallArgvsLit}) ;
-	")) ;
-					}
-					// 不存在的方法
+					// 精确匹配函数名 -----------------------
 					else
 					{
-						// 创建一个全新的方法用于 aop
-						$aMethodToken = $this->createMethod($sFuncName,$arrNeedWeaveMethods[$sFuncName]->sAdviceDefineArgvsLit,'private',false,$aTokenPool,$aClassEnd,'insertBefore') ;
-						$aMethodToken->setBelongsClass($aObject) ;
-						$aMethodToken->setBelongsNamespace($aObject->belongsNamespace()) ;
-						$arrNeedWeaveMethods[$sFuncName]->aExecutePoint = $aMethodToken ;
+						if(!$aJointPoint->matchClass($sTargetClassName))
+						{
+							continue ;
+						}
 						
-						$aTokenPool->insertAfter($aMethodToken->bodyToken(),new Token(T_STRING," // 这只是一个影子方法 ")) ;
+						$sFuncName = $aJointPoint->weaveMethod() ;
+						
+						if( empty($arrNeedWeaveMethods[$sFuncName]) )
+						{
+							$arrNeedWeaveMethods[$sFuncName] = new GenerateStat($aTokenPool) ;
+						}
+						$arrNeedWeaveMethods[$sFuncName]->addAdvices($aPointcut->advices()->iterator()) ;
+						
+						// 目标类的方法
+						if( $aMethodToken=$aTokenPool->findFunction($sFuncName,$sTargetClassName) )
+						{
+							$arrNeedWeaveMethods[$sFuncName]->aExecutePoint = $aMethodToken ;
+						}
+						// 目标类的父类的方法
+						else if( isset($arrParentMethodNames[$sFuncName]) )
+						{
+							$aMethodRef = $arrParentMethodNames[$sFuncName] ;
+							$aMethodRef instanceof \ReflectionMethod ;
+							
+							// 产生函数定义和函数调用的参数表
+							$this->generateArgvsByReflection($arrNeedWeaveMethods[$sFuncName],$aMethodRef) ;
+							
+							if( $aMethodRef->isPublic() )
+							{
+								$sAccess = 'public' ;
+							}
+							else if( $aMethodRef->isProtected() )
+							{
+								$sAccess = 'protected' ;
+							}
+							else if( $aMethodRef->isPrivate() )
+							{
+								$sAccess = 'private' ;
+							}
+							
+							// 创建一个覆盖父类的方法用于 aop
+							$aMethodToken = $this->createMethod($sFuncName,$arrNeedWeaveMethods[$sFuncName]->sAdviceDefineArgvsLit,$sAccess,$aMethodRef->isStatic(),$aTokenPool,$aClassEnd,'insertBefore') ;
+							$aMethodToken->setBelongsClass($aObject) ;
+							$aMethodToken->setBelongsNamespace($aObject->belongsNamespace()) ;
+							$arrNeedWeaveMethods[$sFuncName]->aExecutePoint = $aMethodToken ;
+		
+							// 创建函数内容
+							$aTokenPool->insertAfter($aMethodToken->bodyToken(),new Token(T_STRING,"
+			// 调用父类方法
+			return parent::{$sFuncName}({$arrNeedWeaveMethods[$sFuncName]->sAdviceCallArgvsLit}) ;
+		")) ;
+						}
+						// 不存在的方法
+						else
+						{
+							// 创建一个全新的方法用于 aop
+							$aMethodToken = $this->createMethod($sFuncName,$arrNeedWeaveMethods[$sFuncName]->sAdviceDefineArgvsLit,'private',false,$aTokenPool,$aClassEnd,'insertBefore') ;
+							$aMethodToken->setBelongsClass($aObject) ;
+							$aMethodToken->setBelongsNamespace($aObject->belongsNamespace()) ;
+							$arrNeedWeaveMethods[$sFuncName]->aExecutePoint = $aMethodToken ;
+							
+							$aTokenPool->insertAfter($aMethodToken->bodyToken(),new Token(T_STRING," // 这只是一个影子方法 ")) ;
+						}
 					}
 				}
 			}
@@ -158,41 +162,6 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		}
 	}
 	
-	protected function generateArgvsByReflection(GenerateStat $aStat,\ReflectionMethod $aMethodRef)
-	{
-		$aStat->sAdviceCallArgvsLit = array() ;
-		$aStat->sAdviceDefineArgvsLit = array() ;
-		
-		foreach($aMethodRef->getParameters() as $aParamRef)
-		{
-			$aStat->sAdviceCallArgvsLit[] = '$'.$aParamRef->getName() ;
-			
-			$sDefineArgv = '' ;
-			if($aParamRef->isArray())
-			{
-				$sDefineArgv.= 'array ' ;
-			}
-			if($aParamClsRef=$aParamRef->getClass())
-			{
-				$sDefineArgv.= '\\'.$aParamClsRef->getName().' ' ;
-			}
-			if($aParamRef->isPassedByReference())
-			{
-				$sDefineArgv.= '& ' ;
-			}
-			$sDefineArgv.= '$'.$aParamRef->getName() ;
-			
-			if($aParamRef->isDefaultValueAvailable())
-			{
-				$defaultValue = $aParamRef->getDefaultValue() ;
-				$sDefineArgv.= '=' . var_export($defaultValue,true) ;
-			}
-			$aStat->sAdviceDefineArgvsLit[] = $sDefineArgv ;
-		}
-		
-		$aStat->sAdviceCallArgvsLit = implode(',',$aStat->sAdviceCallArgvsLit) ;
-		$aStat->sAdviceDefineArgvsLit = implode(',',$aStat->sAdviceDefineArgvsLit) ;
-	}
 	
 	/**
 	 * 创建并织入一个用于集中调用各个advice的函数
@@ -266,7 +235,22 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		$aStat->aAdvicesDispatchFunc->setBodyToken($aBodyStart) ;
 			
 		$aStat->aTokenPool->insertBefore($aOriFuncStart,$aBodyStart) ;
-		$aStat->aTokenPool->insertBefore($aOriFuncStart,$aBodyEnd) ;	
+		$aStat->aTokenPool->insertBefore($aOriFuncStart,$aBodyEnd) ;
+		
+		// init call state 对像
+		$sLines = "\r\n" ;
+		$sLines.= "\t\t\$__apo_aCallState = new \\org\jecat\\framework\\lang\\aop\\AdviceCallState() ;\r\n" ;
+		if( !$aStat->aExecutePoint->staticToken() )
+		{
+			$sLines.= "\t\t\$__apo_aCallState->aOriginObject = \$this ;\r\n" ;
+		}
+		$sLines.= "\t\t\$__apo_aCallState->sOriginClass = '".addslashes($aStat->aAdvicesDispatchFunc->belongsClass()->fullName())."';\r\n" ;
+		$sLines.= "\t\t\$__apo_aCallState->sOriginMethod = '".$aStat->aAdvicesDispatchFunc->name()."' ;\r\n" ;
+		foreach( $this->parseArgvs($aStat->aTokenPool,$aStat->aAdvicesDispatchFunc) as $sArgvName=>$sArgv)
+		{
+			$sLines.= "\t\t\$__apo_aCallState->arrAvgvs['{$sArgvName}'] =& \${$sArgvName} ;\r\n" ;
+		}
+		$aStat->aTokenPool->insertAfter($aBodyStart,new Token(T_WHITESPACE,$sLines)) ;
 		
 		// 换行
 		$aStat->aTokenPool->insertBefore($aOriFuncStart,new Token(T_WHITESPACE,"\r\n\r\n\t")) ;
@@ -277,13 +261,13 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		parent::weaveAdvices($aStat) ;
 		
 		// 添加函数的返回值
-		$aStat->aTokenPool->insertBefore($aStat->aAdvicesDispatchFunc->endToken(),new Token(T_WHITESPACE,"\r\n\t\treturn \$__function_return_of_around_advices__ ;\r\n\t")) ;
+		$aStat->aTokenPool->insertBefore($aStat->aAdvicesDispatchFunc->endToken(),new Token(T_WHITESPACE,"\r\n\t\treturn \$__apo_aCallState->returnValue ;\r\n\t")) ;
 	}
 	
 	protected function weaveAroundAdviceCall(GenerateStat $aStat,$sAdviceCallCode)
 	{
 		$aBodyEnd = $aStat->aAdvicesDispatchFunc->endToken() ;
-		$aStat->aTokenPool->insertBefore($aBodyEnd,new Token(T_STRING,"\r\n\r\n\t\t\$__function_return_of_around_advices__ =& {$sAdviceCallCode} ;\r\n")) ;
+		$aStat->aTokenPool->insertBefore($aBodyEnd,new Token(T_STRING,"\r\n\r\n\t\t\$__apo_aCallState->returnValue =& {$sAdviceCallCode} ;\r\n")) ;
 	}
 
 	protected function replaceOriginExecutePoint(GenerateStat $aStat)
@@ -339,8 +323,48 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		return $arrNewTokens ;
 	}
 	
-	private function generateArgvs(TokenPool $aTokenPool,FunctionDefine $aOriFunctionDefine)
-	{		
+	protected function generateArgvsByReflection(GenerateStat $aStat,\ReflectionMethod $aMethodRef)
+	{
+		$arrAdviceCallArgvsLit = array() ;
+		$arrAdviceDefineArgvsLit = array() ;
+		foreach($aMethodRef->getParameters() as $aParamRef)
+		{
+			$arrAdviceCallArgvsLit[] = '$'.$aParamRef->getName() ;
+	
+			$sDefineArgv = '' ;
+			if($aParamRef->isArray())
+			{
+				$sDefineArgv.= 'array ' ;
+			}
+			if($aParamClsRef=$aParamRef->getClass())
+			{
+				$sDefineArgv.= '\\'.$aParamClsRef->getName().' ' ;
+			}
+			if($aParamRef->isPassedByReference())
+			{
+				$sDefineArgv.= '& ' ;
+			}
+			$sDefineArgv.= '$'.$aParamRef->getName() ;
+	
+			if($aParamRef->isDefaultValueAvailable())
+			{
+				$defaultValue = $aParamRef->getDefaultValue() ;
+				$sDefineArgv.= '=' . var_export($defaultValue,true) ;
+			}
+			$arrAdviceDefineArgvsLit[] = $sDefineArgv ;
+		}
+		
+		$arrAdviceDefineArgvsLit[] = '\\org\\jecat\\framework\\lang\\aop\\AdviceCallState $__apo_aCallState' ;
+		$aStat->sAdviceDefineArgvsLit = implode(',',$arrAdviceDefineArgvsLit) ;
+		
+		$aStat->sOriginCallArgvsLit = implode(',',$arrAdviceCallArgvsLit) ;
+		
+		array_unshift($arrAdviceCallArgvsLit,'$__apo_aCallState') ;
+		$aStat->sAdviceCallArgvsLit = implode(',',$arrAdviceCallArgvsLit) ;
+	}
+	
+	private function parseArgvs(TokenPool $aTokenPool,FunctionDefine $aOriFunctionDefine)
+	{
 		$aArgLstStart = $aOriFunctionDefine->argListToken() ;
 		$aArgLstEnd = $aArgLstStart->theOther() ;
 		
@@ -373,30 +397,40 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 					
 			if( $aToken->tokenType()===T_VARIABLE )
 			{
-				$arrArgvs[] = $aToken->targetCode() ;
+				$sArgv = $aToken->targetCode() ;
+				$sArgvName = substr($sArgv,0,1)=='$'? @substr($sArgv,1): $sArgv ;
+				$arrArgvs[$sArgvName] = $sArgv ;
 			}
 			
 			$aIter->next() ;
 		}
 		
-		return implode(', ', $arrArgvs) ;
+		return $arrArgvs ;
 	}
-
+	
 	protected function generateAdviceArgvs(GenerateStat $aStat)
 	{
 		if(!$aStat->sAdviceDefineArgvsLit)
 		{
-			$aStat->sAdviceDefineArgvsLit = '' ;
+			$sAdviceDefineArgvsLit = '' ;
 			foreach($this->cloneFunctionArgvLst($aStat->aTokenPool, $aStat->aExecutePoint) as $aToken)
 			{
-				$aStat->sAdviceDefineArgvsLit.= $aToken->targetCode() ;
+				$sAdviceDefineArgvsLit.= $aToken->targetCode() ;
 			}
+			$sAdviceDefineArgvsLit = trim($sAdviceDefineArgvsLit) ;
+			$aStat->sAdviceDefineArgvsLit = 
+						'\\org\\jecat\\framework\\lang\\aop\\AdviceCallState $__apo_aCallState'
+						. ($sAdviceDefineArgvsLit? (', '.$sAdviceDefineArgvsLit): '') ;
 		}
 		
 		// advice 调用参数
 		if(!$aStat->sAdviceCallArgvsLit)
 		{
-			$aStat->sAdviceCallArgvsLit = $this->generateArgvs($aStat->aTokenPool,$aStat->aExecutePoint) ;
+			$arrArgvs=(array)$this->parseArgvs($aStat->aTokenPool,$aStat->aExecutePoint) ;
+			$aStat->sOriginCallArgvsLit = implode(',',$arrArgvs) ;
+			
+			array_unshift($arrArgvs,'$__apo_aCallState') ;
+			$aStat->sAdviceCallArgvsLit = implode(',',$arrArgvs) ;
 		}
 	}
 	
@@ -404,6 +438,50 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 	{
 		// 只有在 目标函数 和 切入函数同时为 动态方法时，才通过 $this-> 调用 advice
 		return (!$aAdvice->isStatic() and !$aStat->aExecutePoint->staticToken())? '$this->': 'self::' ;
+	}
+	
+	protected function compileAdviceCode(GenerateStat $aStat,Advice $aAdvice,Advice $aNextAroundAdvice=null)
+	{
+		$sSource = parent::compileAdviceCode($aStat,$aAdvice,$aNextAroundAdvice) ;
+		
+		// 针对 around 位置的 advice 的特殊处理
+		if( $aAdvice->position()==Advice::around )
+		{
+			// --------------------------
+			// aop_calling_state() 
+			$sSource = preg_replace('/aop_calling_state\\s*\\(\\s*\\)/is', 'current(func_get_args())', $sSource) ;
+			
+			
+			// --------------------------
+			// aop_call_origin()
+			
+			// 调用下一个advice
+			if( $aNextAroundAdvice )
+			{
+				$sCallType = $this->generateAdviceCalltype($aStat,$aNextAroundAdvice) ;
+				$sMethod = $sCallType.$this->generateAdviceWeavedFunctionName($aStat,$aNextAroundAdvice) ;
+				
+				if( preg_match_all('/aop_call_origin\\s*\\(\\s*([^\\s\\)]?)/i', $sSource, $arrResult, PREG_OFFSET_CAPTURE|PREG_SET_ORDER) )
+				{
+					for(end($arrResult);$arrMatched=current($arrResult);prev($arrResult))
+					{
+						$sCallCode = $sMethod.'( $__apo_aCallState' ;
+						$sCallCode.= empty($arrMatched[1][0])? ' ': ', ' ;
+
+						$sSource = substr_replace($sSource, $sCallCode, $arrMatched[0][1], strlen($arrMatched[0][0])) ;
+					}
+				}
+			}
+			
+			// 调用原始函数
+			else
+			{
+				$sSource = str_ireplace('aop_call_origin',$aStat->sOriginJointCode,$sSource) ;
+			}
+		}
+		
+		
+		return $sSource ;
 	}
 }
 

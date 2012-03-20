@@ -1,11 +1,14 @@
 <?php
 namespace org\jecat\framework\lang\aop\jointpoint ;
 
+use org\jecat\framework\lang\aop\compiler\ClassInfoLibrary;
+use org\jecat\framework\lang\aop\Pointcut;
 use org\jecat\framework\lang\Object;
 use org\jecat\framework\lang\compile\object\Token;
 use org\jecat\framework\lang\Exception;
+use org\jecat\framework\bean\BeanFactory;
 
-abstract class JointPoint extends Object
+abstract class JointPoint extends Object implements \Serializable
 {
 	const ACCESS_SET = 'set' ;
 	const ACCESS_GET = 'get' ;
@@ -14,9 +17,9 @@ abstract class JointPoint extends Object
 	/**
 	 * @return JointPoint
 	 */
-	static public function createDefineMethod($sClassName,$sMethodNamePattern='*')
+	static public function createDefineMethod($sClassName,$sMethodNamePattern='*',$bMatchDerivedClass=false)
 	{
-		return new JointPointMethodDefine($sClassName,$sMethodNamePattern) ;
+		return new JointPointMethodDefine($sClassName,$sMethodNamePattern,$bMatchDerivedClass=false) ;
 	}
 	
 	/**
@@ -67,11 +70,14 @@ abstract class JointPoint extends Object
 	
 	//////////////////////////////////////////////////////////////////
 	
-	public function __construct($sWeaveClass,$sWeaveMethod='*')
+	public function __construct($sWeaveClass=null,$sWeaveMethod='*',$bMatchDerivedClass=false)
 	{
 		$this->setWeaveClass($sWeaveClass) ;
 		$this->setWeaveMethod($sWeaveMethod) ;
+		$this->bMatchDerivedClass = $bMatchDerivedClass ;
 	}
+	
+	abstract static public function createFromDeclare($sDeclare) ;
 	
 	abstract public function exportDeclare($bWithClass=true) ;
 		
@@ -126,12 +132,64 @@ abstract class JointPoint extends Object
 	
 	abstract public function matchExecutionPoint(Token $aToken) ;
 	
+	public function matchClass($sTargetClass)
+	{
+		if( $this->bMatchDerivedClass )
+		{
+			return ClassInfoLibrary::singleton()->isA($sTargetClass,$this->weaveClass()) ;
+		}
+		else
+		{
+			return $this->weaveClass() == $sTargetClass ; 
+		}
+	}
+	
+	public function setPointcut(Pointcut $aPointcut)
+	{
+		$this->aPointcut = $aPointcut ;
+	}
+	public function pointcut()
+	{
+		return $this->aPointcut ;
+	}
+	
+	public function serialize ()
+	{
+		return serialize( array(
+				'sWeaveClass' => & $this->sWeaveClass ,
+				'sWeaveMethod' => & $this->sWeaveMethod ,
+				'sWeaveMethodNameRegexp' => & $this->sWeaveMethodNameRegexp ,
+		) ) ;
+	}
+	
+	/**
+	 * @param serialized
+	 */
+	public function unserialize ($serialized)
+	{
+		$arrData = unserialize($serialized) ;
+	
+		$this->sWeaveClass =& $arrData['sWeaveClass'] ;
+		$this->sWeaveMethod =& $arrData['sWeaveMethod'] ;
+		$this->sWeaveMethodNameRegexp =& $arrData['sWeaveMethodNameRegexp'] ;
+	}
+	
+	public function isMatchDerivedClass()
+	{
+		$this->bMatchDerivedClass ;
+	}
+	
 	private $sWeaveClass ;
+
+	private $bMatchDerivedClass = false ;
 	
 	private $sWeaveMethod ;
 	
 	private $sWeaveMethodNameRegexp ;
 	
+	private $aPointcut ;
+	
+	protected $arrBeanConfig ;
 }
 
 ?>

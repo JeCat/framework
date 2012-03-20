@@ -8,6 +8,23 @@ class Assert
 	{
 		self::$bEnableAssert = $bEnable? true: false ;
 	}
+	
+	static public function must($expression,$sMessage=null)
+	{
+		if( !self::$bEnableAssert )
+		{
+			return ;
+		}
+		
+		if(!$expression)
+		{
+			if( !$sMessage )
+			{
+				$sMessage = "程序中的某个位置触发了异常：表达式的值不应该为 false, null, 0 等值" ;
+			}
+			throw new Exception($sMessage) ;
+		}		
+	}
 
 	static public function notNull($Types,$sMessage=null)
 	{

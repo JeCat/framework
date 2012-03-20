@@ -1,46 +1,62 @@
 <?php
 namespace org\jecat\framework\db\reflecter\imp;
 
+use org\jecat\framework\db\DB;
 use org\jecat\framework\db\reflecter\AbStractIndexReflecter;
 
 class MySQLIndexReflecter extends AbStractIndexReflecter
 {
-	function __construct($aDBReflecterFactory, $sTable, $sIndexName, $sDBName = null)
+	static public function reflectTableIndexes($sTableName,$sDBName=null,DB $aDB=null)
 	{
-		$aDB = $aDBReflecterFactory->db();
-		$aIterIndex = $aDB->query ($this->makeIndexSql($sTable, $sIndexName, $sDBName));
-		
-		if($aIterIndex->rowCount() == 0)
+		if(!$aDB)
 		{
-			$this->bIsExist = false;
-			return;
+			$aDB = DB::singleton() ;
 		}
 		
-		for($i = 0; $i < $aIterIndex->rowCount (); $i ++)
+		if( !$aResult=$aDB->query(self::makeIndexSql($sTableName,$sDBName)) or $aResult->rowCount()==0 )
 		{
-			$this->arrColumnsNames [] = $aIterIndex->field ( 'Column_name', $i );
+			return array() ;
+		}
+		$arrAllIndexes = array() ;
+		foreach( $aResult->fetchAll(\PDO::FETCH_ASSOC) as $arrIndexRow)
+		{
+			if( !isset($arrAllIndexes[ $arrIndexRow['Key_name'] ]) )
+			{
+				$arrAllIndexes[ $arrIndexRow['Key_name'] ] = $arrIndexRow ;
+			}
+			
+			$arrAllIndexes[ $arrIndexRow['Key_name'] ]['columns'][] = $arrIndexRow['Column_name'] ;
 		}
 		
-		if ($aIterIndex->field ( 'Key_name', 0 ) === 'PRIMARY')
-		{
-			$this->bIsPrimary = true;
+		$arrIndexReflecters = array() ;
+		foreach($arrAllIndexes as $sIndexName=>$arrIndex)
+		{			
+			$aIndexReflecter = new self() ;
+			
+			// $aIndexReflecter
+			$aIndexReflecter->bIsPrimary = $arrIndex['Key_name']=='PRIMARY' ;
+			$aIndexReflecter->bIsFullText = $arrIndex['Index_type']=='FULLTEXT';
+			$aIndexReflecter->bIsUnique = $arrIndex['Non_unique']=='0' ;
+			$aIndexReflecter->sName = $sIndexName ;
+			$aIndexReflecter->arrColumnsNames = $arrIndex['columns'] ;
+			
+			$arrIndexReflecters[$sIndexName] = $aIndexReflecter ;
 		}
 		
-		if ($aIterIndex->field ( 'Index_type', 0 ) === 'FULLTEXT')
-		{
-			$this->bIsFullText = true;
-		}
-		
-		if ($aIterIndex->field ( 'Non_unique', 0 ) == '0')
-		{
-			$this->bIsUnique = true;
-		}
-		
-		$this->sName = $sIndexName;
+		return $arrIndexReflecters ;
 	}
 	
-	private function makeIndexSql($sTable, $sIndexName, $sDBName) {
-		 return "SHOW index FROM `" . $sDBName . "`.`" . $sTable . "` " . "WHERE `Key_name`='" . $sIndexName . "'" ;
+	static private function makeIndexSql($sTable,$sDBName=null)
+	{
+		if($sDBName)
+		{
+			$sTable = "`{$sDBName}`.`{$sTable}`" ;
+		}
+		else
+		{
+			$sTable = "`{$sTable}`" ;
+		}
+		return "SHOW index FROM " . $sTable ;
 	}
 	
 	public function isPrimary()

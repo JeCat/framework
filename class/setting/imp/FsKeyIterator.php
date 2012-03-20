@@ -1,7 +1,7 @@
 <?php
 namespace org\jecat\framework\setting\imp ;
 
-use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\fs\Folder;
 use org\jecat\framework\fs\FSIterator;
 
 class FsKeyIterator extends \IteratorIterator

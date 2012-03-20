@@ -3,7 +3,7 @@ namespace org\jecat\framework\ui ;
 
 use org\jecat\framework\io\OutputStreamBuffer;
 use org\jecat\framework\lang\Exception;
-use org\jecat\framework\fs\IFile;
+use org\jecat\framework\fs\File;
 use org\jecat\framework\io\IOutputStream;
 
 class TargetCodeOutputStream extends OutputStreamBuffer implements IOutputStream
@@ -13,7 +13,7 @@ class TargetCodeOutputStream extends OutputStreamBuffer implements IOutputStream
 		/*$aWriter = $aCompiledFile->openWriter(false) ;
 		if(!$aWriter)
 		{
-			throw new Exception("保存XHTML模板的编译文件时无法打开文件:%s",$aCompiledFile->url()) ;
+			throw new Exception("保存XHTML模板的编译文件时无法打开文件:%s",$aCompiledFile->path()) ;
 		}*/
 		
 		$this->aCompiledWriter = $aWriter ;

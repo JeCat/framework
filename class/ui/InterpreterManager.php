@@ -3,7 +3,7 @@ namespace org\jecat\framework\ui ;
 
 use org\jecat\framework\io\IInputStream;
 
-use org\jecat\framework\fs\IFile;
+use org\jecat\framework\fs\File;
 
 use org\jecat\framework\pattern\composite\Container;
 use org\jecat\framework\util\String;

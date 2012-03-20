@@ -1,13 +1,13 @@
 <?php
 namespace org\jecat\framework\lang\compile ;
 
-use org\jecat\framework\fs\IFile ;
+use org\jecat\framework\fs\File ;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\compile\object\Token;
 
 class ClassCompileException extends Exception
 {
-	public function __construct(IFile $aClassSouce=null,Token $aCauseToken,$sMessage,$messageArgvs=array(),\Exception $aCause=null)
+	public function __construct(File $aClassSouce=null,Token $aCauseToken,$sMessage,$messageArgvs=array(),\Exception $aCause=null)
 	{
 		$this->aClassSouce = $aClassSouce ;
 		$this->aCauseToken = $aCauseToken ;
@@ -23,13 +23,13 @@ class ClassCompileException extends Exception
 		return $this->aCauseToken ;
 	}
 	
-	public function setClassSouce(IFile $aClassSouce)
+	public function setClassSouce(File $aClassSouce)
 	{
 		$this->aClassSouce = $aClassSouce ;
 	}
 	
 	/**
-	 * @return org\jecat\framework\fs\IFile
+	 * @return org\jecat\framework\fs\File
 	 */
 	public function classSouce()
 	{
@@ -42,7 +42,7 @@ class ClassCompileException extends Exception
 	private $aCauseToken ;
 	
 	/**
-	 * @var org\jecat\framework\fs\IFile
+	 * @var org\jecat\framework\fs\File
 	 */
 	private $aClassSouce ;
 }

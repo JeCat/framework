@@ -1,7 +1,7 @@
 <?php
 namespace org\jecat\framework\fs\imp ;
 
-use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\fs\Folder;
 
 class MockFileSystem extends FileSystem{
 	public function iterator($sPath){

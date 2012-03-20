@@ -65,7 +65,7 @@ class Object implements IObject, ISingletonable, IFlyweightable
 	 * 
 	 * @return Object
 	 */
-	static public function createInstance($argvs=null,Application $aApp=null,$sClassName=null)
+	static public function createInstance($argvs=null,$sClassName=null)
 	{
 		if($argvs===null)
 		{
@@ -92,15 +92,7 @@ class Object implements IObject, ISingletonable, IFlyweightable
 		{
 			throw new Exception("无法创建抽象类:%s的实例",$sClassName) ;
 		}
-		$aObject = $aRefClass->newInstanceArgs($argvs) ;
-		
-		// set application
-		if( $aApp and $aObject instanceof IObject )
-		{
-			$aObject->setApplication($aApp) ;
-		}
-		
-		return $aObject ;
+		return $aRefClass->newInstanceArgs($argvs) ;
 	}
 	
 	/**
@@ -117,7 +109,7 @@ class Object implements IObject, ISingletonable, IFlyweightable
 		{
 			if($bCreateNew)
 			{
-				self::$arrGlobalInstancs[$sClass] = self::createInstance($createArgvs,null,$sClass) ;
+				self::$arrGlobalInstancs[$sClass] = self::createInstance($createArgvs,$sClass) ;
 			}
 			else 
 			{
@@ -239,7 +231,7 @@ class Object implements IObject, ISingletonable, IFlyweightable
 		
 		if( !$aIns and $bCreateNew )
 		{
-			return $bCreateNew? ($aIns=self::createInstance($keys,null,$sClassName)): null ;
+			return $bCreateNew? ($aIns=self::createInstance($keys,$sClassName)): null ;
 		}
 		else
 		{
@@ -297,6 +289,15 @@ class Object implements IObject, ISingletonable, IFlyweightable
 		return $arrPool[$sLastKey]['ins'] ;
 	}
 	
+	static public function shareObjectMemento()
+	{
+		return array(self::$arrGlobalInstancs,self::$arrFlyweightInstancs) ;
+	}
+	static public function setShareObjectMemento(array $arrMemento)
+	{
+		self::$arrGlobalInstancs = $arrMemento[0] ;
+		self::$arrFlyweightInstancs = $arrMemento[1] ;
+	}
 	
 	/**
 	 * @return org\jecat\framework\util\IHashTable

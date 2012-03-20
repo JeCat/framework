@@ -1,8 +1,9 @@
 <?php
 namespace org\jecat\framework\lang\oop ;
 
+use org\jecat\framework\fs\Folder;
 use org\jecat\framework\system\Application;
-use org\jecat\framework\fs\IFile;
+use org\jecat\framework\fs\File;
 use org\jecat\framework\lang\Object;
 use org\jecat\framework\lang\compile\ClassCompileException;
 use org\jecat\framework\io\OutputStream;
@@ -11,8 +12,12 @@ use org\jecat\framework\lang\compile\CompilerFactory;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\Assert;
 
+
+
+
 class ClassLoader extends Object implements \Serializable
-{
+{	
+	/*
 	const SEARCH_COMPILED = 1 ;		// 在编译文件中搜索类
 	const SEARCH_SOURCE = 2 ;			// 在源文件中搜索类
 	
@@ -20,6 +25,7 @@ class ClassLoader extends Object implements \Serializable
 	const SEARCH_COMPILED_FIRST = 3 ;	// 搜索时编译文件优先：SEARCH_COMPILED | SEARCH_SOURCE
 	const SEARCH_ALL = 3 ;				// 搜索编译文件和源文件：SEARCH_COMPILED | SEARCH_SOURCE
 	const SEARCH_DEFAULT = 7 ;			// SEARCH_COMPILED_FIRST | AUTO_COMPILE
+	*/
 	
 	public function __construct()
 	{		
@@ -37,27 +43,49 @@ class ClassLoader extends Object implements \Serializable
 	/**
 	 * @return Package
 	 */
-	public function addPackage($sNamespace,$sSourceFolder=null) 
+	public function addPackage($sNamespace,$folder=null,$nPriority=Package::source) 
 	{
 		if( $sNamespace instanceof Package )
 		{
 			$aPackage = $sNamespace ;
 		}
+		else if( $folder instanceof Folder )
+		{
+			$aPackage = new Package($sNamespace,$folder) ;
+		}
 		else
 		{
-			$aPackage = new Package($sNamespace,Package::findFolder($sSourceFolder)) ;
+			$aPackage = new Package($sNamespace,Package::findFolder($folder)) ;
+		}
+		
+		// 增加一个优先级
+		if(!array_key_exists($nPriority,$this->arrPackages))
+		{
+			$this->arrPackages[$nPriority] = array() ;
+			
+			// 保证优先级排序
+			ksort($this->arrPackages) ;
 		}
 
-		$this->arrPackages[$aPackage->ns()] = $aPackage ;
+		$this->arrPackages[$nPriority][$aPackage->ns()] = $aPackage ;
+		
+		$this->sPackagesSignature = null ;
+		
 		return $aPackage ;
 	}
 	
-	public function removePackage($aPackage){
-		foreach($this->packageIterator() as $package){
-			if($aPackage->folder()->path() === $package->folder()->path() ){
-				unset( $this->arrPackages[$package->ns()] );
+	public function removePackage($aPackage)
+	{
+		foreach($this->arrPackages as $nPriority=> &$arrPackages)
+		{
+			$nIdx = array_search($aPackage,$arrPackages,true) ;
+			if( $nIdx!==false )
+			{
+				unset($arrPackages[$nIdx]) ;
 			}
 		}
+		
+		$this->sPackagesSignature = null ;
 	}
 		
 	/**
@@ -84,134 +112,34 @@ class ClassLoader extends Object implements \Serializable
 		}
 		
 		// 搜索类
-		try{
-			if( $aClassFile=$this->searchClass($sClassName) )
-			{
-				$this->arrClassPathCache[$sClassName] = $aClassFile->url() ;
-				
-				$aClassFile->includeFile(false,true) ;
-			}
-		}
-		catch (ClassCompileException $e)
+		if( $sClassFile=$this->searchClass($sClassName) )
 		{
-			echo $e->message(). " <br />\r\n" ;
-			if( $aClassSource=$e->classSouce() )
-			{
-				echo "class source file :" . $aClassSource->url(). " <br />\r\n" ;
-			}
-			if( $aToken=$e->causeToken() )
-			{
-				echo "problem on line: " , $aToken->line() , ", position:", $aToken->position(), " <br />\r\n" ;
-				echo "token source: “" , $aToken->sourceCode(), "” <br />\r\n" ;
-			}
-			echo "<pre>",$e->getTraceAsString(),"</pre>" ;
-			exit() ;
+			// $this->arrClassPathCache[$sClassName] = $sClassFile ;
+			require ($sClassFile) ;
 		}
 		
 		$this->fLoadTime+= microtime(true) - $fTime ;
 	}
 	
-	public function searchClass($sClassName,$nSearchFlag=null)
+	public function searchClass($sClassName,$nPriority=Package::all)
 	{
-		if($nSearchFlag===null)
+		for(end($this->arrPackages); $arrPackages=&current($this->arrPackages); prev($this->arrPackages))
 		{
-			$nSearchFlag = self::SEARCH_COMPILED_FIRST ;
-			if( $this->isEnableClassCompile() and !$this->skipForClassCompile($sClassName) )
-			{
-				$nSearchFlag|= self::AUTO_COMPILE ;
-			}
-		}
-		
-		if( ($nSearchFlag&self::SEARCH_COMPILED)==self::SEARCH_COMPILED )
-		{
-			$aCmpdPackage = $this->compiler()->compiledPackage() ;
-			$sFullInnerPath = dirname( str_replace('\\','/',$sClassName) ) ;
-		}
-		
-		for( end($this->arrPackages); $aSrcPackage=current($this->arrPackages); prev($this->arrPackages) )
-		{
-			if( !list($sInnerPath,$sShortClassName)=$aSrcPackage->parsePath($sClassName) )
+			if( !(key($this->arrPackages) & $nPriority) )
 			{
 				continue ;
 			}
 			
-			// 只搜索编译文件
-			if( ($nSearchFlag&self::SEARCH_ALL)==self::SEARCH_COMPILED )
+			for(end($arrPackages); $aPackage=current($arrPackages); prev($arrPackages))
 			{
-				if( $aCmpdClassFile=$aCmpdPackage->searchClassEx($sFullInnerPath,$sShortClassName) )
+				if($sFilepath=$aPackage->searchClass($sClassName))
 				{
-					return $aCmpdClassFile ;
+					return $sFilepath ;
 				}
 			}
-			
-			// 只搜索源文件
-			else if( ($nSearchFlag&self::SEARCH_ALL)==self::SEARCH_SOURCE )
-			{
-				if( $aSrcClassFile=$aSrcPackage->searchClassEx($sInnerPath,$sShortClassName) )
-				{
-					return $aSrcClassFile ;
-				}
-			}
-			
-			// 编译文件优先
-			else if( ($nSearchFlag&self::SEARCH_COMPILED_FIRST)==self::SEARCH_COMPILED_FIRST )
-			{
-				// 编译后的文件
-				$aCmpdClassFile = $aCmpdPackage->searchClassEx($sFullInnerPath,$sShortClassName) ;
-			
-				// 找到编译后的文件，且不要求自动编译，则直接返回
-				if( $aCmpdClassFile and ($nSearchFlag&self::AUTO_COMPILE)!=self::AUTO_COMPILE )
-				{
-					return $aCmpdClassFile ;
-				}
-			
-				// 源文件
-				$aSrcClassFile = null ;
-				if( $nSearchFlag&self::SEARCH_SOURCE )
-				{
-					$aSrcClassFile = $aSrcPackage->searchClassEx($sInnerPath,$sShortClassName) ;
-				}
-			
-				// 确定是否需要自动编译（找到源文件，且提供了编译目录）
-				if( ($nSearchFlag&self::AUTO_COMPILE)==self::AUTO_COMPILE and $aSrcClassFile and $aCmpdPackage->folder() )
-				{
-					// 确定编译文件是否失效（编译文件不存在，最后修改时间小于源文件，文件为空）
-					if( !$aCmpdClassFile or $aCmpdClassFile->modifyTime()<$aSrcClassFile->modifyTime() or !$aCmpdClassFile->length() )
-					{
-						// 创建编译文件
-						if( !$aCmpdClassFile )
-						{
-							$aCmpdClassFile = $aCmpdPackage->createClassFile($sFullInnerPath,$sShortClassName) ;
-						}
-						
-						// 编译文件
-						try{
-							$this->aCompiler->compile( $aSrcClassFileReader=$aSrcClassFile->openReader(), $aCmpdClassFileReader=$aCmpdClassFile->openWriter() ) ;
-							$this->arrCompiledClasses[] = $sClassName ;
-						}
-						catch (ClassCompileException $e)
-						{
-							$e->setClassSouce($aSrcClassFile) ;
-							throw $e ;
-						}
-						
-						$aSrcClassFileReader->close() ;
-						$aCmpdClassFileReader->close() ;
-					}
-				}
-				
-				// 返回
-				if( $aCmpdClassFile )
-				{
-					return $aCmpdClassFile ;
-				}
-				else if( $aSrcClassFile )
-				{
-					return $aSrcClassFile ;
-				}
-			}
-			
 		}
+		
+		return null ;
 	}
 		
 	
@@ -220,50 +148,36 @@ class ClassLoader extends Object implements \Serializable
 	 */
 	public function namespaceIterator()
 	{
-		return new \org\jecat\framework\pattern\iterate\ArrayIterator( array_keys($this->arrPackages) ) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator(
+			array_keys(
+				call_user_func_array('array_merge',$this->arrPackages)
+			)
+		) ;
 	}
 	
 	/**
 	 * @return \Iterator
 	 */
-	public function packageIterator()
+	public function packageIterator($nPriority=Package::all)
 	{
-		return new \org\jecat\framework\pattern\iterate\ArrayIterator( $this->arrPackages ) ;
-	}
-	
-	/**
-	 * @return \Iterator
-	 */
-	public function classIterator($sNamespace=null)
-	{
-		return new ClassIterator( $this, $sNamespace ) ;
-	}
-
-	/**
-	 * @return org\jecat\framework\lang\compile\Compiler
-	 */
-	public function compiler()
-	{
-		if(!$this->aCompiler)
+		$arrAllPackages = array() ;
+		foreach($this->arrPackages as $key => &$arrPackages)
 		{
-			$this->aCompiler = CompilerFactory::singleton()->create() ;
+			if( !($key & $nPriority) )
+			{
+				continue ;
+			}
+			$arrAllPackages = array_merge( $arrAllPackages, array_values($arrPackages) ) ;
 		}
-		
-		return $this->aCompiler ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator( $arrAllPackages ) ;
 	}
 	
-	public function isEnableClassCompile()
+	/**
+	 * @return \Iterator
+	 */
+	public function classIterator($sNamespace=null,$nPriority=Package::all)
 	{
-		return $this->bEnableClassCompile ; 
-	}
-	public function enableClassCompile($bEnble=true)
-	{
-		$this->bEnableClassCompile = $bEnble? true: false ;
-	}
-	
-	public function skipForClassCompile($sClassFullName)
-	{
-		return preg_match($this->sSkipClassesForCompile,$sClassFullName) ;
+		return new ClassIterator( $this, $sNamespace , $nPriority ) ;
 	}
 	
 	public function totalLoadTime()
@@ -273,10 +187,13 @@ class ClassLoader extends Object implements \Serializable
 
 	public function serialize()
 	{
+		// 计算 signature 
+		$this->signature() ;
+		
 		$arrData = array(
-			'arrPackages' => array() ,
-			'arrClassPathCache' => &$this->arrClassPathCache ,
+			//'arrClassPathCache' => &$this->arrClassPathCache ,
 			'arrPackages' => &$this->arrPackages ,
+			'sPackagesSignature' => &$this->sPackagesSignature ,
 		) ;
 		
 		return serialize($arrData) ;
@@ -287,7 +204,8 @@ class ClassLoader extends Object implements \Serializable
 		$this->__construct() ;
 		
 		$arrData = unserialize($serialized) ;
-		$this->arrClassPathCache =& $arrData['arrClassPathCache'] ;
+		//$this->arrClassPathCache =& $arrData['arrClassPathCache'] ;
+		$this->sPackagesSignature =& $arrData['sPackagesSignature'] ;
 		$this->arrPackages =& $arrData['arrPackages'] ;
 	}
 	
@@ -300,26 +218,40 @@ class ClassLoader extends Object implements \Serializable
 		$this->bEnableClassCache = $bEnable? true: false ;
 	}
 	
-	public function compiledClasses()
+	public function signature()
 	{
-		return $this->arrCompiledClasses ;
+		if(!$this->sPackagesSignature)
+		{
+			$sSignature = '' ;
+			foreach($this->arrPackages as &$arrPackages)
+			{
+				foreach($arrPackages as $aPackage)
+				{
+					$sSignature.= $aPackage->signature() ;
+				}
+			}
+			$this->sPackagesSignature = md5($sSignature) ;
+		}
+		
+		return $this->sPackagesSignature ;
 	}
 	
 	private $arrPackages = array() ;
+	
+	private $sPackagesSignature ;
 
-	private $aCompiler = null ;
+	//private $aCompiler = null ;
 	
-	private $bEnableClassCompile = false ;
+	//private $bEnableClassCompile = false ;
 	
-	private $sSkipClassesForCompile = '`^org\\\\jecat\\\\framework\\\\(util|io|system|lang|pattern)\\\\`' ;
+	//private $sSkipClassesForCompile = '`^org\\\\jecat\\\\framework\\\\(util|io|system|lang|pattern)\\\\`' ;
 	
 	private $fLoadTime = 0 ;
 	
 	private $arrClassPathCache = array() ;
 	private $bEnableClassCache = false ;
 	
-	private $arrCompiledClasses ;
+	//private $arrCompiledClasses ;
 	
 }
 
-?>

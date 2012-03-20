@@ -7,6 +7,12 @@ use org\jecat\framework\pattern\composite\Container;
 
 class TokenPool extends Container
 {
+	public function __construct($sSourceFilepath=null)
+	{
+		parent::__construct('org\\jecat\\framework\\lang\\compile\\object\\AbstractObject') ;
+		$this->sSourceFilepath = $sSourceFilepath ;
+	}
+	
 	public function add($object,$sName=null,$bAdoptRelative=true)
 	{
 		parent::add($object,$sName,$bAdoptRelative) ;
@@ -117,9 +123,15 @@ class TokenPool extends Container
 		}
 	}
 	
+	public function sourcePath()
+	{
+		return $this->sSourceFilepath ;
+	}
+	
 	private $arrClasses = array() ;
 	private $arrMethods = array() ;
-	private $arrNamespaces  ;
+	private $arrNamespaces ;
+	private $sSourceFilepath ;
 }
 
 ?>

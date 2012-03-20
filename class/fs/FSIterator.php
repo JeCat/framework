@@ -24,13 +24,13 @@ abstract class FSIterator implements \Iterator{
 	// 默认值
 	const FLAG_DEFAULT = 0x36 ; // CONTAIN_FILE | CONTAIN_FOLDER | RETURN_ABSOLUTE_PATH | RECURSIVE_SEARCH
 	
-	public function __construct(IFolder $aParentFolder , $nFlags){
+	public function __construct(Folder $aParentFolder , $nFlags){
 		$this->nFlags=$nFlags;
 		$this->aParentFolder = $aParentFolder;
 	}
 	
 	/**
-	 * @return IFSO
+	 * @return FSO
 	 */
 	abstract public function getFSO();
 	

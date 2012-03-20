@@ -1,7 +1,7 @@
 <?php
 namespace org\jecat\framework\fs\archive ;
 
-use org\jecat\framework\fs\FileSystem;
+use org\jecat\framework\fs\Folder;
 
 use org\jecat\framework\fs\IFolder;
 use org\jecat\framework\fs\IFile;
