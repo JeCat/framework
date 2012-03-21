@@ -20,15 +20,16 @@ class FormCompiler extends NodeCompiler
 			$aDev->write("if( !(\$aVariables->get('theView') instanceof \\org\\jecat\\framework\\mvc\\view\\IFormView) or \$aVariables->get('theView')->isShowForm() )\r\n{\r\n") ;
 			
 			$this->compileTag($aObject->headTag(), $aObjectContainer, $aDev, $aCompilerManager) ;
-
-			$this->compileChildren($aObject, $aObjectContainer, $aDev, $aCompilerManager) ;
-
+			
 			$aDev->write("\tif(\$aVariables->get('theView') instanceof \\org\\jecat\\framework\\mvc\\view\\IFormView){\r\n") ;
 			$aDev->write("\t\t") ;
 			$aDev->output('<input type="hidden" name="') ;
 			$aDev->write("\t\t\$aDevice->write( \$aVariables->get('theView')->htmlFormSignature() ) ;\r\n") ;
 			$aDev->output('" value="1" />') ;
+			$aDev->output('<input type="hidden" name="act" value="submit" />') ;
 			$aDev->write("\t}\r\n") ;
+
+			$this->compileChildren($aObject, $aObjectContainer, $aDev, $aCompilerManager) ;
 			
 			$this->compileTag($aTailTag, $aObjectContainer, $aDev, $aCompilerManager) ;
 			

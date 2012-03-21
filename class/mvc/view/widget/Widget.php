@@ -96,6 +96,22 @@ class Widget extends Object implements IViewWidget, IBean
 			$this->setTemplateName($arrConfig['template']) ;
 		}
 		
+		if( isset($arrConfig['style']) and !isset($arrConfig['attr.style']) )
+		{
+			$arrConfig['attr.style'] = $arrConfig['style'] ;
+		}
+		if( isset($arrConfig['class']) and !isset($arrConfig['attr.style'])  )
+		{
+			$arrConfig['attr.class'] = $arrConfig['class'] ;
+		}
+		foreach($arrConfig as $key=>&$value)
+		{
+			if( substr($key,0,5)=='attr.' )
+			{
+				$this->setAttribute(substr($key,5),$value) ;
+			}
+		}
+		
     	$this->arrBeanConfig = $arrConfig ;
     }
     
