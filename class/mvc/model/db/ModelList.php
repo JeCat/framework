@@ -337,31 +337,33 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator
 		}
 	}
 	
-	public function seek ($position)
-	{
-		$aShareModel->nDataRow = $position ;
-	}
-	
 	public function prev()
-	{
+	{	
 		if( $aShareModel = $this->shareModel() )
 		{
 			$aShareModel->nDataRow -- ;
-		}
+		}		
 	}
 	
 	public function last()
 	{
 		if( $aShareModel = $this->shareModel() )
 		{
-			$aShareModel->nDataRow = count($this->arrDataSheet)-1 ;
+			$aShareModel->nDataRow = count($this->arrDataSheet) - 1 ;
 			if($aShareModel->nDataRow<0)
 			{
-				$aShareModel->nDataRow = 0 ; 
+				$aShareModel->nDataRow = 0 ;
 			}
-		}
+		}	
 	}
 	
+	public function seek ($position)
+	{
+		if( $aShareModel = $this->shareModel() )
+		{
+			$aShareModel->nDataRow = $position ;
+		}
+	}
 	
 	/**
 	 * @return ModelList
