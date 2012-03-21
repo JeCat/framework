@@ -632,7 +632,7 @@ class Model extends AbstractModel implements IBean
 		{
 			if(!array_key_exists($sAssociationName,$arrChildrenContainer))
 			{
-				$arrChildrenContainer[] = $this->child($sAssociationName) ;
+				$arrChildrenContainer[$sAssociationName] = $this->child($sAssociationName) ;
 			}
 		}
 		
@@ -716,9 +716,9 @@ class Model extends AbstractModel implements IBean
 	}
 	protected function printStructChildren(IOutputStream $aOutput = null, $nDepth = 0)
 	{
-		foreach ( $this->childIterator () as $aChild )
+		foreach ( $this->childIterator () as $sName=>$aChild )
 		{
-			$aChild->printStruct ( $aOutput, $nDepth + 1 );
+			$aChild->printStruct ( $aOutput, $nDepth + 1, "<b>[Model".($aChild->isList()?' List':'')."] {$sName}</b>" );
 		}	
 	}
 	
