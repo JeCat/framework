@@ -42,7 +42,7 @@ class Email extends Object implements IVerifier ,IBean{
 			throw new Exception ( __CLASS__ . "的" . __METHOD__ . "传入了错误的data参数(得到的参数是:%s)", array ($data ) );
 		}
 		
-		if (! preg_match ( "|^[_\\w-]+(.[_\\w-]+)*@[\\w-]+(.[\\w-]+)*$|", $data )) {
+		if (! preg_match ( "|^[_+.+\\w-]+(.[_\\w-]+)*@[\\w-]+(.[\\w-]+)*$|", $data )) {
 			if ($bThrowException) {
 				throw new VerifyFailed ( "Email格式错误" );
 			}
