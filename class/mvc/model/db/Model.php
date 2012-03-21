@@ -626,17 +626,15 @@ class Model extends AbstractModel implements IBean
 	 */
 	public function childIterator()
 	{
-		$arrChildrenContainer = $this->childrenContainer() ;
 		
 		foreach( $this->prototype()->associationNames() as $sAssociationName)
 		{
-			if(!array_key_exists($sAssociationName,$arrChildrenContainer))
-			{
-				$arrChildrenContainer[$sAssociationName] = $this->child($sAssociationName) ;
-			}
+			// 自动创建子模型
+			$this->child($sAssociationName) ;
+			
 		}
 		
-		return new \org\jecat\framework\pattern\iterate\ArrayIterator($arrChildrenContainer) ;
+		return new \org\jecat\framework\pattern\iterate\ArrayIterator($this->childrenContainer()) ;
 	}
 	
 	/**
