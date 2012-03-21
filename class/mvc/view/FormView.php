@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\view ;
 
+use org\jecat\framework\lang\Exception;
+
 use org\jecat\framework\ui\UI;
 use org\jecat\framework\mvc\view\widget\IViewFormWidget;
 use org\jecat\framework\util\IDataSrc;
@@ -41,8 +43,17 @@ class FormView extends View implements IFormView
     	parent::buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
     }
 	
-	public function loadWidgets(IDataSrc $aDataSrc)
+	public function loadWidgets(IDataSrc $aDataSrc=null,$bVerify=true)
 	{
+		if( !$aDataSrc )
+		{
+			if( !$aController=$this->controller() )
+			{
+				throw new Exception("FormView::loadWidgets()的参数\$aDataSrc为空，并且该 FormView 对像没有被添加给一个控制器，因此无法得到数据。") ;
+			}
+			$aDataSrc = $aController->params() ;
+		}
+		
 		foreach($this->widgets() as $aWidget)
 		{
 			$aWidget->setDataFromSubmit($aDataSrc) ;
@@ -56,6 +67,8 @@ class FormView extends View implements IFormView
 				$aChild->loadWidgets($aDataSrc) ;
 			}
 		}
+		
+		return !$bVerify or $this->verifyWidgets() ;
 	}
 	
 	public function verifyWidgets()
