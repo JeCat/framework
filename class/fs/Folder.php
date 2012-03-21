@@ -67,7 +67,7 @@ class Folder extends FSO
 		}
 		else if( !$aFile and ($nFlag&self::FIND_AUTO_CREATE_OBJECT)==self::FIND_AUTO_CREATE_OBJECT )
 		{
-			return $this->createChildFile($sPath,File::CREATE_DEFAULT|self::CREATE_ONLY_OBJECT) ;
+			return $this->createChildFile($sPath,File::CREATE_DEFAULT|self::CREATE_ONLY_OBJECT|FSO::CLEAN_PATH) ;
 		}
 		else
 		{
