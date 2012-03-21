@@ -114,8 +114,8 @@ class FormWidget extends Widget implements IViewFormWidget
 				$this->addVerifier(
 						$aBeanFactory->createBean($arrVerifierConf,$sNamespace,true)
 						, isset($arrVerifierConf['message'])? $arrVerifierConf['message']: null
-						, isset($arrVerifierConf['callback'])? $arrVerifierConf['callback']: null
-						, isset($arrVerifierConf['callback.argvs'])? $arrVerifierConf['callback.argvs']: null
+						, isset($arrVerifierConf['onfail'])? $arrVerifierConf['onfail']: null
+						, isset($arrVerifierConf['onfail.argvs'])? $arrVerifierConf['onfail.argvs']: null
 				) ;
 			}
 		}
@@ -173,11 +173,13 @@ class FormWidget extends Widget implements IViewFormWidget
 				
 			} catch (VerifyFailed $e) {
 
+				$sTitle = $this->title()?: $this->id() ;
+				
 				$this->messageQueue()->add(
 					new Message(
 						Message::error
-						, "%s无效：".$e->getMessage()
-						, array_merge(array($this->title()),$e->messageArgvs())
+						, "窗体“%s”中的内容无效：".$e->getMessage()
+						, array_merge(array($sTitle),$e->messageArgvs())
 				) ) ;
 				
 				return false ;
