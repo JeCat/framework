@@ -2,9 +2,8 @@
 
 namespace org\jecat\framework\mvc\model\db ;
 
+use org\jecat\framework\mvc\model\db\orm\Deleter;
 use org\jecat\framework\mvc\model\IModel;
-
-use org\opencomb\friendlyerror\__HighterActiver;
 use org\jecat\framework\io\IOutputStream;
 use org\jecat\framework\mvc\controller\Response;
 use org\jecat\framework\bean\BeanConfException;
@@ -517,9 +516,34 @@ class Model extends AbstractModel implements IBean
 		return $this->_dataIterator(true) ;
 	}
 	
-	protected function & transDataName(& $sName)
+	protected function transDataName(& $sName)
 	{
-		return $sName = $this->prototype()->path().'.'.$sName ;
+		$aPrototype = $this->prototype() ;
+		$arrPath = explode('.',$sName) ;
+		
+		if(count($arrPath)>1)
+		{
+			$sName = array_pop($arrPath) ;
+			while( each($arrPath)!==false )
+			{
+				$sPrototypeName = array_shift($arrPath) ;
+				if( !$aAssociation = $aPrototype->associationByName($sPrototypeName) )
+				{
+					if($arrPath)
+					{
+						$sPrototypeName.= '.'.implode('.',$arrPath) ;
+					}
+					$sName = $sPrototypeName . '.' . $sName ;
+					break ;
+				}
+				
+				$aPrototype = $aAssociation->toPrototype() ;
+			}
+		}
+		
+		$sName = $aPrototype->getColumnByAlias($sName)?: $sName ;
+		
+		return $sName = $aPrototype->path().'.'.$sName ;
 	}
 	
 	/**
