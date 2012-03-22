@@ -285,10 +285,10 @@ abstract class FSO extends Object implements \Serializable
 	 */
 	static public function relativePath($sFromPath,$sToPath)
 	{
-		if($sFromPath instanceof IFSO){
+		if($sFromPath instanceof FSO){
 			$sFromPath = $sFromPath->path();
 		}
-		if($sToPath instanceof IFSO){
+		if($sToPath instanceof FSO){
 			$sToPath = $sToPath->path();
 		}
 		

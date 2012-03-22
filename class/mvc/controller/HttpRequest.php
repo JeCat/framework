@@ -2,8 +2,6 @@
 namespace org\jecat\framework\mvc\controller ;
 
 use org\jecat\framework\system\Application;
-use org\jecat\framework\fs\imp\UploadFile;
-use org\jecat\framework\fs\imp\LocalFileSystem;
 use org\jecat\framework\util\DataSrc ;
 use org\jecat\framework\fs\Folder ;
 
@@ -224,23 +222,12 @@ class HttpRequest extends Request
 			return ;
 		}
 		
-		$aFs = Folder::singleton() ;
-		$this->mountUploadTmp($aFs) ;
-		
 		$aDataSrc = new DataSrc() ;
 		$this->addChild($aDataSrc) ;
 		
 		foreach($_FILES as $sName=>$arrFileInfo)
 		{
-			$aDataSrc->set($sName,UploadFile::createInstance(array($aFs,self::$sUploadTmpPath,$sName,$arrFileInfo))) ;
-		}
-	}
-	
-	private function mountUploadTmp(FileSystem $aFs)
-	{
-		if( !$aFs->exists(self::$sUploadTmpPath) )
-		{
-			$aFs->mount(self::$sUploadTmpPath,LocalFolder::createInstance(UploadFile::uploadTempDir())) ;
+			$aDataSrc->set($sName,$arrFileInfo) ;
 		}
 	}
 	
