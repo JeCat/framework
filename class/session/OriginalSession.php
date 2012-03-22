@@ -14,6 +14,10 @@ class OriginalSession extends Session
 		}
 		
 		self::setSingleton($this) ;
+		
+		register_shutdown_function(function (){
+			session_write_close() ;
+		}) ;
 	}
 	
 	public function sessionId()
