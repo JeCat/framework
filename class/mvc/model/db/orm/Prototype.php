@@ -834,7 +834,7 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		// where
 		if(!empty($arrConfig['where']))
 		{
-			self::buildBeanRestriction($arrConfig['where'],$this->criteria()->where()) ;
+			self::buildBeanRestriction($arrConfig['where'],$this->criteria()->where()->createRestriction()) ;
 		}
 		
 		// associations
