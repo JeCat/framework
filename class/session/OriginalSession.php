@@ -15,6 +15,13 @@ class OriginalSession extends Session
 		
 		self::setSingleton($this) ;
 	}
+	public function __destruct()
+	{
+		if( $this->hasStarted() )
+		{
+			session_write_close() ;
+		}
+	}
 	
 	public function sessionId()
 	{
