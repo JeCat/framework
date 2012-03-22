@@ -2,7 +2,7 @@
 namespace org\jecat\framework\mvc\view\widget;
 
 use org\jecat\framework\fs\Folder;
-
+use org\jecat\framework\fs\File as FsFile;
 use org\jecat\framework\message\Message;
 use org\jecat\framework\mvc\view\DataExchanger;
 use org\jecat\framework\lang\Type;
@@ -13,8 +13,6 @@ use org\jecat\framework\mvc\view\widgetIViewFormWidget;
 use org\jecat\framework\util\IDataSrc;
 use org\jecat\framework\fs\archive\IAchiveStrategy;
 use org\jecat\framework\fs\archive\DateAchiveStrategy;
-use org\jecat\framework\fs\File;
-use org\jecat\framework\fs\Folder;
 
 class File extends FormWidget
 {
@@ -213,18 +211,23 @@ class File extends FormWidget
 		}
 		
 		// 保存文件
-		$aSavedFile = $this->aAchiveStrategy->makeFilePath ( $this->aUploadedFile, $this->aStoreFolder );
+		$sSavedFile = $this->aAchiveStrategy->makeFilePath ( $this->arrUploadedFile, $this->aStoreFolder );
 		
 		// 创建保存目录
-		if (! $aFolderOfSavedFile = Folder::singleton()->findFolder ( $aSavedFile ))
-		{
-			if (! Folder::singleton()->createChildFolder ( $aSavedFile ))
+		$aFolderOfSavedFile = new Folder( $sSavedFile ) ;
+		if( ! $aFolderOfSavedFile->exists() ){
+			if (! $aFolderOfSavedFile->create() )
 			{
-				throw new Exception ( __CLASS__ . "的" . __METHOD__ . "在创建路径\"%s\"时出错", array ($this->aStoreFolder->path () ) );
+				throw new Exception ( __CLASS__ . "的" . __METHOD__ . "在创建路径\"%s\"时出错", array ($aFolderOfSavedFile->path () ) );
 			}
 		}
 		
-		$aSavedFile = $this->aUploadedFile->move ( $aSavedFile . $this->aAchiveStrategy->makeFilename ( $this->aUploadedFile ) );
+		$sSavedFile = $sSavedFile . $this->aAchiveStrategy->makeFilename ( $this->arrUploadedFile ) ;
+		
+		move_uploaded_file($this->arrUploadedFile['tmp_name'],$sSavedFile);
+		
+		$aSavedFile = new FsFile($sSavedFile) ;
+		
 		$this->setValue ( $aSavedFile );
 		
 		return $aSavedFile;
@@ -258,16 +261,12 @@ class File extends FormWidget
 	
 	public function setDataFromSubmit(IDataSrc $aDataSrc)
 	{
-		if ($this->aUploadedFile = $aDataSrc->get ( $this->formName () ))
+		if ($this->arrUploadedFile = $aDataSrc->get ( $this->formName () ))
 		{
-			if (! $this->aUploadedFile instanceof File)
-			{
-				throw new Exception ( __METHOD__ . "() %s数据必须是一个 org\\jecat\\framework\\fs\\File 对象，提供的是%s类型", array ($this->formName (), Type::detectType ( $this->aUploadedFile ) ) );
-			}
 		}
 		
 		// 删除文件
-		if ($aOriginFile = $this->value () and ($this->aUploadedFile or $aDataSrc->get ( $this->id () . '_delete' )))
+		if ($aOriginFile = $this->value () and ($this->arrUploadedFile or $aDataSrc->get ( $this->id () . '_delete' )))
 		{
 			if ($aOriginFile->delete ())
 			{
@@ -281,7 +280,7 @@ class File extends FormWidget
 		}
 		
 		// move file, and setValue
-		if ($this->aUploadedFile && $this->aUploadedFile->exists ())
+		if ($this->arrUploadedFile && file_exists($this->arrUploadedFile['tmp_name']))
 		{
 			$this->setValue ( $this->moveToStoreFolder () );
 		}
@@ -316,7 +315,7 @@ class File extends FormWidget
 	/**
 	 * @var	org\jecat\framework\fs\File
 	 */
-	private $aUploadedFile;
+	private $arrUploadedFile;
 	/**
 	 * @var	boolean
 	 */

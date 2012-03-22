@@ -2,10 +2,7 @@
 namespace org\jecat\framework\fs\archive ;
 
 use org\jecat\framework\fs\Folder;
-
-use org\jecat\framework\fs\IFolder;
-use org\jecat\framework\fs\IFile;
-
+use org\jecat\framework\fs\File;
 /**
  * 按照当前日期生成归档路径
  * 使用享元模式创建对象, 按照年、月、日分类目录归档文件：
@@ -23,10 +20,7 @@ class DateAchiveStrategy extends IAchiveStrategy
 		$this->bHourly = $bHourly? true: false ;
 	}
 	
-	/**
-	 * @return org\jecat\framework\fs\IFile
-	 */
-	public function makeFilePath(IFile $aOriginalFile,IFolder $aToDir) 
+	public function makeFilePath(array $arrUploadedFile,Folder $aToDir) 
 	{
 		$sToPath = $aToDir->path() ;
 		
@@ -53,5 +47,3 @@ class DateAchiveStrategy extends IAchiveStrategy
 		return  $sToPath.'/';
 	}
 }
-
-?>
