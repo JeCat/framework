@@ -190,7 +190,7 @@ class Inserter extends OperationStrategy
 			if( $aChildModel->isList() )
 			{
 				$value = $aModel->data($arrFromKeys[$nIdx]) ;
-				foreach ($aChildModel->childIterator() as $aChildChildModel)
+				foreach ($aChildModel as $aChildChildModel)
 				{
 					$aChildChildModel->setData( $sKey, $value ,false) ;
 				}
