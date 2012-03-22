@@ -83,7 +83,7 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator
 		return $aChild->nDataRow ;
 	}
 	
-	public function child($name)
+	public function child($name,$aShareChild=false)
 	{
 		if( is_int($name) and $name>=0 )
 		{
@@ -93,8 +93,31 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator
 			}
 			else
 			{
-				$this->nDataRow = $name ;
-				return $this->shareModel() ;
+				// 返回共享的 child 对像
+				if($aShareChild)
+				{
+					$this->seek($name) ;
+					return $this->shareModel() ;
+				}
+				
+				// 返回独立的 child 对像
+				else
+				{
+					if( !$this->arrAloneChildren or !isset($this->arrAloneChildren[$name]) )
+					{
+						if(!$aPrototype=$this->prototype())
+						{
+							return null ;
+						}
+						$this->arrAloneChildren[$name] = $aPrototype->createModel(false) ;
+						
+						// 数据共享， 指正独立
+						$this->arrAloneChildren[$name]->arrDataSheet =& $this->arrDataSheet ;
+						$this->arrAloneChildren[$name]->nDataRow = $name ;
+					}
+					
+					return $this->arrAloneChildren[$name] ;
+				}
 			}
 		}
 		else
@@ -134,21 +157,9 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator
 		return is_array($this->arrDataSheet)? count($this->arrDataSheet): 0 ;	
 	}
 	
-	public function childIterator($bAloneIterator=false)
+	public function childIterator($bAloneIterator=true)
 	{
-		if(!$bAloneIterator)
-		{
-			return $this ;
-		}
-		else
-		{
-			$aNewIter = clone $this ;
-						
-			// 共享 数据集
-			$aNewIter->arrDataSheet =& $this->arrDataSheet ;
-			
-			return $aNewIter ;
-		}
+		return $bAloneIterator? new ModelListIterator($this): $this ;
 	}
 	
 	public function sortChildren($callback,$bDesc=false)
@@ -403,6 +414,8 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator
 		$nDataRow = $this->nDataRow ;
 		$this->nDataRow =& $nDataRow ;
 	}
+
+	private $arrAloneChildren ;
 	
 	private $aShareModel ;
 	

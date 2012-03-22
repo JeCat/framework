@@ -3,16 +3,17 @@ namespace org\jecat\framework\mvc\model\db ;
 
 class ModelListIterator implements \Iterator
 {
-	public function __construct(ModelList $aModelList,array $arrModelIndexes=null)
+	public function __construct(ModelList $aModelList,array $arrModelIndexes=null,$bShareChild=false)
 	{
 		$this->aModelList = $aModelList ;
 		$this->arrModelIndexes = $arrModelIndexes===null? range( 0, $this->aModelList->childrenCount()-1 ): $arrModelIndexes ;
+		$this->bShareChild = $bShareChild ;
 	}
 	
 	public function current ()
 	{
 		$nIndex = current($this->arrModelIndexes) ;
-		return $this->aModelList->child($nIndex) ;
+		return $this->aModelList->child($nIndex,$this->bShareChild) ;
 	}
 	
 	public function next ()
@@ -27,7 +28,7 @@ class ModelListIterator implements \Iterator
 	
 	public function valid ()
 	{
-		return current($this->arrModelIndexes) ;
+		return current($this->arrModelIndexes)!==false ;
 	}
 	
 	public function rewind ()
@@ -36,5 +37,7 @@ class ModelListIterator implements \Iterator
 	}
 	
 	private $arrModelIndexes ;
+	
+	private $bShareChild ;
 }
 
