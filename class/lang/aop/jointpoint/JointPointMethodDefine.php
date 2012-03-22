@@ -15,7 +15,7 @@ class JointPointMethodDefine extends JointPoint
 	
 	static public function createFromDeclare($sDeclare)
 	{
-		if( !preg_match('/^([\\w\\\\_]+)::([\\w_]+)(\[derived\])?$/i',$sDeclare,$arrRes) )
+		if( !preg_match('/^([\\w\\\\_]+)::([\\w_]+)\\s*\\(\\s*\\)\\s*(\[derived\])?$/i',$sDeclare,$arrRes) )
 		{
 			return null ;
 		}
@@ -24,7 +24,7 @@ class JointPointMethodDefine extends JointPoint
 	
 	public function exportDeclare($bWithClass=true)
 	{
-		return ($bWithClass?$this->weaveClass():'')."::".$this->weaveMethod() ;
+		return ($bWithClass?$this->weaveClass():'')."::".$this->weaveMethod().'()' ;
 	}
 	
 	public function matchExecutionPoint(Token $aToken)

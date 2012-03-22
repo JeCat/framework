@@ -2,7 +2,6 @@
 namespace org\jecat\framework\lang\aop ;
 
 use org\jecat\framework\bean\BeanFactory;
-
 use org\jecat\framework\fs\File;
 use org\jecat\framework\lang\compile\IStrategySummary;
 use org\jecat\framework\fs\FSO;
@@ -30,7 +29,10 @@ class AOP extends Object implements IStrategySummary, \Serializable
 		$this->aJointPointIterator = null ;
 	}
 	
-	public function registerBean(array $arrConfig,$sAspectDefineFile)
+	/**
+	 * @return AOP 
+	 */
+	public function registerBean(array $arrConfig,$sAspectDefineFile=null)
 	{
 		if( empty($arrConfig['class']) )
 		{
@@ -43,6 +45,8 @@ class AOP extends Object implements IStrategySummary, \Serializable
 			$aAspect->setAspectFilepath(FSO::tidyPath($sAspectDefineFile)) ;
 		}
 		$this->aspects()->add($aAspect) ;
+		
+		return $this ;
 	}
 	
 	public function unregister(Aspect $aAspect)
