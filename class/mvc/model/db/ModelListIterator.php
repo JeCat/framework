@@ -6,7 +6,15 @@ class ModelListIterator implements \Iterator
 	public function __construct(ModelList $aModelList,array $arrModelIndexes=null,$bShareChild=false)
 	{
 		$this->aModelList = $aModelList ;
-		$this->arrModelIndexes = $arrModelIndexes===null? range( 0, $this->aModelList->childrenCount()-1 ): $arrModelIndexes ;
+		if($arrModelIndexes===null)
+		{
+			$nModelCount = $this->aModelList->childrenCount() ;
+			$this->arrModelIndexes = $nModelCount>0? range( 0, $nModelCount-1 ): array() ;
+		}
+		else
+		{
+			$this->arrModelIndexes = $arrModelIndexes ;
+		}
 		$this->bShareChild = $bShareChild ;
 	}
 	
