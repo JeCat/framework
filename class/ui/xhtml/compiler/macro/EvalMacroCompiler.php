@@ -34,7 +34,7 @@ class EvalMacroCompiler extends MacroCompiler
 {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		$aDev->write( ExpressionCompiler::compileExpression($aObject->source(),$aObjectContainer->variableDeclares(),false,true) ) ;
+		$aDev->write( ExpressionCompiler::compileExpression($aObject->source(),$aObjectContainer->variableDeclares(),false,true).';' ) ;
 	}
 }
 
