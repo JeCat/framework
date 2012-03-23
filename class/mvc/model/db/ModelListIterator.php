@@ -1,7 +1,9 @@
 <?php
 namespace org\jecat\framework\mvc\model\db ;
 
-class ModelListIterator implements \Iterator
+use org\jecat\framework\pattern\iterate\IReversableIterator;
+
+class ModelListIterator implements IReversableIterator
 {
 	public function __construct(ModelList $aModelList,array $arrModelIndexes=null,$bShareChild=false)
 	{
@@ -42,6 +44,16 @@ class ModelListIterator implements \Iterator
 	public function rewind ()
 	{
 		reset($this->arrModelIndexes) ;
+	}
+	
+	// IReversableIterator::prev
+	public function prev(){
+		prev($this->arrModelIndexes);
+	}
+	
+	// IReversableIterator::last
+	public function last(){
+		end($this->arrModelIndexes);
 	}
 	
 	private $arrModelIndexes ;
