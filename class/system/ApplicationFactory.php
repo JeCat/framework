@@ -85,11 +85,14 @@ abstract class ApplicationFactory extends Object
 
 	public function createClassLoader(Application $aApp)
 	{		
-		$aClassLoader = new ClassLoader( Folder::singleton()->findFile("classpath.php") ) ;
+		$aClassLoader = new ClassLoader() ;
 		$aFolder = Folder::singleton() ;
 		
+		// 将依赖的库加入到 class loader 中
+		$aClassLoader->addPackage( 'com\\google\\code', \org\jecat\framework\PATH.'/lib/class/com.google.code' ) ;
+		
 		// 将 jecat 加入到 class loader 中
-		$aClassLoader->addPackage( 'org\\jecat\\framework', $aFolder->findFolder('framework/class') ) ;
+		$aClassLoader->addPackage( 'org\\jecat\\framework', \org\jecat\framework\CLASSPATH ) ;
 		
 		// 将保存 数据表 实现类的临时目录加入到 class loader 中
 		$aPackage = new ShadowClassPackage(
