@@ -31,6 +31,7 @@ abstract class SQL
 		
 	}
 	
+	// ------------
 	
 	
 	static public function createRawAlias($sAlias,$bAs=true)
@@ -56,7 +57,7 @@ abstract class SQL
 				'expr_type' => 'table' ,
 				'table' => $sName ,
 				'alias' => $sAlias? self::createRawAlias($sAlias): null ,
-				'join_type' => 'JOIN' ,
+				'join_type' => 'CROSS' ,
 				/*
 				'ref_type' => '' ,
 				'ref_clause' => '' ,
@@ -79,8 +80,6 @@ abstract class SQL
 	{
 		$this->setRawSql($arrRawSql=array()) ; 
 	}
-	
-	abstract public function __toString() ;
 	
 	public function & rawSql()
 	{
