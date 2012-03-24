@@ -59,19 +59,21 @@ class Folder extends FSO
 			// FSO::tidyPath($sPath,true) ;
 		}
 		
-		$aFile =  $this->find($sPath,$nFlag&(~FSO::type)|FSO::file|FSO::CLEAN_PATH) ;
+		$file =  $this->find($sPath,$nFlag&(~FSO::type)|FSO::file|FSO::CLEAN_PATH) ;
 		
-		if( !$aFile and ($nFlag&self::FIND_AUTO_CREATE)==self::FIND_AUTO_CREATE )
+		if( !$file and ($nFlag&self::FIND_AUTO_CREATE)==self::FIND_AUTO_CREATE )
 		{
-			return $this->createChildFile($sPath,File::CREATE_DEFAULT|FSO::CLEAN_PATH) ;
+			$aFile = $this->createChildFile($sPath,File::CREATE_DEFAULT|FSO::CLEAN_PATH) ;
+			return (Folder::FIND_RETURN_PATH & $nFlag)? $aFile->path(): $aFile ;			
 		}
-		else if( !$aFile and ($nFlag&self::FIND_AUTO_CREATE_OBJECT)==self::FIND_AUTO_CREATE_OBJECT )
+		else if( !$file and ($nFlag&self::FIND_AUTO_CREATE_OBJECT)==self::FIND_AUTO_CREATE_OBJECT )
 		{
-			return $this->createChildFile($sPath,File::CREATE_DEFAULT|self::CREATE_ONLY_OBJECT|FSO::CLEAN_PATH) ;
+			$aFile = $this->createChildFile($sPath,File::CREATE_DEFAULT|self::CREATE_ONLY_OBJECT|FSO::CLEAN_PATH) ;
+			return (Folder::FIND_RETURN_PATH & $nFlag)? $aFile->path(): $aFile ;
 		}
 		else
 		{
-			return $aFile ;
+			return $file ;
 		}
 	}
 
@@ -86,19 +88,21 @@ class Folder extends FSO
 			// FSO::tidyPath($sPath,true) ;
 		}
 		
-		$aFolder =  $this->find($sPath,$nFlag&(~FSO::type)|FSO::folder|FSO::CLEAN_PATH) ;
+		$folder =  $this->find($sPath,$nFlag&(~FSO::type)|FSO::folder|FSO::CLEAN_PATH) ;
 		
-		if( !$aFolder and ($nFlag&self::FIND_AUTO_CREATE) == self::FIND_AUTO_CREATE )
+		if( !$folder and ($nFlag&self::FIND_AUTO_CREATE) == self::FIND_AUTO_CREATE )
 		{
-			return $this->createChildFolder($sPath,Folder::CREATE_DEFAULT|FSO::CLEAN_PATH) ;
+			$aFolder = $this->createChildFolder($sPath,Folder::CREATE_DEFAULT|FSO::CLEAN_PATH) ;
+			return (Folder::FIND_RETURN_PATH & $nFlag)? $aFolder->path(): $aFolder ;
 		}
-		else if( !$aFolder and ($nFlag&self::FIND_AUTO_CREATE_OBJECT) == self::FIND_AUTO_CREATE_OBJECT )
+		else if( !$folder and ($nFlag&self::FIND_AUTO_CREATE_OBJECT) == self::FIND_AUTO_CREATE_OBJECT )
 		{
-			return $this->createChildFolder($sPath,Folder::CREATE_DEFAULT|self::CREATE_ONLY_OBJECT|FSO::CLEAN_PATH) ;
+			$aFolder = $this->createChildFolder($sPath,Folder::CREATE_DEFAULT|self::CREATE_ONLY_OBJECT|FSO::CLEAN_PATH) ;
+			return (Folder::FIND_RETURN_PATH & $nFlag)? $aFolder->path(): $aFolder ;
 		}
 		else
 		{
-			return $aFolder ;
+			return $folder ;
 		}
 	}
 

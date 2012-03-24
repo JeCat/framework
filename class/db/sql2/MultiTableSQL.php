@@ -6,22 +6,17 @@ use org\jecat\framework\lang\Type;
 
 abstract class MultiTableSQL extends SQL
 {
+	function __construct($sTableName=null)
+	{
+		if($sTableName)
+		{
+			$this->addTable($sTableName) ;
+		}
+	}
+	
 	function __clone()
-	{
-	}
-	
-	/**
-	 * 把所有条件拼接成字符串,相当于把这个对象字符串化
-	 *
-	 * @return string
-	 */
-	public function __toString()
 	{}
-	
-	public function toStringLimit()
-	{
-	}
-	
+		
 	// -- from --
 	
 	/**
@@ -132,7 +127,7 @@ abstract class MultiTableSQL extends SQL
 		}
 	}
 
-	public function joinTable($sFromTable,$sToTable,$sJoinType='LEFT',$on=null,$using=null,$sAlias=null)
+	public function joinTable($sFromTable,$sToTable,$on=null,$using=null,$sAlias=null,$sJoinType='LEFT')
 	{
 		if( !$arrFromTableList=&self::findTableList($this->rawTables()) )
 		{

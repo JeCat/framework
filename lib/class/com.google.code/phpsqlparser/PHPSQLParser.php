@@ -404,7 +404,7 @@ namespace com\google\code\phpsqlparser ;
         #This is the lexer
         #this function splits up a SQL statement into easy to "parse"
         #tokens for the SQL processor
-        private function split_sql($sql) {
+        public function split_sql($sql) {
 
             if (!is_string($sql)) {
                 echo "SQL:\n";
@@ -774,7 +774,7 @@ EOREGEX
             if (!empty($out['GROUP'])) {
                 $out['GROUP'] = $this->process_group($out['GROUP'], $out['SELECT']);
             }
-            if (!empty($out['ORDER'])) {
+            if (!empty($out['ORDER'])) {print_r($out['ORDER']) ;
                 $out['ORDER'] = $this->process_order($out['ORDER'], $out['SELECT']);
             }
             if (!empty($out['LIMIT'])) {
@@ -889,7 +889,7 @@ EOREGEX
         
          Finally, at the end, the epxression list is returned.
          */
-        private function process_select(&$tokens) {
+        public function process_select(&$tokens) {
             $expression = "";
             $expr = array();
             foreach ($tokens as $token) {

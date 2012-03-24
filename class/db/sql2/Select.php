@@ -50,7 +50,10 @@ class Select extends MultiTableSQL
 		) ;
 	}*/
 		
-	public function setPredicateTop($nLength=30,$bPercent=false)
+	//public function setPredicateTop($nLength=30,$bPercent=false)
+	//{}
+	
+	public function addColumns()
 	{
 		
 	}

@@ -7,6 +7,26 @@ use org\jecat\framework\lang\Object;
 
 abstract class SQL
 {
+	static public function insert($sTableName)
+	{
+	}
+	static public function delete($sTableName)
+	{
+		
+	}
+	/**
+	 * @return Select
+	 */
+	static public function select($sTableName=null)
+	{
+		return new Select($sTableName) ;
+	}
+	static public function update($sTableName)
+	{
+		
+	}
+	
+	
 	/**
 	 * @return Select
 	 */
@@ -70,15 +90,32 @@ abstract class SQL
 	/**
 	 * @return com\google\code\phpsqlparser\PHPSQLParser
 	 */
-	static protected function parser()
+	static public function parser()
 	{
 		return Object::singleton(true,null,'com\\google\\code\\phpsqlparser\\PHPSQLParser') ;
-	} 
+	}
+	/**
+	 * @return com\google\code\phpsqlparser\PHPSQLCreator
+	 */
+	static public function compiler()
+	{
+		return Object::singleton(true,null,'com\\google\\code\\phpsqlparser\\PHPSQLCreator') ;
+	}
 	
 	// ----------------------------------------------------------
 	public function __construct()
 	{
 		$this->setRawSql($arrRawSql=array()) ; 
+	}
+	
+	/**
+	 * 把所有条件拼接成字符串,相当于把这个对象字符串化
+	 *
+	 * @return string
+	 */
+	public function __toString()
+	{
+		return $this->arrRowSql? self::compiler()->create($this->arrRowSql): null ;
 	}
 	
 	public function & rawSql()
