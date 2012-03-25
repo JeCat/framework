@@ -53,16 +53,43 @@ class Select extends MultiTableSQL
 	//public function setPredicateTop($nLength=30,$bPercent=false)
 	//{}
 	
-	public function addColumns()
+	/**
+	 * 向Select对像 添加多个返回字段。
+	 * 可以传入多个参数，每个参数是一个或一组返回字段：
+	 * 如果参数类型为字符串，则做为字段名称; 
+	 * 如果参数类型为数组，则数组里的字符串类型的键名做为别名，值做为字段名
+	 */
+	public function addColumns($columnName/* ... */)
 	{
+		$arrRawColumns =& $this->rawColumns() ;
 		
+		foreach (func_get_args() as $column)
+		{
+			if( is_array($column) )
+			{
+				foreach($column as $key=>&$sColumnName)
+				{
+					$arrRawColumns[] = self::createRawColumn($sColumnName,is_string($key)?$key:null) ;
+				}
+			}
+			else
+			{
+				$arrRawColumns[] = self::createRawColumn((string)$column) ;
+			}
+		}
+		
+		return $this ;
 	}
 	
+	/**
+	 * 向Select对像 添加多个返回字段。
+	 */
 	public function addColumn($sClmName,$sAlias=null)
-	{
+	{		
 		if( is_string($sClmName) )
 		{
-			$this->arrRawColumns[] = self::createRawColumn($sClmName,$sAlias) ;
+			$arrRawColumns =& $this->rawColumns() ;
+			$arrRawColumns[] = self::createRawColumn($sClmName,$sAlias) ;
 		}
 		
 		// 未知类型
@@ -70,15 +97,41 @@ class Select extends MultiTableSQL
 		{
 			throw new Exception("参数类型无效") ;
 		}
+		
+		return $this ;
+	}
+	
+	/**
+	 * 以sql表达式的形式，向select对像添加一个或多个返回字段。
+	 */
+	public function addColumnsExpr($sExpression)
+	{
+			
+		$aParser = self::parser() ;
+		$arrTokens = $aParser->split_sql($sExpression,true) ;
+		//print_r() ;
+		$arrRawClms = $aParser->process_select($arrTokens) ;
+		
+		$arrRawColumns =& $this->rawColumns() ;
+		$arrRawColumns = array_merge($arrRawColumns,$arrRawClms) ;
+		
+		return $this ;
 	}
 	
 	public function clearColumns()
 	{
 	    $this->arrRawColumns = null;
+	    return $this ;
 	}
 	
-	private $arrRawColumns = null ;
-	
+	protected function & rawColumns()
+	{
+		if(!isset($this->arrRawSql['SELECT']))
+		{
+			$this->arrRawSql['SELECT'] = array() ;
+		}
+		return $this->arrRawSql['SELECT'] ;
+	}	
 	
 	/**
 	 * Enter description here ...

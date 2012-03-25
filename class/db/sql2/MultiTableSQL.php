@@ -231,36 +231,36 @@ abstract class MultiTableSQL extends SQL
 	}
 	
 	public function setLimitFrom($sLimitFrom) {
-		$this->arrRowSql['LIMIT']['start'] = $sLimitFrom ;		
+		$this->arrRawSql['LIMIT']['start'] = $sLimitFrom ;		
 		return $this ;
 	}
 	public function limitFrom()
 	{
-		return isset($this->arrRowSql['LIMIT']['start'])? $this->arrRowSql['LIMIT']['start']: null ;
+		return isset($this->arrRawSql['LIMIT']['start'])? $this->arrRawSql['LIMIT']['start']: null ;
 	}
 	
 	public function setLimitLen($nLimitLen){
-		$this->arrRowSql['LIMIT']['end'] = (int)$nLimitLen ;		
+		$this->arrRawSql['LIMIT']['end'] = (int)$nLimitLen ;		
 		return $this ;
 	}
 	
 	public function limitLen()
 	{
-		return isset($this->arrRowSql['LIMIT']['end'])? $this->arrRowSql['LIMIT']['end']: null ;
+		return isset($this->arrRawSql['LIMIT']['end'])? $this->arrRawSql['LIMIT']['end']: null ;
 	}
 	
 	// -- where --
 	public function setRawWhere(array & $arrRawWhere)
 	{
-		$this->arrRowSql['WHERE'] =& $arrRawWhere ;
+		$this->arrRawSql['WHERE'] =& $arrRawWhere ;
 	}
 	public function & rawWhere(array & $arrRawWhere)
 	{
-		if( !isset($this->arrRowSql['WHERE']) )
+		if( !isset($this->arrRawSql['WHERE']) )
 		{
-			$this->arrRowSql['WHERE'] = array() ;
+			$this->arrRawSql['WHERE'] = array() ;
 		}
-		return $this->arrRowSql['WHERE'] ;
+		return $this->arrRawSql['WHERE'] ;
 	}	
 	public function setWhere(Restriction $aWhere){
 		$this->aWhere = $aWhere;
@@ -271,15 +271,15 @@ abstract class MultiTableSQL extends SQL
 	 * @return Restriction
 	 */
 	public function where($bAutoCreate=true){
-		if( !isset($this->arrRowSql['WHERE']) )
+		if( !isset($this->arrRawSql['WHERE']) )
 		{
-			$this->arrRowSql['WHERE'] = array() ;
+			$this->arrRawSql['WHERE'] = array() ;
 		}
 		
 		if( !$this->aWhere )
 		{
 			$this->aWhere = new Restriction() ;
-			$this->aWhere->setRawSql($this->arrRowSql['WHERE']) ;
+			$this->aWhere->setRawSql($this->arrRawSql['WHERE']) ;
 		}
 		
 		return $this->aWhere ;
@@ -289,7 +289,7 @@ abstract class MultiTableSQL extends SQL
 	// -- order by --
 	public function addOrderBy($sColumn,$bDesc=true)
 	{
-		$this->arrRowSql['ORDER'][] = array(
+		$this->arrRawSql['ORDER'][] = array(
 				'type' => 'expression' ,
 				'base_expr' => $sColumn ,
 				'direction' => $bDesc? 'DESC': 'ASC' ,
@@ -299,13 +299,13 @@ abstract class MultiTableSQL extends SQL
 	
 	public function setRawSqlOrders(array & $arrRawSqlOrders)
 	{
-		$this->arrRowSql['ORDER'] =& $arrRawSqlOrders ;
+		$this->arrRawSql['ORDER'] =& $arrRawSqlOrders ;
 		return $this ;
 	}
 	
 	public function clearOrders()
 	{
-		unset($this->arrRowSql['ORDER']) ;
+		unset($this->arrRawSql['ORDER']) ;
 		return $this ;
 	}
 	
@@ -330,21 +330,19 @@ abstract class MultiTableSQL extends SQL
 	
 	public function & rawSqlGroupBy()
 	{
-		if(!isset($this->arrRowSql['GROUP']))
+		if(!isset($this->arrRawSql['GROUP']))
 		{
-			$this->arrRowSql['GROUP'] = array() ;
+			$this->arrRawSql['GROUP'] = array() ;
 		}
 			
-		return $this->arrRowSql['GROUP'] ;
+		return $this->arrRawSql['GROUP'] ;
 	}
 	
 	public function clearGroupBy()
 	{
-		unset($this->arrRowSql['GROUP']) ;
+		unset($this->arrRawSql['GROUP']) ;
 		return $this ;
 	}
-	
-	private $arrRawSqlTables ;
 	
 	private $aWhere ;
 }

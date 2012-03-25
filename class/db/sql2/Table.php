@@ -12,25 +12,25 @@ class Table extends SQL
 	
 	public function name()
 	{
-		return $this->arrRowSql['table'] ;
+		return $this->arrRawSql['table'] ;
 	}
 	
 	public function setName($sTableName)
 	{
-		$this->arrRowSql['table'] = $sTableName ;
+		$this->arrRawSql['table'] = $sTableName ;
 		return $this ;
 	}
 	
 	public function alias($bDontUseTablename=false)
 	{
-		return isset($this->arrRowSql['alias'])?
-					$this->arrRowSql['alias'] :
-					( $bDontUseTablename? null: $this->arrRowSql['table'] ) ;
+		return isset($this->arrRawSql['alias'])?
+					$this->arrRawSql['alias'] :
+					( $bDontUseTablename? null: $this->arrRawSql['table'] ) ;
 	}
 	
 	public function setAlias($sAlias)
 	{
-		$this->arrRowSql['alias'] = $sAlias ;
+		$this->arrRawSql['alias'] = $sAlias ;
 		return $this ;
 	}
 	

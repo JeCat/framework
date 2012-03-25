@@ -40,34 +40,17 @@ namespace com\google\code\phpsqlparser ;
         }
 
         public function create($parsed) {
-            $k = key($parsed);
-            switch ($k) {
-
-            case "UNION":
-            case "UNION ALL":
-                die("UNIONS not implemented");
-                break;
-            case "SELECT":
-                $this->created = $this->processSelectStatement($parsed);
-                break;
-            case "INSERT":
-                $this->created = $this->processInsertStatement($parsed);
-                break;
-            case "DELETE":
-                $this->created = $this->processDeleteStatement($parsed);
-                break;
-            case "UPDATE":
-                $this->created = $this->processUpdateStatement($parsed);
-                break;
-            default:
-                die("unknown key " . $k);
-                break;
-            }
-            return $this->created;
+			foreach(array('SELECT','INSERT','DELETE','UPDATE') as $key)
+			{
+				if(isset($parsed[$key]))
+				{
+					return $this->created = call_user_func(array($this,'process'.$key.'Statement'),$parsed) ;
+				}
+			}
         }
 
         protected function stop($part, $partkey, $entry, $entrykey) {
-            die("unknown " . $entrykey . " in " . $part . "[" . $partkey . "] " . $entry[$entrykey]);
+            throw new \Exception("unknown " . $entrykey . " in " . $part . "[" . $partkey . "] " . $entry[$entrykey]);
         }
 
         protected function processSelectStatement($parsed) {
@@ -327,19 +310,37 @@ namespace com\google\code\phpsqlparser ;
 
             $sql = "";
             foreach ($parsed['sub_tree'] as $k => $v) {
-                $len = strlen($sql);
-                $sql .= $this->processFunction($v);
-                $sql .= $this->processConstant($v);
-                $sql .= $this->processColRef($v);
-                $sql .= $this->processReserved($v);
-
-                if ($len == strlen($sql)) {
-                    $this->stop('function subtree', $k, $v, 'expr_type');
+               // $len = strlen($sql);
+                $bValid = false ;
+            	
+                foreach (array(
+                		'Function' ,
+                		'Constant' ,
+                		'ColRef' ,
+                		'Reserved' ,
+                		'Operator' ,
+                ) as $type)
+                {
+                	if( $sTarget = call_user_func(array($this,'process'.$type),$v) )
+                	{
+                		$bValid = true ;
+                		
+                		if( $k and $type!=='Reserved' and $type!=='Operator' )
+                		{
+                			$sql.= ',' ;
+                		}
+                		$sql.= $sTarget ;
+                		
+                		break ;
+                	}
                 }
 
-                $sql .= ($this->isReserved($v) ? " " : ",");
+                if (!$bValid)
+                {
+                    $this->stop('function subtree', $k, $v, 'expr_type');
+                }
             }
-            return $parsed['base_expr'] . "(" . substr($sql,0,-1) . ")";
+            return $parsed['base_expr'] . "({$sql})" ;
         }
 
         protected function processSelectExpression($parsed) {
@@ -361,6 +362,8 @@ namespace com\google\code\phpsqlparser ;
                 $sql .= $this->processFunction($v);
                 $sql .= $this->processConstant($v);
                 $sql .= $this->processSubQuery($v);
+                $sql .= $this->processColRef($v);
+                $sql .= $this->processOperator($v);
 
                 if ($len == strlen($sql)) {
                     $this->stop('expression subtree', $k, $v, 'expr_type');

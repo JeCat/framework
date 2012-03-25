@@ -404,7 +404,7 @@ namespace com\google\code\phpsqlparser ;
         #This is the lexer
         #this function splits up a SQL statement into easy to "parse"
         #tokens for the SQL processor
-        public function split_sql($sql) {
+        public function split_sql($sql,$bTrim=false) {
 
             if (!is_string($sql)) {
                 echo "SQL:\n";
@@ -427,6 +427,15 @@ EOREGEX
             $tokens = $this->balanceParenthesis($tokens);
             $tokens = $this->balanceBackticks($tokens, '`');
             $tokens = $this->balanceBackticks($tokens, '\'');
+            
+            if($bTrim)
+            {
+	            foreach($tokens as &$t)
+	            {
+	            	$t = trim($t) ;
+	            }
+            }
+            
             return $tokens;
         }
 
@@ -774,7 +783,7 @@ EOREGEX
             if (!empty($out['GROUP'])) {
                 $out['GROUP'] = $this->process_group($out['GROUP'], $out['SELECT']);
             }
-            if (!empty($out['ORDER'])) {print_r($out['ORDER']) ;
+            if (!empty($out['ORDER'])) {
                 $out['ORDER'] = $this->process_order($out['ORDER'], $out['SELECT']);
             }
             if (!empty($out['LIMIT'])) {
@@ -920,7 +929,7 @@ EOREGEX
         /* This fuction processes each SELECT clause.  We determine what (if any) alias
          is provided, and we set the type of expression.
          */
-        private function process_select_expr($expression) {
+        public function process_select_expr($expression) {
 
             $tokens = $this->split_sql($expression);
             $token_count = count($tokens);

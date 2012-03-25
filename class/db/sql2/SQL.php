@@ -115,21 +115,21 @@ abstract class SQL
 	 */
 	public function __toString()
 	{
-		return $this->arrRowSql? self::compiler()->create($this->arrRowSql): null ;
+		return $this->arrRawSql? self::compiler()->create($this->arrRawSql): null ;
 	}
 	
 	public function & rawSql()
 	{
-		return $this->arrRowSql ;
+		return $this->arrRawSql ;
 	}
 	public function setRawSql(array & $arrRawSql)
 	{
-		$this->arrRowSql =& $arrRawSql ;
+		$this->arrRawSql =& $arrRawSql ;
 		
 		return $this ;
 	}
 	
-	protected $arrRowSql = array() ;
+	protected $arrRawSql = array() ;
 }
 
 
