@@ -35,6 +35,12 @@ class Parser extends AbstractParserState
 			$aParser->finish($sToken,$aTree) ;
 			$aParser = $aParser->parentState() ;
 		}
+		/** 
+		while(isset($aTree->arrTree['tmp_parent_tree']))
+		{
+			$this->restoreParentTree($aTree) ;
+		}
+		 */
 		
 		return $aTree->arrTree ;
 	}
@@ -64,15 +70,24 @@ class Parser extends AbstractParserState
 		}
 				
 		// 向上追溯所有层次上的兄弟状态是否开启
+		$arrParserTrace = array() ;
 		$aParser = $aTokenTree->aCurrentParser ;
 		while($aParentParser=$aParser->parentState())
 		{
+			// 路径上的parser
+			$arrParserTrace[] = $aParser ;
+			
 			foreach($aParentParser->childStates() as $aBrotherParser)
 			{
 				// bingo !  parser state changing
 				if( $aParser!==$aBrotherParser and $aBrotherParser->examineStateChange($sToken,$aTokenTree) )
 				{
-					$aParser->finish($sToken,$aTokenTree) ;
+					// 依次结束路径上的parser
+					foreach($arrParserTrace as $aParser)
+					{
+						$aParser->finish($sToken,$aTokenTree) ;
+					}
+					
 					$aTokenTree->aCurrentParser = $aBrotherParser ;
 					$aBrotherParser->active($sToken,$aTokenTree) ;
 					return ;
