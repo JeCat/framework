@@ -21,7 +21,7 @@ class Parser extends AbstractParserState
 		$aTree->arrTokenList =& $arrTokenList ;
 		$aTree->aCurrentParser = $this ;
 		
-		for(reset($aTree->arrTokenList);$sToken=current($aTree->arrTokenList);next($aTree->arrTokenList))
+		for(reset($aTree->arrTokenList);($sToken=current($aTree->arrTokenList))!==false;next($aTree->arrTokenList))
 		{
 			// 切换到其它状态
 			$this->changeState($sToken,$aTree) ;
@@ -80,7 +80,7 @@ class Parser extends AbstractParserState
 			foreach($aParentParser->childStates() as $aBrotherParser)
 			{
 				// bingo !  parser state changing
-				if( $aParser!==$aBrotherParser and $aBrotherParser->examineStateChange($sToken,$aTokenTree) )
+				if( $aTokenTree->aCurrentParser!==$aBrotherParser and $aBrotherParser->examineStateChange($sToken,$aTokenTree) )
 				{
 					// 依次结束路径上的parser
 					foreach($arrParserTrace as $aParser)
@@ -171,7 +171,7 @@ class Parser extends AbstractParserState
 			}
 	
 			$oneToken = trim($oneToken) ;
-			if($oneToken)
+			if( $oneToken!=='' and $oneToken!==null )
 			{
 				$arrTokens[$nSqlIdx][] = $oneToken ;
 			}

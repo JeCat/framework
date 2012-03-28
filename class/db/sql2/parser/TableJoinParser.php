@@ -88,7 +88,6 @@ class TableJoinParser extends AbstractParserState
 						break ;
 					
 					default :
-						throw new SqlParserException($aTokenTree, "遇到无效的join，无法为 join 子句确定对应的数据表表达式") ;
 						break ;
 				}
 			}

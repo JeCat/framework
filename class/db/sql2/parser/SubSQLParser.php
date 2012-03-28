@@ -7,6 +7,7 @@ class SubSQLParser extends AbstractParserState
 	public function __construct($sCommend)
 	{
 		$this->sCommend = strtoupper($sCommend) ;
+		$this->sCommendLower = strtolower($sCommend) ;
 	}
 
 	public function examineStateChange(& $sToken,TokenTree $aTokenTree)
@@ -32,7 +33,7 @@ class SubSQLParser extends AbstractParserState
 	public function active(& $sToken,TokenTree $aTokenTree)
 	{
 		$aTokenTree->arrTree[$this->sCommend] = array(
-				'expr_type' => 'clause' ,
+				'expr_type' => 'clause_' . $this->sCommendLower ,
 				'subtree' => array() ,
 		) ;
 		
@@ -44,6 +45,7 @@ class SubSQLParser extends AbstractParserState
 	}
 	
 	private $sCommend ;
+	private $sCommendLower ;
 	
 }
 

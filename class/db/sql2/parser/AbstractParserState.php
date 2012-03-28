@@ -89,28 +89,6 @@ abstract class AbstractParserState extends Object
 		$aTokenTree->arrTree =& $arrTree ;
 	}
 	
-	
-	
-	protected function parseName($sToken)
-	{
-		if( is_numeric($sToken) ) 
-		{
-			return null ;
-		}
-		
-		if( substr($sToken,0,1)==='`' and substr($sToken,-1)==='`' )
-		{
-			return substr($sToken,1,-1) ;
-		}
-	
-		if( preg_match('/^[_\\-\\w]+$/',$sToken) )
-		{
-			return $sToken ;
-		}
-	
-		return null ;
-	}
-	
 	private $aParentState ;
 	/**
 	 * @var Dialect
