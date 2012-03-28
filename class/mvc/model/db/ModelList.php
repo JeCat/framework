@@ -287,6 +287,11 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator
 		return $this->nTotalCount ;
 	}
 	
+	public function printStruct(IOutputStream $aOutput = null, $nDepth = 0, $sDisplayTitle=null )
+	{
+		parent::printStruct($aOutput, $nDepth, "<b>[Model List] ".$this->name().'</b>');
+	}
+	
 	protected function printStructData(IOutputStream $aOutput = null, $nDepth = 0)
 	{
 		// nothing todo

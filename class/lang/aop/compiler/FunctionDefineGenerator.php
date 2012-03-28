@@ -466,9 +466,16 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 					for(end($arrResult);$arrMatched=current($arrResult);prev($arrResult))
 					{
 						$sCallCode = $sMethod.'( $__apo_aCallState' ;
-						$sCallCode.= empty($arrMatched[1][0])? ' ': ', ' ;
-
-						$sSource = substr_replace($sSource, $sCallCode, $arrMatched[0][1], strlen($arrMatched[0][0])-1) ;
+						if(empty($arrMatched[1][0]))
+						{
+							$sCallCode.= '' ;
+							$sSource = substr_replace($sSource, $sCallCode, $arrMatched[0][1], strlen($arrMatched[0][0])) ;
+						}
+						else
+						{
+							$sCallCode.= ', ' ;
+							$sSource = substr_replace($sSource, $sCallCode, $arrMatched[0][1], strlen($arrMatched[0][0])-1) ;
+						}
 					}
 				}
 			}
