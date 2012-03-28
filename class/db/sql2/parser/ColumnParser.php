@@ -20,6 +20,7 @@ class ColumnParser extends NameParser
 			$aTokenTree->arrTree[] = array(
 					'expr_type' => 'column' ,
 					'column' => $columnName ?: $sToken ,
+					'subtree' => array($sToken)
 			) ;
 		}
 		

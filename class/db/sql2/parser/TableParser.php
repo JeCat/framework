@@ -20,11 +20,12 @@ class TableParser extends NameParser
 			$aTokenTree->arrTree[] = strtoupper($sToken) ;
 		}
 		
-		else if( $sTableName = $this->parseName($sToken) )
+		else if( $tableName = $this->parseName($sToken) )
 		{
 			$aTokenTree->arrTree[] = array(
 					'expr_type' => 'table' ,
-					'table' => $sTableName ,
+					'table' => $tableName ,
+					'subtree' => array($sToken)
 			) ;
 		}
 		

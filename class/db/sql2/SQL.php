@@ -7,6 +7,13 @@ use org\jecat\framework\lang\Object;
 
 abstract class SQL
 {
+	const CLAUSE_SELECT = 'SELECT' ;
+	const CLAUSE_FROM = 'FROM' ;
+	const CLAUSE_WHERE = 'WHERE' ;
+	const CLAUSE_GROUP = 'GROUP' ;
+	const CLAUSE_ORDER = 'ORDER' ;
+	const CLAUSE_LIMIT = 'LIMIT' ;
+	
 	static public function insert($sTableName)
 	{
 	}
@@ -32,9 +39,12 @@ abstract class SQL
 	 */
 	static public function make($sSql)
 	{
-		$arrRawSql = self::parser()->parse($sSql) ;
+		if( ! $arrRawSqls = self::parser()->parse($sSql) )
+		{
+			return ;
+		}
 		
-		if( array_key_exists('SELECT',$arrRawSql) )
+		if( array_key_exists('SELECT',$arrRawSqls[0]) )
 		{
 			$aSql = new Select() ;
 		}
@@ -44,7 +54,7 @@ abstract class SQL
 			return null ;
 		}
 		
-		return $aSql->setRawSql($arrRawSql) ;
+		return $aSql->setRawSql($arrRawSqls[0]) ;
 	}
 	static public function makeRestriction($sSql)
 	{
@@ -52,54 +62,60 @@ abstract class SQL
 	}
 	
 	// ------------
-	
-	
-	static public function createRawAlias($sAlias,$bAs=true)
+	static public function createRawColumn($sTable,$sName,$sAlias=null,$sDB=null)
 	{
-		return $sAlias? array(
-						'as' => $bAs?true:false ,
-						'name' => $sAlias ,
-						'base_expr' => ($bAs? 'AS ': '').$sAlias ,
-			): null ;
-	}
-	static public function createRawColumn($sName,$sAlias=null)
-	{
-		return array(
-				'expr_type' => 'colref' ,
-				'base_expr' => $sName ,
-				'alias' => $sAlias? self::createRawAlias($sAlias): null ,
-				// 'sub_tree' => '' ,
+		$arrRaw = array(
+				'expr_type' => 'column' ,
+				'column' => $sName ,
 		) ;
+		
+		if($sTable)
+		{
+			$arrRaw['table'] = $sTable ;
+		}
+		if($sAlias)
+		{
+			$arrRaw['alias'] = $sAlias ;
+		}
+		if($sDB)
+		{
+			$arrRaw['db'] = $sDB ;
+		}
+		
+		return $arrRaw ;
 	}
-	static public function createRawTable($sName,$sAlias=null)
+	static public function createRawTable($sName,$sAlias=null,$sDB=null)
 	{
-		return array(
+		$arrRaw = array(
 				'expr_type' => 'table' ,
 				'table' => $sName ,
-				'alias' => $sAlias? self::createRawAlias($sAlias): null ,
-				'join_type' => 'CROSS' ,
-				/*
-				'ref_type' => '' ,
-				'ref_clause' => '' ,
-				'base_expr' => '' ,
-				'sub_tree' => '' ,	
-				*/
 		) ;
+		
+		if($sAlias)
+		{
+			$arrRaw['alias'] = $sAlias ;
+		}
+		if($sDB)
+		{
+			$arrRaw['db'] = $sDB ;
+		}
+		
+		return $arrRaw ;
 	}
 	
 	/**
-	 * @return com\google\code\phpsqlparser\PHPSQLParser
+	 * @return parser\Parser
 	 */
 	static public function parser()
 	{
-		return Object::singleton(true,null,'com\\google\\code\\phpsqlparser\\PHPSQLParser') ;
+		return parser\BaseParserFactory::singleton()->create() ;
 	}
 	/**
-	 * @return com\google\code\phpsqlparser\PHPSQLCreator
+	 * @return parser\SqlCompiler
 	 */
 	static public function compiler()
 	{
-		return Object::singleton(true,null,'com\\google\\code\\phpsqlparser\\PHPSQLCreator') ;
+		return parser\SqlCompiler::singleton() ;
 	}
 	
 	// ----------------------------------------------------------
@@ -109,13 +125,16 @@ abstract class SQL
 	}
 	
 	/**
-	 * 把所有条件拼接成字符串,相当于把这个对象字符串化
 	 *
 	 * @return string
 	 */
 	public function __toString()
 	{
-		return $this->arrRawSql? self::compiler()->create($this->arrRawSql): null ;
+		try{
+			return self::compiler()->compile($this->arrRawSql) ;
+		} catch (\Exception $e) {
+			return '' ;
+		}
 	}
 	
 	public function & rawSql()
@@ -127,6 +146,19 @@ abstract class SQL
 		$this->arrRawSql =& $arrRawSql ;
 		
 		return $this ;
+	}
+	
+	protected function setRawClause($sType,array & $arrRawWhere)
+	{
+		$this->arrRawSql[$sType] =& $arrRawWhere ;
+	}
+	protected function & rawClause($sType)
+	{
+		if( !isset($this->arrRawSql[$sType]) )
+		{
+			$this->arrRawSql[$sType] = array('subtree'=>array()) ;
+		}
+		return $this->arrRawSql[$sType] ;
 	}
 	
 	protected $arrRawSql = array() ;

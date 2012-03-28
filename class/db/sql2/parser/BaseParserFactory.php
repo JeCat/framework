@@ -8,9 +8,14 @@ use org\jecat\framework\lang\Object;
  * @return Parser
  */
 class BaseParserFactory extends Object
-{
-	public function create(Dialect $aDialect=null)
+{	
+	public function create($bShare=true,Dialect $aDialect=null)
 	{
+		if( $bShare and $this->aShareParser )
+		{
+			return $this->aShareParser ;
+		}
+		
 		if(!$aDialect)
 		{
 			$aDialect = Dialect::singleton() ;
@@ -18,7 +23,7 @@ class BaseParserFactory extends Object
 		
 		$aParser = new Parser($aDialect) ;
 		
-		return $aParser->setDialect($aDialect)
+		$aParser->setDialect($aDialect)
 		
 				// SELECT 子句
 				->addChildState(
@@ -69,7 +74,16 @@ class BaseParserFactory extends Object
 					self::createParser('SubSQLParser',$aDialect,'limit') 
 							->addChildState(self::createParser('ColumnParser',$aDialect))
 				) ;
-	} 
+	
+		
+		if( $bShare )
+		{
+			$this->aShareParser = $aParser ;
+		}
+		
+		
+		return $aParser ;
+	}
 	
 	/**
 	 * @return AbstractParserState
@@ -83,6 +97,8 @@ class BaseParserFactory extends Object
 		
 		return $aParser ;
 	}
+	
+	private $aShareParser ;
 }
 
 ?>

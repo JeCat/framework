@@ -69,12 +69,12 @@ class Select extends MultiTableSQL
 			{
 				foreach($column as $key=>&$sColumnName)
 				{
-					$arrRawColumns[] = self::createRawColumn($sColumnName,is_string($key)?$key:null) ;
+					$arrRawColumns[] = self::createRawColumn(null,$sColumnName,is_string($key)?$key:null) ;
 				}
 			}
 			else
 			{
-				$arrRawColumns[] = self::createRawColumn((string)$column) ;
+				$arrRawColumns[] = self::createRawColumn(null,(string)$column) ;
 			}
 		}
 		
@@ -84,12 +84,12 @@ class Select extends MultiTableSQL
 	/**
 	 * 向Select对像 添加多个返回字段。
 	 */
-	public function addColumn($sClmName,$sAlias=null)
+	public function addColumn($sClmName,$sAlias=null,$sTable=null,$sDB=null)
 	{		
 		if( is_string($sClmName) )
 		{
 			$arrRawColumns =& $this->rawColumns() ;
-			$arrRawColumns[] = self::createRawColumn($sClmName,$sAlias) ;
+			$arrRawColumns[] = self::createRawColumn($sTable,$sClmName,$sAlias,$sDB) ;
 		}
 		
 		// 未知类型
@@ -105,22 +105,21 @@ class Select extends MultiTableSQL
 	 * 以sql表达式的形式，向select对像添加一个或多个返回字段。
 	 */
 	public function addColumnsExpr($sExpression)
-	{
-			
-		$aParser = self::parser() ;
+	{			
+		/*$aParser = self::parser() ;
 		$arrTokens = $aParser->split_sql($sExpression,true) ;
 		//print_r() ;
 		$arrRawClms = $aParser->process_select($arrTokens) ;
 		
 		$arrRawColumns =& $this->rawColumns() ;
-		$arrRawColumns = array_merge($arrRawColumns,$arrRawClms) ;
+		$arrRawColumns = array_merge($arrRawColumns,$arrRawClms) ;*/
 		
 		return $this ;
 	}
 	
 	public function clearColumns()
 	{
-	    $this->arrRawColumns = null;
+	    $this->arrRawSql['SELECT']['subtree'] = array() ;
 	    return $this ;
 	}
 	
@@ -128,7 +127,7 @@ class Select extends MultiTableSQL
 	{
 		if(!isset($this->arrRawSql['SELECT']))
 		{
-			$this->arrRawSql['SELECT'] = array() ;
+			$this->arrRawSql['SELECT'] = array('subtree'=>array()) ;
 		}
 		return $this->arrRawSql['SELECT'] ;
 	}	

@@ -49,16 +49,15 @@ abstract class MultiTableSQL extends SQL
 			throw new Exception("参数类型无效") ;
 		}
 		
-		$arrRawFrom = $this->rawTables() ;
-		$arrRawTable['join_type'] = count($arrRawFrom)? 'CROSS': 'JOIN' ;
+		$arrRawFrom =& $this->rawClause(self::CLAUSE_FROM) ;
 		
 		if($sAlias)
 		{
-			$arrRawFrom[$sAlias] =& $arrRawTable ;
+			$arrRawFrom['subtree'][$sAlias] =& $arrRawTable ;
 		}
 		else
 		{
-			$arrRawFrom[] =& $arrRawTable ;
+			$arrRawFrom['subtree'][] =& $arrRawTable ;
 		}
 	}
 	
@@ -121,7 +120,7 @@ abstract class MultiTableSQL extends SQL
 						{
 							$arrRawList ;
 						}
-					} 
+					}
 				}
 			}
 		}
@@ -129,7 +128,7 @@ abstract class MultiTableSQL extends SQL
 
 	public function joinTable($sFromTable,$sToTable,$on=null,$using=null,$sAlias=null,$sJoinType='LEFT')
 	{
-		if( !$arrFromTableList=&self::findTableList($this->rawTables()) )
+		if( !$arrFromTableList=&self::findTableList($sFromTable,$this->rawClause(self::CLAUSE_FROM)) )
 		{
 			throw new Exception("名为 %s 的数据表不存在，无法在该数据表上 join 另一个数据表。",$sFromTable) ;
 		}
@@ -165,16 +164,7 @@ abstract class MultiTableSQL extends SQL
 	
 	public function clearTables()
 	{
-		unset($this->arrRawSql['FROM']) ;
-	}
-	
-	public function & rawTables()
-	{
-		if(!isset($this->arrRawSql['FROM']))
-		{
-			$this->arrRawSql['FROM'] = array() ;
-		}
-		return $this->arrRawSql['FROM'] ;
+		unset($this->arrRawSql[self::CLAUSE_FROM]) ;
 	}
 	
 	/**
@@ -182,8 +172,8 @@ abstract class MultiTableSQL extends SQL
 	 */
 	public function tableIterator()
 	{
-		return isset($this->arrRawSql['FROM'])?
-				new \ArrayIterator(self::allTables($this->arrRawSql['FROM'])) :
+		return isset($this->arrRawSql[self::CLAUSE_FROM])?
+				new \ArrayIterator(self::allTables($this->arrRawSql[self::CLAUSE_FROM])) :
 				new \EmptyIterator() ;
 	}
 	
@@ -210,7 +200,7 @@ abstract class MultiTableSQL extends SQL
 	 */
 	public function table($sAlias)
 	{
-		if( !$arrTableList =& self::findTableList($sAlias,$this->rawTables()) )
+		if( !$arrTableList =& self::findTableList($sAlias,$this->rawClause(self::CLAUSE_FROM)) )
 		{
 			return null ;
 		}
@@ -225,43 +215,11 @@ abstract class MultiTableSQL extends SQL
 	 * @param int $sLimitFrom limit 开始
 	 */
 	public function setLimit($nLimitLen , $sLimitFrom = 0){
-		$this->setLimitLen($nLimitLen);
-		$this->setLimitFrom($sLimitFrom);
+		$this->arrRawSql['LIMIT']['subtree'] = array( $nLimitLen, ',', $sLimitFrom ) ;
 		return $this ;
 	}
 	
-	public function setLimitFrom($sLimitFrom) {
-		$this->arrRawSql['LIMIT']['start'] = $sLimitFrom ;		
-		return $this ;
-	}
-	public function limitFrom()
-	{
-		return isset($this->arrRawSql['LIMIT']['start'])? $this->arrRawSql['LIMIT']['start']: null ;
-	}
-	
-	public function setLimitLen($nLimitLen){
-		$this->arrRawSql['LIMIT']['end'] = (int)$nLimitLen ;		
-		return $this ;
-	}
-	
-	public function limitLen()
-	{
-		return isset($this->arrRawSql['LIMIT']['end'])? $this->arrRawSql['LIMIT']['end']: null ;
-	}
-	
-	// -- where --
-	public function setRawWhere(array & $arrRawWhere)
-	{
-		$this->arrRawSql['WHERE'] =& $arrRawWhere ;
-	}
-	public function & rawWhere(array & $arrRawWhere)
-	{
-		if( !isset($this->arrRawSql['WHERE']) )
-		{
-			$this->arrRawSql['WHERE'] = array() ;
-		}
-		return $this->arrRawSql['WHERE'] ;
-	}	
+	// -- where --	
 	public function setWhere(Restriction $aWhere){
 		$this->aWhere = $aWhere;
 		$this->setRawWhere( $aWhere->rawSql() ) ;
@@ -271,15 +229,15 @@ abstract class MultiTableSQL extends SQL
 	 * @return Restriction
 	 */
 	public function where($bAutoCreate=true){
-		if( !isset($this->arrRawSql['WHERE']) )
+		if( !isset($this->arrRawSql[self::CLAUSE_WHERE]) )
 		{
-			$this->arrRawSql['WHERE'] = array() ;
+			$this->arrRawSql[self::CLAUSE_WHERE] = array() ;
 		}
 		
 		if( !$this->aWhere )
 		{
 			$this->aWhere = new Restriction() ;
-			$this->aWhere->setRawSql($this->arrRawSql['WHERE']) ;
+			$this->aWhere->setRawSql($this->arrRawSql[self::CLAUSE_WHERE]) ;
 		}
 		
 		return $this->aWhere ;
@@ -297,12 +255,6 @@ abstract class MultiTableSQL extends SQL
 		return $this ;
 	}
 	
-	public function setRawSqlOrders(array & $arrRawSqlOrders)
-	{
-		$this->arrRawSql['ORDER'] =& $arrRawSqlOrders ;
-		return $this ;
-	}
-	
 	public function clearOrders()
 	{
 		unset($this->arrRawSql['ORDER']) ;
@@ -315,7 +267,7 @@ abstract class MultiTableSQL extends SQL
 		$columns = Type::toArray($columns,Type::toArray_emptyForNull) ;
 		if($columns)
 		{
-			$arrGroupBy =& $this->rawSqlGroupBy() ;
+			$arrGroupBy =& $this->rawClause(self::CLAUSE_GROUP) ;
 			
 			foreach($columns as $sColumn)
 			{
@@ -326,16 +278,6 @@ abstract class MultiTableSQL extends SQL
 			}
 		}
 		return $this ;
-	}
-	
-	public function & rawSqlGroupBy()
-	{
-		if(!isset($this->arrRawSql['GROUP']))
-		{
-			$this->arrRawSql['GROUP'] = array() ;
-		}
-			
-		return $this->arrRawSql['GROUP'] ;
 	}
 	
 	public function clearGroupBy()

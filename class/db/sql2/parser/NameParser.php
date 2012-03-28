@@ -42,8 +42,12 @@ abstract class NameParser extends AbstractParserState
 					throw new SqlParserException($aTokenTree, "遇到无效的名称分隔符“.” , “.” 前不是一个字段或数据表的表达式：%s", $prevToken['expr_type']) ;
 					break ;
 			}
-					array_pop($aTokenTree->arrTree) ;
-					array_push($aTokenTree->arrTree,$prevToken) ;
+			
+			$prevToken['subtree'][] = $sToken ;
+			$prevToken['subtree'][] = $nextToken ;
+			
+			array_pop($aTokenTree->arrTree) ;
+			array_push($aTokenTree->arrTree,$prevToken) ;
 		}
 		else if( is_string($prevToken) )
 		{
@@ -75,7 +79,10 @@ abstract class NameParser extends AbstractParserState
 					{
 						throw new SqlParserException($aTokenTree, "遇到无效的 as , as 后面不是一个合法的别名：%s", $nextToken) ;
 					}
-		
+			
+					$prevToken['subtree'][] = $sToken ;
+					$prevToken['subtree'][] = $nextToken ;
+				
 					array_pop($aTokenTree->arrTree) ;
 					array_push($aTokenTree->arrTree,$prevToken) ;
 		
@@ -86,13 +93,18 @@ abstract class NameParser extends AbstractParserState
 				break ;
 			}
 		}
-		else if( is_string($prevToken) )
+		/*else if( is_string($prevToken) )
 		{
 			throw new SqlParserException($aTokenTree, "遇到无效的 as , as 前不是一个字段或数据表的表达式：%s", $prevToken) ;
 		}
 		else
 		{
 			throw new SqlParserException($aTokenTree, "遇到遇到意外的token类型：%s", Type::detectType($prevToken)) ;
+		}*/
+		
+		else
+		{
+			$aTokenTree->arrTree[] = $sToken ;
 		}
 	}
 	
