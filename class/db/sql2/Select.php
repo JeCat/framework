@@ -61,20 +61,29 @@ class Select extends MultiTableSQL
 	 */
 	public function addColumns($columnName/* ... */)
 	{
-		$arrRawColumns =& $this->rawColumns() ;
+		$arrRawColumns =& $this->rawClause(self::CLAUSE_SELECT) ;
 		
 		foreach (func_get_args() as $column)
 		{
-			if( is_array($column) )
+			if( is_array($column) and !empty($column) )
 			{
+				$nIdx = 0 ;
 				foreach($column as $key=>&$sColumnName)
 				{
-					$arrRawColumns[] = self::createRawColumn(null,$sColumnName,is_string($key)?$key:null) ;
+					if( $nIdx++ or self::addColumnNeedComma($arrRawColumns) )
+					{
+						$arrRawColumns['subtree'][] = ',' ;
+					}
+					$arrRawColumns['subtree'][] = self::createRawColumn(null,$sColumnName,is_string($key)?$key:null) ;
 				}
 			}
 			else
 			{
-				$arrRawColumns[] = self::createRawColumn(null,(string)$column) ;
+				if(self::addColumnNeedComma($arrRawColumns))
+				{
+					$arrRawColumns['subtree'][] = ',' ;
+				}
+				$arrRawColumns['subtree'][] = self::createRawColumn(null,(string)$column) ;
 			}
 		}
 		
@@ -89,7 +98,13 @@ class Select extends MultiTableSQL
 		if( is_string($sClmName) )
 		{
 			$arrRawColumns =& $this->rawColumns() ;
-			$arrRawColumns[] = self::createRawColumn($sTable,$sClmName,$sAlias,$sDB) ;
+			
+			if( self::addColumnNeedComma($arrRawColumns) )
+			{
+				$arrRawColumns['subtree'][] = ',' ;
+			}
+			
+			$arrRawColumns['subtree'][] = self::createRawColumn($sTable,$sClmName,$sAlias,$sDB) ;
 		}
 		
 		// 未知类型
@@ -117,20 +132,17 @@ class Select extends MultiTableSQL
 		return $this ;
 	}
 	
-	public function clearColumns()
+	static private function addColumnNeedComma(array & $arrRawColumns)
 	{
-	    $this->arrRawSql['SELECT']['subtree'] = array() ;
-	    return $this ;
+		$lastToken = end($arrRawColumns['subtree']) ;
+		return is_array($lastToken) and ($lastToken['expr_type']=='column' or !empty($lastToken['as'])) ;
 	}
 	
-	protected function & rawColumns()
+	public function clearColumns()
 	{
-		if(!isset($this->arrRawSql['SELECT']))
-		{
-			$this->arrRawSql['SELECT'] = array('subtree'=>array()) ;
-		}
-		return $this->arrRawSql['SELECT'] ;
-	}	
+	    $this->arrRawSql[self::CLAUSE_SELECT]['subtree'] = array() ;
+	    return $this ;
+	}
 	
 	/**
 	 * Enter description here ...

@@ -7,28 +7,43 @@ use org\jecat\framework\lang\Object;
 
 abstract class SQL
 {
-	const CLAUSE_SELECT = 'SELECT' ;
-	const CLAUSE_FROM = 'FROM' ;
-	const CLAUSE_WHERE = 'WHERE' ;
-	const CLAUSE_GROUP = 'GROUP' ;
-	const CLAUSE_ORDER = 'ORDER' ;
-	const CLAUSE_LIMIT = 'LIMIT' ;
+	const CLAUSE_SELECT = 1 ; // SELECT
+	const CLAUSE_FROM = 10 ;  // FROM
+	const CLAUSE_WHERE = 11 ; // WHERE
+	const CLAUSE_GROUP = 12 ; // GROUP
+	const CLAUSE_ORDER = 13 ; // ORDER
+	const CLAUSE_LIMIT = 16 ; // LIMIT
 	
-	static public function insert($sTableName)
-	{
-	}
-	static public function delete($sTableName)
-	{
-		
-	}
+	static private $mapClauses = array(
+			self::CLAUSE_SELECT => 'SELECT' ,
+			self::CLAUSE_FROM => 'FROM' ,
+			self::CLAUSE_WHERE => 'WHERE' ,
+			self::CLAUSE_GROUP => 'GROUP' ,
+			self::CLAUSE_ORDER => 'ORDER' ,
+			self::CLAUSE_LIMIT => 'LIMIT' ,
+	) ;
+	static private $mapClausesLower = array(
+			self::CLAUSE_SELECT => 'select' ,
+			self::CLAUSE_FROM => 'from' ,
+			self::CLAUSE_WHERE => 'where' ,
+			self::CLAUSE_GROUP => 'group' ,
+			self::CLAUSE_ORDER => 'order' ,
+			self::CLAUSE_LIMIT => 'limit' ,
+	) ;
+	
+	
+	static public function insert($sTableName,$sTableAlias=null)
+	{}
+	static public function delete($sTableName,$sTableAlias=null)
+	{}
 	/**
 	 * @return Select
 	 */
-	static public function select($sTableName=null)
+	static public function select($sTableName=null,$sTableAlias=null)
 	{
-		return new Select($sTableName) ;
+		return new Select($sTableName,$sTableAlias) ;
 	}
-	static public function update($sTableName)
+	static public function update($sTableName,$sTableAlias=null)
 	{
 		
 	}
@@ -44,7 +59,7 @@ abstract class SQL
 			return ;
 		}
 		
-		if( array_key_exists('SELECT',$arrRawSqls[0]) )
+		if( isset($arrRawSqls[0]['commend']) and $arrRawSqls[0]['commend']==='SELECT' )
 		{
 			$aSql = new Select() ;
 		}
@@ -73,13 +88,13 @@ abstract class SQL
 		{
 			$arrRaw['table'] = $sTable ;
 		}
-		if($sAlias)
-		{
-			$arrRaw['alias'] = $sAlias ;
-		}
 		if($sDB)
 		{
 			$arrRaw['db'] = $sDB ;
+		}
+		if($sAlias)
+		{
+			$arrRaw['as'] = $sAlias ;
 		}
 		
 		return $arrRaw ;
@@ -91,20 +106,20 @@ abstract class SQL
 				'table' => $sName ,
 		) ;
 		
-		if($sAlias)
-		{
-			$arrRaw['alias'] = $sAlias ;
-		}
 		if($sDB)
 		{
 			$arrRaw['db'] = $sDB ;
+		}
+		if($sAlias)
+		{
+			$arrRaw['as'] = $sAlias ;
 		}
 		
 		return $arrRaw ;
 	}
 	
 	/**
-	 * @return parser\Parser
+	 * @return parser\SqlParser
 	 */
 	static public function parser()
 	{
@@ -130,9 +145,15 @@ abstract class SQL
 	 */
 	public function __toString()
 	{
+		ksort($this->arrRawSql['subtree']) ;
+		
 		try{
-			return self::compiler()->compile($this->arrRawSql) ;
+			return self::compiler()->compile($this->arrRawSql['subtree']) ;
 		} catch (\Exception $e) {
+			error_log($e->getMessage()) ;
+			return '' ;
+		} catch (Exception $e) {
+			error_log($e->message()) ;
 			return '' ;
 		}
 	}
@@ -150,15 +171,23 @@ abstract class SQL
 	
 	protected function setRawClause($sType,array & $arrRawWhere)
 	{
-		$this->arrRawSql[$sType] =& $arrRawWhere ;
+		$this->arrRawSql['subtree'][$sType] =& $arrRawWhere ;
 	}
 	protected function & rawClause($sType)
 	{
-		if( !isset($this->arrRawSql[$sType]) )
+		if( !isset($this->arrRawSql['subtree'][$sType]) )
 		{
-			$this->arrRawSql[$sType] = array('subtree'=>array()) ;
+			$this->arrRawSql['subtree'][$sType] = array(
+					'expr_type' => 'clause_'. self::$mapClausesLower[$sType] ,
+					'subtree' => array( self::$mapClauses[$sType] ) ,
+			) ;
+			
+			if( $sType == self::CLAUSE_GROUP or $sType==self::CLAUSE_ORDER )
+			{
+				$this->arrRawSql['subtree'][$sType]['subtree'][] = 'BY' ;
+			}
 		}
-		return $this->arrRawSql[$sType] ;
+		return $this->arrRawSql['subtree'][$sType] ;
 	}
 	
 	protected $arrRawSql = array() ;

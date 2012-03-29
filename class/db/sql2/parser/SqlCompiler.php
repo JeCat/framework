@@ -6,19 +6,32 @@ use org\jecat\framework\lang\Object;
 
 class SqlCompiler extends Object
 {
-	public function compile(array & $arrTokenTree)
+	public function compile(array & $arrParseState)
 	{
 		$sSql = '' ;
 		
-		foreach($arrTokenTree as &$token)
+		foreach($arrParseState as &$token)
 		{
-			if( is_string($token) )
+			if( is_string($token) or is_numeric($token) )
 			{
 				$sSql.= ' ' . $token ;
 			}
-			else if( is_array($token) and isset($token['subtree']) )
+			else if( is_array($token) )
 			{
-				$sSql.= ' ' . $this->compile($token['subtree']) ;
+				switch ($token['expr_type'])
+				{
+					case 'table' : 
+						$sSql.= ' ' . $this->compileTokenTable($token) ;
+						break ;
+						
+					case 'column' :
+						$sSql.= ' ' . $this->compileTokenColumn($token) ;
+						break ;
+				}
+				if( !empty($token['subtree']) )
+				{
+					$sSql.= ' ' . $this->compile($token['subtree']) ;
+				}
 			}
 			else
 			{
@@ -28,6 +41,37 @@ class SqlCompiler extends Object
 		
 		return $sSql? substr($sSql,1): '' ;
 	}
+	
+	public function compileTokenTable(array & $arrToken)
+	{
+		$sSql = empty($arrToken['db'])? '': ('`'.$arrToken['db'].'`.') ;
+		
+		$sSql.= '`'.$arrToken['table'].'`' ;
+		
+		if(!empty($arrToken['as']))
+		{
+			$sSql.= ' AS `' . $arrToken['as'] . '`' ;
+		}
+		
+		return $sSql ;
+	}
+	public function compileTokenColumn(array & $arrToken)
+	{
+		$sSql = empty($arrToken['db'])? '': ('`'.$arrToken['db'].'`.') ;
+		$sSql = empty($arrToken['table'])? '': ('`'.$arrToken['table'].'`.') ;
+		
+		$sSql.= ($arrToken['column']==='*')?
+					$arrToken['column'] :
+					('`'.$arrToken['column'].'`') ;
+		
+		if(!empty($arrToken['as']))
+		{
+			$sSql.= ' AS `' . $arrToken['as'] . '`' ;
+		}
+		
+		return $sSql ;
+		
+	} 
 }
 
 ?>

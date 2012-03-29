@@ -21,19 +21,19 @@ class BaseParserFactory extends Object
 			$aDialect = Dialect::singleton() ;
 		}
 		
-		$aParser = new Parser($aDialect) ;
+		$aParser = new AbstractParser($aDialect) ;
 		
 		$aParser->setDialect($aDialect)
 		
 				// SELECT 子句
 				->addChildState(
-					self::createParser('SubSQLParser',$aDialect,'select') 
+					self::createParser('ClauseParser',$aDialect,'select') 
 						->addChildState( self::createParser('ColumnParser',$aDialect) )
 				)
 				
 				// FROM 子句
 				->addChildState(
-					self::createParser('SubSQLParser',$aDialect,'from') 
+					self::createParser('ClauseParser',$aDialect,'from') 
 						->addChildState( self::createParser('SubQueryParser',$aDialect,$aParser) )
 						->addChildState(self::createParser('TableParser',$aDialect))
 						
@@ -43,12 +43,12 @@ class BaseParserFactory extends Object
 									->addChildState(self::createParser('TableParser',$aDialect))
 									// ON 子句
 									->addChildState(
-										self::createParser('SubSQLParser',$aDialect,'on') 
+										self::createParser('ClauseParser',$aDialect,'on') 
 											->addChildState(self::createParser('ColumnParser',$aDialect))
 									)
 									// USING 子句
 									->addChildState(
-										self::createParser('SubSQLParser',$aDialect,'using') 
+										self::createParser('ClauseParser',$aDialect,'using') 
 											->addChildState(self::createParser('ColumnParser',$aDialect))
 									)
 						)
@@ -56,22 +56,22 @@ class BaseParserFactory extends Object
 				
 				// WHERE 子句
 				->addChildState(
-						self::createParser('SubSQLParser',$aDialect,'where')
+						self::createParser('ClauseParser',$aDialect,'where')
 							->addChildState(self::createParser('ColumnParser',$aDialect))
 				)
 				// GROUP 子句
 				->addChildState(
-					self::createParser('SubSQLParser',$aDialect,'group') 
+					self::createParser('ClauseParser',$aDialect,'group') 
 							->addChildState(self::createParser('ColumnParser',$aDialect))
 				)
 				// ORDER 子句
 				->addChildState(
-					self::createParser('SubSQLParser',$aDialect,'order') 
+					self::createParser('ClauseParser',$aDialect,'order') 
 							->addChildState(self::createParser('ColumnParser',$aDialect))
 				)
 				// LIMIT 子句
 				->addChildState(
-					self::createParser('SubSQLParser',$aDialect,'limit') 
+					self::createParser('ClauseParser',$aDialect,'limit') 
 							->addChildState(self::createParser('ColumnParser',$aDialect))
 				) ;
 	
@@ -86,7 +86,7 @@ class BaseParserFactory extends Object
 	}
 	
 	/**
-	 * @return AbstractParserState
+	 * @return AbstractParser
 	 */
 	static private function createParser($sClass,Dialect $aDialect,$argvs=null,$sNamespace=__NAMESPACE__)
 	{

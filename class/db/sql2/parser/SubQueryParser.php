@@ -1,21 +1,21 @@
 <?php
 namespace org\jecat\framework\db\sql2\parser ;
 
-class SubQueryParser extends AbstractParserState
+class SubQueryParser extends AbstractParser
 {
-	public function __construct(Parser $aParser)
+	public function __construct(AbstractParser $aParser)
 	{
 		$this->aParser = $aParser ;
 	}
 	
-	public function examineStateChange(& $sToken,TokenTree $aTokenTree)
+	public function examineStateChange(& $sToken,ParseState $aParseState)
 	{
 		if($sToken==='(')
 		{
-			$nextToken = next($aTokenTree->arrTokenList) ;
+			$nextToken = next($aParseState->arrTokenList) ;
 			if($nextToken!==false)
 			{
-				prev($aTokenTree->arrTokenList) ;
+				prev($aParseState->arrTokenList) ;
 				
 				return strtolower($nextToken)==='select' ;
 			}
@@ -24,20 +24,20 @@ class SubQueryParser extends AbstractParserState
 		return false ;
 	}
 	
-	public function processToken($sToken,TokenTree $aTokenTree)
+	public function processToken($sToken,ParseState $aParseState)
 	{
-		$arrTokenSlice = self::closeTokens($aTokenTree->arrTokenList) ;
+		$arrTokenSlice = self::closeTokens($aParseState->arrTokenList) ;
 		$arrSubTree = $this->aParser->parseStatement( $arrTokenSlice ) ;
 		array_unshift($arrSubTree,'(') ;
 		array_push($arrSubTree,')') ;
 		
-		$aTokenTree->arrTree[] = array(
+		$aParseState->arrTree[] = array(
 				'expr_type' => 'subquery' ,
 				'subtree' => $arrSubTree ,
 		) ;
 	}
 	
-	public function examineStateFinish(& $sToken,TokenTree $aTokenTree)
+	public function examineStateFinish(& $sToken,ParseState $aParseState)
 	{
 		return true ;
 	}

@@ -6,11 +6,11 @@ use org\jecat\framework\lang\Type;
 
 abstract class MultiTableSQL extends SQL
 {
-	function __construct($sTableName=null)
+	function __construct($sTableName=null,$sTableAlias=null)
 	{
 		if($sTableName)
 		{
-			$this->addTable($sTableName) ;
+			$this->addTable($sTableName,$sTableAlias) ;
 		}
 	}
 	
@@ -28,7 +28,6 @@ abstract class MultiTableSQL extends SQL
 	{
 		if( is_string($table) )
 		{
-			$sAlias = $sAlias ?: $table ;
 			$arrRawTable = self::createRawTable($table,$sAlias) ;
 		}
 		
@@ -71,7 +70,7 @@ abstract class MultiTableSQL extends SQL
 					$arrRawTable['object'] = new Table() ;
 					break ;
 				case 'subquery':
-					$arrRawTable['object'] = new SubQuery() ;
+					$arrRawTable['object'] = new Select() ;
 					break ;
 				default :
 					throw new Exception("遇到无效的 table 类型： %s",$arrRawTable['expr_type']) ;
@@ -85,55 +84,72 @@ abstract class MultiTableSQL extends SQL
 	}
 	
 	/**
-	 * 返回指定数据表名所属的数组(TableList)，并加索引改为表名
+	 * 返回指定数据表名所属的subtree数组，并加索引改为表名
 	 */
-	static protected function & findTableList($sTableName,array&$arrRawList)
+	protected function & findTableRaw($sTableName,array&$arrRawTree)
 	{		
 		// 先用序号直接查找
-		if( isset($arrRawList[$sTableName]) )
+		if( isset($this->arrRawSql['tables'][$sTableName]) )
 		{
-			return $arrRawList ;
+			return $this->arrRawSql['tables'][$sTableName] ;
 		}
 		
-		foreach($arrRawList as $name=>&$arrRawTable)
+		foreach($arrRawTree as &$rawToken)
 		{
-			if( is_int($name) )
+			if( !is_array($rawToken) )
 			{
-				if( $arrRawTable['expr_type']=='table_expression' )
+				continue ;
+			}
+			else if( $rawToken['expr_type'] == 'table' )
+			{
+				if( $sTableName === (isset($rawToken['as'])? $rawToken['as']: $rawToken['table']) )
 				{
-					// 递归查找
-					if( $arrFoundList =& $this->findTableList($sTableName,$arrRawTable['sub_tree']) )
-					{
-						return $arrFoundList ;
-					}
+					$this->arrRawSql['tables'][$sTableName] =& $rawToken ;
+					return $rawToken ;
 				}
-				else
+			}
+			else if( !empty($rawToken['subtree']) )
+			{
+				if( $arrNameToken =& $this->findNameRaw($sName,$rawToken['subtree'],$sType) )
 				{
-					// select 子查询必须存在 别名
-					if( $sThisTableName = (isset($arrRawTable['alias']['name'])? $arrRawTable['alias']['name']: $arrRawTable['table']) )
-					{
-						// 将 序号类型的 key， 改为字符串类型，便于下次查找
-						unset($arrRawList[$name]) ;
-						$arrRawList[$sThisTableName] =& $arrRawTable ;
-						
-						if($sTableName==$sThisTableName)
-						{
-							$arrRawList ;
-						}
-					}
+					return $arrNameToken ;
 				}
 			}
 		}
+		
+		return $null = null ;
 	}
 
 	public function joinTable($sFromTable,$sToTable,$on=null,$using=null,$sAlias=null,$sJoinType='LEFT')
 	{
-		if( !$arrFromTableList=&self::findTableList($sFromTable,$this->rawClause(self::CLAUSE_FROM)) )
+		$arrRawFrom =& $this->rawClause(self::CLAUSE_FROM) ;
+		if( !$arrFromTableToken=&$this->findTableRaw($sFromTable,$arrRawFrom['subtree']) )
 		{
 			throw new Exception("名为 %s 的数据表不存在，无法在该数据表上 join 另一个数据表。",$sFromTable) ;
 		}
 		
-		$arrRawFromTable =& $arrFromTableList[$sFromTable] ;
+		$arrFromTableToken['subtree'][] = $sJoinType ;
+		$arrFromTableToken['subtree'][] = 'JOIN' ;
+		$arrFromTableToken['subtree'][] = '(' ;
+		$arrFromTableToken['subtree'][] =  self::createRawTable($sToTable,$sAlias) ;
+		$arrFromTableToken['subtree'][] = ')' ;
+		
+		if($on)
+		{
+			$arrFromTableToken['subtree'][] = 'ON' ;
+			$arrFromTableToken['subtree'][] = '(' ;
+			$arrFromTableToken['subtree'][] =  $on ;
+			$arrFromTableToken['subtree'][] = ')' ;
+		}
+		if($using)
+		{
+			$arrFromTableToken['subtree'][] = 'USING' ;
+			$arrFromTableToken['subtree'][] = '(' ;
+			$arrFromTableToken['subtree'][] =  $using ;
+			$arrFromTableToken['subtree'][] = ')' ;
+		}
+		
+		/*$arrRawFromTable =& $arrFromTableList[$sFromTable] ;
 		$arrRawToTable = self::createRawTable($sToTable,$sAlias) ;
 		
 		// from表 没有被其它表连接
@@ -160,6 +176,8 @@ abstract class MultiTableSQL extends SQL
 			$arrRawFromTable['sub_tree'][] = $arrNewRawFromTable ;
 			$arrRawFromTable['sub_tree'][] =& $arrRawToTable ;
 		}
+		*/
+		return $this ;
 	}
 	
 	public function clearTables()
@@ -214,8 +232,21 @@ abstract class MultiTableSQL extends SQL
 	 * @param int $nLimitLen limit 长度
 	 * @param int $sLimitFrom limit 开始
 	 */
-	public function setLimit($nLimitLen , $sLimitFrom = 0){
-		$this->arrRawSql['LIMIT']['subtree'] = array( $nLimitLen, ',', $sLimitFrom ) ;
+	public function setLimit($nLimitLen , $limitFrom = null)
+	{
+		$arrRawLimit =& $this->rawClause(self::CLAUSE_LIMIT) ;
+		
+		if( $limitFrom!==null )
+		{
+			$arrRawLimit['subtree'][] = $limitFrom ;
+			$arrRawLimit['subtree'][] = ',' ;
+			$arrRawLimit['subtree'][] = $nLimitLen ;
+		}
+		else 
+		{
+			$arrRawLimit['subtree'][] = $nLimitLen ;
+		}
+		
 		return $this ;
 	}
 	
@@ -231,13 +262,13 @@ abstract class MultiTableSQL extends SQL
 	public function where($bAutoCreate=true){
 		if( !isset($this->arrRawSql[self::CLAUSE_WHERE]) )
 		{
-			$this->arrRawSql[self::CLAUSE_WHERE] = array() ;
+			$this->arrRawSql[self::CLAUSE_WHERE]['subtree'] = array() ;
 		}
 		
 		if( !$this->aWhere )
 		{
 			$this->aWhere = new Restriction() ;
-			$this->aWhere->setRawSql($this->arrRawSql[self::CLAUSE_WHERE]) ;
+			$this->aWhere->setRawSql($this->arrRawSql[self::CLAUSE_WHERE]['subtree']) ;
 		}
 		
 		return $this->aWhere ;
@@ -247,17 +278,17 @@ abstract class MultiTableSQL extends SQL
 	// -- order by --
 	public function addOrderBy($sColumn,$bDesc=true)
 	{
-		$this->arrRawSql['ORDER'][] = array(
-				'type' => 'expression' ,
-				'base_expr' => $sColumn ,
-				'direction' => $bDesc? 'DESC': 'ASC' ,
-		) ;
+		$arrRawOrder =& $this->rawClause(self::CLAUSE_ORDER) ;
+		
+		$arrRawOrder['subtree'][] = self::createRawColumn(null, $sColumn) ;
+		$arrRawOrder['subtree'][] = $bDesc? 'DESC': 'ASC' ;
+		
 		return $this ;
 	}
 	
 	public function clearOrders()
 	{
-		unset($this->arrRawSql['ORDER']) ;
+		unset($this->arrRawSql[self::CLAUSE_ORDER]) ;
 		return $this ;
 	}
 	
@@ -271,7 +302,7 @@ abstract class MultiTableSQL extends SQL
 			
 			foreach($columns as $sColumn)
 			{
-				array_unshift($arrGroupBy,array(
+				array_unshift($arrGroupBy['subtree'],array(
 					'type' => 'expression' ,
 					'base_expr' => $sColumn ,
 				)) ;
@@ -282,11 +313,9 @@ abstract class MultiTableSQL extends SQL
 	
 	public function clearGroupBy()
 	{
-		unset($this->arrRawSql['GROUP']) ;
+		unset($this->arrRawSql[self::CLAUSE_GROUP]) ;
 		return $this ;
 	}
-	
-	private $aWhere ;
 }
 
 ?>

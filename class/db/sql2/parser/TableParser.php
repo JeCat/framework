@@ -3,43 +3,42 @@ namespace org\jecat\framework\db\sql2\parser ;
 
 class TableParser extends NameParser
 {
-	public function processToken($sToken,TokenTree $aTokenTree)
+	public function processToken($sToken,ParseState $aParseState)
 	{
 		if($sToken==='.')
 		{
-			$this->processNameSeparator($sToken, $aTokenTree) ;
+			$this->processNameSeparator($sToken, $aParseState) ;
 		}
 		
 		else if($sToken==='AS')
 		{
-			$this->processAlias($sToken, $aTokenTree) ;
+			$this->processAlias($sToken, $aParseState) ;
 		}
 		
-		else if( $this->dialect()->isReserved($sToken) )
+		else if( $this->aDialect->isReserved($sToken) )
 		{
-			$aTokenTree->arrTree[] = strtoupper($sToken) ;
+			$aParseState->arrTree[] = strtoupper($sToken) ;
 		}
 		
 		else if( $tableName = $this->parseName($sToken) )
 		{
-			$aTokenTree->arrTree[] = array(
+			$aParseState->arrTree[] = array(
 					'expr_type' => 'table' ,
 					'table' => $tableName ,
-					'subtree' => array($sToken)
 			) ;
 		}
 		
 		// unknow
 		else
 		{
-			$aTokenTree->arrTree[] = $sToken;
+			$aParseState->arrTree[] = $sToken;
 		}
 	}	
 	
-	public function examineStateChange(& $sToken,TokenTree $aTokenTree)
+	public function examineStateChange(& $sToken,ParseState $aParseState)
 	{
-		return parent::examineStateChange($sToken,$aTokenTree)
-					or (!$this->dialect()->isReserved($sToken) and !$this->dialect()->isOperator($sToken) and $this->parseName($sToken)) ;
+		return parent::examineStateChange($sToken,$aParseState)
+					or (!$this->aDialect->isReserved($sToken) and !$this->aDialect->isOperator($sToken) and $this->parseName($sToken)) ;
 	}
 }
 

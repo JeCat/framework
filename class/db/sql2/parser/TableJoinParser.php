@@ -3,21 +3,21 @@ namespace org\jecat\framework\db\sql2\parser ;
 
 use org\jecat\framework\lang\Type;
 
-class TableJoinParser extends AbstractParserState
+class TableJoinParser extends AbstractParser
 {
 	
-	public function examineStateChange(& $sToken,TokenTree $aTokenTree)
+	public function examineStateChange(& $sToken,ParseState $aParseState)
 	{
-		if($this->dialect()->isJoinType($sToken))
+		if($this->aDialect->isJoinType($sToken))
 		{
-			if(next($aTokenTree->arrTokenList)==='JOIN')
+			if(next($aParseState->arrTokenList)==='JOIN')
 			{
-				prev($aTokenTree->arrTokenList) ;
+				prev($aParseState->arrTokenList) ;
 				return true ;
 			}
 			else
 			{
-				throw new SqlParserException($aTokenTree,"LEFT token 后面必须是 JOIN") ;
+				throw new SqlParserException($aParseState,"LEFT token 后面必须是 JOIN") ;
 			}
 		}
 		else
@@ -26,20 +26,20 @@ class TableJoinParser extends AbstractParserState
 		}
 	}
 	
-	public function processToken($sToken,TokenTree $aTokenTree)
+	public function processToken($sToken,ParseState $aParseState)
 	{
-		$aTokenTree->arrTree[] = $sToken ;
+		$aParseState->arrTree[] = $sToken ;
 	}
 	
-	public function active(& $sToken,TokenTree $aTokenTree)
+	public function active(& $sToken,ParseState $aParseState)
 	{
 		// 追溯对应的 table
-		$arrTableToken =& $this->findJoinedTable($sToken,$aTokenTree) ;
+		$arrTableToken =& $this->findJoinedTable($sToken,$aParseState) ;
 		
 		if($sToken!=='JOIN')
 		{
 			$sJoinType = $sToken ;
-			$sToken = next($aTokenTree->arrTokenList) ;
+			$sToken = next($aParseState->arrTokenList) ;
 		}
 		else
 		{
@@ -52,28 +52,28 @@ class TableJoinParser extends AbstractParserState
 				'subtree' => $sJoinType? array($sJoinType): array() ,
 		) ;
 		
-		//$aTokenTree->arrTree[] =& $arrJoinToken ;
+		//$aParseState->arrTree[] =& $arrJoinToken ;
 		$arrTableToken['subtree'][] =& $arrJoinToken ;
 		
-		$this->switchToSubTree($aTokenTree,$arrJoinToken['subtree']) ;
+		$this->switchToSubTree($aParseState,$arrJoinToken['subtree']) ;
 	}
-	public function finish(& $sToken,TokenTree $aTokenTree)
+	public function finish(& $sToken,ParseState $aParseState)
 	{
-		$this->restoreParentTree($aTokenTree) ;
+		$this->restoreParentTree($aParseState) ;
 	}
 	
-	public function examineStateFinish(& $sToken,TokenTree $aTokenTree)
+	public function examineStateFinish(& $sToken,ParseState $aParseState)
 	{
 		return false ;
 	}
 	
-	private function & findJoinedTable(& $sToken,TokenTree $aTokenTree)
+	private function & findJoinedTable(& $sToken,ParseState $aParseState)
 	{
-		for( end($aTokenTree->arrTree); $prevToken=current($aTokenTree->arrTree); prev($aTokenTree->arrTree) )
+		for( end($aParseState->arrTree); $prevToken=current($aParseState->arrTree); prev($aParseState->arrTree) )
 		{
 			if( !is_array($prevToken) )
 			{
-				throw new SqlParserException($aTokenTree, "join 前的 token 类型无效：%s",Type::reflectType($prevToken)) ;
+				throw new SqlParserException($aParseState, "join 前的 token 类型无效：%s",Type::reflectType($prevToken)) ;
 			}
 			
 			else
@@ -83,8 +83,8 @@ class TableJoinParser extends AbstractParserState
 					// bingo
 					case 'table' :
 					case 'subquery' :
-						$pos = key($aTokenTree->arrTree) ;
-						return $aTokenTree->arrTree[ $pos ] ;
+						$pos = key($aParseState->arrTree) ;
+						return $aParseState->arrTree[ $pos ] ;
 						break ;
 						
 					case 'join_expression' :	// nothing todo
@@ -96,7 +96,7 @@ class TableJoinParser extends AbstractParserState
 			}
 		}
 
-		throw new SqlParserException($aTokenTree, "遇到无效的join，无法为 join 子句确定对应的数据表表达式") ;
+		throw new SqlParserException($aParseState, "遇到无效的join，无法为 join 子句确定对应的数据表表达式") ;
 	}
 }
 

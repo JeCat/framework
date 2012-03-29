@@ -3,39 +3,38 @@ namespace org\jecat\framework\db\sql2\parser ;
 
 class ColumnParser extends NameParser
 {
-	public function processToken($sToken,TokenTree $aTokenTree)
+	public function processToken($sToken,ParseState $aParseState)
 	{
 		if($sToken==='.')
 		{
-			$this->processNameSeparator($sToken, $aTokenTree) ;
+			$this->processNameSeparator($sToken, $aParseState) ;
 		}
 		
 		else if($sToken==='AS')
 		{
-			$this->processAlias($sToken, $aTokenTree) ;
+			$this->processAlias($sToken, $aParseState) ;
 		}
 		
 		else if( $columnName=$this->parseName($sToken) or $sToken==='*' )
 		{
-			$aTokenTree->arrTree[] = array(
+			$aParseState->arrTree[] = array(
 					'expr_type' => 'column' ,
 					'column' => $columnName ?: $sToken ,
-					'subtree' => array($sToken)
 			) ;
 		}
 		
 		// unknow
 		else
 		{
-			$aTokenTree->arrTree[] = $sToken;
+			$aParseState->arrTree[] = $sToken;
 		}		
 	}
 	
-	public function examineStateChange(& $sToken,TokenTree $aTokenTree)
+	public function examineStateChange(& $sToken,ParseState $aParseState)
 	{
-		return parent::examineStateChange($sToken,$aTokenTree)
+		return parent::examineStateChange($sToken,$aParseState)
 					or $sToken==='*'
-					or (!$this->dialect()->isReserved($sToken) and !$this->dialect()->isOperator($sToken) ) ;
+					or (!$this->aDialect->isReserved($sToken) and !$this->aDialect->isOperator($sToken) ) ;
 	}
 }
 

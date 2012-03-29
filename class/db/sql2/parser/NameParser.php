@@ -3,23 +3,23 @@ namespace org\jecat\framework\db\sql2\parser ;
 
 use org\jecat\framework\lang\Type;
 
-abstract class NameParser extends AbstractParserState
+abstract class NameParser extends AbstractParser
 {
-	protected function processNameSeparator($sToken,TokenTree $aTokenTree)
+	protected function processNameSeparator($sToken,ParseState $aParseState)
 	{
-		$prevToken = end($aTokenTree->arrTree) ;
+		$prevToken = end($aParseState->arrTree) ;
 		if( is_array($prevToken) )
 		{
-			if ( !$nextToken = next($aTokenTree->arrTokenList) )
+			if ( !$nextToken = next($aParseState->arrTokenList) )
 			{
-				throw new SqlParserException($aTokenTree, "遇到无效的名称分隔符“.” , “.” 后面没有内容了") ;
+				throw new SqlParserException($aParseState, "遇到无效的名称分隔符“.” , “.” 后面没有内容了") ;
 			}
 			
 			if( !$nextName=$this->parseName($nextToken) )
 			{
-				throw new SqlParserException($aTokenTree, "遇到无效的名称分隔符“.” , “.” 后面不是一个合法的别名：%s", $nextToken) ;
+				throw new SqlParserException($aParseState, "遇到无效的名称分隔符“.” , “.” 后面不是一个合法的别名：%s", $nextToken) ;
 			}
-					
+
 			switch($prevToken['expr_type'])
 			{
 				case 'column' :
@@ -39,29 +39,29 @@ abstract class NameParser extends AbstractParserState
 					break ;
 					
 				default :
-					throw new SqlParserException($aTokenTree, "遇到无效的名称分隔符“.” , “.” 前不是一个字段或数据表的表达式：%s", $prevToken['expr_type']) ;
+					throw new SqlParserException($aParseState, "遇到无效的名称分隔符“.” , “.” 前不是一个字段或数据表的表达式：%s", $prevToken['expr_type']) ;
 					break ;
 			}
 			
 			$prevToken['subtree'][] = $sToken ;
 			$prevToken['subtree'][] = $nextToken ;
 			
-			array_pop($aTokenTree->arrTree) ;
-			array_push($aTokenTree->arrTree,$prevToken) ;
+			array_pop($aParseState->arrTree) ;
+			array_push($aParseState->arrTree,$prevToken) ;
 		}
 		else if( is_string($prevToken) )
 		{
-			throw new SqlParserException($aTokenTree, "遇到无效的名称分隔符“.” , “.” 前不是一个字段或数据表的表达式：%s", $prevToken) ;
+			throw new SqlParserException($aParseState, "遇到无效的名称分隔符“.” , “.” 前不是一个字段或数据表的表达式：%s", $prevToken) ;
 		}
 		else 
 		{
-			throw new SqlParserException($aTokenTree, "遇到遇到意外的token类型：%s", Type::detectType($prevToken)) ;
+			throw new SqlParserException($aParseState, "遇到遇到意外的token类型：%s", Type::detectType($prevToken)) ;
 		}
 	}
 	
-	protected function processAlias($sToken,TokenTree $aTokenTree)
+	protected function processAlias($sToken,ParseState $aParseState)
 	{
-		$prevToken = end($aTokenTree->arrTree) ;
+		$prevToken = end($aParseState->arrTree) ;
 		if( is_array($prevToken) )
 		{
 			switch($prevToken['expr_type'])
@@ -70,41 +70,41 @@ abstract class NameParser extends AbstractParserState
 				case 'table' :
 				case 'subquery' :
 		
-					if ( !$nextToken = next($aTokenTree->arrTokenList) )
+					if ( !$nextToken = next($aParseState->arrTokenList) )
 					{
-						throw new SqlParserException($aTokenTree, "遇到无效的 as , as 后面没有内容了") ;
+						throw new SqlParserException($aParseState, "遇到无效的 as , as 后面没有内容了") ;
 					}
 		
 					if( !$prevToken['as']=$this->parseName($nextToken) )
 					{
-						throw new SqlParserException($aTokenTree, "遇到无效的 as , as 后面不是一个合法的别名：%s", $nextToken) ;
+						throw new SqlParserException($aParseState, "遇到无效的 as , as 后面不是一个合法的别名：%s", $nextToken) ;
 					}
 			
 					$prevToken['subtree'][] = $sToken ;
 					$prevToken['subtree'][] = $nextToken ;
 				
-					array_pop($aTokenTree->arrTree) ;
-					array_push($aTokenTree->arrTree,$prevToken) ;
+					array_pop($aParseState->arrTree) ;
+					array_push($aParseState->arrTree,$prevToken) ;
 		
 					break ;
 		
 				default :
-					throw new SqlParserException($aTokenTree, "遇到无效的 as , as 前不是一个字段或数据表的表达式：%s", $prevToken['expr_type']) ;
+					throw new SqlParserException($aParseState, "遇到无效的 as , as 前不是一个字段或数据表的表达式：%s", $prevToken['expr_type']) ;
 				break ;
 			}
 		}
 		/*else if( is_string($prevToken) )
 		{
-			throw new SqlParserException($aTokenTree, "遇到无效的 as , as 前不是一个字段或数据表的表达式：%s", $prevToken) ;
+			throw new SqlParserException($aParseState, "遇到无效的 as , as 前不是一个字段或数据表的表达式：%s", $prevToken) ;
 		}
 		else
 		{
-			throw new SqlParserException($aTokenTree, "遇到遇到意外的token类型：%s", Type::detectType($prevToken)) ;
+			throw new SqlParserException($aParseState, "遇到遇到意外的token类型：%s", Type::detectType($prevToken)) ;
 		}*/
 		
 		else
 		{
-			$aTokenTree->arrTree[] = $sToken ;
+			$aParseState->arrTree[] = $sToken ;
 		}
 	}
 	
@@ -128,12 +128,12 @@ abstract class NameParser extends AbstractParserState
 		return null ;
 	}
 	
-	public function examineStateChange(& $sToken,TokenTree $aTokenTree)
+	public function examineStateChange(& $sToken,ParseState $aParseState)
 	{
 		return $sToken === '.' or $sToken === 'AS' ;
 	}
 	
-	public function examineStateFinish(& $sToken,TokenTree $aTokenTree)
+	public function examineStateFinish(& $sToken,ParseState $aParseState)
 	{
 		return true ;
 	}
