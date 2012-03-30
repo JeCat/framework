@@ -260,15 +260,13 @@ abstract class MultiTableSQL extends SQL
 	 * @return Restriction
 	 */
 	public function where($bAutoCreate=true){
-		if( !isset($this->arrRawSql[self::CLAUSE_WHERE]) )
-		{
-			$this->arrRawSql[self::CLAUSE_WHERE]['subtree'] = array() ;
-		}
+		
+		$arrRawWhere =& $this->rawClause(self::CLAUSE_WHERE) ;
 		
 		if( !$this->aWhere )
 		{
 			$this->aWhere = new Restriction() ;
-			$this->aWhere->setRawSql($this->arrRawSql[self::CLAUSE_WHERE]['subtree']) ;
+			$this->aWhere->setRawSql($arrRawWhere) ;
 		}
 		
 		return $this->aWhere ;
@@ -316,6 +314,7 @@ abstract class MultiTableSQL extends SQL
 		unset($this->arrRawSql[self::CLAUSE_GROUP]) ;
 		return $this ;
 	}
+	
+	private $aWhere ;
 }
 
-?>

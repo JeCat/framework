@@ -1,6 +1,8 @@
 <?php 
 namespace org\jecat\framework\db\sql2 ;
 
+use org\jecat\framework\db\sql2\parser\BaseParserFactory;
+
 use org\jecat\framework\lang\Exception;
 
 use org\jecat\framework\lang\Object;
@@ -74,6 +76,10 @@ abstract class SQL
 	static public function makeRestriction($sSql)
 	{
 		
+	}
+	static public function makeColumn($sColumnExpr)
+	{
+		return BaseParserFactory::singleton()->create(true,null,'column')->parse($sColumnExpr,true) ;
 	}
 	
 	// ------------

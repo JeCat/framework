@@ -5,14 +5,31 @@ use org\jecat\framework\lang\Object;
 
 class AbstractParser extends Object
 {
-	public function & parse($sSql)
+	public function & parse($sSql,$bFirstStatementTree=false)
 	{
 		$arrTrees = array () ;
-		foreach($this->scanTokens($sSql) as $nSqlIdx=>$arrTokenList)
+		if($bFirstStatementTree)
 		{
-			$arrTrees[$nSqlIdx] =& $this->parseStatement($arrTokenList) ;
+			$arrTokenList = $this->scanTokens($sSql) ;
+			if( !empty($arrTokenList[0]) )
+			{
+				$arrTokenList = $this->parseStatement($arrTokenList[0]) ;
+				return $arrTokenList['subtree'] ;
+			}
+			else
+			{
+				return $arrTrees ;
+			}
 		}
-		return $arrTrees ;
+		
+		else
+		{
+			foreach($this->scanTokens($sSql) as $nSqlIdx=>$arrTokenList)
+			{
+				$arrTrees[$nSqlIdx] =& $this->parseStatement($arrTokenList) ;
+			}
+			return $arrTrees ;
+		}
 	}
 	
 	public function & parseStatement(&$arrTokenList)
@@ -37,16 +54,7 @@ class AbstractParser extends Object
 	}
 	
 	public function changeState(& $sToken,ParseState $aParseState)
-	{
-		// parser 结束，返回上级状态
-		// ----------------
-		if( $aParseState->aCurrentParser->examineStateFinish($sToken,$aParseState) )
-		{
-			$aParseState->aCurrentParser->finish($sToken,$aParseState) ;
-			$aParseState->popParser() ;
-			$aParseState->aCurrentParser->wakeup($sToken,$aParseState) ;
-		}
-		
+	{		
 		// 依次 检查 parser stack 中各个 parser 的 child parser 是否开启
 		// parser stack 中的 0 位置是 当前 parser
 		// ----------------
@@ -56,14 +64,8 @@ class AbstractParser extends Object
 			prev($aParseState->arrParserStack), $nStackIdx++
 		)
 		{
-			
 			foreach($aParser->childParsers() as $aChildParser)
 			{
-				// 循环到第2次时，遍历出来的 child parser 都是和当前 parser 同级别的，需要过滤自己
-				if( $nStackIdx==1 and $aParseState->aCurrentParser===$aChildParser )
-				{
-					continue ;
-				}
 				// bingo !  parser changing
 				if( $aChildParser->examineStateChange($sToken,$aParseState) )
 				{

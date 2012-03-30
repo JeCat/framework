@@ -48,9 +48,22 @@ class BaseParserFactory extends Object
 							->addChildState($this->create($bShare,$aDialect,'join'))  ;
 				break ;
 				
-			case 'where' :
-				$aParser = self::createParserInstace('ClauseParser',$aDialect,'where')
+			case 'join' :
+				$aParser = self::createParserInstace('TableJoinParser',$aDialect)
+								->addChildState($this->create($bShare,$aDialect,'table'))
+								->addChildState($this->create($bShare,$aDialect,'on'))
+								->addChildState($this->create($bShare,$aDialect,'using')) ;
+				break ;
+				
+			case 'using' :
+				$aParser = self::createParserInstace('ClauseParser',$aDialect,'using') 
 								->addChildState($this->create($bShare,$aDialect,'table')) ;
+				break ;
+				
+			case 'on' :
+			case 'where' :
+				$aParser = self::createParserInstace('ClauseParser',$aDialect,$sAction)
+								->addChildState($this->create($bShare,$aDialect,'column')) ;
 				break ;
 				
 			case 'group' :
@@ -68,29 +81,12 @@ class BaseParserFactory extends Object
 								->addChildState($this->create($bShare,$aDialect,'table')) ;
 				break ;
 				
-			case 'on' :
-				$aParser = self::createParserInstace('ClauseParser',$aDialect,'on') 
-								->addChildState($this->create($bShare,$aDialect,'table')) ;
-				break ;
-				
-			case 'using' :
-				$aParser = self::createParserInstace('ClauseParser',$aDialect,'using') 
-								->addChildState($this->create($bShare,$aDialect,'table')) ;
-				break ;
-				
 			case 'column' :
 				$aParser = self::createParserInstace('ColumnParser',$aDialect) ;
 				break ;
 				
 			case 'table' :
 				$aParser = self::createParserInstace('TableParser',$aDialect) ;
-				break ;
-				
-			case 'join' :
-				$aParser = self::createParserInstace('TableJoinParser',$aDialect)
-								->addChildState($this->create($bShare,$aDialect,'table'))
-								->addChildState($this->create($bShare,$aDialect,'on'))
-								->addChildState($this->create($bShare,$aDialect,'using')) ;
 				break ;
 				
 			case 'subquery' :

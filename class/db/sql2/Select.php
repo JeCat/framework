@@ -1,6 +1,8 @@
 <?php 
 namespace org\jecat\framework\db\sql2 ;
 
+use org\jecat\framework\db\sql2\parser\BaseParserFactory;
+
 use org\jecat\framework\lang\Exception;
 
 class Select extends MultiTableSQL 
@@ -97,7 +99,7 @@ class Select extends MultiTableSQL
 	{		
 		if( is_string($sClmName) )
 		{
-			$arrRawColumns =& $this->rawColumns() ;
+			$arrRawColumns =& $this->rawClause(self::CLAUSE_SELECT) ;
 			
 			if( self::addColumnNeedComma($arrRawColumns) )
 			{
@@ -120,14 +122,20 @@ class Select extends MultiTableSQL
 	 * 以sql表达式的形式，向select对像添加一个或多个返回字段。
 	 */
 	public function addColumnsExpr($sExpression)
-	{			
-		/*$aParser = self::parser() ;
-		$arrTokens = $aParser->split_sql($sExpression,true) ;
-		//print_r() ;
-		$arrRawClms = $aParser->process_select($arrTokens) ;
-		
-		$arrRawColumns =& $this->rawColumns() ;
-		$arrRawColumns = array_merge($arrRawColumns,$arrRawClms) ;*/
+	{
+		$arrSubTree = BaseParserFactory::singleton()->create(true,null,'select')
+				->parse($sExpression,true) ;
+		if( !empty($arrSubTree) )
+		{
+			$arrRawColumns =& $this->rawClause(self::CLAUSE_SELECT) ;
+			
+			if( self::addColumnNeedComma($arrRawColumns) )
+			{
+				$arrRawColumns['subtree'][] = ',' ;
+			}
+			
+			$arrRawColumns['subtree'] = array_merge($arrRawColumns['subtree'],$arrSubTree) ;
+		}
 		
 		return $this ;
 	}
