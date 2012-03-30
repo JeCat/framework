@@ -189,19 +189,10 @@ class AbstractParser extends Object
 	{
 		return false ;
 	}
-	
-	public function examineStateFinish(& $sToken,ParseState $aParseState)
-	{
-		return false ;
-	}
-	
+		
 	public function active(& $sToken,ParseState $aParseState)
 	{}
 	public function finish(& $sToken,ParseState $aParseState)
-	{}
-	public function sleep(& $sToken,ParseState $aParseState)
-	{}
-	public function wakeup(& $sToken,ParseState $aParseState)
 	{}
 		
 	/**
