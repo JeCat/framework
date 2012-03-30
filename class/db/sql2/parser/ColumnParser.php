@@ -3,7 +3,7 @@ namespace org\jecat\framework\db\sql2\parser ;
 
 class ColumnParser extends NameParser
 {
-	public function processToken($sToken,ParseState $aParseState)
+	public function processToken(&$sToken,ParseState $aParseState)
 	{
 		if($sToken==='.')
 		{

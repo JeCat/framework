@@ -5,7 +5,7 @@ use org\jecat\framework\lang\Type;
 
 abstract class NameParser extends AbstractParser
 {
-	protected function processNameSeparator($sToken,ParseState $aParseState)
+	protected function processNameSeparator(&$sToken,ParseState $aParseState)
 	{
 		$prevToken = end($aParseState->arrTree) ;
 		if( is_array($prevToken) )
@@ -59,7 +59,7 @@ abstract class NameParser extends AbstractParser
 		}
 	}
 	
-	protected function processAlias($sToken,ParseState $aParseState)
+	protected function processAlias(&$sToken,ParseState $aParseState)
 	{
 		$prevToken = end($aParseState->arrTree) ;
 		if( is_array($prevToken) )
@@ -108,7 +108,7 @@ abstract class NameParser extends AbstractParser
 		}
 	}
 	
-	protected function parseName($sToken)
+	protected function parseName(&$sToken)
 	{
 		if( is_numeric($sToken) )
 		{

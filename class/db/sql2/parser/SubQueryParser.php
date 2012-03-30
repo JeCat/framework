@@ -24,7 +24,7 @@ class SubQueryParser extends AbstractParser
 		return false ;
 	}
 	
-	public function processToken($sToken,ParseState $aParseState)
+	public function processToken(&$sToken,ParseState $aParseState)
 	{
 		$arrTokenSlice = self::closeTokens($aParseState->arrTokenList) ;
 		$arrSubTree = $this->aParser->parseStatement( $arrTokenSlice ) ;

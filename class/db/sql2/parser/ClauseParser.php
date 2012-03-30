@@ -23,7 +23,7 @@ class ClauseParser extends AbstractParser
 		}
 	}
 	
-	public function processToken($sToken,ParseState $aParseState)
+	public function processToken(&$sToken,ParseState $aParseState)
 	{
 		$aParseState->arrTree[] = $sToken ;
 	}
