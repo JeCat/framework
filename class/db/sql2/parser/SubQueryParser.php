@@ -2,12 +2,7 @@
 namespace org\jecat\framework\db\sql2\parser ;
 
 class SubQueryParser extends AbstractParser
-{
-	public function __construct(AbstractParser $aParser)
-	{
-		$this->aParser = $aParser ;
-	}
-	
+{	
 	public function examineStateChange(& $sToken,ParseState $aParseState)
 	{
 		if($sToken==='(')
@@ -27,7 +22,7 @@ class SubQueryParser extends AbstractParser
 	public function processToken(&$sToken,ParseState $aParseState)
 	{
 		$arrTokenSlice = self::closeTokens($aParseState->arrTokenList) ;
-		$arrSubTree = $this->aParser->parseStatement( $arrTokenSlice ) ;
+		$arrSubTree = BaseParserFactory::singleton()->create()->parseStatement( $arrTokenSlice ) ;
 		array_unshift($arrSubTree,'(') ;
 		array_push($arrSubTree,')') ;
 		
@@ -78,8 +73,6 @@ class SubQueryParser extends AbstractParser
 			}
 		}
 	}
-	
-	private $aParser ;
 }
 
 ?>
