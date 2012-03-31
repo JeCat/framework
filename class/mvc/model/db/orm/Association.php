@@ -249,14 +249,14 @@ class Association implements IBean, \Serializable, IIncompleteSerializable
 	/**
 	 * @return org\jecat\framework\db\sql\TablesJoin
 	 */
-	public function sqlTablesJoin()
+	/*public function sqlTablesJoin()
 	{
 		return $this->aTablesJoin ;
 	}
 	public function setSqlTablesJoin(TablesJoin $aTablesJoin)
 	{
 		$this->aTablesJoin = $aTablesJoin ;
-	}
+	}*/
 	
 	public function joinType()
 	{
@@ -347,12 +347,7 @@ class Association implements IBean, \Serializable, IIncompleteSerializable
 		}
 		if(!empty($arrConfig['join']))
 		{
-			$mapTypes = array(
-				'left' => TablesJoin::JOIN_LEFT ,
-				'right' => TablesJoin::JOIN_RIGHT ,
-				'inner' => TablesJoin::JOIN_INNER ,
-			) ;
-			$this->sJoinType = isset($mapTypes[$arrConfig['join']])? $mapTypes[$arrConfig['join']]: $arrConfig['join'] ;
+			$this->sJoinType = strtoupper($arrConfig['join']) ;
 		}
 		
 		$this->done() ;
@@ -472,7 +467,7 @@ class Association implements IBean, \Serializable, IIncompleteSerializable
 	private $arrToBridgeKeys = array();
 	private $arrFromBridgeKeys = array();
 	private $aTablesJoin = null ;
-	private $sJoinType = TablesJoin::JOIN_LEFT ;
+	private $sJoinType = 'LEFT' ;
 	
 	private $arrBeanConfig ;
 	

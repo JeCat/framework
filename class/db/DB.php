@@ -1,6 +1,8 @@
 <?php 
 namespace org\jecat\framework\db ;
 
+use org\jecat\framework\db\sql\SQL;
+
 use org\jecat\framework\db\sql\StatementState;
 use org\jecat\framework\db\reflecter\imp\MySQLReflecterFactory;
 use org\jecat\framework\lang\Exception;
@@ -127,8 +129,14 @@ class DB extends Object
 	}
 	
 	public function queryCount(Select $aSelect,$sColumn='*')
-	{		
-		$aRecords = $this->query( $aSelect->makeStatementForCount('rowCount',$sColumn,$this->sharedStatementState()) ) ;
+	{
+		$arrRawSql =& $aSelect->rawSql() ;
+		$arrReturnsBak =& $arrRawSql['subtree'][SQL::CLAUSE_SELECT]['subtree'] ;
+		
+		$arrRawSql['subtree'][SQL::CLAUSE_SELECT]['subtree'] = array("count({$sColumn}) as rowCount") ;
+		$aRecords = $this->query($aSelect) ;
+		
+		$arrRawSql['subtree'][SQL::CLAUSE_SELECT]['subtree'] =& $arrReturnsBak ;
 		
 		if( $aRecords )
 		{

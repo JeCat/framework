@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\lang\Object;
+
 use org\jecat\framework\mvc\model\db\ModelList;
 use org\jecat\framework\db\sql\Order;
 use org\jecat\framework\util\serialize\IIncompleteSerializable;
@@ -33,7 +35,7 @@ use org\jecat\framework\db\sql\StatementFactory;
  *
  */
 
-class Prototype extends StatementFactory implements IBean, \Serializable, IIncompleteSerializable
+class Prototype extends Object implements IBean, \Serializable, IIncompleteSerializable
 {
 	const youKnow = null ;
 	
@@ -141,7 +143,7 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 	 * @return org\jecat\framework\db\sql\Criteria
 	 */
 
-	public function criteria($bCreate=true)
+	/*public function criteria($bCreate=true)
 	{
 		if( !$this->aCriteria and $bCreate )
 		{
@@ -149,7 +151,7 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		}
 		
 		return $this->aCriteria;
-	}
+	}*/
 	
 	public function associatedBy()
 	{
@@ -974,17 +976,17 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 	/**
 	 * override parent class StatementFactory
 	 */
-	protected function initStatement(Statement $aStatement)
+	/*protected function initStatement(Statement $aStatement)
 	{
 		$aStatement->setNameTransfer($this->nameTransfer()) ;
 		$aStatement->setStatementFactory($this) ;
 		return $aStatement ;
-	}
+	}*/
 
 	/**
 	 * @return org\jecat\framework\db\sql\name\NameTransfer
 	 */
-	public function nameTransfer()
+	/*public function nameTransfer()
 	{
 		if(!$this->aStatementNameTransfer)
 		{
@@ -992,19 +994,19 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 			$this->aStatementNameTransfer->addColumnNameHandle(array($this,'statementColumnNameHandle')) ;
 		}
 		return $this->aStatementNameTransfer ;
-	}
+	}*/
 
 	/**
 	 * @return org\jecat\framework\db\sql\StatementFactory ;
 	 */
-	public function statementFactory()
+	/*public function statementFactory()
 	{
 		return $this ;
-	}
+	}*/
 	/**
 	 * @return org\jecat\framework\db\sql\Table ;
 	 */
-	public function createSqlTable()
+	/*public function createSqlTable()
 	{
 		return $this->createTable($this->tableName(),$this->sqlTableAlias()) ;
 	}
@@ -1031,7 +1033,7 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		}
 
 		return '`'.$this->path()."{$sTableName}`.`{$sColumn}`" ;
-	}
+	}*/
 	
 	// -----------------------------------------------
 	public function serializableProperties()

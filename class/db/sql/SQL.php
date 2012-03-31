@@ -1,7 +1,7 @@
 <?php 
-namespace org\jecat\framework\db\sql2 ;
+namespace org\jecat\framework\db\sql ;
 
-use org\jecat\framework\db\sql2\parser\BaseParserFactory;
+use org\jecat\framework\db\sql\parser\BaseParserFactory;
 
 use org\jecat\framework\lang\Exception;
 
@@ -194,12 +194,13 @@ abstract class SQL
 		{
 			$this->arrRawSql['subtree'][$sType] = array(
 					'expr_type' => 'clause_'. self::$mapClausesLower[$sType] ,
-					'subtree' => array( self::$mapClauses[$sType] ) ,
+					'pretree' => array( self::$mapClauses[$sType] ) ,
+					'subtree' => array() ,
 			) ;
 			
 			if( $sType == self::CLAUSE_GROUP or $sType==self::CLAUSE_ORDER )
 			{
-				$this->arrRawSql['subtree'][$sType]['subtree'][] = 'BY' ;
+				$this->arrRawSql['subtree'][$sType]['pretree'][] = 'BY' ;
 			}
 		}
 		return $this->arrRawSql['subtree'][$sType] ;

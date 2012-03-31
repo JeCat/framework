@@ -1,6 +1,10 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\db\sql\SQL;
+
+use org\jecat\framework\db\sql\MultiTableSQL;
+
 use org\jecat\framework\mvc\model\db\Recordset;
 use org\jecat\framework\db\sql\Restriction;
 use org\jecat\framework\mvc\model\db\Model;
@@ -14,7 +18,7 @@ use org\jecat\framework\db\sql\Criteria;
 
 class Selecter extends OperationStrategy
 {
-	public function execute(Prototype $aPrototype,array & $arrDataSheet,Select $aSelect=null,Criteria $aCriteria=null,$bList=false,DB $aDB=null)
+	public function execute(Prototype $aPrototype,array & $arrDataSheet,Select $aSelect=null,/*Criteria $aCriteria=null,*/$bList=false,DB $aDB=null)
 	{		
 		if(!$aDB)
 		{
@@ -28,10 +32,10 @@ class Selecter extends OperationStrategy
 			$aSelect = $aPrototype->sharedStatementSelect() ;
 		}
 		
-		if($aCriteria)
+		/*if($aCriteria)
 		{
 			$aSelect->setCriteria($aCriteria);
-		}
+		}*/
 		
 		// -----------------
 		// step 2. query for all one to one association tables 
@@ -41,7 +45,7 @@ class Selecter extends OperationStrategy
 		// set limit
 		if( !$bList )
 		{
-			$aSelect->criteria()->setLimitLen(1) ;
+			$aSelect->setLimit(1,0) ;
 		}
 		else
 		{
@@ -132,14 +136,14 @@ class Selecter extends OperationStrategy
 			$aDB = DB::singleton() ;
 		}
 		
-		$aCriteria = $aPrototype->statementFactory()
+		/*$aCriteria = $aPrototype->statementFactory()
 						->createCriteria()
 						->setLimit(1) ;
-		$aSelect->setCriteria($aCriteria) ;
+		$aSelect->setCriteria($aCriteria) ;*/
 		
 		foreach($aPrototype->keys() as $sKey)
 		{
-			$aCriteria->where()->eq($sKey,$aModel->data($sKey)) ;
+			$aSelect->where()->eq($sKey,$aModel->data($sKey),$aPrototype->sqlTableAlias()) ;
 		}
 		
 		return $aDB->queryCount($aSelect)>0 ;
@@ -208,12 +212,10 @@ class Selecter extends OperationStrategy
 
 	private function setGroupBy(Select $aSelect,Prototype $aPrototype)
 	{
-		$aCriteria = $aSelect->criteria() ;
-		$aCriteria->clearGroupBy() ;
-		
+		$aSelect->clearGroupBy() ;
 		foreach($aPrototype->keys() as $sClmName)
 		{
-			$aCriteria->addGroupBy('`'.$aPrototype->sqlTableAlias().'`.`'.$sClmName.'`') ;
+			$aSelect->addGroupBy($sClmName,$aPrototype->sqlTableAlias()) ;
 		}
 	}
 	
@@ -223,10 +225,7 @@ class Selecter extends OperationStrategy
 		$arrColumns = array_merge($aPrototype->columns() , $aPrototype->keys());
 		foreach($arrColumns as $sColumnName)
 		{
-			$aSelect->addColumn(
-				'`'.$aPrototype->sqlTableAlias().'`.`'.$sColumnName.'`'
-				// , $aPrototype->sqlColumnAlias($sColumnName)
-			) ;
+			$aSelect->addColumn( $sColumnName, null, $aPrototype->sqlTableAlias() ) ;
 		}
 
 		// add columns for one to one associated prototypes
@@ -256,25 +255,25 @@ class Selecter extends OperationStrategy
 	 */
 	static public function buildSelect(Prototype $aPrototype)
 	{
-		$aSelect = $aPrototype->statementFactory()->createSelect() ;
+		$aSelect = new Select($aPrototype->tableName(),$aPrototype->sqlTableAlias()) ;//$aPrototype->statementFactory()->createSelect() ;
 		
 		// 主表的名称
-		$aTable = $aPrototype->createSqlTable() ;
-		$aSelect->addTable($aTable) ;
+		//$aTable = $aPrototype->createSqlTable() ;
+		//$aSelect->addTable($aTable) ;
 		
 		// criteria
-		$aCriteria = clone $aPrototype->criteria() ;
-		$aSelect->setCriteria( $aCriteria ) ;
+		//$aCriteria = clone $aPrototype->criteria() ;
+		//$aSelect->setCriteria( $aCriteria ) ;
 		
 		// 递归连接所有关联原型的 table
-		self::joinTables( $aTable, $aPrototype ) ;
+		self::joinTables( $aSelect, $aPrototype ) ;
 		
 		return $aSelect ;
 	}
 	
-	static private function joinTables(Table $aFromTable,Prototype $aForPrototype)
+	static private function joinTables(MultiTableSQL $aSelect,Prototype $aForPrototype)
 	{
-		$sFromTableAlias = $aFromTable->alias() ;
+		$sFromTableAlias = $aForPrototype->sqlTableAlias() ;
 			
 		foreach( $aForPrototype->associationIterator() as $aAssoc )
 		{
@@ -284,55 +283,57 @@ class Selecter extends OperationStrategy
 			// 两表关联
 			if( $aAssoc->isType(Association::pair) )
 			{
-				// create table for toPrototype
-				$aTable = $aPrototype->createSqlTable() ;
-		
-				$aTablesJoin = self::joinTwoTables(
-						$aFromTable
-						, $aTable
-						, $aAssoc->fromKeys()
-						, $aAssoc->toKeys()
-						, $aPrototype->statementFactory()
-						, $aAssoc->joinType()
-				) ;
 				
-				// 记录 TablesJoin 对象
-				$aAssoc->setSqlTablesJoin($aTablesJoin) ;
+				$arrOnTokens =& self::makeResrictionForForeignKey($sFromTableAlias,$sToTableAlias,$aAssoc->fromKeys(), $aAssoc->toKeys()) ;
+				array_unshift($arrOnTokens, 'ON', '(') ;
+				$arrOnTokens[] = ')' ;
+				
+				$aSelect->_joinTableRaw(
+						$sFromTableAlias
+						, $aPrototype->tableName()
+						, $sToTableAlias
+						, $aAssoc->joinType()
+						, $arrOnTokens
+				) ;
 			}
 			
 			// 三表关联
 			else if( $aAssoc->isType(Association::triplet) )
 			{
-				// 从左表连接到中间表
-				$aBridgeTable = $aPrototype->statementFactory()->createTable( $aAssoc->bridgeTableName(), $aAssoc->bridgeSqlTableAlias() ) ;
-				$aTablesJoin = self::joinTwoTables(
-						$aFromTable
-						, $aBridgeTable
-						, $aAssoc->fromKeys()
-						, $aAssoc->toBridgeKeys()
-						, $aPrototype->statementFactory()
-						, $aAssoc->joinType()
-				) ;
+				$sBridgeTableAlias = $aAssoc->bridgeSqlTableAlias() ;
 				
-				// 记录中间表的 TablesJoin 对象
-				$aAssoc->setSqlTablesJoin($aTablesJoin) ;
+				// 从左表连接到中间表
+				$arrOnTokens =& self::makeResrictionForForeignKey($sFromTableAlias,$sBridgeTableAlias,$aAssoc->fromKeys(),$aAssoc->toBridgeKeys()) ;
+				array_unshift($arrOnTokens, 'ON', '(') ;
+				$arrOnTokens[] = ')' ;
+				
+				$aSelect->_joinTableRaw(
+						$sFromTableAlias
+						, $aAssoc->bridgeTableName()
+						, $sBridgeTableAlias
+						, $aAssoc->joinType()
+						, $arrOnTokens
+				) ;
 				
 				// 从中间表连接到右表
-				$aTable = $aPrototype->createSqlTable() ;
-				$aBridgeTablesJoin = self::joinTwoTables(
-						$aBridgeTable
-						, $aTable
-						, $aAssoc->fromBridgeKeys()
-						, $aAssoc->toKeys()
-						, $aPrototype->statementFactory()
+				$arrOnTokens =& self::makeResrictionForForeignKey($sBridgeTableAlias,$sToTableAlias,$aAssoc->fromBridgeKeys(),$aAssoc->toKeys()) ;
+				array_unshift($arrOnTokens, 'ON', '(') ;
+				$arrOnTokens[] = ')' ;
+				
+				$aSelect->_joinTableRaw(
+						$sBridgeTableAlias
+						, $aPrototype->tableName()
+						, $sToTableAlias
 						, $aAssoc->joinType()
+						, $arrOnTokens
 				) ;
+				
 			
 				// 在桥接表上加入自定义的 join on 条件
-				if( $aTablesJoinOn = $aAssoc->otherBridgeTableJoinOn(false) )
+				/*if( $aTablesJoinOn = $aAssoc->otherBridgeTableJoinOn(false) )
 				{
 					$aBridgeTablesJoin->on()->add($aTablesJoinOn) ;
-				}
+				}*/
 			}
 			
 			else 
@@ -341,48 +342,27 @@ class Selecter extends OperationStrategy
 			}
 		
 			// 加入自定义的 join on 条件
-			if( $aOtherTablesJoinOn = $aAssoc->otherTableJoinOn(false) )
+			/*if( $aOtherTablesJoinOn = $aAssoc->otherTableJoinOn(false) )
 			{
 				$aTablesJoin->on()->add($aOtherTablesJoinOn) ;
-			}
+			}*/
 				
 			// 递归
-			self::joinTables( $aTable, $aPrototype ) ;
+			self::joinTables( $aSelect, $aPrototype ) ;
 		}
 	}
 	
-	static private function joinTwoTables( $aFromTable,Table $aTable,array $arrFromKeys,$arrToKeys,StatementFactory $aSqlFactory,$sJoinType)
-	{
-		// create table join
-		$aTablesJoin = $aSqlFactory->createTablesJoin($sJoinType) ;
-		
-		$aTablesJoinOn = $aSqlFactory->createRestriction() ;
-		self::makeResrictionForForeignKey($aFromTable->alias(),$aTable->alias(),$arrFromKeys,$arrToKeys,$aTablesJoinOn) ;
-		
-		$aTablesJoin->addTable( $aTable, $aTablesJoinOn ) ;
-		$aFromTable->addJoin($aTablesJoin) ;
-		
-		return $aTablesJoin ;
-	}
-
-	static private function makeResrictionForForeignKey($sFromTableName=null,$sToTableName=null,$arrFromKeys,$arrToKeys,Restriction $aRestriction)
-	{
-		if($sToTableName)
-		{
-			$sToTableName = "`{$sToTableName}`." ;
-		}
-		if($sFromTableName)
-		{
-			$sFromTableName = "`{$sFromTableName}`." ;
-		}
-		
+	static private function & makeResrictionForForeignKey($sFromTableName=null,$sToTableName=null,array & $arrFromKeys,array & $arrToKeys)
+	{		
+		$arrTokens = array() ;
 		foreach ($arrFromKeys as $nIdx=>$sFromKey)
 		{
-			$aRestriction->eqColumn(
-				"{$sFromTableName}`{$sFromKey}`"
-				, "{$sToTableName}`{$arrToKeys[$nIdx]}`"
-			) ;
+			$arrTokens[] = SQL::createRawColumn($sFromTableName, $sFromKey) ;
+			$arrTokens[] = '=' ;
+			$arrTokens[] = SQL::createRawColumn($sToTableName, $arrToKeys[$nIdx]) ;
 		}
+		
+		return $arrTokens ;
 	}
 }
 ?>

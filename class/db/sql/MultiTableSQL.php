@@ -1,5 +1,5 @@
 <?php 
-namespace org\jecat\framework\db\sql2 ;
+namespace org\jecat\framework\db\sql ;
 
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\Type;
@@ -120,7 +120,22 @@ abstract class MultiTableSQL extends SQL
 		return $null = null ;
 	}
 
-	public function joinTable($sFromTable,$sToTable,$on=null,$using=null,$sAlias=null,$sJoinType='LEFT')
+	public function joinTable($sFromTable,$sToTable,$sAlias=null,$on=null,$using=null,$sJoinType='LEFT')
+	{
+		$arrTokens = array() ;
+		if($on)
+		{
+			array_push($arrTokens,'ON','(',$on,')') ;
+		}
+		if($using)
+		{
+			array_push($arrTokens,'USING','(',$using,')') ;
+		}
+		
+		return $this->_joinTableRaw($sFromTable,$sToTable,$sAlias,$sJoinType,$arrTokens) ;
+	}
+	
+	public function _joinTableRaw($sFromTable,$sToTable,$sAlias=null,$sJoinType='LEFT',array $arrRawTokens=array())
 	{
 		$arrRawFrom =& $this->rawClause(self::CLAUSE_FROM) ;
 		if( !$arrFromTableToken=&$this->findTableRaw($sFromTable,$arrRawFrom['subtree']) )
@@ -128,55 +143,15 @@ abstract class MultiTableSQL extends SQL
 			throw new Exception("名为 %s 的数据表不存在，无法在该数据表上 join 另一个数据表。",$sFromTable) ;
 		}
 		
-		$arrFromTableToken['subtree'][] = $sJoinType ;
-		$arrFromTableToken['subtree'][] = 'JOIN' ;
-		$arrFromTableToken['subtree'][] = '(' ;
-		$arrFromTableToken['subtree'][] =  self::createRawTable($sToTable,$sAlias) ;
-		$arrFromTableToken['subtree'][] = ')' ;
+		array_unshift($arrRawTokens, $sJoinType,'JOIN','(',self::createRawTable($sToTable,$sAlias),')') ;
 		
-		if($on)
-		{
-			$arrFromTableToken['subtree'][] = 'ON' ;
-			$arrFromTableToken['subtree'][] = '(' ;
-			$arrFromTableToken['subtree'][] =  $on ;
-			$arrFromTableToken['subtree'][] = ')' ;
-		}
-		if($using)
-		{
-			$arrFromTableToken['subtree'][] = 'USING' ;
-			$arrFromTableToken['subtree'][] = '(' ;
-			$arrFromTableToken['subtree'][] =  $using ;
-			$arrFromTableToken['subtree'][] = ')' ;
-		}
+		$arrJoinToken = array(
+				'expr_type' => 'join_expression' ,
+				'type' => $sJoinType ,
+				'subtree' => &$arrRawTokens ,
+		) ;
+		$arrFromTableToken['subtree'][] =& $arrJoinToken ;
 		
-		/*$arrRawFromTable =& $arrFromTableList[$sFromTable] ;
-		$arrRawToTable = self::createRawTable($sToTable,$sAlias) ;
-		
-		// from表 没有被其它表连接
-		if( in_array( $arrRawFromTable['join_type'], array('JOIN','CROSS') ) )
-		{
-			// 在 from 表后面 插入 join 表
-			$pos = array_search($arrRawFromTable,$arrFromTableList) ;
-			array_splice($arrFromTableList,$pos,0,$arrRawToTable) ;
-		}
-		
-		// from表 已经被其它表连接
-		else
-		{
-			// 将 from 表替换成 table_expression 类型
-			$arrNewRawFromTable = $arrRawFromTable ;
-			$arrNewRawFromTable['join_type'] = 'JOIN' ;
-			$arrRawToTable['join_type'] = $sJoinType ;
-			
-			unset($arrRawFromTable['table']) ;
-			unset($arrRawFromTable['alias']) ;
-			$arrRawFromTable['expr_type'] = 'table_expression' ;
-			$arrRawFromTable['sub_tree'] = array() ;
-			
-			$arrRawFromTable['sub_tree'][] = $arrNewRawFromTable ;
-			$arrRawFromTable['sub_tree'][] =& $arrRawToTable ;
-		}
-		*/
 		return $this ;
 	}
 	
@@ -291,27 +266,21 @@ abstract class MultiTableSQL extends SQL
 	}
 	
 	// -- group by --
-	public function addGroupBy($columns)
+	public function addGroupBy($sColumn,$sTable=null,$sDB=null)
 	{
-		$columns = Type::toArray($columns,Type::toArray_emptyForNull) ;
-		if($columns)
+		$arrGroupBy =& $this->rawClause(self::CLAUSE_GROUP) ;
+		if( !empty($arrGroupBy['subtree']) )
 		{
-			$arrGroupBy =& $this->rawClause(self::CLAUSE_GROUP) ;
-			
-			foreach($columns as $sColumn)
-			{
-				array_unshift($arrGroupBy['subtree'],array(
-					'type' => 'expression' ,
-					'base_expr' => $sColumn ,
-				)) ;
-			}
+			$arrGroupBy['subtree'][] = ',' ;
 		}
+		$arrGroupBy['subtree'][] = self::createRawColumn($sTable, $sColumn, null, $sDB) ;
+		
 		return $this ;
 	}
 	
 	public function clearGroupBy()
 	{
-		unset($this->arrRawSql[self::CLAUSE_GROUP]) ;
+		$this->arrRawSql[self::CLAUSE_GROUP]['subtree'] = array() ;
 		return $this ;
 	}
 	

@@ -85,7 +85,7 @@ class Model extends AbstractModel implements IBean
 		
 		$this->nDataRow = 0 ;
 		return Selecter::singleton()->execute(
-			$this->prototype() , $this->recordset(), null , self::buildCriteria($this->prototype(),$values,$keys), $this->isList(), $this->db()
+			$this->prototype() , $this->recordset(), null /*, self::buildCriteria($this->prototype(),$values,$keys)*/, $this->isList(), $this->db()
 		) ;
 	}
 
@@ -137,20 +137,20 @@ class Model extends AbstractModel implements IBean
 	/**
 	 * @return org\jecat\framework\db\sql\Criteria
 	 */
-	public function createCriteria(Restriction $aRestriction=null)
+	/*public function createCriteria(Restriction $aRestriction=null)
 	{
-		return $this->prototype()->statementFactory()->createCriteria($aRestriction) ;
-	}
+		return ; //$this->prototype()->statementFactory()->createCriteria($aRestriction) ;
+	}*/
 	
 	/**
 	 * @return org\jecat\framework\db\sql\Restriction
 	 */
-	public function createWhere($bLogic=true)
+	/*public function createWhere($bLogic=true)
 	{
-		return $this->prototype()->statementFactory()->createRestriction($bLogic) ;
-	}
+		return ; //$this->prototype()->statementFactory()->createRestriction($bLogic) ;
+	}*/
 	
-	static public function buildCriteria(Prototype $aPrototype,$values=null,$keys=null)
+	/*static public function buildCriteria(Prototype $aPrototype,$values=null,$keys=null)
 	{
 		if($values===null)
 		{
@@ -181,7 +181,7 @@ class Model extends AbstractModel implements IBean
 			}
 			return $aSelectCriteria ;
 		}
-	}
+	}*/
 	
 	public function setPagination($iPerPage,$iPageNum){
 	    $this->prototype()->criteria()->setLimit( $iPerPage, $iPerPage*($iPageNum-1) ) ;

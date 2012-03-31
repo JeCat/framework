@@ -1,7 +1,7 @@
 <?php
-namespace org\jecat\framework\db\sql2\parser ;
+namespace org\jecat\framework\db\sql\parser ;
 
-use org\jecat\framework\db\sql2\SQL ;
+use org\jecat\framework\db\sql\SQL ;
 
 class ClauseParser extends AbstractParser
 {

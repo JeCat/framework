@@ -1,5 +1,7 @@
 <?php
-namespace org\jecat\framework\db\sql2;
+namespace org\jecat\framework\db\sql;
+
+use org\jecat\framework\db\sql\name\NameTransfer;
 
 /**
  *  @wiki /MVC模式/数据库模型/模型加载的条件
@@ -67,61 +69,96 @@ namespace org\jecat\framework\db\sql2;
  *	 |}
  */
 
-use org\jecat\framework\db\sql2\parser\BaseParserFactory;
-
-class Restriction extends SQL
+class Restriction extends SubStatement
 {
 	public function __construct($bLogic=true)
 	{
-		parent::__construct() ;
-		$this->setDefaultLogic($bLogic) ;
+		$this->setLogic($bLogic) ;
 	} 
+	
+	/**
+	 * 把所有条件拼接成字符串,相当于把这个对象字符串化
+	 * 
+	 * @param $aState
+	 * @return string
+	 */
+	public function makeStatement(StatementState $aState)
+	{
+		if(!$this->arrExpressions)
+		{
+			return '1' ;
+		}
+		
+		$arrExpressions = array ();
+		foreach ( $this->arrExpressions as $express )
+		{
+			if ($express instanceof Restriction)
+			{
+				$sExpress = $express->makeStatement ($aState) ;
+				if($sExpress!='1')
+				{
+					$arrExpressions[] = $sExpress ;
+				}
+			}
+			else if(is_array($express))
+			{				
+				// 字段名
+				$n = count($express) ;
+				for($i=1;$i<$n;$i++)
+				{
+					$express[$i] = $this->transColumn($express[$i],$aState) ;
+				}
+				
+				$arrExpressions [] = call_user_func_array('sprintf',$express) ;
+			}
+			else
+			{
+				$arrExpressions [] = $express;
+			}
+		}
+		
+		switch (count($arrExpressions))
+		{
+			case 0 :
+				return '1' ;
+			case 1 :
+				return $arrExpressions[0] ;
+			default :
+				return '('.implode($this->sLogic,$arrExpressions).')' ;
+		}
+	}
+	
+	public function checkValid($bThrowException = true)
+	{
+		return true;
+	}
+	
+	/**
+	 * 返回这个对象用'AND'还是'OR'来拼接条件.
+	 * 
+	 * @return boolean 如果用'AND'拼接返回true,用'OR'拼接返回false
+	 */
+	public function logic() {
+		return $this->sLogic == ' AND ';
+	}
+	
+	/**
+	 * 
+	 * 设置用'AND'还是用'OR'来拼接条件.
+	 * @param boolean 使用'AND'拼接条件则传入true,使用'OR'拼接则传入false
+	 */
+	public function setLogic($bLogic) {
+		$this->sLogic = $bLogic ? ' AND ' : ' OR ';
+		return $this ;
+	}
 	
 	/**
 	 * 清空所有已添加的条件语句.
 	 */
 	public function clear()
 	{
-		$this->arrRawSql['subtree'] = array() ;
+		$this->arrExpressions = null ;
 		return $this ;
-	}
-	
-	/**
-	 * 返回这个对象用'AND'还是'OR'来拼接条件.
-	 *
-	 * @return boolean 如果用'AND'拼接返回true,用'OR'拼接返回false
-	 */
-	public function defaultLogic() {
-		return $this->sLogic == ' AND ';
-	}
-	
-	/**
-	 *
-	 * 设置用'AND'还是用'OR'来拼接条件.
-	 * @param boolean 使用'AND'拼接条件则传入true,使用'OR'拼接则传入false
-	 */
-	public function setDefaultLogic($bLogic) {
-		$this->sLogic = $bLogic ? ' AND ' : ' OR ';
-		return $this ;
-	}
-	
-	protected function putLogic($bLogicAnd)
-	{
-		if( !empty($this->arrRawSql['subtree']) )
-		{
-			$this->arrRawSql['subtree'][] = ($bLogicAnd===null)? $this->sLogic: ($bLogicAnd? 'AND': 'OR') ;
-		}
-	}
-	protected function putColumn($sColumn,$sTable=null)
-	{
-		if($sTable===null)
-		{
-			$this->arrRawSql['subtree'] = array_merge( $this->arrRawSql['subtree'], self::makeColumn($sColumn) ) ;
-		}
-		else
-		{
-			$this->arrRawSql['subtree'][] = self::createRawColumn($sTable?:'',$sColumn) ;
-		}
 	}
 	
 	/**
@@ -130,12 +167,9 @@ class Restriction extends SQL
 	 * @param mix $value 期望值
 	 * @return self
 	 */
-	public function eq($sClmName, $value, $sTable=null, $bLogicAnd=null)
+	public function eq($sClmName, $value)
 	{
-		$this->putLogic($bLogicAnd) ;
-		$this->putColumn($sClmName,$sTable) ;
-		$this->arrRawSql['subtree'][] = '=' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
+		$this->arrExpressions[] = array("%s = ".$this->transValue($value),$sClmName) ;
 		return $this;
 	}
 	
@@ -145,12 +179,9 @@ class Restriction extends SQL
 	 * @param string $sOtherClmName 另外一个需检验的字段名
 	 * @return self 
 	 */
-	public function eqColumn($sClmName,$sOtherClmName, $sTable=null, $sOtherClmTable=null, $bLogicAnd=true)
+	public function eqColumn($sClmName,$sOtherClmName)
 	{
-		$this->putLogic($bLogicAnd) ;
-		$this->putColumn($sClmName,$sTable) ;
-		$this->arrRawSql['subtree'][] = '=' ;
-		$this->putColumn($sOtherClmName,$sOtherClmTable) ;
+		$this->arrExpressions[] = array("%s = %s",$sClmName,$sOtherClmName) ;
 		return $this;
 	}
 	
@@ -160,12 +191,9 @@ class Restriction extends SQL
 	 * @param mix $value 期望值
 	 * @return self
 	 */
-	public function ne($sClmName, $value, $sTable=null, $bLogicAnd=true)
+	public function ne($sClmName, $value)
 	{
-		$this->putLogic($bLogicAnd) ;
-		$this->putColumn($sClmName,$sTable) ;
-		$this->arrRawSql['subtree'][] = '<>' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
+		$this->arrExpressions[] = array("%s <> ".$this->transValue($value),$sClmName) ;
 		return $this;
 	}
 	
@@ -175,12 +203,9 @@ class Restriction extends SQL
 	 * @param string $sOtherClmName 另外一个需检验的字段名
 	 * @return self 
 	 */
-	public function neColumn($sClmName, $sOtherClmName, $sTable=null, $sOtherClmTable=null, $bLogicAnd=true)
+	public function neColumn($sClmName, $sOtherClmName)
 	{
-		$this->putLogic($bLogicAnd) ;
-		$this->putColumn($sClmName,$sTable) ;
-		$this->arrRawSql['subtree'][] = '<>' ;
-		$this->putColumn($sOtherClmName,$sOtherClmTable) ;
+		$this->arrExpressions[] = array("%s <> %s",$sClmName,$sOtherClmName) ;
 		return $this;
 	}
 	
@@ -190,12 +215,9 @@ class Restriction extends SQL
 	 * @param mix $value 期望值
 	 * @return self 
 	 */
-	public function gt($sClmName, $value, $sTable=null, $bLogicAnd=true)
+	public function gt($sClmName, $value)
 	{
-		$this->putLogic($bLogicAnd) ;
-		$this->putColumn($sClmName,$sTable) ;
-		$this->arrRawSql['subtree'][] = '>' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
+		$this->arrExpressions[] = array("%s > ".$this->transValue($value),$sClmName) ;
 		return $this;
 	}
 	
@@ -205,12 +227,9 @@ class Restriction extends SQL
 	 * @param string $sOtherClmName 大于号右边的字段名
 	 * @return self 
 	 */
-	public function gtColumn($sClmName, $sOtherClmName, $sTable=null, $sOtherClmTable=null, $bLogicAnd=true)
+	public function gtColumn($sClmName, $sOtherClmName)
 	{
-		$this->putLogic($bLogicAnd) ;
-		$this->putColumn($sClmName,$sTable) ;
-		$this->arrRawSql['subtree'][] = '>' ;
-		$this->putColumn($sOtherClmName,$sOtherClmTable) ;
+		$this->arrExpressions[] = array("%s > %s",$sClmName,$sOtherClmName) ;
 		return $this;
 	}
 	
@@ -220,12 +239,9 @@ class Restriction extends SQL
 	 * @param mix $value 期望值
 	 * @return self 
 	 */
-	public function ge($sClmName, $value, $sTable=null, $bLogicAnd=true)
+	public function ge($sClmName, $value)
 	{
-		$this->putLogic($bLogicAnd) ;
-		$this->putColumn($sClmName,$sTable) ;
-		$this->arrRawSql['subtree'][] = '>=' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
+		$this->arrExpressions[] = array("%s >= ".$this->transValue($value),$sClmName) ;
 		return $this;
 	}
 	
@@ -235,12 +251,9 @@ class Restriction extends SQL
 	 * @param string $sOtherClmName 大于等于号右边的字段名
 	 * @return self 
 	 */
-	public function geColumn($sClmName, $sOtherClmName, $sTable=null, $sOtherClmTable=null, $bLogicAnd=true)
+	public function geColumn($sClmName, $sOtherClmName)
 	{
-		$this->putLogic($bLogicAnd) ;
-		$this->putColumn($sClmName,$sTable) ;
-		$this->arrRawSql['subtree'][] = '>=' ;
-		$this->putColumn($sOtherClmName,$sOtherClmTable) ;
+		$this->arrExpressions[] = array("%s >= %s",$sClmName,$sOtherClmName) ;
 		return $this;
 	}
 	
@@ -250,12 +263,9 @@ class Restriction extends SQL
 	 * @param mix $value 期望值
 	 * @return self 
 	 */
-	public function lt($sClmName, $value, $sTable=null, $bLogicAnd=true)
+	public function lt($sClmName, $value)
 	{
-		$this->putLogic($bLogicAnd) ;
-		$this->putColumn($sClmName,$sTable) ;
-		$this->arrRawSql['subtree'][] = '<' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
+		$this->arrExpressions[] = array("%s < ".$this->transValue($value),$sClmName) ;
 		return $this;
 	}
 	
@@ -265,12 +275,9 @@ class Restriction extends SQL
 	 * @param string $sOtherClmName 小于号右边的字段名
 	 * @return self 
 	 */
-	public function ltColumn($sClmName, $sOtherClmName, $sTable=null, $sOtherClmTable=null, $bLogicAnd=true)
+	public function ltColumn($sClmName, $sOtherClmName)
 	{
-		$this->putLogic($bLogicAnd) ;
-		$this->putColumn($sClmName,$sTable) ;
-		$this->arrRawSql['subtree'][] = '<' ;
-		$this->putColumn($sOtherClmName,$sOtherClmTable) ;
+		$this->arrExpressions[] = array("%s < %s",$sClmName,$sOtherClmName) ;
 		return $this;
 	}
 	
@@ -280,12 +287,9 @@ class Restriction extends SQL
 	 * @param mix $value 期望值
 	 * @return self 
 	 */
-	public function le($sClmName, $value, $sTable=null, $bLogicAnd=true)
+	public function le($sClmName, $value)
 	{
-		$this->putLogic($bLogicAnd) ;
-		$this->putColumn($sClmName,$sTable) ;
-		$this->arrRawSql['subtree'][] = '<=' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
+		$this->arrExpressions[] = array("%s <= ".$this->transValue($value),$sClmName) ;
 		return $this;
 	}
 	
@@ -295,12 +299,9 @@ class Restriction extends SQL
 	 * @param string $sOtherClmName 小于等于号右边的字段名
 	 * @return self 
 	 */
-	public function leColumn($sClmName, $sOtherClmName, $sTable=null, $sOtherClmTable=null, $bLogicAnd=true)
+	public function leColumn($sClmName, $sOtherClmName)
 	{
-		$this->putLogic($bLogicAnd) ;
-		$this->putColumn($sClmName,$sTable) ;
-		$this->arrRawSql['subtree'][] = '<=' ;
-		$this->putColumn($sOtherClmName,$sOtherClmTable) ;
+		$this->arrExpressions[] = array("%s <= %s",$sClmName,$sOtherClmName) ;
 		return $this;
 	}
 	
@@ -310,12 +311,9 @@ class Restriction extends SQL
 	 * @param mix $value 期望值
 	 * @return self 
 	 */
-	public function like($sClmName, $value, $sTable=null, $bLogicAnd=true)
+	public function like($sClmName, $value)
 	{
-		$this->putLogic($bLogicAnd) ;
-		$this->putColumn($sClmName,$sTable) ;
-		$this->arrRawSql['subtree'][] = 'LIKE' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
+		$this->arrExpressions[] = array("%s LIKE ".$this->transValue($value),$sClmName) ;
 		return $this;
 	}
 	
@@ -325,12 +323,9 @@ class Restriction extends SQL
 	 * @param mix $value 期望值
 	 * @return self 
 	 */
-	public function notLike($sClmName, $value, $sTable=null, $bLogicAnd=true)
+	public function notLike($sClmName, $value)
 	{
-		$this->putLogic($bLogicAnd) ;
-		$this->putColumn($sClmName,$sTable) ;
-		$this->arrRawSql['subtree'][] = 'NOT LIKE' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
+		$this->arrExpressions[] = array("%s NOT LIKE ".$this->transValue($value),$sClmName) ;
 		return $this;
 	}
 	
@@ -340,12 +335,9 @@ class Restriction extends SQL
 	 * @param mix $value 正则
 	 * @return self 
 	 */
-	public function regexp($sClmName, $value, $sTable=null, $bLogicAnd=true)
+	public function regexp($sClmName, $value)
 	{
-		$this->putLogic($bLogicAnd) ;
-		$this->putColumn($sClmName,$sTable) ;
-		$this->arrRawSql['subtree'][] = 'REGEXP' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
+		$this->arrExpressions[] = array("%s REGEXP ".$this->transValue($value),$sClmName) ;
 		return $this;
 	}
 	
@@ -355,18 +347,13 @@ class Restriction extends SQL
 	 * @param array $arrValues 比照数组
 	 * @return self 
 	 */
-	public function in($sClmName, array $arrValues, $sTable=null, $bLogicAnd=true)
+	public function in($sClmName, array $arrValues )
 	{
-		foreach($arrValues as &$v)
+		foreach($arrValues as $v)
 		{
-			$v = self::transValue($v);
+			$v = $this->transValue($v);
 		}
-		$this->putLogic($bLogicAnd) ;
-		$this->arrRawSql['subtree'][] = '(' ;
-		$this->putColumn($sClmName,$sTable) ;
-		$this->arrRawSql['subtree'][] = 'IN' ;
-		$this->arrRawSql['subtree'][] = implode(",",$arrValues) ;
-		$this->arrRawSql['subtree'][] = ')' ;
+		$this->arrExpressions[] = array("%s IN (".implode(",",$arrValues).")",$sClmName) ;
 		return $this;
 	}
 	
@@ -376,18 +363,13 @@ class Restriction extends SQL
 	 * @param array $arrValues 比照数组
 	 * @return self 
 	 */
-	public function notIn($sClmName, array $arrValues, $sTable=null, $bLogicAnd=true)
+	public function notIn($sClmName, array $arrValues )
 	{
 		foreach($arrValues as $v)
 		{
-			$v = self::transValue($v);
+			$v = $this->transValue($v);
 		}
-		$this->putLogic($bLogicAnd) ;
-		$this->arrRawSql['subtree'][] = '(' ;
-		$this->putColumn($sClmName,$sTable) ;
-		$this->arrRawSql['subtree'][] = 'NOT IN' ;
-		$this->arrRawSql['subtree'][] = implode(",",$arrValues) ;
-		$this->arrRawSql['subtree'][] = ')' ;
+		$this->arrExpressions[] = array("%s NOT IN (".implode(",",$arrValues).")",$sClmName) ;
 		return $this;
 	}
 	
@@ -398,14 +380,14 @@ class Restriction extends SQL
 	 * @param mix $otherValue
 	 * @return self
 	 */
-	public function between($sClmName, $value, $otherValue, $sTable=null, $bLogicAnd=true)
+	public function between($sClmName, $value, $otherValue)
 	{
-		$this->putLogic($bLogicAnd) ;
-		$this->putColumn($sClmName,$sTable) ;
-		$this->arrRawSql['subtree'][] = 'BETWEEN' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
-		$this->arrRawSql['subtree'][] = 'AND' ;
-		$this->arrRawSql['subtree'][] = self::transValue($otherValue) ;
+		$this->arrExpressions[] = array("%s BETWEEN "
+									. $this->transValue($value) 
+									. ' AND '
+									. $this->transValue($otherValue)
+								,$sClmName
+		) ;
 		return $this;
 	}
 	
@@ -414,12 +396,9 @@ class Restriction extends SQL
 	 * @param string $sClmName
 	 * @return self
 	 */
-	public function isNull($sClmName, $sTable=null, $bLogicAnd=true)
+	public function isNull($sClmName)
 	{
-		$this->putLogic($bLogicAnd) ;
-		$this->putColumn($sClmName,$sTable) ;
-		$this->arrRawSql['subtree'][] = 'IS NULL' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
+		$this->arrExpressions[] = array("%s IS NULL ",$sClmName) ;
 		return $this;
 	}
 	
@@ -428,12 +407,9 @@ class Restriction extends SQL
 	 * @param string $sClmName
 	 * @return self
 	 */
-	public function isNotNull($sClmName, $sTable=null, $bLogicAnd=true)
+	public function isNotNull($sClmName)
 	{
-		$this->putLogic($bLogicAnd) ;
-		$this->putColumn($sClmName,$sTable) ;
-		$this->arrRawSql['subtree'][] = 'IS NOT NULL' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
+		$this->arrExpressions[] = array("%s IS NOT NULL ",$sClmName) ;
 		return $this;
 	}
 	
@@ -442,17 +418,9 @@ class Restriction extends SQL
 	 * @param string sql条件语句
 	 * @return self 调用方法的实例自身
 	 */
-	public function expression($sExpression, $bLogicAnd=true)
+	public function expression($sExpression)
 	{
-		$arrTokenTree =& BaseParserFactory::singleton()->create(true,null,'where')->parse($sExpression,true) ;
-		if( $arrTokenTree )
-		{
-			$this->putLogic($bLogicAnd) ;
-			$this->arrRawSql['subtree'] = array_merge(
-						$this->arrRawSql['subtree']
-						, $arrTokenTree
-			) ;
-		}
+		$this->arrExpressions [] = $sExpression;
 		return $this;
 	}
 	
@@ -461,15 +429,26 @@ class Restriction extends SQL
 	 * @param self 被添加的Restriction对象
 	 * @return self 
 	 */
-	public function add(self $aOtherRestriction, $bLogicAnd=true)
+	public function add(self $aOtherRestriction)
 	{
-		$this->putLogic($bLogicAnd) ;
-		$this->arrRawSql['subtree'][] = '(' ;
-		$this->arrRawSql['subtree'][] =& $aOtherRestriction->rawSql() ;
-		$this->arrRawSql['subtree'][] = ')' ;
-		return $this ;
+		$this->arrExpressions [] = $aOtherRestriction;
+		return $this;
 	}
-		
+	
+	/**
+	 * 把一个 Restriction 实例添加到条件集合中去.
+	 * @param self 被添加的Restriction对象
+	 * @return self 
+	 */
+	public function remove(self $aOtherRestriction)
+	{
+		$nIdx = array_search($aOtherRestriction,$this->arrExpressions,true) ;
+		if($nIdx!==false)
+		{
+			unset($this->arrExpressions[$nIdx]) ;
+		}
+	}
+	
 	/**
 	 * 
 	 * 创建一个新的Restriction对象并把它作为条件语句的一部分添加到方法调用者中
@@ -477,41 +456,28 @@ class Restriction extends SQL
 	 */
 	public function createRestriction($bLogic=true)
 	{
-		$aRestriction = self($bLogic) ;
+		$aRestriction = $this->statementFactory()->createRestriction($bLogic) ;
 		$this->add($aRestriction);
 		return $aRestriction;
 	}
-	    
-    /**
-     *
-     * 对直接量进行转化,使其在组合后的sql语句中合法.
-     * @param mix $value 条件语句中的直接量
-     * @return string
-     */
-	static protected function transValue($value)
+	
+    function __clone()
     {
-    	if (is_string ( $value ))
+    	if( $this->arrExpressions )
     	{
-    		return "'" . addslashes ( $value ) . "'";
-    	}
-    	else if (is_numeric ( $value ))
-    	{
-    		return "'" .$value. "'";
-    	}
-    	else if (is_bool ( $value ))
-    	{
-    		return $value ? "'1'" : "'0'";
-    	}
-    	else if ($value === null)
-    	{
-    		return "NULL";
-    	}
-    	else
-    	{
-    		return "'" . strval ( $value ) . "'";
+	        foreach( $this->arrExpressions as &$expression)
+	        {
+	            if(is_object($expression))
+	            {
+	                $expression = clone $expression;
+	            }
+	        }
     	}
     }
-
-    private $sLogic = 'AND' ;
+    
+	private $sLogic = ' AND ';
+	
+	private $arrExpressions = null ;
+	
 }
 ?>

@@ -1,5 +1,5 @@
 <?php
-namespace org\jecat\framework\db\sql2\parser ;
+namespace org\jecat\framework\db\sql\parser ;
 
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\Object;
@@ -34,6 +34,10 @@ class SqlCompiler extends Object
 					case 'column' :
 						$sSql.= ' ' . $this->compileTokenColumn($token) ;
 						break ;
+				}
+				if( !empty($token['pretree']) )
+				{
+					$sSql.= ' ' . $this->compile($token['pretree'],$arrFactors) ;
 				}
 				if( !empty($token['subtree']) )
 				{

@@ -1,7 +1,7 @@
 <?php
-namespace org\jecat\framework\db\sql2\parser ;
+namespace org\jecat\framework\db\sql\parser ;
 
-class ColumnParser extends NameParser
+class TableParser extends NameParser
 {
 	public function processToken(&$sToken,ParseState $aParseState)
 	{
@@ -20,11 +20,11 @@ class ColumnParser extends NameParser
 			$aParseState->arrTree[] = $sToken ;
 		}
 		
-		else if( $columnName=$this->parseName($sToken) or $sToken==='*' )
+		else if( $tableName = $this->parseName($sToken) )
 		{
 			$aParseState->arrTree[] = array(
-					'expr_type' => 'column' ,
-					'column' => $columnName ?: $sToken ,
+					'expr_type' => 'table' ,
+					'table' => $tableName ,
 			) ;
 		}
 		
@@ -32,14 +32,13 @@ class ColumnParser extends NameParser
 		else
 		{
 			$aParseState->arrTree[] = $sToken;
-		}		
-	}
+		}
+	}	
 	
 	public function examineStateChange(& $sToken,ParseState $aParseState)
 	{
 		return parent::examineStateChange($sToken,$aParseState)
-					or $sToken==='*'
-					or (!$this->aDialect->isReserved($sToken) and !$this->aDialect->isOperator($sToken) ) ;
+					or (!$this->aDialect->isReserved($sToken) and !$this->aDialect->isOperator($sToken) and $this->parseName($sToken)) ;
 	}
 }
 

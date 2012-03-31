@@ -1,5 +1,5 @@
 <?php
-namespace org\jecat\framework\db\sql2\parser ;
+namespace org\jecat\framework\db\sql\parser ;
 
 use org\jecat\framework\lang\Type;
 
