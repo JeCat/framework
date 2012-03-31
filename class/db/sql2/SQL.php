@@ -71,6 +71,13 @@ abstract class SQL
 			return null ;
 		}
 		
+		$arrArgvs = func_get_args() ;
+		array_shift($arrArgvs) ;
+		if($arrArgvs)
+		{
+			call_user_func_array(array($aSql,'addFactors'),$arrArgvs) ;
+		}
+		
 		return $aSql->setRawSql($arrRawSqls[0]) ;
 	}
 	static public function makeRestriction($sSql)
@@ -81,6 +88,8 @@ abstract class SQL
 	{
 		return BaseParserFactory::singleton()->create(true,null,'column')->parse($sColumnExpr,true) ;
 	}
+	
+	
 	
 	// ------------
 	static public function createRawColumn($sTable,$sName,$sAlias=null,$sDB=null)
@@ -144,17 +153,17 @@ abstract class SQL
 	{
 		$this->setRawSql($arrRawSql=array()) ; 
 	}
-	
+		
 	/**
 	 *
 	 * @return string
 	 */
 	public function __toString()
-	{
+	{	
 		ksort($this->arrRawSql['subtree']) ;
 		
 		try{
-			return self::compiler()->compile($this->arrRawSql['subtree']) ;
+			return self::compiler()->compile($this->arrRawSql['subtree'],$this->arrFactors) ;
 		} catch (\Exception $e) {
 			error_log($e->getMessage()) ;
 			return '' ;
@@ -196,8 +205,50 @@ abstract class SQL
 		return $this->arrRawSql['subtree'][$sType] ;
 	}
 	
+	protected function & makeFactors(& $factors)
+	{
+		if(is_array($factors))
+		{
+			foreach($factors as $key=>&$value)
+			{
+				if( is_int($key) )
+				{
+					unset($factors[$key]) ;
+					$factors['@'.(1+$key)] =& $value ;
+				}
+			}
+		}
+		else
+		{
+			$factors = array('@1'=>$factors) ;
+		}
+		
+		return $factors ;
+	}
+	
+	public function addFactors(/* ... */)
+	{
+		if( $this->arrFactors===null )
+		{
+			$this->arrFactors = array() ;
+		}
+		
+		$arrArgs = func_get_args() ;
+		if( is_array($arrArgs[0]) )
+		{
+			$this->arrFactors+= self::makeFactors($arrArgs[0]) ;
+		}
+		else
+		{
+			$this->arrFactors+= self::makeFactors($arrArgs) ;
+		}
+			
+		return $this ;
+	}
+	
 	protected $arrRawSql = array() ;
+	
+	protected $arrFactors ;
 }
 
 
-?>

@@ -15,6 +15,11 @@ class ColumnParser extends NameParser
 			$this->processAlias($sToken, $aParseState) ;
 		}
 		
+		else if( $this->aDialect->isReserved($sToken) or $this->aDialect->isOperator($sToken) )
+		{
+			$aParseState->arrTree[] = $sToken ;
+		}
+		
 		else if( $columnName=$this->parseName($sToken) or $sToken==='*' )
 		{
 			$aParseState->arrTree[] = array(

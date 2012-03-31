@@ -6,7 +6,7 @@ use org\jecat\framework\lang\Object;
 
 class SqlCompiler extends Object
 {
-	public function compile(array & $arrParseState)
+	public function compile(array & $arrParseState,array & $arrFactors=null)
 	{
 		$sSql = '' ;
 		
@@ -14,7 +14,14 @@ class SqlCompiler extends Object
 		{
 			if( is_string($token) or is_numeric($token) )
 			{
-				$sSql.= ' ' . $token ;
+				if( $arrFactors and array_key_exists($token,$arrFactors) )
+				{
+					$sSql.= " '" . addslashes($arrFactors[$token]) . "'" ;
+				}
+				else 
+				{
+					$sSql.= ' ' . $token ;
+				}
 			}
 			else if( is_array($token) )
 			{
@@ -30,7 +37,7 @@ class SqlCompiler extends Object
 				}
 				if( !empty($token['subtree']) )
 				{
-					$sSql.= ' ' . $this->compile($token['subtree']) ;
+					$sSql.= ' ' . $this->compile($token['subtree'],$arrFactors) ;
 				}
 			}
 			else
