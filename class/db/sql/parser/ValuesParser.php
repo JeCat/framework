@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\db\sql\parser ;
 
+use org\jecat\framework\db\sql\Insert;
+
 use org\jecat\framework\db\sql\SQL;
 
 class ValuesParser extends AbstractParser
@@ -16,15 +18,12 @@ class ValuesParser extends AbstractParser
 	public function examineStateChange(& $sToken,ParseState $aParseState)
 	{
 		return $sToken === 'VALUES' ;
-	}		
+	}
+	
 
 	public function active(& $sToken,ParseState $aParseState)
 	{
-		$arrValuesToken = array(
-				'expr_type' => 'clause_values' ,
-				'pretree' => array() ,
-				'subtree' => array() ,
-		) ;
+		$arrValuesToken = Insert::createRawInsertValues() ;
 		
 		// 追溯前面的 字段列表
 		if( end($aParseState->arrTree)===')' )
@@ -38,29 +37,31 @@ class ValuesParser extends AbstractParser
 					if($token===')')
 					{
 						$nDepth ++ ;
+						continue ;
 					}
 					else if($token==='(')
 					{
 						$nDepth -- ;
+						continue ;
 					}
 				}
 				
 				if( !empty($token['expr_type']) and $token['expr_type']==='column' )
 				{
-					$arrValuesToken['pretree'][ $token['column'] ] = $token ;
+					$arrValuesToken['pretree']['COLUMNS']['subtree'][ $token['column'] ] = $token ;
 					$arrValuesToken['columns'][] = $token['column'] ;
 				}
 				else
 				{
-					$arrValuesToken['pretree'][] = $token ;
+					$arrValuesToken['pretree']['COLUMNS']['subtree'][] = $token ;
 				}
 				
 			} while( $nDepth ) ;
 			
-			$arrValuesToken['pretree'] = array_reverse($arrValuesToken['pretree'],true) ;	
+			$arrValuesToken['pretree']['COLUMNS']['subtree'] = array_reverse($arrValuesToken['pretree']['COLUMNS']['subtree'],true) ;	
+			$arrValuesToken['columns'] = array_reverse($arrValuesToken['columns'],false) ;	
 		}
 
-		$arrValuesToken['pretree'][] = 'VALUES' ;
 		$aParseState->arrTree[] =& $arrValuesToken ;
 		$this->switchToSubTree($aParseState, $arrValuesToken) ;
 	}
@@ -70,14 +71,14 @@ class ValuesParser extends AbstractParser
 		$arrValuesTree =& $aParseState->arrTree ;
 		$this->restoreParentTree($aParseState) ;
 		
-		// 分行 -------------------------------
+		// ----------------------------------------------------------
+		// 分行 -----------------------------------------------------
 		$arrRowTokenTree ;
 		$arrNewValuesTree = array() ;
 		$nDepth = 0 ;
 		$nRowIdx = 0 ;
 		$nClmIdx = 0 ;
 		$sRowKey = false ;
-		//$sColumn = null ;
 		foreach($arrValuesTree as $nIdx=>&$token)
 		{
 			if( is_string($token) )
@@ -91,8 +92,6 @@ class ValuesParser extends AbstractParser
 							'expr_type' => 'values_row' ,
 							'subtree' => array() ,
 					) ;
-					//$nClmIdx = 0 ;
-					//$sColumn = isset($aParseState->arrTree[SQL::CLAUSE_VALUES]['columns'][$nClmIdx])? $aParseState->arrTree[SQL::CLAUSE_VALUES]['columns'][$nClmIdx]: null ;
 					continue ;
 				}
 
@@ -104,14 +103,6 @@ class ValuesParser extends AbstractParser
 					$sRowKey = false ;
 					continue ;
 				}
-				
-				// 结束一列
-				/*else if( $token===',' and $nDepth===1 )
-				{
-					$nClmIdx ++ ;
-					$sColumn = isset($aParseState->arrTree[SQL::CLAUSE_VALUES]['columns'][$nClmIdx])? $aParseState->arrTree[SQL::CLAUSE_VALUES]['columns'][$nClmIdx]: null ;
-					
-				}*/
 			}
 			
 			else if( is_array($token) and $token['expr_type']=='subquery' )
@@ -130,32 +121,67 @@ class ValuesParser extends AbstractParser
 			}
 		}
 
-		// 分列 -------------------------------
+		// ----------------------------------------------------------
+		// 分列 -----------------------------------------------------
 		foreach($arrNewValuesTree as &$rowToken)
 		{
-			if( is_array($rowToken) and  $rowToken['expr_type']==='values_row' )
+			if( is_array($rowToken) and  $rowToken['expr_type']==='values_row' and !empty($rowToken['subtree']) )
 			{
+				$arrValueExprTree = array(
+						'expr_type' => 'expression' ,
+						'subtree' => array() ,
+				) ;
+				$arrNewValueListTree = array() ;
+				$nClmIdx = 0 ;
+				$sColumn = isset($aParseState->arrTree[SQL::CLAUSE_VALUES]['columns'][$nClmIdx])? $aParseState->arrTree[SQL::CLAUSE_VALUES]['columns'][$nClmIdx]: null ;
 				$nDepth = 0 ;
+				
 				foreach($rowToken['subtree'] as &$token)
 				{
-					
-					if($token==='(' and 0===$nDepth++ )
+					if($token==='(' )
 					{
-						continue ;
+						$nDepth++ ;
+					}
+					else if( $token===')' )
+					{
+						$nDepth-- ;
 					}
 					
-					// 结束一行
-					else if( $token===')' and 0===--$nDepth )
+					// 结束一列
+					else if( $token===',' and $nDepth===0 )
 					{
-						continue ;
-					}
-					else if( $token===',' and $nDepth===1 )
-					{
+						if($sColumn===null)
+						{
+							$arrNewValueListTree[] = $arrValueExprTree ;
+						}
+						else
+						{
+							$arrNewValueListTree[$sColumn] = $arrValueExprTree ;
+						}
+						$arrValueExprTree['subtree'] = array() ;
+
 						$nClmIdx ++ ;
 						$sColumn = isset($aParseState->arrTree[SQL::CLAUSE_VALUES]['columns'][$nClmIdx])? $aParseState->arrTree[SQL::CLAUSE_VALUES]['columns'][$nClmIdx]: null ;
-							
+					}
+					
+					else 
+					{
+						$arrValueExprTree['subtree'][] =& $token ;
 					}
 				}
+
+				// 最后一段
+				if($sColumn===null)
+				{
+					$arrNewValueListTree[] = $arrValueExprTree ;
+				}
+				else
+				{
+					$arrNewValueListTree[$sColumn] = $arrValueExprTree ;
+				}
+				
+				// 替换原来的
+				$rowToken['subtree'] = $arrNewValueListTree ;
 			}
 		}
 		

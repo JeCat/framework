@@ -30,20 +30,55 @@ class Insert extends SQL
 		return $this ;
 	}
 	
-	public function setDatas(array $arrDatas)
+	public function setData($sColumn,$value,$bValueExpr=false,$nRow=0)
 	{
-		$arrRawValues =& $this->rawClause(SQL::CLAUSE_VALUES,$this->rawClause(SQL::CLAUSE_INSERT)) ;
-		$arrRawValues['pretree'] = array('(') ;
-		$arrRawValues['subtree'] = array('(') ;
+		$arrRawValues =& $this->rawClauseValue() ;
 		
-		foreach($arrDatas as $sClm=>&$value)
+		$sValueRowKey = 'ROW'.$nRow ;
+		
+		// 更改已经存在的数据
+		if( isset($arrRawValues['pretree']['COLUMNS']['subtree'][$sColumn]) )
 		{
-			$arrRawValues['pretree'][$sClm] = self::createRawColumn(null,$sClm) ;
-			$arrRawValues['subtree'][$sClm] = self::transValue($value) ;
+			$arrRawValues['subtree'][$sValueRowKey]['subtree'][$sColumn]['subtree'] = $bValueExpr? array( $value ): array( $value ) ;
 		}
-		$arrRawValues['pretree'][] = ')' ;
-		$arrRawValues['pretree'][] = 'VALUES' ;
-		$arrRawValues['subtree'][] = ')' ;
+		
+		// 插入新数据
+		else 
+		{
+			if(!empty($arrRawValues['pretree']['COLUMNS']['subtree']))
+			{
+				$arrRawValues['pretree']['COLUMNS']['subtree'][] = ',' ;
+			}
+			$arrRawValues['pretree']['COLUMNS']['subtree'][$sColumn] = self::createRawColumn(null,$sColumn) ;
+			
+			// 插入行
+			if( !isset($arrRawValues['subtree'][$sValueRowKey]) )
+			{
+				if( !empty($arrRawValues['subtree']) )
+				{
+					$arrRawValues['subtree'][] = ',' ;
+				}
+				$arrRawValues['subtree'][$sValueRowKey] = array(
+							'expr_type' => 'values_row' ,
+							'subtree' => array() ,
+				) ;
+			}
+			
+			// 写入数据
+			if( !empty($arrRawValues['subtree'][$sValueRowKey]['subtree']) )
+			{
+				$arrRawValues['subtree'][$sValueRowKey]['subtree'][] = ',' ;
+			}
+			
+			if($bValueExpr)
+			{
+				// todo ...
+			}
+			else
+			{
+				$arrRawValues['subtree'][$sValueRowKey]['subtree'][$sColumn] = $value ;
+			}
+		}
 		
 		return $this ;
 			
@@ -51,7 +86,6 @@ class Insert extends SQL
 
 	public function addRow(array $arrDatas)
 	{
-
 		return $this ;
 	}
 	
@@ -67,6 +101,36 @@ class Insert extends SQL
 		unset($arrRawInsert['subtree'][SQL::CLAUSE_VALUES]) ;
 		return $this ;
 	}
+
+	
+	static public function createRawInsertValues()
+	{
+		return array(
+				'expr_type' => 'clause_values' ,
+				'pretree' => array(
+						'(' ,
+						'COLUMNS'=>array(
+								'expr_type' => 'values_clmlst' ,
+								'subtree' => array() ,
+						) ,
+						')' ,
+						'VALUE' ,
+				) ,
+				'subtree' => array() ,
+		) ;
+	}
+	
+	protected function & rawClauseValue()
+	{
+		$arrRawInsert =& $this->rawClause(SQL::CLAUSE_INSERT) ;
+		
+		if( !isset($arrRawInsert['subtree'][SQL::CLAUSE_VALUES]) )
+		{
+			$arrRawInsert['subtree'][SQL::CLAUSE_VALUES] = self::createRawInsertValues() ;
+		}
+		return $arrRawInsert['subtree'][SQL::CLAUSE_VALUES] ;
+	}
+	
 	/*
 	public function removeData($sColumnName)
 	{
