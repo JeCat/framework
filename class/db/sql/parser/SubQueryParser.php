@@ -23,12 +23,13 @@ class SubQueryParser extends AbstractParser
 	{
 		$arrTokenSlice = self::closeTokens($aParseState->arrTokenList) ;
 		$arrSubTree = BaseParserFactory::singleton()->create()->parseStatement( $arrTokenSlice ) ;
-		array_unshift($arrSubTree,'(') ;
-		array_push($arrSubTree,')') ;
+		array_unshift($arrSubTree['subtree'],'(') ;
+		array_push($arrSubTree['subtree'],')') ;
 		
 		$aParseState->arrTree[] = array(
 				'expr_type' => 'subquery' ,
-				'subtree' => $arrSubTree ,
+				'subtree' => &$arrSubTree['subtree'] ,
+				'command' => &$arrSubTree['command'] ,
 		) ;
 	}
 	

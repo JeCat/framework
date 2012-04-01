@@ -132,7 +132,6 @@ abstract class NameParser extends AbstractParser
 	{
 		return $sToken === '.' or $sToken === 'AS' ;
 	}
-	
 	public function examineStateFinish(& $sToken,ParseState $aParseState)
 	{
 		return true ;

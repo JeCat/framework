@@ -43,6 +43,12 @@ class ParseState
 		$this->aCurrentParser = end($this->arrParserStack) ;
 		return $aParser ;
 	}
+	
+	public function & lastTokenInTree()
+	{
+		end($this->arrTree) ;
+		return $this->arrTree[ key($this->arrTree) ] ;
+	}
 }
 
 ?>

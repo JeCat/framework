@@ -22,7 +22,7 @@ class TableJoinParser extends AbstractParser
 		}
 		else
 		{
-			return strtoupper($sToken)==='JOIN' ;
+			return $sToken==='JOIN' ;
 		}
 	}
 	
@@ -55,7 +55,7 @@ class TableJoinParser extends AbstractParser
 		//$aParseState->arrTree[] =& $arrJoinToken ;
 		$arrTableToken['subtree'][] =& $arrJoinToken ;
 		
-		$this->switchToSubTree($aParseState,$arrJoinToken['subtree']) ;
+		$this->switchToSubTree($aParseState,$arrJoinToken) ;
 	}
 	public function finish(& $sToken,ParseState $aParseState)
 	{

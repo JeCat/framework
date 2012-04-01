@@ -28,19 +28,42 @@ class BaseParserFactory extends Object
 		{
 			case 'statement' :
 				$aParser = self::createParserInstace('AbstractParser',$aDialect)
+								->addChildState($this->create($bShare,$aDialect,'insert'))
+								->addChildState($this->create($bShare,$aDialect,'replace'))
+								//->addChildState($this->create($bShare,$aDialect,'delete'))
+								//->addChildState($this->create($bShare,$aDialect,'update'))
 								->addChildState($this->create($bShare,$aDialect,'select'))
 								->addChildState($this->create($bShare,$aDialect,'from'))
 								->addChildState($this->create($bShare,$aDialect,'where')) 
 								->addChildState($this->create($bShare,$aDialect,'group'))
 								->addChildState($this->create($bShare,$aDialect,'order'))
-								->addChildState($this->create($bShare,$aDialect,'limit')) ; 
+								->addChildState($this->create($bShare,$aDialect,'limit'))
+								->addChildState($this->create($bShare,$aDialect,'set'))
+								->addChildState($this->create($bShare,$aDialect,'values')) ;
 				break ;
-				
+
 			case 'select' :
 				$aParser = self::createParserInstace('ClauseParser',$aDialect,'select')
 								->addChildState($this->create($bShare,$aDialect,'column')) ;
 				break ;
-				
+
+				case 'replace' :
+				case 'insert' :
+					$aParser = self::createParserInstace('ClauseParser',$aDialect,'insert')
+								->addChildState($this->create($bShare,$aDialect,'into'))
+								->addChildState($this->create($bShare,$aDialect,'column')) 
+								->addChildState($this->create($bShare,$aDialect,'values')) ;
+					break ;
+					
+			case 'update' :
+					$aParser = self::createParserInstace('ClauseParser',$aDialect,'update') ;
+					break ;
+
+			case 'into' :
+					$aParser = self::createParserInstace('IntoParser',$aDialect)
+								->addChildState($this->create($bShare,$aDialect,'table')) ;
+					break ;
+						
 			case 'from' :
 				$aParser = self::createParserInstace('ClauseParser',$aDialect,'from') 
 							->addChildState($this->create($bShare,$aDialect,'subquery') )
@@ -79,6 +102,17 @@ class BaseParserFactory extends Object
 			case 'limit' :
 				$aParser = self::createParserInstace('ClauseParser',$aDialect,'limit')
 								->addChildState($this->create($bShare,$aDialect,'table')) ;
+				break ;
+				
+			case 'set' :
+				$aParser = self::createParserInstace('SetParser',$aDialect)
+								->addChildState($this->create($bShare,$aDialect,'column')) ;
+				break ;
+				
+			case 'values' :
+				$aParser = self::createParserInstace('ValuesParser',$aDialect)
+								->addChildState($this->create($bShare,$aDialect,'column'))
+								->addChildState($this->create($bShare,$aDialect,'subquery')) ;
 				break ;
 				
 			case 'column' :

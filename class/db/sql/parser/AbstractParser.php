@@ -54,16 +54,25 @@ class AbstractParser extends Object
 	}
 	
 	public function changeState(& $sToken,ParseState $aParseState)
-	{		
+	{
 		// 依次 检查 parser stack 中各个 parser 的 child parser 是否开启
 		// parser stack 中的 0 位置是 当前 parser
 		// ----------------
 		$aSwitchParser = null ;
 		for( end($aParseState->arrParserStack), $nStackIdx=0;
 			$aParser=current($aParseState->arrParserStack);
-			prev($aParseState->arrParserStack), $nStackIdx++
 		)
 		{
+			// 检查当前 parser 是否结束
+			if( $aParseState->aCurrentParser->examineStateFinish($sToken,$aParseState) )
+			{
+				$aParseState->aCurrentParser->finish($sToken,$aParseState) ;
+				$aParseState->popParser() ;
+				end($aParseState->arrParserStack) ;
+				$nStackIdx = 0 ;
+				continue ;
+			}
+		
 			foreach($aParser->childParsers() as $aChildParser)
 			{
 				// bingo !  parser changing
@@ -78,6 +87,9 @@ class AbstractParser extends Object
 			{
 				break ;
 			}
+
+			prev($aParseState->arrParserStack);
+			$nStackIdx++ ;
 		}
 		
 		
@@ -184,8 +196,12 @@ class AbstractParser extends Object
 	{
 		$aParseState->arrTree[] = $sToken ;
 	}	
-	
+
 	public function examineStateChange(& $sToken,ParseState $aParseState)
+	{
+		return false ;
+	}
+	public function examineStateFinish(& $sToken,ParseState $aParseState)
 	{
 		return false ;
 	}
@@ -228,10 +244,10 @@ class AbstractParser extends Object
 		return $this->aDialect ;
 	}
 	
-	public function switchToSubTree(ParseState $aParseState,& $arrCurrentTree)
+	public function switchToSubTree(ParseState $aParseState,& $arrNewCurrentToken,$sTreeKey='subtree')
 	{
-		$arrCurrentTree['tmp_parent_tree'] =& $aParseState->arrTree ;
-		$aParseState->arrTree =& $arrCurrentTree ;
+		$arrNewCurrentToken[$sTreeKey]['tmp_parent_tree'] =& $aParseState->arrTree ;
+		$aParseState->arrTree =& $arrNewCurrentToken[$sTreeKey] ;
 	}
 	public function restoreParentTree(ParseState $aParseState)
 	{

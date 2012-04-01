@@ -5,15 +5,15 @@ use org\jecat\framework\db\sql\SQL ;
 
 class ClauseParser extends AbstractParser
 {
-	public function __construct($sCommend)
+	public function __construct($scommand)
 	{
-		$this->sCommend = strtoupper($sCommend) ;
-		$this->sCommendLower = strtolower($sCommend) ;
+		$this->scommand = strtoupper($scommand) ;
+		$this->scommandLower = strtolower($scommand) ;
 	}
 
 	public function examineStateChange(& $sToken,ParseState $aParseState)
 	{
-		if( $sToken===$this->sCommend )
+		if( $sToken===$this->scommand )
 		{
 			return true ;	
 		}
@@ -25,48 +25,45 @@ class ClauseParser extends AbstractParser
 	
 	public function processToken(&$sToken,ParseState $aParseState)
 	{
+		if( $sToken===$this->scommand )
+		{
+			return ;
+		}
 		$aParseState->arrTree[] = $sToken ;
 	}
 	
 	public function active(& $sToken,ParseState $aParseState)
 	{
 		$arrToken = array(
-				'expr_type' => 'clause_' . $this->sCommendLower ,
+				'expr_type' => 'clause_' . $this->scommandLower ,
+				'pretree' => array($this->scommand) ,
 				'subtree' => array() ,
 		) ;
 		
 		if( $this->aDialect->isCommand($sToken) )
 		{
-			$aParseState->arrStatement['commend'] = $sToken ;
+			$aParseState->arrStatement['command'] = $sToken ;
 		}
 		
-		if( isset(self::$arrCommendIndexes[$this->sCommend]) )
+		if( ($nIdx=array_search($this->scommand,SQL::$mapClauses))!==false )
 		{
-			$aParseState->arrTree[self::$arrCommendIndexes[$this->sCommend]] =& $arrToken ;
+			$aParseState->arrTree[$nIdx] =& $arrToken ;
 		}
 		else
 		{
 			$aParseState->arrTree[] =& $arrToken ;
 		}
 		
-		$this->switchToSubTree($aParseState,$arrToken['subtree']) ;
+		$this->switchToSubTree($aParseState,$arrToken) ;
 	}
 	public function finish(& $sToken,ParseState $aParseState)
 	{
 		$this->restoreParentTree($aParseState) ;
 	}
 	
-	private $sCommend ;
-	private $sCommendLower ;
+	private $scommand ;
+	private $scommandLower ;
 	
-	static private $arrCommendIndexes = array(
-			'SELECT' => SQL::CLAUSE_SELECT ,
-			'FROM' => SQL::CLAUSE_FROM ,
-			'WHERE' => SQL::CLAUSE_WHERE ,
-			'GROUP' => SQL::CLAUSE_GROUP ,
-			'ORDER' => SQL::CLAUSE_ORDER ,
-			'LIMIT' => SQL::CLAUSE_LIMIT ,
-	) ;	
 }
 
 ?>

@@ -9,28 +9,49 @@ use org\jecat\framework\lang\Object;
 
 abstract class SQL
 {
-	const CLAUSE_SELECT = 1 ; // SELECT
-	const CLAUSE_FROM = 10 ;  // FROM
-	const CLAUSE_WHERE = 11 ; // WHERE
-	const CLAUSE_GROUP = 12 ; // GROUP
-	const CLAUSE_ORDER = 13 ; // ORDER
-	const CLAUSE_LIMIT = 16 ; // LIMIT
+	const CLAUSE_SELECT = 1 ;	// SELECT
+	const CLAUSE_INSERT = 2 ;	// INSERT
+	const CLAUSE_REPLACE = 3 ;	// REPLACE
+	const CLAUSE_UPDATE = 4 ;	// UPDATE
+	const CLAUSE_DELETE = 5 ;	// DELETE	
+	const CLAUSE_FROM = 10 ;	// FROM
+	const CLAUSE_WHERE = 11 ;	// WHERE
+	const CLAUSE_GROUP = 12 ;	// GROUP
+	const CLAUSE_ORDER = 13 ;	// ORDER
+	const CLAUSE_LIMIT = 16 ;	// LIMIT
+	const CLAUSE_INTO = 21 ;	// INTO
+	const CLAUSE_VALUES = 22 ;	// VALUES
+	const CLAUSE_SET = 23 ;	// SET
 	
-	static private $mapClauses = array(
+	static public $mapClauses = array(
 			self::CLAUSE_SELECT => 'SELECT' ,
+			self::CLAUSE_INSERT => 'INSERT' ,
+			self::CLAUSE_REPLACE => 'REPLACE' ,
+			self::CLAUSE_UPDATE => 'UPDATE' ,
+			self::CLAUSE_DELETE => 'DELETE' ,
 			self::CLAUSE_FROM => 'FROM' ,
 			self::CLAUSE_WHERE => 'WHERE' ,
 			self::CLAUSE_GROUP => 'GROUP' ,
 			self::CLAUSE_ORDER => 'ORDER' ,
 			self::CLAUSE_LIMIT => 'LIMIT' ,
+			self::CLAUSE_INTO => 'INTO' ,
+			self::CLAUSE_VALUES => 'VALUES' ,
+			self::CLAUSE_SET => 'SET' ,
 	) ;
-	static private $mapClausesLower = array(
+	static public $mapClausesLower = array(
 			self::CLAUSE_SELECT => 'select' ,
+			self::CLAUSE_INSERT => 'insert' ,
+			self::CLAUSE_REPLACE => 'replace' ,
+			self::CLAUSE_UPDATE => 'update' ,
+			self::CLAUSE_DELETE => 'delete' ,
 			self::CLAUSE_FROM => 'from' ,
 			self::CLAUSE_WHERE => 'where' ,
 			self::CLAUSE_GROUP => 'group' ,
 			self::CLAUSE_ORDER => 'order' ,
 			self::CLAUSE_LIMIT => 'limit' ,
+			self::CLAUSE_INTO => 'into' ,
+			self::CLAUSE_VALUES => 'values' ,
+			self::CLAUSE_SET => 'set' ,
 	) ;
 	
 	
@@ -132,6 +153,19 @@ abstract class SQL
 		
 		return $arrRaw ;
 	}
+	static public function & transValue(& $value)
+	{
+		if( is_string($value) )
+		{
+			$value = "'" . addslashes($value) . "'" ;
+		}
+		else if( is_bool($value) )
+		{
+			$value = $value? "'1'" : "'0'" ;
+		}
+
+		return $value ;
+	}
 	
 	/**
 	 * @return parser\SqlParser
@@ -188,11 +222,16 @@ abstract class SQL
 	{
 		$this->arrRawSql['subtree'][$sType] =& $arrRawWhere ;
 	}
-	protected function & rawClause($sType)
+	protected function & rawClause($sType,& $arrParentToken=null)
 	{
-		if( !isset($this->arrRawSql['subtree'][$sType]) )
+		if(!$arrParentToken)
 		{
-			$this->arrRawSql['subtree'][$sType] = array(
+			$arrParentToken =& $this->arrRawSql ;
+		}
+		
+		if( !isset($arrParentToken['subtree'][$sType]) )
+		{
+			$arrParentToken['subtree'][$sType] = array(
 					'expr_type' => 'clause_'. self::$mapClausesLower[$sType] ,
 					'pretree' => array( self::$mapClauses[$sType] ) ,
 					'subtree' => array() ,
@@ -200,10 +239,10 @@ abstract class SQL
 			
 			if( $sType == self::CLAUSE_GROUP or $sType==self::CLAUSE_ORDER )
 			{
-				$this->arrRawSql['subtree'][$sType]['pretree'][] = 'BY' ;
+				$arrParentToken['subtree'][$sType]['pretree'][] = 'BY' ;
 			}
 		}
-		return $this->arrRawSql['subtree'][$sType] ;
+		return $arrParentToken['subtree'][$sType] ;
 	}
 	
 	protected function & makeFactors(& $factors)
