@@ -8,6 +8,10 @@ abstract class MultiTableSQL extends SQL
 {
 	function __construct($sTableName=null,$sTableAlias=null)
 	{
+		$this->arrRawSql = array(
+				'expr_type' => 'query' ,
+				'subtree' => array() ,
+		) ;
 		if($sTableName)
 		{
 			$this->addTable($sTableName,$sTableAlias) ;
@@ -48,7 +52,7 @@ abstract class MultiTableSQL extends SQL
 			throw new Exception("参数类型无效") ;
 		}
 		
-		$arrRawFrom =& $this->rawClause(self::CLAUSE_FROM) ;
+		$arrRawFrom =& $this->rawClause($this->nTablesClause) ;
 		
 		if($sAlias)
 		{
@@ -137,7 +141,7 @@ abstract class MultiTableSQL extends SQL
 	
 	public function _joinTableRaw($sFromTable,$sToTable,$sAlias=null,$sJoinType='LEFT',array $arrRawTokens=array())
 	{
-		$arrRawFrom =& $this->rawClause(self::CLAUSE_FROM) ;
+		$arrRawFrom =& $this->rawClause($this->nTablesClause) ;
 		if( !$arrFromTableToken=&$this->findTableRaw($sFromTable,$arrRawFrom['subtree']) )
 		{
 			throw new Exception("名为 %s 的数据表不存在，无法在该数据表上 join 另一个数据表。",$sFromTable) ;
@@ -157,7 +161,7 @@ abstract class MultiTableSQL extends SQL
 	
 	public function clearTables()
 	{
-		unset($this->arrRawSql[self::CLAUSE_FROM]) ;
+		unset($this->arrRawSql[$this->nTablesClause]) ;
 	}
 	
 	/**
@@ -165,8 +169,8 @@ abstract class MultiTableSQL extends SQL
 	 */
 	public function tableIterator()
 	{
-		return isset($this->arrRawSql[self::CLAUSE_FROM])?
-				new \ArrayIterator(self::allTables($this->arrRawSql[self::CLAUSE_FROM])) :
+		return isset($this->arrRawSql[$this->nTablesClause])?
+				new \ArrayIterator(self::allTables($this->arrRawSql[$this->nTablesClause])) :
 				new \EmptyIterator() ;
 	}
 	
@@ -193,7 +197,7 @@ abstract class MultiTableSQL extends SQL
 	 */
 	public function table($sAlias)
 	{
-		if( !$arrTableList =& self::findTableList($sAlias,$this->rawClause(self::CLAUSE_FROM)) )
+		if( !$arrTableList =& self::findTableList($sAlias,$this->rawClause($this->nTablesClause)) )
 		{
 			return null ;
 		}
@@ -285,5 +289,7 @@ abstract class MultiTableSQL extends SQL
 	}
 	
 	private $aWhere ;
+	
+	protected $nTablesClause = SQL::CLAUSE_FROM ;
 }
 

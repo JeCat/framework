@@ -135,7 +135,7 @@ class Restriction extends SQL
 		$this->putLogic($bLogicAnd) ;
 		$this->putColumn($sClmName,$sTable) ;
 		$this->arrRawSql['subtree'][] = '=' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
+		$this->arrRawSql['subtree'][] = SQL::transValue($value) ;
 		return $this;
 	}
 	
@@ -165,7 +165,7 @@ class Restriction extends SQL
 		$this->putLogic($bLogicAnd) ;
 		$this->putColumn($sClmName,$sTable) ;
 		$this->arrRawSql['subtree'][] = '<>' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
+		$this->arrRawSql['subtree'][] = SQL::transValue($value) ;
 		return $this;
 	}
 	
@@ -195,7 +195,7 @@ class Restriction extends SQL
 		$this->putLogic($bLogicAnd) ;
 		$this->putColumn($sClmName,$sTable) ;
 		$this->arrRawSql['subtree'][] = '>' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
+		$this->arrRawSql['subtree'][] = SQL::transValue($value) ;
 		return $this;
 	}
 	
@@ -225,7 +225,7 @@ class Restriction extends SQL
 		$this->putLogic($bLogicAnd) ;
 		$this->putColumn($sClmName,$sTable) ;
 		$this->arrRawSql['subtree'][] = '>=' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
+		$this->arrRawSql['subtree'][] = SQL::transValue($value) ;
 		return $this;
 	}
 	
@@ -255,7 +255,7 @@ class Restriction extends SQL
 		$this->putLogic($bLogicAnd) ;
 		$this->putColumn($sClmName,$sTable) ;
 		$this->arrRawSql['subtree'][] = '<' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
+		$this->arrRawSql['subtree'][] = SQL::transValue($value) ;
 		return $this;
 	}
 	
@@ -285,7 +285,7 @@ class Restriction extends SQL
 		$this->putLogic($bLogicAnd) ;
 		$this->putColumn($sClmName,$sTable) ;
 		$this->arrRawSql['subtree'][] = '<=' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
+		$this->arrRawSql['subtree'][] = SQL::transValue($value) ;
 		return $this;
 	}
 	
@@ -315,7 +315,7 @@ class Restriction extends SQL
 		$this->putLogic($bLogicAnd) ;
 		$this->putColumn($sClmName,$sTable) ;
 		$this->arrRawSql['subtree'][] = 'LIKE' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
+		$this->arrRawSql['subtree'][] = SQL::transValue($value) ;
 		return $this;
 	}
 	
@@ -330,7 +330,7 @@ class Restriction extends SQL
 		$this->putLogic($bLogicAnd) ;
 		$this->putColumn($sClmName,$sTable) ;
 		$this->arrRawSql['subtree'][] = 'NOT LIKE' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
+		$this->arrRawSql['subtree'][] = SQL::transValue($value) ;
 		return $this;
 	}
 	
@@ -345,7 +345,7 @@ class Restriction extends SQL
 		$this->putLogic($bLogicAnd) ;
 		$this->putColumn($sClmName,$sTable) ;
 		$this->arrRawSql['subtree'][] = 'REGEXP' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
+		$this->arrRawSql['subtree'][] = SQL::transValue($value) ;
 		return $this;
 	}
 	
@@ -359,7 +359,7 @@ class Restriction extends SQL
 	{
 		foreach($arrValues as &$v)
 		{
-			$v = self::transValue($v);
+			$v = SQL::transValue($v);
 		}
 		$this->putLogic($bLogicAnd) ;
 		$this->arrRawSql['subtree'][] = '(' ;
@@ -380,7 +380,7 @@ class Restriction extends SQL
 	{
 		foreach($arrValues as $v)
 		{
-			$v = self::transValue($v);
+			$v = SQL::transValue($v);
 		}
 		$this->putLogic($bLogicAnd) ;
 		$this->arrRawSql['subtree'][] = '(' ;
@@ -403,9 +403,9 @@ class Restriction extends SQL
 		$this->putLogic($bLogicAnd) ;
 		$this->putColumn($sClmName,$sTable) ;
 		$this->arrRawSql['subtree'][] = 'BETWEEN' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
+		$this->arrRawSql['subtree'][] = SQL::transValue($value) ;
 		$this->arrRawSql['subtree'][] = 'AND' ;
-		$this->arrRawSql['subtree'][] = self::transValue($otherValue) ;
+		$this->arrRawSql['subtree'][] = SQL::transValue($otherValue) ;
 		return $this;
 	}
 	
@@ -419,7 +419,6 @@ class Restriction extends SQL
 		$this->putLogic($bLogicAnd) ;
 		$this->putColumn($sClmName,$sTable) ;
 		$this->arrRawSql['subtree'][] = 'IS NULL' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
 		return $this;
 	}
 	
@@ -433,7 +432,6 @@ class Restriction extends SQL
 		$this->putLogic($bLogicAnd) ;
 		$this->putColumn($sClmName,$sTable) ;
 		$this->arrRawSql['subtree'][] = 'IS NOT NULL' ;
-		$this->arrRawSql['subtree'][] = self::transValue($value) ;
 		return $this;
 	}
 	
@@ -453,6 +451,17 @@ class Restriction extends SQL
 						, $arrTokenTree
 			) ;
 		}
+		return $this;
+	}
+	
+	public function _expessionTokens($arrExpressionTokens, $bLogicAnd=true)
+	{
+		$this->putLogic($bLogicAnd) ;
+		$this->arrRawSql['subtree'] = array_merge(
+					$this->arrRawSql['subtree']
+					, $arrExpressionTokens
+		) ;
+
 		return $this;
 	}
 	
@@ -477,40 +486,11 @@ class Restriction extends SQL
 	 */
 	public function createRestriction($bLogic=true)
 	{
-		$aRestriction = self($bLogic) ;
+		$aRestriction = new self($bLogic) ;
 		$this->add($aRestriction);
 		return $aRestriction;
 	}
 	    
-    /**
-     *
-     * 对直接量进行转化,使其在组合后的sql语句中合法.
-     * @param mix $value 条件语句中的直接量
-     * @return string
-     */
-	static protected function transValue($value)
-    {
-    	if (is_string ( $value ))
-    	{
-    		return "'" . addslashes ( $value ) . "'";
-    	}
-    	else if (is_numeric ( $value ))
-    	{
-    		return "'" .$value. "'";
-    	}
-    	else if (is_bool ( $value ))
-    	{
-    		return $value ? "'1'" : "'0'";
-    	}
-    	else if ($value === null)
-    	{
-    		return "NULL";
-    	}
-    	else
-    	{
-    		return "'" . strval ( $value ) . "'";
-    	}
-    }
 
     private $sLogic = 'AND' ;
 }

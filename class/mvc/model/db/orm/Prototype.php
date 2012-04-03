@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\db\sql\Update;
+
 use org\jecat\framework\lang\Object;
 
 use org\jecat\framework\mvc\model\db\ModelList;
@@ -967,7 +969,7 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	{
 		if( !$this->aStatementUpdate )
 		{
-			$this->aStatementUpdate = $this->statementFactory()->createUpdate($this ->tableName()) ;
+			$this->aStatementUpdate = new Update($this->tableName()) ;
 		}
 
 		return $this->aStatementUpdate ;

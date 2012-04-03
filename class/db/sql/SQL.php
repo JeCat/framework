@@ -15,13 +15,13 @@ abstract class SQL
 	const CLAUSE_UPDATE = 4 ;	// UPDATE
 	const CLAUSE_DELETE = 5 ;	// DELETE	
 	const CLAUSE_FROM = 10 ;	// FROM
-	const CLAUSE_WHERE = 11 ;	// WHERE
-	const CLAUSE_GROUP = 12 ;	// GROUP
-	const CLAUSE_ORDER = 13 ;	// ORDER
-	const CLAUSE_LIMIT = 16 ;	// LIMIT
+	const CLAUSE_WHERE = 15 ;	// WHERE
+	const CLAUSE_GROUP = 16 ;	// GROUP
+	const CLAUSE_ORDER = 17 ;	// ORDER
+	const CLAUSE_LIMIT = 18 ;	// LIMIT
 	const CLAUSE_INTO = 21 ;	// INTO
 	const CLAUSE_VALUES = 22 ;	// VALUES
-	const CLAUSE_SET = 23 ;	// SET
+	const CLAUSE_SET = 13 ;	// SET
 	
 	static public $mapClauses = array(
 			self::CLAUSE_SELECT => 'SELECT' ,
@@ -153,19 +153,38 @@ abstract class SQL
 		
 		return $arrRaw ;
 	}
-	static public function & transValue(& $value)
-	{
-		if( is_string($value) )
-		{
-			$value = "'" . addslashes($value) . "'" ;
-		}
-		else if( is_bool($value) )
-		{
-			$value = $value? "'1'" : "'0'" ;
-		}
-
-		return $value ;
-	}
+	
+    /**
+     *
+     * 对直接量进行转化,使其在组合后的sql语句中合法.
+     * @param mix $value 条件语句中的直接量
+     * @return string
+     */
+	static public function & transValue(&$value)
+    {
+    	if (is_string ( $value ))
+    	{
+    		$value = "'" . addslashes ( $value ) . "'";
+    	}
+    	else if (is_numeric ( $value ))
+    	{
+    		$value = "'" .$value. "'";
+    	}
+    	else if (is_bool ( $value ))
+    	{
+    		$value = $value ? "'1'" : "'0'";
+    	}
+    	else if ($value === null)
+    	{
+    		$value = "NULL";
+    	}
+    	else
+    	{
+    		$value = "'" . strval ( $value ) . "'";
+    	}
+    	
+    	return $value ;
+    }
 	
 	/**
 	 * @return parser\SqlParser
@@ -218,11 +237,11 @@ abstract class SQL
 		return $this ;
 	}
 	
-	protected function setRawClause($sType,array & $arrRawWhere)
+	public function setRawClause($sType,array & $arrRawWhere)
 	{
 		$this->arrRawSql['subtree'][$sType] =& $arrRawWhere ;
 	}
-	protected function & rawClause($sType,& $arrParentToken=null)
+	public function & rawClause($sType,& $arrParentToken=null)
 	{
 		if(!$arrParentToken)
 		{

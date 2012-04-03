@@ -7,6 +7,10 @@ class Insert extends SQL
 {
 	public function __construct($sTableName="")
 	{
+		$this->arrRawSql = array(
+				'expr_type' => 'query' ,
+				'subtree' => array() ,
+		) ;
 		$this->setTableName($sTableName) ;
 	}
 	
@@ -30,7 +34,7 @@ class Insert extends SQL
 		return $this ;
 	}
 	
-	public function setData($sColumn,$value,$bValueExpr=false,$nRow=0)
+	public function setData($sColumn,$value=null,$bValueExpr=false,$nRow=0)
 	{
 		$arrRawValues =& $this->rawClauseValue() ;
 		

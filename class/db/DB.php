@@ -130,13 +130,12 @@ class DB extends Object
 	
 	public function queryCount(Select $aSelect,$sColumn='*')
 	{
-		$arrRawSql =& $aSelect->rawSql() ;
-		$arrReturnsBak =& $arrRawSql['subtree'][SQL::CLAUSE_SELECT]['subtree'] ;
+		$arrRawSelect =& $aSelect->rawClause(SQL::CLAUSE_SELECT) ;
+		$arrReturnsBak =& $arrRawSelect['subtree'] ;
 		
-		$arrRawSql['subtree'][SQL::CLAUSE_SELECT]['subtree'] = array("count({$sColumn}) as rowCount") ;
+		$arrRawSelect['subtree'] = array("count({$sColumn}) as rowCount") ;
 		$aRecords = $this->query($aSelect) ;
-		
-		$arrRawSql['subtree'][SQL::CLAUSE_SELECT]['subtree'] =& $arrReturnsBak ;
+		$arrRawSelect['subtree'] =& $arrReturnsBak ;
 		
 		if( $aRecords )
 		{

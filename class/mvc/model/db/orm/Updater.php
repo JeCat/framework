@@ -1,6 +1,7 @@
 <?php
-
 namespace org\jecat\framework\mvc\model\db\orm;
+
+use org\jecat\framework\db\sql\SQL;
 
 use org\jecat\framework\mvc\model\db\Model;
 use org\jecat\framework\lang\Object;
@@ -10,7 +11,7 @@ use org\jecat\framework\db\sql\StatementFactory ;
 class Updater extends Object{
     public function execute(DB $aDB, Model $aModel){
         $aPrototype = $aModel->prototype();
-        $aUpdate = StatementFactory::singleton()->createUpdate($aPrototype->tableName()) ;
+        $aUpdate = $aPrototype->statementUpdate() ;
         
         // 从 belongs to model 中设置外键值
         foreach($aPrototype->associations() as $aAssociation){
@@ -26,8 +27,8 @@ class Updater extends Object{
         }
         
         // 产生一个criteria并设置给$aUpdate
-        $aCriteria = StatementFactory::singleton()->createCriteria() ;
-        $aUpdate->setCriteria($aCriteria);
+        //$aCriteria = StatementFactory::singleton()->createCriteria() ;
+        //$aUpdate->setCriteria($aCriteria);
         
 		// update当前model
         $aUpdate->clearData() ;
@@ -43,9 +44,12 @@ class Updater extends Object{
 	        
 	        //用主键作为查询条件
 	        else
-	       {
-	        	$aCriteria->where()->eq($sKey,$aModel->data($sKey)) ;
-	        }        	
+	        {
+	        	$aUpdate->where()->_expessionTokens( array(
+	        			SQL::createRawColumn(null,$sKey)
+	        			, '=', SQL::transValue($aModel->data($sKey))
+	        	) ) ;
+	        }
         }
         
 		$bFlagChanged = false;//当前表是否有修改
@@ -54,7 +58,7 @@ class Updater extends Object{
 			//只update发生修改的项
 			if($aModel->changed($sClmName))
 			{
-				$aUpdate->setData($sClmName,$aModel->data($sClmName));
+				$aUpdate->setData($sClmName,$aModel->data($sClmName),false);
 				$bFlagChanged = true;
 			}
 		}
@@ -128,4 +132,4 @@ class Updater extends Object{
     }
 }
 
-?>
+
