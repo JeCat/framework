@@ -18,8 +18,8 @@ use org\jecat\framework\db\sql\Criteria;
 
 class Selecter extends OperationStrategy
 {
-	public function execute(Prototype $aPrototype,array & $arrDataSheet,Select $aSelect=null,/*Criteria $aCriteria=null,*/$bList=false,DB $aDB=null)
-	{		
+	public function execute(Prototype $aPrototype,array & $arrDataSheet,Select $aSelect=null, Restriction $aRestriction=null, $list=false,DB $aDB=null)
+	{
 		if(!$aDB)
 		{
 			$aDB = DB::singleton() ;
@@ -32,10 +32,10 @@ class Selecter extends OperationStrategy
 			$aSelect = $aPrototype->sharedStatementSelect() ;
 		}
 		
-		/*if($aCriteria)
+		if($aRestriction)
 		{
-			$aSelect->setCriteria($aCriteria);
-		}*/
+			$aSelect->criteria()->where()->add($aRestriction);
+		}
 		
 		// -----------------
 		// step 2. query for all one to one association tables 
@@ -43,32 +43,36 @@ class Selecter extends OperationStrategy
 		$this->addColumnsForOneToOne($aSelect,$aPrototype,$arrMultitermAssociations) ;
 		
 		// set limit
-		if( !$bList )
+		if( !$list )
 		{
-			$aSelect->setLimit(1,0) ;
+			$aSelect->criteria()->setLimit(1,0) ;
 		}
 		else
 		{
-			/**
-			 * 考虑到 criteria 可能是为了不影响 prototype 的情况下临时产生的对象，
-			 * 这里不可以用 prototype 的 limit 覆盖掉 criteria 中已有的 criteria 参数。
-			 * 因此这行删除。
-			 */
-			// $aSelect->criteria()->setLimit( $aPrototype->criteria()->limitLen(), $aPrototype->criteria()->limitFrom() ) ;
+			$aSelect->criteria()->setLimit( $list[0], $list[1] ) ;
 		}
-		
+				
 		// set group by
-		$this->setGroupBy($aSelect,$aPrototype) ;
-		
+		$this->setGroupBy($aSelect->criteria(),$aPrototype) ;
+			
 		// query
 		$aDB->pdo()->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES,1) ;
 		try{
 			$aPdoRecordset=$aDB->query($aSelect) ;
-		}catch (\Exception $e){
+		}catch (\Exception $e){}
+		
+		//} final {
 			$aDB->pdo()->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES,0) ;
+			if($aRestriction)
+			{
+				$aSelect->criteria()->where()->remove($aRestriction);
+			}
+		//}
+		
+		if( isset($e) )
+		{
 			throw $e ;
 		}
-		$aDB->pdo()->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES,0) ;
 		
 		if( !$aPdoRecordset or !$aPdoRecordset->rowCount() )
 		{
@@ -210,12 +214,12 @@ class Selecter extends OperationStrategy
 		}
 	}
 
-	private function setGroupBy(Select $aSelect,Prototype $aPrototype)
+	private function setGroupBy(Criteria $aCriteria,Prototype $aPrototype)
 	{
-		$aSelect->clearGroupBy() ;
+		$aCriteria->clearGroupBy(false) ;
 		foreach($aPrototype->keys() as $sClmName)
 		{
-			$aSelect->addGroupBy($sClmName,$aPrototype->sqlTableAlias()) ;
+			$aCriteria->addGroupBy($sClmName,$aPrototype->sqlTableAlias()) ;
 		}
 	}
 	

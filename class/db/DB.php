@@ -106,8 +106,7 @@ class DB extends Object
 	 */
 	public function query($sql)
 	{
-		$arrLog['sql'] = ($sql instanceof Statement)?
-				$sql->makeStatement($this->sharedStatementState()): strval($sql) ;
+		$arrLog['sql'] = strval($sql) ;
 	
 		$fBefore = microtime(true) ;
 		$result = $this->pdo()->query($arrLog['sql'],\PDO::FETCH_ASSOC) ;
@@ -133,9 +132,18 @@ class DB extends Object
 		$arrRawSelect =& $aSelect->rawClause(SQL::CLAUSE_SELECT) ;
 		$arrReturnsBak =& $arrRawSelect['subtree'] ;
 		
-		$arrRawSelect['subtree'] = array("count({$sColumn}) as rowCount") ;
-		$aRecords = $this->query($aSelect) ;
-		$arrRawSelect['subtree'] =& $arrReturnsBak ;
+		$arrTmp = array("count({$sColumn}) as rowCount") ;
+		$arrRawSelect['subtree'] =& $arrTmp ;
+		try{
+			$aRecords = $this->query($aSelect) ;
+		}catch(\Exception $e){}
+		//} final {
+			$arrRawSelect['subtree'] =& $arrReturnsBak ;
+		//}
+		if(isset($e))
+		{
+			throw $e ;
+		}
 		
 		if( $aRecords )
 		{

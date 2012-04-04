@@ -45,10 +45,10 @@ class Updater extends Object{
 	        //用主键作为查询条件
 	        else
 	        {
-	        	$aUpdate->where()->_expessionTokens( array(
+	        	$aUpdate->where()->expression( array(
 	        			SQL::createRawColumn(null,$sKey)
 	        			, '=', SQL::transValue($aModel->data($sKey))
-	        	) ) ;
+	        	), true, true ) ;
 	        }
         }
         

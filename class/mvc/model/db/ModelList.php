@@ -1,6 +1,7 @@
 <?php
 namespace org\jecat\framework\mvc\model\db ;
 
+use org\jecat\framework\mvc\model\IPaginal;
 use org\jecat\framework\pattern\iterate\IReversableIterator;
 use org\jecat\framework\db\DB;
 use org\jecat\framework\mvc\model\db\orm\Selecter;
@@ -9,7 +10,7 @@ use org\jecat\framework\lang\Exception;
 use org\jecat\framework\io\IOutputStream;
 use org\jecat\framework\mvc\controller\Response;
 
-class ModelList extends Model implements \SeekableIterator, IReversableIterator
+class ModelList extends Model implements \SeekableIterator, IReversableIterator, IPaginal
 {
 	public function isEmpty()
 	{
@@ -18,9 +19,18 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator
 	
 	public function load($values=null,$keys=null)
 	{
+		$this->clearData() ;
+		$this->nDataRow = 0 ;
 		$this->nTotalCount = -1 ;
 		
-		return parent::load($values,$keys) ;
+		return Selecter::singleton()->execute(
+			$this->prototype()
+			, $this->recordset()
+			, null
+			, self::buildRestriction($this->prototype(),$values,$keys)
+			, array($this->nPerPage,($this->nPageNum-1)*$this->nPerPage)
+			, $this->db()
+		) ;
 	}
 	public function save($bForceCreate=false)
 	{
@@ -420,9 +430,19 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator
 		$this->nDataRow =& $nDataRow ;
 	}
 
+
+	public function setPagination($nPerPage,$nPageNum)
+	{
+		$this->nPerPage = $nPerPage ;
+		$this->$nPageNum = $nPageNum ;
+	}
+	
 	private $arrAloneChildren ;
 	
 	private $aShareModel ;
 	
 	private $nTotalCount = -1 ;
+	
+	private $nPerPage = 20 ;
+	private $nPageNum = 1 ;
 }

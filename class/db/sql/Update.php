@@ -21,16 +21,7 @@ class Update extends MultiTableSQL implements IDataSettableStatement
 	}
 	public function setData($sColumnName,$value=null,$bValueExpr=false)
 	{
-		$pos = strpos($sColumnName,'.') ;
-		if($pos!==false)
-		{
-			$sTableName = substr($sColumnName,0,$pos) ;
-			$sColumnName = substr($sColumnName,$pos+1) ;
-		}
-		else
-		{
-			$sTableName = null ;
-		}
+		list($sTableName,$sColumnName) = SQL::splitColumn($sColumnName) ;
 		
 		$arrRawSet =& $this->rawClause(SQL::CLAUSE_SET) ;
 		if( isset($arrRawSet['subtree'][$sColumnName]) and !empty($arrRawSet['subtree']) )

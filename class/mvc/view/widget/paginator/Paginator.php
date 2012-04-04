@@ -194,18 +194,21 @@ class Paginator extends FormWidget implements IModelChangeObserver
         $this->updatePaginal();
     }
     
-    public function currentPageNum(){
+    public function currentPageNum()
+    {
         $iNum=(int)$this->value();
-        if( $iNum > $this->totalPageCount() ) $iNum = $this->totalPageCount();
-        if( $iNum < 1) $iNum =1 ;
-        return $iNum;
+        return $iNum<1? 1: $iNum ;
     }
     
-    public function onModelChanging(View $aView){
-        $this->setPaginal($aView->model());
+    public function onModelChanging(View $aView)
+    {
+    	if( $aModel=$aView->model() and ($aModel instanceof IPaginal) )
+    	{
+    		$this->setPaginal($aModel);
+    	}
     }
     
-    public function setPaginal($aPaginal){
+    public function setPaginal(IPaginal $aPaginal){
         $this->aPaginal=$aPaginal;
         $this->updatePaginal();
     }

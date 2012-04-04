@@ -71,10 +71,10 @@ use org\jecat\framework\db\sql\parser\BaseParserFactory;
 
 class Restriction extends SQL
 {
-	public function __construct($bLogic=true)
+	public function __construct($bDefaultLogic=true,array & $arrRawSql=null)
 	{
-		parent::__construct() ;
-		$this->setDefaultLogic($bLogic) ;
+		$this->setDefaultLogic($bDefaultLogic) ;
+		parent::__construct($arrRawSql) ;
 	} 
 	
 	/**
@@ -440,28 +440,24 @@ class Restriction extends SQL
 	 * @param string sql条件语句
 	 * @return self 调用方法的实例自身
 	 */
-	public function expression($sExpression, $bLogicAnd=true)
+	public function expression($expression, $bLogicAnd=true, $bRawTokenExpr=false)
 	{
-		$arrTokenTree =& BaseParserFactory::singleton()->create(true,null,'where')->parse($sExpression,true) ;
-		if( $arrTokenTree )
+		if(!$bRawTokenExpr)
 		{
+			$expression =& BaseParserFactory::singleton()->create(true,null,'where')->parse($expression,true) ;
+		}
+		if( $expression )
+		{			
 			$this->putLogic($bLogicAnd) ;
+			if(!isset($this->arrRawSql['subtree']))
+			{
+				$this->arrRawSql['subtree'] = array() ;
+			}
 			$this->arrRawSql['subtree'] = array_merge(
 						$this->arrRawSql['subtree']
-						, $arrTokenTree
+						, $expression
 			) ;
 		}
-		return $this;
-	}
-	
-	public function _expessionTokens($arrExpressionTokens, $bLogicAnd=true)
-	{
-		$this->putLogic($bLogicAnd) ;
-		$this->arrRawSql['subtree'] = array_merge(
-					$this->arrRawSql['subtree']
-					, $arrExpressionTokens
-		) ;
-
 		return $this;
 	}
 	
@@ -472,13 +468,38 @@ class Restriction extends SQL
 	 */
 	public function add(self $aOtherRestriction, $bLogicAnd=true)
 	{
-		$this->putLogic($bLogicAnd) ;
-		$this->arrRawSql['subtree'][] = '(' ;
-		$this->arrRawSql['subtree'][] =& $aOtherRestriction->rawSql() ;
-		$this->arrRawSql['subtree'][] = ')' ;
+		$arrRawSql =& $aOtherRestriction->rawSql() ;
+		$sIndex = spl_object_hash($aOtherRestriction) ;
+		$bEmpty = empty($this->arrRawSql['subtree']) ;
+		
+		$this->arrRawSql['subtree'][ $sIndex ] = array(
+				'expr_type' => 'expression' ,
+				'subtree' => &$arrRawSql['subtree'] ,
+		) ;
+		
+		if( !empty($arrRawSql['factors']) )
+		{
+			$this->arrRawSql['subtree'][ $sIndex ]['factors'] =& $arrRawSql['factors'] ;
+		}
+		
+		if( !$bEmpty )
+		{
+			$this->arrRawSql['subtree'][$sIndex]['pretree'] = $bLogicAnd? 'AND': 'OR' ;
+		}
+		
 		return $this ;
 	}
-		
+
+	/**
+	 * 删除通过 Restriction::add() 添加的 Restriction对象
+	 * @return self
+	 */
+	public function remove(self $aOtherRestriction)
+	{
+		unset($this->arrRawSql['subtree'][ spl_object_hash($aOtherRestriction) ]) ;
+		return $this ;
+	}
+	
 	/**
 	 * 
 	 * 创建一个新的Restriction对象并把它作为条件语句的一部分添加到方法调用者中

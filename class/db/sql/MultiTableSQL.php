@@ -204,91 +204,36 @@ abstract class MultiTableSQL extends SQL
 		return self::tableFromRaw($arrTableList[$sAlias]) ;
 	}
 	
-	// -- limit --
+	// ----------
 	
 	/**
-	 *  设置limit条件
-	 * @param int $nLimitLen limit 长度
-	 * @param int $sLimitFrom limit 开始
+	 * @return Criteria
 	 */
-	public function setLimit($nLimitLen , $limitFrom = null)
+	public function criteria($bAutoCreate=true)
 	{
-		$arrRawLimit =& $this->rawClause(self::CLAUSE_LIMIT) ;
-		
-		if( $limitFrom!==null )
+		if( !$this->aCriteria and $bAutoCreate )
 		{
-			$arrRawLimit['subtree'][] = $limitFrom ;
-			$arrRawLimit['subtree'][] = ',' ;
-			$arrRawLimit['subtree'][] = $nLimitLen ;
+			$this->aCriteria = new Criteria($this->rawSql()) ;
 		}
-		else 
-		{
-			$arrRawLimit['subtree'][] = $nLimitLen ;
-		}
-		
-		return $this ;
+		return $this->aCriteria ;
 	}
-	
-	// -- where --	
-	public function setWhere(Restriction $aWhere){
-		$this->aWhere = $aWhere;
-		$this->setRawWhere( $aWhere->rawSql() ) ;
-		return $this ;
+
+	/**
+	 * @return Criteria
+	 */
+	public function setCriteria(Criteria $aCriteria)
+	{
+		$aCriteria->attache($this->rawSql()) ;
 	}
 	/**
 	 * @return Restriction
 	 */
-	public function where($bAutoCreate=true){
-		
-		$arrRawWhere =& $this->rawClause(self::CLAUSE_WHERE) ;
-		
-		if( !$this->aWhere )
-		{
-			$this->aWhere = new Restriction() ;
-			$this->aWhere->setRawSql($arrRawWhere) ;
-		}
-		
-		return $this->aWhere ;
-	}
-	
-	
-	// -- order by --
-	public function addOrderBy($sColumn,$bDesc=true)
+	public function where($bAutoCreate=true)
 	{
-		$arrRawOrder =& $this->rawClause(self::CLAUSE_ORDER) ;
-		
-		$arrRawOrder['subtree'][] = self::createRawColumn(null, $sColumn) ;
-		$arrRawOrder['subtree'][] = $bDesc? 'DESC': 'ASC' ;
-		
-		return $this ;
+		return $this->criteria($bAutoCreate)->where($bAutoCreate) ;
 	}
-	
-	public function clearOrders()
-	{
-		unset($this->arrRawSql[self::CLAUSE_ORDER]) ;
-		return $this ;
-	}
-	
-	// -- group by --
-	public function addGroupBy($sColumn,$sTable=null,$sDB=null)
-	{
-		$arrGroupBy =& $this->rawClause(self::CLAUSE_GROUP) ;
-		if( !empty($arrGroupBy['subtree']) )
-		{
-			$arrGroupBy['subtree'][] = ',' ;
-		}
-		$arrGroupBy['subtree'][] = self::createRawColumn($sTable, $sColumn, null, $sDB) ;
-		
-		return $this ;
-	}
-	
-	public function clearGroupBy()
-	{
-		$this->arrRawSql[self::CLAUSE_GROUP]['subtree'] = array() ;
-		return $this ;
-	}
-	
-	private $aWhere ;
+
+	private $aCriteria ;
 	
 	protected $nTablesClause = SQL::CLAUSE_FROM ;
 }

@@ -1,6 +1,8 @@
 <?php 
 namespace org\jecat\framework\db\sql ;
 
+use org\jecat\framework\lang\Type;
+
 use org\jecat\framework\db\sql\parser\BaseParserFactory;
 
 use org\jecat\framework\lang\Exception;
@@ -75,7 +77,7 @@ abstract class SQL
 	/**
 	 * @return Select
 	 */
-	static public function make($sSql)
+	static public function make($sSql,$factors=null)
 	{
 		if( ! $arrRawSqls = self::parser()->parse($sSql) )
 		{
@@ -92,18 +94,30 @@ abstract class SQL
 			return null ;
 		}
 		
-		$arrArgvs = func_get_args() ;
-		array_shift($arrArgvs) ;
-		if($arrArgvs)
+		if($factors)
 		{
-			call_user_func_array(array($aSql,'addFactors'),$arrArgvs) ;
+			$factors = Type::toArray($factors,Type::toArray_ignoreNull) ;
+			$aSql->addFactors($factors) ;
 		}
 		
 		return $aSql->setRawSql($arrRawSqls[0]) ;
 	}
-	static public function makeRestriction($sSql)
-	{
+	/**
+	 * @return Restriction
+	 */
+	static public function makeRestriction($sSql,$factors=null)
+	{		
+		$arrTrees = BaseParserFactory::singleton()->create(true,null,'where')->parse($sSql) ;
 		
+		$aRestriction = empty($arrTrees[0])? new Restriction(): new Restriction( true, $arrTrees[0] ) ;
+
+		if($factors)
+		{
+			$factors = Type::toArray($factors,Type::toArray_ignoreNull) ;
+			$aRestriction->addFactors($factors) ;
+		}
+		
+		return $aRestriction ;
 	}
 	static public function makeColumn($sColumnExpr)
 	{
@@ -202,9 +216,16 @@ abstract class SQL
 	}
 	
 	// ----------------------------------------------------------
-	public function __construct()
+	public function __construct(array & $arrRawSql=null)
 	{
-		$this->setRawSql($arrRawSql=array()) ; 
+		if($arrRawSql)
+		{
+			$this->arrRawSql =& $arrRawSql ;
+		}
+		else
+		{
+			$this->arrRawSql = array() ;
+		}
 	}
 		
 	/**
@@ -216,7 +237,7 @@ abstract class SQL
 		ksort($this->arrRawSql['subtree']) ;
 		
 		try{
-			return self::compiler()->compile($this->arrRawSql['subtree'],$this->arrFactors) ;
+			return self::compiler()->compile($this->arrRawSql) ;
 		} catch (\Exception $e) {
 			error_log($e->getMessage()) ;
 			return '' ;
@@ -247,7 +268,7 @@ abstract class SQL
 		{
 			$arrParentToken =& $this->arrRawSql ;
 		}
-		
+
 		if( !isset($arrParentToken['subtree'][$sType]) )
 		{
 			$arrParentToken['subtree'][$sType] = array(
@@ -256,7 +277,7 @@ abstract class SQL
 					'subtree' => array() ,
 			) ;
 			
-			if( $sType == self::CLAUSE_GROUP or $sType==self::CLAUSE_ORDER )
+			if( $sType === self::CLAUSE_GROUP or $sType===self::CLAUSE_ORDER )
 			{
 				$arrParentToken['subtree'][$sType]['pretree'][] = 'BY' ;
 			}
@@ -287,27 +308,44 @@ abstract class SQL
 	
 	public function addFactors(/* ... */)
 	{
-		if( $this->arrFactors===null )
+		if( !isset($this->arrRawSql['factors']) )
 		{
-			$this->arrFactors = array() ;
+			$this->arrRawSql['factors'] = array() ;
 		}
 		
 		$arrArgs = func_get_args() ;
 		if( is_array($arrArgs[0]) )
 		{
-			$this->arrFactors+= self::makeFactors($arrArgs[0]) ;
+			$this->arrRawSql['factors']+= self::makeFactors($arrArgs[0]) ;
 		}
 		else
 		{
-			$this->arrFactors+= self::makeFactors($arrArgs) ;
+			$this->arrRawSql['factors']+= self::makeFactors($arrArgs) ;
 		}
 			
 		return $this ;
 	}
 	
+
+	static public function splitColumn($sColumn)
+	{
+		$pos = strrpos($sColumn,'.') ;
+		if($pos!==false)
+		{
+			$sTableName = substr($sColumn,0,$pos) ;
+			$sColumn = substr($sColumn,$pos+1) ;
+		}
+		else
+		{
+			$sTableName = null ;
+		}
+		
+		return array($sTableName,$sColumn) ;
+	}
+	
 	protected $arrRawSql = array() ;
 	
-	protected $arrFactors ;
+	// protected $arrFactors ;
 }
 
 

@@ -1,6 +1,10 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\db\sql\SQL;
+
+use org\jecat\framework\db\sql\Criteria;
+
 use org\jecat\framework\db\sql\Update;
 
 use org\jecat\framework\lang\Object;
@@ -783,27 +787,39 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 		{
 			$this->addColumnAlias($arrConfig['alias']) ;
 		}
-		// limit
+		// limit ----------------
+		$nLimitLen = 30 ;
+		$limitFrom = 0 ;
 		if( !empty($arrConfig['limit']) )
 		{
-			$this->criteria()->setLimitLen($arrConfig['limit']) ;
+			$nLimitLen = $arrConfig['limit'] ;
 		}
 		// limitLen
 		if( !empty($arrConfig['limitLen']) )
 		{
-			$this->criteria()->setLimitLen($arrConfig['limitLen']) ;
+			$nLimitLen = $arrConfig['limitLen'] ;
 		}
 		// limitFrom
 		if( !empty($arrConfig['limitFrom']) )
 		{
-			$this->criteria()->setLimitFrom($arrConfig['limitFrom']) ;
+			$limitFrom = $arrConfig['limitFrom'] ;
 		}
-		// order
+		if($nLimitLen===-1)
+		{
+			$this->criteria()->clearLimit() ;
+		}
+		else 
+		{
+			$this->criteria()->setLimit($nLimitLen,$limitFrom) ;
+		}
+		
+		// order ----------------
 		if( !empty($arrConfig['order']) )
 		{
 			foreach((array)$arrConfig['order'] as $sColumn)
 			{
-				$this->criteria()->orders()->add($sColumn,true) ;
+				list($sTable,$sColumn) = SQL::splitColumn($sColumn) ;
+				$this->criteria()->addOrderBy($sColumn,true,$sTable) ;
 			}
 		}
 		// orderDesc
@@ -811,7 +827,8 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 		{
 			foreach((array)$arrConfig['orderDesc'] as $sColumn)
 			{
-				$this->criteria()->orders()->add($sColumn,true) ;
+				list($sTable,$sColumn) = SQL::splitColumn($sColumn) ;
+				$this->criteria()->addOrderBy($sColumn,true,$sTable) ;
 			}
 		}
 		// orderAsc
@@ -819,7 +836,8 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 		{
 			foreach((array)$arrConfig['orderAsc'] as $sColumn)
 			{
-				$this->criteria()->orders()->add($sColumn,false) ;
+				list($sTable,$sColumn) = SQL::splitColumn($sColumn) ;
+				$this->criteria()->addOrderBy($sColumn,false,$sTable) ;
 			}
 		}
 		// orderRand
@@ -889,6 +907,7 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 		$this->arrBeanConfig = $arrConfig ;
 	}
 	
+	
 	static public function buildBeanRestriction(array $arrRestrictionConfig,Restriction $aRestriction)
 	{
 		// 第一项 'and' 或 'or'
@@ -945,15 +964,33 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 		$this->arrBeanConfig ;
 	}
 	
+	public function criteria($bAutoCreate=true)
+	{
+		if( !$this->aCriteria and $bAutoCreate )
+		{
+			$this->aCriteria = new Criteria() ;
+		}
+		return $this->aCriteria ;
+	}
+	
 	// statement
+	/**
+	 * @return org\jecat\framework\db\sql\Insert
+	 */
 	public function statementInsert()
 	{
 		$this->aStatementInsert ;
 	}
+	/**
+	 * @return org\jecat\framework\db\sql\Delete
+	 */
 	public function statementDelete()
 	{
 		$this->aStatementDelete ;
 	}
+	/**
+	 * @return org\jecat\framework\db\sql\Select
+	 */
 	public function sharedStatementSelect()
 	{
 		if(!$this->aStatementSelect)
