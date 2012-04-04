@@ -76,7 +76,7 @@ class Select extends MultiTableSQL
 					{
 						$arrRawColumns['subtree'][] = ',' ;
 					}
-					$arrRawColumns['subtree'][] = self::createRawColumn(null,$sColumnName,is_string($key)?$key:null) ;
+					$arrRawColumns['subtree'][] = self::createRawColumn(null,$sColumnName,is_string($key)?$key:null,true) ;
 				}
 			}
 			else
@@ -85,7 +85,7 @@ class Select extends MultiTableSQL
 				{
 					$arrRawColumns['subtree'][] = ',' ;
 				}
-				$arrRawColumns['subtree'][] = self::createRawColumn(null,(string)$column) ;
+				$arrRawColumns['subtree'][] = self::createRawColumn(null,(string)$column,null,true) ;
 			}
 		}
 		
@@ -95,7 +95,7 @@ class Select extends MultiTableSQL
 	/**
 	 * 向Select对像 添加多个返回字段。
 	 */
-	public function addColumn($sClmName,$sAlias=null,$sTable=null,$sDB=null)
+	public function addColumn($sClmName,$sAlias=null,$sTable=null)
 	{		
 		if( is_string($sClmName) )
 		{
@@ -106,7 +106,7 @@ class Select extends MultiTableSQL
 				$arrRawColumns['subtree'][] = ',' ;
 			}
 			
-			$arrRawColumns['subtree'][] = self::createRawColumn($sTable,$sClmName,$sAlias,$sDB) ;
+			$arrRawColumns['subtree'][] = self::createRawColumn($sTable,$sClmName,$sAlias,true) ;
 		}
 		
 		// 未知类型

@@ -116,12 +116,10 @@ class Restriction extends SQL
 	{
 		if($sTable===null)
 		{
-			$this->arrRawSql['subtree'] = array_merge( $this->arrRawSql['subtree'], self::makeColumn($sColumn) ) ;
+			list($sTable,$sColumn) = SQL::splitColumn($sColumn) ;
 		}
-		else
-		{
-			$this->arrRawSql['subtree'][] = self::createRawColumn($sTable?:'',$sColumn) ;
-		}
+		
+		$this->arrRawSql['subtree'][] = self::createRawColumn($sTable?:'',$sColumn) ;
 	}
 	
 	/**

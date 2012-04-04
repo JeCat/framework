@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\db\sql\parser ;
 
+use org\jecat\framework\lang\Assert;
+
 use org\jecat\framework\lang\Object;
 
 class AbstractParser extends Object
@@ -41,6 +43,7 @@ class AbstractParser extends Object
 			// 切换到其它状态
 			$this->changeState($sToken,$aParseState) ;
 		
+			Assert::must($aParseState->aCurrentParser) ;
 			$aParseState->aCurrentParser->processToken($sToken,$aParseState) ;
 		}
 		

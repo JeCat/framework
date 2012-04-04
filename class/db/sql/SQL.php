@@ -1,6 +1,8 @@
 <?php 
 namespace org\jecat\framework\db\sql ;
 
+use org\jecat\framework\db\sql\compiler\SqlCompiler;
+
 use org\jecat\framework\lang\Type;
 
 use org\jecat\framework\db\sql\parser\BaseParserFactory;
@@ -127,7 +129,7 @@ abstract class SQL
 	
 	
 	// ------------
-	static public function createRawColumn($sTable,$sName,$sAlias=null,$sDB=null)
+	static public function createRawColumn($sTable,$sName,$sAlias=null,$bReturnedList=false)
 	{
 		$arrRaw = array(
 				'expr_type' => 'column' ,
@@ -138,13 +140,13 @@ abstract class SQL
 		{
 			$arrRaw['table'] = $sTable ;
 		}
-		if($sDB)
-		{
-			$arrRaw['db'] = $sDB ;
-		}
 		if($sAlias)
 		{
 			$arrRaw['as'] = $sAlias ;
+		}
+		if($bReturnedList)
+		{
+			$arrRaw['declare'] = true ;
 		}
 		
 		return $arrRaw ;
@@ -212,7 +214,7 @@ abstract class SQL
 	 */
 	static public function compiler()
 	{
-		return parser\SqlCompiler::singleton() ;
+		return compiler\SqlCompiler::singleton() ;
 	}
 	
 	// ----------------------------------------------------------
@@ -227,6 +229,22 @@ abstract class SQL
 			$this->arrRawSql = array() ;
 		}
 	}
+	
+	/**
+	 *
+	 * @return string
+	 */
+	public function toString(SqlCompiler $aSqlCompiler=null)
+	{
+		if(!$aSqlCompiler)
+		{
+			$aSqlCompiler = self::compiler() ;
+		}
+		
+		ksort($this->arrRawSql['subtree']) ;
+		
+		return $aSqlCompiler->compile($this->arrRawSql) ;
+	}
 		
 	/**
 	 *
@@ -234,10 +252,8 @@ abstract class SQL
 	 */
 	public function __toString()
 	{	
-		ksort($this->arrRawSql['subtree']) ;
-		
 		try{
-			return self::compiler()->compile($this->arrRawSql) ;
+			return $this->toString() ;
 		} catch (\Exception $e) {
 			error_log($e->getMessage()) ;
 			return '' ;

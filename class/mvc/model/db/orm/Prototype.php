@@ -1,14 +1,13 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\db\sql\compiler\SqlNameCompiler;
+
+use org\jecat\framework\db\sql\compiler\SqlCompiler;
 use org\jecat\framework\db\sql\SQL;
-
 use org\jecat\framework\db\sql\Criteria;
-
 use org\jecat\framework\db\sql\Update;
-
 use org\jecat\framework\lang\Object;
-
 use org\jecat\framework\mvc\model\db\ModelList;
 use org\jecat\framework\db\sql\Order;
 use org\jecat\framework\util\serialize\IIncompleteSerializable;
@@ -977,14 +976,14 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	/**
 	 * @return org\jecat\framework\db\sql\Insert
 	 */
-	public function statementInsert()
+	public function sharedStatementInsert()
 	{
 		$this->aStatementInsert ;
 	}
 	/**
 	 * @return org\jecat\framework\db\sql\Delete
 	 */
-	public function statementDelete()
+	public function sharedStatementDelete()
 	{
 		$this->aStatementDelete ;
 	}
@@ -996,83 +995,30 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 		if(!$this->aStatementSelect)
 		{
 			$this->aStatementSelect = Selecter::buildSelect($this) ;
+			
+			$arrTokenTree =& $this->aStatementSelect->rawSql() ;
+			$arrTokenTree['omited_first_table'] = $this->name() ;
+			$arrTokenTree['omited_first_table_len'] = strlen($arrTokenTree['omited_first_table']) ;
 		}
 		return $this->aStatementSelect ;
 	}
 	/**
 	 * return org\jecat\framework\db\sql\Update
 	 */
-	public function statementUpdate()
+	public function sharedStatementUpdate()
 	{
 		if( !$this->aStatementUpdate )
 		{
 			$this->aStatementUpdate = new Update($this->tableName()) ;
+
+			$arrTokenTree =& $this->aStatementUpdate->rawSql() ;
+			$arrTokenTree['omited_first_table'] = $this->name() ;
+			$arrTokenTree['omited_first_table_len'] = strlen($arrTokenTree['omited_first_table']) ;
 		}
 
 		return $this->aStatementUpdate ;
 	}
 	
-	/**
-	 * override parent class StatementFactory
-	 */
-	/*protected function initStatement(Statement $aStatement)
-	{
-		$aStatement->setNameTransfer($this->nameTransfer()) ;
-		$aStatement->setStatementFactory($this) ;
-		return $aStatement ;
-	}*/
-
-	/**
-	 * @return org\jecat\framework\db\sql\name\NameTransfer
-	 */
-	/*public function nameTransfer()
-	{
-		if(!$this->aStatementNameTransfer)
-		{
-			$this->aStatementNameTransfer = NameTransferFactory::singleton()->create() ;
-			$this->aStatementNameTransfer->addColumnNameHandle(array($this,'statementColumnNameHandle')) ;
-		}
-		return $this->aStatementNameTransfer ;
-	}*/
-
-	/**
-	 * @return org\jecat\framework\db\sql\StatementFactory ;
-	 */
-	/*public function statementFactory()
-	{
-		return $this ;
-	}*/
-	/**
-	 * @return org\jecat\framework\db\sql\Table ;
-	 */
-	/*public function createSqlTable()
-	{
-		return $this->createTable($this->tableName(),$this->sqlTableAlias()) ;
-	}
-	public function statementColumnNameHandle($sName,Statement $aStatement,StatementState $sState)
-	{
-		// delete和Update不支持别名，不做表别名转换
-		if( !$sState->supportTableAlias() )
-		{
-			return array($this->getColumnByAlias($sName),$aStatement,$sState) ;
-		}
-		
-		// 切分 原型名称 和 字段名称
-		$sColumn = $this->getColumnByAlias($sName)?: $sName ;
-		
-		$nPos = strrpos($sColumn,'.') ;
-		if($nPos!==false)
-		{
-			$sTableName = '.'.substr($sColumn,0,$nPos) ;
-			$sColumn = substr($sColumn,$nPos+1) ;
-		}
-		else 
-		{
-			$sTableName = '' ;
-		}
-
-		return '`'.$this->path()."{$sTableName}`.`{$sColumn}`" ;
-	}*/
 	
 	// -----------------------------------------------
 	public function serializableProperties()
@@ -1123,6 +1069,43 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 		return $this->aDB ;
 	}
 	
+	/**
+	 * @return org\jecat\framework\db\sql\compiler\SqlCompiler
+	 */
+	static public function sqlCompiler()
+	{
+		if( !self::$aSqlCompiler )
+		{
+			$aNameCompiler = new SqlNameCompiler() ;
+			$aNameCompiler->registerColumnNameTranslaters(array(__CLASS__,'translateColumnName')) ;
+			
+			self::$aSqlCompiler = new SqlCompiler(true) ;			
+			self::$aSqlCompiler->registerTokenCompiler('column', $aNameCompiler) ;
+			self::$aSqlCompiler->registerTokenCompiler('table', $aNameCompiler) ;
+		}
+		
+		return self::$aSqlCompiler ;
+	}
+	
+	static public function translateColumnName($sTable,$sColumn,$sAlias,array & $arrToken,array & $arrTokenTree)
+	{		
+		if( empty($arrToken['declare']) and !empty($arrTokenTree['omited_first_table'])
+				and $arrTokenTree['omited_first_table']!=substr($sTable,0,$arrTokenTree['omited_first_table_len'])
+				and '.'!=substr($sTable,$arrTokenTree['omited_first_table_len']) 
+		) {
+			if($sTable)
+			{
+				$sTable = $arrTokenTree['omited_first_table'].'.'.$sTable ;
+			}
+			else
+			{
+				$sTable = $arrTokenTree['omited_first_table'] ;
+			}
+		}
+		
+		return array( $sTable, $sColumn, $sAlias ) ;
+	}
+	
 	// 固有属性 ----------------------------
 	private $sName;// 如果不提供，用表名作名字。
 	private $sTableName='';
@@ -1146,5 +1129,7 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	private $aStatementDelete ;
 	private $aStatementSelect ;
 	private $aStatementUpdate ;
+	
+	static private $aSqlCompiler ;
 	
 }

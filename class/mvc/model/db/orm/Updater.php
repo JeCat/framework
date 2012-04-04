@@ -11,7 +11,7 @@ use org\jecat\framework\db\sql\StatementFactory ;
 class Updater extends Object{
     public function execute(DB $aDB, Model $aModel){
         $aPrototype = $aModel->prototype();
-        $aUpdate = $aPrototype->statementUpdate() ;
+        $aUpdate = $aPrototype->sharedStatementUpdate() ;
         
         // 从 belongs to model 中设置外键值
         foreach($aPrototype->associations() as $aAssociation){

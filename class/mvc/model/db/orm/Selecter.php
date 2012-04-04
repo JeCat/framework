@@ -58,7 +58,7 @@ class Selecter extends OperationStrategy
 		// query
 		$aDB->pdo()->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES,1) ;
 		try{
-			$aPdoRecordset=$aDB->query($aSelect) ;
+			$aPdoRecordset=$aDB->query( $aSelect->toString(Prototype::sqlCompiler()) ) ;
 		}catch (\Exception $e){}
 		
 		//} final {
@@ -122,7 +122,7 @@ class Selecter extends OperationStrategy
 			$sKey.= ' `'.$aPrototype->sqlTableAlias().'`.`'.$sClmName.'`' ;
 		}
 		
-		return $aDB->queryCount($aSelect,$sKey) ;
+		return $aDB->queryCount( $aSelect->toString(Prototype::sqlCompiler()), $sKey ) ;
 	}
 	
 	public function hasExists(Model $aModel,Prototype $aPrototype=null,Select $aSelect=null,DB $aDB=null)
