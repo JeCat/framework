@@ -136,10 +136,6 @@ class AccessRouter extends \org\jecat\framework\lang\Object
     	
     	// 转换为 class
     	$sControllerClass = str_replace(".","\\",$sControllerName) ;
-    	if( !preg_match("/^\\\\/",$sControllerClass) )
-    	{
-    		$sControllerClass = "\\" . $sControllerClass ;
-    	}
     	
     	if( class_exists($sControllerClass) )
     	{

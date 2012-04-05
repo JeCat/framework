@@ -1,16 +1,25 @@
 <?php
 namespace org\jecat\framework\cache ;
 
-class Memcache implements ICache
+use org\jecat\framework\lang\Type;
+use org\jecat\framework\lang\Assert;
+
+class Memcache extends Cache
 {
+	public function __construct($sServer='127.0.0.1',$nPort=11211)
+	{
+		$this->hMemcacheConnection = memcache_connect($sServer,$nPort) ;
+	}
+	
 	/**
 	 * Enter description here ...
 	 * 
 	 * @return string
 	 */
-	function get($sDataName)
+	public function item($sDataName)
 	{
-		// todo ...
+		$data = memcache_get($this->hMemcacheConnection,$sDataName) ;
+		return unserialize($data) ;
 	}
 	
 	/**
@@ -18,9 +27,10 @@ class Memcache implements ICache
 	 * 
 	 * @return void
 	 */
-	function set($sName,$sData,$nCreateTimeMicroSec=-1)
+	public function setItem($sName,$data,$nExpire=self::expire_default)
 	{
-		// todo ...
+		$data = serialize($data) ;
+		return memcache_set($this->hMemcacheConnection,$sName,$data,0,$nExpire=self::expire_default) ;
 	}
 	
 	/**
@@ -28,9 +38,9 @@ class Memcache implements ICache
 	 * 
 	 * @return bool
 	 */
-	function delete($sDataName)
+	public function delete($sDataName)
 	{
-		// todo ...
+		return memcache_delete($this->hMemcacheConnection,$sDataName) ;
 	}
 	
 	/**
@@ -38,19 +48,12 @@ class Memcache implements ICache
 	 * 
 	 * @return bool
 	 */
-	function isExpire($sDataName,$nCreateTimeMicroSec=-1)
+	public function isExpire($sDataName)
 	{
-		// todo ...
+		return $this->get($sDataName)===null ;
 	}
 	
-	/**
-	 * Enter description here ...
-	 * 
-	 * @return int
-	 */
-	function createTime($sDataName)
-	{
-		// todo ...
-	}
+	
+	private $hMemcacheConnection ;
 }
 ?>
