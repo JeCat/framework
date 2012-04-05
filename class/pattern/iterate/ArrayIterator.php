@@ -13,7 +13,6 @@ class ArrayIterator extends Object implements INonlinearIterator
 		$this->nEndPosition = count($this->arrKeys)-1 ;
 	}
 	
-	
 	public function position()
 	{
 		return $this->nPosition ;

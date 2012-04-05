@@ -3,11 +3,6 @@ namespace org\jecat\framework ;
 
 
 //////////////////////////////
-// 错误处理
-use org\jecat\framework\mvc\view\Webpage;
-use org\jecat\framework\ui\xhtml\Factory;
-use org\jecat\framework\system\Application;
-
 // 报告所有错误
 error_reporting(E_ALL & ~E_DEPRECATED) ;
 
@@ -20,9 +15,9 @@ header("Content-Type: text/html; charset=UTF-8") ;
 // 关闭魔术引用
 set_magic_quotes_runtime(false) ;
 
-define( __NAMESPACE__."\\VERSION", '0.7.0' ) ;
-define( __NAMESPACE__."\\PATH", __DIR__ ) ;
-define( __NAMESPACE__."\\CLASSPATH", __DIR__.'/class' ) ;
+define( "org\\jecat\\framework\\VERSION", '0.7.0' ) ;
+define( "org\\jecat\\framework\\PATH", __DIR__ ) ;
+define( "org\\jecat\\framework\\CLASSPATH", __DIR__.'/class' ) ;
 
 // 预加载类(Before Class Loader)
 require_once CLASSPATH."/pattern/ISingletonable.php" ;

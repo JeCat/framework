@@ -1,7 +1,7 @@
 <?php
 namespace org\jecat\framework\cache ;
 
-class DBCache implements ICache
+class DBCache extends Cache
 {
 	/**
 	 * Enter description here ...
