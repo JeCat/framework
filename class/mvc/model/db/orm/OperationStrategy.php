@@ -1,6 +1,9 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm ;
 
+use org\jecat\framework\db\sql\SQL;
+
+use org\jecat\framework\db\sql\Restriction;
 use org\jecat\framework\mvc\model\db\Recordset;
 use org\jecat\framework\mvc\model\db\Model;
 use org\jecat\framework\db\sql\IDataSettableStatement;
@@ -9,14 +12,9 @@ use org\jecat\framework\lang\Object;
 
 abstract class OperationStrategy extends Object
 {
-	protected function makeResrictionForAsscotion(array & $arrDataRow,$sFromTableName=null,array $arrFromKeys,$sToTableName=null,array $arrToKeys, StatementFactory $aSqlFactory)
+	protected function makeResrictionForAsscotion(array & $arrDataRow,$sFromTableName=null,array $arrFromKeys,$sToTableName=null,array $arrToKeys)
 	{
-		if($sToTableName)
-		{
-			$sToTableName = "`{$sToTableName}`." ;
-		}
-		
-		$aRestriction = $aSqlFactory->createRestriction() ;
+		$aRestriction = new Restriction() ;
 		
 		foreach($arrFromKeys as $nIdx=>$sFromKey)
 		{
@@ -24,7 +22,10 @@ abstract class OperationStrategy extends Object
 			{
 				$sFromKey = $sFromTableName.'.'.$sFromKey ;
 			}
-			$aRestriction->eq( "{$sToTableName}`{$arrToKeys[$nIdx]}`", $arrDataRow[$sFromKey] ) ;
+			$aRestriction->expression( array(
+					SQL::createRawColumn($sToTableName, $arrToKeys[$nIdx]) ,
+					'=' , SQL::transValue($arrDataRow[$sFromKey])
+			), true, true ) ;
 		}
 		
 		return $aRestriction ;

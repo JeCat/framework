@@ -14,6 +14,8 @@ class Type
 	const MAP = 64 ;
 	const ARR = 64 ;
 	const OBJECT = 128 ;*/
+	
+	static public $null = null ;
 
 	const STRING = "string" ;
 	const INT = "int" ;

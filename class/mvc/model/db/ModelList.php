@@ -23,12 +23,15 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator,
 		$this->nDataRow = 0 ;
 		$this->nTotalCount = -1 ;
 		
+		$nLimitLen = $this->perPage() ;
+		$nLimitFrom = $this->aPrototype? (int)$this->aPrototype->limitFrom(): 0 ;
+		
 		return Selecter::singleton()->execute(
 			$this->prototype()
 			, $this->recordset()
 			, null
 			, self::buildRestriction($this->prototype(),$values,$keys)
-			, array($this->nPerPage,($this->nPageNum-1)*$this->nPerPage)
+			, array($nLimitLen,$nLimitFrom+($this->pageNum()-1)*$nLimitLen)
 			, $this->db()
 		) ;
 	}
@@ -434,7 +437,21 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator,
 	public function setPagination($nPerPage,$nPageNum)
 	{
 		$this->nPerPage = $nPerPage ;
-		$this->$nPageNum = $nPageNum ;
+		$this->nPageNum = $nPageNum ;
+	}
+
+	public function perPage()
+	{
+		if( $this->nPerPage===null )
+		{
+			$this->nPerPage = $this->aPrototype? $this->aPrototype->limitLength(): 20 ;
+		}
+		return $this->nPerPage ;
+	}
+	public function pageNum()
+	{
+		return $this->nPageNum ;
+	
 	}
 	
 	private $arrAloneChildren ;
@@ -443,6 +460,6 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator,
 	
 	private $nTotalCount = -1 ;
 	
-	private $nPerPage = 20 ;
+	private $nPerPage ;
 	private $nPageNum = 1 ;
 }

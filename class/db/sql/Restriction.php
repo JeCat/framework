@@ -360,9 +360,9 @@ class Restriction extends SQL
 			$v = SQL::transValue($v);
 		}
 		$this->putLogic($bLogicAnd) ;
-		$this->arrRawSql['subtree'][] = '(' ;
 		$this->putColumn($sClmName,$sTable) ;
 		$this->arrRawSql['subtree'][] = 'IN' ;
+		$this->arrRawSql['subtree'][] = '(' ;
 		$this->arrRawSql['subtree'][] = implode(",",$arrValues) ;
 		$this->arrRawSql['subtree'][] = ')' ;
 		return $this;

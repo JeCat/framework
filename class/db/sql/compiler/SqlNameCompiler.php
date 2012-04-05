@@ -37,7 +37,7 @@ class SqlNameCompiler
 			{
 				foreach($this->arrColumnNameTranslaters as &$translaters)
 				{
-					list($sTable,$sColumn,$sAlias) = call_user_func($translaters,$sTable,$sColumn,$sAlias,& $arrToken,& $arrTokenTree) ;
+					list($sTable,$sColumn,$sAlias) = call_user_func($translaters,$sTable,$sColumn,$sAlias,$arrToken,$arrTokenTree) ;
 				}
 			}
 			

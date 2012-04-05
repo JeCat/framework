@@ -144,20 +144,6 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 		return $this;
 	}
 	
-	/**
-	 * @return org\jecat\framework\db\sql\Criteria
-	 */
-
-	/*public function criteria($bCreate=true)
-	{
-		if( !$this->aCriteria and $bCreate )
-		{
-			$this->aCriteria = $this->statementFactory()->createCriteria() ;
-		}
-		
-		return $this->aCriteria;
-	}*/
-	
 	public function associatedBy()
 	{
 		return $this->aAssociationBy;
@@ -787,29 +773,27 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 			$this->addColumnAlias($arrConfig['alias']) ;
 		}
 		// limit ----------------
-		$nLimitLen = 30 ;
-		$limitFrom = 0 ;
 		if( !empty($arrConfig['limit']) )
 		{
-			$nLimitLen = $arrConfig['limit'] ;
+			$this->nLimitLen = $arrConfig['limit'] ;
 		}
 		// limitLen
 		if( !empty($arrConfig['limitLen']) )
 		{
-			$nLimitLen = $arrConfig['limitLen'] ;
+			$this->nLimitLen = $arrConfig['limitLen'] ;
 		}
 		// limitFrom
 		if( !empty($arrConfig['limitFrom']) )
 		{
-			$limitFrom = $arrConfig['limitFrom'] ;
+			$this->limitFrom = $arrConfig['limitFrom'] ;
 		}
-		if($nLimitLen===-1)
+		if($this->nLimitLen===-1)
 		{
 			$this->criteria()->clearLimit() ;
 		}
 		else 
 		{
-			$this->criteria()->setLimit($nLimitLen,$limitFrom) ;
+			$this->criteria()->setLimit($this->nLimitLen,$this->limitFrom) ;
 		}
 		
 		// order ----------------
@@ -971,6 +955,15 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 		}
 		return $this->aCriteria ;
 	}
+
+	public function limitLength()
+	{
+		return $this->nLimitLen ;
+	}
+	public function limitFrom()
+	{
+		return $this->limitFrom ;
+	}
 	
 	// statement
 	/**
@@ -1032,6 +1025,8 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 				'arrKeys' ,
 				'sDevicePrimaryKey' ,
 				'sModelClass' ,
+				'nLimitLen' ,
+				'limitFrom' ,
 				'aCriteria' ,
 				'aAssociationBy' ,
 				'arrAssociations' ,
@@ -1113,6 +1108,8 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	private $arrColumnAliases = array();
 	private $arrKeys ;
 	private $sDevicePrimaryKey = null ;
+	private $nLimitLen = 30 ;
+	private $limitFrom = 0 ;
 	private $aCriteria = null;
 	private $arrAssociations =  array();
 	private $aAssociationBy = null;

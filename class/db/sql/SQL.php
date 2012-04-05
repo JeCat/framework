@@ -274,20 +274,32 @@ abstract class SQL
 		return $this ;
 	}
 	
-	public function setRawClause($sType,array & $arrRawWhere)
+	public function setRawClause($sType,array & $arrRawWhere=null)
 	{
-		$this->arrRawSql['subtree'][$sType] =& $arrRawWhere ;
-	}
-	public function & rawClause($sType,& $arrParentToken=null)
-	{
-		if(!$arrParentToken)
+		if($arrRawWhere===null)
 		{
-			$arrParentToken =& $this->arrRawSql ;
+			unset($this->arrRawSql['subtree'][$sType]) ;
 		}
-
-		if( !isset($arrParentToken['subtree'][$sType]) )
+		else
 		{
-			$arrParentToken['subtree'][$sType] = array(
+			$this->arrRawSql['subtree'][$sType] =& $arrRawWhere ;
+		}
+	}
+	public function & rawClause($sType,$bAutoCreate=true,array & $parentToken=null)
+	{
+		if(!$parentToken)
+		{
+			$parentToken =& $this->arrRawSql ;
+		}
+		
+		if( !isset($parentToken['subtree'][$sType]) )
+		{
+			if(!$bAutoCreate)
+			{
+				return Type::$null ;
+			}
+			
+			$parentToken['subtree'][$sType] = array(
 					'expr_type' => 'clause_'. self::$mapClausesLower[$sType] ,
 					'pretree' => array( self::$mapClauses[$sType] ) ,
 					'subtree' => array() ,
@@ -295,10 +307,10 @@ abstract class SQL
 			
 			if( $sType === self::CLAUSE_GROUP or $sType===self::CLAUSE_ORDER )
 			{
-				$arrParentToken['subtree'][$sType]['pretree'][] = 'BY' ;
+				$parentToken['subtree'][$sType]['pretree'][] = 'BY' ;
 			}
 		}
-		return $arrParentToken['subtree'][$sType] ;
+		return $parentToken['subtree'][$sType] ;
 	}
 	
 	protected function & makeFactors(& $factors)

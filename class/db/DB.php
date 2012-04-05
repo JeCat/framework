@@ -1,6 +1,8 @@
 <?php 
 namespace org\jecat\framework\db ;
 
+use org\jecat\framework\db\sql\compiler\SqlCompiler;
+
 use org\jecat\framework\db\sql\SQL;
 
 use org\jecat\framework\db\sql\StatementState;
@@ -127,7 +129,7 @@ class DB extends Object
 		return $result ;
 	}
 	
-	public function queryCount(Select $aSelect,$sColumn='*')
+	public function queryCount(Select $aSelect,$sColumn='*',SqlCompiler $aSqlCompiler=null)
 	{
 		$arrRawSelect =& $aSelect->rawClause(SQL::CLAUSE_SELECT) ;
 		$arrReturnsBak =& $arrRawSelect['subtree'] ;
@@ -135,7 +137,7 @@ class DB extends Object
 		$arrTmp = array("count({$sColumn}) as rowCount") ;
 		$arrRawSelect['subtree'] =& $arrTmp ;
 		try{
-			$aRecords = $this->query($aSelect) ;
+			$aRecords = $this->query($aSelect->toString($aSqlCompiler)) ;
 		}catch(\Exception $e){}
 		//} final {
 			$arrRawSelect['subtree'] =& $arrReturnsBak ;
@@ -159,8 +161,7 @@ class DB extends Object
 	
 	public function execute($sql)
 	{
-		$arrLog['sql'] = ($sql instanceof Statement)?
-		$sql->makeStatement($this->sharedStatementState()): strval($sql) ;
+		$arrLog['sql'] = strval($sql) ;
 	
 		$fBefore = microtime(true) ;
 		$ret = $this->pdo()->exec($arrLog['sql']) ;

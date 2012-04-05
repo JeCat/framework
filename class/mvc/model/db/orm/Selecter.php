@@ -122,7 +122,7 @@ class Selecter extends OperationStrategy
 			$sKey.= ' `'.$aPrototype->sqlTableAlias().'`.`'.$sClmName.'`' ;
 		}
 		
-		return $aDB->queryCount( $aSelect->toString(Prototype::sqlCompiler()), $sKey ) ;
+		return $aDB->queryCount( $aSelect, $sKey, Prototype::sqlCompiler() ) ;
 	}
 	
 	public function hasExists(Model $aModel,Prototype $aPrototype=null,Select $aSelect=null,DB $aDB=null)
@@ -139,18 +139,23 @@ class Selecter extends OperationStrategy
 		{
 			$aDB = DB::singleton() ;
 		}
+
+		// 备份原来的 limit
+		$arrRawOriLimit =& $aSelect->rawClause(SQL::CLAUSE_LIMIT,false) ;
 		
-		/*$aCriteria = $aPrototype->statementFactory()
-						->createCriteria()
-						->setLimit(1) ;
-		$aSelect->setCriteria($aCriteria) ;*/
+		$aSelect->criteria()->setLimit(1,0) ;
 		
 		foreach($aPrototype->keys() as $sKey)
 		{
 			$aSelect->where()->eq($sKey,$aModel->data($sKey),$aPrototype->sqlTableAlias()) ;
 		}
 		
-		return $aDB->queryCount($aSelect)>0 ;
+		$bExists =  $aDB->queryCount($aSelect)>0 ;
+		
+		// 还原原来的 limit
+		$aSelect->setRawClause(SQL::CLAUSE_LIMIT,$arrRawOriLimit) ;
+		
+		return $bExists ;
 	}
 	
 	private function queryForMultitermAssoc(DB $aDB,Association $aMultitermAssoc,array & $arrDataSheet,$nRowIdx,Select $aSelect)
@@ -160,7 +165,7 @@ class Selecter extends OperationStrategy
 		
 		// 清理一些 select 状态
 		$aSelect->clearColumns() ;
-
+		
 		// 根据上一轮查询设置条件
 		if( $aMultitermAssoc->isType(Association::hasMany) )				// hasMany
 		{			
@@ -170,7 +175,6 @@ class Selecter extends OperationStrategy
 					, $aMultitermAssoc->fromKeys()
 					, $aToPrototype->sqlTableAlias()
 					, $aMultitermAssoc->toKeys()
-					, $aFromPrototype->statementFactory()
 			) ;
 		}
 		else if( $aMultitermAssoc->isType(Association::hasAndBelongsToMany) )	// hasAndBelongsTo
@@ -181,37 +185,33 @@ class Selecter extends OperationStrategy
 					, $aMultitermAssoc->fromKeys()
 					, $aMultitermAssoc->bridgeSqlTableAlias()
 					, $aMultitermAssoc->toBridgeKeys()
-					, $aFromPrototype->statementFactory()
 			) ;
 		}
 		else
 		{
 			throw new ORMException("what's this?") ;
 		}
-	
-		if( !$aTablesJoin=$aMultitermAssoc->sqlTablesJoin() )
-		{
-			throw new ORMException("关联对象没有TablesJoin对象") ;
-		}
 		
-		// 设置查询条件
 		$aSelect->criteria()->where()->add($aRestraction) ;
-		
+			
 		// 设置 order by
-		$aOriOrders = $aSelect->criteria()->orders(false) ;
-		if($aToPrototype->criteria()->orders(false)){
-			$aSelect->criteria()->setOrders($aToPrototype->criteria()->orders(false)) ;
-		}
+		$rawOriOrder =& $aSelect->rawClause(SQL::CLAUSE_ORDER,false) ;
+		$aSelect->setRawClause( SQL::CLAUSE_ORDER, $aToPrototype->criteria()->rawClause(SQL::CLAUSE_ORDER,false) ) ;
 
 		// 新建的一个记录表
 		$sheet =& Model::dataSheet($arrDataSheet,$nRowIdx,$aToPrototype->name(),true) ;
-		$this->execute($aToPrototype,$sheet,$aSelect,null,true,$aDB) ;
+		$this->execute(
+				$aToPrototype
+				, $sheet
+				, $aSelect
+				, null
+				, array($aToPrototype->limitLength(),$aToPrototype->limitFrom())
+				, $aDB
+		) ;
 		
 		// 清理条件 和 恢复order by
 		$aSelect->criteria()->where()->remove($aRestraction) ;
-		if($aOriOrders){
-			$aSelect->criteria()->setOrders($aOriOrders) ;
-		}
+		$aSelect->setRawClause(SQL::CLAUSE_ORDER,$rawOriOrder) ;
 	}
 
 	private function setGroupBy(Criteria $aCriteria,Prototype $aPrototype)

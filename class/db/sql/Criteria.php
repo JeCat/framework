@@ -14,10 +14,12 @@ class Criteria extends SQL
 	{
 		if($nLimitLen<0)
 		{
-			$this->clearLimit() ;
+			$this->clearLimit(true) ;
 		}
-		else 
+		else
 		{
+			$this->clearLimit(false) ;
+		
 			$arrRawLimit =& $this->rawClause(self::CLAUSE_LIMIT) ;
 		
 			if( $limitFrom!==null )
@@ -28,16 +30,26 @@ class Criteria extends SQL
 			}
 			else
 			{
-				$arrRawLimit['subtree'][] = $nLimitLen ;
+				$arrRawLimit['subtree'][] = (int)$nLimitLen ;
 			}
 		}
 	
 		return $this ;
 	}
 	
-	public function clearLimit()
+	public function clearLimit($bRemoveCluuse=true)
 	{
-		unset($this->arrRawSql[self::CLAUSE_LIMIT]) ;
+		if($bRemoveCluuse)
+		{
+			unset($this->arrRawSql['subtree'][self::CLAUSE_LIMIT]) ;
+		}
+		else
+		{
+			if(isset($this->arrRawSql['subtree'][self::CLAUSE_LIMIT]))
+			{
+				$this->arrRawSql['subtree'][self::CLAUSE_LIMIT]['subtree'] = array() ;
+			}
+		}
 	}
 	
 	// -- where --
@@ -76,7 +88,7 @@ class Criteria extends SQL
 	
 	public function clearOrders()
 	{
-		unset($this->arrRawSql[self::CLAUSE_ORDER]) ;
+		unset($this->arrRawSql['subtree'][self::CLAUSE_ORDER]) ;
 		return $this ;
 	}
 	

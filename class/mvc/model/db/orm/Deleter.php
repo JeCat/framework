@@ -1,30 +1,35 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\db\sql\SQL;
+use org\jecat\framework\db\sql\Delete;
 use org\jecat\framework\lang\Object;
 use org\jecat\framework\db\DB;
 use org\jecat\framework\mvc\model\db\Model ;
 use org\jecat\framework\db\sql\StatementFactory ;
 
 class Deleter extends Object{
-    public function execute(DB $aDB, Model $aModel){
+    public function execute(DB $aDB, Model $aModel)
+    {
         $aPrototype = $aModel->prototype();
-        $aDelete = StatementFactory::singleton()->createDelete($aPrototype ->tableName());
-        
-        // 产生一个criteria并设置给$aUpdate
-        $aDelete->setCriteria(StatementFactory::singleton()->createCriteria());
-        
+        $aDelete = new Delete($aPrototype ->tableName());
+                
         // 设置limit
         $aDelete->criteria()->setLimit(1);
         
         // delete 当前model
-        foreach($aModel->dataNameIterator() as $sClmName){
-        	if(in_array($sClmName,$aPrototype->keys())){//是主键
-				if($aModel->changed($sClmName)){//主键发生修改
-					throw new ORMException('org\jecat\framework\mvc\model\db\orm\Updater : Key 有修改，无法进行Delete操作');
-				}else{//用主键作为查询条件
-					$aDelete->criteria()->where()->eq('`'.$sClmName.'`',$aModel->data($sClmName));
-				}
+        foreach($aPrototype->keys() as $sClmName)
+        {
+			if($aModel->changed($sClmName))
+			{//主键发生修改
+				throw new ORMException('org\jecat\framework\mvc\model\db\orm\Updater : Key 有修改，无法进行Delete操作');
+			}
+			else
+			{//用主键作为查询条件
+				$aDelete->criteria()->where()->expression(array(
+						SQL::createRawColumn(null,$sClmName) ,
+						'=' , SQL::transValue($aModel->data($sClmName))
+				),true,true) ;
 			}
         }
         $aDB->execute($aDelete);

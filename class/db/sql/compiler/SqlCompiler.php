@@ -1,7 +1,8 @@
 <?php
 namespace org\jecat\framework\db\sql\compiler ;
 
-use org\jecat\framework\lang\Exception;
+use org\jecat\framework\lang\Type;
+
 use org\jecat\framework\lang\Object;
 
 class SqlCompiler extends Object
@@ -35,8 +36,7 @@ class SqlCompiler extends Object
 			{
 				$arrFactors =& $arrInFactors ;
 			}
-			
-			
+						
 			foreach($arrRawSql[$sTreeType] as &$token)
 			{
 				if( is_string($token) or is_numeric($token) )
@@ -72,7 +72,7 @@ class SqlCompiler extends Object
 				}
 				else
 				{
-					throw new Exception("遇到类型无效的 sql token: %s",$token) ;
+					throw new SqlCompileException($arrTokenTree,$token,"遇到类型无效的 sql token: %s",Type::detectType($token)) ;
 				}
 			}
 		}

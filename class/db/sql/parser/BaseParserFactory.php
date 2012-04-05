@@ -30,8 +30,8 @@ class BaseParserFactory extends Object
 				$aParser = self::createParserInstace('AbstractParser',$aDialect)
 								->addChildState($this->create($bShare,$aDialect,'insert'))
 								->addChildState($this->create($bShare,$aDialect,'replace'))
-								//->addChildState($this->create($bShare,$aDialect,'delete'))
-								//->addChildState($this->create($bShare,$aDialect,'update'))
+								->addChildState($this->create($bShare,$aDialect,'delete'))
+								->addChildState($this->create($bShare,$aDialect,'update'))
 								->addChildState($this->create($bShare,$aDialect,'select'))
 								->addChildState($this->create($bShare,$aDialect,'from'))
 								->addChildState($this->create($bShare,$aDialect,'where')) 
@@ -54,10 +54,14 @@ class BaseParserFactory extends Object
 								->addChildState($this->create($bShare,$aDialect,'column')) 
 								->addChildState($this->create($bShare,$aDialect,'values')) ;
 					break ;
-					
+
 			case 'update' :
 					$aParser = self::createParserInstace('ClauseParser',$aDialect,'update') ;
 					break ;
+					
+			case 'delete' :
+				$aParser = self::createParserInstace('ClauseParser',$aDialect,'delete') ;
+				break ;
 
 			case 'into' :
 					$aParser = self::createParserInstace('IntoParser',$aDialect)
