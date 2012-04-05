@@ -13,7 +13,7 @@ date_default_timezone_set('Asia/Shanghai') ;
 header("Content-Type: text/html; charset=UTF-8") ;
 
 // 关闭魔术引用
-set_magic_quotes_runtime(false) ;
+// set_magic_quotes_runtime(false) ;
 
 define( "org\\jecat\\framework\\VERSION", '0.7.0' ) ;
 define( "org\\jecat\\framework\\PATH", __DIR__ ) ;
