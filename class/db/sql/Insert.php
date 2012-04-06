@@ -109,7 +109,6 @@ class Insert extends SQL
 		return isset($this->mapData[$sColumnName])? $this->mapData[$sColumnName]: null ;
 	}
 	
-	
 	public function clearData()
 	{
 		$arrRawInsert = $this->rawClause(SQL::CLAUSE_INSERT) ;

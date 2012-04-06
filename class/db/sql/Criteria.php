@@ -100,7 +100,7 @@ class Criteria extends SQL
 		{
 			$arrGroupBy['subtree'][] = ',' ;
 		}
-		$arrGroupBy['subtree'][] = self::createRawColumn($sTable, $sColumn, null, $sDB) ;
+		$arrGroupBy['subtree'][] = self::createRawColumn($sTable,$sColumn,null) ;
 	
 		return $this ;
 	}

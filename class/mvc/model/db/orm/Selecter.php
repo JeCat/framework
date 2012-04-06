@@ -58,7 +58,7 @@ class Selecter extends OperationStrategy
 		// query
 		$aDB->pdo()->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES,1) ;
 		try{
-			$aPdoRecordset=$aDB->query( $aSelect->toString(Prototype::sqlCompiler()) ) ;
+			$aPdoRecordset=$aDB->query( $aSelect, null, Prototype::sqlCompiler() ) ;
 		}catch (\Exception $e){}
 		
 		//} final {
@@ -145,12 +145,20 @@ class Selecter extends OperationStrategy
 		
 		$aSelect->criteria()->setLimit(1,0) ;
 		
-		foreach($aPrototype->keys() as $sKey)
+		$aRestriction = $aSelect->where()->createRestriction() ;
+		foreach($aPrototype->keys() as $nIdx=>$sKey)
 		{
-			$aSelect->where()->eq($sKey,$aModel->data($sKey),$aPrototype->sqlTableAlias()) ;
+			$aRestriction->expression(array(
+					SQL::createRawColumn($aPrototype->sqlTableAlias(), $sKey)
+					, '=', SQL::transValue($aModel->data($sKey))
+			),true,true) ;
 		}
 		
+		// 查询
 		$bExists =  $aDB->queryCount($aSelect)>0 ;
+		
+		// 移除条件
+		$aSelect->where()->remove($aRestriction) ;
 		
 		// 还原原来的 limit
 		$aSelect->setRawClause(SQL::CLAUSE_LIMIT,$arrRawOriLimit) ;
@@ -260,14 +268,12 @@ class Selecter extends OperationStrategy
 	static public function buildSelect(Prototype $aPrototype)
 	{
 		$aSelect = new Select($aPrototype->tableName(),$aPrototype->sqlTableAlias()) ;//$aPrototype->statementFactory()->createSelect() ;
-		
-		// 主表的名称
-		//$aTable = $aPrototype->createSqlTable() ;
-		//$aSelect->addTable($aTable) ;
-		
-		// criteria
-		//$aCriteria = clone $aPrototype->criteria() ;
-		//$aSelect->setCriteria( $aCriteria ) ;
+				
+		// where
+		if( $arrRawWhere =& $aPrototype->whereRawSql() )
+		{
+			$aSelect->setRawClause( SQL::CLAUSE_WHERE, $arrRawWhere ) ;
+		}
 		
 		// 递归连接所有关联原型的 table
 		self::joinTables( $aSelect, $aPrototype ) ;
@@ -286,18 +292,19 @@ class Selecter extends OperationStrategy
 			
 			// 两表关联
 			if( $aAssoc->isType(Association::pair) )
-			{
-				
-				$arrOnTokens =& self::makeResrictionForForeignKey($sFromTableAlias,$sToTableAlias,$aAssoc->fromKeys(), $aAssoc->toKeys()) ;
-				array_unshift($arrOnTokens, 'ON', '(') ;
-				$arrOnTokens[] = ')' ;
-				
+			{				
 				$aSelect->_joinTableRaw(
 						$sFromTableAlias
 						, $aPrototype->tableName()
 						, $sToTableAlias
 						, $aAssoc->joinType()
-						, $arrOnTokens
+						, self::makeResrictionForForeignKey(
+								$sFromTableAlias
+								, $sToTableAlias
+								, $aAssoc->fromKeys()
+								, $aAssoc->toKeys()
+								, $aAssoc->joinOnRawSql()
+						)
 				) ;
 			}
 			
@@ -307,64 +314,63 @@ class Selecter extends OperationStrategy
 				$sBridgeTableAlias = $aAssoc->bridgeSqlTableAlias() ;
 				
 				// 从左表连接到中间表
-				$arrOnTokens =& self::makeResrictionForForeignKey($sFromTableAlias,$sBridgeTableAlias,$aAssoc->fromKeys(),$aAssoc->toBridgeKeys()) ;
-				array_unshift($arrOnTokens, 'ON', '(') ;
-				$arrOnTokens[] = ')' ;
-				
 				$aSelect->_joinTableRaw(
 						$sFromTableAlias
 						, $aAssoc->bridgeTableName()
 						, $sBridgeTableAlias
 						, $aAssoc->joinType()
-						, $arrOnTokens
+						, self::makeResrictionForForeignKey(
+								$sFromTableAlias
+								, $sBridgeTableAlias
+								, $aAssoc->fromKeys()
+								, $aAssoc->toBridgeKeys()
+								, $aAssoc->joinOnRawSql()
+						)
 				) ;
 				
-				// 从中间表连接到右表
-				$arrOnTokens =& self::makeResrictionForForeignKey($sBridgeTableAlias,$sToTableAlias,$aAssoc->fromBridgeKeys(),$aAssoc->toKeys()) ;
-				array_unshift($arrOnTokens, 'ON', '(') ;
-				$arrOnTokens[] = ')' ;
-				
+				// 从中间表连接到右表				
 				$aSelect->_joinTableRaw(
 						$sBridgeTableAlias
 						, $aPrototype->tableName()
 						, $sToTableAlias
 						, $aAssoc->joinType()
-						, $arrOnTokens
+						, self::makeResrictionForForeignKey(
+								$sBridgeTableAlias
+								, $sToTableAlias
+								, $aAssoc->fromBridgeKeys()
+								, $aAssoc->toKeys()
+								, $aAssoc->joinOnRawSql()
+						)
 				) ;
-				
-			
-				// 在桥接表上加入自定义的 join on 条件
-				/*if( $aTablesJoinOn = $aAssoc->otherBridgeTableJoinOn(false) )
-				{
-					$aBridgeTablesJoin->on()->add($aTablesJoinOn) ;
-				}*/
 			}
 			
 			else 
 			{
 				throw new Exception("what's this?") ;
 			}
-		
-			// 加入自定义的 join on 条件
-			/*if( $aOtherTablesJoinOn = $aAssoc->otherTableJoinOn(false) )
-			{
-				$aTablesJoin->on()->add($aOtherTablesJoinOn) ;
-			}*/
 				
 			// 递归
 			self::joinTables( $aSelect, $aPrototype ) ;
 		}
 	}
 	
-	static private function & makeResrictionForForeignKey($sFromTableName=null,$sToTableName=null,array & $arrFromKeys,array & $arrToKeys)
-	{		
-		$arrTokens = array() ;
+	static private function & makeResrictionForForeignKey($sFromTableName=null,$sToTableName=null,array & $arrFromKeys,array & $arrToKeys,array & $arrConditions=null)
+	{
+		$arrTokens = array('ON','(') ;
 		foreach ($arrFromKeys as $nIdx=>$sFromKey)
 		{
 			$arrTokens[] = SQL::createRawColumn($sFromTableName, $sFromKey) ;
 			$arrTokens[] = '=' ;
 			$arrTokens[] = SQL::createRawColumn($sToTableName, $arrToKeys[$nIdx]) ;
 		}
+
+		if( $arrConditions )
+		{
+			$arrOnTokens[] = ',' ;
+			$arrOnTokens[] = $arrConditions ;
+		}
+		
+		$arrTokens[] = ')' ;
 		
 		return $arrTokens ;
 	}

@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\db\sql\parser\BaseParserFactory;
+
 use org\jecat\framework\db\sql\compiler\SqlNameCompiler;
 
 use org\jecat\framework\db\sql\compiler\SqlCompiler;
@@ -839,7 +841,24 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 		// where
 		if(!empty($arrConfig['where']))
 		{
-			self::buildBeanRestriction($arrConfig['where'],$this->criteria()->where()->createRestriction()) ;
+			$aSqlParser = BaseParserFactory::singleton()->create(true,null,'where') ;
+			if( is_array($arrConfig['where']) )
+			{
+				$arrOnFactors = $arrConfig['where'] ;
+				$this->arrWhereRawSql = array(
+						'expr_type' => 'clause_where' ,
+						'subtree' => $aSqlParser->parse(array_shift($arrOnFactors),true) ,
+						'factors' => & $arrOnFactors ,
+				) ;
+			}
+			else
+			{
+				$this->arrWhereRawSql = array(
+						'expr_type' => 'clause_on' ,
+						'subtree' => $aSqlParser->parse($arrConfig['where'],true) ,
+				) ;
+			}
+			// self::buildBeanRestriction($arrConfig['where'],$this->criteria()->where()->createRestriction()) ;
 		}
 		
 		// associations
@@ -890,58 +909,6 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 		$this->arrBeanConfig = $arrConfig ;
 	}
 	
-	
-	static public function buildBeanRestriction(array $arrRestrictionConfig,Restriction $aRestriction)
-	{
-		// 第一项 'and' 或 'or'
-		$sLogic = array_shift($arrRestrictionConfig) ;
-		if( $sLogic )
-		{
-			if(is_string($sLogic))
-			{
-				$aRestriction->setLogic( strtolower($sLogic)!='or' ) ;
-			}
-			else 
-			{
-				array_unshift($arrRestrictionConfig,$sLogic) ;
-			}
-		}
-		
-		foreach ($arrRestrictionConfig as &$arrCondition)
-		{
-			if( !is_array($arrCondition) )
-			{
-				throw new BeanConfException('无效的orm bean config 内容：%s，做为sql条件，必须是一个数组',var_export($arrCondition,true)) ;
-			}
-			
-			$sOperator = array_shift($arrCondition) ;
-			$sOperator = strtolower($sOperator) ;
-			
-			// 递归 条件分组
-			if($sOperator=='restriction')
-			{
-				$sOperator = 'and' ;
-			}
-			if( $sOperator=='and' or $sOperator=='or' )
-			{
-				array_unshift($arrCondition,$sOperator) ;
-				self::buildBeanRestriction($arrCondition,$aRestriction->createRestriction()) ;
-			}
-			// 处理条件
-			else 
-			{
-				if( !is_string($sOperator) or !method_exists($aRestriction,$sOperator))
-				{
-					throw new BeanConfException(
-							'无效的orm bean config 内容：%s，做为sql条件，数组的第一个元素必须是一个有效的表示运算符的字符串'
-							, var_export($arrCondition,true)
-					) ;
-				}
-				call_user_func_array(array($aRestriction,$sOperator),$arrCondition) ;
-			}
-		}
-	}
-	
 	public function beanConfig()
 	{
 		$this->arrBeanConfig ;
@@ -963,6 +930,10 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	public function limitFrom()
 	{
 		return $this->limitFrom ;
+	}
+	public function & whereRawSql()
+	{
+		return $this->arrWhereRawSql ;
 	}
 	
 	// statement
@@ -1027,6 +998,7 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 				'sModelClass' ,
 				'nLimitLen' ,
 				'limitFrom' ,
+				'arrWhereRawSql' ,
 				'aCriteria' ,
 				'aAssociationBy' ,
 				'arrAssociations' ,
@@ -1110,6 +1082,7 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	private $sDevicePrimaryKey = null ;
 	private $nLimitLen = 30 ;
 	private $limitFrom = 0 ;
+	private $arrWhereRawSql = 0 ;
 	private $aCriteria = null;
 	private $arrAssociations =  array();
 	private $aAssociationBy = null;

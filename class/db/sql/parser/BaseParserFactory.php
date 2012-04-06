@@ -84,7 +84,7 @@ class BaseParserFactory extends Object
 				
 			case 'using' :
 				$aParser = self::createParserInstace('ClauseParser',$aDialect,'using') 
-								->addChildState($this->create($bShare,$aDialect,'table')) ;
+								->addChildState($this->create($bShare,$aDialect,'column')) ;
 				break ;
 				
 			case 'on' :
@@ -95,17 +95,16 @@ class BaseParserFactory extends Object
 				
 			case 'group' :
 				$aParser = self::createParserInstace('ClauseParser',$aDialect,'group')
-								->addChildState($this->create($bShare,$aDialect,'table')) ;
+								->addChildState($this->create($bShare,$aDialect,'column')) ;
 				break ;
 				
 			case 'order' :
 				$aParser = self::createParserInstace('ClauseParser',$aDialect,'order')
-								->addChildState($this->create($bShare,$aDialect,'table')) ;
+								->addChildState($this->create($bShare,$aDialect,'column')) ;
 				break ;
 				
 			case 'limit' :
-				$aParser = self::createParserInstace('ClauseParser',$aDialect,'limit')
-								->addChildState($this->create($bShare,$aDialect,'table')) ;
+				$aParser = self::createParserInstace('ClauseParser',$aDialect,'limit') ;
 				break ;
 				
 			case 'set' :

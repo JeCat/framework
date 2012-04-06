@@ -17,7 +17,14 @@ abstract class NameParser extends AbstractParser
 			
 			if( !$nextName=$this->parseName($nextToken) )
 			{
-				throw new SqlParserException($aParseState, "遇到无效的名称分隔符“.” , “.” 后面不是一个合法的别名：%s", $nextToken) ;
+				if($nextToken==='*')
+				{
+					$nextName = $nextToken ;
+				}
+				else
+				{
+					throw new SqlParserException($aParseState, "遇到无效的名称分隔符“.” , “.” 后面不是一个合法的名称：%s", $nextToken) ;
+				}
 			}
 
 			switch($prevToken['expr_type'])
@@ -42,9 +49,6 @@ abstract class NameParser extends AbstractParser
 					throw new SqlParserException($aParseState, "遇到无效的名称分隔符“.” , “.” 前不是一个字段或数据表的表达式：%s", $prevToken['expr_type']) ;
 					break ;
 			}
-			
-			$prevToken['subtree'][] = $sToken ;
-			$prevToken['subtree'][] = $nextToken ;
 			
 			array_pop($aParseState->arrTree) ;
 			array_push($aParseState->arrTree,$prevToken) ;
@@ -79,9 +83,6 @@ abstract class NameParser extends AbstractParser
 					{
 						throw new SqlParserException($aParseState, "遇到无效的 as , as 后面不是一个合法的别名：%s", $nextToken) ;
 					}
-			
-					$prevToken['subtree'][] = $sToken ;
-					$prevToken['subtree'][] = $nextToken ;
 				
 					array_pop($aParseState->arrTree) ;
 					array_push($aParseState->arrTree,$prevToken) ;

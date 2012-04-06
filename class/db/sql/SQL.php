@@ -86,9 +86,10 @@ abstract class SQL
 			return ;
 		}
 		
-		if( isset($arrRawSqls[0]['commend']) and $arrRawSqls[0]['commend']==='SELECT' )
+		if( isset($arrRawSqls[0]['command']) and $arrRawSqls[0]['command']==='SELECT' )
 		{
 			$aSql = new Select() ;
+			$aSql->setRawSql($arrRawSqls[0]) ;
 		}
 		
 		else 
@@ -102,7 +103,7 @@ abstract class SQL
 			$aSql->addFactors($factors) ;
 		}
 		
-		return $aSql->setRawSql($arrRawSqls[0]) ;
+		return $aSql ;
 	}
 	/**
 	 * @return Restriction

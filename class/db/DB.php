@@ -1,6 +1,8 @@
 <?php 
 namespace org\jecat\framework\db ;
 
+use org\jecat\framework\db\sql\parser\BaseParserFactory;
+
 use org\jecat\framework\db\sql\compiler\SqlCompiler;
 
 use org\jecat\framework\db\sql\SQL;
@@ -106,9 +108,9 @@ class DB extends Object
 	/**
 	 * @return \PDOStatement
 	 */
-	public function query($sql)
+	public function query($sql,$factors=null,SqlCompiler $aSqlCompiler=null)
 	{
-		$arrLog['sql'] = strval($sql) ;
+		$arrLog['sql'] = $this->makeSql($sql,$factors,$aSqlCompiler) ;
 	
 		$fBefore = microtime(true) ;
 		$result = $this->pdo()->query($arrLog['sql'],\PDO::FETCH_ASSOC) ;
@@ -129,6 +131,34 @@ class DB extends Object
 		return $result ;
 	}
 	
+	private function makeSql($inputSql,$factors=null,SqlCompiler $aSqlCompiler=null)
+	{
+		if( is_string($inputSql) )
+		{
+			$aSql = SQL::make($inputSql,$factors) ;
+		}
+		
+		else if( $inputSql instanceof SQL )
+		{
+			$aSql = $inputSql ;
+			$aSql->addFactors($factors) ;
+		}
+		
+		else
+		{
+			throw new ExecuteException($this,null,0,"DB::query() 输入的参数 \$sql 类型无效。") ;
+		}
+		
+		if($aSql)
+		{
+			return $aSql->toString($aSqlCompiler) ;
+		}
+		else
+		{
+			return $inputSql ;
+		}		
+	}
+	
 	public function queryCount(Select $aSelect,$sColumn='*',SqlCompiler $aSqlCompiler=null)
 	{
 		$arrRawSelect =& $aSelect->rawClause(SQL::CLAUSE_SELECT) ;
@@ -137,7 +167,7 @@ class DB extends Object
 		$arrTmp = array("count({$sColumn}) as rowCount") ;
 		$arrRawSelect['subtree'] =& $arrTmp ;
 		try{
-			$aRecords = $this->query($aSelect->toString($aSqlCompiler)) ;
+			$aRecords = $this->query($aSelect,null,$aSqlCompiler) ;
 		}catch(\Exception $e){}
 		//} final {
 			$arrRawSelect['subtree'] =& $arrReturnsBak ;
@@ -159,9 +189,9 @@ class DB extends Object
 		}
 	}
 	
-	public function execute($sql)
+	public function execute($inputSql,$factors=null,SqlCompiler $aSqlCompiler=null)
 	{
-		$arrLog['sql'] = strval($sql) ;
+		$arrLog['sql'] = $this->makeSql($inputSql,$factors,$aSqlCompiler) ;
 	
 		$fBefore = microtime(true) ;
 		$ret = $this->pdo()->exec($arrLog['sql']) ;

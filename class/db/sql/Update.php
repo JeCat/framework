@@ -23,6 +23,7 @@ class Update extends MultiTableSQL implements IDataSettableStatement
 	{
 		list($sTableName,$sColumnName) = SQL::splitColumn($sColumnName) ;
 		
+		
 		$arrRawSet =& $this->rawClause(SQL::CLAUSE_SET) ;
 		if( !isset($arrRawSet['subtree'][$sColumnName]) and !empty($arrRawSet['subtree']) )
 		{
@@ -34,18 +35,27 @@ class Update extends MultiTableSQL implements IDataSettableStatement
 				'pretree' => array(
 						SQL::createRawColumn($sTableName,$sColumnName), '='
 				) ,
-				'subtree' => array( $bValueExpr? SQL::transValue($value): SQL::transValue($value) ) ,
+				//'subtree' => array( $bValueExpr? SQL::transValue($value): SQL::transValue($value) ) ,
 		) ;
+
+		if($bValueExpr)
+		{
+			$arrRawSet['subtree'][$sColumnName]['subtree'] = BaseParserFactory::singleton()->create(true,null,'values')->parse($value,true) ;
+		}
+		else
+		{
+			$arrRawSet['subtree'][$sColumnName]['subtree'] = array( SQL::transValue($value) ) ;
+		}
 	}
 	
 	public function removeData($sColumnName)
 	{
-		unset($this->arrRawSql[SQL::CLAUSE_SET]) ;
+		unset($this->arrRawSql['subtree'][SQL::CLAUSE_SET]) ;
 	}
 
 	public function clearData()
 	{
-		unset($this->arrRawSql[SQL::CLAUSE_SET]) ;
+		unset($this->arrRawSql['subtree'][SQL::CLAUSE_SET]) ;
 	}
 }
 
