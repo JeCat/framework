@@ -1,22 +1,33 @@
 <?php
 namespace org\jecat\framework\db\sql\compiler ;
 
+use org\jecat\framework\db\DB;
+
+use org\jecat\framework\setting\Setting;
+
 class SqlNameCompiler
-{
+{	
 	public function compile(SqlCompiler $aSqlCompiler,array & $arrTokenTree,array & $arrToken,array & $arrFactors=null)
 	{
 		// 处理表名
 		if( $arrToken['expr_type']==='table' )
 		{
-			//$sTable = $arrToken['table'] ;
-			//$sDB = empty($arrToken['db'])? null: $arrToken['db'] ;
-			//$sAlias = empty($arrToken['as'])? null: $arrToken['as'] ;
-			
-			//$sSql = $sDB? '': ('`'.$sDB.'`.') ;
-			$sSql = '`'.$arrToken['table'].'`' ;
-			if(!empty($arrToken['as']))
+			$sTable = $arrToken['table'] ;
+			$sAlias = empty($arrToken['as'])? null: $arrToken['as'] ;
+
+			// 表名称转换
+			if($this->arrTableNameTranslaters)
 			{
-				$sSql.= ' AS `' . $arrToken['as'] . '`' ;
+				foreach($this->arrTableNameTranslaters as &$translaters)
+				{
+					list($sTable,$sAlias) = call_user_func($translaters,$sTable,$sAlias,$arrToken,$arrTokenTree) ;
+				}
+			}
+			
+			$sSql = '`'.$sTable.'`' ;
+			if($sAlias)
+			{
+				$sSql.= ' AS `' . $sAlias . '`' ;
 			}
 			
 			// 处理 join 子句
@@ -56,6 +67,18 @@ class SqlNameCompiler
 	{
 		$this->arrColumnNameTranslaters[] = $fnTranslaters ;
 	}
+	public function registerTableNameTranslaters($fnTranslaters)
+	{
+		$this->arrTableNameTranslaters[] = $fnTranslaters ;
+	}
+
+	static public function translateTableName($sTable,$sAlias,array & $arrToken,array & $arrTokenTree)
+	{
+		return array( DB::singleton()->transTableName($sTable), $sAlias ) ;
+	}
 	
 	private $arrColumnNameTranslaters ;
+	
+	private $arrTableNameTranslaters = array( array(__CLASS__,'translateTableName') ) ;
+	
 }

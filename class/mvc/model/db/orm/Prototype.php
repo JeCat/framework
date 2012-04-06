@@ -544,19 +544,18 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	{
 		if(!$this->sModelClass)
 		{
-			$sModelShortClass = '_'.preg_replace('[^\w_]','_',$this->tableName()) ;
-			$this->sModelClass = self::MODEL_IMPLEMENT_CLASS_NS .'\\'. $sModelShortClass ;
+			$this->sModelClass = self::modelShadowClassName($this->tableName()) ;
 		}
 		return $this->sModelClass ;
 	}
 	
 	static public function modelShadowClassName($sTableName){
-		$sModelShortClass = '_'.preg_replace('[^\w_]','_',$sTableName) ;
+		$sModelShortClass = '_'.preg_replace('/[^\\w_]/','_',$sTableName) ;
 		return self::MODEL_IMPLEMENT_CLASS_NS .'\\'. $sModelShortClass ;
 	}
 	
 	static public function prototypeShadowClassName($sTableName){
-		$sShortClass = '_'.preg_replace('[^\w_]','_',$sTableName) ;
+		$sShortClass = '_'.preg_replace('/[^\\w_]/','_',$sTableName) ;
 		return self::PROTOTYPE_IMPLEMENT_CLASS_NS .'\\'. $sShortClass ;
 	}
 	
@@ -596,9 +595,8 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	{
 		// 根据 table 自动生成影子class
 		if( !empty($arrConfig['table']) )
-		{			
-			$sShortClass = '_'.preg_replace('[^\w_]','_',$arrConfig['table']) ;
-			$sClass = self::PROTOTYPE_IMPLEMENT_CLASS_NS .'\\'. $sShortClass ;
+		{
+			$sClass = self::prototypeShadowClassName($arrConfig['table']) ;
 		}
 		
 		$aBean = new $sClass() ;
@@ -1047,8 +1045,8 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 			$aNameCompiler->registerColumnNameTranslaters(array(__CLASS__,'translateColumnName')) ;
 			
 			self::$aSqlCompiler = new SqlCompiler(true) ;			
-			self::$aSqlCompiler->registerTokenCompiler('column', $aNameCompiler) ;
-			self::$aSqlCompiler->registerTokenCompiler('table', $aNameCompiler) ;
+			self::$aSqlCompiler->registerTokenCompiler('column',$aNameCompiler) ;
+			self::$aSqlCompiler->registerTokenCompiler('table',$aNameCompiler) ;
 		}
 		
 		return self::$aSqlCompiler ;

@@ -11,7 +11,7 @@ use org\jecat\framework\lang\Exception;
 
 use org\jecat\framework\lang\Object;
 
-abstract class SQL
+class SQL
 {
 	const CLAUSE_SELECT = 1 ;	// SELECT
 	const CLAUSE_INSERT = 2 ;	// INSERT
@@ -86,16 +86,35 @@ abstract class SQL
 			return ;
 		}
 		
-		if( isset($arrRawSqls[0]['command']) and $arrRawSqls[0]['command']==='SELECT' )
+		if( empty($arrRawSqls[0]) )
 		{
-			$aSql = new Select() ;
-			$aSql->setRawSql($arrRawSqls[0]) ;
+			return null ;
+		}
+		
+		if( isset($arrRawSqls[0]['command']) )
+		{
+			switch($arrRawSqls[0]['command'])
+			{
+				case 'SELECT' :
+					$aSql = new Select() ;
+				case 'INSERT' :
+					$aSql = new Insert() ;
+				case 'UPDATE' :
+					$aSql = new Update() ;
+				case 'DELETE' :
+					$aSql = new Delete() ;
+					break ;
+				default:
+					throw new Exception("sql raw 的 command 无效：%s",$arrRawSqls[0]['command']) ;
+			}
 		}
 		
 		else 
 		{
-			return null ;
+			$aSql = new SQL() ;
 		}
+		
+		$aSql->setRawSql($arrRawSqls[0]) ;
 		
 		if($factors)
 		{

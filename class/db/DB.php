@@ -227,6 +227,25 @@ class DB extends Object
 		return $this->sCurrentDBName ;
 	}
 	
+	public function & transTableName($sTableName)
+	{
+		// 将 命名空间的分隔符号 : 转换成 _ 
+		$sTableName = str_replace(':','_',$sTableName) ;
+		
+		// 加上表名的前缀
+		if( $this->sTableNamePrefix and $sTableName[0]!==':' )
+		{
+			$sTableName = self::$sTableNamePrefix.$sTableName ;
+		}
+		
+		return $sTableName ;
+	}
+
+	public function setTableNamePrefix($sTableNamePrefix)
+	{
+		$this->sTableNamePrefix = $sTableNamePrefix ;
+	}
+	
 	/**
 	 * @return org\jecat\framework\db\sql\reflecter\AbstractReflecterFactory
 	 */
@@ -302,7 +321,8 @@ class DB extends Object
 	private $sCurrentDBName ;
 	private $arrExecuteLog ;
 	private $aSharedStatementState ;
-	
+
+	private $sTableNamePrefix ;
 }
 
 ?>

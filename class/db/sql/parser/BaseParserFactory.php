@@ -60,7 +60,8 @@ class BaseParserFactory extends Object
 					break ;
 					
 			case 'delete' :
-				$aParser = self::createParserInstace('ClauseParser',$aDialect,'delete') ;
+				$aParser = self::createParserInstace('ClauseParser',$aDialect,'delete')
+								->addChildState($this->create($bShare,$aDialect,'from')) ;
 				break ;
 
 			case 'into' :
