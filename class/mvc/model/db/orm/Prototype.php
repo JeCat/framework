@@ -1,10 +1,9 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\lang\Assert;
 use org\jecat\framework\db\sql\parser\BaseParserFactory;
-
 use org\jecat\framework\db\sql\compiler\SqlNameCompiler;
-
 use org\jecat\framework\db\sql\compiler\SqlCompiler;
 use org\jecat\framework\db\sql\SQL;
 use org\jecat\framework\db\sql\Criteria;
@@ -549,14 +548,16 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 		return $this->sModelClass ;
 	}
 	
-	static public function modelShadowClassName($sTableName){
-		$sModelShortClass = '_'.preg_replace('/[^\\w_]/','_',$sTableName) ;
-		return self::MODEL_IMPLEMENT_CLASS_NS .'\\'. $sModelShortClass ;
+	static public function modelShadowClassName($sTableName)
+	{
+		$sModelClass = self::MODEL_IMPLEMENT_CLASS_NS .'\\_'.preg_replace('/[^\\w_]/','_',$sTableName) ;
+		return class_exists($sModelClass)? $sModelClass: 'org\\jecat\\framework\\mvc\\model\\db\\Model' ;
 	}
 	
-	static public function prototypeShadowClassName($sTableName){
-		$sShortClass = '_'.preg_replace('/[^\\w_]/','_',$sTableName) ;
-		return self::PROTOTYPE_IMPLEMENT_CLASS_NS .'\\'. $sShortClass ;
+	static public function prototypeShadowClassName($sTableName)
+	{
+		$sClass = self::PROTOTYPE_IMPLEMENT_CLASS_NS .'\\_'.preg_replace('/[^\\w_]/','_',$sTableName) ;
+		return class_exists($sClass)? $sClass: __CLASS__ ;
 	}
 	
 	// criteria setter

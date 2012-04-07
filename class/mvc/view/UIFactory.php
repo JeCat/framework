@@ -59,7 +59,7 @@ class UIFactory extends UIFactoryBase
 	public function newSourceFileManager()
 	{
 		$aSrcMgr = parent::newSourceFileManager() ;
-		$aSrcMgr->addFolder(Folder::singleton()->findFolder('/framework/template/'),null,'org\\jecat\\framework') ;
+		$aSrcMgr->addFolder(new Folder(\org\jecat\framework\PATH.'/template',Folder::CLEAN_PATH),null,'org\\jecat\\framework') ;
 		
 		return $aSrcMgr ;
 	}

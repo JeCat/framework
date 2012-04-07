@@ -254,11 +254,7 @@ class DB extends Object
 		// 自动链接到数据库
 		if( !$this->hasConnected() )
 		{
-			try{
-				$this->connect() ;
-			} catch (\Exception $e) {
-				return null ;
-			}
+			$this->connect() ;
 		}
 		
 		//识别数据库的名称(mysql,oracle)

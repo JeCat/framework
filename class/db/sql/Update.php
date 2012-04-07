@@ -23,7 +23,6 @@ class Update extends MultiTableSQL implements IDataSettableStatement
 	{
 		list($sTableName,$sColumnName) = SQL::splitColumn($sColumnName) ;
 		
-		
 		$arrRawSet =& $this->rawClause(SQL::CLAUSE_SET) ;
 		if( !isset($arrRawSet['subtree'][$sColumnName]) and !empty($arrRawSet['subtree']) )
 		{

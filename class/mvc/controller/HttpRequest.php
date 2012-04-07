@@ -44,7 +44,6 @@ class HttpRequest extends Request
 		
 		// $_FILES 
 		$this->buildUploadFiles($aApp?:Application::singleton()) ;
-		
 		// 
 		$this->sRequestUrl = (empty($_SERVER['HTTPS'])?'http://':'https://').$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'] ;
 		
@@ -152,7 +151,10 @@ class HttpRequest extends Request
 	{
 		return $this->urlInfo('pass') ;
 	}
-	
+	public function urlBase()
+	{
+		return $this->urlInfo('scheme') . '://' . $this->urlInfo('host') . dirname($this->urlInfo('path')) ;
+	}	
 	public function urlNoQuery()
 	{
 		return $this->urlInfo('scheme') . '://' . $this->urlInfo('host') . $this->urlInfo('path') ;
@@ -234,6 +236,6 @@ class HttpRequest extends Request
 	private $sUri ;
 	private $arrUrlPathInfo ;
 	private $sRequestUrl ;
-	static private $sUploadTmpPath = '/tmp/upload' ;
+	private $sRequestUrlBase ;
 }
 ?>

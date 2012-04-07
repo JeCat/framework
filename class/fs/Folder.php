@@ -15,6 +15,16 @@ class Folder extends FSO
 	const FIND_AUTO_CREATE_OBJECT = 2 ;		// 如果找不到文件，自动创建一个文件对象（没有实际创建文件）
 	const FIND_DEFAULT = FSO::unknow ;			// FSO::unknow
 		
+	static public function createFolder($sPath,$nFlag=self::CREATE_DEFAULT)
+	{
+		$aFolder = new Folder($sPath,$nFlag) ;
+		if(!$aFolder->exists())
+		{
+			$aFolder->create($nFlag) ;
+		}
+		return $aFolder ;
+	}
+	
 	/**
 	 * @return FSO
 	 * @retval $type参数		不存在	存在为File	存在为Folder
@@ -55,7 +65,14 @@ class Folder extends FSO
 	{
 		if( !($nFlag&FSO::CLEAN_PATH) )
 		{
-			$sPath = $this->path() . '/' . $sPath  ;
+			if( $sPath and $sPath[0]==='/' )
+			{
+				$sPath = $this->path() . $sPath  ;
+			}
+			else 
+			{
+				$sPath = $this->path() . '/' . $sPath  ;
+			}
 			// FSO::tidyPath($sPath,true) ;
 		}
 		
