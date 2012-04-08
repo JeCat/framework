@@ -840,22 +840,18 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 		// where
 		if(!empty($arrConfig['where']))
 		{
+			$arrRawWhere =& $this->criteria()->rawClause(SQL::CLAUSE_WHERE) ;
 			$aSqlParser = BaseParserFactory::singleton()->create(true,null,'where') ;
+			
 			if( is_array($arrConfig['where']) )
 			{
 				$arrOnFactors = $arrConfig['where'] ;
-				$this->arrWhereRawSql = array(
-						'expr_type' => 'clause_where' ,
-						'subtree' => $aSqlParser->parse(array_shift($arrOnFactors),true) ,
-						'factors' => & $arrOnFactors ,
-				) ;
+				$arrRawWhere['subtree'] = $aSqlParser->parse(array_shift($arrOnFactors),true) ;
+				call_user_func_array(array($this->criteria()->where(),'addFactors'), $arrOnFactors) ;
 			}
 			else
 			{
-				$this->arrWhereRawSql = array(
-						'expr_type' => 'clause_on' ,
-						'subtree' => $aSqlParser->parse($arrConfig['where'],true) ,
-				) ;
+				$arrRawWhere['subtree'] = $aSqlParser->parse($arrConfig['where'],true) ;
 			}
 			// self::buildBeanRestriction($arrConfig['where'],$this->criteria()->where()->createRestriction()) ;
 		}
@@ -930,10 +926,6 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	{
 		return $this->limitFrom ;
 	}
-	public function & whereRawSql()
-	{
-		return $this->arrWhereRawSql ;
-	}
 	
 	// statement
 	/**
@@ -960,7 +952,7 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 			$this->aStatementSelect = Selecter::buildSelect($this) ;
 			
 			$arrTokenTree =& $this->aStatementSelect->rawSql() ;
-			$arrTokenTree['omited_first_table'] = $this->name() ;
+			$arrTokenTree['omited_first_table'] = $this->sqlTableAlias() ;
 			$arrTokenTree['omited_first_table_len'] = strlen($arrTokenTree['omited_first_table']) ;
 		}
 		return $this->aStatementSelect ;
@@ -997,7 +989,6 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 				'sModelClass' ,
 				'nLimitLen' ,
 				'limitFrom' ,
-				'arrWhereRawSql' ,
 				'aCriteria' ,
 				'aAssociationBy' ,
 				'arrAssociations' ,
@@ -1081,7 +1072,6 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	private $sDevicePrimaryKey = null ;
 	private $nLimitLen = 30 ;
 	private $limitFrom = 0 ;
-	private $arrWhereRawSql = 0 ;
 	private $aCriteria = null;
 	private $arrAssociations =  array();
 	private $aAssociationBy = null;

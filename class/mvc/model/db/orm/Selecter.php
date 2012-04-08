@@ -274,7 +274,7 @@ class Selecter extends OperationStrategy
 		$aSelect = new Select($aPrototype->tableName(),$aPrototype->sqlTableAlias()) ;//$aPrototype->statementFactory()->createSelect() ;
 				
 		// where
-		if( $arrRawWhere =& $aPrototype->whereRawSql() )
+		if( $arrRawWhere =& $aPrototype->criteria()->rawClause(SQL::CLAUSE_WHERE) )
 		{
 			$aSelect->setRawClause( SQL::CLAUSE_WHERE, $arrRawWhere ) ;
 		}

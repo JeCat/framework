@@ -128,15 +128,17 @@ class SQL
 	 * @return Restriction
 	 */
 	static public function makeRestriction($sSql,$factors=null)
-	{		
+	{
+		$factors = func_get_args() ;
+		$sSql = array_shift($factors) ;
+		
 		$arrTrees = BaseParserFactory::singleton()->create(true,null,'where')->parse($sSql) ;
 		
 		$aRestriction = empty($arrTrees[0])? new Restriction(): new Restriction( true, $arrTrees[0] ) ;
 
 		if($factors)
 		{
-			$factors = Type::toArray($factors,Type::toArray_ignoreNull) ;
-			$aRestriction->addFactors($factors) ;
+			call_user_func_array(array($aRestriction,'addFactors'),$factors) ;
 		}
 		
 		return $aRestriction ;
@@ -374,6 +376,12 @@ class SQL
 		return $this ;
 	}
 	
+	public function __clone()
+	{
+		// 解除对原对像的引用
+		$arrRawSql = $this->arrRawSql ;
+		$this->arrRawSql =& $arrRawSql ;
+	}
 
 	static public function splitColumn($sColumn)
 	{

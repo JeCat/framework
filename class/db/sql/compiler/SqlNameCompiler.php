@@ -2,7 +2,6 @@
 namespace org\jecat\framework\db\sql\compiler ;
 
 use org\jecat\framework\db\DB;
-
 use org\jecat\framework\setting\Setting;
 
 class SqlNameCompiler

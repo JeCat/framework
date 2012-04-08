@@ -95,7 +95,10 @@ class Model extends AbstractModel implements IBean
 	
 	public function loadSql($sWhereStatement=null,$arrFactors=null)
 	{
-		return $this->load( $sWhereStatement? SQL::makeRestriction($sWhereStatement,$arrFactors): null ) ;
+		return $this->load( $sWhereStatement? 
+				call_user_func_array(array('org\\jecat\\framework\\db\\sql\\SQL','makeRestriction'),func_get_args())
+				: null
+		) ;
 	}
 
 	/**
@@ -163,7 +166,7 @@ class Model extends AbstractModel implements IBean
 	{
 		if($values===null)
 		{
-			return $aPrototype->criteria()->where() ;
+			return null ;
 		}
 		
 		$keys = $keys? (array)$keys: $aPrototype->keys() ;
@@ -180,8 +183,9 @@ class Model extends AbstractModel implements IBean
 			$values = array_values((array) $values) ;
 			foreach($keys as $nIdx=>$sKey)
 			{
+				list($sTable,$sColumn) = SQL::splitColumn($sKey) ;
 				$aRestriction->expression( array(
-						SQL::createRawColumn($sSqlTableAlias, $sKey),
+						SQL::createRawColumn($sTable,$sColumn),
 						'=', SQL::transValue($values[$nIdx])
 				), true, true ) ;
 			}
