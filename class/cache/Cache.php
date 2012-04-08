@@ -54,6 +54,10 @@ abstract class Cache extends Object
 	{
 		return self::flyweight('high-speed',false)?: self::singleton(false) ;
 	}
+	static public function setHighSpeed(Cache $aCache)
+	{
+		self::setFlyweight($aCache,'high-speed') ;
+	}
 	
 	static protected $expire_default = 900 ;
 	
