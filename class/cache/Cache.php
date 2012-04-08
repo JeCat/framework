@@ -46,6 +46,10 @@ abstract class Cache extends Object
 		return $aSingleton ;
 	}
 	
+	/**
+	 * 返回一个高速缓存对像
+	 * 如果系统中没有设置高速缓存对像，则返回 Cache 类的单件
+	 */
 	static public function highSpeed()
 	{
 		return self::flyweight('high-speed',false)?: self::singleton(false) ;

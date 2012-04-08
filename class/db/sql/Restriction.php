@@ -466,7 +466,7 @@ class Restriction extends SQL
 	{
 		if(!$bRawTokenExpr)
 		{
-			$expression =& BaseParserFactory::singleton()->create(true,null,'where')->parse($expression,true) ;
+			$expression =& SQL::parseSql($expression,'where',true) ;
 		}
 		if( $expression )
 		{			

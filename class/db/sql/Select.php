@@ -146,8 +146,8 @@ class Select extends MultiTableSQL
 	 */
 	public function addColumnsExpr($sExpression)
 	{
-		$arrSubTree = BaseParserFactory::singleton()->create(true,null,'select')
-				->parse($sExpression,true) ;
+		$arrSubTree =& SQL::parseSql($sExpression,'select',true) ;
+		
 		if( !empty($arrSubTree) )
 		{
 			$arrRawColumns =& $this->rawClause(self::CLAUSE_SELECT) ;

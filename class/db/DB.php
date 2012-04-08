@@ -158,7 +158,10 @@ class DB extends Object
 		else if( $inputSql instanceof SQL )
 		{
 			$aSql = $inputSql ;
-			$aSql->addFactors($factors) ;
+			if($factors)
+			{
+				$aSql->addFactors($factors) ;
+			}
 		}
 		
 		else

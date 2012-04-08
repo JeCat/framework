@@ -25,6 +25,8 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\db\sql\SQL;
+
 use org\jecat\framework\db\sql\parser\BaseParserFactory;
 use org\jecat\framework\util\serialize\IIncompleteSerializable;
 use org\jecat\framework\util\serialize\ShareObjectSerializer;
@@ -349,22 +351,18 @@ class Association implements IBean, \Serializable, IIncompleteSerializable
 		}
 		if(!empty($arrConfig['on']))
 		{
-			$aSqlParser = BaseParserFactory::singleton()->create(true,null,'on') ;
 			if( is_array($arrConfig['on']) )
 			{
 				$arrOnFactors = $arrConfig['on'] ;
-				$this->arrOnRawSql = array(
-						'expr_type' => 'clause_on' ,
-						'subtree' => $aSqlParser->parse(array_shift($arrOnFactors),true) ,
-						'factors' => & $arrOnFactors ,
-				) ;				
+				$this->arrOnRawSql['expr_type'] = 'clause_on' ;
+				$this->arrOnRawSql['subtree'] =& SQL::parseSql(array_shift($arrOnFactors),'on',true) ;
+				$aOnClause = new SQL($this->arrOnRawSql) ;
+				$aOnClause->addFactors($arrOnFactors) ;
 			}
 			else
 			{
-				$this->arrOnRawSql = array(
-						'expr_type' => 'clause_on' ,
-						'subtree' => $aSqlParser->parse($arrConfig['on'],true) ,
-				) ;			
+				$this->arrOnRawSql['expr_type'] = 'clause_on' ;		
+				$this->arrOnRawSql['subtree'] =& SQL::parseSql($arrConfig['on'],'on',true) ;
 			}
 		}
 		if(!empty($arrConfig['join']))

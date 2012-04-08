@@ -63,7 +63,7 @@ class Update extends MultiTableSQL implements IDataSettableStatement
 
 		if($bValueExpr)
 		{
-			$arrRawSet['subtree'][$sColumnName]['subtree'] = BaseParserFactory::singleton()->create(true,null,'values')->parse($value,true) ;
+			$arrRawSet['subtree'][$sColumnName]['subtree'] =& SQL::parseSql($sExpression,'values',true) ;
 		}
 		else
 		{

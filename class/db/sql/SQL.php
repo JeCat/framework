@@ -25,6 +25,8 @@
 /*-- Project Introduce --*/ 
 namespace org\jecat\framework\db\sql ;
 
+use org\jecat\framework\cache\Cache;
+
 use org\jecat\framework\db\sql\compiler\SqlCompiler;
 use org\jecat\framework\lang\Type;
 use org\jecat\framework\db\sql\parser\BaseParserFactory;
@@ -100,14 +102,12 @@ class SQL
 	 */
 	static public function make($sSql,$factors=null)
 	{
-		if( ! $arrRawSqls = self::parser()->parse($sSql) )
+		$factors = func_get_args() ;
+		$sSql = array_shift($factors) ;
+		
+		if( !$arrRawSqls=self::parseSql($sSql) or empty($arrRawSqls[0]) )
 		{
 			return ;
-		}
-		
-		if( empty($arrRawSqls[0]) )
-		{
-			return null ;
 		}
 		
 		if( isset($arrRawSqls[0]['command']) )
@@ -137,7 +137,6 @@ class SQL
 		
 		if($factors)
 		{
-			$factors = Type::toArray($factors,Type::toArray_ignoreNull) ;
 			$aSql->addFactors($factors) ;
 		}
 		
@@ -150,23 +149,46 @@ class SQL
 	{
 		$factors = func_get_args() ;
 		$sSql = array_shift($factors) ;
-		
-		$arrTrees = BaseParserFactory::singleton()->create(true,null,'where')->parse($sSql) ;
+
+		if( !$arrTrees=self::parseSql($sSql,'where') or empty($arrTrees[0]) )
+		{
+			return ;
+		}
 		
 		$aRestriction = empty($arrTrees[0])? new Restriction(): new Restriction( true, $arrTrees[0] ) ;
 
 		if($factors)
 		{
-			call_user_func_array(array($aRestriction,'addFactors'),$factors) ;
+			$aRestriction->addFactors($factors) ;
 		}
 		
 		return $aRestriction ;
 	}
 	static public function makeColumn($sColumnExpr)
 	{
-		return BaseParserFactory::singleton()->create(true,null,'column')->parse($sColumnExpr,true) ;
+		return self::parseSql($sColumnExpr,'column',true) ;
 	}
 	
+	static public function & parseSql($sStatement,$sParserName=null,$bReturnFirstTree=false)
+	{
+		$aCache = Cache::highSpeed() ;
+		$sSqlCacheKey = '/db/sql/raw/'.md5($sStatement) ;
+		
+		// 优先从缓存中查找
+		if( !$arrTrees = $aCache->item($sSqlCacheKey) )
+		{
+			if( !$arrTrees =& BaseParserFactory::singleton()->create(true,null,$sParserName)->parse($sStatement,$bReturnFirstTree) )
+			{
+				$null = null ;
+				return $null ;
+			}
+				
+			// 写入缓存
+			$aCache->setItem($sSqlCacheKey,$arrTrees) ;
+		}
+		
+		return $arrTrees ;
+	}
 	
 	
 	// ------------
@@ -375,21 +397,20 @@ class SQL
 		return $factors ;
 	}
 	
-	public function addFactors(/* ... */)
+	public function addFactors(array & $factors)
 	{
 		if( !isset($this->arrRawSql['factors']) )
 		{
 			$this->arrRawSql['factors'] = array() ;
 		}
 		
-		$arrArgs = func_get_args() ;
-		if( is_array($arrArgs[0]) )
+		if( is_array($factors[0]) )
 		{
-			$this->arrRawSql['factors']+= self::makeFactors($arrArgs[0]) ;
+			$this->arrRawSql['factors']+= self::makeFactors($factors[0]) ;
 		}
 		else
 		{
-			$this->arrRawSql['factors']+= self::makeFactors($arrArgs) ;
+			$this->arrRawSql['factors']+= self::makeFactors($factors) ;
 		}
 			
 		return $this ;
