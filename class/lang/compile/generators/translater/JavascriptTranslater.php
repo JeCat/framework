@@ -2,6 +2,7 @@
 namespace org\jecat\framework\lang\compile\generators\translater ;
 
 use org\jecat\framework\lang\compile\ClassCompileException;
+
 use org\jecat\framework\lang\Assert;
 use org\jecat\framework\lang\compile\object\Token;
 use org\jecat\framework\lang\compile\object\TokenPool;
@@ -233,5 +234,3 @@ class JavascriptTranslater extends Object implements IGenerator
 	}
 	
 }
-
-
