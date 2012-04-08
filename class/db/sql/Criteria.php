@@ -80,6 +80,10 @@ class Criteria extends SQL
 	{
 		$arrRawOrder =& $this->rawClause(self::CLAUSE_ORDER) ;
 	
+		if(!empty($arrRawOrder['subtree']))
+		{
+			$arrRawOrder['subtree'][] = ',' ;
+		}
 		$arrRawOrder['subtree'][] = self::createRawColumn($sTable, $sColumn) ;
 		$arrRawOrder['subtree'][] = $bDesc? 'DESC': 'ASC' ;
 	

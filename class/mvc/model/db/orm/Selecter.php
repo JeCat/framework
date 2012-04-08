@@ -54,6 +54,10 @@ class Selecter extends OperationStrategy
 				
 		// set group by
 		$this->setGroupBy($aSelect->criteria(),$aPrototype) ;
+		
+		// set order by
+		$aSelect->criteria()->clearOrders() ;
+		$aSelect->setRawClause(SQL::CLAUSE_ORDER,$aPrototype->criteria()->rawClause(SQL::CLAUSE_ORDER,false)) ;
 			
 		// query
 		$aDB->pdo()->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES,1) ;

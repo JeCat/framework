@@ -44,6 +44,7 @@ class BaseParserFactory extends Object
 
 			case 'select' :
 				$aParser = self::createParserInstace('ClauseParser',$aDialect,'select')
+								->addChildState($this->create($bShare,$aDialect,'function'))
 								->addChildState($this->create($bShare,$aDialect,'column')) ;
 				break ;
 
@@ -91,6 +92,7 @@ class BaseParserFactory extends Object
 			case 'on' :
 			case 'where' :
 				$aParser = self::createParserInstace('ClauseParser',$aDialect,$sAction)
+								->addChildState($this->create($bShare,$aDialect,'function'))
 								->addChildState($this->create($bShare,$aDialect,'column')) ;
 				break ;
 				
@@ -110,11 +112,13 @@ class BaseParserFactory extends Object
 				
 			case 'set' :
 				$aParser = self::createParserInstace('SetParser',$aDialect)
+								->addChildState($this->create($bShare,$aDialect,'function'))
 								->addChildState($this->create($bShare,$aDialect,'column')) ;
 				break ;
 				
 			case 'values' :
 				$aParser = self::createParserInstace('ValuesParser',$aDialect)
+								->addChildState($this->create($bShare,$aDialect,'function'))
 								->addChildState($this->create($bShare,$aDialect,'column'))
 								->addChildState($this->create($bShare,$aDialect,'subquery')) ;
 				break ;
@@ -129,6 +133,10 @@ class BaseParserFactory extends Object
 				
 			case 'subquery' :
 				$aParser = self::createParserInstace('SubQueryParser',$aDialect) ;
+				break ;
+			
+			case 'function' :
+				$aParser = self::createParserInstace('FunctionParser',$aDialect) ;
 				break ;
 		}
 		

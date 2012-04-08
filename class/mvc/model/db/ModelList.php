@@ -444,7 +444,8 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator,
 	{
 		if( $this->nPerPage===null )
 		{
-			$this->nPerPage = $this->aPrototype? $this->aPrototype->limitLength(): 20 ;
+			$aPrototype = $this->prototype() ;
+			$this->nPerPage = $aPrototype? $aPrototype->limitLength(): 20 ;
 		}
 		return $this->nPerPage ;
 	}
