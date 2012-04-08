@@ -28,5 +28,3 @@ abstract class IAchiveStrategy extends Object
 		// return 'hash'.$aFile->hash().'.'.$aFile->name() ;
 	}
 }
-
-?>
