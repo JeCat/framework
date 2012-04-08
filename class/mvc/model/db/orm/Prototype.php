@@ -1,7 +1,30 @@
 <?php
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  这个文件是 JeCat PHP框架的一部分，该项目和此文件 均遵循 GNU 自由软件协议
+// 
+//  Copyleft 2008-2012 JeCat.cn(http://team.JeCat.cn)
+//
+//
+//  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
+//  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
+//  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
+//  正在使用的这个版本是：0.7.1
+//
+//
+//
+//  相关的链接：
+//    [主页]			http://www.JeCat.cn
+//    [源代码]		https://github.com/JeCat/framework
+//    [下载(http)]	https://nodeload.github.com/JeCat/framework/zipball/master
+//    [下载(git)]	git clone git://github.com/JeCat/framework.git jecat
+//  不很相关：
+//    [MP3]			http://www.google.com/search?q=jellicle+songs+for+jellicle+cats+Andrew+Lloyd+Webber
+//    [VCD/DVD]		http://www.google.com/search?q=CAT+Andrew+Lloyd+Webber+video
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\model\db\orm;
 
-use org\jecat\framework\lang\Assert;
 use org\jecat\framework\db\sql\parser\BaseParserFactory;
 use org\jecat\framework\db\sql\compiler\SqlNameCompiler;
 use org\jecat\framework\db\sql\compiler\SqlCompiler;
@@ -13,22 +36,12 @@ use org\jecat\framework\mvc\model\db\ModelList;
 use org\jecat\framework\db\sql\Order;
 use org\jecat\framework\util\serialize\IIncompleteSerializable;
 use org\jecat\framework\util\serialize\ShareObjectSerializer;
-use org\jecat\framework\db\sql\Restriction;
-use org\jecat\framework\bean\BeanConfException;
 use org\jecat\framework\lang\Type;
-use org\jecat\framework\fs\Folder;
-use org\jecat\framework\db\sql\Statement;
-use org\jecat\framework\db\sql\StatementState;
-use org\jecat\framework\db\sql\name\NameTransferFactory;
 use org\jecat\framework\mvc\model\db\orm\Association;
 use org\jecat\framework\bean\BeanFactory;
 use org\jecat\framework\bean\IBean;
-use org\jecat\framework\db\sql\name\NameTransfer;
-use org\jecat\framework\mvc\model\db\Model;
-use org\jecat\framework\db\reflecter\AbstractReflecterFactory;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\db\DB;
-use org\jecat\framework\db\sql\StatementFactory;
 
 /**
  * 
@@ -840,22 +853,18 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 		// where
 		if(!empty($arrConfig['where']))
 		{
+			$arrRawWhere =& $this->criteria()->rawClause(SQL::CLAUSE_WHERE) ;
 			$aSqlParser = BaseParserFactory::singleton()->create(true,null,'where') ;
+			
 			if( is_array($arrConfig['where']) )
 			{
 				$arrOnFactors = $arrConfig['where'] ;
-				$this->arrWhereRawSql = array(
-						'expr_type' => 'clause_where' ,
-						'subtree' => $aSqlParser->parse(array_shift($arrOnFactors),true) ,
-						'factors' => & $arrOnFactors ,
-				) ;
+				$arrRawWhere['subtree'] = $aSqlParser->parse(array_shift($arrOnFactors),true) ;
+				call_user_func_array(array($this->criteria()->where(),'addFactors'), $arrOnFactors) ;
 			}
 			else
 			{
-				$this->arrWhereRawSql = array(
-						'expr_type' => 'clause_on' ,
-						'subtree' => $aSqlParser->parse($arrConfig['where'],true) ,
-				) ;
+				$arrRawWhere['subtree'] = $aSqlParser->parse($arrConfig['where'],true) ;
 			}
 			// self::buildBeanRestriction($arrConfig['where'],$this->criteria()->where()->createRestriction()) ;
 		}
@@ -930,10 +939,6 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	{
 		return $this->limitFrom ;
 	}
-	public function & whereRawSql()
-	{
-		return $this->arrWhereRawSql ;
-	}
 	
 	// statement
 	/**
@@ -960,7 +965,7 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 			$this->aStatementSelect = Selecter::buildSelect($this) ;
 			
 			$arrTokenTree =& $this->aStatementSelect->rawSql() ;
-			$arrTokenTree['omited_first_table'] = $this->name() ;
+			$arrTokenTree['omited_first_table'] = $this->sqlTableAlias() ;
 			$arrTokenTree['omited_first_table_len'] = strlen($arrTokenTree['omited_first_table']) ;
 		}
 		return $this->aStatementSelect ;
@@ -997,7 +1002,6 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 				'sModelClass' ,
 				'nLimitLen' ,
 				'limitFrom' ,
-				'arrWhereRawSql' ,
 				'aCriteria' ,
 				'aAssociationBy' ,
 				'arrAssociations' ,
@@ -1081,7 +1085,6 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	private $sDevicePrimaryKey = null ;
 	private $nLimitLen = 30 ;
 	private $limitFrom = 0 ;
-	private $arrWhereRawSql = 0 ;
 	private $aCriteria = null;
 	private $arrAssociations =  array();
 	private $aAssociationBy = null;
@@ -1102,3 +1105,4 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	static private $aSqlCompiler ;
 	
 }
+
