@@ -8,9 +8,11 @@ class FSCache extends Cache
 {
 	public function __construct($sFolder)
 	{
-		$this->aFolder = Folder::singleton()->findFolder(
-			$sFolder,Folder::FIND_AUTO_CREATE
-		) ;
+		$this->aFolder = new Folder($sFolder) ;
+		if( !$this->aFolder->exists() )
+		{
+			$this->aFolder->create() ;
+		}
 	}
 	
 	public function item($sDataPath)

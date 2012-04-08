@@ -12,7 +12,6 @@ use org\jecat\framework\setting\Setting;
 
 class FsSetting extends Setting implements \Serializable
 {
-	
 	/**
 	 * 
 	 * @param Folder $aRootFolder
@@ -21,6 +20,11 @@ class FsSetting extends Setting implements \Serializable
 	{
 		$this->aRootFolder = $aRootFolder;
 	}
+	
+	static public function createFromPath($sFolderPath) 
+	{
+		return new self( Folder::createFolder($sFolderPath) ) ;
+	} 
 
 	/**
 	 * @return IKey 

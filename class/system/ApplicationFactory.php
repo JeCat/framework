@@ -55,7 +55,7 @@ abstract class ApplicationFactory extends Object
 		$aOriApp = Application::switchSingleton($aApp) ;		
 		
 		// filesystem
-		Folder::setSingleton($this->createFileSystem($aApp,$sApplicationRootPath)) ;
+		Folder::setSingleton(new Folder($sApplicationRootPath)) ;
 		
 		// 初始化 class loader
 		ClassLoader::setSingleton($this->createClassLoader($aApp)) ;
@@ -77,19 +77,11 @@ abstract class ApplicationFactory extends Object
 			Application::setSingleton($aOriApp) ;
 		}
 	}
-	
-	public function createFileSystem(Application $aApp,$sRootPath)
-	{
-		return new Folder($sRootPath) ;
-	}
 
-	public function createClassLoader(Application $aApp)
+	public function createClassLoader()
 	{		
 		$aClassLoader = new ClassLoader() ;
 		$aFolder = Folder::singleton() ;
-		
-		// 将依赖的库加入到 class loader 中
-		$aClassLoader->addPackage( 'com\\google\\code', \org\jecat\framework\PATH.'/lib/class/com.google.code' ) ;
 		
 		// 将 jecat 加入到 class loader 中
 		$aClassLoader->addPackage( 'org\\jecat\\framework', \org\jecat\framework\CLASSPATH ) ;
@@ -147,7 +139,6 @@ abstract class ApplicationFactory extends Object
 		}
 
 		return new FsSetting( $aSettingFolder ) ;
-
 	}
 	
 	static private $aGlobalInstance ;

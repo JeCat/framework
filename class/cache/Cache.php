@@ -22,6 +22,11 @@ abstract class Cache extends Object
 		return $aSingleton ;
 	}
 	
+	static public function highSpeed()
+	{
+		return self::flyweight('high-speed',false)?: self::singleton(false) ;
+	}
+	
 	static protected $expire_default = 900 ;
 	
 	static private $aSingleton ;

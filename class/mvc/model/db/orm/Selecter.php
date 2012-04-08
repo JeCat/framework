@@ -1,6 +1,10 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\db\sql\SQL;
+
+use org\jecat\framework\db\sql\MultiTableSQL;
+
 use org\jecat\framework\mvc\model\db\Recordset;
 use org\jecat\framework\db\sql\Restriction;
 use org\jecat\framework\mvc\model\db\Model;
@@ -14,8 +18,8 @@ use org\jecat\framework\db\sql\Criteria;
 
 class Selecter extends OperationStrategy
 {
-	public function execute(Prototype $aPrototype,array & $arrDataSheet,Select $aSelect=null,Criteria $aCriteria=null,$bList=false,DB $aDB=null)
-	{		
+	public function execute(Prototype $aPrototype,array & $arrDataSheet,Select $aSelect=null, Restriction $aRestriction=null, $list=false,DB $aDB=null)
+	{
 		if(!$aDB)
 		{
 			$aDB = DB::singleton() ;
@@ -28,9 +32,9 @@ class Selecter extends OperationStrategy
 			$aSelect = $aPrototype->sharedStatementSelect() ;
 		}
 		
-		if($aCriteria)
+		if($aRestriction)
 		{
-			$aSelect->setCriteria($aCriteria);
+			$aSelect->criteria()->where()->add($aRestriction);
 		}
 		
 		// -----------------
@@ -39,32 +43,40 @@ class Selecter extends OperationStrategy
 		$this->addColumnsForOneToOne($aSelect,$aPrototype,$arrMultitermAssociations) ;
 		
 		// set limit
-		if( !$bList )
+		if( !$list )
 		{
-			$aSelect->criteria()->setLimitLen(1) ;
+			$aSelect->criteria()->setLimit(1,0) ;
 		}
 		else
 		{
-			/**
-			 * 考虑到 criteria 可能是为了不影响 prototype 的情况下临时产生的对象，
-			 * 这里不可以用 prototype 的 limit 覆盖掉 criteria 中已有的 criteria 参数。
-			 * 因此这行删除。
-			 */
-			// $aSelect->criteria()->setLimit( $aPrototype->criteria()->limitLen(), $aPrototype->criteria()->limitFrom() ) ;
+			$aSelect->criteria()->setLimit( $list[0], $list[1] ) ;
 		}
-		
+				
 		// set group by
-		$this->setGroupBy($aSelect,$aPrototype) ;
+		$this->setGroupBy($aSelect->criteria(),$aPrototype) ;
 		
+		// set order by
+		$aSelect->criteria()->clearOrders() ;
+		$aSelect->setRawClause(SQL::CLAUSE_ORDER,$aPrototype->criteria()->rawClause(SQL::CLAUSE_ORDER,false)) ;
+			
 		// query
 		$aDB->pdo()->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES,1) ;
 		try{
-			$aPdoRecordset=$aDB->query($aSelect) ;
-		}catch (\Exception $e){
+			$aPdoRecordset=$aDB->query( $aSelect, null, Prototype::sqlCompiler() ) ;
+		}catch (\Exception $e){}
+		
+		//} final {
 			$aDB->pdo()->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES,0) ;
+			if($aRestriction)
+			{
+				$aSelect->criteria()->where()->remove($aRestriction);
+			}
+		//}
+		
+		if( isset($e) )
+		{
 			throw $e ;
 		}
-		$aDB->pdo()->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES,0) ;
 		
 		if( !$aPdoRecordset or !$aPdoRecordset->rowCount() )
 		{
@@ -114,7 +126,7 @@ class Selecter extends OperationStrategy
 			$sKey.= ' `'.$aPrototype->sqlTableAlias().'`.`'.$sClmName.'`' ;
 		}
 		
-		return $aDB->queryCount($aSelect,$sKey) ;
+		return $aDB->queryCount( $aSelect, $sKey, Prototype::sqlCompiler() ) ;
 	}
 	
 	public function hasExists(Model $aModel,Prototype $aPrototype=null,Select $aSelect=null,DB $aDB=null)
@@ -131,18 +143,31 @@ class Selecter extends OperationStrategy
 		{
 			$aDB = DB::singleton() ;
 		}
+
+		// 备份原来的 limit
+		$arrRawOriLimit =& $aSelect->rawClause(SQL::CLAUSE_LIMIT,false) ;
 		
-		$aCriteria = $aPrototype->statementFactory()
-						->createCriteria()
-						->setLimit(1) ;
-		$aSelect->setCriteria($aCriteria) ;
+		$aSelect->criteria()->setLimit(1,0) ;
 		
-		foreach($aPrototype->keys() as $sKey)
+		$aRestriction = $aSelect->where()->createRestriction() ;
+		foreach($aPrototype->keys() as $nIdx=>$sKey)
 		{
-			$aCriteria->where()->eq($sKey,$aModel->data($sKey)) ;
+			$aRestriction->expression(array(
+					SQL::createRawColumn($aPrototype->sqlTableAlias(), $sKey)
+					, '=', SQL::transValue($aModel->data($sKey))
+			),true,true) ;
 		}
 		
-		return $aDB->queryCount($aSelect)>0 ;
+		// 查询
+		$bExists =  $aDB->queryCount($aSelect)>0 ;
+		
+		// 移除条件
+		$aSelect->where()->remove($aRestriction) ;
+		
+		// 还原原来的 limit
+		$aSelect->setRawClause(SQL::CLAUSE_LIMIT,$arrRawOriLimit) ;
+		
+		return $bExists ;
 	}
 	
 	private function queryForMultitermAssoc(DB $aDB,Association $aMultitermAssoc,array & $arrDataSheet,$nRowIdx,Select $aSelect)
@@ -152,7 +177,7 @@ class Selecter extends OperationStrategy
 		
 		// 清理一些 select 状态
 		$aSelect->clearColumns() ;
-
+		
 		// 根据上一轮查询设置条件
 		if( $aMultitermAssoc->isType(Association::hasMany) )				// hasMany
 		{			
@@ -162,7 +187,6 @@ class Selecter extends OperationStrategy
 					, $aMultitermAssoc->fromKeys()
 					, $aToPrototype->sqlTableAlias()
 					, $aMultitermAssoc->toKeys()
-					, $aFromPrototype->statementFactory()
 			) ;
 		}
 		else if( $aMultitermAssoc->isType(Association::hasAndBelongsToMany) )	// hasAndBelongsTo
@@ -173,47 +197,41 @@ class Selecter extends OperationStrategy
 					, $aMultitermAssoc->fromKeys()
 					, $aMultitermAssoc->bridgeSqlTableAlias()
 					, $aMultitermAssoc->toBridgeKeys()
-					, $aFromPrototype->statementFactory()
 			) ;
 		}
 		else
 		{
 			throw new ORMException("what's this?") ;
 		}
-	
-		if( !$aTablesJoin=$aMultitermAssoc->sqlTablesJoin() )
-		{
-			throw new ORMException("关联对象没有TablesJoin对象") ;
-		}
 		
-		// 设置查询条件
 		$aSelect->criteria()->where()->add($aRestraction) ;
-		
+			
 		// 设置 order by
-		$aOriOrders = $aSelect->criteria()->orders(false) ;
-		if($aToPrototype->criteria()->orders(false)){
-			$aSelect->criteria()->setOrders($aToPrototype->criteria()->orders(false)) ;
-		}
+		$rawOriOrder =& $aSelect->rawClause(SQL::CLAUSE_ORDER,false) ;
+		$aSelect->setRawClause( SQL::CLAUSE_ORDER, $aToPrototype->criteria()->rawClause(SQL::CLAUSE_ORDER,false) ) ;
 
 		// 新建的一个记录表
 		$sheet =& Model::dataSheet($arrDataSheet,$nRowIdx,$aToPrototype->name(),true) ;
-		$this->execute($aToPrototype,$sheet,$aSelect,null,true,$aDB) ;
+		$this->execute(
+				$aToPrototype
+				, $sheet
+				, $aSelect
+				, null
+				, array($aToPrototype->limitLength(),$aToPrototype->limitFrom())
+				, $aDB
+		) ;
 		
 		// 清理条件 和 恢复order by
 		$aSelect->criteria()->where()->remove($aRestraction) ;
-		if($aOriOrders){
-			$aSelect->criteria()->setOrders($aOriOrders) ;
-		}
+		$aSelect->setRawClause(SQL::CLAUSE_ORDER,$rawOriOrder) ;
 	}
 
-	private function setGroupBy(Select $aSelect,Prototype $aPrototype)
+	private function setGroupBy(Criteria $aCriteria,Prototype $aPrototype)
 	{
-		$aCriteria = $aSelect->criteria() ;
-		$aCriteria->clearGroupBy() ;
-		
+		$aCriteria->clearGroupBy(false) ;
 		foreach($aPrototype->keys() as $sClmName)
 		{
-			$aCriteria->addGroupBy('`'.$aPrototype->sqlTableAlias().'`.`'.$sClmName.'`') ;
+			$aCriteria->addGroupBy($sClmName,$aPrototype->sqlTableAlias()) ;
 		}
 	}
 	
@@ -223,10 +241,7 @@ class Selecter extends OperationStrategy
 		$arrColumns = array_merge($aPrototype->columns() , $aPrototype->keys());
 		foreach($arrColumns as $sColumnName)
 		{
-			$aSelect->addColumn(
-				'`'.$aPrototype->sqlTableAlias().'`.`'.$sColumnName.'`'
-				// , $aPrototype->sqlColumnAlias($sColumnName)
-			) ;
+			$aSelect->addColumn( $sColumnName, null, $aPrototype->sqlTableAlias() ) ;
 		}
 
 		// add columns for one to one associated prototypes
@@ -256,25 +271,23 @@ class Selecter extends OperationStrategy
 	 */
 	static public function buildSelect(Prototype $aPrototype)
 	{
-		$aSelect = $aPrototype->statementFactory()->createSelect() ;
-		
-		// 主表的名称
-		$aTable = $aPrototype->createSqlTable() ;
-		$aSelect->addTable($aTable) ;
-		
-		// criteria
-		$aCriteria = clone $aPrototype->criteria() ;
-		$aSelect->setCriteria( $aCriteria ) ;
+		$aSelect = new Select($aPrototype->tableName(),$aPrototype->sqlTableAlias()) ;//$aPrototype->statementFactory()->createSelect() ;
+				
+		// where
+		if( $arrRawWhere =& $aPrototype->whereRawSql() )
+		{
+			$aSelect->setRawClause( SQL::CLAUSE_WHERE, $arrRawWhere ) ;
+		}
 		
 		// 递归连接所有关联原型的 table
-		self::joinTables( $aTable, $aPrototype ) ;
+		self::joinTables( $aSelect, $aPrototype ) ;
 		
 		return $aSelect ;
 	}
 	
-	static private function joinTables(Table $aFromTable,Prototype $aForPrototype)
+	static private function joinTables(MultiTableSQL $aSelect,Prototype $aForPrototype)
 	{
-		$sFromTableAlias = $aFromTable->alias() ;
+		$sFromTableAlias = $aForPrototype->sqlTableAlias() ;
 			
 		foreach( $aForPrototype->associationIterator() as $aAssoc )
 		{
@@ -283,106 +296,87 @@ class Selecter extends OperationStrategy
 			
 			// 两表关联
 			if( $aAssoc->isType(Association::pair) )
-			{
-				// create table for toPrototype
-				$aTable = $aPrototype->createSqlTable() ;
-		
-				$aTablesJoin = self::joinTwoTables(
-						$aFromTable
-						, $aTable
-						, $aAssoc->fromKeys()
-						, $aAssoc->toKeys()
-						, $aPrototype->statementFactory()
+			{				
+				$aSelect->_joinTableRaw(
+						$sFromTableAlias
+						, $aPrototype->tableName()
+						, $sToTableAlias
 						, $aAssoc->joinType()
+						, self::makeResrictionForForeignKey(
+								$sFromTableAlias
+								, $sToTableAlias
+								, $aAssoc->fromKeys()
+								, $aAssoc->toKeys()
+								, $aAssoc->joinOnRawSql()
+						)
 				) ;
-				
-				// 记录 TablesJoin 对象
-				$aAssoc->setSqlTablesJoin($aTablesJoin) ;
 			}
 			
 			// 三表关联
 			else if( $aAssoc->isType(Association::triplet) )
 			{
+				$sBridgeTableAlias = $aAssoc->bridgeSqlTableAlias() ;
+				
 				// 从左表连接到中间表
-				$aBridgeTable = $aPrototype->statementFactory()->createTable( $aAssoc->bridgeTableName(), $aAssoc->bridgeSqlTableAlias() ) ;
-				$aTablesJoin = self::joinTwoTables(
-						$aFromTable
-						, $aBridgeTable
-						, $aAssoc->fromKeys()
-						, $aAssoc->toBridgeKeys()
-						, $aPrototype->statementFactory()
+				$aSelect->_joinTableRaw(
+						$sFromTableAlias
+						, $aAssoc->bridgeTableName()
+						, $sBridgeTableAlias
 						, $aAssoc->joinType()
+						, self::makeResrictionForForeignKey(
+								$sFromTableAlias
+								, $sBridgeTableAlias
+								, $aAssoc->fromKeys()
+								, $aAssoc->toBridgeKeys()
+								, $aAssoc->joinOnRawSql()
+						)
 				) ;
 				
-				// 记录中间表的 TablesJoin 对象
-				$aAssoc->setSqlTablesJoin($aTablesJoin) ;
-				
-				// 从中间表连接到右表
-				$aTable = $aPrototype->createSqlTable() ;
-				$aBridgeTablesJoin = self::joinTwoTables(
-						$aBridgeTable
-						, $aTable
-						, $aAssoc->fromBridgeKeys()
-						, $aAssoc->toKeys()
-						, $aPrototype->statementFactory()
+				// 从中间表连接到右表				
+				$aSelect->_joinTableRaw(
+						$sBridgeTableAlias
+						, $aPrototype->tableName()
+						, $sToTableAlias
 						, $aAssoc->joinType()
+						, self::makeResrictionForForeignKey(
+								$sBridgeTableAlias
+								, $sToTableAlias
+								, $aAssoc->fromBridgeKeys()
+								, $aAssoc->toKeys()
+								, $aAssoc->joinOnRawSql()
+						)
 				) ;
-			
-				// 在桥接表上加入自定义的 join on 条件
-				if( $aTablesJoinOn = $aAssoc->otherBridgeTableJoinOn(false) )
-				{
-					$aBridgeTablesJoin->on()->add($aTablesJoinOn) ;
-				}
 			}
 			
 			else 
 			{
 				throw new Exception("what's this?") ;
 			}
-		
-			// 加入自定义的 join on 条件
-			if( $aOtherTablesJoinOn = $aAssoc->otherTableJoinOn(false) )
-			{
-				$aTablesJoin->on()->add($aOtherTablesJoinOn) ;
-			}
 				
 			// 递归
-			self::joinTables( $aTable, $aPrototype ) ;
+			self::joinTables( $aSelect, $aPrototype ) ;
 		}
 	}
 	
-	static private function joinTwoTables( $aFromTable,Table $aTable,array $arrFromKeys,$arrToKeys,StatementFactory $aSqlFactory,$sJoinType)
+	static private function & makeResrictionForForeignKey($sFromTableName=null,$sToTableName=null,array & $arrFromKeys,array & $arrToKeys,array & $arrConditions=null)
 	{
-		// create table join
-		$aTablesJoin = $aSqlFactory->createTablesJoin($sJoinType) ;
-		
-		$aTablesJoinOn = $aSqlFactory->createRestriction() ;
-		self::makeResrictionForForeignKey($aFromTable->alias(),$aTable->alias(),$arrFromKeys,$arrToKeys,$aTablesJoinOn) ;
-		
-		$aTablesJoin->addTable( $aTable, $aTablesJoinOn ) ;
-		$aFromTable->addJoin($aTablesJoin) ;
-		
-		return $aTablesJoin ;
-	}
-
-	static private function makeResrictionForForeignKey($sFromTableName=null,$sToTableName=null,$arrFromKeys,$arrToKeys,Restriction $aRestriction)
-	{
-		if($sToTableName)
-		{
-			$sToTableName = "`{$sToTableName}`." ;
-		}
-		if($sFromTableName)
-		{
-			$sFromTableName = "`{$sFromTableName}`." ;
-		}
-		
+		$arrTokens = array('ON','(') ;
 		foreach ($arrFromKeys as $nIdx=>$sFromKey)
 		{
-			$aRestriction->eqColumn(
-				"{$sFromTableName}`{$sFromKey}`"
-				, "{$sToTableName}`{$arrToKeys[$nIdx]}`"
-			) ;
+			$arrTokens[] = SQL::createRawColumn($sFromTableName, $sFromKey) ;
+			$arrTokens[] = '=' ;
+			$arrTokens[] = SQL::createRawColumn($sToTableName, $arrToKeys[$nIdx]) ;
 		}
+
+		if( $arrConditions )
+		{
+			$arrOnTokens[] = ',' ;
+			$arrOnTokens[] = $arrConditions ;
+		}
+		
+		$arrTokens[] = ')' ;
+		
+		return $arrTokens ;
 	}
 }
 ?>

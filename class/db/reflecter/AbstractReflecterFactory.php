@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\db\reflecter;
 
+use org\jecat\framework\cache\Cache;
+
 use org\jecat\framework\system\Application;
 use org\jecat\framework\cache\ICache;
 use org\jecat\framework\cache\DBCache;
@@ -113,10 +115,10 @@ abstract class AbstractReflecterFactory
 	 */
 	public function cache()
 	{
-		return Application::singleton()->cache();
+		return Cache::singleton();
 	}
 	
-	public function setCache(ICache $aCache)
+	public function setCache(Cache $aCache)
 	{
 		$this->aCache = $aCache;
 	}

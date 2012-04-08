@@ -1,73 +1,39 @@
 <?php
 namespace org\jecat\framework\db\sql ;
 
-class Table extends SubStatement
+class Table extends SQL
 {
-	public function __construct($sTableName,$sAlias=null)
+	public function __construct()
 	{
-		$this->sTableName = $sTableName ;
-		$this->sAlias = $sAlias?:$sTableName ;
 	}
 	
-	public function makeStatement(StatementState $aState)
-	{
-		$sSql = "`$this->sTableName`" ;
-		if( $this->sAlias and $aState->supportTableAlias() and $this->sAlias!=$this->sTableName )
-		{
-			$sSql.= " AS `{$this->sAlias}`" ;
-		}
-		
-		foreach($this->arrJoinSubStatements as $aJoin)
-		{
-			$sSql.= $aJoin->makeStatement($aState) ;
-		}
-		
-		return $sSql ;
-	}
-	
-	public function checkValid($bThrowException=true) 
-	{
-		return true ;
-	}
+	public function __toString()
+	{}
 	
 	public function name()
 	{
-		return $this->sTableName ;
+		return $this->arrRawSql['table'] ;
 	}
 	
 	public function setName($sTableName)
 	{
-		$this->sTableName = $sTableName ;
+		$this->arrRawSql['table'] = $sTableName ;
+		return $this ;
 	}
 	
-	public function alias()
+	public function alias($bDontUseTablename=false)
 	{
-		return $this->sAlias ;
+		return isset($this->arrRawSql['alias'])?
+					$this->arrRawSql['alias'] :
+					( $bDontUseTablename? null: $this->arrRawSql['table'] ) ;
 	}
 	
 	public function setAlias($sAlias)
 	{
-		$this->sAlias = $sAlias ;
+		$this->arrRawSql['alias'] = $sAlias ;
+		return $this ;
 	}
 	
-	public function addJoin(TablesJoin $aJoin)
-	{
-		$this->arrJoinSubStatements[] = $aJoin ;
-	}
-	
-	public function clearJoins()
-	{
-		$this->arrJoinSubStatements = array() ;
-	}
-	
-	public function joins()
-	{
-		return $this->arrJoinSubStatements ;
-	}
-	
-	private $sTableName = '' ;
-	private $sAlias = '' ;
-	private $arrJoinSubStatements = array() ;
 }
 
 ?>

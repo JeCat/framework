@@ -1,83 +1,61 @@
 <?php
-
 namespace org\jecat\framework\db\sql ;
 
-class Update extends MultiTableStatement implements IDataSettableStatement
-{
-	public function setReplace($bReplace=true)
-	{
-		$this->bReplace = $bReplace? true: false ;
-	}
-	
-	public function isReplace()
-	{
-		return $this->bReplace ;
-	}
-	
-	public function makeStatement(StatementState $aState)
-	{
-		$aState->setSupportLimitStart(false)
-				->setSupportTableAlias(false) ;
-				
-		$this->checkValid(true) ;
-		
-		$sStatement = ($this->isReplace()? "REPLACE ": "UPDATE ")
-				. $this->makeStatementTableList($aState)
-				. " SET " ;
+use org\jecat\framework\db\sql\parser\BaseParserFactory;
+use org\jecat\framework\db\sql\compiler\SqlCompiler;
 
-		$arrValues = array() ;
-		foreach($this->mapData as $sClm=>&$sData)
+class Update extends MultiTableSQL implements IDataSettableStatement
+{
+	function __construct($sTableName=null,$sTableAlias=null)
+	{
+		$this->nTablesClause = SQL::CLAUSE_UPDATE ;
+		parent::__construct($sTableName,$sTableAlias) ;
+	}
+	public function data($sColumnName)
+	{
+		$arrRawSet =& $this->rawClause(SQL::CLAUSE_SET) ;
+		if( isset($arrRawSet['subtree'][$sColumnName]) )
 		{
-			$arrValues[] = $this->transColumn($sClm,$aState)." = ".$sData ;
+			return SqlCompiler::singleton()->compile($arrRawSet['subtree'][$sColumnName]['subtree']) ;
+		}
+	}
+	public function setData($sColumnName,$value=null,$bValueExpr=false)
+	{
+		list($sTableName,$sColumnName) = SQL::splitColumn($sColumnName) ;
+		
+		$arrRawSet =& $this->rawClause(SQL::CLAUSE_SET) ;
+		if( !isset($arrRawSet['subtree'][$sColumnName]) and !empty($arrRawSet['subtree']) )
+		{
+			$arrRawSet['subtree'][] = ',' ;
 		}
 		
-		$sStatement.= implode(", ", $arrValues) ;
-		
-		if( $aCriteria=$this->criteria(false) )
+		$arrRawSet['subtree'][$sColumnName] = array(
+				'expr_type' => 'assignment' ,
+				'pretree' => array(
+						SQL::createRawColumn($sTableName,$sColumnName), '='
+				) ,
+				//'subtree' => array( $bValueExpr? SQL::transValue($value): SQL::transValue($value) ) ,
+		) ;
+
+		if($bValueExpr)
 		{
-			$sStatement.= ' ' . $aCriteria->makeStatement($aState) ;
+			$arrRawSet['subtree'][$sColumnName]['subtree'] = BaseParserFactory::singleton()->create(true,null,'values')->parse($value,true) ;
 		}
-			
-		return $sStatement ;
-	}
-	
-	public function set($sColumnName,$statement)
-	{
-		$this->mapData[$sColumnName] = $statement ;
-	}
-	public function setData($sColumnName,$sData=null)
-	{
-		$this->mapData[$sColumnName] = $this->transValue($sData) ;
+		else
+		{
+			$arrRawSet['subtree'][$sColumnName]['subtree'] = array( SQL::transValue($value) ) ;
+		}
 	}
 	
 	public function removeData($sColumnName)
 	{
-		unset($this->mapData[$sColumnName]) ;
+		unset($this->arrRawSql['subtree'][SQL::CLAUSE_SET]) ;
 	}
 
 	public function clearData()
 	{
-		$this->mapData = array() ;
+		unset($this->arrRawSql['subtree'][SQL::CLAUSE_SET]) ;
 	}
-
-	public function data($sColumnName)
-	{
-		return isset($this->mapData[$sColumnName])? $this->mapData[$sColumnName]: null ;
-	}
-
-	public function dataIterator()
-	{
-		return new \org\jecat\framework\pattern\iterate\ArrayIterator($this->mapData) ;
-	}
-
-	public function dataNameIterator()
-	{
-		return new \org\jecat\framework\pattern\iterate\ArrayIterator( array_keys($this->mapData) ) ;
-	}
-	
-	private $mapData = array() ;
-	
-	private $bReplace = false ;
 }
 
 ?>

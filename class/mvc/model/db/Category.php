@@ -5,7 +5,6 @@ use org\jecat\framework\lang\Object;
 use org\jecat\framework\util\Stack;
 use org\jecat\framework\mvc\model\db\orm\Selecter;
 use org\jecat\framework\mvc\model\db\orm\Prototype;
-use org\jecat\framework\db\sql\StatementFactory;
 use org\jecat\framework\db\sql\Update;
 use org\jecat\framework\db\DB;
 use org\jecat\framework\lang\Exception;
@@ -63,8 +62,6 @@ class Category extends Object
 		$sLftClm = self::leftColumn($aOrmPrototype) ;
 		$sRgtClm = self::rightColumn($aOrmPrototype) ;
 		
-		$aSqlFactory = StatementFactory::singleton() ;
-		
 		if($nTarget===self::end)
 		{
 			$nTarget = $this->endRightFoot($aOrmPrototype,$sRgtClm) + 1 ;
@@ -83,7 +80,7 @@ class Category extends Object
 		// 检查当前分类的左右点是否有效
 		$this->checkPoints($nOriLft,$nOriRgt) ;
 
-		$aUpdate = $aSqlFactory->createUpdate($aOrmPrototype->tableName()) ;
+		$aUpdate = new Update($aOrmPrototype->tableName()) ;
 		$aUpdate->criteria()->setLimit(-1) ;
 			
 		// 移动已经存在的记录
@@ -159,7 +156,7 @@ class Category extends Object
 		DB::singleton()->execute("delete from ".$aOrmPrototype->tableName()." where {$sLftClm}>={$nOriLft} and {$sRgtClm}<={$nOriRgt}") ;
 		
 		$nMove = $nOriRgt-$nOriLft+1 ;
-		$aUpdate = StatementFactory::singleton()->createUpdate($aOrmPrototype->tableName()) ;
+		$aUpdate = new Update($aOrmPrototype->tableName()) ;
 		
 		$this->moveFeet($aUpdate,$sLftClm,-$nMove,$nOriLft) ;
 		$this->moveFeet($aUpdate,$sRgtClm,-$nMove,$nOriLft) ;
@@ -321,7 +318,8 @@ class Category extends Object
 		{
 			return 0 ;
 		}
-		return (int)$aRecords->field('rgt') ;
+		$arrRow = $aRecords->fetch() ;
+		return (int)$arrRow['rgt'] ;
 	}
 	
 	private function moveFeet(Update $aUpdate,$sColumn,$nMove,$gtLft=null,$ltRgt=null)
@@ -338,7 +336,7 @@ class Category extends Object
 		}
 		
 		$aUpdate->clearData() ;
-		$aUpdate->set($sColumn,"{$sColumn}+${nMove}") ;
+		$aUpdate->setData($sColumn,"{$sColumn}+${nMove}",true) ;
 		
 		DB::singleton()->execute($aUpdate) ;
 	}
@@ -358,8 +356,8 @@ class Category extends Object
 		}
 		
 		$aUpdate->clearData() ;
-		$aUpdate->set('lft',"{$sLftClm}+${nMove}") ;
-		$aUpdate->set('rgt',"{$sRgtClm}+${nMove}") ;
+		$aUpdate->setData('lft',"{$sLftClm}+${nMove}",true) ;
+		$aUpdate->setData('rgt',"{$sRgtClm}+${nMove}",true) ;
 		
 		DB::singleton()->execute($aUpdate) ;
 	}
@@ -407,11 +405,11 @@ class Category extends Object
 	
 	static public function leftColumn(Prototype $aPrototype)
 	{
-		return '`'.($aPrototype->getColumnByAlias('lft')?:'lft').'`' ;
+		return ($aPrototype->getColumnByAlias('lft')?:'lft') ;
 	}
 	static public function rightColumn(Prototype $aPrototype)
 	{
-		return '`'.($aPrototype->getColumnByAlias('rgt')?:'rgt').'`' ;
+		return ($aPrototype->getColumnByAlias('rgt')?:'rgt') ;
 	}
 	
 	/**

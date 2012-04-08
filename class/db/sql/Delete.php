@@ -1,33 +1,17 @@
 <?php
-
 namespace org\jecat\framework\db\sql ;
 
-class Delete extends MultiTableStatement
+class Delete extends MultiTableSQL
 {
-	public function __construct($sTableName=null)
+	public function __construct($sTableName="")
 	{
-		parent::__construct($sTableName,null) ;
-	}
-	
-	public function makeStatement(StatementState $aState)
-	{
-		$aState->setSupportLimitStart(false)
-				->setSupportTableAlias(false) ;
-				
-		$this->checkValid(true) ;
+		$this->arrRawSql = array(
+				'expr_type' => 'query' ,
+				'subtree' => array( 'DELETE' ) ,
+				'command' => 'DELETE' ,
+		) ;
 		
-		$aCriteria = $this->criteria() ;
-		
-		$sStatement = "DELETE FROM " . $this->makeStatementTableList($aState) ;
-	
-		if($aaCriteria=$this->criteria(false))
-		{
-			$sStatement.= $aaCriteria->makeStatement($aState) ;
-		}
-		// limit
-//		$sStatement.= $this->makeStatementLimit($aState) ;
-		
-		return $sStatement ;
+		$this->addTable($sTableName) ;
 	}
 }
 

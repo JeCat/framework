@@ -1,6 +1,12 @@
 <?php 
 namespace org\jecat\framework\db ;
 
+use org\jecat\framework\db\sql\parser\BaseParserFactory;
+
+use org\jecat\framework\db\sql\compiler\SqlCompiler;
+
+use org\jecat\framework\db\sql\SQL;
+
 use org\jecat\framework\db\sql\StatementState;
 use org\jecat\framework\db\reflecter\imp\MySQLReflecterFactory;
 use org\jecat\framework\lang\Exception;
@@ -102,10 +108,9 @@ class DB extends Object
 	/**
 	 * @return \PDOStatement
 	 */
-	public function query($sql)
+	public function query($sql,$factors=null,SqlCompiler $aSqlCompiler=null)
 	{
-		$arrLog['sql'] = ($sql instanceof Statement)?
-				$sql->makeStatement($this->sharedStatementState()): strval($sql) ;
+		$arrLog['sql'] = $this->makeSql($sql,$factors,$aSqlCompiler) ;
 	
 		$fBefore = microtime(true) ;
 		$result = $this->pdo()->query($arrLog['sql'],\PDO::FETCH_ASSOC) ;
@@ -126,9 +131,51 @@ class DB extends Object
 		return $result ;
 	}
 	
-	public function queryCount(Select $aSelect,$sColumn='*')
-	{		
-		$aRecords = $this->query( $aSelect->makeStatementForCount('rowCount',$sColumn,$this->sharedStatementState()) ) ;
+	private function makeSql($inputSql,$factors=null,SqlCompiler $aSqlCompiler=null)
+	{
+		if( is_string($inputSql) )
+		{
+			$aSql = SQL::make($inputSql,$factors) ;
+		}
+		
+		else if( $inputSql instanceof SQL )
+		{
+			$aSql = $inputSql ;
+			$aSql->addFactors($factors) ;
+		}
+		
+		else
+		{
+			throw new ExecuteException($this,null,0,"DB::query() 输入的参数 \$sql 类型无效。") ;
+		}
+		
+		if($aSql)
+		{
+			return $aSql->toString($aSqlCompiler) ;
+		}
+		else
+		{
+			return $inputSql ;
+		}		
+	}
+	
+	public function queryCount(Select $aSelect,$sColumn='*',SqlCompiler $aSqlCompiler=null)
+	{
+		$arrRawSelect =& $aSelect->rawClause(SQL::CLAUSE_SELECT) ;
+		$arrReturnsBak =& $arrRawSelect['subtree'] ;
+		
+		$arrTmp = array("count({$sColumn}) as rowCount") ;
+		$arrRawSelect['subtree'] =& $arrTmp ;
+		try{
+			$aRecords = $this->query($aSelect,null,$aSqlCompiler) ;
+		}catch(\Exception $e){}
+		//} final {
+			$arrRawSelect['subtree'] =& $arrReturnsBak ;
+		//}
+		if(isset($e))
+		{
+			throw $e ;
+		}
 		
 		if( $aRecords )
 		{
@@ -142,10 +189,9 @@ class DB extends Object
 		}
 	}
 	
-	public function execute($sql)
+	public function execute($inputSql,$factors=null,SqlCompiler $aSqlCompiler=null)
 	{
-		$arrLog['sql'] = ($sql instanceof Statement)?
-		$sql->makeStatement($this->sharedStatementState()): strval($sql) ;
+		$arrLog['sql'] = $this->makeSql($inputSql,$factors,$aSqlCompiler) ;
 	
 		$fBefore = microtime(true) ;
 		$ret = $this->pdo()->exec($arrLog['sql']) ;
@@ -181,6 +227,25 @@ class DB extends Object
 		return $this->sCurrentDBName ;
 	}
 	
+	public function & transTableName($sTableName)
+	{
+		// 将 命名空间的分隔符号 : 转换成 _ 
+		$sTableName = str_replace(':','_',$sTableName) ;
+		
+		// 加上表名的前缀
+		if( $this->sTableNamePrefix and $sTableName[0]!==':' )
+		{
+			$sTableName = self::$sTableNamePrefix.$sTableName ;
+		}
+		
+		return $sTableName ;
+	}
+
+	public function setTableNamePrefix($sTableNamePrefix)
+	{
+		$this->sTableNamePrefix = $sTableNamePrefix ;
+	}
+	
 	/**
 	 * @return org\jecat\framework\db\sql\reflecter\AbstractReflecterFactory
 	 */
@@ -189,11 +254,7 @@ class DB extends Object
 		// 自动链接到数据库
 		if( !$this->hasConnected() )
 		{
-			try{
-				$this->connect() ;
-			} catch (\Exception $e) {
-				return null ;
-			}
+			$this->connect() ;
 		}
 		
 		//识别数据库的名称(mysql,oracle)
@@ -256,7 +317,8 @@ class DB extends Object
 	private $sCurrentDBName ;
 	private $arrExecuteLog ;
 	private $aSharedStatementState ;
-	
+
+	private $sTableNamePrefix ;
 }
 
 ?>

@@ -2,6 +2,8 @@
 
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\db\sql\Insert;
+use org\jecat\framework\db\sql\Select;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\Object;
 use org\jecat\framework\db\DB;
@@ -13,11 +15,11 @@ class Inserter extends OperationStrategy
     public function execute(DB $aDB, Model $aModel)
 	{
 		$aPrototype = $aModel->prototype() ;
-		$aInsert = $aPrototype->statementFactory()->createInsert($aPrototype->tableName()) ;
+		$aInsert = new Insert($aPrototype->tableName()) ;
 		
 		// 从 belongs to model 中设置外键值
 		foreach($aPrototype->associations() as $aAssociation)
-		{				
+		{
 			if( $aAssociation->isType(Association::belongsTo) )
 			{
 				if( !$aAssocModel=$aModel->child($aAssociation->name()) )
@@ -72,7 +74,7 @@ class Inserter extends OperationStrategy
 				$value = $aModel->data($sClmName) ;
 				if($value!==null)
 				{
-					$aInsert->setData('`'.$sClmName.'`',$value) ;
+					$aInsert->setData($sClmName,$value) ;
 				}
 			}
 			
@@ -159,14 +161,11 @@ class Inserter extends OperationStrategy
 	protected function buildBridge(DB $aDB,Association $aAssociation,Model $aFromModel,Model $aToModel)
 	{
 		$aFromPrototype = $aAssociation->fromPrototype() ;
-		$aStatementFactory = $aFromPrototype->statementFactory() ;
-		$aSelect = $aStatementFactory->createSelect($aAssociation->bridgeTableName()) ;
-		$aSelect->criteria()->where()->add(
-			$this->makeResrictionForAsscotion($aFromModel,$aFromPrototype->path(),$aAssociation->fromKeys(),null,$aAssociation->toBridgeKeys(),$aStatementFactory)
-		) ;
-		$aSelect->criteria()->where()->add(
-			$this->makeResrictionForAsscotion($aToModel,$aAssociation->toPrototype()->path(),$aAssociation->toKeys(),null,$aAssociation->fromBridgeKeys(),$aStatementFactory)
-		) ;
+		$aSelect = new Select($aAssociation->bridgeTableName()) ;
+		
+		$aRestraction = $aSelect->criteria()->where() ;
+		$this->makeResrictionForAsscotion($aRestraction,$aFromPrototype->path(),$aAssociation->fromKeys(),null,$aAssociation->toBridgeKeys()) ;
+		$this->makeResrictionForAsscotion($aRestraction,$aAssociation->toPrototype()->path(),$aAssociation->toKeys(),null,$aAssociation->fromBridgeKeys()) ;
 		
 		// 检查对应的桥接表记录是否存在
 		if( !$aDB->queryCount($aSelect) )

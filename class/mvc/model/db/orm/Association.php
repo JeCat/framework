@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\db\sql\parser\BaseParserFactory;
+
 use org\jecat\framework\util\serialize\IIncompleteSerializable;
 use org\jecat\framework\util\serialize\ShareObjectSerializer;
 use org\jecat\framework\lang\Type;
@@ -249,14 +251,14 @@ class Association implements IBean, \Serializable, IIncompleteSerializable
 	/**
 	 * @return org\jecat\framework\db\sql\TablesJoin
 	 */
-	public function sqlTablesJoin()
+	/*public function sqlTablesJoin()
 	{
 		return $this->aTablesJoin ;
 	}
 	public function setSqlTablesJoin(TablesJoin $aTablesJoin)
 	{
 		$this->aTablesJoin = $aTablesJoin ;
-	}
+	}*/
 	
 	public function joinType()
 	{
@@ -329,30 +331,27 @@ class Association implements IBean, \Serializable, IIncompleteSerializable
 		}
 		if(!empty($arrConfig['on']))
 		{
-			$arrConfig['on'] = (array)$arrConfig['on'] ;
-			foreach($arrConfig['on'] as &$items)
+			$aSqlParser = BaseParserFactory::singleton()->create(true,null,'on') ;
+			if( is_array($arrConfig['on']) )
 			{
-				// 桥接表区分是否 Bridge 上的条件
-				if( $this->isType(self::hasAndBelongsToMany) and strpos($items[1],'to.')===0 )
-				{
-					$aRestriction = $this->otherBridgeTableJoinOn() ;
-				}
-				else
-				{
-					$aRestriction = $this->otherTableJoinOn() ;
-				}
-				$sMethod = array_shift($items) ;
-				call_user_func_array(array($aRestriction,$sMethod),$items) ;
+				$arrOnFactors = $arrConfig['on'] ;
+				$this->arrOnRawSql = array(
+						'expr_type' => 'clause_on' ,
+						'subtree' => $aSqlParser->parse(array_shift($arrOnFactors),true) ,
+						'factors' => & $arrOnFactors ,
+				) ;				
+			}
+			else
+			{
+				$this->arrOnRawSql = array(
+						'expr_type' => 'clause_on' ,
+						'subtree' => $aSqlParser->parse($arrConfig['on'],true) ,
+				) ;			
 			}
 		}
 		if(!empty($arrConfig['join']))
 		{
-			$mapTypes = array(
-				'left' => TablesJoin::JOIN_LEFT ,
-				'right' => TablesJoin::JOIN_RIGHT ,
-				'inner' => TablesJoin::JOIN_INNER ,
-			) ;
-			$this->sJoinType = isset($mapTypes[$arrConfig['join']])? $mapTypes[$arrConfig['join']]: $arrConfig['join'] ;
+			$this->sJoinType = strtoupper($arrConfig['join']) ;
 		}
 		
 		$this->done() ;
@@ -370,68 +369,9 @@ class Association implements IBean, \Serializable, IIncompleteSerializable
 		$this->aDB = $aDB ;
 	}
 	
-	public function on()
+	public function & joinOnRawSql()
 	{
-		return $this->aTablesJoin? $this->aTablesJoin->on(): null ;
-	}
-	
-	// --------------
-	public function otherTableJoinOn($bAutoCreate=true)
-	{
-		if( !$this->aOtherTableJoinOn and $bAutoCreate )
-		{
-			$this->aOtherTableJoinOn = $this->createJoinOn() ;
-		}
-		return $this->aOtherTableJoinOn ;
-	}
-	public function otherBridgeTableJoinOn($bAutoCreate=true)
-	{
-		if( !$this->aOtherTableJoinOn and $bAutoCreate )
-		{
-			$this->aOtherTableJoinOn = $this->createJoinOn() ;
-		}
-		return $this->aOtherTableJoinOn ;
-	}
-	private function createJoinOn()
-	{
-		$aTableJoinOn = new Restriction() ;
-		
-		$aStatementNameTransfer = NameTransferFactory::singleton()->create() ;
-		$aStatementNameTransfer->addColumnNameHandle(array($this,'statementColumnNameHandle')) ;
-		
-		$aTableJoinOn->setNameTransfer($aStatementNameTransfer) ;
-		
-		return $aTableJoinOn ;
-	}
-	public function statementColumnNameHandle($sName,Statement $aStatement,StatementState $sState)
-	{
-		// 切分 原型名称 和 字段名称
-		$nPos = strrpos($sName,'.') ;
-		if($nPos===false)
-		{
-			throw new ORMException("ORM 关联的Join On条件，必须指出字段所属的表(from,to,bridge)") ;	
-		}
-		
-		$sColumnName = substr($sName,$nPos+1) ;
-		
-		switch(substr($sName,0,$nPos))
-		{
-			case 'from' :
-				$aPrototype = $this->fromPrototype() ;
-				break ;
-			case 'to' :
-				$aPrototype = $this->toPrototype() ;
-				break ;
-			case 'bridge' :
-				return '`'.$this->bridgeSqlTableAlias()."`.`{$sColumnName}`" ;
-			default :
-				throw new ORMException("ORM 关联的Join On条件，必须使用：from,to,bridge 表示对应的表名; 传入的字段名为：%s",$sName) ;	
-		}
-		
-		return array(
-			'`'.$aPrototype->sqlTableAlias().'`.`'.($aPrototype->getColumnByAlias($sColumnName)?:$sColumnName).'`'
-			, $aStatement, $sState
-		) ;
+		return $this->arrOnRawSql ;
 	}
 	// ----------------------------------
 	public function serializableProperties()
@@ -444,6 +384,7 @@ class Association implements IBean, \Serializable, IIncompleteSerializable
 				'sBridgeTable' ,
 				'arrToBridgeKeys' ,
 				'arrFromBridgeKeys' ,
+				'arrOnRawSql' ,
 				'sJoinType' ,
 				'arrBeanConfig' ,
 				'aToPrototype' ,
@@ -471,11 +412,10 @@ class Association implements IBean, \Serializable, IIncompleteSerializable
 	private $sBridgeTable;
 	private $arrToBridgeKeys = array();
 	private $arrFromBridgeKeys = array();
-	private $aTablesJoin = null ;
-	private $sJoinType = TablesJoin::JOIN_LEFT ;
+	private $arrOnRawSql ;
+	//private $aTablesJoin = null ;
+	private $sJoinType = 'LEFT' ;
 	
 	private $arrBeanConfig ;
-	
-	private $aOtherTableJoinOn ;
 	
 }

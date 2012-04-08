@@ -1,6 +1,14 @@
 <?php
 namespace org\jecat\framework\mvc\model\db\orm;
 
+use org\jecat\framework\lang\Assert;
+use org\jecat\framework\db\sql\parser\BaseParserFactory;
+use org\jecat\framework\db\sql\compiler\SqlNameCompiler;
+use org\jecat\framework\db\sql\compiler\SqlCompiler;
+use org\jecat\framework\db\sql\SQL;
+use org\jecat\framework\db\sql\Criteria;
+use org\jecat\framework\db\sql\Update;
+use org\jecat\framework\lang\Object;
 use org\jecat\framework\mvc\model\db\ModelList;
 use org\jecat\framework\db\sql\Order;
 use org\jecat\framework\util\serialize\IIncompleteSerializable;
@@ -33,7 +41,7 @@ use org\jecat\framework\db\sql\StatementFactory;
  *
  */
 
-class Prototype extends StatementFactory implements IBean, \Serializable, IIncompleteSerializable
+class Prototype extends Object implements IBean, \Serializable, IIncompleteSerializable
 {
 	const youKnow = null ;
 	
@@ -135,20 +143,6 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 	{
 		$this->sTableName = $sTableName;
 		return $this;
-	}
-	
-	/**
-	 * @return org\jecat\framework\db\sql\Criteria
-	 */
-
-	public function criteria($bCreate=true)
-	{
-		if( !$this->aCriteria and $bCreate )
-		{
-			$this->aCriteria = $this->statementFactory()->createCriteria() ;
-		}
-		
-		return $this->aCriteria;
 	}
 	
 	public function associatedBy()
@@ -549,20 +543,21 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 	{
 		if(!$this->sModelClass)
 		{
-			$sModelShortClass = '_'.preg_replace('[^\w_]','_',$this->tableName()) ;
-			$this->sModelClass = self::MODEL_IMPLEMENT_CLASS_NS .'\\'. $sModelShortClass ;
+			$this->sModelClass = self::modelShadowClassName($this->tableName()) ;
 		}
 		return $this->sModelClass ;
 	}
 	
-	static public function modelShadowClassName($sTableName){
-		$sModelShortClass = '_'.preg_replace('[^\w_]','_',$sTableName) ;
-		return self::MODEL_IMPLEMENT_CLASS_NS .'\\'. $sModelShortClass ;
+	static public function modelShadowClassName($sTableName)
+	{
+		$sModelClass = self::MODEL_IMPLEMENT_CLASS_NS .'\\_'.preg_replace('/[^\\w_]/','_',$sTableName) ;
+		return class_exists($sModelClass)? $sModelClass: 'org\\jecat\\framework\\mvc\\model\\db\\Model' ;
 	}
 	
-	static public function prototypeShadowClassName($sTableName){
-		$sShortClass = '_'.preg_replace('[^\w_]','_',$sTableName) ;
-		return self::PROTOTYPE_IMPLEMENT_CLASS_NS .'\\'. $sShortClass ;
+	static public function prototypeShadowClassName($sTableName)
+	{
+		$sClass = self::PROTOTYPE_IMPLEMENT_CLASS_NS .'\\_'.preg_replace('/[^\\w_]/','_',$sTableName) ;
+		return class_exists($sClass)? $sClass: __CLASS__ ;
 	}
 	
 	// criteria setter
@@ -601,9 +596,8 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 	{
 		// 根据 table 自动生成影子class
 		if( !empty($arrConfig['table']) )
-		{			
-			$sShortClass = '_'.preg_replace('[^\w_]','_',$arrConfig['table']) ;
-			$sClass = self::PROTOTYPE_IMPLEMENT_CLASS_NS .'\\'. $sShortClass ;
+		{
+			$sClass = self::prototypeShadowClassName($arrConfig['table']) ;
 		}
 		
 		$aBean = new $sClass() ;
@@ -779,27 +773,37 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		{
 			$this->addColumnAlias($arrConfig['alias']) ;
 		}
-		// limit
+		// limit ----------------
 		if( !empty($arrConfig['limit']) )
 		{
-			$this->criteria()->setLimitLen($arrConfig['limit']) ;
+			$this->nLimitLen = $arrConfig['limit'] ;
 		}
 		// limitLen
 		if( !empty($arrConfig['limitLen']) )
 		{
-			$this->criteria()->setLimitLen($arrConfig['limitLen']) ;
+			$this->nLimitLen = $arrConfig['limitLen'] ;
 		}
 		// limitFrom
 		if( !empty($arrConfig['limitFrom']) )
 		{
-			$this->criteria()->setLimitFrom($arrConfig['limitFrom']) ;
+			$this->limitFrom = $arrConfig['limitFrom'] ;
 		}
-		// order
+		if($this->nLimitLen===-1)
+		{
+			$this->criteria()->clearLimit() ;
+		}
+		else 
+		{
+			$this->criteria()->setLimit($this->nLimitLen,$this->limitFrom) ;
+		}
+		
+		// order ----------------
 		if( !empty($arrConfig['order']) )
 		{
 			foreach((array)$arrConfig['order'] as $sColumn)
 			{
-				$this->criteria()->orders()->add($sColumn,true) ;
+				list($sTable,$sColumn) = SQL::splitColumn($sColumn) ;
+				$this->criteria()->addOrderBy($sColumn,true,$sTable) ;
 			}
 		}
 		// orderDesc
@@ -807,7 +811,8 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		{
 			foreach((array)$arrConfig['orderDesc'] as $sColumn)
 			{
-				$this->criteria()->orders()->add($sColumn,true) ;
+				list($sTable,$sColumn) = SQL::splitColumn($sColumn) ;
+				$this->criteria()->addOrderBy($sColumn,true,$sTable) ;
 			}
 		}
 		// orderAsc
@@ -815,7 +820,8 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		{
 			foreach((array)$arrConfig['orderAsc'] as $sColumn)
 			{
-				$this->criteria()->orders()->add($sColumn,false) ;
+				list($sTable,$sColumn) = SQL::splitColumn($sColumn) ;
+				$this->criteria()->addOrderBy($sColumn,false,$sTable) ;
 			}
 		}
 		// orderRand
@@ -834,7 +840,24 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		// where
 		if(!empty($arrConfig['where']))
 		{
-			self::buildBeanRestriction($arrConfig['where'],$this->criteria()->where()->createRestriction()) ;
+			$aSqlParser = BaseParserFactory::singleton()->create(true,null,'where') ;
+			if( is_array($arrConfig['where']) )
+			{
+				$arrOnFactors = $arrConfig['where'] ;
+				$this->arrWhereRawSql = array(
+						'expr_type' => 'clause_where' ,
+						'subtree' => $aSqlParser->parse(array_shift($arrOnFactors),true) ,
+						'factors' => & $arrOnFactors ,
+				) ;
+			}
+			else
+			{
+				$this->arrWhereRawSql = array(
+						'expr_type' => 'clause_on' ,
+						'subtree' => $aSqlParser->parse($arrConfig['where'],true) ,
+				) ;
+			}
+			// self::buildBeanRestriction($arrConfig['where'],$this->criteria()->where()->createRestriction()) ;
 		}
 		
 		// associations
@@ -885,153 +908,80 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		$this->arrBeanConfig = $arrConfig ;
 	}
 	
-	static public function buildBeanRestriction(array $arrRestrictionConfig,Restriction $aRestriction)
-	{
-		// 第一项 'and' 或 'or'
-		$sLogic = array_shift($arrRestrictionConfig) ;
-		if( $sLogic )
-		{
-			if(is_string($sLogic))
-			{
-				$aRestriction->setLogic( strtolower($sLogic)!='or' ) ;
-			}
-			else 
-			{
-				array_unshift($arrRestrictionConfig,$sLogic) ;
-			}
-		}
-		
-		foreach ($arrRestrictionConfig as &$arrCondition)
-		{
-			if( !is_array($arrCondition) )
-			{
-				throw new BeanConfException('无效的orm bean config 内容：%s，做为sql条件，必须是一个数组',var_export($arrCondition,true)) ;
-			}
-			
-			$sOperator = array_shift($arrCondition) ;
-			$sOperator = strtolower($sOperator) ;
-			
-			// 递归 条件分组
-			if($sOperator=='restriction')
-			{
-				$sOperator = 'and' ;
-			}
-			if( $sOperator=='and' or $sOperator=='or' )
-			{
-				array_unshift($arrCondition,$sOperator) ;
-				self::buildBeanRestriction($arrCondition,$aRestriction->createRestriction()) ;
-			}
-			// 处理条件
-			else 
-			{
-				if( !is_string($sOperator) or !method_exists($aRestriction,$sOperator))
-				{
-					throw new BeanConfException(
-							'无效的orm bean config 内容：%s，做为sql条件，数组的第一个元素必须是一个有效的表示运算符的字符串'
-							, var_export($arrCondition,true)
-					) ;
-				}
-				call_user_func_array(array($aRestriction,$sOperator),$arrCondition) ;
-			}
-		}
-	}
-	
 	public function beanConfig()
 	{
 		$this->arrBeanConfig ;
 	}
 	
+	public function criteria($bAutoCreate=true)
+	{
+		if( !$this->aCriteria and $bAutoCreate )
+		{
+			$this->aCriteria = new Criteria() ;
+		}
+		return $this->aCriteria ;
+	}
+
+	public function limitLength()
+	{
+		return $this->nLimitLen ;
+	}
+	public function limitFrom()
+	{
+		return $this->limitFrom ;
+	}
+	public function & whereRawSql()
+	{
+		return $this->arrWhereRawSql ;
+	}
+	
 	// statement
-	public function statementInsert()
+	/**
+	 * @return org\jecat\framework\db\sql\Insert
+	 */
+	public function sharedStatementInsert()
 	{
 		$this->aStatementInsert ;
 	}
-	public function statementDelete()
+	/**
+	 * @return org\jecat\framework\db\sql\Delete
+	 */
+	public function sharedStatementDelete()
 	{
 		$this->aStatementDelete ;
 	}
+	/**
+	 * @return org\jecat\framework\db\sql\Select
+	 */
 	public function sharedStatementSelect()
 	{
 		if(!$this->aStatementSelect)
 		{
 			$this->aStatementSelect = Selecter::buildSelect($this) ;
+			
+			$arrTokenTree =& $this->aStatementSelect->rawSql() ;
+			$arrTokenTree['omited_first_table'] = $this->name() ;
+			$arrTokenTree['omited_first_table_len'] = strlen($arrTokenTree['omited_first_table']) ;
 		}
 		return $this->aStatementSelect ;
 	}
 	/**
 	 * return org\jecat\framework\db\sql\Update
 	 */
-	public function statementUpdate()
+	public function sharedStatementUpdate()
 	{
 		if( !$this->aStatementUpdate )
 		{
-			$this->aStatementUpdate = $this->statementFactory()->createUpdate($this ->tableName()) ;
+			$this->aStatementUpdate = new Update($this->tableName()) ;
+
+			$arrTokenTree =& $this->aStatementUpdate->rawSql() ;
+			$arrTokenTree['omited_first_table'] = $this->name() ;
+			$arrTokenTree['omited_first_table_len'] = strlen($arrTokenTree['omited_first_table']) ;
 		}
 
 		return $this->aStatementUpdate ;
 	}
 	
-	/**
-	 * override parent class StatementFactory
-	 */
-	protected function initStatement(Statement $aStatement)
-	{
-		$aStatement->setNameTransfer($this->nameTransfer()) ;
-		$aStatement->setStatementFactory($this) ;
-		return $aStatement ;
-	}
-
-	/**
-	 * @return org\jecat\framework\db\sql\name\NameTransfer
-	 */
-	public function nameTransfer()
-	{
-		if(!$this->aStatementNameTransfer)
-		{
-			$this->aStatementNameTransfer = NameTransferFactory::singleton()->create() ;
-			$this->aStatementNameTransfer->addColumnNameHandle(array($this,'statementColumnNameHandle')) ;
-		}
-		return $this->aStatementNameTransfer ;
-	}
-
-	/**
-	 * @return org\jecat\framework\db\sql\StatementFactory ;
-	 */
-	public function statementFactory()
-	{
-		return $this ;
-	}
-	/**
-	 * @return org\jecat\framework\db\sql\Table ;
-	 */
-	public function createSqlTable()
-	{
-		return $this->createTable($this->tableName(),$this->sqlTableAlias()) ;
-	}
-	public function statementColumnNameHandle($sName,Statement $aStatement,StatementState $sState)
-	{
-		// delete和Update不支持别名，不做表别名转换
-		if( !$sState->supportTableAlias() )
-		{
-			return array($this->getColumnByAlias($sName),$aStatement,$sState) ;
-		}
-		
-		// 切分 原型名称 和 字段名称
-		$sColumn = $this->getColumnByAlias($sName)?: $sName ;
-		
-		$nPos = strrpos($sColumn,'.') ;
-		if($nPos!==false)
-		{
-			$sTableName = '.'.substr($sColumn,0,$nPos) ;
-			$sColumn = substr($sColumn,$nPos+1) ;
-		}
-		else 
-		{
-			$sTableName = '' ;
-		}
-
-		return '`'.$this->path()."{$sTableName}`.`{$sColumn}`" ;
-	}
 	
 	// -----------------------------------------------
 	public function serializableProperties()
@@ -1045,6 +995,9 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 				'arrKeys' ,
 				'sDevicePrimaryKey' ,
 				'sModelClass' ,
+				'nLimitLen' ,
+				'limitFrom' ,
+				'arrWhereRawSql' ,
 				'aCriteria' ,
 				'aAssociationBy' ,
 				'arrAssociations' ,
@@ -1082,6 +1035,43 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 		return $this->aDB ;
 	}
 	
+	/**
+	 * @return org\jecat\framework\db\sql\compiler\SqlCompiler
+	 */
+	static public function sqlCompiler()
+	{
+		if( !self::$aSqlCompiler )
+		{
+			$aNameCompiler = new SqlNameCompiler() ;
+			$aNameCompiler->registerColumnNameTranslaters(array(__CLASS__,'translateColumnName')) ;
+			
+			self::$aSqlCompiler = new SqlCompiler(true) ;			
+			self::$aSqlCompiler->registerTokenCompiler('column',$aNameCompiler) ;
+			self::$aSqlCompiler->registerTokenCompiler('table',$aNameCompiler) ;
+		}
+		
+		return self::$aSqlCompiler ;
+	}
+	
+	static public function translateColumnName($sTable,$sColumn,$sAlias,array & $arrToken,array & $arrTokenTree)
+	{		
+		if( empty($arrToken['declare']) and !empty($arrTokenTree['omited_first_table'])
+				and $arrTokenTree['omited_first_table']!=substr($sTable,0,$arrTokenTree['omited_first_table_len'])
+				and '.'!=substr($sTable,$arrTokenTree['omited_first_table_len']) 
+		) {
+			if($sTable)
+			{
+				$sTable = $arrTokenTree['omited_first_table'].'.'.$sTable ;
+			}
+			else
+			{
+				$sTable = $arrTokenTree['omited_first_table'] ;
+			}
+		}
+		
+		return array( $sTable, $sColumn, $sAlias ) ;
+	}
+	
 	// 固有属性 ----------------------------
 	private $sName;// 如果不提供，用表名作名字。
 	private $sTableName='';
@@ -1089,6 +1079,9 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 	private $arrColumnAliases = array();
 	private $arrKeys ;
 	private $sDevicePrimaryKey = null ;
+	private $nLimitLen = 30 ;
+	private $limitFrom = 0 ;
+	private $arrWhereRawSql = 0 ;
 	private $aCriteria = null;
 	private $arrAssociations =  array();
 	private $aAssociationBy = null;
@@ -1105,5 +1098,7 @@ class Prototype extends StatementFactory implements IBean, \Serializable, IIncom
 	private $aStatementDelete ;
 	private $aStatementSelect ;
 	private $aStatementUpdate ;
+	
+	static private $aSqlCompiler ;
 	
 }

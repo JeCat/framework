@@ -2,6 +2,10 @@
 
 namespace org\jecat\framework\mvc\model\db ;
 
+use org\jecat\framework\db\sql\parser\BaseParserFactory;
+
+use org\jecat\framework\db\sql\SQL;
+
 use org\jecat\framework\mvc\model\db\orm\Deleter;
 use org\jecat\framework\mvc\model\IModel;
 use org\jecat\framework\io\IOutputStream;
@@ -85,8 +89,13 @@ class Model extends AbstractModel implements IBean
 		
 		$this->nDataRow = 0 ;
 		return Selecter::singleton()->execute(
-			$this->prototype() , $this->recordset(), null , self::buildCriteria($this->prototype(),$values,$keys), $this->isList(), $this->db()
+			$this->prototype() , $this->recordset(), null , self::buildRestriction($this->prototype(),$values,$keys), false, $this->db()
 		) ;
+	}
+	
+	public function loadSql($sWhereStatement=null,$arrFactors=null)
+	{
+		return $this->load( $sWhereStatement? SQL::makeRestriction($sWhereStatement,$arrFactors): null ) ;
 	}
 
 	/**
@@ -137,73 +146,47 @@ class Model extends AbstractModel implements IBean
 	/**
 	 * @return org\jecat\framework\db\sql\Criteria
 	 */
-	public function createCriteria(Restriction $aRestriction=null)
+	/*public function createCriteria(Restriction $aRestriction=null)
 	{
-		return $this->prototype()->statementFactory()->createCriteria($aRestriction) ;
-	}
+		return ; //$this->prototype()->statementFactory()->createCriteria($aRestriction) ;
+	}*/
 	
 	/**
 	 * @return org\jecat\framework\db\sql\Restriction
 	 */
-	public function createWhere($bLogic=true)
+	/*public function createWhere($bLogic=true)
 	{
-		return $this->prototype()->statementFactory()->createRestriction($bLogic) ;
-	}
+		return ; //$this->prototype()->statementFactory()->createRestriction($bLogic) ;
+	}*/
 	
-	static public function buildCriteria(Prototype $aPrototype,$values=null,$keys=null)
+	static public function buildRestriction(Prototype $aPrototype,$values=null,$keys=null)
 	{
 		if($values===null)
 		{
-			return $aPrototype->criteria() ;
+			return $aPrototype->criteria()->where() ;
 		}
 		
 		$keys = $keys? (array)$keys: $aPrototype->keys() ;
 		
-		if($values instanceof Criteria)
+		if($values instanceof Restriction)
 		{
-			return $values;
-		}
-		else if($values instanceof Restriction)
-		{
-			$aSelectCriteria = clone $aPrototype->criteria() ;
-			
-			$aSelectCriteria->where()->add($values) ;
-			return $aSelectCriteria ;
+			return $values ;
 		}
 		else
 		{
-			$aSelectCriteria = clone $aPrototype->criteria() ;
+			$aRestriction = new Restriction() ;
 			
+			$sSqlTableAlias = $aPrototype->sqlTableAlias() ;
 			$values = array_values((array) $values) ;
 			foreach($keys as $nIdx=>$sKey)
 			{
-				$aSelectCriteria->where()->eq( $sKey, $values[$nIdx] ) ;
+				$aRestriction->expression( array(
+						SQL::createRawColumn($sSqlTableAlias, $sKey),
+						'=', SQL::transValue($values[$nIdx])
+				), true, true ) ;
 			}
-			return $aSelectCriteria ;
+			return $aRestriction ;
 		}
-	}
-	
-	public function setPagination($iPerPage,$iPageNum){
-	    $this->prototype()->criteria()->setLimit( $iPerPage, $iPerPage*($iPageNum-1) ) ;
-	}
-
-	
-	/**
-	 * 覆盖父类方法，实现 prototype 字段别名
-	 */
-	protected function findDataByPath(&$sDataName,&$aModel,&$bDataExist)
-	{/*
-		// 原型中的别名
-		if( $aPrototype = $this->prototype() )
-		{
-			$sRealName = $aPrototype->getColumnByAlias($sDataName) ;
-			if( $sRealName!==null )
-			{
-				$sDataName = $sRealName ;
-			}
-		}
-		
-		return parent::findDataByPath($sDataName,$aModel,$bDataExist) ;*/
 	}
 	
 	// implements IBean
@@ -549,7 +532,7 @@ class Model extends AbstractModel implements IBean
 	/**
 	 * @return Recordset
 	 */
-	private function & recordset()
+	protected function & recordset()
 	{
 		if($this->arrDataSheet===null)
 		{

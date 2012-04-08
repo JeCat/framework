@@ -1,11 +1,12 @@
 <?php
 namespace org\jecat\framework\lang\oop ;
 
+use org\jecat\framework\lang\Object;
 use org\jecat\framework\fs\FSO;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\fs\Folder;
 
-class Package implements \Serializable
+class Package extends Object implements \Serializable
 {		
 	const source = 1 ;
 	const encode = 8 ;

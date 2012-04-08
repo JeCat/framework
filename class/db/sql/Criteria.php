@@ -1,172 +1,151 @@
 <?php
-namespace org\jecat\framework\db\sql;
+namespace org\jecat\framework\db\sql ;
 
-use org\jecat\framework\lang\Type;
-
-use org\jecat\framework\lang\Exception;
-
-class Criteria extends SubStatement
-{
-	public function __construct(Restriction $aWhere = null){
-		if($aWhere !== null){
-			$this->setRestriction($aWhere);
-		}
-	}
-	
-	/**
-	 * 把所有条件拼接成字符串,相当于把这个对象字符串化
-	 * 
-	 * @param $aState 
-	 * @return string
-	 */
-	public function makeStatement(StatementState $aState) {
-		
-		$sStatement = '' ;
-		
-		if($this->aWhere)
-		{
-			$sStatement = ' WHERE ' . $this->aWhere->makeStatement($aState);
-		}
-		if( $this->arrGroupByClms )
-		{
-			$sStatement.= ' GROUP BY ' ;
-			foreach($this->arrGroupByClms as $i=>$sColumn)
-			{
-				if($i>0)
-				{
-					$sStatement.= ', ' ;
-				}
-				$sStatement.= $this->transColumn($sColumn,$aState) ;
-			}
-		}
-		if( $this->aOrder )
-		{
-			$sStatement .= ' ' . $this->aOrder->makeStatement($aState);
-		}
-		
-		$sStatement .= ' ' . $this->makeStatementLimit($aState) ;
-		
-		return $sStatement;
-	}
-	
-	public function checkValid($bThrowException = true) {
-		return true;
-	}
+class Criteria extends SQL
+{	
+	// -- limit --
 	
 	/**
 	 *  设置limit条件
 	 * @param int $nLimitLen limit 长度
 	 * @param int $sLimitFrom limit 开始
 	 */
-	public function setLimit($nLimitLen , $sLimitFrom = 0){
-		$this->setLimitLen($nLimitLen);
-		$this->setLimitFrom($sLimitFrom);
-		return $this ;
-	}
-	
-	public function makeStatementLimit(StatementState $aState){
-		if($this->nLimitLen===-1)
+	public function setLimit($nLimitLen,$limitFrom = null)
+	{
+		if($nLimitLen<0)
 		{
-			return '';
-		}		
-		$sLimit = ' LIMIT ';
-		
-		if($aState->supportLimitStart() and $this->sLimitFrom != 0)
-		{
-			$sLimit .= $this->sLimitFrom . ', ';
+			$this->clearLimit(true) ;
 		}
-		$sLimit .= $this->nLimitLen ;
-		return $sLimit;
-	}
+		else
+		{
+			$this->clearLimit(false) ;
+		
+			$arrRawLimit =& $this->rawClause(self::CLAUSE_LIMIT) ;
+		
+			if( $limitFrom!==null )
+			{
+				$arrRawLimit['subtree'][] = $limitFrom ;
+				$arrRawLimit['subtree'][] = ',' ;
+				$arrRawLimit['subtree'][] = $nLimitLen ;
+			}
+			else
+			{
+				$arrRawLimit['subtree'][] = (int)$nLimitLen ;
+			}
+		}
 	
-	public function setLimitFrom($sLimitFrom) {
-		$this->sLimitFrom = $sLimitFrom;
 		return $this ;
 	}
-	public function limitFrom()
+	
+	public function clearLimit($bRemoveCluuse=true)
 	{
-		return $this->sLimitFrom;
+		if($bRemoveCluuse)
+		{
+			unset($this->arrRawSql['subtree'][self::CLAUSE_LIMIT]) ;
+		}
+		else
+		{
+			if(isset($this->arrRawSql['subtree'][self::CLAUSE_LIMIT]))
+			{
+				$this->arrRawSql['subtree'][self::CLAUSE_LIMIT]['subtree'] = array() ;
+			}
+		}
 	}
 	
-	public function setLimitLen($nLimitLen){
-		$this->nLimitLen = (int)$nLimitLen;
-		return $this ;
-	}
-	
-	public function limitLen()
-	{
-		return $this->nLimitLen;
-	}
-	
+	// -- where --
 	public function setWhere(Restriction $aWhere){
 		$this->aWhere = $aWhere;
+		$this->setRawWhere( $aWhere->rawSql() ) ;
 		return $this ;
 	}
-	
 	/**
 	 * @return Restriction
 	 */
-	public function where($bAutoCreate=true){
+	public function where($bAutoCreate=true)
+	{
+		$arrRawWhere =& $this->rawClause(self::CLAUSE_WHERE) ;
+	
 		if( !$this->aWhere and $bAutoCreate )
 		{
-			$this->aWhere = $this->statementFactory()->createRestriction();
+			$this->aWhere = new Restriction() ;
+			$this->aWhere->setRawSql($arrRawWhere) ;
 		}
+	
 		return $this->aWhere ;
 	}
 	
-	public function addOrderBy($sColumn,$bDesc=true)
+	
+	// -- order by --
+	public function addOrderBy($sColumn,$bDesc=true,$sTable=null)
 	{
-		$this->orders()->add($sColumn,$bDesc) ;
-		return $this ;
-	}
+		$arrRawOrder =& $this->rawClause(self::CLAUSE_ORDER) ;
 	
-	public function setOrders(Order $aOrder){
-		$this->aOrder = $aOrder;
-		return $this ;
-	}
-	
-	/**
-	 * 
-	 * @return Order 
-	 */
-	public function orders($bAutoCreate=true){
-		if(!$this->aOrder and $bAutoCreate)
+		if(!empty($arrRawOrder['subtree']))
 		{
-			$this->aOrder = $this->statementFactory()->createOrder();
+			$arrRawOrder['subtree'][] = ',' ;
 		}
-
-		return $this->aOrder;
+		$arrRawOrder['subtree'][] = self::createRawColumn($sTable, $sColumn) ;
+		$arrRawOrder['subtree'][] = $bDesc? 'DESC': 'ASC' ;
+	
+		return $this ;
 	}
-
-	function __clone()
+	
+	public function clearOrders()
 	{
-	    if($this->aOrder !== null) $this->aOrder = clone $this->aOrder;
-	    if($this->aWhere !== null) $this->aWhere = clone $this->aWhere;
+		unset($this->arrRawSql['subtree'][self::CLAUSE_ORDER]) ;
+		return $this ;
 	}
 	
 	// -- group by --
-	public function addGroupBy($columns)
+	public function addGroupBy($sColumn,$sTable=null,$sDB=null)
 	{
-		$this->arrGroupByClms = array_merge(Type::toArray($columns,Type::toArray_emptyForNull) ,Type::toArray($this->arrGroupByClms,Type::toArray_emptyForNull)) ;
+		$arrGroupBy =& $this->rawClause(self::CLAUSE_GROUP) ;
+		if( !empty($arrGroupBy['subtree']) )
+		{
+			$arrGroupBy['subtree'][] = ',' ;
+		}
+		$arrGroupBy['subtree'][] = self::createRawColumn($sTable,$sColumn,null) ;
+	
 		return $this ;
 	}
 	
-	public function groupBy()
+	public function clearGroupBy($bRemoveCluuse=true)
 	{
-		return $this->arrGroupByClms?: array() ;
-	}
-	
-	public function clearGroupBy()
-	{
-		$this->arrGroupByClms = null ;
+		if($bRemoveCluuse)
+		{
+			unset($this->arrRawSql['subtree'][self::CLAUSE_GROUP]) ;
+		}
+		else if(isset($this->arrRawSql['subtree'][self::CLAUSE_GROUP]))
+		{
+			$this->arrRawSql['subtree'][self::CLAUSE_GROUP]['subtree'] = array() ;
+		}
 		return $this ;
 	}
-
 	
-	private $aWhere = null;
-	private $aOrder = null;
-	private $sLimitFrom = 0;
-	private $nLimitLen = 30;
-	private $arrGroupByClms;
+	public function attache(array & $arrRawSql)
+	{
+		if( isset($this->arrRawSql['subtree'][self::CLAUSE_WHERE]) )
+		{
+			$arrRawSql['subtree'][self::CLAUSE_WHERE] =& $this->arrRawSql['subtree'][self::CLAUSE_WHERE] ;
+		}
+		
+		if( isset($this->arrRawSql['subtree'][self::CLAUSE_GROUP]) )
+		{
+			$arrRawSql['subtree'][self::CLAUSE_GROUP] =& $this->arrRawSql['subtree'][self::CLAUSE_GROUP] ;
+		}
+		
+		if( isset($this->arrRawSql['subtree'][self::CLAUSE_ORDER]) )
+		{
+			$arrRawSql['subtree'][self::CLAUSE_ORDER] =& $this->arrRawSql['subtree'][self::CLAUSE_ORDER] ;
+		}
+		
+		if( isset($this->arrRawSql['subtree'][self::CLAUSE_LIMIT]) )
+		{
+			$arrRawSql['subtree'][self::CLAUSE_LIMIT] =& $this->arrRawSql['subtree'][self::CLAUSE_LIMIT] ;
+		}
+	}
+	
+	private $aWhere ;
 }
+
 ?>
