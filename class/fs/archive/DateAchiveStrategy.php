@@ -71,4 +71,3 @@ class DateAchiveStrategy extends IAchiveStrategy
 		return  $sToPath.'/';
 	}
 }
-
