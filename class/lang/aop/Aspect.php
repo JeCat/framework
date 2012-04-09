@@ -305,7 +305,7 @@ class Aspect extends NamedObject implements \Serializable, IBean
 					}
 				
 					$bStatic = $aRefFunc->isStatic() ;					
-					$sAdviceName = $aRefFunc->getName() ;
+					$sAdviceName = $aRefFunc->getDeclaringClass()->getName().'::'.$aRefFunc->getName() ;
 				}
 				else
 				{
