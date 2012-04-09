@@ -27,7 +27,7 @@ namespace org\jecat\framework\cache ;
 
 class EmptyCache extends Cache
 {
-	public function itemData($sDataPath)
+	public function item($sDataPath)
 	{
 		return null ;
 	}
@@ -37,7 +37,7 @@ class EmptyCache extends Cache
 	 *
 	 * @return void
 	 */
-	public function setItemData($sDataPath,$data,$nExpire=self::expire_default)
+	public function setItem($sDataPath,$data,$nExpire=self::expire_default)
 	{}
 	
 	/**
@@ -45,18 +45,13 @@ class EmptyCache extends Cache
 	 *
 	 * @return bool
 	 */
-	public function deleteItemData($sDataPath)
-	{}
-	
-	/**
-	 * Enter description here ...
-	 *
-	 * @return bool
-	 */
-	public function isDataExpire($sDataPath)
+	public function isExpire($sDataPath)
 	{
 		return true ;
 	}
+
+	public function delete($sDataPath)
+	{}
 }
 
 
