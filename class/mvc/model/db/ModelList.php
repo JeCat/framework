@@ -58,6 +58,24 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator,
 			, $this->db()
 		) ;
 	}
+
+	public function loadSql($sWhereStatement=null,$arrFactors=null)
+	{
+		$aRestriction = $sWhereStatement?
+					call_user_func_array(array('org\\jecat\\framework\\db\\sql\\SQL','makeRestriction'),func_get_args())
+					: null ;
+	
+		$this->clearData() ;
+		$this->nDataRow = 0 ;
+
+		$nLimitLen = $this->perPage() ;
+		$nLimitFrom = $this->aPrototype? (int)$this->aPrototype->limitFrom(): 0 ;
+		
+		return Selecter::singleton()->execute(
+				$this->prototype() , $this->recordset(), null , $aRestriction, array($nLimitLen,$nLimitFrom+($this->pageNum()-1)*$nLimitLen), $this->db()
+		) ;
+	}
+	
 	public function save($bForceCreate=false)
 	{
 		foreach($this as $aChildModel)
