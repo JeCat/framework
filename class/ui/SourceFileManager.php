@@ -56,8 +56,14 @@ class SourceFileManager extends ResourceManager
 	 */
 	public function findCompiled($sSourceFile,$sNamespace,$bAutoCreate=false)
 	{
-		$sPath = $this->compiledFolderPath() . '/' . $this->compileStrategySignture() . '/' . $sNamespace . '/' . $sSourceFile . '.php' ; 
-		return Folder::singleton()->findFile($sPath,$bAutoCreate?Folder::FIND_AUTO_CREATE:0) ;
+		$sPath = $this->compiledFolderPath() . '/' . $this->compileStrategySignture() . '/' . $sNamespace . '/' . $sSourceFile . '.php' ;
+		$aFile = new File($sPath) ;
+		
+		if( $bAutoCreate and !$aFile->exists() )
+		{
+			$aFile->create() ;
+		}
+		return $aFile ;
 	}
 	
 	public function setCompileStrategySignture($sCompileStrategySignture)
