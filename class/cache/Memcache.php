@@ -30,7 +30,15 @@ class Memcache extends Cache
 {
 	public function __construct($sServer='127.0.0.1',$nPort=11211)
 	{
-		$this->hMemcacheConnection = memcache_connect($sServer,$nPort) ;
+		if( !function_exists('memcache_connect') )
+		{
+			throw new \Exception('not fount memcache functions .') ;
+		}
+		
+		if( !$this->hMemcacheConnection = memcache_connect($sServer,$nPort) )
+		{
+			throw new \Exception('can not connect memcache server: '.$sServer .':'. $nPort) ;
+		}
 	}
 	
 	/**

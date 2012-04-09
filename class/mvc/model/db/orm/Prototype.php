@@ -854,17 +854,16 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 		if(!empty($arrConfig['where']))
 		{
 			$arrRawWhere =& $this->criteria()->rawClause(SQL::CLAUSE_WHERE) ;
-			$aSqlParser = BaseParserFactory::singleton()->create(true,null,'where') ;
 			
 			if( is_array($arrConfig['where']) )
 			{
 				$arrOnFactors = $arrConfig['where'] ;
-				$arrRawWhere['subtree'] = $aSqlParser->parse(array_shift($arrOnFactors),true) ;
-				call_user_func_array(array($this->criteria()->where(),'addFactors'), $arrOnFactors) ;
+				$arrRawWhere['subtree'] = & SQL::parseSql(array_shift($arrOnFactors),'where',true) ;
+				$this->criteria()->where()->addFactors($arrOnFactors) ;
 			}
 			else
 			{
-				$arrRawWhere['subtree'] = $aSqlParser->parse($arrConfig['where'],true) ;
+				$arrRawWhere['subtree'] = & SQL::parseSql($arrConfig['where'],'where',true) ;
 			}
 			// self::buildBeanRestriction($arrConfig['where'],$this->criteria()->where()->createRestriction()) ;
 		}
