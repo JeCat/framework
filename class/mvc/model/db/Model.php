@@ -105,7 +105,7 @@ class Model extends AbstractModel implements IBean
 	{
 		if( $values instanceof Restriction )
 		{
-			trigger_error('Model::load() 不再接收 Criteria/Restriction 对像做为参数',E_USER_DEPRECATED ) ;
+			trigger_error('Model::load() 不再接收 Criteria/Restriction 对像做为参数，如果需要传入较复杂的查询条件，请使用 loadSql() 函数。',E_USER_DEPRECATED ) ;
 		}
 		
 		$this->clearData() ;
@@ -174,22 +174,6 @@ class Model extends AbstractModel implements IBean
 	{
 		return Deleter::singleton()->execute($this->db(), $this) ;
 	}
-	
-	/**
-	 * @return org\jecat\framework\db\sql\Criteria
-	 */
-	/*public function createCriteria(Restriction $aRestriction=null)
-	{
-		return ; //$this->prototype()->statementFactory()->createCriteria($aRestriction) ;
-	}*/
-	
-	/**
-	 * @return org\jecat\framework\db\sql\Restriction
-	 */
-	/*public function createWhere($bLogic=true)
-	{
-		return ; //$this->prototype()->statementFactory()->createRestriction($bLogic) ;
-	}*/
 	
 	static public function buildRestriction(Prototype $aPrototype,$values=null,$keys=null)
 	{

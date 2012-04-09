@@ -43,14 +43,17 @@ class AOP extends Object implements IStrategySummary, \Serializable
 	 */
 	public function register($sAspectClass)
 	{
-		if( isset($this->arrAspectClasses[$sAspectClass]) )
+		trigger_error('请使用 AOP::registerBean() 替代 AOP::register()',E_USER_DEPRECATED ) ;
+		
+		if( !isset($this->arrAspectClasses[$sAspectClass]) )
 		{
-			return ;
+			$this->arrAspectClasses[$sAspectClass] = $sAspectClass ;
+			$this->parseAspectClass($sAspectClass) ;
+			$this->aPointcutIterator = null ;
+			$this->aJointPointIterator = null ;
 		}
-		$this->arrAspectClasses[$sAspectClass] = $sAspectClass ;
-		$this->parseAspectClass($sAspectClass) ;
-		$this->aPointcutIterator = null ;
-		$this->aJointPointIterator = null ;
+
+		return $this ;
 	}
 	
 	/**
