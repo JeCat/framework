@@ -26,6 +26,8 @@
 
 namespace org\jecat\framework\mvc\model\db ;
 
+use org\jecat\framework\lang\Exception;
+
 use org\jecat\framework\db\sql\SQL;
 use org\jecat\framework\mvc\model\db\orm\Deleter;
 use org\jecat\framework\mvc\model\IModel;
@@ -101,6 +103,11 @@ class Model extends AbstractModel implements IBean
 	 */
 	public function load($values=null,$keys=null)
 	{
+		if( $values instanceof Restriction )
+		{
+			trigger_error('Model::load() 不再接收 Criteria/Restriction 对像做为参数',E_USER_DEPRECATED ) ;
+		}
+		
 		$this->clearData() ;
 		
 		$this->nDataRow = 0 ;
@@ -110,10 +117,16 @@ class Model extends AbstractModel implements IBean
 	}
 	
 	public function loadSql($sWhereStatement=null,$arrFactors=null)
-	{
-		return $this->load( $sWhereStatement? 
+	{		
+		$aRestriction = $sWhereStatement?
 				call_user_func_array(array('org\\jecat\\framework\\db\\sql\\SQL','makeRestriction'),func_get_args())
-				: null
+				: null ;
+		
+		$this->clearData() ;
+		$this->nDataRow = 0 ;
+		
+		return Selecter::singleton()->execute(
+				$this->prototype() , $this->recordset(), null , $aRestriction, false, $this->db()
 		) ;
 	}
 
@@ -192,7 +205,7 @@ class Model extends AbstractModel implements IBean
 			return $values ;
 		}
 		else
-		{
+		{			
 			$aRestriction = new Restriction() ;
 			
 			$sSqlTableAlias = $aPrototype->sqlTableAlias() ;
