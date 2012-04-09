@@ -109,7 +109,7 @@ class ViewAssemblySlot extends OutputStreamBuffer implements \Serializable
 			// 找指定 xpath 的view
 			foreach($this->arrXPaths as $sXPath)
 			{
-				if( $aFoundView=View::xpath($aViewContainer,$sXPath) )
+				if( $aFoundView=View::findXPath($aViewContainer,$sXPath) )
 				{
 					$this->pullinOneView($aFoundView) ;
 				}

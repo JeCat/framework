@@ -649,9 +649,35 @@ class View extends NamableComposite implements IView, IBean
     }
     
     /**
+     * $bAbsolute == true : 从顶级view开始计算
+     * $bAbsolute == false : 从所属controller的mainView开始计算，即向上追溯，遇到一个隶属controller的view为止
      * @return IView
      */
-    static public function xpath(IContainer $aViewContainer,$sViewXPath)
+    public function xpath($bAbsolute=true)
+    {
+    	$sXPath = '' ;
+    	$aView = $this ;
+    	do {
+    		if($sXPath)
+    		{
+    			$sXPath = '/' . $sXPath ;
+    		}
+    		$sXPath = $aView->name() . $sXPath ;
+    		
+    		if( $bAbsolute and $aView->controller() )
+    		{
+    			break ;
+    		}
+    		
+    	}while( $aView = $aView->parent() ) ;
+    	
+    	return $sXPath ;
+    }
+    
+    /**
+     * @return IView
+     */
+    static public function findXPath(IContainer $aViewContainer,$sViewXPath)
     {
     	$arrPath = explode('/',$sViewXPath) ;
     	$aView = $aViewContainer ;
