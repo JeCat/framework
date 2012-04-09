@@ -169,7 +169,7 @@ class SQL
 		return self::parseSql($sColumnExpr,'column',true) ;
 	}
 	
-	static public function & parseSql($sStatement,$sParserName=null,$bReturnFirstTree=false)
+	static public function & parseSql($sStatement,$sParserName='statement',$bReturnFirstTree=false)
 	{
 		$aCache = Cache::highSpeed() ;
 		$sSqlCacheKey = '/db/sql/raw/'.md5($sStatement) ;

@@ -255,7 +255,7 @@ class DB extends Object
 		// 加上表名的前缀
 		if( $this->sTableNamePrefix and $sTableName[0]!==':' )
 		{
-			$sTableName = self::$sTableNamePrefix.$sTableName ;
+			$sTableName = $this->sTableNamePrefix.$sTableName ;
 		}
 		
 		return $sTableName ;
