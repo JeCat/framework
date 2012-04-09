@@ -180,6 +180,7 @@ class Application extends Object implements \Serializable
 		{
 			$this->aPublicFolders = new ResourceManager() ;
 			$aFolder = new Folder(\org\jecat\framework\PATH.'/public') ;
+			$aFolder->setHttpUrl('framework/public') ;
 			if( !$aFolder->exists() )
 			{
 				throw new Exception("目录 /framework/public 丢失，无法提供该目录下的文件") ;

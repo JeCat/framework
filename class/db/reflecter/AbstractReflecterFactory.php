@@ -77,7 +77,8 @@ abstract class AbstractReflecterFactory
 		
 		if($aCache)
 		{
-			$sCachePath = self::tableCachePath($sTable,$sDBName);
+			$sTableEsc = str_replace(':','_',$sTable) ;
+			$sCachePath = self::tableCachePath($sTableEsc,$sDBName);
 			$aCacheData = $aCache->item($sCachePath);
 			
 			if(!$aCacheData)
