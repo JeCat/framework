@@ -506,7 +506,7 @@ class Restriction extends SQL
 		
 		if( !$bEmpty )
 		{
-			$this->arrRawSql['subtree'][$sIndex]['pretree'] = $bLogicAnd? 'AND': 'OR' ;
+			$this->arrRawSql['subtree'][$sIndex]['pretree'][] = $bLogicAnd? 'AND': 'OR' ;
 		}
 		
 		return $this ;
