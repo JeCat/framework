@@ -239,7 +239,7 @@ class SQL
      * @param mix $value 条件语句中的直接量
      * @return string
      */
-	static public function & transValue(&$value)
+	static public function & transValue($value)
     {
     	if (is_string ( $value ))
     	{
