@@ -271,6 +271,7 @@ class BeanFactory extends Object implements \Serializable
 	public function registerBeanClass($sClassName,$sAlias=null)
 	{
 		$this->arrBeanClassAlias[ $sAlias ?: $sClassName ] = $sClassName ;
+		return $this ;
 	}
 	
 	public function beanClassNameByAlias($sAlias)

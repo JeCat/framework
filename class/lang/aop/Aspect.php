@@ -25,6 +25,8 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\lang\aop ;
 
+use org\jecat\framework\lang\Type;
+
 use org\jecat\framework\bean\BeanFactory;
 use org\jecat\framework\bean\IBean;
 use org\jecat\framework\fs\FSO;
@@ -282,17 +284,9 @@ class Aspect extends NamedObject implements \Serializable, IBean
 			// advice
 			else if( is_callable($item,true) )
 			{
-				$aRefFunc = is_array($item)? new \ReflectionMethod($item[0],$item[1]): new \ReflectionFunction($item) ;
-				
 				// 源文
-				$arrSourceLines = file($aRefFunc->getFileName()) ;
-				$nStartLine = $aRefFunc->getStartLine()+1-1 ;
-				$nEndLine = $aRefFunc->getEndLine() ;
-				$nEndLine = $aRefFunc->getEndLine()-1-1 ;
-				$arrFunctionLines = array_slice($arrSourceLines, $nStartLine, $nEndLine-$nStartLine+1) ;
-				$sSource = implode('',$arrFunctionLines) ;
-				$sSource = trim($sSource) ;
-				$sSource = preg_replace('/(^\\{)/', '', $sSource) ;
+				$sSource = Type::reflectFunctionBody($item) ;
+				$aRefFunc = is_array($item)? new \ReflectionMethod($item[0],$item[1]): new \ReflectionFunction($item) ;
 				
 				// 函数定义时声明的 access 和 static
 				if( $aRefFunc instanceof \ReflectionMethod )

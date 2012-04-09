@@ -126,7 +126,9 @@ class Menu extends AbstractBase
 		}
 	}
     
-    
+    /**
+     * @return org\jecat\framework\mvc\view\IView
+     */
     public function view()
     {
     	if( $aView = parent::view() )

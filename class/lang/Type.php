@@ -51,6 +51,7 @@ class Type
 	const NULL = "null" ;
 	const RESOURCE = "resource" ;
 	const OBJECT = "object" ;
+	const CALLBACK = "callback" ;
 	
 	static private $arrTypes = array(
 			self::STRING ,
@@ -62,6 +63,7 @@ class Type
 			self::RESOURCE ,
 			self::ARR ,
 			self::OBJECT ,
+			self::CALLBACK ,
 	) ;
 	
 	static public function check($Types,& $Variable)
@@ -185,6 +187,23 @@ class Type
 		}
 
 		return $variable ;
+	}
+	
+	static public function reflectFunctionBody($fnCallback)
+	{
+		$aRefFunc = is_array($fnCallback)? new \ReflectionMethod($fnCallback[0],$fnCallback[1]): new \ReflectionFunction($fnCallback) ;
+		
+		// 源文
+		$arrSourceLines = file($aRefFunc->getFileName()) ;
+		$nStartLine = $aRefFunc->getStartLine()+1-1 ;
+		$nEndLine = $aRefFunc->getEndLine() ;
+		$nEndLine = $aRefFunc->getEndLine()-1-1 ;
+		$arrFunctionLines = array_slice($arrSourceLines, $nStartLine, $nEndLine-$nStartLine+1) ;
+		$sBodySource = implode('',$arrFunctionLines) ;
+		$sBodySource = trim($sBodySource) ;
+		$sBodySource = preg_replace('/(^\\{)/', '', $sBodySource) ;
+		
+		return $sBodySource ;
 	}
 }
 

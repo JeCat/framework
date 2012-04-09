@@ -111,7 +111,14 @@ class Assert
 			throw new TypeException($Variable,$Types,$sVarName) ;
 		}
 	}
-	
+
+	static public function isCallback(& $Variable,$bSyntaxOnly=true,$sVarName=null)
+	{
+		if( !is_callable($Variable,$bSyntaxOnly) )
+		{
+			throw new TypeException($Variable,$Types,$sVarName) ;
+		}
+	}
 	
 	static private $bEnableAssert = true ;
 }
