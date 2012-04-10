@@ -33,9 +33,17 @@ class LocalFolderIterator extends FSIterator{
 		if( $nFlags & self::RECURSIVE_BREADTH_FIRST ){
 			throw new Exception('unfinished flag : RECURSIVE_BREADTH_FIRST');
 		}
-		if( $nFlags & self::RECURSIVE_SEARCH ){
+		
+		if(!$aFolder->exists())
+		{
+			$this->aIterator = new \EmptyIterator() ;
+		}
+		else if( $nFlags & self::RECURSIVE_SEARCH )
+		{
 			$this->aIterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($aFolder->path()),\RecursiveIteratorIterator::SELF_FIRST) ;
-		}else{
+		}
+		else
+		{
 			$this->aIterator = new \DirectoryIterator($aFolder->path());
 		}
 	}

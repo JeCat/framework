@@ -25,6 +25,8 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\fs ;
 
+use org\jecat\framework\lang\Exception;
+
 use org\jecat\framework\io\OutputStream;
 use org\jecat\framework\io\InputStream;
 
@@ -55,13 +57,12 @@ class File extends FSO
 		
 		if( !$this->makeParentFolder($sLocalPath,true) )
 		{
-			return false ;
+			throw new Exception("无法创建文件所属目录：%s",$sLocalPath) ;
 		}
 		
-		$hHandle = fopen($sLocalPath,$bAppend?'a':'w') ;
-		if( !$hHandle )
+		if( !$hHandle=fopen($sLocalPath,$bAppend?'a':'w') )
 		{
-			return null ;
+			throw new Exception("无法打开文件：%s",$sLocalPath) ;
 		}
 		
 		return OutputStream::createInstance($hHandle) ;
