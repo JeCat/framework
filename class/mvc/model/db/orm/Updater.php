@@ -52,10 +52,9 @@ class Updater extends Object{
         //$aCriteria = StatementFactory::singleton()->createCriteria() ;
         //$aUpdate->setCriteria($aCriteria);
         
-		// update当前model
-        $aUpdate->clearData() ;
         
         // 处理主键
+        $aUpdate->where()->clear() ;
         foreach( $aPrototype->keys() as $sKey)
         {
         	//主键发生修改
@@ -73,7 +72,8 @@ class Updater extends Object{
 	        	), true, true ) ;
 	        }
         }
-        
+
+        $aUpdate->clearData() ;
 		$bFlagChanged = false;//当前表是否有修改
 		foreach($aPrototype->columns() as $sClmName)
 		{
