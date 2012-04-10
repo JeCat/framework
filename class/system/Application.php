@@ -25,10 +25,12 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\system ;
 
+
 use org\jecat\framework\lang\Object;
 use org\jecat\framework\resrc\ResourceManager;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\fs\Folder;
+use org\jecat\framework\setting\Setting;
 
 /**
  * @wiki /目录(草稿)
@@ -227,13 +229,24 @@ class Application extends Object implements \Serializable
 		return ;
 	}
 	
+	public function isDebugging()
+	{
+		if($this->bDebugging===null)
+		{
+			$this->bDebugging = (bool)Setting::singleton()->item('/service/debug','stat') ;
+		}
+		return $this->bDebugging ;
+	}
+	
 	private $arrGlobalSingeltonInstance ;
 	
 	private $sEntrance = '' ; 
 	
 	private $aPublicFolders ;
 	
-	private $fUptime ;
+	private $fUptime ; 
 	
-	static private $aGlobalSingeltonInstance ; 
+	private $bDebugging = null ;
+	
+	static private $aGlobalSingeltonInstance ;
 }

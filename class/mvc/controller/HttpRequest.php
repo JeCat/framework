@@ -177,7 +177,7 @@ class HttpRequest extends Request
 	public function urlBase()
 	{
 		return $this->urlInfo('scheme') . '://' . $this->urlInfo('host') . dirname($this->urlInfo('path')) ;
-	}	
+	}
 	public function urlNoQuery()
 	{
 		return $this->urlInfo('scheme') . '://' . $this->urlInfo('host') . $this->urlInfo('path') ;
