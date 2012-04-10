@@ -192,7 +192,7 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator,
 			return ;
 		}
 		
-		usset($this->arrDataSheet[$aModel->nDataRow]) ;
+		unset($this->arrDataSheet[$aModel->nDataRow]) ;
 		
 		if( (--$aModel->nDataRow)<0 )
 		{
