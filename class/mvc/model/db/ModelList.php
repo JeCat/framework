@@ -185,6 +185,10 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator,
 		throw new Exception("ModelList 的 addChild 方法被禁用") ; 
 	}
 	
+	/**
+	 * 将子model从父model容器中移出(不是删除数据,如果要删除数据请使用model自身的delete方法)
+	 * 
+	 */
 	public function removeChild(IModel $aModel)
 	{
 		if( $aModel!==$this->aShareModel )
