@@ -30,7 +30,7 @@ use org\jecat\framework\fs\Folder;
 use org\jecat\framework\fs\File;
 use org\jecat\framework\resrc\ResourceManager;
 
-class SourceFileManager extends ResourceManager
+class SourceFileManager extends ResourceManager implements \Serializable
 {
 	public function setCompiledFolderPath($sPath)
 	{
@@ -88,10 +88,28 @@ class SourceFileManager extends ResourceManager
 	{
 		$this->bForceCompile = $bForceCompile ;
 	}
+
+	public function serialize()
+	{
+		return serialize(array(
+				'parent' => parent::serialize() ,	
+				'sCompileStrategySignture' => $this->sCompileStrategySignture ,	
+				'sCompiledFolderPath' => $this->sCompiledFolderPath ,	
+		)) ;
+	}
+	
+	public function unserialize($serialized)
+	{
+		$arrData = unserialize($serialized) ;
+		
+		parent::unserialize($arrData['parent']) ;
+		$this->sCompileStrategySignture = $arrData['sCompileStrategySignture'] ;
+		$this->sCompiledFolderPath = $arrData['sCompiledFolderPath'] ;
+	}
 	
 	private $sCompileStrategySignture ;
 	
-	private $sCompiledFolderPath = '/data/compiled/template' ;
+	private $sCompiledFolderPath ;
 	
 	private $bForceCompile = false ;
 	
