@@ -172,7 +172,17 @@ class Model extends AbstractModel implements IBean
 	 */
 	public function delete()
 	{
-		return Deleter::singleton()->execute($this->db(), $this) ;
+		if( Deleter::singleton()->execute($this->db(), $this) )
+		{
+			// 删除数据
+			unset($this->arrDataSheet[$this->nDataRow]) ; 
+			
+			return true ;
+		}
+	 	else
+	 	{
+	 		return false ;
+	 	}
 	}
 	
 	static public function buildRestriction(Prototype $aPrototype,$values=null,$keys=null)
