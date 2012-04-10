@@ -25,6 +25,8 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\view ;
 
+use org\jecat\framework\system\Application;
+
 use org\jecat\framework\lang\Type;
 use org\jecat\framework\pattern\composite\IContainer;
 use org\jecat\framework\mvc\controller\Response;
@@ -412,6 +414,17 @@ class View extends NamableComposite implements IView, IBean
 			$aVars->set('theParams',$this->aController->params()) ;
 		}
 		
+		// debug模式下，输出模板文件的路径
+		if( Application::singleton()->isDebugging() )
+		{
+			$aSrcMgr = $this->ui()->sourceFileManager() ;
+			list($sNamespace,$sSourceFile) = $aSrcMgr->detectNamespace($sTemplate) ;
+			$sSourcePath = $aSrcMgr->find($sSourceFile,$sNamespace)->path() ;
+			
+			$this->outputStream()->write("\r\n\r\n<!-- Template: {$sSourcePath} -->\r\n") ;
+		}
+		
+		// 输出
 		$this->ui()->display($sTemplate,$aVars,$this->outputStream()) ;
 	}
 	
