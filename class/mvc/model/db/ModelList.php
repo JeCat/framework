@@ -141,7 +141,7 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator,
 	{
 		if( is_int($name) and $name>=0 )
 		{
-			if( count($this->arrDataSheet)<=$name )
+			if( !isset($this->arrDataSheet[$name]) )
 			{
 				return null ;
 			}
@@ -164,8 +164,8 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator,
 							return null ;
 						}
 						$this->arrAloneChildren[$name] = $aPrototype->createModel(false) ;
-						
-						// 数据共享， 指正独立
+
+						// 数据共享， 指针独立
 						$this->arrAloneChildren[$name]->arrDataSheet =& $this->arrDataSheet ;
 						$this->arrAloneChildren[$name]->nDataRow = $name ;
 					}
@@ -186,7 +186,7 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator,
 	}
 	
 	/**
-	 * 将子model从父model容器中移出(不是删除数据,如果要删除数据请使用model自身的delete方法)
+	 * 将子model从父model容器中移出(不是从数据库删除数据,如果要删除数据库中的数据请使用model自身的delete方法)
 	 * 
 	 */
 	public function removeChild(IModel $aModel)
@@ -217,7 +217,16 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator,
 	
 	public function childIterator($bAloneIterator=true)
 	{
-		return $bAloneIterator? new ModelListIterator($this): $this ;
+		if($bAloneIterator) 
+		{
+			return new ModelListIterator($this,array_keys($this->arrDataSheet),false) ;
+		}
+		
+		if(!$this->aShareChildrenIterator)
+		{
+			$this->aShareChildrenIterator = new ModelListIterator($this,array_keys($this->arrDataSheet),true) ;
+		}
+		return $this->aShareChildrenIterator ;
 	}
 	
 	public function sortChildren($callback,$bDesc=false)
@@ -374,61 +383,44 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator,
 	// implements \Iterator ----------------------------------
 	public function current ()
 	{
-		return $this->shareModel() ;
+		return $this->childIterator(false)->current() ;
 	}
 	
 	public function next ()
 	{
-		if( $aShareModel = $this->shareModel() )
-		{
-			$aShareModel->nDataRow ++ ;
-		}
+		$this->childIterator(false)->next() ;
 	}
 	
 	public function key ()
 	{
-		if( $aShareModel = $this->shareModel() )
-		{
-			return $aShareModel->nDataRow ;
-		}
-		else 
-		{
-			return null ;
-		}
+		return $this->childIterator(false)->key() ;
 	}
 	
 	public function valid ()
 	{
-		$aShareModel = $this->shareModel() ;
-		return $aShareModel and is_array($aShareModel->arrDataSheet) and $aShareModel->nDataRow < count($aShareModel->arrDataSheet) ;
+		return $this->childIterator(false)->valid() ;
 	}
 	
 	public function rewind ()
 	{
-		if( $aShareModel = $this->shareModel() )
+		if( $this->aShareChildrenIterator )
 		{
-			$aShareModel->nDataRow = 0 ;
+			$this->aShareChildrenIterator->setModelIndexes( array_keys($this->arrDataSheet) ) ;
+		}
+		else
+		{
+			$this->childIterator(false)->rewind() ;
 		}
 	}
 	
 	public function prev()
 	{	
-		if( $aShareModel = $this->shareModel() )
-		{
-			$aShareModel->nDataRow -- ;
-		}		
+		$this->childIterator(false)->prev() ;
 	}
 	
 	public function last()
 	{
-		if( $aShareModel = $this->shareModel() )
-		{
-			$aShareModel->nDataRow = count($this->arrDataSheet) - 1 ;
-			if($aShareModel->nDataRow<0)
-			{
-				$aShareModel->nDataRow = 0 ;
-			}
-		}	
+		$this->childIterator(false)->last() ;
 	}
 	
 	public function seek ($position)
@@ -501,6 +493,8 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator,
 	}
 	
 	private $arrAloneChildren ;
+
+	private $aShareChildrenIterator ;
 	
 	private $aShareModel ;
 	

@@ -80,6 +80,12 @@ class ModelListIterator implements IReversableIterator
 		end($this->arrModelIndexes);
 	}
 	
+	public function setModelIndexes($arrModelIndexes)
+	{
+		$this->arrModelIndexes = $arrModelIndexes ;
+		reset($this->arrModelIndexes) ;
+	}
+	
 	private $arrModelIndexes ;
 	
 	private $bShareChild ;
