@@ -53,26 +53,38 @@ class Folder extends FSO
 	 * @return FSO
 	 * @retval $type参数		不存在	存在为File	存在为Folder
 	 */
-	public function find($sPath,$nFlag=self::FIND_DEFAULT)
+	public function find($sInputPath,$nFlag=self::FIND_DEFAULT)
 	{
 		if( !($nFlag&FSO::CLEAN_PATH) )
 		{
-			$sPath = $this->path() . '/' . $sPath  ;
+			if( $sInputPath and $sInputPath[0]!=='/' )
+			{
+				$sInputPath = '/' . $sInputPath  ;
+			}
 			// FSO::tidyPath($sPath,true) ;
 		}
+		$sPath = $this->path() . $sInputPath  ;
 		
 		$nType = $nFlag&FSO::type ;
 		
 		// 是一个文件
 		if( is_file($sPath) and ($nType==self::unknow or $nType&self::file) )
 		{
-			return ($nFlag&self::FIND_RETURN_PATH)? $sPath: new File($sPath,self::CLEAN_PATH) ;
+			if($nFlag&self::FIND_RETURN_PATH)
+			{
+				return $sPath ;
+			}
+			$aFSO = new File($sPath,self::CLEAN_PATH) ;
 		}
 
 		// 是一个目录
 		else if(is_dir($sPath) and ($nType==self::unknow or $nType&self::folder) )
 		{
-			return ($nFlag&self::FIND_RETURN_PATH)? $sPath: new Folder($sPath,self::CLEAN_PATH) ;
+			if($nFlag&self::FIND_RETURN_PATH)
+			{
+				return $sPath ;
+			}
+			$aFSO = new Folder($sPath,self::CLEAN_PATH) ;
 		}
 		
 		// 路径不存在 或 路径的类型和指定的不一致
@@ -80,71 +92,95 @@ class Folder extends FSO
 		{
 			return null;
 		}
+
+		if( $this->httpUrl() )
+		{
+			$aFSO->setHttpUrl($this->httpUrl().$sInputPath) ;
+		}
+		return $aFSO ;
 	}
 	
 	/**
 	 * @return File
 	 */
-	public function findFile($sPath,$nFlag=0)
+	public function findFile($sInputPath,$nFlag=0)
 	{
 		if( !($nFlag&FSO::CLEAN_PATH) )
 		{
-			if( $sPath and $sPath[0]==='/' )
+			if( $sInputPath and $sInputPath[0]!=='/' )
 			{
-				$sPath = $this->path() . $sPath  ;
+				$sInputPath = '/' . $sInputPath  ;
 			}
-			else 
-			{
-				$sPath = $this->path() . '/' . $sPath  ;
-			}
-			// FSO::tidyPath($sPath,true) ;
 		}
 		
-		$file =  $this->find($sPath,$nFlag&(~FSO::type)|FSO::file|FSO::CLEAN_PATH) ;
-		
-		if( !$file and ($nFlag&self::FIND_AUTO_CREATE)==self::FIND_AUTO_CREATE )
-		{
-			$aFile = $this->createChildFile($sPath,File::CREATE_DEFAULT|FSO::CLEAN_PATH) ;
-			return (Folder::FIND_RETURN_PATH & $nFlag)? $aFile->path(): $aFile ;			
-		}
-		else if( !$file and ($nFlag&self::FIND_AUTO_CREATE_OBJECT)==self::FIND_AUTO_CREATE_OBJECT )
-		{
-			$aFile = $this->createChildFile($sPath,File::CREATE_DEFAULT|self::CREATE_ONLY_OBJECT|FSO::CLEAN_PATH) ;
-			return (Folder::FIND_RETURN_PATH & $nFlag)? $aFile->path(): $aFile ;
-		}
-		else
+		if( $file =  $this->find($sInputPath,$nFlag&(~FSO::type)|FSO::file|FSO::CLEAN_PATH) )
 		{
 			return $file ;
 		}
+
+		$sPath = $this->path() . $sInputPath  ;
+		if( ($nFlag&self::FIND_AUTO_CREATE)==self::FIND_AUTO_CREATE )
+		{
+			$aFile = $this->createChildFile($sPath,File::CREATE_DEFAULT|FSO::CLEAN_PATH) ;
+			if( $this->httpUrl() )
+			{
+				$aFile->setHttpUrl($this->httpUrl().$sInputPath) ;
+			}
+			return (Folder::FIND_RETURN_PATH & $nFlag)? $aFile->path(): $aFile ;			
+		}
+		else if( ($nFlag&self::FIND_AUTO_CREATE_OBJECT)==self::FIND_AUTO_CREATE_OBJECT )
+		{
+			$aFile = $this->createChildFile($sPath,File::CREATE_DEFAULT|self::CREATE_ONLY_OBJECT|FSO::CLEAN_PATH) ;
+			if( $this->httpUrl() )
+			{
+				$aFile->setHttpUrl($this->httpUrl().$sInputPath) ;
+			}
+			return (Folder::FIND_RETURN_PATH & $nFlag)? $aFile->path(): $aFile ;
+		}
+		
+		return null ;
 	}
 
 	/**
 	 * @return \Folder
 	 */
-	public function findFolder($sPath,$nFlag=0)
+	public function findFolder($sInputPath,$nFlag=0)
 	{
 		if( !($nFlag&FSO::CLEAN_PATH) )
 		{
-			$sPath = $this->path() . '/' . $sPath  ;
-			// FSO::tidyPath($sPath,true) ;
+			if( $sInputPath and $sInputPath[0]!=='/' )
+			{
+				$sInputPath = '/' . $sInputPath  ;
+			}
 		}
 		
-		$folder =  $this->find($sPath,$nFlag&(~FSO::type)|FSO::folder|FSO::CLEAN_PATH) ;
-		
-		if( !$folder and ($nFlag&self::FIND_AUTO_CREATE) == self::FIND_AUTO_CREATE )
-		{
-			$aFolder = $this->createChildFolder($sPath,Folder::CREATE_DEFAULT|FSO::CLEAN_PATH) ;
-			return (Folder::FIND_RETURN_PATH & $nFlag)? $aFolder->path(): $aFolder ;
-		}
-		else if( !$folder and ($nFlag&self::FIND_AUTO_CREATE_OBJECT) == self::FIND_AUTO_CREATE_OBJECT )
-		{
-			$aFolder = $this->createChildFolder($sPath,Folder::CREATE_DEFAULT|self::CREATE_ONLY_OBJECT|FSO::CLEAN_PATH) ;
-			return (Folder::FIND_RETURN_PATH & $nFlag)? $aFolder->path(): $aFolder ;
-		}
-		else
+		if( $folder =  $this->find($sInputPath,$nFlag&(~FSO::type)|FSO::folder|FSO::CLEAN_PATH) )
 		{
 			return $folder ;
 		}
+
+		$sPath = $this->path() . $sInputPath  ;
+		
+		if( ($nFlag&self::FIND_AUTO_CREATE) == self::FIND_AUTO_CREATE )
+		{
+			$aFolder = $this->createChildFolder($sPath,Folder::CREATE_DEFAULT|FSO::CLEAN_PATH) ;
+			if( $this->httpUrl() )
+			{
+				$aFolder->setHttpUrl($this->httpUrl().$sInputPath) ;
+			}
+			return (Folder::FIND_RETURN_PATH & $nFlag)? $aFolder->path(): $aFolder ;
+		}
+		else if( ($nFlag&self::FIND_AUTO_CREATE_OBJECT) == self::FIND_AUTO_CREATE_OBJECT )
+		{
+			$aFolder = $this->createChildFolder($sPath,Folder::CREATE_DEFAULT|self::CREATE_ONLY_OBJECT|FSO::CLEAN_PATH) ;
+			if( $this->httpUrl() )
+			{
+				$aFolder->setHttpUrl($this->httpUrl().$sInputPath) ;
+			}
+			return (Folder::FIND_RETURN_PATH & $nFlag)? $aFolder->path(): $aFolder ;
+		}
+		
+		return null ;
 	}
 
 	public function create($nMode=self::CREATE_DEFAULT)

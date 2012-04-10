@@ -70,7 +70,7 @@ class File extends FSO
 
 	public function length()
 	{
-		return filesize($this->path()) ;
+		return is_file($this->path())? filesize($this->path()): 0 ;
 	}
 	
 	public function delete()
