@@ -265,6 +265,11 @@ class DB extends Object
 	{
 		$this->sTableNamePrefix = $sTableNamePrefix ;
 	}
+
+	public function tableNamePrefix()
+	{
+		return $this->sTableNamePrefix ;
+	}
 	
 	/**
 	 * @return org\jecat\framework\db\sql\reflecter\AbstractReflecterFactory

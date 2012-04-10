@@ -56,6 +56,7 @@ class BaseParserFactory extends Object
 								->addChildState($this->create($bShare,$aDialect,'delete'))
 								->addChildState($this->create($bShare,$aDialect,'update'))
 								->addChildState($this->create($bShare,$aDialect,'select'))
+								->addChildState($this->create($bShare,$aDialect,'create table'))
 								->addChildState($this->create($bShare,$aDialect,'from'))
 								->addChildState($this->create($bShare,$aDialect,'where')) 
 								->addChildState($this->create($bShare,$aDialect,'group'))
@@ -157,9 +158,14 @@ class BaseParserFactory extends Object
 			case 'subquery' :
 				$aParser = self::createParserInstace('SubQueryParser',$aDialect) ;
 				break ;
-			
+
 			case 'function' :
 				$aParser = self::createParserInstace('FunctionParser',$aDialect) ;
+				break ;
+
+			case 'create table' :
+				$aParser = self::createParserInstace('CreateTableParser',$aDialect)
+								->addChildState($this->create($bShare,$aDialect,'table')) ;
 				break ;
 		}
 		

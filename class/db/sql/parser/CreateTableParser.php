@@ -25,67 +25,28 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\db\sql\parser ;
 
-use org\jecat\framework\db\sql\SQL;
-
-class ClauseParser extends AbstractParser
+class CreateTableParser extends AbstractParser
 {
-	public function __construct($sCommand)
-	{
-		$this->sCommand = strtoupper($sCommand) ;
-		$this->sCommandLower = strtolower($sCommand) ;
-	}
-
-	public function examineStateChange(& $sToken,ParseState $aParseState)
-	{
-		if( $sToken===$this->sCommand )
-		{
-			return true ;	
-		}
-		else
-		{
-			return false ;
-		}
-	}
-	
 	public function processToken(&$sToken,ParseState $aParseState)
 	{
-		if( $sToken===$this->sCommand )
-		{
-			return ;
-		}
 		$aParseState->arrTree[] = $sToken ;
 	}
 	
-	public function active(& $sToken,ParseState $aParseState)
+	public function examineStateFinish(& $sToken,ParseState $aParseState)
 	{
-		$arrToken = array(
-				'expr_type' => 'clause_' . $this->sCommandLower ,
-				'pretree' => array($this->sCommand) ,
-				'subtree' => array() ,
-		) ;
-		
-		if( $this->aDialect->isCommand($sToken) )
-		{
-			$aParseState->arrStatement['command'] = $sToken ;
-		}
-		
-		if( ($nIdx=array_search($this->sCommand,SQL::$mapClauses))!==false )
-		{
-			$aParseState->arrTree[$nIdx] =& $arrToken ;
-		}
-		else
-		{
-			$aParseState->arrTree[] =& $arrToken ;
-		}
-		
-		$this->switchToSubTree($aParseState,$arrToken) ;
-	}
-	public function finish(& $sToken,ParseState $aParseState)
-	{
-		$this->restoreParentTree($aParseState) ;
+		return $sToken==='(' ;
 	}
 	
-	private $sCommand ;
-	private $sCommandLower ;
-	
+	public function examineStateChange(& $sToken,ParseState $aParseState)
+	{
+		if($sToken!=='CREATE')
+		{
+			return false ;
+		}
+		
+		$sNextToken = next($aParseState->arrTokenList) ;
+		prev($aParseState->arrTokenList) ;
+
+		return $sNextToken==='TABLE' ;
+	}
 }
