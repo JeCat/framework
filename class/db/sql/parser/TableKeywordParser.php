@@ -25,43 +25,26 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\db\sql\parser ;
 
-class TableParser extends NameParser
+class TableKeywordParser extends TableParser
 {
-	public function processToken(&$sToken,ParseState $aParseState)
-	{
-		if($sToken==='.')
-		{
-			$this->processNameSeparator($sToken, $aParseState) ;
-		}
-		
-		else if($sToken==='AS')
-		{
-			$this->processAlias($sToken, $aParseState) ;
-		}
-		
-		else if( $this->aDialect->isReserved($sToken) or $this->aDialect->isOperator($sToken) )
-		{
-			$aParseState->arrTree[] = $sToken ;
-		}
-		
-		else if( $tableName = $this->parseName($sToken) )
-		{
-			$aParseState->arrTree[] = array(
-					'expr_type' => 'table' ,
-					'table' => $tableName ,
-			) ;
-		}
-		
-		// unknow
-		else
-		{
-			$aParseState->arrTree[] = $sToken;
-		}
-	}	
-	
 	public function examineStateChange(&$sToken,ParseState $aParseState)
 	{
-		return parent::examineStateChange($sToken,$aParseState)
-					or (!$this->aDialect->isReserved($sToken) and !$this->aDialect->isOperator($sToken) and $this->parseName($sToken)) ;
+		if( $sToken!=='TABLE' )
+		{
+			return false ;
+		}
+		
+		$aParseState->arrTree[] = 'TABLE' ;
+		
+		// 遇到 TABLE ，检查下一个token 是否是有效的表名
+		$sToken = next($aParseState->arrTokenList) ;
+		
+		return parent::examineStateChange($sToken,$aParseState) ;
+	}
+
+	public function examineStateFinish(& $sToken,ParseState $aParseState)
+	{
+		// 遇到 TABLE 则下一个 token 才是表名
+		return $sToken!=='TABLE' ;
 	}
 }

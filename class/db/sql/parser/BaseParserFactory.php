@@ -156,6 +156,10 @@ class BaseParserFactory extends Object
 				$aParser = self::createParserInstace('TableParser',$aDialect) ;
 				break ;
 				
+			case 'table-keyword' :
+				$aParser = self::createParserInstace('TableKeywordParser',$aDialect) ;
+				break ;
+				
 			case 'subquery' :
 				$aParser = self::createParserInstace('SubQueryParser',$aDialect) ;
 				break ;
@@ -166,11 +170,11 @@ class BaseParserFactory extends Object
 
 			case 'create' :
 				$aParser = self::createParserInstace('ClauseParser',$aDialect,'create')
-								->addChildState($this->create($bShare,$aDialect,'table')) ;
+								->addChildState($this->create($bShare,$aDialect,'table-keyword')) ;
 				break ;
 			case 'drop' :
 				$aParser = self::createParserInstace('ClauseParser',$aDialect,'drop')
-								->addChildState($this->create($bShare,$aDialect,'table')) ;
+								->addChildState($this->create($bShare,$aDialect,'table-keyword')) ;
 				break ;
 		}
 		

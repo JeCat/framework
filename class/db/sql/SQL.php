@@ -124,7 +124,8 @@ class SQL
 					$aSql = new Delete() ;
 					break ;
 				default:
-					throw new Exception("sql raw 的 command 无效：%s",$arrRawSqls[0]['command']) ;
+					$aSql = new SQL() ;
+					break ;
 			}
 		}
 		
