@@ -59,9 +59,22 @@ class TableParser extends NameParser
 		}
 	}	
 	
-	public function examineStateChange(& $sToken,ParseState $aParseState)
+	public function examineStateChange($sToken,ParseState $aParseState)
 	{
+		if( $sToken==='TABLE' )
+		{
+			// 遇到 TABLE ，检查下一个token 是否是有效的表名
+			$sToken = next($aParseState->arrTokenList) ;
+			prev($aParseState->arrTokenList) ;
+		}
+		
 		return parent::examineStateChange($sToken,$aParseState)
 					or (!$this->aDialect->isReserved($sToken) and !$this->aDialect->isOperator($sToken) and $this->parseName($sToken)) ;
+	}
+
+	public function examineStateFinish(& $sToken,ParseState $aParseState)
+	{
+		// 遇到 TABLE 则下一个 token 才是表名
+		return $sToken!=='TABLE' ;
 	}
 }
