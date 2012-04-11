@@ -72,6 +72,16 @@ class Memcache extends Cache
 	{
 		return memcache_delete($this->hMemcacheConnection,$sDataName) ;
 	}
+
+	/**
+	 * Enter description here ...
+	 *
+	 * @return bool
+	 */
+	public function clear()
+	{
+		return true ;
+	}
 	
 	/**
 	 * Enter description here ...

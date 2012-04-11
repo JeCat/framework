@@ -83,6 +83,13 @@ abstract class Cache extends Object
 	 * @return bool
 	 */
 	abstract public function delete($sDataPath) ;
+
+	/**
+	 * Enter description here ...
+	 *
+	 * @return bool
+	 */
+	abstract public function clear() ;
 	
 	/**
 	 * Enter description here ...

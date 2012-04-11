@@ -52,6 +52,16 @@ class EmptyCache extends Cache
 
 	public function delete($sDataPath)
 	{}
+
+	/**
+	 * Enter description here ...
+	 *
+	 * @return bool
+	 */
+	public function clear()
+	{
+		return true ;
+	}
 }
 
 

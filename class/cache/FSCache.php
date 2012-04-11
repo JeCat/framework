@@ -135,6 +135,16 @@ class FSCache extends Cache
 			$this->aFolder->deleteChild($sDataPath.'.time') ;
 		}
 	}
+
+	/**
+	 * Enter description here ...
+	 *
+	 * @return bool
+	 */
+	public function clear()
+	{
+		return $this->aFolder->delete(true,true) ;
+	}
 	
 	/**
 	 * Enter description here ...
