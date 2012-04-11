@@ -33,7 +33,7 @@ use org\jecat\framework\lang\Object;
 
 class Id extends Object implements IIdentity, \Serializable
 {
-	const COOKIE_KEY_USERNAME = 'jc_id_username' ;
+	const COOKIE_KEY_USERNAME = 'jc_id_user' ;
 	const COOKIE_KEY_LOGINTIME = 'jc_id_logintime' ;
 	const COOKIE_KEY_SIGNTURE = 'jc_id_signture' ;
 	
@@ -77,8 +77,6 @@ class Id extends Object implements IIdentity, \Serializable
 		setcookie(self::COOKIE_KEY_USERNAME,$aId->username(),$nCookieExpire,$sPath) ;
 		setcookie(self::COOKIE_KEY_LOGINTIME,$nLoginTime,$nCookieExpire,$sPath) ;
 		setcookie(self::COOKIE_KEY_SIGNTURE,$nSignture,$nCookieExpire,$sPath) ;
-		
-		echo $nCookieExpire ;
 	}
 	
 	static public function clearCookie()

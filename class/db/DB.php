@@ -111,18 +111,6 @@ class DB extends Object
 	}
 	
 	/**
-	 * @return org\jecat\framework\db\sql\StatementState
-	 */
-	public function sharedStatementState()
-	{
-		if(!$this->aSharedStatementState)
-		{
-			$this->aSharedStatementState = new StatementState() ;
-		}
-		return $this->aSharedStatementState ;
-	}
-	
-	/**
 	 * @return \PDOStatement
 	 */
 	public function query($sql,$factors=null,SqlCompiler $aSqlCompiler=null)
