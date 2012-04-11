@@ -241,7 +241,7 @@ class DB extends Object
 		$sTableName = str_replace(':','_',$sTableName) ;
 		
 		// 加上表名的前缀
-		if( $this->sTableNamePrefix and $sTableName[0]!==':' )
+		if( $this->sTableNamePrefix and $sTableName[0]!==':' and substr($sTableName,0,$this->nTableNamePrefixLen)!==$this->sTableNamePrefix )
 		{
 			$sTableName = $this->sTableNamePrefix.$sTableName ;
 		}
@@ -252,6 +252,7 @@ class DB extends Object
 	public function setTableNamePrefix($sTableNamePrefix)
 	{
 		$this->sTableNamePrefix = $sTableNamePrefix ;
+		$this->nTableNamePrefixLen = strlen($sTableNamePrefix) ;
 	}
 
 	public function tableNamePrefix()
@@ -332,4 +333,5 @@ class DB extends Object
 	private $aSharedStatementState ;
 
 	private $sTableNamePrefix ;
+	private $nTableNamePrefixLen ;
 }

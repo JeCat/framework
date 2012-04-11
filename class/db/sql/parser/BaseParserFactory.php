@@ -56,7 +56,8 @@ class BaseParserFactory extends Object
 								->addChildState($this->create($bShare,$aDialect,'delete'))
 								->addChildState($this->create($bShare,$aDialect,'update'))
 								->addChildState($this->create($bShare,$aDialect,'select'))
-								->addChildState($this->create($bShare,$aDialect,'create table'))
+								->addChildState($this->create($bShare,$aDialect,'create'))
+								->addChildState($this->create($bShare,$aDialect,'drop'))
 								->addChildState($this->create($bShare,$aDialect,'from'))
 								->addChildState($this->create($bShare,$aDialect,'where')) 
 								->addChildState($this->create($bShare,$aDialect,'group'))
@@ -163,8 +164,12 @@ class BaseParserFactory extends Object
 				$aParser = self::createParserInstace('FunctionParser',$aDialect) ;
 				break ;
 
-			case 'create table' :
-				$aParser = self::createParserInstace('CreateTableParser',$aDialect)
+			case 'create' :
+				$aParser = self::createParserInstace('ClauseParser',$aDialect,'create')
+								->addChildState($this->create($bShare,$aDialect,'table')) ;
+				break ;
+			case 'drop' :
+				$aParser = self::createParserInstace('ClauseParser',$aDialect,'drop')
 								->addChildState($this->create($bShare,$aDialect,'table')) ;
 				break ;
 		}
