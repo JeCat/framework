@@ -8,12 +8,12 @@ use org\jecat\framework\lang\Object;
 
 class MVCEventManager extends Object implements \Serializable
 {
-	public function registerEventHandle($sEventType,$fnHandler,$sControllerClass=null,$sViewXPath=null,$sWidghtId=null)
+	public function registerEventHandle($sEventType,$fnHandler,$sControllerClass=null,$sViewXPath=null,$sWidghtId=null,array $arrCallbackArgvs=null)
 	{
 		Assert::isCallback($fnHandler) ;
 		
 		$sKey = $sControllerClass .'-'. $sViewXPath .'-'. $sWidghtId .'-'. $sEventType ;
-		$this->arrEventHandles[$sKey][] = $fnHandler ;
+		$this->arrEventHandles[$sKey][] = array($fnHandler,$arrCallbackArgvs) ;
 	}
 	
 	public function emitEvent($sEventType,array & $arrArgvs=array(),$sControllerClass=null,$sViewXPath=null,$sWidghtId=null)
@@ -21,9 +21,25 @@ class MVCEventManager extends Object implements \Serializable
 		$sKey = $sControllerClass .'-'. $sViewXPath .'-'. $sWidghtId .'-'. $sEventType ;
 		if(!empty($this->arrEventHandles[$sKey]))
 		{
-			foreach($this->arrEventHandles[$sKey] as &$fnHandler)
-			{				
-				call_user_func_array($fnHandler,$arrArgvs) ;
+			foreach($this->arrEventHandles[$sKey] as &$handler)
+			{
+				if( $handler[1] )
+				{
+					foreach($handler[1] as &$callbackArgv)
+					{
+						$arrArgvs[] =& $callbackArgv ;
+					}
+				}
+				
+				call_user_func_array($handler[0],$arrArgvs) ;
+
+				if( $handler[1] )
+				{
+					for($i=count($handler[1]);$i>0;$i--)
+					{
+						array_pop($arrArgvs) ;
+					}
+				}				
 			}
 		}
 	}
