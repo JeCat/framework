@@ -46,7 +46,7 @@ abstract class FSIterator implements \Iterator{
 	const FOLDER = 0x04 ; // CONTAIN_FOLDER
 	
 	// 默认值
-	const FLAG_DEFAULT = 0x36 ; // CONTAIN_FILE | CONTAIN_FOLDER | RETURN_ABSOLUTE_PATH | RECURSIVE_SEARCH
+	const FLAG_DEFAULT = 0x26 ; // CONTAIN_FILE | CONTAIN_FOLDER | RETURN_ABSOLUTE_PATH | RECURSIVE_SEARCH
 	
 	public function __construct(Folder $aParentFolder , $nFlags){
 		$this->nFlags=$nFlags;

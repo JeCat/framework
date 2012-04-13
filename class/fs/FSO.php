@@ -41,9 +41,10 @@ abstract class FSO extends Object implements \Serializable
 	 * 
 	 * @return void
 	 */
-	public function __construct($sPath,$nFlag=0)
+	public function __construct($sPath,$nFlag=0,$sHttpUrl=null)
 	{
 		$this->sPath = ($nFlag&self::CLEAN_PATH)? $sPath: self::tidyPath($sPath) ;
+		$this->sHttpUrl = $sHttpUrl ;
 	}
 		
 	/**
@@ -300,6 +301,7 @@ abstract class FSO extends Object implements \Serializable
 	public function setHttpUrl($sHttpUrl)
 	{
 		$this->sHttpUrl = $sHttpUrl ;
+		return $this ;
 	}
 	
 	/**

@@ -81,8 +81,11 @@ class ValuesParser extends AbstractParser
 				
 			} while( $nDepth ) ;
 			
-			$arrValuesToken['pretree']['COLUMNS']['subtree'] = array_reverse($arrValuesToken['pretree']['COLUMNS']['subtree'],true) ;	
-			$arrValuesToken['columns'] = array_reverse($arrValuesToken['columns'],false) ;	
+			$arrValuesToken['pretree']['COLUMNS']['subtree'] = array_reverse($arrValuesToken['pretree']['COLUMNS']['subtree'],true) ;
+			if(!empty($arrValuesToken['columns']))
+			{
+				$arrValuesToken['columns'] = array_reverse($arrValuesToken['columns'],false) ;	
+			}
 		}
 
 		$aParseState->arrTree[] =& $arrValuesToken ;
@@ -96,7 +99,6 @@ class ValuesParser extends AbstractParser
 		
 		// ----------------------------------------------------------
 		// 分行 -----------------------------------------------------
-		$arrRowTokenTree ;
 		$arrNewValuesTree = array() ;
 		$nDepth = 0 ;
 		$nRowIdx = 0 ;
@@ -173,6 +175,11 @@ class ValuesParser extends AbstractParser
 					// 结束一列
 					else if( $token===',' and $nDepth===0 )
 					{
+						if($arrNewValueListTree)
+						{
+							$arrNewValueListTree[] = ',' ;
+						}
+						
 						if($sColumn===null)
 						{
 							$arrNewValueListTree[] = $arrValueExprTree ;
@@ -196,6 +203,10 @@ class ValuesParser extends AbstractParser
 				// 最后一段
 				if($sColumn===null)
 				{
+					if($arrNewValueListTree)
+					{
+						$arrNewValueListTree[] = ',' ;
+					}
 					$arrNewValueListTree[] = $arrValueExprTree ;
 				}
 				else

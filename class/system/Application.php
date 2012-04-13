@@ -192,9 +192,9 @@ class Application extends Object implements \Serializable
 		return $this->aPublicFolders ;
 	}
 	
-	public function setPublicFolders(ResourceManager $aPublicFolder)
+	public function setPublicFolders(ResourceManager $aPublicFolders)
 	{
-		$this->aPublicFolders = $aPublicFolder ; 
+		$this->aPublicFolders = $aPublicFolders ; 
 	}
 	
 	

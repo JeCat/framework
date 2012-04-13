@@ -159,7 +159,6 @@ class ResourceManager extends Object implements \Serializable
 	
 	public function unserialize($serialized)
 	{
-		$this->__construct() ;
 		$this->arrFolders = unserialize($serialized) ;
 	}
 
