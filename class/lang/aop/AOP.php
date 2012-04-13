@@ -73,6 +73,9 @@ class AOP extends Object implements IStrategySummary, \Serializable
 		}
 		$this->aspects()->add($aAspect) ;
 		
+		$this->aPointcutIterator = null ;
+		$this->aJointPointIterator = null ;
+		
 		return $this ;
 	}
 	
