@@ -29,12 +29,12 @@ class TableKeywordParser extends TableParser
 {
 	public function examineStateChange(&$sToken,ParseState $aParseState)
 	{
-		if( $sToken!=='TABLE' )
+		if( $sToken!=='TABLE' or $sToken!=='TABLES' )
 		{
 			return false ;
 		}
 		
-		$aParseState->arrTree[] = 'TABLE' ;
+		$aParseState->arrTree[] = $sToken ;
 		
 		// 遇到 TABLE ，检查下一个token 是否是有效的表名
 		$sToken = next($aParseState->arrTokenList) ;
@@ -45,6 +45,7 @@ class TableKeywordParser extends TableParser
 	public function examineStateFinish(& $sToken,ParseState $aParseState)
 	{
 		// 遇到 TABLE 则下一个 token 才是表名
-		return $sToken!=='TABLE' ;
+		// 暂时用 TABLE 代替 TABLES ，即 TABLES 后面只有一个 表名被识别
+		return $sToken!=='TABLE' and $sToken!=='TABLES';
 	}
 }
