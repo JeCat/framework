@@ -66,6 +66,26 @@ class InputStream extends Stream implements IInputStream, ILockable
 		
 		return strlen($sBytes) ;
 	}
+
+	/**
+	 * Enter description here ...
+	 *
+	 * @return org\jecat\framework\util\String
+	 */
+	function readToString(String $aString=null)
+	{
+		if(!$aString)
+		{
+			$aString = new String() ;
+		}
+		
+		while(!$this->isEnd())
+		{
+			$this->readInString($aString,10240) ;
+		}
+	
+		return $aString ;
+	}
 	
 	/**
 	 * Enter description here ...

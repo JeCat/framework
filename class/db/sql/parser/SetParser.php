@@ -103,9 +103,18 @@ class SetParser extends AbstractParser
 			$aParseState->arrTree[] = $sToken ;
 		}
 	}
-	public function examineStateChange(& $sToken,ParseState $aParseState)
+	public function examineStateChange(&$sToken,ParseState $aParseState)
 	{
-		return $sToken === 'SET' ;
+		$sPrevToken = prev($aParseState->arrTokenList) ;
+		if($sPrevToken===false)
+		{
+			reset($aParseState->arrTokenList) ;
+		}
+		else 
+		{
+			next($aParseState->arrTokenList) ;
+		}
+		return $sPrevToken!=='CHARACTER' and $sToken==='SET' ;
 	}		
 	
 	public function active(& $sToken,ParseState $aParseState)

@@ -50,12 +50,17 @@ class DB extends Object
 		{
 			$sDsn = $sDsn?:$this->sPDODsn ;
 			
-			$this->aPDO = new \PDO(
-					$sDsn
-					, $sUsername?:$this->sPDOUsername
-					, $sPasswd?:$this->sPDOPassword
-					, $arrOptions?:$this->arrPDOOptions
-			) ;
+			try{
+				$this->aPDO = new \PDO(
+						$sDsn
+						, $sUsername?:$this->sPDOUsername
+						, $sPasswd?:$this->sPDOPassword
+						, $arrOptions?:$this->arrPDOOptions
+				) ;
+			}catch (\PDOException $e)
+			{
+				throw new ExceptionConnectRefuse('数据库连接被拒绝:%s',$sDsn,$e) ;
+			}
 			
 			if( preg_match('/dbname=(.+?)(;|$)/i',$sDsn,$arrRes) )
 			{

@@ -200,13 +200,14 @@ class ValuesParser extends AbstractParser
 					}
 				}
 
+				
 				// 最后一段
+				if($arrNewValueListTree)
+				{
+					$arrNewValueListTree[] = ',' ;
+				}
 				if($sColumn===null)
 				{
-					if($arrNewValueListTree)
-					{
-						$arrNewValueListTree[] = ',' ;
-					}
 					$arrNewValueListTree[] = $arrValueExprTree ;
 				}
 				else
