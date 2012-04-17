@@ -1043,17 +1043,7 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	 */
 	static public function sqlCompiler()
 	{
-		if( !self::$aSqlCompiler )
-		{
-			$aNameCompiler = new SqlNameCompiler() ;
-			$aNameCompiler->registerColumnNameTranslaters(array(__CLASS__,'translateColumnName')) ;
-			
-			self::$aSqlCompiler = new SqlCompiler(true) ;			
-			self::$aSqlCompiler->registerTokenCompiler('column',$aNameCompiler) ;
-			self::$aSqlCompiler->registerTokenCompiler('table',$aNameCompiler) ;
-		}
-		
-		return self::$aSqlCompiler ;
+		return SqlCompiler::singleton() ;
 	}
 	
 	static public function translateColumnName($sTable,$sColumn,$sAlias,array & $arrToken,array & $arrTokenTree)
@@ -1105,3 +1095,4 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	
 }
 
+SqlNameCompiler::singleton()->registerColumnNameTranslaters(array('org\\jecat\\framework\\mvc\\model\\db\\orm\\Prototype','translateColumnName')) ;

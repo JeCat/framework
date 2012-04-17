@@ -36,7 +36,7 @@ class SqlCompiler extends Object
 		{
 			$this->arrTokenCompilers['column'] 
 			 = $this->arrTokenCompilers['table'] 
-			 = new SqlNameCompiler() ;
+			 = SqlNameCompiler::singleton() ;
 		}
 	}
 	

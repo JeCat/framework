@@ -26,8 +26,9 @@
 namespace org\jecat\framework\db\sql\compiler ;
 
 use org\jecat\framework\db\DB;
+use org\jecat\framework\lang\Object;
 
-class SqlNameCompiler
+class SqlNameCompiler extends Object
 {	
 	public function compile(SqlCompiler $aSqlCompiler,array & $arrTokenTree,array & $arrToken,array & $arrFactors=null)
 	{
@@ -88,10 +89,12 @@ class SqlNameCompiler
 	public function registerColumnNameTranslaters($fnTranslaters)
 	{
 		$this->arrColumnNameTranslaters[] = $fnTranslaters ;
+		return $this ;
 	}
 	public function registerTableNameTranslaters($fnTranslaters)
 	{
 		$this->arrTableNameTranslaters[] = $fnTranslaters ;
+		return $this ;
 	}
 
 	static public function translateTableName($sTable,$sAlias,array & $arrToken,array & $arrTokenTree)
