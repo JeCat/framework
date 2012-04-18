@@ -977,10 +977,6 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 		if( !$this->aStatementUpdate )
 		{
 			$this->aStatementUpdate = new Update($this->tableName()) ;
-
-			$arrTokenTree =& $this->aStatementUpdate->rawSql() ;
-			$arrTokenTree['omited_first_table'] = $this->name() ;
-			$arrTokenTree['omited_first_table_len'] = strlen($arrTokenTree['omited_first_table']) ;
 		}
 
 		return $this->aStatementUpdate ;
