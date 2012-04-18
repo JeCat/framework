@@ -48,6 +48,13 @@ class TableKeywordParser extends TableParser
 			$aParseState->arrTree[] = $sToken ;
 		}
 		
+		// SHOW TABLE STATUS
+		if(strtolower($sToken)==='status')
+		{
+			$aParseState->arrTree[] = $sToken ;
+			$sToken = next($aParseState->arrTokenList) ;
+		}
+		
 		// 遇到 TABLE ，检查下一个token 是否是有效的表名
 		// $sToken = next($aParseState->arrTokenList) ;
 		return parent::examineStateChange($sToken,$aParseState) ;
