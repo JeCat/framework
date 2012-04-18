@@ -64,7 +64,8 @@ class BaseParserFactory extends Object
 								->addChildState($this->create($bShare,$aDialect,'order'))
 								->addChildState($this->create($bShare,$aDialect,'limit'))
 								->addChildState($this->create($bShare,$aDialect,'set'))
-								->addChildState($this->create($bShare,$aDialect,'values')) ;
+								->addChildState($this->create($bShare,$aDialect,'values'))
+								->addChildState($this->create($bShare,$aDialect,'table-keyword')) ;
 				break ;
 
 			case 'select' :
