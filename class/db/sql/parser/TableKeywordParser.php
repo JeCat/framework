@@ -35,6 +35,7 @@ class TableKeywordParser extends TableParser
 		}
 		
 		$aParseState->arrTree[] = $sToken ;
+		$sOriToken = $sToken ;
 
 		// IF NOT EXISTS
 		$arrTokenList = array('IF','NOT','EXISTS') ;
@@ -48,8 +49,17 @@ class TableKeywordParser extends TableParser
 			$aParseState->arrTree[] = $sToken ;
 		}
 		
+		// 到头了， table/tables 后面没有内容
+		if($sToken===false)
+		{
+			prev($aParseState->arrTokenList) ;
+			array_pop($aParseState->arrTree) ;
+			$sToken = $sOriToken ;
+			return false ;
+		}
+		
 		// SHOW TABLE STATUS
-		if(strtolower($sToken)==='status')
+		else if(strtolower($sToken)==='status')
 		{
 			$aParseState->arrTree[] = $sToken ;
 			$sToken = next($aParseState->arrTokenList) ;
