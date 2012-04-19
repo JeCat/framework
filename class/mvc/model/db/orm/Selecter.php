@@ -58,6 +58,7 @@ class Selecter extends OperationStrategy
 		// -----------------
 		// step 2. query for all one to one association tables 
 		$arrMultitermAssociations = array() ;
+		$aSelect->clearColumns() ;
 		$this->addColumnsForOneToOne($aSelect,$aPrototype,$arrMultitermAssociations) ;
 		
 		// set limit

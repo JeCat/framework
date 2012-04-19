@@ -165,8 +165,11 @@ class Select extends MultiTableSQL
 	
 	public function clearColumns()
 	{
-	    $this->arrRawSql[self::CLAUSE_SELECT]['subtree'] = array() ;
-	    return $this ;
+		if(isset($this->arrRawSql['subtree'][self::CLAUSE_SELECT]))
+		{
+			$this->arrRawSql['subtree'][self::CLAUSE_SELECT]['subtree'] = array() ;
+		}
+		return $this ;
 	}
 	
 	/**

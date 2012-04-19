@@ -204,7 +204,7 @@ abstract class MultiTableSQL extends SQL
 		{
 			if( $arrRawTable['expr_type'] == 'table_expression' )
 			{
-				$arrTables = array_merge($arrTables,self::allTables($arrRawTable['sub_tree'])) ;
+				$arrTables = array_merge($arrTables,self::allTables($arrRawTable['subtree'])) ;
 			}
 			else
 			{
