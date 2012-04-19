@@ -108,7 +108,7 @@ class FSCache extends Cache
 			return false ;
 		}
 
-		file_put_contents( $sFilePath.'.time', "<?php return array({$fCreateTimeMicroSec},{$nExpireSec}) ;" ) ;
+		file_put_contents( $sFilePath, "<?php return array({$fCreateTimeMicroSec},{$nExpireSec}) ;" ) ;
 	}
 	
 	/**
