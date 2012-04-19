@@ -72,7 +72,7 @@ class Selecter extends OperationStrategy
 		}
 				
 		// set group by
-		$this->setGroupBy($aSelect->criteria(),$aPrototype) ;
+		// $this->setGroupBy($aSelect->criteria(),$aPrototype) ;
 		
 		// set order by
 		$aSelect->criteria()->clearOrders() ;
