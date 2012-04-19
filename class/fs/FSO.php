@@ -144,11 +144,18 @@ abstract class FSO extends Object implements \Serializable
 	 */
 	static public function tidyPath(& $sPath)
 	{
-			if(!is_string($sPath))
-			{
-				debug_print_backtrace() ;
-				exit() ;
-			}
+		// 处理 path 协议
+		$pos=strpos($sPath,'://') ;
+		if( $pos!==false )
+		{
+			$sProtol = substr($sPath,0,$pos+3) ;
+			$sPath = @substr($sPath,$pos+3) ;
+		}
+		else
+		{
+			$sProtol = '' ;
+		}
+		
 		// 统一、合并斜线
 		$sPath = preg_replace('|[/\\\\]+|', '/', $sPath) ;
 	
@@ -185,24 +192,36 @@ abstract class FSO extends Object implements \Serializable
 			$sPath = implode('/', $arrFoldersStack) ;
 		}
 		
-		return $sPath ;
+		return $sProtol.$sPath ;
 	}
 	
 	/**
 	 * 格式化路径，清理路径中重复的斜线，删除路径末尾的 / ,补充路径开头的 /
 	 */
-	static public function formatPath(& $sPath,$bAbs=true)
+	static public function formatPath( $sPath,$bAbs=true)
 	{
 		if(!$sPath)
 		{
 			return '' ;
 		}
 		
+		// 处理 path 协议
+		$pos=strpos($sPath,'://') ;
+		if( $pos!==false )
+		{
+			$sProtol = substr($sPath,0,$pos+3) ;
+			$sPath = @substr($sPath,$pos+3) ;
+		}
+		else
+		{
+			$sProtol = '' ;
+		}
+		
 		// 统一、合并斜线
 		$sPath = preg_replace('|[/\\\\]+|', '/', $sPath) ;
 	
 		// 补充开头的 /
-		if( $bAbs and substr($sPath,0,1)!='/' ) 
+		if( $bAbs and substr($sPath,0,1)!='/' and !$sProtol ) 
 		{
 			$sPath = '/'.$sPath ;
 		}
@@ -213,7 +232,7 @@ abstract class FSO extends Object implements \Serializable
 			$sPath = substr($sPath,0,-1) ;
 		}
 		
-		return $sPath ;
+		return $sProtol.$sPath ;
 	}
 	
 	/**
