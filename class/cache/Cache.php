@@ -111,5 +111,7 @@ abstract class Cache extends Object
 	 * @return int
 	 */
 	//abstract public function expireTime($sDataPath) ;
+	
+	protected $sFolderPrefix ;
 }
 

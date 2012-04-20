@@ -25,19 +25,22 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\cache ;
 
-use org\jecat\framework\fs\Folder;
+use org\jecat\framework\lang\Object;
 
-class FSCache extends Cache
+class SaeStorageCache extends Cache
 {
-	public function __construct($sFolder)
+	public function __construct($sDomain,$sFolder='')
 	{
+		$this->sDomain = $sDomain ;
 		$this->sFolderPrefix = trim($sFolder,'/').'/' ;
+		$this->aSaeStorage = Object::singleton('SaeStorage') ;
 	}
 	
 	public function item($sDataPath)
 	{
+		$sDataPath = trim($sDataPath,'/') ;
 		$nExpireTime = $this->expireTime($sDataPath) ;
-		if( $nExpireTime<0 )
+		if( $nExpireTime<=0 )
 		{
 			return null ;
 		}
@@ -47,44 +50,19 @@ class FSCache extends Cache
 			return null ;
 		}
 		
-		$sDataPath = $this->sFolderPrefix.trim($sDataPath,'/') ;
-		
-		// 尝试 .php
-		if( is_file($sDataPath.'.php') )
-		{
-			return include $sDataPath.'.php' ;
-		}
-		// 尝试 .data
-		else if( is_file($sDataPath.'.data') )
-		{
-			return unserialize(file_get_contents($sDataPath.'.data')) ;
-		}
-
-		return null ;
+		return unserialize($this->aSaeStorage->read($this->sDomain,$this->sFolderPrefix.$sDataPath.'.data',$sSerialize)) ;
 	}
 	
 	public function setItem($sDataPath,$data,$nExpire=self::expire_default,$fCreateTimeMicroSec=-1)
 	{
-		$sDataPath = $this->sFolderPrefix.trim($sDataPath,'/') ;
+		$sDataPath = trim($sDataPath,'/') ;
+		$sSerialize = serialize($data) ;
+		$sFilePath = $this->sFolderPrefix.$sDataPath.'.data' ;
 			
-		if(is_object($data))
+		if( !$this->aSaeStorage->write($this->sDomain,$sFilePath,$sSerialize) )
 		{
-			$sSerialize = serialize($data) ;
-			$sFilePath = $sDataPath.'.data' ;
+			return false ;
 		}
-		else
-		{
-			$sSerialize = "<?php\r\nreturn ".var_export($data,true).' ;' ;
-			$sFilePath = $sDataPath.'.php' ;
-		}
-		
-		$sDataFolder = dirname($sFilePath) ;
-		if( !is_dir($sDataFolder) and !Folder::createInstance($sDataFolder)->create() )
-		{
-			return ;
-		}
-		
-		file_put_contents( $sFilePath,$sSerialize) ;
 		
 		// create time
 		if($fCreateTimeMicroSec<0)
@@ -105,8 +83,8 @@ class FSCache extends Cache
 		{
 			$nExpireSec = ceil($fCreateTimeMicroSec) + $nExpire ;
 		}
-
-		file_put_contents( $sDataPath.'.time', "<?php return array({$fCreateTimeMicroSec},{$nExpireSec}) ;" ) ;
+		
+		return $this->aSaeStorage->write($this->sDomain,$this->sFolderPrefix.$sDataPath.'.time',$sSerialize) ;
 	}
 	
 	/**
@@ -120,22 +98,13 @@ class FSCache extends Cache
 		{
 			$this->clear() ;
 		}
+		// 删除指定内容
 		else
 		{
-			$sDataPath = $this->sFolderPrefix.trim($sDataPath,'/') ;
-			
-			// 删除目录
-			if( is_dir($sDataPath) )
-			{
-				Folder::createInstance($sDataPath)->delete(true,true) ;
-			}
-			// 删除指定内容
-			else
-			{
-				unlink($sDataPath.'.data') ;
-				unlink($sDataPath.'.php') ;
-				unlink($sDataPath.'.time') ;
-			}
+			$sDataPath = trim($sDataPath,'/') ;
+			$this->aSaeStorage->delete($this->sDomain,$this->sFolderPrefix.$sDataPath.'.data') ;
+			$this->aSaeStorage->delete($this->sDomain,$this->sFolderPrefix.$sDataPath.'.time') ;
+			$this->aSaeStorage->deleteFolder($this->sDomain,$this->sFolderPrefix.$sDataPath) ;
 		}
 	}
 
@@ -146,12 +115,12 @@ class FSCache extends Cache
 	 */
 	public function clear()
 	{
-		return Folder::createInstance($this->sFolderPrefix)->delete(true,true) ;
+		return $this->aSaeStorage->deleteFolder($this->sDomain,$this->sFolderPrefix) ;
 	}
-
+	
 	/**
 	 * Enter description here ...
-	 *
+	 * 
 	 * @return bool
 	 */
 	public function isExpire($sDataPath)
@@ -162,20 +131,20 @@ class FSCache extends Cache
 	
 	/**
 	 * Enter description here ...
-	 *
+	 * 
 	 * @return float
 	 */
 	public function createTime($sDataPath)
 	{
-		$sPath = $this->sFolderPrefix.trim($sDataPath,'/').'.time' ;
-		if(!is_file($sPath))
+		$data = $this->aSaeStorage->read($this->sDomain,$this->sFolderPrefix.ltrim($sDataPath,'/').'.time') ;
+		if($data===false)
 		{
 			return 0 ;
 		}
-		list($fCreateTime,) = explode(',',file_get_contents($sPath)) ;
+		list($fCreateTime,) = explode(',',$data) ;
 		return (int)$fCreateTime ;
 	}
-	
+
 	/**
 	 * Enter description here ...
 	 *
@@ -183,17 +152,15 @@ class FSCache extends Cache
 	 */
 	public function expireTime($sDataPath)
 	{
-		$sPath = $this->sFolderPrefix.trim($sDataPath,'/').'.time' ;
-		if(!is_file($sPath))
+		$data = $this->aSaeStorage->read($this->sDomain,$this->sFolderPrefix.ltrim($sDataPath,'/').'.time') ;
+		if($data===false)
 		{
 			return 0 ;
 		}
-		list(,$nExpireTime) = explode(',',file_get_contents($sPath)) ;
+		list(,$nExpireTime) = explode(',',$data) ;
 		return (int)$nExpireTime ;
 	}
-	
-	/**
-	 * @var org\jecat\framework\fs\FsFolder
-	 */
-	private $aFolder ;
+
+	private $sDomain ;
+	private $aSaeStorage ;
 }

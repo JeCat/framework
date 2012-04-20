@@ -34,7 +34,7 @@ error_reporting(E_ALL & ~E_DEPRECATED) ;
 date_default_timezone_set('Asia/Shanghai') ;
 
 // 编码
-header("Content-Type: text/html; charset=UTF-8") ;
+@header("Content-Type: text/html; charset=UTF-8") ;
 
 define( "org\\jecat\\framework\\VERSION", '0.7.0' ) ;
 define( "org\\jecat\\framework\\PATH", __DIR__ ) ;

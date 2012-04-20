@@ -49,7 +49,7 @@ abstract class Session extends Object implements ISession
 			return true ;
 		}
 		
-		if(session_start())
+		if(@session_start())
 		{
 			$this->bSessionStarted = true ;
 			return true ;
