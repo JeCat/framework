@@ -169,22 +169,22 @@ class ParserStateTag extends ParserState
 						continue ;
 						throw new Exception("UI引擎在分析模板时遇到错误：属性名:%s没有对应的属性值。位置：%d行",array($sAttrName,$aVal->line())) ;
 					}
-					
-					$arrRemoveVal[] = $aVal ;
-					$arrRemoveVal[] = $aAttrName ;
-					$arrRemoveVal[] = $aAttrVal ;
-					
+
 					$aAttrVal->setName($sAttrName) ;
+
+					// 移除 val name
+					array_pop($arrAttrs) ;
 					$arrAttrs[] = $aAttrVal ;
+				}
+				else
+				{
+					$arrAttrs[] = $aVal ;
 				}
 				
 				$aPrevAttrVal = $aAttrValIterator->current() ;
 			}
 			
-			foreach($arrRemoveVal as $aAttrVal)
-			{
-				$aAttrs->remove($aAttrVal) ;
-			}
+			$aAttrs->clear() ;
 			foreach($arrAttrs as $aAttrVal)
 			{
 				$aAttrs->add($aAttrVal) ;
