@@ -38,7 +38,22 @@ class Folder extends FSO
 	const FIND_AUTO_CREATE = 1 ;				// 如果找不到文件，自动创建文件
 	const FIND_AUTO_CREATE_OBJECT = 2 ;		// 如果找不到文件，自动创建一个文件对象（没有实际创建文件）
 	const FIND_DEFAULT = FSO::unknow ;			// FSO::unknow
-		
+
+	/**
+	 * @return Folder
+	 */
+	static public function createInstance($sPath,$sClassName=null)
+	{
+		if( $sClassName===null or $sClassName===__CLASS__ )
+		{
+			return new self($sPath) ;
+		}
+		else
+		{
+			return parent::createInstance($sPath,$sClassName) ;
+		}
+	}
+	
 	static public function createFolder($sPath,$nFlag=self::CREATE_DEFAULT)
 	{
 		$aFolder = new Folder($sPath,$nFlag) ;
@@ -183,14 +198,21 @@ class Folder extends FSO
 		return null ;
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function create($nMode=self::CREATE_DEFAULT)
 	{
+		return self($this->path(),$nMode,($nMode&self::CREATE_RECURSE_DIR)?true: false) ;
+	}
+
+	/**
+	 * @return bool
+	 */
+	static public function mkdir($sPath,$nMode=self::CREATE_DEFAULT,$bRecursive=true)
+	{
 		$nOldMark = umask(0) ;
-		$bRes = mkdir(
-			$this->path()
-			, ($nMode&0777)
-			, ($nMode&self::CREATE_RECURSE_DIR)?true: false
-		) ;
+		$bRes = mkdir( $sPath, ($nMode&0777), $bRecursive ) ;
 		umask($nOldMark) ;
 		
 		return $bRes ;

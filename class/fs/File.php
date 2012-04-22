@@ -33,6 +33,21 @@ use org\jecat\framework\io\InputStream;
 class File extends FSO
 {
 	const CREATE_DEFAULT = 020664 ; 	// CREATE_RECURSE_DIR | 0664
+
+	/**
+	 * @return File
+	 */
+	static public function createInstance($sPath,$sClassName=null)
+	{
+		if( $sClassName===null or $sClassName===__CLASS__ )
+		{
+			return new self($sPath) ;
+		}
+		else
+		{
+			return parent::createInstance($sPath,$sClassName) ;
+		}
+	}
 	
 	/**
 	 * @return io\IInputStream
