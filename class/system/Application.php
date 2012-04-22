@@ -30,7 +30,7 @@ use org\jecat\framework\lang\Object;
 use org\jecat\framework\resrc\ResourceManager;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\fs\Folder;
-use org\jecat\framework\setting\Setting;
+use org\jecat\framework\setting\ISetting;
 
 /**
  * @wiki /目录(草稿)
@@ -196,7 +196,19 @@ class Application extends Object implements \Serializable
 	{
 		$this->aPublicFolders = $aPublicFolders ; 
 	}
+
+	/**
+	 * @return org\jecat\framework\setting\ISetting
+	 */
+	public function setting()
+	{
+		return $this->aSetting ;
+	}
 	
+	public function setSetting(ISetting $aSetting)
+	{
+		$this->aSetting = $aSetting ;
+	}
 	
 	/**
 	 * @return Application
@@ -233,7 +245,14 @@ class Application extends Object implements \Serializable
 	{
 		if($this->bDebugging===null)
 		{
-			$this->bDebugging = (bool)Setting::singleton()->item('/service/debug','stat') ;
+			if($this->aSetting)
+			{
+				$this->bDebugging = (bool)$this->aSetting->item('/application/debug','stat') ;
+			}
+			else 
+			{
+				return false ;
+			}
 		}
 		return $this->bDebugging ;
 	}
@@ -243,6 +262,8 @@ class Application extends Object implements \Serializable
 	private $sEntrance = '' ; 
 	
 	private $aPublicFolders ;
+	
+	private $aSetting ;
 	
 	private $fUptime ; 
 	

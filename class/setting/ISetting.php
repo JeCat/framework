@@ -28,13 +28,6 @@ namespace org\jecat\framework\setting ;
 interface ISetting
 {
 	/**
-	 * 获得一个键对象
-	 * @param string $sPath 键路径
-	 * @return IKey 
-	 */
-	public function key($sPath,$bAutoCreate=false) ;
-	
-	/**
 	 * 新建一个键
 	 * @param string $sPath 键路径
 	 * @return IKey 
@@ -56,17 +49,11 @@ interface ISetting
 	public function deleteKey($sPath) ;
 	
 	/**
-	 * 保存键
-	 * @param string $sPath 键路径
-	 */
-	public function saveKey($sPath) ;
-	
-	/**
 	 * 获得子键的键名迭代器
 	 * @param string $sPath 键路径
 	 * @return \Iterator 
 	 */
-	public function keyIterator($sPath) ;
+	public function keyIterator($sPath=null) ;
 	
 	/**
 	 * 获得项的值
@@ -106,10 +93,16 @@ interface ISetting
 	 */
 	public function itemIterator($sPath) ;
 	
+
 	/**
-	 * 在指定的路径上，分离出一个setting
-	 * @param string $sPath 键路径
+	 * 保存
+	 */
+	public function save() ;
+
+
+	/**
+	 * @param string $sKeyPath 键路径
 	 * @return ISetting
 	 */
-	public function separate($sPath) ;
+	public function separate($sKeyPath) ;
 }
