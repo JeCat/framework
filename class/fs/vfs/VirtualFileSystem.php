@@ -4,47 +4,6 @@ namespace org\jecat\framework\fs\vfs ;
 
 class VirtualFileSystem
 {
-	static public function flyweight($sProtocol='vfs')
-	{
-		if( !isset(self::$arrProtocols[$sProtocol]) )
-		{
-			self::$arrProtocols[$sProtocol] = new self($sProtocol) ;
-		}
-		
-		return self::$arrProtocols[$sProtocol] ;
-	}
-	static public function setFlyweight(self $aInstance,$sProtocol='vfs')
-	{
-		$arrProtocols[$sProtocol] = $aInstance ;
-	}
-	
-	public function __construct($sProtocol)
-	{
-		$this->sProtocol = $sProtocol ;
-		stream_register_wrapper($sProtocol,'org\\jecat\\framework\\fs\\vfs\\VFSWrapper') ;
-	}
-	
-	static public function findFileSystemByUrl($sUrl)
-	{
-		$arrUrlInfo = parse_url($sUrl) ;
-		if( !$aVfs=VirtualFileSystem::flyweight($arrUrlInfo['scheme']) )
-		{
-			return null ;
-		}
-		
-		return $aVfs->fileSystem($arrUrlInfo['host'].$arrUrlInfo['path']) ;
-	}
-	static public function localeFileSystemByUrl($sUrl)
-	{
-		$arrUrlInfo = parse_url($sUrl) ;
-		if( !$aVfs=VirtualFileSystem::flyweight($arrUrlInfo['scheme']) )
-		{
-			return null ;
-		}
-		
-		return $aVfs->localeFileSystemPath($arrUrlInfo['host'].$arrUrlInfo['path']) ;
-	}
-
 	/**
 	 * 挂载一个物理文件系统
 	 */
@@ -127,9 +86,6 @@ class VirtualFileSystem
 		return array_keys($this->arrConcreteFileSystem) ;
 	}
 	
-	private $sProtocol ;
 	private $arrConcreteFileSystem ;
-	
-	static private $arrProtocols = array() ;
 }
 
