@@ -203,7 +203,7 @@ class Folder extends FSO
 	 */
 	public function create($nMode=self::CREATE_DEFAULT)
 	{
-		return self($this->path(),$nMode,($nMode&self::CREATE_RECURSE_DIR)?true: false) ;
+		return self::mkdir($this->path(),$nMode,($nMode&self::CREATE_RECURSE_DIR)?true: false) ;
 	}
 
 	/**
