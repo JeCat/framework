@@ -131,7 +131,7 @@ class Selecter extends OperationStrategy
 		}
 
 		try{
-			$nTotalCount = $aDB->queryCount( $aSelect, $sKey, Prototype::sqlCompiler() ) ;
+			$nTotalCount = $aDB->queryCount( $aSelect, "*", Prototype::sqlCompiler() ) ;
 		}catch (\Exception $e){}
 		//} final {
 			if($aRestriction)
@@ -139,7 +139,7 @@ class Selecter extends OperationStrategy
 				$aSelect->criteria()->where()->remove($aRestriction);
 			}
 		//}
-		if($e)
+		if(isset($e) and $e)
 		{
 			throw $e ;
 		}
