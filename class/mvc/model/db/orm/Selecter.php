@@ -120,32 +120,31 @@ class Selecter extends OperationStrategy
 		return true ;
 	}
 	
-	public function totalCount(DB $aDB,Prototype $aPrototype,Criteria $aCriteria=null)
+	public function totalCount(DB $aDB,Prototype $aPrototype,Restriction $aRestriction=null)
 	{
 		$aSelect = $aPrototype->sharedStatementSelect() ;
-		if($aCriteria)
-		{
-			$aSelect->setCriteria($aCriteria);
-		}
-		else 
-		{
-			$aCriteria = $aSelect->criteria() ;
-		}
+		$aCriteria = $aSelect->criteria() ;
 		$aCriteria->setLimit(-1) ;
-		$aCriteria->clearGroupBy() ;
-		
-		$sKey = 'DISTINCT ' ;
-		$nKeyIdx = 0 ;
-		foreach($aPrototype->keys() as $sClmName)
+		if($aRestriction)
 		{
-			if( $nKeyIdx++ )
+			$aSelect->criteria()->where()->add($aRestriction);
+		}
+
+		try{
+			$nTotalCount = $aDB->queryCount( $aSelect, $sKey, Prototype::sqlCompiler() ) ;
+		}catch (\Exception $e){}
+		//} final {
+			if($aRestriction)
 			{
-				$sKey.= ',' ;
+				$aSelect->criteria()->where()->remove($aRestriction);
 			}
-			$sKey.= ' `'.$aPrototype->sqlTableAlias().'`.`'.$sClmName.'`' ;
+		//}
+		if($e)
+		{
+			throw $e ;
 		}
 		
-		return $aDB->queryCount( $aSelect, $sKey, Prototype::sqlCompiler() ) ;
+		return $nTotalCount ;
 	}
 	
 	public function hasExists(Model $aModel,Prototype $aPrototype=null,Select $aSelect=null,DB $aDB=null)
