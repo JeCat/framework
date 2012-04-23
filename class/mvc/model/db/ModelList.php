@@ -499,6 +499,8 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator,
 	private $aShareChildrenIterator ;
 	
 	private $aShareModel ;
+
+	private $aLoadRestriction ;
 	
 	private $nTotalCount = -1 ;
 	
