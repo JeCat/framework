@@ -139,7 +139,7 @@ class Selecter extends OperationStrategy
 				$aSelect->criteria()->where()->remove($aRestriction);
 			}
 		//}
-		if($e)
+		if(!empty($e))
 		{
 			throw $e ;
 		}
