@@ -25,6 +25,8 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\controller ;
 
+use org\jecat\framework\util\EventManager;
+
 use org\jecat\framework\mvc\view\View;
 use org\jecat\framework\system\ApplicationFactory;
 use org\jecat\framework\db\DB;
@@ -112,6 +114,10 @@ class Response extends Object
 	 */
 	public function respond(Controller $aController)
 	{
+		$arrEventArgvs = array($aController) ;
+		EventManager::singleton()->emitEvent(__CLASS__,'beforeRespond',$arrEventArgvs) ;
+		
+		
 		switch ($aController->params()->get('rspn'))
 		{
 		// msgqueue ------------
@@ -248,6 +254,9 @@ class Response extends Object
 				$this->printDebugModelStruct($aController,$sModelName) ;
 			}
 		}
+		
+
+		EventManager::singleton()->emitEvent(__CLASS__,'afterRespond',$arrEventArgvs) ;
 	}
 	
 	private function printDebugModelStruct(Controller $aController,$sModelName)
