@@ -387,6 +387,10 @@ class Selecter extends OperationStrategy
 		$arrTokens = array('ON','(') ;
 		foreach ($arrFromKeys as $nIdx=>$sFromKey)
 		{
+			if($nIdx)
+			{
+				$arrTokens[] = 'AND' ;
+			}
 			$arrTokens[] = SQL::createRawColumn($sFromTableName, $sFromKey) ;
 			$arrTokens[] = '=' ;
 			$arrTokens[] = SQL::createRawColumn($sToTableName, $arrToKeys[$nIdx]) ;
@@ -394,8 +398,8 @@ class Selecter extends OperationStrategy
 
 		if( $arrConditions )
 		{
-			$arrOnTokens[] = ',' ;
-			$arrOnTokens[] = $arrConditions ;
+			$arrTokens[] = 'AND' ;
+			$arrTokens[] = $arrConditions ;
 		}
 		
 		$arrTokens[] = ')' ;
