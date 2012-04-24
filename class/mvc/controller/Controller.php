@@ -25,6 +25,10 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\controller ;
 
+use org\jecat\framework\auth\IdManager;
+
+use org\jecat\framework\auth\AuthenticationException;
+
 use org\jecat\framework\auth\Authorizer;
 use org\jecat\framework\io\IOutputStream;
 use org\jecat\framework\mvc\view\View;
@@ -346,6 +350,11 @@ class Controller extends NamableComposite implements IController, IBean
     		) ;
     		$this->setAuthorizer( $aBeanFactory->createBean($arrAuthorConf,$sNamespace) ) ;
     	}
+    	if( isset($arrConfig['perms.autocheck']) )
+    	{
+    		$this->bAutoCheckPermissions = $arrConfig['perms.autocheck']? true: false ;
+    	}
+    	
     	
     	// process
     	if( !empty($arrConfig['process']) )
@@ -482,17 +491,41 @@ class Controller extends NamableComposite implements IController, IBean
     }
     
     static protected function processController(IController $aController)
-    {
+    {    	
+    	// 执行子控制器
 		foreach($aController->iterator() as $aChild)
 		{
 			self::processController($aChild) ;
 		}
-    		
+
+		// 重定向输出
+		if( $aController->bCatchOutput )
+		{
+    		ob_start( array($aController->mainView()->outputStream(),'write') ) ;
+		}
+		
+		// 执行自己
     	try{
+			// 检查权限
+			if( $aController->autoCheckPerms() )
+			{
+				$aController->checkPermissions() ;
+			}
+		
     		$aController->process() ;
     	}
-    	catch(_ExceptionRelocation $e)
+    	catch(_ExceptionRelocation $aRelocation)
     	{}
+    	catch(\Exception $e)
+    	{}
+    	if( $aController->bCatchOutput )
+    	{
+    		ob_end_flush() ;
+    	}
+    	if(!empty($e))
+    	{
+    		throw $e ;
+    	}
     }
     
     public function renderMainView(IView $aMainView)
@@ -521,6 +554,31 @@ class Controller extends NamableComposite implements IController, IBean
 		$aViewRelocater->variables()->set('url',$sUrl) ;
 		
 		throw new _ExceptionRelocation ;
+    }
+
+    /**
+     * @return org\jecat\framework\auth\IIdentity
+     */
+    protected function requireLogined($sDenyMessage=null,array $arrDenyArgvs=array())
+    {
+    	if( !$aId=IdManager::singleton()->currentId() )
+    	{
+    		$this->permissionDenied($sDenyMessage,$arrDenyArgvs) ;
+    	}
+    	return $aId ;
+    }
+    
+    protected function checkPermissions($sDenyMessage=null,array $arrDenyArgvs=array())
+    {
+    	if( !$this->authorizer()->check(IdManager::singleton()) )
+    	{
+    		$this->permissionDenied($sDenyMessage,$arrDenyArgvs) ;
+    	}
+    }
+    
+    protected function permissionDenied($sDenyMessage=null,array $arrDenyArgvs=array())
+    {
+    	throw new AuthenticationException($this,$sDenyMessage,$arrDenyArgvs) ;
     }
     
     public function buildParams($Params)
@@ -688,7 +746,7 @@ class Controller extends NamableComposite implements IController, IBean
 	 * @return bool
      */
     public function preprocessForm(IFormView $aView)
-    {    	
+    {
     	// 加载视图控件数据
     	$aView->loadWidgets($this->params) ;
     	
@@ -1022,7 +1080,10 @@ class Controller extends NamableComposite implements IController, IBean
    		$this->properties()->set('keywords',(array)$keys) ;
    	}
    	
-   	
+   	public function autoCheckPerms()
+   	{
+   		return $this->bAutoCheckPermissions ;
+   	}
    	
 
     static private $aRegexpModelName = null ;
@@ -1053,6 +1114,9 @@ class Controller extends NamableComposite implements IController, IBean
     private $aAuthorizer ;
     
     protected $fnProcess ;
+    
+    private $bAutoCheckPermissions = true ;
+    private $bCatchOutput = true ;
     
     static private $nAssignedId = 0 ;
     
