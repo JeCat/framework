@@ -303,12 +303,6 @@ class Selecter extends OperationStrategy
 			$aSelect->setRawClause( SQL::CLAUSE_GROUP, $arrRawClause ) ;
 		}
 		
-		// order by
-		if( $arrRawClause = $aPrototype->criteria()->rawClause(SQL::CLAUSE_ORDER) )
-		{
-			$aSelect->setRawClause( SQL::CLAUSE_ORDER, $arrRawClause ) ;
-		}
-		
 		// 递归连接所有关联原型的 table
 		self::joinTables( $aSelect, $aPrototype ) ;
 		
