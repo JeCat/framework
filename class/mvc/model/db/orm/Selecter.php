@@ -290,11 +290,23 @@ class Selecter extends OperationStrategy
 	static public function buildSelect(Prototype $aPrototype)
 	{
 		$aSelect = new Select($aPrototype->tableName(),$aPrototype->sqlTableAlias()) ;//$aPrototype->statementFactory()->createSelect() ;
-				
+
 		// where
 		if( $arrRawWhere =& $aPrototype->criteria()->rawClause(SQL::CLAUSE_WHERE) )
 		{
 			$aSelect->setRawClause( SQL::CLAUSE_WHERE, $arrRawWhere ) ;
+		}
+
+		// group by
+		if( $arrRawClause = $aPrototype->criteria()->rawClause(SQL::CLAUSE_GROUP) )
+		{
+			$aSelect->setRawClause( SQL::CLAUSE_GROUP, $arrRawClause ) ;
+		}
+		
+		// order by
+		if( $arrRawClause = $aPrototype->criteria()->rawClause(SQL::CLAUSE_ORDER) )
+		{
+			$aSelect->setRawClause( SQL::CLAUSE_ORDER, $arrRawClause ) ;
 		}
 		
 		// 递归连接所有关联原型的 table
