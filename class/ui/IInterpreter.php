@@ -33,3 +33,4 @@ interface IInterpreter
 	
 	public function compileStrategySignture() ;
 }
+

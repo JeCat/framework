@@ -144,3 +144,4 @@ abstract class FactoryBase extends JcObject implements IFactory
 	protected $aCompilers ;
 	protected $aInterpreters ;
 }
+

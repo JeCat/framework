@@ -67,3 +67,4 @@ class AttributeValue extends Text
 	
 	private $sName ;
 }
+

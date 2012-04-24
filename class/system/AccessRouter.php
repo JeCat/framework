@@ -175,3 +175,4 @@ class AccessRouter extends \org\jecat\framework\lang\Object
 	
 	private $arrControllers = array() ;
 }
+

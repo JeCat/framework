@@ -33,3 +33,4 @@ interface IReversableIterator extends \Iterator
 	public function last() ;
 	
 }
+

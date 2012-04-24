@@ -108,3 +108,4 @@ class Exception extends \Exception implements IException, IObject
 	
 	private $arrArgvs = array() ;
 }
+

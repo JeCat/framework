@@ -43,3 +43,4 @@ class SqlParserException extends Exception
 		parent::__construct($sMessage,$argvs) ;
 	}
 }
+

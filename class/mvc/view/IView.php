@@ -25,7 +25,7 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\view ;
 
-use org\jecat\framework\mvc\controller\IController;
+use org\jecat\framework\mvc\controller\Controller;
 use org\jecat\framework\message\IMessageQueueHolder;
 use org\jecat\framework\io\OutputStreamBuffer;
 use org\jecat\framework\util\IHashTable;
@@ -78,8 +78,9 @@ interface IView extends IContainer, IMessageQueueHolder, IWidgetContainer
 	 */
 	public function controller() ;
 	
-	public function setController(IController $aController=null) ;
+	public function setController(Controller $aController=null) ;
     
     public function id() ;
     
 }
+

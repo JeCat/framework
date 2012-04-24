@@ -64,3 +64,4 @@ class NewObjectParser implements ISyntaxParser
 		$aNewObject->setArgvToken($aToken) ;
 	}
 }
+

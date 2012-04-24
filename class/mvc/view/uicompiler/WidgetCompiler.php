@@ -215,3 +215,4 @@ class WidgetCompiler extends NodeCompiler
 		$aDev->write("//// ---------------xxx------------------------------------\r\n") ;
 	}
 }
+

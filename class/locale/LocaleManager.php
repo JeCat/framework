@@ -107,3 +107,5 @@ class LocaleManager extends Object
 	
 	private $arrLocales = array() ;
 }
+
+

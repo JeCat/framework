@@ -25,7 +25,6 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\system ;
 
-
 use org\jecat\framework\lang\Object;
 use org\jecat\framework\resrc\ResourceManager;
 use org\jecat\framework\lang\Exception;
@@ -250,3 +249,4 @@ class Application extends Object implements \Serializable
 	
 	static private $aGlobalSingeltonInstance ;
 }
+

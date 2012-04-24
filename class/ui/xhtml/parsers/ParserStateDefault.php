@@ -54,3 +54,4 @@ class ParserStateDefault extends ParserState
 		return $aSource->length()>$nPosition ;
 	}
 }
+

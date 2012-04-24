@@ -156,3 +156,4 @@ class MsgQueueCompiler extends NodeCompiler
 		$aDev->write("// -------------------------------------\r\n") ;
 	}
 }
+

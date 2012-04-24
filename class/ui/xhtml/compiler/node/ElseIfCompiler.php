@@ -66,3 +66,4 @@ class ElseIfCompiler extends NodeCompiler {
 		$this->compileChildren ( $aObject, $aObjectContainer, $aDev, $aCompilerManager );
 	}
 }
+

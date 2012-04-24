@@ -289,3 +289,4 @@ class AbstractParser extends Object
 	protected $arrChildParsers = array() ;
 	
 }
+

@@ -60,3 +60,4 @@ class Mark extends ObjectBase
 	private $sEndMark ;	
 	
 }
+

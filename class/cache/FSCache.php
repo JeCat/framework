@@ -197,3 +197,4 @@ class FSCache extends Cache
 	 */
 	private $aFolder ;
 }
+

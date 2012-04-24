@@ -130,7 +130,7 @@ class WebpageFrame extends Controller
 	/**
 	 * 接管子控制器的视图
 	 */
-	protected function takeOverView(IController $aChild,$sChildName=null)
+	protected function takeOverView(Controller $aChild,$sChildName=null)
 	{
 		if(!$sChildName)
 		{
@@ -145,9 +145,9 @@ class WebpageFrame extends Controller
 	
 	public function addFrameView(IView $aFrameView)
 	{
-		if( $aOriController = $aFrameView->controller() )
+		if( $aOrController = $aFrameView->controller() )
 		{
-			$aOriController->removeView($aFrameView) ;
+			$aOrController->removeView($aFrameView) ;
 		}
 		$aFrameView->setController($this) ;
 	
@@ -216,3 +216,4 @@ class WebpageFrame extends Controller
     
     private $arrFrameViews ;
 }
+

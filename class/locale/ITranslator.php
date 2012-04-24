@@ -32,3 +32,5 @@ interface ITranslator
 	
 	public function trans($sOri,$argvs=null,$sSavePackageName=null) ;
 }
+
+

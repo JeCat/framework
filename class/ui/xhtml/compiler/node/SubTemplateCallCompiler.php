@@ -128,3 +128,4 @@ class SubTemplateCallCompiler extends NodeCompiler
 	}
 
 }
+

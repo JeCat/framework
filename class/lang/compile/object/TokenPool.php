@@ -157,3 +157,4 @@ class TokenPool extends Container
 	private $arrNamespaces ;
 	private $sSourceFilepath ;
 }
+

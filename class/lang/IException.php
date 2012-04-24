@@ -41,3 +41,4 @@ interface IException
 	public function trace() ;
 	
 }
+

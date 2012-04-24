@@ -32,3 +32,4 @@ interface INamable
 	
 	public function setName($sName) ;
 }
+

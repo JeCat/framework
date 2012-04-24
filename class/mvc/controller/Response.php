@@ -250,7 +250,7 @@ class Response extends Object
 		}
 	}
 	
-	private function printDebugModelStruct(IController $aController,$sModelName)
+	private function printDebugModelStruct(Controller $aController,$sModelName)
 	{
 		$this->printer()->write( "<div style='padding-top:10px'><h4>[模型：{$sModelName}]</h4>" ) ;
 		if( $aModel=$aController->modelByName($sModelName) )
@@ -357,5 +357,6 @@ class Response extends Object
 	
 	private $arrReturnVariables ;
 }
+
 
 

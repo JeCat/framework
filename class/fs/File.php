@@ -26,7 +26,6 @@
 namespace org\jecat\framework\fs ;
 
 use org\jecat\framework\lang\Exception;
-
 use org\jecat\framework\io\OutputStream;
 use org\jecat\framework\io\InputStream;
 
@@ -188,3 +187,4 @@ class File extends FSO
 		return is_file($this->path());
 	}
 }
+

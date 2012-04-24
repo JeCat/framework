@@ -208,3 +208,4 @@ class Attributes extends HashTable
 	private $sSource ;
 	private $arrAnonymous = array() ;
 }
+

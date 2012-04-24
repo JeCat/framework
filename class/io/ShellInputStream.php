@@ -33,3 +33,5 @@ class ShellInputStream extends InputStream
 		parent::__construct(fopen('php://stdin','r')) ;
 	}
 }
+
+

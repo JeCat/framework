@@ -26,7 +26,6 @@
 namespace org\jecat\framework\lang\aop ;
 
 use org\jecat\framework\lang\Type;
-
 use org\jecat\framework\bean\BeanFactory;
 use org\jecat\framework\bean\IBean;
 use org\jecat\framework\fs\FSO;
@@ -366,3 +365,4 @@ class Aspect extends NamedObject implements \Serializable, IBean
 	private $nAspectFilemtime = 0 ;
 	
 }
+

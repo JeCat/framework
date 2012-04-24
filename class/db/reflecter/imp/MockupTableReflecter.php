@@ -76,3 +76,4 @@ class MockupTableReflecter extends AbStractTableReflecter
 	
 	public $bIsExist=false;
 }
+

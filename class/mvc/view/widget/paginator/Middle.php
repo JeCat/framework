@@ -37,3 +37,4 @@ class Middle extends AbstractStrategy{
         return range($iStart,$iStart + $iWidth-1);
     }
 }
+

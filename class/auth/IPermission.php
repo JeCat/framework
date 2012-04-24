@@ -33,3 +33,5 @@ interface IPermission
 	
 	public function setNecessary($bNecessary=true) ;
 }
+
+

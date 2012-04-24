@@ -109,3 +109,4 @@ class Parser extends JcObject implements IInterpreter
 		return __CLASS__ ;
 	}
 }
+

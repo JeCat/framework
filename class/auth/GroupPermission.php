@@ -93,3 +93,5 @@ class GroupPermission extends PermissionBase
 
 	private $arrPermissions ;
 }
+
+

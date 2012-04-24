@@ -138,3 +138,4 @@ class ObjectBase extends Object implements IObject
 	
 	private $sSource ;
 }
+

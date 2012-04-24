@@ -59,3 +59,4 @@ class HashAchiveStrategy extends IAchiveStrategy
 
 	private $nDepth ;
 }
+

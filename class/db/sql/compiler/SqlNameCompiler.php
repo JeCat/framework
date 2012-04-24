@@ -107,3 +107,4 @@ class SqlNameCompiler extends Object
 	private $arrTableNameTranslaters = array( array(__CLASS__,'translateTableName') ) ;
 	
 }
+

@@ -25,7 +25,6 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\model\db\orm;
 
-use org\jecat\framework\db\sql\parser\BaseParserFactory;
 use org\jecat\framework\db\sql\compiler\SqlNameCompiler;
 use org\jecat\framework\db\sql\compiler\SqlCompiler;
 use org\jecat\framework\db\sql\SQL;
@@ -1092,3 +1091,4 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 }
 
 SqlNameCompiler::singleton()->registerColumnNameTranslaters(array('org\\jecat\\framework\\mvc\\model\\db\\orm\\Prototype','translateColumnName')) ;
+

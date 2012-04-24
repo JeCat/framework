@@ -105,3 +105,4 @@ class SubTemplateDefineCompiler extends NodeCompiler
 	}
 
 }
+

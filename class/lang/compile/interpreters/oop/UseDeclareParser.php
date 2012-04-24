@@ -89,3 +89,4 @@ class UseDeclareParser implements ISyntaxParser
 		$aTokenPool->addUseDeclare($aNewToken) ;
 	}
 }
+

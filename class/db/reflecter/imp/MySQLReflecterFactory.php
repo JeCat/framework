@@ -45,3 +45,4 @@ class MySQLReflecterFactory extends AbstractReflecterFactory
 		return new MySQLColumnReflecter ( $this, $sTable, $sColumn , $sDBName);
 	}
 }
+

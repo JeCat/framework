@@ -48,3 +48,4 @@ abstract class AbStractIndexReflecter extends DBStructReflecter
 	 */
 	abstract public function columnNames();
 }
+

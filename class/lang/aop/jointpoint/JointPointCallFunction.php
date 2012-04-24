@@ -75,3 +75,4 @@ class JointPointCallFunction extends JointPoint
 	
 	private $sCallFunctionNameRegexp ;
 }
+

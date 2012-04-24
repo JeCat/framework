@@ -2,7 +2,6 @@
 namespace org\jecat\framework\mvc ;
 
 use org\jecat\framework\lang\Exception;
-use org\jecat\framework\lang\Type;
 use org\jecat\framework\lang\Assert;
 use org\jecat\framework\lang\Object;
 
@@ -83,5 +82,3 @@ class MVCEventManager extends Object implements \Serializable
 	
 	private $arrEventHandles = array() ;
 }
-
-?>

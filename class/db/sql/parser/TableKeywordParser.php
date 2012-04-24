@@ -77,3 +77,4 @@ class TableKeywordParser extends TableParser
 		return $sToken!=='TABLE' and $sToken!=='TABLES' ;
 	}
 }
+

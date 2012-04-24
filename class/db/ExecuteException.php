@@ -87,3 +87,4 @@ class ExecuteException extends JcException
 	private $nDeviceErrorNo ;
 	private $sDeviceErrorMsg ;
 }
+

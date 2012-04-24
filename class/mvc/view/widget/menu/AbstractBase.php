@@ -35,3 +35,4 @@ abstract class AbstractBase extends FormWidget
 	const CSS_CLASS_BASE = 'jc-widget-menu' ;
 }
 
+

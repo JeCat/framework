@@ -78,3 +78,4 @@ abstract class OperationStrategy extends Object
 		}
 	}
 }
+

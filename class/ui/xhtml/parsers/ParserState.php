@@ -123,3 +123,4 @@ abstract class ParserState extends JcObject
 	
 	protected $arrChangeToStates = array() ;
 }
+

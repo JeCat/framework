@@ -78,3 +78,5 @@ interface IInputStream
 	
 	
 }
+
+

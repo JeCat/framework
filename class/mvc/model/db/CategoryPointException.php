@@ -29,3 +29,4 @@ use org\jecat\framework\lang\Exception;
 
 class CategoryPointException extends Exception
 {}
+

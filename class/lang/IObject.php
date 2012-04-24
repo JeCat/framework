@@ -44,3 +44,4 @@ interface IObject
 	 */
 	public function setApplication(Application $aApp) ;
 }
+

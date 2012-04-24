@@ -166,3 +166,4 @@ abstract class ApplicationFactory extends Object
 	
 	static private $aGlobalInstance ;
 }
+

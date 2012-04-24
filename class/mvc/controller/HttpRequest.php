@@ -261,3 +261,4 @@ class HttpRequest extends Request
 	private $sRequestUrl ;
 	private $sRequestUrlBase ;
 }
+

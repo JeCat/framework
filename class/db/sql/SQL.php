@@ -26,7 +26,6 @@
 namespace org\jecat\framework\db\sql ;
 
 use org\jecat\framework\cache\Cache;
-
 use org\jecat\framework\db\sql\compiler\SqlCompiler;
 use org\jecat\framework\lang\Type;
 use org\jecat\framework\db\sql\parser\BaseParserFactory;
@@ -444,6 +443,7 @@ class SQL
 	
 	// protected $arrFactors ;
 }
+
 
 
 

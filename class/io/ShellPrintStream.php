@@ -120,3 +120,5 @@ class ShellPrintStream extends PrintStream
 	
 	private $bEnableEscape = false ;
 }
+
+

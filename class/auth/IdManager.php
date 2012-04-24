@@ -197,3 +197,5 @@ class IdManager extends Object implements \Serializable
 	
 	private $aCurrentId = null ;
 }
+
+

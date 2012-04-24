@@ -46,3 +46,5 @@ interface IHashTable
 	public function nameIterator() ;
 	public function valueIterator() ;
 }
+
+

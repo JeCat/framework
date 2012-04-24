@@ -55,3 +55,4 @@ class DocCommentDeclare extends Token
 
 	private $aDocComment ;
 }
+

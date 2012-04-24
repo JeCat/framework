@@ -164,3 +164,4 @@ class SaeStorageCache extends Cache
 	private $sDomain ;
 	private $aSaeStorage ;
 }
+

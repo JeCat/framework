@@ -101,3 +101,5 @@ abstract class Stream extends Object implements IStream, IClosable
 	protected $hHandle ;
 	
 }
+
+

@@ -42,3 +42,4 @@ interface IObject extends IUiObject
 	public function setSource($sSource) ;
 	
 }
+

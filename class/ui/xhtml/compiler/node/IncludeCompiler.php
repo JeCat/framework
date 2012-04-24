@@ -113,3 +113,4 @@ class IncludeCompiler extends NodeCompiler
 		$aDev->write("\$this->display({$sFileName},\$__include_aVariables,\$aDevice) ; ") ;		
 	}
 }
+

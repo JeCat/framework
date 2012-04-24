@@ -82,3 +82,4 @@ abstract class Session extends Object implements ISession
 	
 	private $bSessionStarted = false ;
 }
+

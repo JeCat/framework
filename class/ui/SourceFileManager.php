@@ -26,7 +26,6 @@
 
 namespace org\jecat\framework\ui ;
 
-use org\jecat\framework\fs\Folder;
 use org\jecat\framework\fs\File;
 use org\jecat\framework\resrc\ResourceManager;
 
@@ -114,3 +113,4 @@ class SourceFileManager extends ResourceManager implements \Serializable
 	private $bForceCompile = false ;
 	
 }
+

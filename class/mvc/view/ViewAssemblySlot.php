@@ -240,3 +240,4 @@ class ViewAssemblySlot extends OutputStreamBuffer implements \Serializable
 	
 }
 
+

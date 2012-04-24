@@ -294,3 +294,4 @@ class Compiler extends JcObject
 	
 	private $sCompiledFolderPath = '/data/compiled/class' ;
 }
+

@@ -45,3 +45,4 @@ class HttpAppFactory extends ApplicationFactory
 		return new \org\jecat\framework\io\HtmlPrintStream() ;
 	}
 }
+

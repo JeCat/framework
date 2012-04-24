@@ -71,3 +71,4 @@ class NotEmpty extends Object implements IVerifier,IBean {
 	
 	private $arrBeanConfig = array();
 }
+

@@ -36,3 +36,5 @@ interface IMessageQueueHolder
 	
 	public function createMessage($sType,$sMessage,$arrMessageArgs=null,$aPoster=null) ;
 }
+
+

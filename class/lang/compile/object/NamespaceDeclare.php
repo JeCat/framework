@@ -41,3 +41,4 @@ class NamespaceDeclare extends NamespaceString
 	}
 }
 
+

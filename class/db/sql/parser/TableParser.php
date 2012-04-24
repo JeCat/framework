@@ -65,3 +65,4 @@ class TableParser extends NameParser
 					or (!$this->aDialect->isReserved($sToken) and !$this->aDialect->isOperator($sToken) and $this->parseName($sToken)) ;
 	}
 }
+

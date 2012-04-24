@@ -96,3 +96,4 @@ class Memcache extends Cache
 	
 	private $hMemcacheConnection ;
 }
+

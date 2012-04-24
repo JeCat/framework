@@ -82,3 +82,4 @@ class SyntaxScanner extends Object implements IInterpreter
 	private $arrParsers ;
 	private $aPHPCodeParser = array();
 }
+

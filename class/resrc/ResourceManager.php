@@ -177,3 +177,5 @@ class ResourceManager extends Object implements \Serializable
 	
 	private $arrFilenameWrappers = array() ;
 }
+
+

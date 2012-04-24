@@ -217,5 +217,3 @@ class VFSWrapper
 
 	static private $arrProtocols = array() ;
 }
-
-?>

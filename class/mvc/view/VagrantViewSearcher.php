@@ -68,3 +68,4 @@ class VagrantViewSearcher extends CompositeSearcher
 		return false ;
 	}
 }
+

@@ -291,3 +291,4 @@ class ViewLayoutFrame extends View
 	
 	private $arrChildDevices ;
 }
+

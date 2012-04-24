@@ -64,3 +64,4 @@ class NewObject extends Token
 	
 	private $aArgv ;
 }
+

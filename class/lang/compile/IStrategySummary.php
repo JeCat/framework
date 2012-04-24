@@ -29,3 +29,4 @@ interface IStrategySummary
 {
 	public function strategySummary() ;
 }
+

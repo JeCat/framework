@@ -32,3 +32,4 @@ interface ISyntaxParser
 {
 	public function parse(TokenPool $aTokenPool,INonlinearIterator $aTokenPoolIter,State $aState) ;
 }
+

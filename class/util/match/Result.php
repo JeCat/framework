@@ -51,3 +51,5 @@ class Result extends Object
 	
 	private $arrResult ;
 }
+
+

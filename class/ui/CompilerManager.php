@@ -130,3 +130,4 @@ class CompilerManager extends JcObject
 	
 	private $arrCompilers = array() ;
 }
+

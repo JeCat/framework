@@ -49,3 +49,4 @@ interface IWidgetContainer {
 	public function widgitIterator() ;
 	
 }
+

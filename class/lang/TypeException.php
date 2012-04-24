@@ -48,3 +48,4 @@ class TypeException extends Exception
 	
 	private $arrRequireTypes = array() ;
 }
+

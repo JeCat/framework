@@ -112,3 +112,4 @@ class PatchSlotPath
 	
 	private $arrSegments = array() ;
 }
+

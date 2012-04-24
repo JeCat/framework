@@ -104,3 +104,5 @@ class Serializer
 	
 	private $arrInstanceSerializeds ;
 }
+
+

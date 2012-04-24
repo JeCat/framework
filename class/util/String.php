@@ -250,3 +250,5 @@ class String extends Object
 			, 'replace' => array( 'function'=>'str_replace', 'pos'=>3, 'modify'=>1 ) 
 	 ) ;
 }
+
+

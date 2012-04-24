@@ -56,3 +56,5 @@ class StdOutputFilterMgr extends FilterMangeger
 		parent::stop() ;
 	}
 }
+
+

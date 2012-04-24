@@ -66,3 +66,4 @@ class LoopelseCompiler extends NodeCompiler
 					");
 	}
 }
+

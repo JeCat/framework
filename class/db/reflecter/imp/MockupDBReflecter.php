@@ -60,3 +60,4 @@ class MockupDBReflecter extends AbStractDBReflecter
 	
 	public $bIsExist = false ;
 }
+

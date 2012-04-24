@@ -69,3 +69,4 @@ class CompilingStatus
 	
 	private $arrStatuses ;
 }
+

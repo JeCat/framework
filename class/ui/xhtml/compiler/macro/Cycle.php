@@ -47,3 +47,4 @@ class Cycle
 	
 	private $aArrIter;
 }
+

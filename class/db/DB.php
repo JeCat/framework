@@ -27,7 +27,6 @@ namespace org\jecat\framework\db ;
 
 use org\jecat\framework\db\sql\compiler\SqlCompiler;
 use org\jecat\framework\db\sql\SQL;
-use org\jecat\framework\db\sql\StatementState;
 use org\jecat\framework\db\reflecter\imp\MySQLReflecterFactory;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\mvc\controller\Response;
@@ -340,3 +339,4 @@ class DB extends Object
 	private $sTableNamePrefix ;
 	private $nTableNamePrefixLen ;
 }
+

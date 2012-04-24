@@ -109,3 +109,4 @@ class Object extends Composite implements IObject
 	
 	private $aProperties ;
 }
+

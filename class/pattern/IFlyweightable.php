@@ -29,3 +29,4 @@ interface IFlyweightable
 {
 	static public function flyweight($keys,$bCreateNew=true,$sClassName=null) ;
 }
+

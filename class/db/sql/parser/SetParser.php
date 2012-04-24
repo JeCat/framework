@@ -141,3 +141,4 @@ class SetParser extends AbstractParser
 		$this->restoreParentTree($aParseState) ;
 	}
 }
+

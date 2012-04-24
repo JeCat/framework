@@ -151,3 +151,4 @@ class Length extends Object implements IVerifier, IBean
 	private $nMinLen = -1 ;
 	private $bByByte = true ;
 }
+

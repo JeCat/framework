@@ -97,3 +97,4 @@ class PatchSlot
 	
 	private $arrPatchs ;
 }
+

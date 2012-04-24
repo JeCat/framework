@@ -45,3 +45,4 @@ class WeaveCompiler extends BaseCompiler
 		return WeaveManager::singleton()->compileStrategySignture() ;
 	}
 }
+

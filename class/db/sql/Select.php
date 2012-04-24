@@ -25,7 +25,6 @@
 /*-- Project Introduce --*/ 
 namespace org\jecat\framework\db\sql ;
 
-use org\jecat\framework\db\sql\parser\BaseParserFactory;
 use org\jecat\framework\lang\Exception;
 
 class Select extends MultiTableSQL 
@@ -193,3 +192,4 @@ class Select extends MultiTableSQL
 	 */
 	private $nPredicateTopLen = 30 ;
 }
+

@@ -66,3 +66,4 @@ interface ISession
 	public function variableNameIterator() ;
 	
 }
+

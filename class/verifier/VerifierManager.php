@@ -136,3 +136,4 @@ class VerifierManager extends Object
 	private $arrVerifierOthers = array() ; 
 	private $bLogic = true; //true校验器之间为and关系, false校验器之间为or关系
 }
+

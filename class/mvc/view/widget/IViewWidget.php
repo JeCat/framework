@@ -56,3 +56,4 @@ interface IViewWidget extends IMessageQueueHolder
 	public function attributeNameIterator() ;
 	public function removeAttribute($sName) ;
 }
+

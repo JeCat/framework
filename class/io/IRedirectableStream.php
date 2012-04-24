@@ -31,3 +31,5 @@ interface IRedirectableStream extends IOutputStream
 	
 	public function redirectionDev() ;
 }
+
+

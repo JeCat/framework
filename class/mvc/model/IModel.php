@@ -72,3 +72,5 @@ interface IModel extends \ArrayAccess, \Iterator
 	public function dataIterator() ;
 	
 }
+
+

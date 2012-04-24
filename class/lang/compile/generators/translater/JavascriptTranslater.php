@@ -234,3 +234,4 @@ class JavascriptTranslater extends Object implements IGenerator
 	
 }
 
+

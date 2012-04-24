@@ -93,3 +93,4 @@ class ClosureObjectParser extends Object implements IInterpreter
 	}
 	
 }
+

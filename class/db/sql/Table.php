@@ -59,3 +59,4 @@ class Table extends SQL
 	}
 	
 }
+

@@ -403,3 +403,4 @@ class Selecter extends OperationStrategy
 		return $arrTokens ;
 	}
 }
+

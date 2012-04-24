@@ -125,3 +125,4 @@ class ParserStateMacro extends ParserState
 	
 	private $arrMacroTypes = array() ;
 }
+

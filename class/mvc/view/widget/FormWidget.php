@@ -251,3 +251,4 @@ class FormWidget extends Widget implements IViewFormWidget
 	
 	private $bDisabled = false;
 }
+

@@ -54,3 +54,4 @@ class StructEndCompiler extends NodeCompiler
 		$aDev->write("}");
 	}
 }
+

@@ -26,8 +26,6 @@
 
 namespace org\jecat\framework\mvc\model\db ;
 
-use org\jecat\framework\lang\Exception;
-
 use org\jecat\framework\db\sql\SQL;
 use org\jecat\framework\mvc\model\db\orm\Deleter;
 use org\jecat\framework\mvc\model\IModel;
@@ -767,6 +765,7 @@ class Model extends AbstractModel implements IBean
 	
 	
 }
+
 
 
 

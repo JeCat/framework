@@ -141,3 +141,4 @@ abstract class StructDefine extends Token
 	private $aTokenBody ;
 	private $aDocToken ;
 }
+

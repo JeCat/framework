@@ -38,3 +38,4 @@ class Delete extends MultiTableSQL
 		$this->addTable($sTableName) ;
 	}
 }
+

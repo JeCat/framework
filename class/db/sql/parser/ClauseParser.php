@@ -89,3 +89,4 @@ class ClauseParser extends AbstractParser
 	private $sCommandLower ;
 	
 }
+

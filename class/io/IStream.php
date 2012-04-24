@@ -35,3 +35,5 @@ interface IStream
 	public function supportsLock() ;
 	
 }
+
+

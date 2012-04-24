@@ -223,3 +223,4 @@ class Inserter extends OperationStrategy
 		}
 	}
 }
+

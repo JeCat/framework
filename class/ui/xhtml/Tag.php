@@ -106,3 +106,4 @@ class Tag extends ObjectBase
 	private $aAttrs ;
 	private $nType ;
 }
+

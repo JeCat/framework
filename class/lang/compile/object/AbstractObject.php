@@ -92,3 +92,4 @@ class AbstractObject extends Composite
 	
 	private $nPostion ;
 }
+

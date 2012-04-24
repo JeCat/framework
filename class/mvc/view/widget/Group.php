@@ -282,3 +282,4 @@ class Group extends FormWidget {
 	private $arrSerializMethodArgs;
 	private $arrUnSerializMethodArgs;
 }
+

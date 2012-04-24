@@ -73,3 +73,4 @@ class UseDeclare extends NamespaceString
 	private $aAsNameToken ;
 }
 
+

@@ -66,3 +66,4 @@ class FormCompiler extends NodeCompiler
 		}
 	}
 }
+

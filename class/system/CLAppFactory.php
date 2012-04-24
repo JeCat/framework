@@ -47,3 +47,4 @@ class CLAppFactory extends ApplicationFactory
 		return new \org\jecat\framework\io\ShellPrintStream() ;
 	}
 }
+

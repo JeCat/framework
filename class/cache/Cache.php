@@ -115,3 +115,4 @@ abstract class Cache extends Object
 	protected $sFolderPrefix ;
 }
 
+

@@ -41,3 +41,4 @@ interface IObject extends IContainer, IContainedable
 	
 	public function printStruct(IOutputStream $aDevice=null,$nDepth=0) ;
 }
+

@@ -92,3 +92,4 @@ class GenerateStat
 	public $sOriginJointMethodName = '' ;
 	
 }
+

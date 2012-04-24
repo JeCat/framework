@@ -269,3 +269,4 @@ class Advice extends NamedObject implements \Serializable
 	
 	protected $arrBeanConfig ;
 }
+

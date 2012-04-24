@@ -57,3 +57,4 @@ class FunctionParser extends AbstractParser
 		return true ;
 	}
 }
+

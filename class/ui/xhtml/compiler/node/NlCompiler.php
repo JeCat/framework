@@ -62,3 +62,4 @@ class NlCompiler extends NodeCompiler
 		$aDev->write ( 'echo "\\r\\n" ; ' );
 	}
 }
+

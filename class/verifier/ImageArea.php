@@ -127,3 +127,4 @@ class ImageArea extends Object implements IVerifier, IBean
 	private $nMaxArea;
 	private $nMinArea;
 }
+

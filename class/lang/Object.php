@@ -346,3 +346,4 @@ class Object implements IObject, ISingletonable, IFlyweightable
  * 
  * Jecat 是一个PHP开源框架.
  */
+

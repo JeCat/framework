@@ -148,3 +148,5 @@ class InputStream extends Stream implements IInputStream, ILockable
 		flock($this->hHandle,LOCK_SH) ;
 	}
 }
+
+

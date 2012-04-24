@@ -166,3 +166,4 @@ class FormView extends View implements IFormView
 	
 	private $bShowForm = true ;
 }
+

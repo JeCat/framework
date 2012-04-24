@@ -93,3 +93,4 @@ class DoWhileCompiler extends NodeCompiler {
 		$aDev->write ( ");" );
 	}
 }
+

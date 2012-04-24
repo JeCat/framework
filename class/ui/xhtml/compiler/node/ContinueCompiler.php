@@ -71,3 +71,4 @@ class ContinueCompiler extends NodeCompiler {
 						 . '; ' );
 	}
 }
+

@@ -32,3 +32,4 @@ interface IInterpreter
 {
 	public function analyze(TokenPool $aTokenPool) ;
 }
+

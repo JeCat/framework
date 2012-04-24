@@ -33,3 +33,5 @@ interface IBean
 	
 	public function beanConfig() ;
 }
+
+

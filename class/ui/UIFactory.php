@@ -140,3 +140,4 @@ abstract class UIFactory extends JeObject implements IFactory
 	protected $aCompilers ;
 	protected $aInterpreters ;
 }
+

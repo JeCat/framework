@@ -171,3 +171,4 @@ class ClosureToken extends Token
 	
 	private $aTheOther ;
 }
+

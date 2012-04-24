@@ -25,7 +25,6 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\db\sql ;
 
-use org\jecat\framework\db\sql\parser\BaseParserFactory;
 use org\jecat\framework\db\sql\compiler\SqlCompiler;
 
 class Update extends MultiTableSQL implements IDataSettableStatement
@@ -81,3 +80,4 @@ class Update extends MultiTableSQL implements IDataSettableStatement
 		unset($this->arrRawSql['subtree'][SQL::CLAUSE_SET]) ;
 	}
 }
+

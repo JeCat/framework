@@ -77,3 +77,4 @@ class WeaveParser extends Object implements IInterpreter
 	
 	private $aWeaveManager ;
 }
+

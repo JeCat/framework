@@ -133,3 +133,4 @@ class TargetCodeOutputStream extends OutputStreamBuffer implements IOutputStream
 	
 	private $bUseHereDoc = true ;
 }
+

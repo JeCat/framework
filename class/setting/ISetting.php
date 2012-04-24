@@ -113,3 +113,5 @@ interface ISetting
 	 */
 	public function separate($sPath) ;
 }
+
+

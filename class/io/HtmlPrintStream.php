@@ -60,3 +60,5 @@ class HtmlPrintStream extends PrintStream implements IOutputStream
 		}
 	}
 }
+
+

@@ -56,3 +56,4 @@ class WeaveinObject extends ObjectBase
 	private $aCompiled ;
 	private $aTargetObject ;
 }
+
