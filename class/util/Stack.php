@@ -112,3 +112,5 @@ class Stack extends Object
 
 	private $arrDataStack ;
 }
+
+

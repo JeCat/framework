@@ -35,3 +35,4 @@ interface IDataSettableStatement
 	
 	public function clearData() ;
 }
+

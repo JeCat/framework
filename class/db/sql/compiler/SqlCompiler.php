@@ -110,3 +110,4 @@ class SqlCompiler extends Object
 	
 	private $arrTokenCompilers ;
 }
+

@@ -169,3 +169,4 @@ class ImageSize extends Object implements IVerifier, IBean
 	private $nMinWidth = -1;
 	private $nMinHeight = -1;
 }
+

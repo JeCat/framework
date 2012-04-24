@@ -69,3 +69,4 @@ interface IContainer
 	public function insertAfter($object,$_) ;
 	public function insertAfterByPosition($nPos,$_) ;
 }
+

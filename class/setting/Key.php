@@ -122,3 +122,5 @@ abstract class Key extends Object implements IKey
 	protected $bDataChanged = false ;
 
 }
+
+

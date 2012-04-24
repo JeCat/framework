@@ -177,3 +177,5 @@ class HtmlResourcePool extends Object
 	
 	private $aCssManager ;
 }
+
+

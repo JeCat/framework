@@ -140,3 +140,5 @@ abstract class Setting extends Object implements ISetting
 		}
 	}
 }
+
+

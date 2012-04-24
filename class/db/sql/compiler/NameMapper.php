@@ -32,3 +32,4 @@ class NameMapper extends Object
 	private $arrTableMapping = array() ;
 }
 
+

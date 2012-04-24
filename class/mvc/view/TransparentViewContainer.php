@@ -222,3 +222,4 @@ class _TransparentViewContainerNameIterator extends \IteratorIterator
 	private $sContainerName ;
 }
 
+

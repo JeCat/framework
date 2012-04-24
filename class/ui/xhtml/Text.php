@@ -95,3 +95,4 @@ class Text extends ObjectBase
 		$this->setSource('') ;
 	}
 }
+

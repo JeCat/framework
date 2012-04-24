@@ -172,3 +172,4 @@ class FunctionDefine extends StructDefine
 	private $arrParameterToken = array();
 	private $bReturnByRef = false ;
 }
+

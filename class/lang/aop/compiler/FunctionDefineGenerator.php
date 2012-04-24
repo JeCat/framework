@@ -510,3 +510,4 @@ class FunctionDefineGenerator extends AOPWeaveGenerator
 		return $sSource ;
 	}
 }
+

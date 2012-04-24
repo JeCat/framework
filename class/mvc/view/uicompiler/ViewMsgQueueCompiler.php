@@ -91,3 +91,4 @@ class ViewMsgQueueCompiler extends NodeCompiler
 		}
 	}
 }
+

@@ -73,3 +73,4 @@ class Same extends Object implements IVerifier ,IBean{
 		return true;
 	}
 }
+

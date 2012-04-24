@@ -185,3 +185,4 @@ abstract class AbstractReflecterFactory
 	 */
 	private $aCache;
 }
+

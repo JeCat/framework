@@ -64,3 +64,4 @@ class VariableDeclares
 	private $arrDeclareVariables = array() ;
 }
 
+

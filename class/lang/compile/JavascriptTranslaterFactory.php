@@ -43,3 +43,4 @@ class JavascriptTranslaterFactory extends CompilerFactory
 	}
 
 }
+

@@ -29,3 +29,4 @@ interface IVerifier
 {
 	public function verify($data,$bThrowException) ;
 }
+

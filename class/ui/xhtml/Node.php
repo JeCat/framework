@@ -155,3 +155,4 @@ class Node extends ObjectBase
 	private $aTailTag ;	
 	
 }
+

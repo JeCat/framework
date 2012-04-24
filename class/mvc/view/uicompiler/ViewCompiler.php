@@ -135,3 +135,4 @@ class ViewCompiler extends NodeCompiler
 		$aDev->write("//-------------------\r\n") ;
 	}
 }
+

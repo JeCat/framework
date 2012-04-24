@@ -103,3 +103,4 @@ class State
 	  **/
 	private $aCurrentNamespace  ;
 }
+

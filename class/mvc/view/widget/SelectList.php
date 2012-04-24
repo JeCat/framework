@@ -237,3 +237,4 @@ class SelectList extends Select {
 	private $nSize;
 	private $bMultiple;
 }
+

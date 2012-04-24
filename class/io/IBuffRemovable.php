@@ -29,3 +29,5 @@ interface IBuffRemovable
 {
 	public function removeBuff($content) ;
 }
+
+

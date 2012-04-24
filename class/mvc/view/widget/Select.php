@@ -200,3 +200,4 @@ class Select extends FormWidget {
 	
 	private $arrOptions = Array ();
 }
+

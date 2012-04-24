@@ -43,3 +43,5 @@ interface IClosable
 	public function isActiving() ;
 	
 }
+
+

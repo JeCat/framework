@@ -258,3 +258,4 @@ class UI extends JcObject
 
 	private $aInterpreters ;
 }
+

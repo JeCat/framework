@@ -55,3 +55,4 @@ abstract class AbStractColumnReflecter extends DBStructReflecter
 	 */
 	abstract public function isExist();
 }
+

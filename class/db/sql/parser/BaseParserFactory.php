@@ -266,3 +266,4 @@ class BaseParserFactory extends Object
 	
 	private $arrShareParsers ;
 }
+

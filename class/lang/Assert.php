@@ -122,3 +122,4 @@ class Assert
 	
 	static private $bEnableAssert = true ;
 }
+

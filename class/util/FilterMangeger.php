@@ -137,3 +137,5 @@ class FilterMangeger extends Object implements IFilterMangeger
 	
 	private $bWorking = true ;
 }
+
+

@@ -42,3 +42,4 @@ class NamableComposite extends Composite implements INamable
 	private $sName ;
 	
 }
+

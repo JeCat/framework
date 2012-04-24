@@ -37,3 +37,4 @@ class IntoParser extends ClauseParser
 		return count($aParseState->arrTree)>1 ;
 	}
 }
+

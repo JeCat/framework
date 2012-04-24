@@ -184,3 +184,5 @@ class Authorizer implements IBean
 	private $arrBeanConfig ;
 }
 
+
+

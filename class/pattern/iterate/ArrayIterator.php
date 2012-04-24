@@ -129,3 +129,4 @@ class ArrayIterator extends Object implements INonlinearIterator
 	
 	private $arrElements ;
 }
+

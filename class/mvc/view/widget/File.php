@@ -342,3 +342,4 @@ class File extends FormWidget
 	 */
 	private $bFullPath = true;
 }
+

@@ -140,3 +140,5 @@ class FsSetting extends Setting implements \Serializable
 	 */
 	private $aRootFolder;
 }
+
+

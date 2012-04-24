@@ -154,3 +154,5 @@ class Recordset
 	private $arrSheetCarsor ;
 	private $nRowIndex = -1 ;
 }
+
+

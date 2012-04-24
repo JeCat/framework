@@ -69,3 +69,4 @@ class CompiledAlert extends Object implements IGenerator
 		) ;
 	}
 }
+

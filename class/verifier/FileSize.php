@@ -136,3 +136,4 @@ class FileSize extends Object implements IVerifier,IBean {
 	private $nMaxSize;
 	private $nMinSize;
 }
+

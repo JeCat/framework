@@ -89,3 +89,4 @@ class ClassDefine extends StructDefine
 	private $aTokenBody ;
 	private $bAbstract = false ;
 }
+

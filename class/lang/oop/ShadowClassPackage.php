@@ -161,3 +161,4 @@ class ShadowClassPackage extends Package implements \Serializable
 	
 	private $sParentClass ;
 }
+

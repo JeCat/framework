@@ -25,6 +25,8 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\controller ;
 
+use org\jecat\framework\auth\IdManager;
+use org\jecat\framework\auth\AuthenticationException;
 use org\jecat\framework\auth\Authorizer;
 use org\jecat\framework\io\IOutputStream;
 use org\jecat\framework\mvc\view\View;
@@ -78,13 +80,13 @@ use org\jecat\framework\pattern\composite\NamableComposite;
  * 。。。
  */
 
-class Controller extends NamableComposite implements IController, IBean
+class Controller extends NamableComposite implements IBean
 {
     function __construct ($params=null,$sName=null,$bBuildAtonce=true)
     {
     	$this->setName($sName) ;
     	
-		parent::__construct("org\\jecat\\framework\\mvc\\controller\\IController") ;
+		parent::__construct("org\\jecat\\framework\\mvc\\controller\\Controller") ;
 		
 		$this->buildParams($params) ;
 		
@@ -346,6 +348,11 @@ class Controller extends NamableComposite implements IController, IBean
     		) ;
     		$this->setAuthorizer( $aBeanFactory->createBean($arrAuthorConf,$sNamespace) ) ;
     	}
+    	if( isset($arrConfig['perms.autocheck']) )
+    	{
+    		$this->bAutoCheckPermissions = $arrConfig['perms.autocheck']? true: false ;
+    	}
+    	
     	
     	// process
     	if( !empty($arrConfig['process']) )
@@ -465,7 +472,7 @@ class Controller extends NamableComposite implements IController, IBean
      * 控制器的执行入口是 mainRun() 方法，在你写一个控制器类的时候，应该将控制器的执行过程写在 process() 函数里，由mainRun()调用你的process()函数，而不是直接重写mainRun()。
      * process()是控制器自己的业务逻辑，mainRun()包含了很多系统级的
      * 
-     * @see IController::mainRun()
+     * @see Controller::mainRun()
      */
     public function mainRun ()
     {
@@ -478,21 +485,45 @@ class Controller extends NamableComposite implements IController, IBean
     		self::processController($aFrame) ;
     	}
     	
-    	$this->response()->process($this) ;
+    	$this->response()->respond($this) ;
     }
     
-    static protected function processController(IController $aController)
-    {
+    static protected function processController(Controller $aController)
+    {    	
+    	// 执行子控制器
 		foreach($aController->iterator() as $aChild)
 		{
 			self::processController($aChild) ;
 		}
-    		
+
+		// 重定向输出
+		if( $aController->bCatchOutput )
+		{
+    		ob_start( array($aController->mainView()->outputStream(),'write') ) ;
+		}
+		
+		// 执行自己
     	try{
+			// 检查权限
+			if( $aController->autoCheckPerms() )
+			{
+				$aController->checkPermissions() ;
+			}
+		
     		$aController->process() ;
     	}
-    	catch(_ExceptionRelocation $e)
+    	catch(_ExceptionRelocation $aRelocation)
     	{}
+    	catch(\Exception $e)
+    	{}
+    	if( $aController->bCatchOutput )
+    	{
+    		ob_end_flush() ;
+    	}
+    	if(!empty($e))
+    	{
+    		throw $e ;
+    	}
     }
     
     public function renderMainView(IView $aMainView)
@@ -521,6 +552,31 @@ class Controller extends NamableComposite implements IController, IBean
 		$aViewRelocater->variables()->set('url',$sUrl) ;
 		
 		throw new _ExceptionRelocation ;
+    }
+
+    /**
+     * @return org\jecat\framework\auth\IIdentity
+     */
+    protected function requireLogined($sDenyMessage=null,array $arrDenyArgvs=array())
+    {
+    	if( !$aId=IdManager::singleton()->currentId() )
+    	{
+    		$this->permissionDenied($sDenyMessage,$arrDenyArgvs) ;
+    	}
+    	return $aId ;
+    }
+    
+    protected function checkPermissions($sDenyMessage=null,array $arrDenyArgvs=array())
+    {
+    	if( !$this->authorizer()->check(IdManager::singleton()) )
+    	{
+    		$this->permissionDenied($sDenyMessage,$arrDenyArgvs) ;
+    	}
+    }
+    
+    protected function permissionDenied($sDenyMessage=null,array $arrDenyArgvs=array())
+    {
+    	throw new AuthenticationException($this,$sDenyMessage,$arrDenyArgvs) ;
     }
     
     public function buildParams($Params)
@@ -601,7 +657,7 @@ class Controller extends NamableComposite implements IController, IBean
 	/**
 	 * 接管子控制器的视图
 	 */
-	protected function takeOverView(IController $aChild,$sChildName=null)
+	protected function takeOverView(Controller $aChild,$sChildName=null)
 	{
 		$this->mainView()->add( $aChild->mainView(), $sChildName?:$aChild->name(), true )  ;
 	} 
@@ -688,7 +744,7 @@ class Controller extends NamableComposite implements IController, IBean
 	 * @return bool
      */
     public function preprocessForm(IFormView $aView)
-    {    	
+    {
     	// 加载视图控件数据
     	$aView->loadWidgets($this->params) ;
     	
@@ -860,9 +916,9 @@ class Controller extends NamableComposite implements IController, IBean
     
     public function addView(IView $aView,$sName=null)
     {
-    	if( $aOriController = $aView->controller() )
+    	if( $aOrController = $aView->controller() )
     	{
-    		$aOriController->removeView($aView) ;
+    		$aOrController->removeView($aView) ;
     	}
     	
     	$aView->setController($this) ;
@@ -966,9 +1022,9 @@ class Controller extends NamableComposite implements IController, IBean
    	
    	
    	/**
-   	 * @return IController
+   	 * @return Controller
    	 */
-   	static public function topController(IController $aController)
+   	static public function topController(Controller $aController)
    	{
    		if( !$aParent = $aController->parent() )
    		{
@@ -981,7 +1037,7 @@ class Controller extends NamableComposite implements IController, IBean
    	}
    	
    	
-   	// for webpage html head (is not belongs to IController) ----------------------
+   	// for webpage html head (is not belongs to Controller) ----------------------
    	public function title()
    	{
    		if(!$aProperties=$this->properties(false))
@@ -1022,7 +1078,10 @@ class Controller extends NamableComposite implements IController, IBean
    		$this->properties()->set('keywords',(array)$keys) ;
    	}
    	
-   	
+   	public function autoCheckPerms()
+   	{
+   		return $this->bAutoCheckPermissions ;
+   	}
    	
 
     static private $aRegexpModelName = null ;
@@ -1054,11 +1113,15 @@ class Controller extends NamableComposite implements IController, IBean
     
     protected $fnProcess ;
     
+    private $bAutoCheckPermissions = true ;
+    private $bCatchOutput = true ;
+    
     static private $nAssignedId = 0 ;
     
 }
 
 class _ExceptionRelocation extends \Exception
 {}
+
 
 

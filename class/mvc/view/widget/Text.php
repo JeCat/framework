@@ -171,3 +171,4 @@ class Text extends FormWidget
 	
 	private $nType;
 }
+

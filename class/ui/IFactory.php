@@ -47,3 +47,4 @@ interface IFactory
 	 */
 	public function createInterpreterManager() ;	
 }
+

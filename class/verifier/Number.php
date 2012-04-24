@@ -143,3 +143,4 @@ class Number extends Object implements IVerifier, IBean
 	
 	private $arrBeanConfig = array();
 }
+

@@ -39,3 +39,5 @@ interface ILocale extends ITranslator
 	public function telNumber($Number) ;
 	
 }
+
+

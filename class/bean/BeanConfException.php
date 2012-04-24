@@ -29,3 +29,5 @@ use org\jecat\framework\lang\Exception;
 
 class BeanConfException extends Exception
 {}
+
+

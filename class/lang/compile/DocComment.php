@@ -130,3 +130,4 @@ class DocComment extends Object
 	private $sDescription = '' ;
 	private $arrItems = array() ;
 }
+

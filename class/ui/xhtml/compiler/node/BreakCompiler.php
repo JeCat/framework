@@ -62,3 +62,4 @@ class BreakCompiler extends NodeCompiler {
 // 						 . ';' );
 	}
 }
+

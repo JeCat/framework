@@ -33,3 +33,4 @@ interface IGenerator
 {
 	public function generateTargetCode(TokenPool $aTokenPool, Token $aObject) ;
 }
+

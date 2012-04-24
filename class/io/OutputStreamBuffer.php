@@ -137,3 +137,5 @@ class OutputStreamBuffer extends OutputStream implements IRedirectableStream, IB
 	
 	private $aRedirectionDev ;
 }
+
+

@@ -26,11 +26,10 @@
 namespace org\jecat\framework\mvc\view ;
 
 use org\jecat\framework\system\Application;
-
 use org\jecat\framework\lang\Type;
 use org\jecat\framework\pattern\composite\IContainer;
 use org\jecat\framework\mvc\controller\Response;
-use org\jecat\framework\mvc\controller\IController;
+use org\jecat\framework\mvc\controller\Controller;
 use org\jecat\framework\bean\BeanConfException;
 use org\jecat\framework\bean\BeanFactory;
 use org\jecat\framework\lang\Exception;
@@ -278,7 +277,7 @@ class View extends NamableComposite implements IView, IBean
 		return $this->aController ;
 	}
 	
-	public function setController(IController $aController=null)
+	public function setController(Controller $aController=null)
 	{
 		$this->aController = $aController ;
 	}
@@ -419,7 +418,14 @@ class View extends NamableComposite implements IView, IBean
 		{
 			$aSrcMgr = $this->ui()->sourceFileManager() ;
 			list($sNamespace,$sSourceFile) = $aSrcMgr->detectNamespace($sTemplate) ;
-			$sSourcePath = $aSrcMgr->find($sSourceFile,$sNamespace)->path() ;
+			if( $aTemplateFile=$aSrcMgr->find($sSourceFile,$sNamespace) )
+			{
+				$sSourcePath = $aTemplateFile->path() ;
+			}
+			else 
+			{
+				$sSourcePath = "can not find template file: {$sNamespace}:{$sSourceFile}" ;
+			}
 			
 			$this->outputStream()->write("\r\n\r\n<!-- Template: {$sSourcePath} -->\r\n") ;
 		}
@@ -769,5 +775,6 @@ class View extends NamableComposite implements IView, IBean
     
     static private $nAssignedId = 0 ;
 }
+
 
 

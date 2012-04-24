@@ -147,3 +147,4 @@ class LocalFolderIterator extends FSIterator{
 	private $aIterator;
 }
 
+

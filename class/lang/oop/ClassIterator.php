@@ -70,3 +70,4 @@ class ClassIterator extends \ArrayIterator
 	}
 
 }
+

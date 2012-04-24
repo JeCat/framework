@@ -129,3 +129,4 @@ class FileExt extends Object implements IVerifier,IBean {
 	private $arrExt = array();
 	private $bAllow = true;
 }
+

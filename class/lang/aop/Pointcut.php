@@ -204,3 +204,4 @@ class Pointcut extends NamedObject implements \Serializable
 	
 	private $sDefineMethod ;
 }
+

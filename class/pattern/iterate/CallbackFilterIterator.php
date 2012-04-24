@@ -134,3 +134,4 @@ class CallbackFilterIterator extends Object implements \OuterIterator
 	private $aOriginIterator ;
 
 }
+

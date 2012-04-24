@@ -332,3 +332,5 @@ class BeanFactory extends Object implements \Serializable
 	
 	private $aBeanFolders ;
 }
+
+

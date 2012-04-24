@@ -60,3 +60,4 @@ class LoadResourceCompiler extends NodeCompiler
 		$aDev->write("\$aDevice->write(\\org\\jecat\\framework\\resrc\\HtmlResourcePool::singleton()) ;\r\n") ;
 	}
 }
+

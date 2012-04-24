@@ -52,3 +52,4 @@ class Composite extends Container implements IContainedable
 	
 	private $aParent = null ;
 }
+

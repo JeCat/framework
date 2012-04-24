@@ -37,3 +37,4 @@ interface ICompiler
 	
 	public function compileStrategySignture() ;
 }
+

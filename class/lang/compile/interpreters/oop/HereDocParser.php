@@ -64,3 +64,4 @@ class HereDocParser implements ISyntaxParser
 	}
 
 }
+

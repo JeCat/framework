@@ -120,32 +120,31 @@ class Selecter extends OperationStrategy
 		return true ;
 	}
 	
-	public function totalCount(DB $aDB,Prototype $aPrototype,Criteria $aCriteria=null)
+	public function totalCount(DB $aDB,Prototype $aPrototype,Restriction $aRestriction=null)
 	{
 		$aSelect = $aPrototype->sharedStatementSelect() ;
-		if($aCriteria)
-		{
-			$aSelect->setCriteria($aCriteria);
-		}
-		else 
-		{
-			$aCriteria = $aSelect->criteria() ;
-		}
+		$aCriteria = $aSelect->criteria() ;
 		$aCriteria->setLimit(-1) ;
-		$aCriteria->clearGroupBy() ;
-		
-		$sKey = 'DISTINCT ' ;
-		$nKeyIdx = 0 ;
-		foreach($aPrototype->keys() as $sClmName)
+		if($aRestriction)
 		{
-			if( $nKeyIdx++ )
+			$aSelect->criteria()->where()->add($aRestriction);
+		}
+
+		try{
+			$nTotalCount = $aDB->queryCount( $aSelect, "*", Prototype::sqlCompiler() ) ;
+		}catch (\Exception $e){}
+		//} final {
+			if($aRestriction)
 			{
-				$sKey.= ',' ;
+				$aSelect->criteria()->where()->remove($aRestriction);
 			}
-			$sKey.= ' `'.$aPrototype->sqlTableAlias().'`.`'.$sClmName.'`' ;
+		//}
+		if(!empty($e))
+		{
+			throw $e ;
 		}
 		
-		return $aDB->queryCount( $aSelect, $sKey, Prototype::sqlCompiler() ) ;
+		return $nTotalCount ;
 	}
 	
 	public function hasExists(Model $aModel,Prototype $aPrototype=null,Select $aSelect=null,DB $aDB=null)
@@ -291,11 +290,17 @@ class Selecter extends OperationStrategy
 	static public function buildSelect(Prototype $aPrototype)
 	{
 		$aSelect = new Select($aPrototype->tableName(),$aPrototype->sqlTableAlias()) ;//$aPrototype->statementFactory()->createSelect() ;
-				
+
 		// where
 		if( $arrRawWhere =& $aPrototype->criteria()->rawClause(SQL::CLAUSE_WHERE) )
 		{
 			$aSelect->setRawClause( SQL::CLAUSE_WHERE, $arrRawWhere ) ;
+		}
+
+		// group by
+		if( $arrRawClause = $aPrototype->criteria()->rawClause(SQL::CLAUSE_GROUP) )
+		{
+			$aSelect->setRawClause( SQL::CLAUSE_GROUP, $arrRawClause ) ;
 		}
 		
 		// 递归连接所有关联原型的 table
@@ -382,6 +387,10 @@ class Selecter extends OperationStrategy
 		$arrTokens = array('ON','(') ;
 		foreach ($arrFromKeys as $nIdx=>$sFromKey)
 		{
+			if($nIdx)
+			{
+				$arrTokens[] = 'AND' ;
+			}
 			$arrTokens[] = SQL::createRawColumn($sFromTableName, $sFromKey) ;
 			$arrTokens[] = '=' ;
 			$arrTokens[] = SQL::createRawColumn($sToTableName, $arrToKeys[$nIdx]) ;
@@ -389,8 +398,8 @@ class Selecter extends OperationStrategy
 
 		if( $arrConditions )
 		{
-			$arrOnTokens[] = ',' ;
-			$arrOnTokens[] = $arrConditions ;
+			$arrTokens[] = 'AND' ;
+			$arrTokens[] = $arrConditions ;
 		}
 		
 		$arrTokens[] = ')' ;
@@ -398,3 +407,4 @@ class Selecter extends OperationStrategy
 		return $arrTokens ;
 	}
 }
+

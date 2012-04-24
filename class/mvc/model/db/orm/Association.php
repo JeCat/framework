@@ -26,8 +26,6 @@
 namespace org\jecat\framework\mvc\model\db\orm;
 
 use org\jecat\framework\db\sql\SQL;
-
-use org\jecat\framework\db\sql\parser\BaseParserFactory;
 use org\jecat\framework\util\serialize\IIncompleteSerializable;
 use org\jecat\framework\util\serialize\ShareObjectSerializer;
 use org\jecat\framework\lang\Type;
@@ -435,4 +433,5 @@ class Association implements IBean, \Serializable, IIncompleteSerializable
 	private $arrBeanConfig ;
 	
 }
+
 

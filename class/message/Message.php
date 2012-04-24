@@ -70,3 +70,5 @@ class Message extends Object
 	private $sMessage ;
 	private $arrMessageArgs ;
 }
+
+

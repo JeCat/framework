@@ -79,3 +79,4 @@ class ReverseIterator extends Object implements IReversableIterator, \OuterItera
 	
 	private $aOriginIterator ;
 }
+

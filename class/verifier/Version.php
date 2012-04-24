@@ -64,3 +64,4 @@ class Version extends Object implements IVerifier ,IBean{
 		return true ;
 	}
 }
+

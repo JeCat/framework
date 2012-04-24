@@ -216,3 +216,4 @@ abstract class JointPoint extends Object implements \Serializable
 	
 	protected $arrBeanConfig ;
 }
+

@@ -188,3 +188,4 @@ class Insert extends SQL
 	
 	private $mapData = array() ;
 }
+

@@ -76,3 +76,4 @@ class Email extends Object implements IVerifier ,IBean{
 	
 	private $arrBeanConfig = array();
 }
+

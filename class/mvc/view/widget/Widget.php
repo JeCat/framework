@@ -346,3 +346,4 @@ class Widget extends Object implements IViewWidget, IBean
 	
     private $arrBeanConfig ;
 }
+

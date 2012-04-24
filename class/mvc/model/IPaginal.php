@@ -31,3 +31,4 @@ interface IPaginal
     public function totalCount();
     public function setPagination($nPerPage,$nPageNum);
 }
+

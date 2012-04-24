@@ -43,3 +43,4 @@ class VerifyFailed extends Exception
 	
 	private $arrVerify = array(); 
 }
+

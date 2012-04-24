@@ -38,3 +38,4 @@ class CommentMacroCompiler extends MacroCompiler
 		// nothing todo
 	}
 }
+

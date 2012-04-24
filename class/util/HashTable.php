@@ -248,3 +248,5 @@ class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator, \
 	
 	private $sClass = array() ;
 }
+
+

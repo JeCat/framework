@@ -171,3 +171,4 @@ class Criteria extends SQL
 	
 	private $aWhere ;
 }
+

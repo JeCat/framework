@@ -92,3 +92,4 @@ class WeaveManager extends Object
 	
 	private $arrPatchSlots = array() ;
 }
+

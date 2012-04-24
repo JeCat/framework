@@ -87,3 +87,4 @@ class NamespaceString extends Token
 	
 	protected $arrNameAndSlashes ;
 }
+

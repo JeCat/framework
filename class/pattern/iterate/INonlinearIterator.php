@@ -33,3 +33,4 @@ interface INonlinearIterator extends \SeekableIterator, IReversableIterator
 	public function searchKey ($key) ;
 
 }
+

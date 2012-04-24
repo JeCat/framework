@@ -46,3 +46,5 @@ class StopFilterSignal extends Exception
 	
 	private $ReturnVariables ;
 }
+
+

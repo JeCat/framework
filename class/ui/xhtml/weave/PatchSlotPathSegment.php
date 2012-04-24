@@ -129,3 +129,4 @@ class PatchSlotPathSegment
 	
 	private $nPos ;
 }
+

@@ -1,27 +1,36 @@
 <?php
-namespace org\jecat\framework\mvc ;
+namespace org\jecat\framework\util ;
 
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\Assert;
 use org\jecat\framework\lang\Object;
 
-class MVCEventManager extends Object implements \Serializable
+class EventManager extends Object implements \Serializable
 {
-	public function registerEventHandle($sEventType,$fnHandler,$sControllerClass=null,$sViewXPath=null,$sWidghtId=null,array $arrCallbackArgvs=null)
+	public function registerEventHandle($sClass,$sEvent,$fnHandler,array $arrCallbackArgvs=null,$sourceObject='*')
 	{
 		Assert::isCallback($fnHandler) ;
 		
-		$sKey = $sControllerClass .'-'. $sViewXPath .'-'. $sWidghtId .'-'. $sEventType ;
-		$this->arrEventHandles[$sKey][] = array($fnHandler,$arrCallbackArgvs) ;
+		if( is_object($sourceObject) )
+		{
+			$sourceObject = spl_object_hash($sourceObject) ;
+		}
+		
+		$this->arrEventHandles[$sClass][$sEvent][$sourceObject][] = array($fnHandler,$arrCallbackArgvs) ;
 	}
 	
-	public function emitEvent($sEventType,array & $arrArgvs=array(),$sControllerClass=null,$sViewXPath=null,$sWidghtId=null)
+	public function emitEvent($sClass,$sEvent,array & $arrArgvs=array(),$sourceObject='*')
 	{
-		$sKey = $sControllerClass .'-'. $sViewXPath .'-'. $sWidghtId .'-'. $sEventType ;
-		if(!empty($this->arrEventHandles[$sKey]))
+		if( is_object($sourceObject) )
 		{
-			foreach($this->arrEventHandles[$sKey] as &$handler)
+			$sourceObject = spl_object_hash($sourceObject) ;
+		}
+		
+		if(!empty($this->arrEventHandles[$sClass][$sEvent][$sourceObject]))
+		{
+			foreach($this->arrEventHandles[$sClass][$sEvent][$sourceObject] as &$handler)
 			{
+				// 合并注册时提供的参数
 				if( $handler[1] )
 				{
 					foreach($handler[1] as &$callbackArgv)
@@ -32,6 +41,7 @@ class MVCEventManager extends Object implements \Serializable
 				
 				call_user_func_array($handler[0],$arrArgvs) ;
 
+				// 清理注册时提供的参数
 				if( $handler[1] )
 				{
 					for($i=count($handler[1]);$i>0;$i--)

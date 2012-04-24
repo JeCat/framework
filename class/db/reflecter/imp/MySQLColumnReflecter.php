@@ -164,3 +164,4 @@ class MySQLColumnReflecter extends AbStractColumnReflecter
 	
 	private $bIsExist = true;
 }
+

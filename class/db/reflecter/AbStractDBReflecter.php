@@ -45,3 +45,4 @@ abstract class AbStractDBReflecter extends DBStructReflecter
 	abstract public function isExist();
 }
 
+

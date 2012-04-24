@@ -63,3 +63,4 @@ class ParserStateNode extends ParserState
 		return $aObject->parent() ;
 	}
 }
+

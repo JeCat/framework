@@ -141,3 +141,5 @@ class InputStreamCache extends Object implements IInputStream
 	
 	private $nPostion = 0 ;
 }
+
+

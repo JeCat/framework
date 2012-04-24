@@ -60,3 +60,4 @@ class Macro extends ObjectBase
 	private $sEndMacro ;	
 	
 }
+

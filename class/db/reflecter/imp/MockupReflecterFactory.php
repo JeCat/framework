@@ -177,3 +177,4 @@ class MockupReflecterFactory extends AbstractReflecterFactory
 	
 	public $sCurrentDBName ;
 }
+

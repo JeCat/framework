@@ -141,3 +141,4 @@ class CallFunctionParser implements ISyntaxParser
 		}
 	}	
 }
+

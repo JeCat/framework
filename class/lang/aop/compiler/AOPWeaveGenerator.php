@@ -377,3 +377,4 @@ abstract class AOPWeaveGenerator extends Object implements IGenerator
 	
 	private $aAop ;
 }
+

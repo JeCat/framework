@@ -99,3 +99,4 @@ class SubQueryParser extends AbstractParser
 		}
 	}
 }
+

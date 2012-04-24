@@ -162,3 +162,4 @@ abstract class NameParser extends AbstractParser
 		return true ;
 	}
 }
+

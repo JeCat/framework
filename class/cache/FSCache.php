@@ -132,9 +132,9 @@ class FSCache extends Cache
 			// 删除指定内容
 			else
 			{
-				unlink($sDataPath.'.data') ;
-				unlink($sDataPath.'.php') ;
-				unlink($sDataPath.'.time') ;
+				@unlink($sDataPath.'.data') ;
+				@unlink($sDataPath.'.php') ;
+				@unlink($sDataPath.'.time') ;
 			}
 		}
 	}
@@ -197,3 +197,4 @@ class FSCache extends Cache
 	 */
 	private $aFolder ;
 }
+

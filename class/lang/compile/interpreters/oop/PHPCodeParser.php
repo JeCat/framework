@@ -53,3 +53,4 @@ class PHPCodeParser implements ISyntaxParser
 		}
 	}
 }
+

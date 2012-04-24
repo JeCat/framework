@@ -36,3 +36,5 @@ interface IOutputStream
 	public function flush() ;
 	
 }
+
+

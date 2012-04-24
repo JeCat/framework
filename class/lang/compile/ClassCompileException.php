@@ -70,3 +70,4 @@ class ClassCompileException extends Exception
 	 */
 	private $aClassSouce ;
 }
+

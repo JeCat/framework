@@ -25,12 +25,12 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\auth ;
 
-use org\jecat\framework\mvc\controller\IController;
+use org\jecat\framework\mvc\controller\Controller;
 use org\jecat\framework\lang\Exception;
 
 class AuthenticationException extends Exception
 {
-	public function __construct(IController $aCauseController,$sMessage=null,$aArgvs=array())
+	public function __construct(Controller $aCauseController,$sMessage=null,$aArgvs=array())
 	{
 		$this->aCaseController = $aCauseController ;
 		
@@ -46,7 +46,7 @@ class AuthenticationException extends Exception
 		return $this->aCaseController ;
 	}
 	
-	static public function checkLogined(IController $aCauseController)
+	static public function checkLogined(Controller $aCauseController)
 	{
 		if( !IdManager::singleton()->currentId() )
 		{
@@ -56,3 +56,5 @@ class AuthenticationException extends Exception
 	
 	private $aCaseController ;
 }
+
+

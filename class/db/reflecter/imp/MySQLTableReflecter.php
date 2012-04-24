@@ -134,3 +134,4 @@ class MySQLTableReflecter extends AbStractTableReflecter
 	private $bIsExist=true;
 }
 
+

@@ -100,3 +100,4 @@ class Callback extends Object implements IVerifier ,IBean
 	
 	private $arrArgvs ;
 }
+

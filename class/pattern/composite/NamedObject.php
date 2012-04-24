@@ -46,3 +46,4 @@ abstract class NamedObject extends Object implements INamable
 	
 	private $sName ;
 }
+

@@ -53,3 +53,4 @@ abstract class DBStructReflecter
 	
 	private $aFactory;
 }
+

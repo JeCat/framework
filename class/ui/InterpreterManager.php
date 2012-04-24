@@ -70,3 +70,4 @@ class InterpreterManager extends Container
 		return md5($seed) ;
 	}
 }
+

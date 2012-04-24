@@ -113,3 +113,4 @@ class BaseCompiler extends JcObject implements ICompiler
 	
 	private $arrCompilers = array() ;
 }
+

@@ -449,3 +449,4 @@ class Category extends Object
 	// private $arrChildCategories = array() ;
 }
 
+

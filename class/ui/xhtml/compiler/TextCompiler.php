@@ -48,3 +48,4 @@ class TextCompiler extends BaseCompiler
 		}
 	}
 }
+

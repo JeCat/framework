@@ -49,3 +49,4 @@ class MacroCompiler extends BaseCompiler
 		
 	}
 }
+

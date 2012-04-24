@@ -39,3 +39,4 @@ class SqlCompileException extends Exception
 		parent::__construct($sMessage,$argvs) ;
 	}
 }
+

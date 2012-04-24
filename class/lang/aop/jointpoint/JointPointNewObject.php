@@ -75,3 +75,4 @@ class JointPointNewObject extends JointPoint
 	
 	private $sNewObjectRegexp ;
 }
+

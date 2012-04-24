@@ -59,3 +59,4 @@ class CompositeSearcher extends \ArrayIterator
 		return $arrRes ;
 	} 
 }
+

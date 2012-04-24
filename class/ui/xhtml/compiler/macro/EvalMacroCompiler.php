@@ -61,3 +61,4 @@ class EvalMacroCompiler extends MacroCompiler
 		$aDev->write( ExpressionCompiler::compileExpression($aObject->source(),$aObjectContainer->variableDeclares(),false,true).';' ) ;
 	}
 }
+

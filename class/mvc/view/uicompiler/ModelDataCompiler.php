@@ -102,3 +102,4 @@ class ModelDataCompiler extends NodeCompiler
 		$aDev->write("}\r\n") ;
 	}
 }
+

@@ -78,3 +78,5 @@ class OutputStream extends Stream implements IOutputStream, ILockable
 		flock($this->hHandle,LOCK_EX) ;
 	}	
 }
+
+

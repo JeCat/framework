@@ -156,3 +156,4 @@ class CheckBtn extends FormWidget
 	private $nType;
 	private $checkedValue;
 }
+

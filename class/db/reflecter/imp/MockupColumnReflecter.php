@@ -133,3 +133,4 @@ class MockupColumnReflecter extends AbStractColumnReflecter
 	public $sName;
 	
 }
+

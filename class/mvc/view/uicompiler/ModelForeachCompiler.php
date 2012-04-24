@@ -103,3 +103,4 @@ class ModelForeachCompiler extends NodeCompiler
 		}
 	}
 }
+

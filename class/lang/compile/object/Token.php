@@ -169,3 +169,4 @@ class Token extends AbstractObject
 	private $aClass ;
 	private $aFunction ;
 }
+

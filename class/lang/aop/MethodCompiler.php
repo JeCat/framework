@@ -31,3 +31,4 @@ class MethodCompiler extends Object
 {
 
 }
+

@@ -59,3 +59,4 @@ class NamespaceDeclareParser implements ISyntaxParser
 		$aState->setCurrentNamespace($aNewToken) ;
 	}
 }
+

@@ -129,3 +129,4 @@ class MySQLIndexReflecter extends AbStractIndexReflecter
 	
 	private $sName;
 }
+

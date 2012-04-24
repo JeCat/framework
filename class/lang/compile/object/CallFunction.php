@@ -68,3 +68,4 @@ class CallFunction extends Token
 	private $aClass ;
 	private $aAccessSymbol ;
 }
+

@@ -66,3 +66,4 @@ class ViewLayoutItemDevice extends OutputStreamBuffer
 	private $aItemDevice ;
 }
 
+

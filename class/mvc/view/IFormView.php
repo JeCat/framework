@@ -39,3 +39,4 @@ interface IFormView {
 	
 	public function hideForm($bHide=true) ;
 }
+

@@ -49,11 +49,13 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator,
 		$nLimitLen = $this->perPage() ;
 		$nLimitFrom = $this->aPrototype? (int)$this->aPrototype->limitFrom(): 0 ;
 		
+		$this->aLoadRestriction = self::buildRestriction($this->prototype(),$values,$keys) ;
+		
 		return Selecter::singleton()->execute(
 			$this->prototype()
 			, $this->recordset()
 			, null
-			, self::buildRestriction($this->prototype(),$values,$keys)
+			, $this->aLoadRestriction
 			, array($nLimitLen,$nLimitFrom+($this->pageNum()-1)*$nLimitLen)
 			, $this->db()
 		) ;
@@ -61,7 +63,7 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator,
 
 	public function loadSql($sWhereStatement=null,$arrFactors=null)
 	{
-		$aRestriction = $sWhereStatement?
+		$this->aLoadRestriction = $sWhereStatement?
 					call_user_func_array(array('org\\jecat\\framework\\db\\sql\\SQL','makeRestriction'),func_get_args())
 					: null ;
 	
@@ -72,7 +74,7 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator,
 		$nLimitFrom = $this->aPrototype? (int)$this->aPrototype->limitFrom(): 0 ;
 		
 		return Selecter::singleton()->execute(
-				$this->prototype() , $this->recordset(), null , $aRestriction, array($nLimitLen,$nLimitFrom+($this->pageNum()-1)*$nLimitLen), $this->db()
+				$this->prototype() , $this->recordset(), null , $this->aLoadRestriction, array($nLimitLen,$nLimitFrom+($this->pageNum()-1)*$nLimitLen), $this->db()
 		) ;
 	}
 	
@@ -349,7 +351,7 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator,
 	{
 		if($this->nTotalCount<0)
 		{
-			$this->nTotalCount =Selecter::singleton()->totalCount(DB::singleton(),$this->prototype()) ;
+			$this->nTotalCount =Selecter::singleton()->totalCount(DB::singleton(),$this->prototype(),$this->aLoadRestriction) ;
 		}
 		return $this->nTotalCount ;
 	}
@@ -497,10 +499,13 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator,
 	private $aShareChildrenIterator ;
 	
 	private $aShareModel ;
+
+	private $aLoadRestriction ;
 	
 	private $nTotalCount = -1 ;
 	
 	private $nPerPage ;
 	private $nPageNum = 1 ;
 }
+
 

@@ -123,3 +123,4 @@ class TableJoinParser extends AbstractParser
 		throw new SqlParserException($aParseState, "遇到无效的join，无法为 join 子句确定对应的数据表表达式") ;
 	}
 }
+

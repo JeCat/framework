@@ -91,7 +91,6 @@ namespace org\jecat\framework\db\sql;
  *	 |}
  */
 
-use org\jecat\framework\db\sql\parser\BaseParserFactory;
 
 class Restriction extends SQL
 {
@@ -537,3 +536,4 @@ class Restriction extends SQL
 
     private $sLogic = 'AND' ;
 }
+
