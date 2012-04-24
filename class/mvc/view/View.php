@@ -419,7 +419,14 @@ class View extends NamableComposite implements IView, IBean
 		{
 			$aSrcMgr = $this->ui()->sourceFileManager() ;
 			list($sNamespace,$sSourceFile) = $aSrcMgr->detectNamespace($sTemplate) ;
-			$sSourcePath = $aSrcMgr->find($sSourceFile,$sNamespace)->path() ;
+			if( $aTemplateFile=$aSrcMgr->find($sSourceFile,$sNamespace) )
+			{
+				$sSourcePath = $aTemplateFile->path() ;
+			}
+			else 
+			{
+				$sSourcePath = "can not find template file: {$sNamespace}:{$sSourceFile}" ;
+			}
 			
 			$this->outputStream()->write("\r\n\r\n<!-- Template: {$sSourcePath} -->\r\n") ;
 		}
