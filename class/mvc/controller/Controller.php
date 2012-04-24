@@ -487,7 +487,7 @@ class Controller extends NamableComposite implements IController, IBean
     		self::processController($aFrame) ;
     	}
     	
-    	$this->response()->process($this) ;
+    	$this->response()->respond($this) ;
     }
     
     static protected function processController(IController $aController)

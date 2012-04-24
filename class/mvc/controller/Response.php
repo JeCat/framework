@@ -28,7 +28,7 @@ namespace org\jecat\framework\mvc\controller ;
 use org\jecat\framework\mvc\view\View;
 use org\jecat\framework\system\ApplicationFactory;
 use org\jecat\framework\db\DB;
-use org\jecat\framework\mvc\controller\IController;
+use org\jecat\framework\mvc\controller\Controller;
 use org\jecat\framework\util\IFilterMangeger;
 use org\jecat\framework\io\PrintStream;
 use org\jecat\framework\lang\Object;
@@ -110,7 +110,7 @@ class Response extends Object
 	 * 该参数可以是一个表示指定模型的名称的字符串，或表示所有模型的”星号“（*）
 	 * 
 	 */
-	public function process(IController $aController)
+	public function respond(Controller $aController)
 	{
 		switch ($aController->params()->get('rspn'))
 		{
