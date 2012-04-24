@@ -54,7 +54,6 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator,
 		return Selecter::singleton()->execute(
 			$this->prototype()
 			, $this->recordset()
-			, null
 			, $this->aLoadRestriction
 			, array($nLimitLen,$nLimitFrom+($this->pageNum()-1)*$nLimitLen)
 			, $this->db()
@@ -74,7 +73,7 @@ class ModelList extends Model implements \SeekableIterator, IReversableIterator,
 		$nLimitFrom = $this->aPrototype? (int)$this->aPrototype->limitFrom(): 0 ;
 		
 		return Selecter::singleton()->execute(
-				$this->prototype() , $this->recordset(), null , $this->aLoadRestriction, array($nLimitLen,$nLimitFrom+($this->pageNum()-1)*$nLimitLen), $this->db()
+				$this->prototype() , $this->recordset(), $this->aLoadRestriction, array($nLimitLen,$nLimitFrom+($this->pageNum()-1)*$nLimitLen), $this->db()
 		) ;
 	}
 	

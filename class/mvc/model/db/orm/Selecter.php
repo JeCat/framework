@@ -36,7 +36,7 @@ use org\jecat\framework\db\sql\Criteria;
 
 class Selecter extends OperationStrategy
 {
-	public function execute(Prototype $aPrototype,array & $arrDataSheet,Select $aSelect=null, Restriction $aRestriction=null, $list=false,DB $aDB=null)
+	public function execute(Prototype $aPrototype,array & $arrDataSheet,Restriction $aRestriction=null, $list=false,DB $aDB=null)
 	{
 		if(!$aDB)
 		{
@@ -44,54 +44,36 @@ class Selecter extends OperationStrategy
 		}
 		
 		// -----------------
-		// step 1. 组装用于查询的 Select 对象
-		if(!$aSelect)
-		{
-			$aSelect = $aPrototype->sharedStatementSelect() ;
-		}
+		//$aSelect = $aPrototype->sharedStatementSelect() ;
+		$arrSelectState =& $aPrototype->selectState() ;
 		
 		if($aRestriction)
 		{
-			$aSelect->criteria()->where()->add($aRestriction);
+			$arrSelectState['statement']->criteria()->where()->add($aRestriction);
 		}
-		
-		// -----------------
-		// step 2. query for all one to one association tables 
-		$arrMultitermAssociations = array() ;
-		$aSelect->clearColumns() ;
-		$this->addColumnsForOneToOne($aSelect,$aPrototype,$arrMultitermAssociations) ;
 		
 		// set limit
 		if( !$list )
 		{
-			$aSelect->criteria()->setLimit(1,0) ;
+			$arrSelectState['statement']->criteria()->setLimit(1,0) ;
 		}
 		else
 		{
-			$aSelect->criteria()->setLimit( $list[0], $list[1] ) ;
+			$arrSelectState['statement']->criteria()->setLimit( $list[0], $list[1] ) ;
 		}
-				
-		// set group by
-		// $this->setGroupBy($aSelect->criteria(),$aPrototype) ;
-		
-		// set order by
-		$aSelect->criteria()->clearOrders() ;
-		$aSelect->setRawClause(SQL::CLAUSE_ORDER,$aPrototype->criteria()->rawClause(SQL::CLAUSE_ORDER,false)) ;
 			
 		// query
 		$aDB->pdo()->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES,1) ;
 		try{
-			$aPdoRecordset=$aDB->query( $aSelect, null, Prototype::sqlCompiler() ) ;
+			$aPdoRecordset=$aDB->query( $arrSelectState['statement'], null, Prototype::sqlCompiler() ) ;
 		}catch (\Exception $e){}
-		
 		//} final {
 			$aDB->pdo()->setAttribute(\PDO::ATTR_FETCH_TABLE_NAMES,0) ;
 			if($aRestriction)
 			{
-				$aSelect->criteria()->where()->remove($aRestriction);
+				$arrSelectState['statement']->criteria()->where()->remove($aRestriction);
 			}
 		//}
-		
 		if( isset($e) )
 		{
 			throw $e ;
@@ -108,13 +90,12 @@ class Selecter extends OperationStrategy
 		// -----------------
 		// step 2. query alonely for multiterm associated prototype 
 		$nTotalRows = count($arrDataSheet) ;
-		for($nRowIdx=0;$nRowIdx<$nTotalRows;$nRowIdx++)
+		foreach($arrSelectState['multitermAssocs'] as $aMultitermAssoc)
 		{
-			foreach($arrMultitermAssociations as $aMultitermAssoc)
+			for($nRowIdx=0;$nRowIdx<$nTotalRows;$nRowIdx++)
 			{
-				$this->queryForMultitermAssoc($aDB,$aMultitermAssoc,$arrDataSheet,$nRowIdx,$aSelect) ;
+				$this->queryForMultitermAssoc($aDB,$aMultitermAssoc,$arrDataSheet,$nRowIdx) ;
 			}
-			
 		}
 
 		return true ;
@@ -188,13 +169,10 @@ class Selecter extends OperationStrategy
 		return $bExists ;
 	}
 	
-	private function queryForMultitermAssoc(DB $aDB,Association $aMultitermAssoc,array & $arrDataSheet,$nRowIdx,Select $aSelect)
+	private function queryForMultitermAssoc(DB $aDB,Association $aMultitermAssoc,array & $arrDataSheet,$nRowIdx)
 	{
 		$aToPrototype = $aMultitermAssoc->toPrototype() ;
 		$aFromPrototype = $aMultitermAssoc->fromPrototype() ;
-		
-		// 清理一些 select 状态
-		$aSelect->clearColumns() ;
 		
 		// 根据上一轮查询设置条件
 		if( $aMultitermAssoc->isType(Association::hasMany) )				// hasMany
@@ -221,164 +199,124 @@ class Selecter extends OperationStrategy
 		{
 			throw new ORMException("what's this?") ;
 		}
-		
-		$aSelect->criteria()->where()->add($aRestraction) ;
-			
-		// 设置 order by
-		$rawOriOrder =& $aSelect->rawClause(SQL::CLAUSE_ORDER,false) ;
-		$aSelect->setRawClause( SQL::CLAUSE_ORDER, $aToPrototype->criteria()->rawClause(SQL::CLAUSE_ORDER,false) ) ;
 
 		// 新建的一个记录表
 		$sheet =& Model::dataSheet($arrDataSheet,$nRowIdx,$aToPrototype->name(),true) ;
 		$this->execute(
 				$aToPrototype
 				, $sheet
-				, $aSelect
-				, null
+				, $aRestraction
 				, array($aToPrototype->limitLength(),$aToPrototype->limitFrom())
 				, $aDB
 		) ;
-		
-		// 清理条件 和 恢复order by
-		$aSelect->criteria()->where()->remove($aRestraction) ;
-		$aSelect->setRawClause(SQL::CLAUSE_ORDER,$rawOriOrder) ;
 	}
 
-	private function setGroupBy(Criteria $aCriteria,Prototype $aPrototype)
-	{
-		$aCriteria->clearGroupBy(false) ;
-		foreach($aPrototype->keys() as $sClmName)
-		{
-			$aCriteria->addGroupBy($sClmName,$aPrototype->sqlTableAlias()) ;
-		}
-	}
-	
-	private function addColumnsForOneToOne(Select $aSelect,Prototype $aPrototype,& $arrMultitermAssociations)
-	{
-		// add columns for pass in prototype
-		$arrColumns = array_merge($aPrototype->columns() , $aPrototype->keys());
-		foreach($arrColumns as $sColumnName)
-		{
-			$aSelect->addColumn( $sColumnName, null, $aPrototype->sqlTableAlias() ) ;
-		}
-
-		// add columns for one to one associated prototypes
-		foreach( $aPrototype->associationIterator() as $aAssoc )
-		{
-			if( $aAssoc->isType(Association::oneToOne) )
-			{
-				$aToPrototype = $aAssoc->toPrototype() ;
-
-				// add columns recursively
-				$this->addColumnsForOneToOne( $aSelect, $aToPrototype, $arrMultitermAssociations ) ;
-			}
-			
-			else
-			{
-				$arrMultitermAssociations[] = $aAssoc ;
-			}
-		}
-	}
-
-	
-	
-
-	// -- Select for Prototype ------------------------------------------------------
+	// -- Build Select for Prototype ------------------------------------------------------
 	/**
 	 * @return org\jecat\framework\db\sql\Select
 	 */
-	static public function buildSelect(Prototype $aPrototype)
+	static public function buildSelect(Prototype $aPrototype,array & $arrSelectState=null)
 	{
-		$aSelect = new Select($aPrototype->tableName(),$aPrototype->sqlTableAlias()) ;//$aPrototype->statementFactory()->createSelect() ;
-
-		// where
-		if( $arrRawWhere =& $aPrototype->criteria()->rawClause(SQL::CLAUSE_WHERE) )
+		$arrSelectState['statement'] = new Select($aPrototype->tableName(),$aPrototype->sqlTableAlias()) ;
+		if(!isset($arrSelectState['multitermAssocs']))
 		{
-			$aSelect->setRawClause( SQL::CLAUSE_WHERE, $arrRawWhere ) ;
+			$arrSelectState['multitermAssocs'] = array() ;
+		}
+		
+		$arrTokenTree =& $arrSelectState['statement']->rawSql() ;
+		$arrTokenTree['omited_first_table'] = $aPrototype->sqlTableAlias() ;
+		$arrTokenTree['omited_first_table_len'] = strlen($arrTokenTree['omited_first_table']) ;
+		
+		// where
+		if( $arrRawWhere = $aPrototype->criteria()->rawClause(SQL::CLAUSE_WHERE) )
+		{
+			$arrSelectState['statement']->setRawClause( SQL::CLAUSE_WHERE, $arrRawWhere ) ;
 		}
 
 		// group by
 		if( $arrRawClause = $aPrototype->criteria()->rawClause(SQL::CLAUSE_GROUP) )
 		{
-			$aSelect->setRawClause( SQL::CLAUSE_GROUP, $arrRawClause ) ;
+			$arrSelectState['statement']->setRawClause( SQL::CLAUSE_GROUP, $arrRawClause ) ;
 		}
+
+		// order by
+		/*if( $arrRawClause = $aPrototype->criteria()->rawClause(SQL::CLAUSE_ORDER) )
+		{
+			$aSelect->setRawClause( SQL::CLAUSE_ORDER, $arrRawClause ) ;
+		}*/
 		
 		// 递归连接所有关联原型的 table
-		self::joinTables( $aSelect, $aPrototype ) ;
+		self::joinTables( $arrSelectState, $aPrototype ) ;
 		
-		return $aSelect ;
+		return $arrSelectState['statement'] ;
 	}
 	
-	static private function joinTables(MultiTableSQL $aSelect,Prototype $aForPrototype)
+	static private function joinTables(array & $arrSelectState,Prototype $aForPrototype)
 	{
+		// add columns for pass in prototype
+		$arrColumns = array_merge($aForPrototype->columns(),$aForPrototype->keys());
+		foreach($arrColumns as $sColumnName)
+		{
+			$arrSelectState['statement']->addColumn( $sColumnName, null, $aForPrototype->sqlTableAlias() ) ;
+		}
+		
+		// join tables
 		$sFromTableAlias = $aForPrototype->sqlTableAlias() ;
 			
 		foreach( $aForPrototype->associationIterator() as $aAssoc )
 		{
 			$aPrototype = $aAssoc->toPrototype() ;
-			$sToTableAlias = $aPrototype->sqlTableAlias() ;
+			$sTableAlias = $aPrototype->sqlTableAlias() ;
 			
-			// 两表关联
-			if( $aAssoc->isType(Association::pair) )
+			// 一对一关联
+			if( $aAssoc->isType(Association::oneToOne) )
 			{				
-				$aSelect->_joinTableRaw(
+			
+				$arrSelectState['statement']->joinTableRaw(
 						$sFromTableAlias
 						, $aPrototype->tableName()
-						, $sToTableAlias
+						, $sTableAlias
 						, $aAssoc->joinType()
 						, self::makeResrictionForForeignKey(
 								$sFromTableAlias
-								, $sToTableAlias
+								, $sTableAlias
 								, $aAssoc->fromKeys()
 								, $aAssoc->toKeys()
 								, $aAssoc->joinOnRawSql()
 						)
 				) ;
+				
+				// 递归 join
+				self::joinTables( $arrSelectState, $aPrototype ) ;
 			}
 			
-			// 三表关联
-			else if( $aAssoc->isType(Association::triplet) )
+			// 多属关联
+			else
 			{
-				$sBridgeTableAlias = $aAssoc->bridgeSqlTableAlias() ;
+				$arrSelectState['multitermAssocs'][] = $aAssoc ;				
 				
-				// 从左表连接到中间表
-				$aSelect->_joinTableRaw(
-						$sFromTableAlias
-						, $aAssoc->bridgeTableName()
-						, $sBridgeTableAlias
-						, $aAssoc->joinType()
-						, self::makeResrictionForForeignKey(
-								$sFromTableAlias
-								, $sBridgeTableAlias
-								, $aAssoc->fromKeys()
-								, $aAssoc->toBridgeKeys()
-								, $aAssoc->joinOnRawSql()
-						)
-				) ;
-				
-				// 从中间表连接到右表				
-				$aSelect->_joinTableRaw(
-						$sBridgeTableAlias
-						, $aPrototype->tableName()
-						, $sToTableAlias
-						, $aAssoc->joinType()
-						, self::makeResrictionForForeignKey(
-								$sBridgeTableAlias
-								, $sToTableAlias
-								, $aAssoc->fromBridgeKeys()
-								, $aAssoc->toKeys()
-								, $aAssoc->joinOnRawSql()
-						)
-				) ;
+				// 三表关联
+				if( $aAssoc->isType(Association::triplet) )
+				{
+					$sBridgeTableAlias = $aAssoc->bridgeSqlTableAlias() ;
+					$sBridgeTable = $aAssoc->bridgeTableName() ;
+					
+					// 从中间表连接到右表
+					$aPrototype->sharedStatementSelect()->joinTableRaw(
+							$sTableAlias
+							, $sBridgeTable
+							, $sBridgeTableAlias
+							, $aAssoc->joinType()
+							, self::makeResrictionForForeignKey(
+									$sTableAlias
+									, $sBridgeTableAlias
+									, $aAssoc->toKeys()
+									, $aAssoc->fromBridgeKeys()
+									, $aAssoc->joinOnRawSql()
+							)
+					) ;
+				}
 			}
-			
-			else 
-			{
-				throw new Exception("what's this?") ;
-			}
-				
-			// 递归
-			self::joinTables( $aSelect, $aPrototype ) ;
 		}
 	}
 	

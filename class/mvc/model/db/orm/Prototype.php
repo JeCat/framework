@@ -28,6 +28,7 @@ namespace org\jecat\framework\mvc\model\db\orm;
 use org\jecat\framework\db\sql\compiler\SqlNameCompiler;
 use org\jecat\framework\db\sql\compiler\SqlCompiler;
 use org\jecat\framework\db\sql\SQL;
+use org\jecat\framework\db\sql\Select;
 use org\jecat\framework\db\sql\Criteria;
 use org\jecat\framework\db\sql\Update;
 use org\jecat\framework\lang\Object;
@@ -155,11 +156,6 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	{
 		$this->sTableName = $sTableName;
 		return $this;
-	}
-	
-	public function associatedBy()
-	{
-		return $this->aAssociationBy;
 	}
 	
 	// columns
@@ -334,7 +330,7 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 		{
 			$aToPrototype = $to ;
 			
-			if($aToPrototype -> aAssociationBy !== null)
+			if($aToPrototype -> aAssociatedBy !== null)
 			{
 				throw new Exception('函数 Prototype::createAssociation() 的参数 $to 已经被关联，不能再关联到其他原型');
 			}
@@ -357,7 +353,7 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 		) ;
 
 		$this->arrAssociations[] = $aAsso;
-		$aToPrototype->aAssociationBy = $aAsso;
+		$aToPrototype->aAssociatedBy = $aAsso;
 		
 		return $aAsso->toPrototype();
 	}
@@ -594,13 +590,13 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	/**
 	 * @return Association
 	 */
-	public function associationBy()
+	public function associatedBy()
 	{
-		return $this->aAssociationBy ;
+		return $this->aAssociatedBy ;
 	}
-	public function setAssociationBy(Association $aAssociationBy)
+	public function setAssociatedBy(Association $aAssociatedBy)
 	{
-		return $this->aAssociationBy = $aAssociationBy ;
+		return $this->aAssociatedBy = $aAssociatedBy ;
 	}
 	
 	// implements IBean
@@ -958,15 +954,19 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	 */
 	public function sharedStatementSelect()
 	{
-		if(!$this->aStatementSelect)
+		if(!$this->arrSelectState)
 		{
-			$this->aStatementSelect = Selecter::buildSelect($this) ;
-			
-			$arrTokenTree =& $this->aStatementSelect->rawSql() ;
-			$arrTokenTree['omited_first_table'] = $this->sqlTableAlias() ;
-			$arrTokenTree['omited_first_table_len'] = strlen($arrTokenTree['omited_first_table']) ;
+			Selecter::buildSelect($this,$this->arrSelectState) ;
 		}
-		return $this->aStatementSelect ;
+		return $this->arrSelectState['statement'] ;
+	}
+	public function & selectState()
+	{
+		if(!$this->arrSelectState)
+		{
+			Selecter::buildSelect($this,$this->arrSelectState) ;
+		}
+		return $this->arrSelectState ;
 	}
 	/**
 	 * return org\jecat\framework\db\sql\Update
@@ -997,7 +997,7 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 				'nLimitLen' ,
 				'limitFrom' ,
 				'aCriteria' ,
-				'aAssociationBy' ,
+				'aAssociatedBy' ,
 				'arrAssociations' ,
 				'arrBeanConfig' ,
 			)
@@ -1071,7 +1071,7 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	private $limitFrom = 0 ;
 	private $aCriteria = null;
 	private $arrAssociations =  array();
-	private $aAssociationBy = null;
+	private $aAssociatedBy = null;
 	private $sModelClass = null ;
 	private $arrBeanConfig ;
 	
@@ -1083,8 +1083,8 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	private $sPathCache ;
 	private $aStatementInsert ;
 	private $aStatementDelete ;
-	private $aStatementSelect ;
 	private $aStatementUpdate ;
+	private $arrSelectState ;
 	
 	static private $aSqlCompiler ;
 	

@@ -159,10 +159,10 @@ abstract class MultiTableSQL extends SQL
 			array_push($arrTokens,'USING','(',$using,')') ;
 		}
 		
-		return $this->_joinTableRaw($sFromTable,$sToTable,$sAlias,$sJoinType,$arrTokens) ;
+		return $this->joinTableRaw($sFromTable,$sToTable,$sAlias,$sJoinType,$arrTokens) ;
 	}
 	
-	public function _joinTableRaw($sFromTable,$sToTable,$sAlias=null,$sJoinType='LEFT',array $arrRawTokens=array())
+	public function joinTableRaw($sFromTable,$sToTable,$sAlias=null,$sJoinType='LEFT',array $arrRawTokens=array())
 	{
 		$arrRawFrom =& $this->rawClause($this->nTablesClause) ;
 		if( !$arrFromTableToken=&$this->findTableRaw($sFromTable,$arrRawFrom['subtree']) )
