@@ -268,6 +268,26 @@ class VersionScope
 		}
 	}
 	
+	public function low()
+	{
+		return $this->aLow ;
+	}
+	
+	public function high()
+	{
+		return $this->aHigh ;
+	}
+	
+	public function lowCompare()
+	{
+		return $this->sLowCompare ;
+	}
+	
+	public function highCompare()
+	{
+		return $this->sHighCompare ;
+	}
+	
 	/**
 	 * 下位版本号
 	 * 
