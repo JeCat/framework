@@ -532,6 +532,15 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 		return ($sTableAlias?$sTableAlias.'.':'').$sColumnName ;
 	}
 	
+	public function sqlForceIndex()
+	{
+		return $this->sForceIndex ;
+	}
+	public function setSqlForceIndex($sForceIndex)
+	{
+		return $this->sForceIndex = $sForceIndex ;
+	}
+	
 	/**
 	 * @return org\jecat\framework\mvc\model\db\Model
 	 */
@@ -754,6 +763,10 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 		else if( !empty($arrConfig['name']) )
 		{
 			$this->setTableName($arrConfig['name']) ;
+		}
+		if( !empty($arrConfig['forceIndex']) )
+		{
+			$this->sForceIndex = $arrConfig['forceIndex'] ;
 		}
 		
 		// name
@@ -992,6 +1005,7 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 			__CLASS__ => array(
 				'sName' ,
 				'sTableName' ,
+				'sForceIndex' ,
 				'arrColumns' ,
 				'arrColumnAliases' ,
 				'arrKeys' ,
@@ -1018,12 +1032,12 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	// constructor
 	public function __construct(){}
 
-	private function __clone()
+	public function __clone()
 	{
 		$this->this->sPathCache = null ;
 		$this->aStatementInsert = null ;
 		$this->aStatementDelete = null ;
-		$this->aStatementSelect = null ;
+		$this->arrSelectState = null ;
 		$this->aStatementUpdate = null ;
 	}
 	
@@ -1066,6 +1080,7 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	// 固有属性 ----------------------------
 	private $sName;// 如果不提供，用表名作名字。
 	private $sTableName='';
+	private $sForceIndex=null;
 	private $arrColumns ;
 	private $arrColumnAliases = array();
 	private $arrKeys ;

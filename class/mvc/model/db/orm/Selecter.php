@@ -217,7 +217,7 @@ class Selecter extends OperationStrategy
 	 */
 	static public function buildSelect(Prototype $aPrototype,array & $arrSelectState=null)
 	{
-		$arrSelectState['statement'] = new Select($aPrototype->tableName(),$aPrototype->sqlTableAlias()) ;
+		$arrSelectState['statement'] = new Select($aPrototype->tableName(),$aPrototype->sqlTableAlias(),$aPrototype->sqlForceIndex()) ;
 		if(!isset($arrSelectState['multitermAssocs']))
 		{
 			$arrSelectState['multitermAssocs'] = array() ;
