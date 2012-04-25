@@ -29,7 +29,7 @@ use org\jecat\framework\lang\Exception;
 
 abstract class MultiTableSQL extends SQL
 {
-	function __construct($sTableName=null,$sTableAlias=null)
+	function __construct($sTableName=null,$sTableAlias=null,$sForceIndex=null)
 	{
 		$this->arrRawSql = array(
 				'expr_type' => 'query' ,
@@ -37,7 +37,7 @@ abstract class MultiTableSQL extends SQL
 		) ;
 		if($sTableName)
 		{
-			$this->addTable($sTableName,$sTableAlias) ;
+			$this->addTable($sTableName,$sTableAlias,$sForceIndex) ;
 		}
 	}
 	
@@ -51,7 +51,7 @@ abstract class MultiTableSQL extends SQL
 	 * 
 	 * @param $table	string,Table
 	 */
-	public function addTable($table,$sAlias=null)
+	public function addTable($table,$sAlias=null,$sForceIndex=null)
 	{
 		if( is_string($table) )
 		{
@@ -84,6 +84,11 @@ abstract class MultiTableSQL extends SQL
 		else
 		{
 			$arrRawFrom['subtree'][] =& $arrRawTable ;
+		}
+		
+		if($sForceIndex)
+		{
+			$arrRawTable['subtree'][] = "FORCE INDEX(`{$sForceIndex}`)" ;
 		}
 	}
 	

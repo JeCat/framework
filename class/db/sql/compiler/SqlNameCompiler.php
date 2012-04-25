@@ -47,10 +47,10 @@ class SqlNameCompiler extends Object
 				}
 			}
 			
-			$sSql = '`'.$sTable.'`' ;
+			$sSql = '`'.$sTable.'` ' ;
 			if($sAlias)
 			{
-				$sSql.= ' AS `' . $sAlias . '`' ;
+				$sSql.= 'AS `' . $sAlias . '` ' ;
 			}
 			
 			// 处理 join 子句
