@@ -1119,7 +1119,7 @@ class Controller extends NamableComposite implements IBean
     protected $fnProcess ;
     
     private $bAutoCheckPermissions = true ;
-    private $bCatchOutput = true ;
+    private $bCatchOutput = false ;
     
     static private $nAssignedId = 0 ;
     
