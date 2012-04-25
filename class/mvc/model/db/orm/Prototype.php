@@ -854,7 +854,10 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 			{
 				$arrOnFactors = $arrConfig['where'] ;
 				$arrRawWhere['subtree'] = & SQL::parseSql(array_shift($arrOnFactors),'where',true) ;
-				$this->criteria()->where()->addFactors($arrOnFactors) ;
+				if($arrOnFactors)
+				{
+					$this->criteria()->where()->addFactors($arrOnFactors) ;
+				}
 			}
 			else
 			{

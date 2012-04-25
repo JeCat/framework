@@ -234,20 +234,19 @@ class Selecter extends OperationStrategy
 		}
 
 		// group by
-		if( $arrRawClause = $aPrototype->criteria()->rawClause(SQL::CLAUSE_GROUP) )
+		if( $arrRawGroup = $aPrototype->criteria()->rawClause(SQL::CLAUSE_GROUP) )
 		{
-			$arrSelectState['statement']->setRawClause( SQL::CLAUSE_GROUP, $arrRawClause ) ;
+			$arrSelectState['statement']->setRawClause( SQL::CLAUSE_GROUP, $arrRawGroup ) ;
 		}
 
 		// order by
-		/*if( $arrRawClause = $aPrototype->criteria()->rawClause(SQL::CLAUSE_ORDER) )
+		if( $arrRawOrder = $aPrototype->criteria()->rawClause(SQL::CLAUSE_ORDER) )
 		{
-			$aSelect->setRawClause( SQL::CLAUSE_ORDER, $arrRawClause ) ;
-		}*/
+			$arrSelectState['statement']->setRawClause( SQL::CLAUSE_ORDER, $arrRawOrder ) ;
+		}
 		
 		// 递归连接所有关联原型的 table
 		self::joinTables( $arrSelectState, $aPrototype ) ;
-		
 		return $arrSelectState['statement'] ;
 	}
 	

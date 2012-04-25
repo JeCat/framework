@@ -337,15 +337,15 @@ class SQL
 		return $this ;
 	}
 	
-	public function setRawClause($sType,array & $arrRawWhere=null)
+	public function setRawClause($sType,array & $arrRawClause=null)
 	{
-		if($arrRawWhere===null)
+		if($arrRawClause===null)
 		{
 			unset($this->arrRawSql['subtree'][$sType]) ;
 		}
 		else
 		{
-			$this->arrRawSql['subtree'][$sType] =& $arrRawWhere ;
+			$this->arrRawSql['subtree'][$sType] =& $arrRawClause ;
 		}
 	}
 	public function & rawClause($sType,$bAutoCreate=true,array & $parentToken=null)
