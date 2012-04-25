@@ -317,7 +317,7 @@ class Association implements IBean, \Serializable, IIncompleteSerializable
 		$arrConfigForToPrototype['class'] = 'prototype' ;
 		
 		$this->aToPrototype = BeanFactory::singleton()->createBean($arrConfigForToPrototype,$sNamespace) ;
-		$this->aToPrototype->setAssociationBy($this) ;
+		$this->aToPrototype->setassociatedBy($this) ;
 	
 		if(!empty($arrConfig['type']))
 		{

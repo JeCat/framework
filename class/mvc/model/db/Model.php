@@ -110,7 +110,7 @@ class Model extends AbstractModel implements IBean
 		
 		$this->nDataRow = 0 ;
 		return Selecter::singleton()->execute(
-			$this->prototype() , $this->recordset(), null , self::buildRestriction($this->prototype(),$values,$keys), false, $this->db()
+			$this->prototype() , $this->recordset(), self::buildRestriction($this->prototype(),$values,$keys), false, $this->db()
 		) ;
 	}
 	
@@ -124,7 +124,7 @@ class Model extends AbstractModel implements IBean
 		$this->nDataRow = 0 ;
 		
 		return Selecter::singleton()->execute(
-				$this->prototype() , $this->recordset(), null , $aRestriction, false, $this->db()
+				$this->prototype() , $this->recordset(), $aRestriction, false, $this->db()
 		) ;
 	}
 
