@@ -139,17 +139,20 @@ abstract class MultiTableSQL extends SQL
 					$this->arrRawSql['tables'][$sTableName] =& $rawToken ;
 					return $rawToken ;
 				}
+				
 			}
-			else if( !empty($rawToken['subtree']) )
+			
+			// 递归
+			if( !empty($rawToken['subtree']) )
 			{
-				if( $arrNameToken =& $this->findNameRaw($sName,$rawToken['subtree'],$sType) )
+				if( $arrNameToken =& $this->findTableRaw($sTableName,$rawToken['subtree']) )
 				{
 					return $arrNameToken ;
 				}
 			}
 		}
 		
-		return $null = null ;
+		return self::$null ;
 	}
 
 	public function joinTable($sFromTable,$sToTable,$sAlias=null,$on=null,$using=null,$sJoinType='LEFT')
@@ -172,7 +175,7 @@ abstract class MultiTableSQL extends SQL
 		$arrRawFrom =& $this->rawClause($this->nTablesClause) ;
 		if( !$arrFromTableToken=&$this->findTableRaw($sFromTable,$arrRawFrom['subtree']) )
 		{
-			throw new Exception("名为 %s 的数据表不存在，无法在该数据表上 join 另一个数据表。",$sFromTable) ;
+			throw new Exception("名为 %s 的数据表不存在，无法在该数据表上 join 另一个数据表(%s %s)。",array($sFromTable,$sToTable,$sAlias)) ;
 		}
 		
 		array_unshift($arrRawTokens, $sJoinType,'JOIN','(',self::createRawTable($sToTable,$sAlias),')') ;
@@ -264,6 +267,8 @@ abstract class MultiTableSQL extends SQL
 	private $aCriteria ;
 	
 	protected $nTablesClause = SQL::CLAUSE_FROM ;
+	
+	static private $null = null ;
 }
 
 
