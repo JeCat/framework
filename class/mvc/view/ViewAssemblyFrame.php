@@ -28,7 +28,7 @@ namespace org\jecat\framework\mvc\view ;
 use org\jecat\framework\io\IRedirectableStream;
 use org\jecat\framework\io\OutputStreamBuffer;
 
-class ViewAssemblySlot extends OutputStreamBuffer implements \Serializable
+class ViewAssemblyFrame extends OutputStreamBuffer
 {
 	const soft = 3 ;
 	const hard = 5 ;
@@ -47,7 +47,7 @@ class ViewAssemblySlot extends OutputStreamBuffer implements \Serializable
 			'xhard' => self::xhard ,
 	) ;
 			
-	public function __construct($priority=self::soft,array $arrXPaths=null,$sLayout=self::layout_vertical,$sContainerFor=self::container_use_controller)
+	public function __construct(IView $aViewContainer,$priority=self::soft,array $arrXPaths=null,$sLayout=self::layout_vertical)
 	{
 		if( isset(self::$arrModeName[$priority]) )
 		{
@@ -59,31 +59,10 @@ class ViewAssemblySlot extends OutputStreamBuffer implements \Serializable
 		}
 		
 		$this->arrXPaths = $arrXPaths ;
-		$this->sContainerFor = $sContainerFor ;
+		$this->aViewContainer = $aViewContainer ;
 	}
-	
-	/**
-	 * 装配视图，将视图渲染后的buffer装配起来
-	 * @see org\jecat\framework\mvc\view.IView::assembly()
-	 */
-	static public function assembly(IView $aParentView)
-	{
-		if( !$aOutputBuffer = $aParentView->outputStream(false) )
-		{
-			return ;
-		}
 		
-		$arrRawData =& $aOutputBuffer->bufferRawDatas() ;
-		foreach($arrRawData as &$data)
-		{
-			if( $data instanceof ViewAssemblySlot )
-			{
-				$data->pullinViews($aParentView) ;
-			}
-		}
-	}
-	
-	public function pullinViews(IView $aView)
+	public function assemble()
 	{
 		if($this->arrXPaths)
 		{
@@ -109,7 +88,7 @@ class ViewAssemblySlot extends OutputStreamBuffer implements \Serializable
 			// 找指定 xpath 的view
 			foreach($this->arrXPaths as $sXPath)
 			{
-				if( $aFoundView=View::findXPath($aViewContainer,$sXPath) )
+				if( $aFoundView=View::findXPath($this->aViewContainer,$sXPath) )
 				{
 					$this->pullinOneView($aFoundView) ;
 				}
@@ -118,7 +97,7 @@ class ViewAssemblySlot extends OutputStreamBuffer implements \Serializable
 		else
 		{
 			// 找 view container 所有的view
-			foreach($aView->iterator() as $aView)
+			foreach($this->aViewContainer->iterator() as $aView)
 			{
 				$this->pullinOneView($aView) ;
 			}
@@ -131,7 +110,7 @@ class ViewAssemblySlot extends OutputStreamBuffer implements \Serializable
 		if( ($aOutputBuffer=$aView->outputStream(false)) instanceof IRedirectableStream )
 		{
 			// 已经被装配到一个 ViewAssemblySlot 中了
-			if( ($aRedirectionDev=$aOutputBuffer->redirectionDev()) instanceof ViewAssemblySlot )
+			if( ($aRedirectionDev=$aOutputBuffer->redirectionDev()) instanceof ViewAssemblyFrame )
 			{
 				// 比较两个 slot 的优先级
 				if( $this->priority() >$aRedirectionDev->priority() )
@@ -145,7 +124,7 @@ class ViewAssemblySlot extends OutputStreamBuffer implements \Serializable
 				$aOutputBuffer->redirect($this) ;
 				
 				// 装配这个视图的buffer
-				self::assembly($aView) ;
+				//self::assemble($aView) ;
 			}
 		}		
 	}
@@ -215,24 +194,10 @@ class ViewAssemblySlot extends OutputStreamBuffer implements \Serializable
 		return $this->sLayout ;
 	}
 	
-	public function serialize()
-	{
-		$arrData['arrXPaths'] =& $this->arrXPaths ;
-		$arrData['nPriority'] =& $this->nPriority ;
-	
-		return serialize($arrData) ;
-	}
-	public function unserialize($sData)
-	{
-		$arrData = unserialize($sData) ;
-		
-		$this->arrXPaths =& $arrData['arrXPaths'] ;
-		$this->nPriority =& $arrData['nPriority'] ;
-	}
 	
 	private $arrXPaths ;
 	
-	private $sContainerFor ;
+	private $aViewContainer ;
 	
 	private $nPriority = 0 ;
 	

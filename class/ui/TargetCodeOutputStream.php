@@ -43,6 +43,7 @@ class TargetCodeOutputStream extends OutputStreamBuffer implements IOutputStream
 		if($bStartScript)
 		{
 			$this->write("<?php\r\n") ;
+			$this->write("use org\\jecat\\framework as jc ;\r\n") ;
 		}
 	}
 	

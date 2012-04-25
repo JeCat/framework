@@ -25,6 +25,10 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\controller ;
 
+use org\jecat\framework\mvc\view\ViewAssembler;
+
+use org\jecat\framework\mvc\view\ViewAssemblySlot;
+
 use org\jecat\framework\util\EventManager;
 
 use org\jecat\framework\mvc\view\View;
@@ -184,7 +188,8 @@ class Response extends Object
 				$aController->messageQueue()->display(null,$aTmpView->outputStream()) ;
 			}
 			
-			$aMainView->assembly() ;
+			ViewAssembler::singleton()->assemble() ;
+			
 			$aController->displayMainView($aMainView,$this->printer()) ;
 			
 			break ;
