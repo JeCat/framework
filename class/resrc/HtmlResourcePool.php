@@ -129,29 +129,40 @@ class HtmlResourcePool extends Object
 		$sRet = '' ;
 	
 		try {
-			foreach($this->iterator(self::RESRC_JS,false) as $sFilename)
+
+			foreach( $this->arrResrcs[self::RESRC_JS] as $sFileName=>&$nBeRequiredCount )
 			{
-				$sUrl = $this->aResourceManager->find($sFilename,'*',true) ;
+				if(!$nBeRequiredCount)
+				{
+					continue ;
+				}
+				$sUrl = $this->aResourceManager->find($sFileName,'*',true) ;
 				if( $sUrl )
 				{
 					$sRet.= "<script type=\"text/javascript\" src=\"{$sUrl}\"></script>\r\n" ;
 				}
-				else 
+				else
 				{
-					$sRet.= "<script type=\"text/javascript\" comment=\"正在请求一个未知的JavaScript文件：{$sFilename}\"></script>\r\n" ;
+					$sRet.= "<script type=\"text/javascript\" comment=\"正在请求一个未知的JavaScript文件：{$sFileName}\"></script>\r\n" ;
 				}
+				$nBeRequiredCount = 0 ;
 			}
-			foreach($this->iterator(self::RESRC_CSS,false) as $sFilename)
+			foreach( $this->arrResrcs[self::RESRC_CSS] as $sFileName=>&$nBeRequiredCount )
 			{
-				$sUrl = $this->aResourceManager->find($sFilename,'*',true) ;
+				if(!$nBeRequiredCount)
+				{
+					continue ;
+				}
+				$sUrl = $this->aResourceManager->find($sFileName,'*',true) ;
 				if( $sUrl )
 				{
 					$sRet.= "<link rel=\"stylesheet\" type=\"text/css\" href=\"{$sUrl}\" />\r\n" ;
 				}
 				else 
 				{
-					$sRet.= "<link rel=\"stylesheet\" type=\"text/css\" comment=\"正在请求一个未知的CSS文件：{$sFilename}\" />\r\n" ;
+					$sRet.= "<link rel=\"stylesheet\" type=\"text/css\" comment=\"正在请求一个未知的CSS文件：{$sFileName}\" />\r\n" ;
 				}
+				$nBeRequiredCount = 0 ;
 			}
 		}
 		catch (Exception $e)

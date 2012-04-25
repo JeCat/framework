@@ -345,6 +345,16 @@ class View extends NamableComposite implements IView, IBean
 		
 		return $this->aOutputStream ;
 	}
+	/**
+	 * @return View
+	 */
+	static public function findViewByStream(IOutputStream $aStream)
+	{
+		if( $aStream instanceof OutputStreamBuffer and $aProperties=$this->aOutputStream->properties(false) )
+		{
+			return $aProperties->get('_view') ;
+		}		
+	}
 	public function setOutputStream(OutputStreamBuffer $aDev)
 	{
 		$this->aOutputStream = $aDev ;

@@ -37,6 +37,10 @@ use org\jecat\framework\lang\Object;
 
 class Response extends Object
 {
+	const event_beforeRespond = 'beforeRespond' ;
+	const event_afterRespond = 'afterRespond' ;
+	const event_afterAssemblyViews = 'afterAssemblyViews' ;
+	
 	public function __construct(PrintStream $aPrinter=null)
 	{
 		$this->aPrinter = $aPrinter ;
@@ -114,8 +118,11 @@ class Response extends Object
 	 */
 	public function respond(Controller $aController)
 	{
-		$arrEventArgvs = array($aController) ;
-		EventManager::singleton()->emitEvent(__CLASS__,'beforeRespond',$arrEventArgvs) ;
+		$aEventManager = EventManager::singleton() ;
+		
+		// 触发事件
+		$arrEventArgvs = array($this,$aController) ;
+		$aEventManager->emitEvent(__CLASS__,self::event_beforeRespond,$arrEventArgvs) ;
 		
 		
 		switch ($aController->params()->get('rspn'))
@@ -184,7 +191,14 @@ class Response extends Object
 				$aController->messageQueue()->display(null,$aTmpView->outputStream()) ;
 			}
 			
+			// 装配视图
 			$aMainView->assembly() ;
+
+			// 触发事件
+			$arrEventArgvs2 = array($this,$aMainView,$aController) ;
+			$aEventManager->emitEvent(__CLASS__,self::event_afterAssemblyViews,$arrEventArgvs2) ;
+			
+			// 显示视图
 			$aController->displayMainView($aMainView,$this->printer()) ;
 			
 			break ;
@@ -255,8 +269,8 @@ class Response extends Object
 			}
 		}
 		
-
-		EventManager::singleton()->emitEvent(__CLASS__,'afterRespond',$arrEventArgvs) ;
+		// 触发事件
+		$aEventManager->emitEvent(__CLASS__,self::event_afterRespond,$arrEventArgvs) ;
 	}
 	
 	private function printDebugModelStruct(Controller $aController,$sModelName)
