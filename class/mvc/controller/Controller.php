@@ -1083,6 +1083,11 @@ class Controller extends NamableComposite implements IBean
    		return $this->bAutoCheckPermissions ;
    	}
    	
+   	public function setCatchOutput($bCatchOutput)
+   	{
+   		$this->bCatchOutput = $bCatchOutput ;
+   	}
+   	
 
     static private $aRegexpModelName = null ;
     
