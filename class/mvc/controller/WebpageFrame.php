@@ -160,6 +160,7 @@ class WebpageFrame extends Controller
     public function setMainView(IView $aView)
     {    	
     	parent::setMainView($aView) ;
+    	$aView->setController($this) ;
     
     	if( !$this->aViewContainer )
     	{

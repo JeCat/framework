@@ -25,6 +25,8 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\view\uicompiler ;
 
+use org\jecat\framework\mvc\view\ViewAssemblySlot;
+
 use org\jecat\framework\lang\Assert;
 use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\CompilerManager;
@@ -101,21 +103,23 @@ class ViewCompiler extends NodeCompiler
 		// 指定view名称
 		if( $aAttrs->has('name') )
 		{
-			$sViewXPaths = 'array(' . $aAttrs->get('name') . ')' ;
+			$arrViewXPaths = 'array(' . $aAttrs->get('name') . ')' ;
 		}
 		else
 		{
-			$sViewXPaths = 'null' ;
+			$arrViewXPaths = 'null' ;
 		}
+
+		$sLayout = $aAttrs->get('layout')?: ViewAssemblySlot::layout_vertical ;
 		
 		// container
 		if( $aAttrs->has('container') )
 		{
-			$sViewContainer = $aAttrs->get('container') ;
+			$sViewContainer = $aAttrs->expression('container') ;
 		}
 		else
 		{
-			$sViewContainer = "'controller'" ;
+			$sViewContainer = "\$theView->controller()->mainView()" ;
 		}
 		
 		// model
@@ -129,8 +133,20 @@ class ViewCompiler extends NodeCompiler
 			$sMode = $aAttrs->has('name')? "'hard'": "'soft'" ;
 		}
 		
-		$aDev->write("\$__aViewAssemblySlot = new \\org\\jecat\\framework\\mvc\\view\\ViewAssemblySlot({$sMode},{$sViewXPaths},{$sViewContainer}) ;") ;
-		$aDev->write("\$theView->outputStream()->write(\$__aViewAssemblySlot) ;" ) ;
+		if( !$nNodeViewId = $aDev->properties(true)->getRef('node.view.id') )
+		{
+			$nNodeViewId = 0 ;
+		}
+		else
+		{
+			$nNodeViewId ++ ;
+		}
+	
+		$aDev->write("\$theView->outputStream()->write(
+	jc\\mvc\\view\\ViewAssembler::singleton()->addFrame(
+		\$theView->xpath().'({$nNodeViewId})'
+		, new jc\\mvc\\view\\ViewAssemblyFrame({$sViewContainer},{$sMode},{$arrViewXPaths},'{$sLayout}')
+) ) ;" ) ;
 		
 		$aDev->write("//-------------------\r\n") ;
 	}

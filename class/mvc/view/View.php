@@ -393,7 +393,10 @@ class View extends NamableComposite implements IView, IBean
 		}
 		
 		// 用于收容”流浪“视图的槽
-		$this->outputStream()->write(new ViewAssemblySlot()) ;
+		$this->outputStream()->write(ViewAssembler::singleton()->addFrame(
+				$this->xpath().':vagrants'
+				, new ViewAssemblyFrame($this))
+		) ;
 		
 		// render child view
 		$this->renderChildren($bRerender) ;
@@ -450,11 +453,6 @@ class View extends NamableComposite implements IView, IBean
 		{
 			$aChildView->render($bRerender) ;
 		}
-	}
-	
-	public function assembly()
-	{
-		ViewAssemblySlot::assembly($this) ;
 	}
 	
 	/**

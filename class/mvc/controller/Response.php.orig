@@ -195,6 +195,7 @@ class Response extends Object
 				$aController->messageQueue()->display(null,$aTmpView->outputStream()) ;
 			}
 			
+<<<<<<< HEAD
 			// 装配视图
 			$aMainView->assembly() ;
 
@@ -203,6 +204,10 @@ class Response extends Object
 			$aEventManager->emitEvent(__CLASS__,self::event_afterAssemblyViews,$arrEventArgvs2) ;
 			
 			// 显示视图
+=======
+			ViewAssembler::singleton()->assemble() ;
+			
+>>>>>>> origin/alee-work-tmp-rafect.view.output
 			$aController->displayMainView($aMainView,$this->printer()) ;
 			
 			break ;
