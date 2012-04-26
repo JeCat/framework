@@ -203,7 +203,12 @@ class ViewAssembler extends Object
 	
 	private function _displayAssemblyList(array & $arrAssemblyList,IOutputStream $aDevice)
 	{
-		$aDevice->write("<div class=\"jc-view-layout-frame\">\r\n") ;
+		$aDevice->write("<div class=\"jc-layout-frame\"") ;
+		if( !empty($arrAssemblyList['id']) )
+		{
+			$aDevice->write(" id=\"{$arrAssemblyList['id']}\"") ;			
+		}
+		$aDevice->write(">\r\n") ;
 		$aDebugging = Application::singleton()->isDebugging() ;
 			
 		foreach( $arrAssemblyList['items'] as &$arrAssemblyItem)
@@ -225,7 +230,7 @@ class ViewAssembler extends Object
 					}
 				}
 
-				$aDevice->write("<div class=\"layout-item-{$arrAssemblyItem['id']}\">\r\n") ;
+				$aDevice->write("<div class=\"jc-view jc-layout-item\" id=\"{$arrAssemblyItem['id']}\">\r\n") ;
 				if($aDebugging)
 				{
 					$aDevice->write("<!-- view name: ".$arrAssemblyItem['object']->name()." -->\r\n") ;
@@ -248,7 +253,7 @@ class ViewAssembler extends Object
 			}
 		}
 		
-		$aDevice->write("<div class='jc-view-layout-end-item'></div></div>\r\n") ;
+		$aDevice->write("<div class='jc-layout-end-item'></div></div>\r\n") ;
 	}
 
 	private $arrAssemblyListRepos = array() ;
