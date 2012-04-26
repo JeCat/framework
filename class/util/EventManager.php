@@ -68,7 +68,7 @@ class EventManager extends Object implements \Serializable
 				if( is_array($fnHandler) )
 				{
 					// 对像方法
-					if(is_object($fnHandler[0]))
+					if(is_object(reset($fnHandler)))
 					{
 						throw new \Exception("无法序列化回调函数：%s::%s()",array(get_class($fnHandler[0]),$fnHandler[1])) ;
 					}
