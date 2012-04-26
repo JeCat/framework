@@ -45,9 +45,9 @@ class Response extends Object
 	const event_afterRespond = 'afterRespond' ;
 	const event_afterAssemblyViews = 'afterAssemblyViews' ;
 	
-	public function __construct(PrintStream $aPrinter=null)
+	public function __construct(PrintStream $aDevice=null)
 	{
-		$this->aPrinter = $aPrinter ;
+		$this->aDevice = $aDevice ;
 	}
 	
 	/**
@@ -148,7 +148,7 @@ class Response extends Object
 		// var ------------
 		case 'var' :
 		case 'var.json' :
-			$this->printer()->write(json_encode($this->arrReturnVariables)) ;
+			$this->device()->write(json_encode($this->arrReturnVariables)) ;
 			
 			break ;
 			
@@ -156,7 +156,7 @@ class Response extends Object
 			break ;
 			
 		case 'var.php' :
-			$this->printer()->write(var_export($this->arrReturnVariables,true)) ;
+			$this->device()->write(var_export($this->arrReturnVariables,true)) ;
 			break ;
 			
 		// view ------------	
@@ -176,8 +176,6 @@ class Response extends Object
 				$aMainView = $aController->mainView() ;
 			}
 			
-			$aController->renderMainView($aMainView) ;
-			
 			// 控制器没有有效视图
 			$nValidViews = 0 ;
 			foreach($aController->viewIterator() as $aView)
@@ -192,18 +190,18 @@ class Response extends Object
 				// 临时提供一个仅显示消息队列的视图
 				$aTmpView = new View() ;
 				$aController->addView($aTmpView,'tmp_view_for_msgqueue') ;
-				$aController->messageQueue()->display(null,$aTmpView->outputStream()) ;
+				$aController->messageQueue()->display(null,$this->device()) ;
 			}
 			
 			// 装配视图
-			$aMainView->assembly() ;
+			ViewAssembler::singleton()->assemble() ;
 
 			// 触发事件
 			$arrEventArgvs2 = array($this,$aMainView,$aController) ;
-			$aEventManager->emitEvent(__CLASS__,self::event_afterAssemblyViews,$arrEventArgvs2) ;
+			//$aEventManager->emitEvent(__CLASS__,self::event_afterAssemblyViews,$arrEventArgvs2) ;
 			
 			// 显示视图
-			$aController->displayMainView($aMainView,$this->printer()) ;
+			$aMainView->render($this->device()) ;
 			
 			break ;
 			
@@ -215,7 +213,7 @@ class Response extends Object
 		// 打印数据库的执行日志
 		if( $aController->params()->has('rspn.debug.db.log') )
 		{
-			$this->printer()->write( '<hr /><h3>数据库执行记录：</h3>' ) ;
+			$this->device()->write( '<hr /><h3>数据库执行记录：</h3>' ) ;
 			
 			// 按执行时间排序
 			$arrLogs = DB::singleton()->executeLog(false) ;
@@ -235,9 +233,9 @@ class Response extends Object
 			foreach($arrLogs as $arrLog)
 			{
 				$fTotal += $arrLog['time'] ;
-				$this->printer()->write( "<div style='padding-top:10px'>[{$arrLog['idx']}]=>耗时:{$arrLog['time']} <pre>{$arrLog['sql']}</pre></div>" ) ;
+				$this->device()->write( "<div style='padding-top:10px'>[{$arrLog['idx']}]=>耗时:{$arrLog['time']} <pre>{$arrLog['sql']}</pre></div>" ) ;
 			}
-			$this->printer()->write( "\r\n<br />DB共执行了 ".count($arrLogs)." 条SQL，总计时间：{$fTotal}\r\n<hr />" ) ;
+			$this->device()->write( "\r\n<br />DB共执行了 ".count($arrLogs)." 条SQL，总计时间：{$fTotal}\r\n<hr />" ) ;
 			
 		}
 		
@@ -252,14 +250,14 @@ class Response extends Object
 				// 控制器自己的模型
 				foreach($aController->modelNameIterator() as $sModelName)
 				{
-					$this->printer()->write( '<hr /><h3>控制器'.$aController->name().'的模型数据结构：</h3>' ) ;
+					$this->device()->write( '<hr /><h3>控制器'.$aController->name().'的模型数据结构：</h3>' ) ;
 					$this->printDebugModelStruct($aController,$sModelName) ;
 				}
 				
 				// 子控制器的模型
 				foreach($aController->iterator() as $aChildController)
 				{
-					$this->printer()->write( '<hr /><h3>控制器'.$aChildController->name().'的模型数据结构：</h3>' ) ;
+					$this->device()->write( '<hr /><h3>控制器'.$aChildController->name().'的模型数据结构：</h3>' ) ;
 					foreach($aChildController->modelNameIterator() as $sModelName)
 					{
 						$this->printDebugModelStruct($aChildController,$sModelName) ;
@@ -268,7 +266,7 @@ class Response extends Object
 			}
 			else
 			{
-				$this->printer()->write( '<hr /><h3>控制器'.$aController->name().'的模型数据结构：</h3>' ) ;
+				$this->device()->write( '<hr /><h3>控制器'.$aController->name().'的模型数据结构：</h3>' ) ;
 				$this->printDebugModelStruct($aController,$sModelName) ;
 			}
 		}
@@ -279,18 +277,18 @@ class Response extends Object
 	
 	private function printDebugModelStruct(Controller $aController,$sModelName)
 	{
-		$this->printer()->write( "<div style='padding-top:10px'><h4>[模型：{$sModelName}]</h4>" ) ;
+		$this->device()->write( "<div style='padding-top:10px'><h4>[模型：{$sModelName}]</h4>" ) ;
 		if( $aModel=$aController->modelByName($sModelName) )
 		{
-			$this->printer()->write( "<pre>" ) ;
-			$aModel->printStruct($this->printer()) ;
-			$this->printer()->write( "</pre>" ) ;
+			$this->device()->write( "<pre>" ) ;
+			$aModel->printStruct($this->device()) ;
+			$this->device()->write( "</pre>" ) ;
 		}
 		else
 		{
-			$this->printer()->write( "模型名称{$sModelName}无效" ) ;
+			$this->device()->write( "模型名称{$sModelName}无效" ) ;
 		}
-		$this->printer()->write( "</div>" ) ;		
+		$this->device()->write( "</div>" ) ;		
 	}
 	
 	// ------------------------
@@ -328,18 +326,18 @@ class Response extends Object
 	 * 
 	 * @return org\jecat\framework\io\PrintSteam
 	 */
-	public function printer($bAutoCreate=true)
+	public function device($bAutoCreate=true)
 	{
-		if( !$this->aPrinter and $bAutoCreate )
+		if( !$this->aDevice and $bAutoCreate )
 		{
-			$this->aPrinter = ApplicationFactory::singleton()->createResponseDevice() ;
+			$this->aDevice = ApplicationFactory::singleton()->createResponseDevice() ;
 		}
-		return $this->aPrinter ;
+		return $this->aDevice ;
 	}
 	
-	public function setPrinter(PrintStream $aPrinter)
+	public function setdevice(PrintStream $aDevice)
 	{
-		$this->aPrinter = $aPrinter ;
+		$this->aDevice = $aDevice ;
 	}
 
 	public function output($sBytes)
@@ -349,7 +347,7 @@ class Response extends Object
 			list($sBytes) = $aFilters->handle($sBytes) ;
 		}
 		
-		$this->aPrinter->println($sBytes) ;
+		$this->aDevice->println($sBytes) ;
 	}
 	
 	/**
@@ -366,11 +364,12 @@ class Response extends Object
 	}
 	
 	/**
+	 * alias for device
 	 * @return org\jecat\framework\io\IOutputStream
 	 */
-	public function device()
+	public function printer()
 	{
-		return $this->aPrinter ;
+		return $this->aDevice ;
 	}
 	
 	/**
@@ -378,7 +377,7 @@ class Response extends Object
 	 * 
 	 * @var org\jecat\framework\io\PrintSteam
 	 */
-	private $aPrinter ;
+	private $aDevice ;
 	
 	private $aFilters ;
 	

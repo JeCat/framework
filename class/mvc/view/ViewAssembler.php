@@ -25,28 +25,236 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\view ;
 
+use org\jecat\framework\system\Application;
+
+use org\jecat\framework\io\IOutputStream;
+use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\Object;
 
 class ViewAssembler extends Object
 {
+	const weak = 1 ;
+	const soft = 3 ;
+	const hard = 5 ;
+	const xhard = 7 ;
+	static private $arrModeName = array(
+			'weak' => self::weak ,
+			'soft' => self::soft ,
+			'hard' => self::hard ,
+			'xhard' => self::xhard ,
+	) ;
+	
+	const layout_vertical = 'v' ;
+	const layout_horizontal = 'h' ;
+
+	const container_use_controller = 'controller' ;
+	const container_use_view = 'view' ;
+	
 	/////////////
 	public function assemble()
 	{
-		foreach( $this->arrAssemblyTree as $arrNode )
+		foreach( $this->arrAssemblyListRepos as $sId=>&$arrAssemblyList )
 		{
-			$arrNode['frame']->assemble() ;
+			if( empty($arrAssemblyList['filter']) )
+			{
+				continue ;
+			}
+			if( empty($arrAssemblyList['filter']['view']) )
+			{
+				throw new Exception('视图装配单缺少 view 信息。') ;
+			}
+			
+			// echo "<br />\r\nassemble list: '", $sId, "'----------<br />\r\n" ;
+						
+			if($arrAssemblyList['filter']['xpaths'])
+			{
+				// 使用 xpath ， 从视图所属的控制器开始
+				if( !$aController=$arrAssemblyList['filter']['view']->controller() )
+				{
+					throw new Exception('视图尚未加入控制器，无法通过 xpath 查找其它视图。') ;
+				}
+				$aViewContainer = $aController->mainView() ;
+				
+				// 找指定 xpath 的view
+				foreach($arrAssemblyList['filter']['xpaths'] as $sXPath)
+				{
+					if( $aFoundView=View::findXPath($aViewContainer,$sXPath) )
+					{
+						// echo 'found view by xpath : ' , $sXPath, "<br />\r\n" ;
+						$this->assembleView($arrAssemblyList,$aFoundView) ;
+					}
+				}
+			}
+			else
+			{
+				// 找 view 的所有下级视图
+				foreach($arrAssemblyList['filter']['view']->iterator() as $aView)
+				{
+					if( $aView->parent() === $arrAssemblyList['filter']['view'] )
+					{
+						// echo 'found child view : ' , $aView->xpath(), "<br />\r\n" ;
+						$this->assembleView($arrAssemblyList,$aView) ;
+					}
+				}
+			}
+			
+			// 用完了
+			unset($arrAssemblyList['filter']) ;
 		}
+		
+		// echo '<pre>' ;
+		/*$arrAssemblyListRepos = $this->arrAssemblyListRepos ;
+		foreach( $arrAssemblyListRepos as $sId=>&$arrAssemblyList )
+		{
+			if(empty($arrAssemblyList['items']))
+			{
+				//unset($arrAssemblyListRepos[$sId]) ;
+			}
+			else
+			{
+				foreach($arrAssemblyList['items'] as &$arrItem)
+				{
+					unset($arrItem['object']) ;
+				}
+			}
+		}
+		print_r($arrAssemblyListRepos) ;*/
+		// echo '</pre>' ;
 	}
 	
-	public function addFrame($sId,ViewAssemblyFrame $aFrame)
+	private function assembleView(& $arrAssemblyList, IView $aView)
 	{
-		$this->arrAssemblyTree[$sId] = array(
-				'frame' => $aFrame ,
+		if( !$sViewId = $aView->id() )
+		{
+			throw new Exception("在装配视图时，遇到未注册的视图。") ;
+		}
+		
+		// 视图已经装配过
+		if( isset($this->arrViewAssemblyRecords[$sViewId]) )
+		{
+			// echo "view {$sViewId} has assembled, pre priority: {$this->arrViewAssemblyRecords[$sViewId]['priority']}, this time priority: {$arrAssemblyList['filter']['priority']} <br />\r\n" ;
+			
+			// 比较两个 slot 的优先级
+			if( $arrAssemblyList['filter']['priority'] > $this->arrViewAssemblyRecords[$sViewId]['priority'] )
+			{
+				// echo "remove {$sViewId} --- <<< {$this->arrViewAssemblyRecords[$sViewId]['list']['id']} @ {$this->arrViewAssemblyRecords[$sViewId]['listpos']} <br />" ;
+				
+				// 从原装配单中清除
+				unset( $this->arrViewAssemblyRecords[$sViewId]['list']['items'][ $this->arrViewAssemblyRecords[$sViewId]['listpos'] ] ) ;
+				unset( $this->arrViewAssemblyRecords[$sViewId] ) ;
+				
+			}
+			
+			else
+			{
+				return ;
+			}
+		}
+		
+		// 写入装配单
+		$arrAssemblyList['items'][] = array(
+				'type' => 'view' ,
+				'id' => $sViewId ,
+				'object' => $aView ,
 		) ;
-		return $aFrame ;
+		
+		// 记录装配状态
+		end($arrAssemblyList['items']) ;
+		$nPos = key($arrAssemblyList['items']) ;
+		$this->arrViewAssemblyRecords[$sViewId] = array(
+				'list' => &$arrAssemblyList ,
+				'listpos' => $nPos ,
+				'priority' => $arrAssemblyList['filter']['priority'] ,
+		) ;
+
+		// echo "assembling view [ {$sViewId} +++ >>> {$arrAssemblyList['id']} @ {$nPos} ] as priority {$arrAssemblyList['filter']['priority']} <br />" ;
 	}
 	
-	private $arrAssemblyTree ;
+	static public function filterModeToPriority($sMode)
+	{
+		return isset(self::$arrModeName[$sMode])? self::$arrModeName[$sMode]: self::soft ; 
+	}
+	
+	public function defineAssemblyList($sId,$sLayout=self::layout_vertical,array $arrFilter=null)
+	{
+		if( isset($this->arrAssemblyListRepos[$sId]) )
+		{
+			print_r(array_keys($this->arrAssemblyListRepos)) ;
+			throw new Exception("ID为 %s 的视图装配单已经存在，正在重复定义视图装配单",$sId) ;
+		}
+		
+		$this->arrAssemblyListRepos[$sId] = array(
+				'id' => $sId ,
+				'filter' => $arrFilter ,
+				'layout' => $sLayout ,
+				'items' => array() ,
+		) ;
+	}
+	
+	public function displayAssemblyList($sId,IOutputStream $aDevice)
+	{
+		if( !isset($this->arrAssemblyListRepos[$sId]) )
+		{
+			throw new Exception("根据装配单显示视图时遇到了不存在的装配单ID:%s",$sId) ;
+		}
+		
+		$this->_displayAssemblyList($this->arrAssemblyListRepos[$sId],$aDevice) ;
+	}
+	
+	private function _displayAssemblyList(array & $arrAssemblyList,IOutputStream $aDevice)
+	{
+		$aDevice->write("<div class=\"jc-view-layout-frame\">\r\n") ;
+		$aDebugging = Application::singleton()->isDebugging() ;
+			
+		foreach( $arrAssemblyList['items'] as &$arrAssemblyItem)
+		{
+			
+			// 视图
+			if( $arrAssemblyItem['type']==='view' )
+			{
+				if(empty($arrAssemblyItem['object']))
+				{
+					if( empty($arrAssemblyItem['id']) )
+					{
+						throw new Exception("视图类型的装配内容，缺少视图注册ID") ;	
+					}
+					
+					if( !$arrAssemblyItem['object'] = View::findRegisteredView($arrAssemblyItem['id']) )
+					{
+						throw new Exception("在根据装配单输出视图时，无法根据提供的视图ID找到视图对像：%s，该视图可能不存在或未注册。",$arrAssemblyItem['id']) ;	
+					}
+				}
+
+				$aDevice->write("<div class=\"layout-item-{$arrAssemblyItem['id']}\">\r\n") ;
+				if($aDebugging)
+				{
+					$aDevice->write("<!-- view name: ".$arrAssemblyItem['object']->name()." -->\r\n") ;
+				}
+				
+				$arrAssemblyItem['object']->render($aDevice) ;
+				
+				$aDevice->write("</div>\r\n") ;
+			}
+	
+			// 另一个 装配单
+			else if( $arrAssemblyItem['type']==='list' )
+			{
+				$this->_displayAssemblyList($arrAssemblyItem,$aDevice) ;
+			}
+			
+			else 
+			{
+				throw new Exception("无效的装配内容类型：%s",$arrAssemblyItem['type']) ;	
+			}
+		}
+		
+		$aDevice->write("<div class='jc-view-layout-end-item'></div></div>\r\n") ;
+	}
+
+	private $arrAssemblyListRepos = array() ;
+	
+	private $arrViewAssemblyRecords = array() ;
+	
 	
 }
 

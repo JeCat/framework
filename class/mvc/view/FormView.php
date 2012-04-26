@@ -32,9 +32,9 @@ use org\jecat\framework\util\IDataSrc;
 
 class FormView extends View implements IFormView
 {
-	public function __construct($sName=null,$sTemplate=null,UI $aUI=null)
+	public function __construct($sName=null,$sTemplate=null,$bVagrantContainer=true,UI $aUI=null)
 	{
-		parent::__construct($sName,$sTemplate,$aUI) ;
+		parent::__construct($sName,$sTemplate,$bVagrantContainer,$aUI) ;
 	}
 	/**
 	 * @wiki /MVC模式/视图/表单视图

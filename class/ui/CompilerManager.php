@@ -76,11 +76,8 @@ class CompilerManager extends JcObject
 	/**
 	 * @return ICompiled
 	 */
-	public function compile(ObjectContainer $aObjectContainer,IOutputStream $aCompiledOutput,$bPHPTag=true)
-	{
-		$aTargetCodeStream = new TargetCodeOutputStream ;
-		$aTargetCodeStream->open($aCompiledOutput,$bPHPTag) ;
-		
+	public function compile(ObjectContainer $aObjectContainer,TargetCodeOutputStream $aTargetCodeStream)
+	{		
 		// 变量声明 buffer
 		$aBuffVarsDeclare = new OutputStreamBuffer() ;
 		$aTargetCodeStream->write($aBuffVarsDeclare) ;
@@ -97,8 +94,6 @@ class CompilerManager extends JcObject
 		
 		// 变量声明
 		$aObjectContainer->variableDeclares()->make($aBuffVarsDeclare) ;
-
-		$aTargetCodeStream->close($bPHPTag) ;
 	}
 	
 	public function createCompiledFile(File $aCompiledFile)

@@ -449,7 +449,7 @@ class Controller extends NamableComposite implements IBean
     {
     	if( !$this->aMainView )
     	{
-    		$this->setMainView( new View('mainView-'.$this->name(),null) ) ;
+    		$this->setMainView( new View($this->name(),null) ) ;
     	}
 
     	return $this->aMainView ;
@@ -464,6 +464,7 @@ class Controller extends NamableComposite implements IBean
     	$this->messageQueue()->addChildHolder($aView) ;
     	
     	$this->aMainView = $aView ;
+    	$aView->setController($this) ;
     }
         
     /**
@@ -499,7 +500,7 @@ class Controller extends NamableComposite implements IBean
 		// 重定向输出
 		if( $aController->bCatchOutput )
 		{
-    		ob_start( array($aController->mainView()->outputStream(),'write') ) ;
+    		ob_start( array($aController->response(),'write') ) ;
 		}
 		
 		// 执行自己
@@ -524,16 +525,6 @@ class Controller extends NamableComposite implements IBean
     	{
     		throw $e ;
     	}
-    }
-    
-    public function renderMainView(IView $aMainView)
-    {    	
-    	$aMainView->render() ;
-    }
-    
-    public function displayMainView(IView $aMainView,IOutputStream $aDev)
-    {
-    	$aMainView->display($aDev) ;
     }
     
     public function location($sUrl,$nFlashSec=3)
@@ -698,7 +689,7 @@ class Controller extends NamableComposite implements IBean
 	{
 		$aView = new View("anonymous",null,$this->mainView()->ui) ;
 		$this->mainView()->add($aView,null,true) ;
-		$aView->outputStream()->write($sContent) ;
+		$this->response()->device()->write($sContent) ;
 	}
 	
 	/**
@@ -714,7 +705,7 @@ class Controller extends NamableComposite implements IBean
 		$aView = new View("anonymous",null,$this->mainView()->ui()) ;
 		$this->mainView()->add($aView,null,true) ;
 		
-		$this->messageQueue()->display($this->mainView()->ui(),$aView->outputStream(),$sTemplateFilename) ;		
+		$this->messageQueue()->display($this->mainView()->ui(),$this->response()->device(),$sTemplateFilename) ;		
 	}
 	
     /**

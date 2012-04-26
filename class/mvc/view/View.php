@@ -49,11 +49,37 @@ use org\jecat\framework\ui\UI;
 
 class View extends NamableComposite implements IView, IBean
 {
-	public function __construct($sName=null,$sTemplate=null,UI $aUI=null)
-	{
+	public function __construct($sName=null,$sTemplate=null,$bVagrantContainer=true,UI $aUI=null)
+	{		
 		parent::__construct("org\\jecat\\framework\\mvc\\view\\IView") ;
 		
+		if(!$sName)
+		{
+			if(!$sTemplate)
+			{
+				throw new Exception("创建视图时必须提供 \$sName 或 \$sTemplate") ;
+			}
+			$sName = $sTemplate ;
+		}
 		$this->setName($sName) ;
+		
+		// 用于收容”流浪“视图的装配单
+		if( $bVagrantContainer )
+		{
+			$this->sVagrantViewsAssemlyListId = $this->id().'-vagrants' ;
+		
+			ViewAssembler::singleton()->defineAssemblyList(
+				$this->sVagrantViewsAssemlyListId
+				, ViewAssembler::layout_vertical
+				, array(
+					'container' => ViewAssembler::container_use_controller ,
+					'priority' => ViewAssembler::soft ,
+					'xpaths' => null ,
+					'view' => $this ,
+				)
+			) ;
+		}
+		
 		$this->setTemplate($sTemplate) ;
 		$this->setUi( $aUI ) ;
 		
@@ -80,8 +106,27 @@ class View extends NamableComposite implements IView, IBean
 	
 	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
+    	if( empty($arrConfig['name']) )
+    	{
+    		throw new BeanConfException("View bean对象的配置数组缺少必要的属性 name") ;
+    	}
+    	
+    	if( !empty($arrConfig['template']) )
+    	{
+    		// 在文件名前 加上命名空间
+    		if( $sNamespace!=='*' and strstr($arrConfig['template'],':')===false )
+    		{
+    			$arrConfig['template'] = $sNamespace.':'.$arrConfig['template'] ;
+    		}
+    	}
+    	
+    	if(!isset($arrConfig['vagrantContainer']))
+    	{
+    		$arrConfig['vagrantContainer'] = true ;
+    	}
+    	
 		$sClass = get_called_class() ;
-		$aBean = new $sClass() ;
+		$aBean = new $sClass( $arrConfig['name'], $arrConfig['template'], $arrConfig['vagrantContainer'] ) ;
 		if($bBuildAtOnce)
 		{
 			$aBean->buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
@@ -130,24 +175,7 @@ class View extends NamableComposite implements IView, IBean
 	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
-    {
-    	if( empty($arrConfig['name']) )
-    	{
-    		throw new BeanConfException("View bean对象的配置数组缺少必要的属性 name") ;
-    	}
-    	$this->setName($arrConfig['name']) ;
-    	
-    	if( !empty($arrConfig['template']) )
-    	{
-    		// 在文件名前 加上命名空间
-    		if( $sNamespace!=='*' and strstr($arrConfig['template'],':')===false )
-    		{
-    			$arrConfig['template'] = $sNamespace.':'.$arrConfig['template'] ;
-    		}
-    		
-    		$this->setTemplate($arrConfig['template']) ;
-    	}
-    	
+    {    	
     	$aBeanFactory = BeanFactory::singleton() ;
     	
     	// 将 widget:xxxx 转换成 widgets[] 结构
@@ -200,7 +228,6 @@ class View extends NamableComposite implements IView, IBean
     			$aVariables->set($sName,$variable) ;
     		}
     	}
-    	
     	
     	$this->arrBeanConfig = $arrConfig ;
     }
@@ -307,7 +334,23 @@ class View extends NamableComposite implements IView, IBean
 	 */
 	public function setTemplate($sTemplate)
 	{
+		if($sTemplate)
+		{
+			if( $this->sSourceFile )
+			{
+				throw new Exception("由于视图依赖模板文件的预处理过程完成视图的初始化，因此不能重复设置视图的模板文件") ;
+			}
+		
+			// compile
+			$aCompiledFile = $this->ui()->compileSourceFile($sTemplate) ;
+			
+			// 预处理
+			$bPreProcess = true ;
+			include $aCompiledFile->path()  ;
+		}
+
 		$this->sSourceFile = $sTemplate ;
+		
 		return $this ;
 	}
 
@@ -333,19 +376,6 @@ class View extends NamableComposite implements IView, IBean
 	}
 	
 	/**
-	 * @return org\jecat\framework\io\OutputStreamBuffer
-	 */
-	public function outputStream($bAutoCreate=true)
-	{
-		if(!$this->aOutputStream and $bAutoCreate)
-		{
-			$this->aOutputStream = new OutputStreamBuffer() ;
-			$this->aOutputStream->properties(true)->set('_view',$this) ;
-		}
-		
-		return $this->aOutputStream ;
-	}
-	/**
 	 * @return View
 	 */
 	static public function findViewByStream(IOutputStream $aStream)
@@ -355,136 +385,76 @@ class View extends NamableComposite implements IView, IBean
 			return $aProperties->get('_view') ;
 		}		
 	}
-	public function setOutputStream(OutputStreamBuffer $aDev)
-	{
-		$this->aOutputStream = $aDev ;
-	}
-	
-	public function isOutputStreamEmpty()
-	{
-		return !$this->aOutputStream or $this->aOutputStream->isEmpty() ;
-	}
-	
-	public function isVagrant()
-	{
-		return !$this->aOutputStream or !$this->aOutputStream->redirectionDev() ;
-	}
 	
 	/**
-	 * 渲染视图，渲染后的结果(html)可以通过 outputStream() 取得
+	 * 渲染视图，渲染后的结果(html)将输出到 $aDevice 参数中
 	 * @see org\jecat\framework\mvc\view.IView::render()
 	 */
-	public function render($bRerender=false)
+	public function render(IOutputStream $aDevice)
 	{
 		if(!$this->bEnable)
 		{
 			return ;
 		}
 		
-		if( $this->bRendered and !$bRerender )
-		{
-			return ;
-		}
-		
-		// render myself
 		if( $sTemplate=$this->template() )
 		{
-			$this->renderTemplate($sTemplate) ;
+			// render myself
+			$aVars = $this->variables() ;
+			$aVars->set('theView',$this) ;
+			$aVars->set('theModel',$this->model()) ;
+			$aVars->set('theController',$this->aController) ;
+			if( $this->aController )
+			{
+				$aVars->set('theParams',$this->aController->params()) ;
+			}
+			
+			// debug模式下，输出模板文件的路径
+			if( Application::singleton()->isDebugging() )
+			{
+				if( !$aUI=$this->ui() ) 
+				{
+					throw new Exception("无法取得 UI 对像。") ;
+				}
+				$aSrcMgr = $aUI->sourceFileManager() ;
+				list($sNamespace,$sSourceFile) = $aSrcMgr->detectNamespace($sTemplate) ;
+				if( $aTemplateFile=$aSrcMgr->find($sSourceFile,$sNamespace) )
+				{
+					$sSourcePath = $aTemplateFile->path() ;
+				}
+				else 
+				{
+					$sSourcePath = "can not find template file: {$sNamespace}:{$sSourceFile}" ;
+				}
+				
+				$aDevice->write("\r\n\r\n<!-- Template: {$sSourcePath} -->\r\n") ;
+			}
+			
+			// 输出
+			$this->ui()->display($sTemplate,$aVars,$aDevice) ;
 		}
 		
-		// 用于收容”流浪“视图的槽
-		$this->outputStream()->write(ViewAssembler::singleton()->addFrame(
-				$this->xpath().':vagrants'
-				, new ViewAssemblyFrame($this))
-		) ;
-		
-		// render child view
-		$this->renderChildren($bRerender) ;
+		// 显示流浪视图
+		if( $this->sVagrantViewsAssemlyListId )
+		{
+			ViewAssembler::singleton()->displayAssemblyList( $this->sVagrantViewsAssemlyListId, $aDevice ) ;
+		}
 		
 		$this->bRendered = true ;
 	}
 		
-	/**
-	 * 
-	 * @param unknown_type $sTemplate
-	 * @wiki /MVC模式/视图/绑定模型
-	 * ==绑定模型==
-	 * 
-	 * view的Bean创建数组中的属性model，view通过model属性指定的model名称，实现绑定模型。
-	 * 绑定模型的实现其实是通过variables实现的。
-	 * 
-	 */
-	
-	protected function renderTemplate($sTemplate)
+	public function show(IOutputStream $aDevice=null)
 	{
-		$aVars = $this->variables() ;
-		$aVars->set('theView',$this) ;
-		$aVars->set('theModel',$this->model()) ;
-		$aVars->set('theController',$this->aController) ;
-		if( $this->aController )
-		{
-			$aVars->set('theParams',$this->aController->params()) ;
-		}
-		
-		// debug模式下，输出模板文件的路径
-		if( Application::singleton()->isDebugging() )
-		{
-			$aSrcMgr = $this->ui()->sourceFileManager() ;
-			list($sNamespace,$sSourceFile) = $aSrcMgr->detectNamespace($sTemplate) ;
-			if( $aTemplateFile=$aSrcMgr->find($sSourceFile,$sNamespace) )
-			{
-				$sSourcePath = $aTemplateFile->path() ;
-			}
-			else 
-			{
-				$sSourcePath = "can not find template file: {$sNamespace}:{$sSourceFile}" ;
-			}
-			
-			$this->outputStream()->write("\r\n\r\n<!-- Template: {$sSourcePath} -->\r\n") ;
-		}
-		
-		// 输出
-		$this->ui()->display($sTemplate,$aVars,$this->outputStream()) ;
-	}
-	
-	protected function renderChildren($bRerender=true)
-	{
-		foreach($this->iterator() as $aChildView)
-		{
-			$aChildView->render($bRerender) ;
-		}
-	}
-	
-	/**
-	 * 输出视图。
-	 * @see org\jecat\framework\mvc\view.IView::display()
-	 */
-	public function display(IOutputStream $aDevice=null)
-	{
-		if(!$this->bEnable)
-		{
-			return ;
-		}
-		
 		if(!$aDevice)
 		{
-			$aDevice = Response::singleton()->printer() ;
+			if(!$aController=$this->controller())
+			{
+				throw new Exception("视图尚未添加给控制器，show()的\$aDevice 参数不可省略") ;				
+			}
+			$aDevice = $aController->response()->device() ;
 		}
 		
-		// display myself
-		if( !$this->isOutputStreamEmpty() )
-		{
-			$aDevice->write( $this->outputStream()->bufferBytes(true) ) ;
-		}
-	}
-	
-	public function show()
-	{
-		$this->render() ;
-		
-		$this->assembly() ;
-		
-		$this->display() ;
+		$this->render($aDevice) ;
 	}
 
 
@@ -668,10 +638,11 @@ class View extends NamableComposite implements IView, IBean
     
     public function id()
     {
-   		if($this->sId===null)
-    	{
-    		$this->sId = ++self::$nAssignedId ;
-    	}
+		if($this->sId===null)
+		{
+			$this->sId = self::registerView($this) ;
+		}
+		    	
     	return $this->sId ;
     }
     
@@ -766,6 +737,32 @@ class View extends NamableComposite implements IView, IBean
 		$aOutput->write("\r\n</pre>");
     }
     
+    static public function registerView(IView $aView)
+    {
+    	$sName = $aView->name() ;
+    	
+    	if( !isset(self::$arrAssignedId[$sName]) )
+    	{
+    		self::$arrAssignedId[$sName] = 0 ;
+    	}
+    	else
+    	{
+    		self::$arrAssignedId[$sName] ++ ;
+    	}
+    	$sId = $sName.':'.self::$arrAssignedId[$sName] ;
+    	
+    	self::$arrRegisteredViews[$sId] = $aView ;
+    	
+    	return $sId ;
+    }
+    /**
+     * @return IView
+     */
+    static public function findRegisteredView($sId)
+    {
+    	return isset(self::$arrRegisteredViews[$sId])? self::$arrRegisteredViews[$sId]: null ; 
+    }
+    
 	private $aModel ;
 	private $aWidgets ;
 	private $sSourceFile ;
@@ -780,8 +777,12 @@ class View extends NamableComposite implements IView, IBean
     private $aController ;
     private $sId ;
 	protected $bRendered = false ;
-    
-    static private $nAssignedId = 0 ;
+	
+	// 是否使用装配单收容浏览视图
+	private $sVagrantViewsAssemlyListId ;
+
+	static private $arrAssignedId = array() ;
+    static private $arrRegisteredViews = array() ;
 }
 
 

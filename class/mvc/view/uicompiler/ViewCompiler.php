@@ -25,8 +25,7 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\view\uicompiler ;
 
-use org\jecat\framework\mvc\view\ViewAssemblySlot;
-
+use org\jecat\framework\mvc\view\ViewAssembler;
 use org\jecat\framework\lang\Assert;
 use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\CompilerManager;
@@ -95,45 +94,33 @@ class ViewCompiler extends NodeCompiler
 
 		$aAttrs = $aObject->attributes() ;
 		
-		
-		$aDev->write("\r\n// display views -------------------") ;
-		
-		$aDev->write("\$theView = \$aVariables->get('theView') ;") ;
-		
+
 		// 指定view名称
-		if( $aAttrs->has('name') )
+		if( $aAttrs->has('xpath') )
 		{
-			$arrViewXPaths = 'array(' . $aAttrs->get('name') . ')' ;
+			$arrViewXPaths = 'array(' . $aAttrs->get('xpath') . ')' ;
+			$bUseXpath = true ;
 		}
 		else
 		{
 			$arrViewXPaths = 'null' ;
-		}
-
-		$sLayout = $aAttrs->get('layout')?: ViewAssemblySlot::layout_vertical ;
-		
-		// container
-		if( $aAttrs->has('container') )
-		{
-			$sViewContainer = $aAttrs->expression('container') ;
-		}
-		else
-		{
-			$sViewContainer = "\$theView->controller()->mainView()" ;
+			$bUseXpath = false ;
 		}
 		
+		$sLayout = $aAttrs->string('layout')?: ViewAssembler::layout_vertical ;
+				
 		// model
 		if($aAttrs->has('mode'))
 		{
-			$sMode = $aAttrs->get('mode') ;
+			$nMode = ViewAssembler::filterModeToPriority($aAttrs->string('mode')) ;
 		}
 		else
 		{
-			// 如果指定名称 hard, 否则 soft
-			$sMode = $aAttrs->has('name')? "'hard'": "'soft'" ;
+			$nMode = $bUseXpath? ViewAssembler::hard: ViewAssembler::soft ;
 		}
 		
-		if( !$nNodeViewId = $aDev->properties(true)->getRef('node.view.id') )
+		$nNodeViewId =& $aDev->properties(true)->getRef('node.view.id') ;
+		if( $nNodeViewId===null )
 		{
 			$nNodeViewId = 0 ;
 		}
@@ -141,14 +128,35 @@ class ViewCompiler extends NodeCompiler
 		{
 			$nNodeViewId ++ ;
 		}
-	
-		$aDev->write("\$theView->outputStream()->write(
-	jc\\mvc\\view\\ViewAssembler::singleton()->addFrame(
-		\$theView->xpath().'({$nNodeViewId})'
-		, new jc\\mvc\\view\\ViewAssemblyFrame({$sViewContainer},{$sMode},{$arrViewXPaths},'{$sLayout}')
-) ) ;" ) ;
 		
-		$aDev->write("//-------------------\r\n") ;
+		$sViewAssemblyListId = "\$this->id().'-pos{$nNodeViewId}'" ;
+		
+		// 视图的预处理
+		$aDev->preprocessStream()->write("\r\n// define view assembly list -------------------") ;
+		$aDev->preprocessStream()->write("if( empty(\$this) or !(\$this instanceof jc\\mvc\\view\\IView) )") ;
+		$aDev->preprocessStream()->write("{") ;
+		$aDev->preprocessStream()->write("	throw new jc\\lang\\Exception('UI标签 <view> 必须用于视图类。') ;") ;
+		$aDev->preprocessStream()->write("}") ;
+
+		$aDev->preprocessStream()->write("jc\\mvc\\view\\ViewAssembler::singleton()->defineAssemblyList(
+		{$sViewAssemblyListId}
+		, '{$sLayout}'
+		, array(
+			'priority' => {$nMode},
+			'xpaths' => {$arrViewXPaths},
+			'view' => \$this ,
+		)
+) ;") ;
+
+		$aDev->write("\r\n// display views ") ;
+		$sViewAssemblyListId = "\$aVariables->theView->id().'-pos{$nNodeViewId}'" ;
+		$aDev->write("jc\\mvc\\view\\ViewAssembler::singleton()->displayAssemblyList({$sViewAssemblyListId},\$aDevice) ;") ;
+		
+		return ;
+		
+		
+		
+		
 	}
 }
 

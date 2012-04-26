@@ -97,6 +97,12 @@ class WebpageFrame extends Controller
 					$arrBeanConf['class'] = 'view' ;
 				}
 				
+				// 默认关闭 vagrant container
+				if(!isset($arrBeanConf['vagrantContainer']))
+				{
+					$arrBeanConf['vagrantContainer'] = false ;
+				}
+				
 				// 创建对象
 				$aBean = $aBeanFactory->createBean($arrBeanConf,$sNamespace,false) ;
 				$aBean->setName($arrBeanConf['name']) ;

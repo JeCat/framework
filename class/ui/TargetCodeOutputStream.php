@@ -30,21 +30,34 @@ use org\jecat\framework\io\IOutputStream;
 
 class TargetCodeOutputStream extends OutputStreamBuffer implements IOutputStream
 {
-	public function open(IOutputStream $aWriter,$bStartScript=true)
+	public function start($bIntact=true)
 	{
-		/*$aWriter = $aCompiledFile->openWriter(false) ;
-		if(!$aWriter)
-		{
-			throw new Exception("保存XHTML模板的编译文件时无法打开文件:%s",$aCompiledFile->path()) ;
-		}*/
+		$this->write("<?php") ;
+		$this->write("use org\\jecat\\framework as jc ;\r\n") ;
+
+		$this->write("// 预处理 ---------") ;
+		$this->write("if( isset(\$bPreProcess) and \$bPreProcess )") ;
+		$this->write("{") ;
 		
-		$this->aCompiledWriter = $aWriter ;
+		$this->aPreprocessStream = new self() ;
+		$this->write($this->aPreprocessStream) ;
 		
-		if($bStartScript)
-		{
-			$this->write("<?php\r\n") ;
-			$this->write("use org\\jecat\\framework as jc ;\r\n") ;
-		}
+		$this->write("}") ;
+		$this->write("else") ;
+		$this->write("{") ;
+	}
+	
+	public function finish()
+	{
+		$this->write("\r\n\r\n}") ;
+	}
+	
+	/**
+	 * @return TargetCodeOutputStream
+	 */
+	public function preprocessStream()
+	{
+		return $this->aPreprocessStream ;
 	}
 	
 	public function bufferBytes($bClear=true)
@@ -52,19 +65,6 @@ class TargetCodeOutputStream extends OutputStreamBuffer implements IOutputStream
 		$this->generateOutputCode() ;
 
 		return parent::bufferBytes($bClear) ;
-	}
-	
-	public function close($bStartScript=true)
-	{
-		$this->generateOutputCode() ;
-		
-		if($bStartScript)
-		{
-			$this->write("?>") ;
-		}
-		
-		$this->aCompiledWriter->write($this->bufferBytes(true)) ;
-		$this->aCompiledWriter->close() ;
 	}
 	
 	public function write($sBytes,$nLen=null,$bFlush=false)
@@ -129,8 +129,6 @@ class TargetCodeOutputStream extends OutputStreamBuffer implements IOutputStream
 	}
 	
 	private $sOutputContents ;
-	
-	private $aCompiledWriter ;
 	
 	private $bUseHereDoc = true ;
 }

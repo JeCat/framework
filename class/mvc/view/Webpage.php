@@ -36,7 +36,7 @@ class Webpage extends View
 			$sName = 'webpage' ;
 		}
 		
-		parent::__construct($sName,'org.jecat.framework:Webpage.template.html',$aUI) ;
+		parent::__construct($sName,'org.jecat.framework:Webpage.template.html',false,$aUI) ;
 	}
 
 	public function title()

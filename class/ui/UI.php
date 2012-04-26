@@ -179,7 +179,7 @@ class UI extends JcObject
 		return $aCompiledFile ;
 	}
 	
-	public function compile(IInputStream $aSourceInput,IOutputStream $aCompiledOutput,ObjectContainer $aObjectContainer=null,$bPHPTag=true)
+	public function compile(IInputStream $aSourceInput,IOutputStream $aCompiledOutput,ObjectContainer $aObjectContainer=null,$bIntact=true)
 	{
 		if(!$aObjectContainer)
 		{
@@ -190,7 +190,19 @@ class UI extends JcObject
 		$this->interpreters()->parse($aSourceInput,$aObjectContainer,$this) ;
 		
 		// 编译
-		$this->compilers()->compile($aObjectContainer,$aCompiledOutput,$bPHPTag) ;
+		$aTargetCodeStream = new TargetCodeOutputStream() ;
+		if($bIntact)
+		{
+			$aTargetCodeStream->start() ;
+		}
+		
+		$this->compilers()->compile($aObjectContainer,$aTargetCodeStream) ;
+
+		if($bIntact)
+		{
+			$aTargetCodeStream->finish() ;
+		}
+		$aCompiledOutput->write($aTargetCodeStream->bufferBytes(true)) ;
 	}
 	
 	public function render(File $aCompiledFile,IHashTable $aVariables=null,IOutputStream $aDevice=null)
@@ -221,6 +233,12 @@ class UI extends JcObject
 		$aVariables->set('theDevice',$aDevice) ;
 		$aVariables->set('theUI',$this);
 		
+		include $aCompiledFile->path()  ;
+	}
+	
+	public function preprocess(File $aCompiledFile)
+	{
+		$bPreProcess = true ;
 		include $aCompiledFile->path()  ;
 	}
 	
