@@ -67,6 +67,10 @@ class EventManager extends Object implements \Serializable
 				// 方法
 				if( is_array($fnHandler) )
 				{
+					if( empty($fnHandler[0]) or empty($fnHandler[1]) )
+					{
+						throw new \Exception("事件回调函数类型错误：%s",var_export($fnHandler,1)) ;
+					}
 					// 对像方法
 					if(is_object($fnHandler[0]))
 					{
