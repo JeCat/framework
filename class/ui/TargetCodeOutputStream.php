@@ -36,14 +36,14 @@ class TargetCodeOutputStream extends OutputStreamBuffer implements IOutputStream
 		$this->write("use org\\jecat\\framework as jc ;\r\n") ;
 
 		$this->write("// 预处理 ---------") ;
-		$this->write("if( isset(\$bPreProcess) and \$bPreProcess )") ;
+		$this->write("if(!empty(\$bPreProcess))") ;
 		$this->write("{") ;
 		
 		$this->aPreprocessStream = new self() ;
 		$this->write($this->aPreprocessStream) ;
 		
 		$this->write("}") ;
-		$this->write("else") ;
+		$this->write("if(!empty(\$bRendering))") ;
 		$this->write("{") ;
 	}
 	

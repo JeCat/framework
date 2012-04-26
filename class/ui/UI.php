@@ -205,7 +205,7 @@ class UI extends JcObject
 		$aCompiledOutput->write($aTargetCodeStream->bufferBytes(true)) ;
 	}
 	
-	public function render(File $aCompiledFile,IHashTable $aVariables=null,IOutputStream $aDevice=null)
+	public function render(File $aCompiledFile,IHashTable $aVariables=null,IOutputStream $aDevice=null,$bPreProcess=true,$bRendering=true)
 	{
 		if(!$aVariables)
 		{
@@ -233,12 +233,6 @@ class UI extends JcObject
 		$aVariables->set('theDevice',$aDevice) ;
 		$aVariables->set('theUI',$this);
 		
-		include $aCompiledFile->path()  ;
-	}
-	
-	public function preprocess(File $aCompiledFile)
-	{
-		$bPreProcess = true ;
 		include $aCompiledFile->path()  ;
 	}
 	

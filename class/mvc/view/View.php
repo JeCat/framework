@@ -342,11 +342,12 @@ class View extends NamableComposite implements IView, IBean
 			}
 		
 			// compile
-			$aCompiledFile = $this->ui()->compileSourceFile($sTemplate) ;
+			$this->aTemplateCompiledFile = $this->ui()->compileSourceFile($sTemplate) ;
 			
 			// 预处理
 			$bPreProcess = true ;
-			include $aCompiledFile->path()  ;
+			$bRendering = false ;
+			include $this->aTemplateCompiledFile->path()  ;
 		}
 
 		$this->sSourceFile = $sTemplate ;
@@ -397,7 +398,7 @@ class View extends NamableComposite implements IView, IBean
 			return ;
 		}
 		
-		if( $sTemplate=$this->template() )
+		if( $this->aTemplateCompiledFile )
 		{
 			// render myself
 			$aVars = $this->variables() ;
@@ -417,7 +418,7 @@ class View extends NamableComposite implements IView, IBean
 					throw new Exception("无法取得 UI 对像。") ;
 				}
 				$aSrcMgr = $aUI->sourceFileManager() ;
-				list($sNamespace,$sSourceFile) = $aSrcMgr->detectNamespace($sTemplate) ;
+				list($sNamespace,$sSourceFile) = $aSrcMgr->detectNamespace($this->template()) ;
 				if( $aTemplateFile=$aSrcMgr->find($sSourceFile,$sNamespace) )
 				{
 					$sSourcePath = $aTemplateFile->path() ;
@@ -429,9 +430,9 @@ class View extends NamableComposite implements IView, IBean
 				
 				$aDevice->write("\r\n\r\n<!-- Template: {$sSourcePath} -->\r\n") ;
 			}
-			
-			// 输出
-			$this->ui()->display($sTemplate,$aVars,$aDevice) ;
+		
+			// render
+			$this->ui()->render($this->aTemplateCompiledFile,$aVars,$aDevice,false,true) ;
 		}
 		
 		// 显示流浪视图
@@ -766,6 +767,7 @@ class View extends NamableComposite implements IView, IBean
 	private $aModel ;
 	private $aWidgets ;
 	private $sSourceFile ;
+	private $aTemplateCompiledFile ;
 	private $aUI ;
 	private $aOutputStream ;
 	private $aVariables ;
