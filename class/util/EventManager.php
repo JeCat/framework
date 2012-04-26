@@ -60,33 +60,41 @@ class EventManager extends Object implements \Serializable
 	public function serialize()
 	{
 		// 检查
-		foreach($this->arrEventHandles as &$arrHandlerList)
+		foreach($this->arrEventHandles as $sClass=>&$arrEventList)
 		{
-			foreach($arrHandlerList as &$fnHandler)
+			foreach($arrEventList as $sEvent=>&$arrObjectList)
 			{
-				// 方法
-				if( is_array($fnHandler) )
+				foreach($arrObjectList as $sObjectId=>&$arrHandlerList)
 				{
-					if( empty($fnHandler[0]) or empty($fnHandler[1]) )
+					foreach($arrHandlerList as &$arrHandler)
 					{
-						throw new \Exception("事件回调函数类型错误：%s",var_export($fnHandler,1)) ;
+						$fnHandler =& $arrHandler[0] ;
+						
+						// 方法
+						if( is_array($fnHandler) )
+						{
+							if( empty($fnHandler[0]) or empty($fnHandler[1]) )
+							{
+								throw new Exception("事件回调函数类型错误：%s",var_export($fnHandler,1)) ;
+							}
+							// 对像方法
+							if(is_object(reset($fnHandler)))
+							{
+								throw new \Exception("无法序列化回调函数：%s::%s()",array(get_class($fnHandler[0]),$fnHandler[1])) ;
+							}
+						}
+						
+						// 
+						else if( is_string($fnHandler) )
+						{}
+						
+						// 匿名函数
+						else
+						{
+							$aRefFunc = new \ReflectionFunction($fnHandler) ;
+							throw new \Exception("无法序列化匿名函数，定义位置 File: %s ; Line: %d",array($aRefFunc->getFileName(),$aRefFunc->getStartLine())) ;
+						}
 					}
-					// 对像方法
-					if(is_object(reset($fnHandler)))
-					{
-						throw new \Exception("无法序列化回调函数：%s::%s()",array(get_class($fnHandler[0]),$fnHandler[1])) ;
-					}
-				}
-				
-				// 
-				else if( is_string($fnHandler) )
-				{}
-				
-				// 匿名函数
-				else
-				{
-					$aRefFunc = new \ReflectionFunction($fnHandler) ;
-					throw new \Exception("无法序列化匿名函数，定义位置 File: %s ; Line: %d",array($aRefFunc->getFileName(),$aRefFunc->getStartLine())) ;
 				}
 			}
 		}
