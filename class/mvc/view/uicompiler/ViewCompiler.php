@@ -94,11 +94,23 @@ class ViewCompiler extends NodeCompiler
 
 		$aAttrs = $aObject->attributes() ;
 		
-
 		// 指定view名称
+
 		if( $aAttrs->has('xpath') )
 		{
-			$arrViewXPaths = 'array(' . $aAttrs->get('xpath') . ')' ;
+			$sXpath = $aAttrs->get('xpath') ;
+		}
+		else if( $aAttrs->has('name') )
+		{
+			$sXpath = $aAttrs->get('name') ;
+		}
+		else
+		{
+			$sXpath = null ;
+		}
+		if( $sXpath )
+		{
+			$arrViewXPaths = "array({$sXpath})" ;
 			$bUseXpath = true ;
 		}
 		else
