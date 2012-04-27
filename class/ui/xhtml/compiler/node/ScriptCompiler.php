@@ -96,7 +96,7 @@ class ScriptCompiler extends NodeCompiler
 			if( $aAttrs->has('src') and !$aAttrs->bool('ignore') )
 			{
 				$sSrc = $aAttrs->get('src') ;
-				$aDev->write("\\org\\jecat\\framework\\resrc\\HtmlResourcePool::singleton()->addRequire({$sSrc},\\org\\jecat\\framework\\resrc\\HtmlResourcePool::RESRC_JS) ;") ;
+				$aDev->preprocessStream()->write("\\org\\jecat\\framework\\resrc\\HtmlResourcePool::singleton()->addRequire({$sSrc},\\org\\jecat\\framework\\resrc\\HtmlResourcePool::RESRC_JS) ;") ;
 			
 				// 清除后文中的空白字符
 				ClearCompiler::clearAfterWhitespace($aObject) ;
