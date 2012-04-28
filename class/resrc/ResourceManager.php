@@ -98,7 +98,7 @@ class ResourceManager extends Object implements \Serializable
 		{
 			if( empty($this->arrFilenameWrappers) )
 			{
-				if( is_file($aFolder->path().'/'.$sFilename) )
+				if( file_exists($aFolder->path().'/'.$sFilename) )
 				{
 					return array($aFolder,$sFilename) ;
 				}
@@ -109,7 +109,7 @@ class ResourceManager extends Object implements \Serializable
 				{
 					$sWrapedFilename = call_user_func_array($funcFilenameWrapper, array($sFilename)) ;
 					
-					if( is_file($aFolder->path().'/'.$sWrapedFilename) )
+					if( file_exists($aFolder->path().'/'.$sWrapedFilename) )
 					{
 						return array($aFolder,$sWrapedFilename) ;
 					}
