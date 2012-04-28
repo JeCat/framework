@@ -203,7 +203,12 @@ class ViewAssembler extends Object
 	
 	private function _displayAssemblyList(array & $arrAssemblyList,IOutputStream $aDevice)
 	{
-		$aDevice->write("<div class=\"jc-layout-frame\"") ;
+		if(empty($arrAssemblyList['items']))
+		{
+			return ;
+		}
+		
+		$aDevice->write("<div class=\"jc-layout jc-frame\"") ;
 		if( !empty($arrAssemblyList['id']) )
 		{
 			$aDevice->write(" id=\"{$arrAssemblyList['id']}\"") ;			
@@ -230,15 +235,22 @@ class ViewAssembler extends Object
 					}
 				}
 
-				$aDevice->write("<div class=\"jc-view jc-layout-item\" id=\"{$arrAssemblyItem['id']}\">\r\n") ;
-				if($aDebugging)
+				$bEmptyView = $arrAssemblyItem['object']->template()? false: true ;
+				if( !$bEmptyView )
 				{
-					$aDevice->write("<!-- view name: ".$arrAssemblyItem['object']->name()." -->\r\n") ;
+					$aDevice->write("<div class=\"jc-layout jc-view\" id=\"{$arrAssemblyItem['id']}\">\r\n") ;
+					if($aDebugging)
+					{
+						$aDevice->write("<!-- view name: ".$arrAssemblyItem['object']->name()." -->\r\n") ;
+					}
 				}
 				
 				$arrAssemblyItem['object']->render($aDevice) ;
 				
-				$aDevice->write("</div>\r\n") ;
+				if( !$bEmptyView )
+				{
+					$aDevice->write("</div>\r\n") ;
+				}
 			}
 	
 			// 另一个 装配单

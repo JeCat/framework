@@ -41,22 +41,18 @@
 }
 
 /* 视图布局框架 */
-.jc-layout-frame{
+.jc-layout{
 }
-.jc-layout-item{
+
+.jc-view{}
+
+/* 视图布局框架中的横向布局视图 */
+.jc-frame-horizontal>.jc-view{
+	float: left ;
+}
+.jc-frame-vertical>.jc-view{
+	float: none ;
 }
 .jc-layout-end-item{
 	clear:both;
 }
-
-/* 视图布局框架中的横向布局视图 */
-.jc-layout-frame-horizontal>.jc-view{
-	float: left ;
-}
-.jc-layout-frame-vertical>.jc-view{
-	float: none ;
-}
-.jc-layout-tab>.jc-view{
-	float: none ;
-}
-.jc-view{}
