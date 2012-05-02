@@ -26,7 +26,6 @@
 namespace org\jecat\framework\mvc\view ;
 
 use org\jecat\framework\system\Application;
-
 use org\jecat\framework\io\IOutputStream;
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\Object;
@@ -37,7 +36,7 @@ class ViewAssembler extends Object
 	const soft = 3 ;
 	const hard = 5 ;
 	const xhard = 7 ;
-	static private $arrModeName = array(
+	static private $mapModeName = array(
 			'weak' => self::weak ,
 			'soft' => self::soft ,
 			'hard' => self::hard ,
@@ -46,6 +45,14 @@ class ViewAssembler extends Object
 	
 	const layout_vertical = 'v' ;
 	const layout_horizontal = 'h' ;
+	static private $mapLayoutItemStyles = array(
+			self::layout_vertical => 'jc-layout-item-vertical' ,
+			self::layout_horizontal => 'jc-layout-item-horizontal' ,
+	) ;
+	static private $mapLayoutFrameStyles = array(
+			self::layout_vertical => 'jc-frame-vertical' ,
+			self::layout_horizontal => 'jc-frame-horizontal' ,
+	) ;
 
 	const container_use_controller = 'controller' ;
 	const container_use_view = 'view' ;
@@ -172,19 +179,19 @@ class ViewAssembler extends Object
 	
 	static public function filterModeToPriority($sMode)
 	{
-		return isset(self::$arrModeName[$sMode])? self::$arrModeName[$sMode]: self::soft ; 
+		return isset(self::$mapModeName[$sMode])? self::$mapModeName[$sMode]: self::soft ; 
 	}
 	
 	public function defineAssemblyList($sId,$sLayout=self::layout_vertical,array $arrFilter=null)
 	{
 		if( isset($this->arrAssemblyListRepos[$sId]) )
 		{
-			print_r(array_keys($this->arrAssemblyListRepos)) ;
 			throw new Exception("ID为 %s 的视图装配单已经存在，正在重复定义视图装配单",$sId) ;
 		}
 		
 		$this->arrAssemblyListRepos[$sId] = array(
 				'id' => $sId ,
+				'type' => 'frame' ,
 				'filter' => $arrFilter ,
 				'layout' => $sLayout ,
 				'items' => array() ,
@@ -201,24 +208,18 @@ class ViewAssembler extends Object
 		$this->_displayAssemblyList($this->arrAssemblyListRepos[$sId],$aDevice) ;
 	}
 	
-	private function _displayAssemblyList(array & $arrAssemblyList,IOutputStream $aDevice)
+	private function _displayAssemblyList(array & $arrAssemblyList,IOutputStream $aDevice,$sParentFrameLayout=null)
 	{
 		if(empty($arrAssemblyList['items']))
 		{
 			return ;
 		}
 		
-		$aDevice->write("<div class=\"jc-layout jc-frame\"") ;
-		if( !empty($arrAssemblyList['id']) )
-		{
-			$aDevice->write(" id=\"{$arrAssemblyList['id']}\"") ;			
-		}
-		$aDevice->write(">\r\n") ;
+		$aDevice->write($this->htmlWrapper($arrAssemblyList,$sParentFrameLayout)) ;
 		$aDebugging = Application::singleton()->isDebugging() ;
 			
 		foreach( $arrAssemblyList['items'] as &$arrAssemblyItem)
 		{
-			
 			// 视图
 			if( $arrAssemblyItem['type']==='view' )
 			{
@@ -238,7 +239,7 @@ class ViewAssembler extends Object
 				$bEmptyView = $arrAssemblyItem['object']->template()? false: true ;
 				if( !$bEmptyView )
 				{
-					$aDevice->write("<div class=\"jc-layout jc-view\" id=\"{$arrAssemblyItem['id']}\">\r\n") ;
+					$aDevice->write($this->htmlWrapper($arrAssemblyItem,$arrAssemblyList['layout'])) ;
 					if($aDebugging)
 					{
 						$aDevice->write("<!-- view name: ".$arrAssemblyItem['object']->name()." -->\r\n") ;
@@ -254,9 +255,9 @@ class ViewAssembler extends Object
 			}
 	
 			// 另一个 装配单
-			else if( $arrAssemblyItem['type']==='list' )
+			else if( $arrAssemblyItem['type']==='frame' )
 			{
-				$this->_displayAssemblyList($arrAssemblyItem,$aDevice) ;
+				$this->_displayAssemblyList($arrAssemblyItem,$aDevice,$arrAssemblyList['layout']) ;
 			}
 			
 			else 
@@ -265,9 +266,55 @@ class ViewAssembler extends Object
 			}
 		}
 		
-		$aDevice->write("<div class='jc-layout-end-item'></div></div>\r\n") ;
+		$aDevice->write("<div class='jc-layout-item-end'></div></div>\r\n") ;
+	}
+	
+	public function htmlWrapper(array $arrAssemblyItem,$sLayout=null)
+	{
+		if(empty($arrAssemblyItem['classes']))
+		{
+			$arrAssemblyItem['classes'] = array() ;
+		}
+		if(empty($arrAssemblyItem['styles']))
+		{
+			$arrAssemblyItem['styles'] = array() ;
+		}
+		
+		$arrAssemblyItem['classes'][] = 'jc-layout' ;
+		if($sLayout)
+		{
+			$arrAssemblyItem['classes'][] = self::$mapLayoutItemStyles[$sLayout] ;
+		}
+		
+		if( $arrAssemblyItem['type']==='frame' )
+		{
+			$arrAssemblyItem['classes'][] = 'jc-frame' ;
+			$arrAssemblyItem['classes'][] = self::$mapLayoutFrameStyles[$arrAssemblyItem['layout']] ;
+		}
+		else 
+		{
+			$arrAssemblyItem['classes'][] = 'jc-view' ;
+		}
+		
+		$sClasses = implode(' ',$arrAssemblyItem['classes']) ;
+		$sStyles = implode(' ',$arrAssemblyItem['styles']) ;
+		
+		return "<div id=\"{$arrAssemblyItem['id']}\" class=\"$sClasses\" style=\"$sStyles\">\r\n" ;
 	}
 
+	/**
+	 * array(
+	 *		'id' => 'xxx' ,
+	 *		'type' => 'frame/view' ,
+	 *		'filter' => array(
+	 *			'view' => '' ,
+	 *			'xpaths' => array() ,
+	 *		) ,
+	 *		'layout' => 'v/h' ,
+	 *		'items' => array() ,
+	 *		'object' => aView ,
+	 * )
+	 */
 	private $arrAssemblyListRepos = array() ;
 	
 	private $arrViewAssemblyRecords = array() ;

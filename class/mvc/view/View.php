@@ -750,7 +750,7 @@ class View extends NamableComposite implements IView, IBean
     	{
     		self::$arrAssignedId[$sName] ++ ;
     	}
-    	$sId = $sName.':'.self::$arrAssignedId[$sName] ;
+    	$sId = $sName.'-'.self::$arrAssignedId[$sName] ;
     	
     	self::$arrRegisteredViews[$sId] = $aView ;
     	

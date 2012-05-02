@@ -47,12 +47,15 @@
 .jc-view{}
 
 /* 视图布局框架中的横向布局视图 */
-.jc-frame-horizontal>.jc-view{
+.jc-frame-horizontal{}
+.jc-frame-vertical{}
+
+.jc-layout-item-horizontal{
 	float: left ;
 }
-.jc-frame-vertical>.jc-view{
+.jc-layout-item-vertical{
 	float: none ;
 }
-.jc-layout-end-item{
+.jc-layout-item-end{
 	clear:both;
 }
