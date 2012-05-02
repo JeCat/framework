@@ -25,6 +25,8 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\controller ;
 
+use org\jecat\framework\io\OutputStreamBuffer;
+
 use org\jecat\framework\mvc\view\ViewAssembler;
 
 use org\jecat\framework\mvc\view\ViewAssemblySlot;
@@ -197,7 +199,9 @@ class Response extends Object
 			ViewAssembler::singleton()->assemble() ;
 			
 			// 显示视图
-			$aMainView->render($this->device()) ;
+			$aOutput = new OutputStreamBuffer() ;
+			$aMainView->render($aOutput) ;
+			$this->device()->write($aOutput) ;
 
 			// 触发事件
 			$arrEventArgvs2 = array($this,$aMainView,$aController) ;
