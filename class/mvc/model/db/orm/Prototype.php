@@ -592,7 +592,7 @@ class Prototype extends Object implements IBean, \Serializable, IIncompleteSeria
 	 */
 	public function addOrderBy($sColumnName,$bAsc=true)
 	{
-		$this->criteria(true)->orders(true)->add($sColumnName,$bAsc) ;
+		$this->criteria(true)->addOrderBy($sColumnName,!$bAsc) ;
 		return $this ;
 	}
 	
