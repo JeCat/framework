@@ -143,7 +143,7 @@ class Response extends Object
 		case 'msgqueue' :
 		case 'msgqueue.html' :
 			
-			$aController->messageQueue()->display() ;
+			$aController->messageQueue()->display(null,$this->device()) ;
 			
 			break ;
 			
@@ -190,13 +190,13 @@ class Response extends Object
 			if(!$nValidViews)
 			{
 				// 临时提供一个仅显示消息队列的视图
-				$aTmpView = new View() ;
-				$aController->addView($aTmpView,'tmp_view_for_msgqueue') ;
+				$aTmpView = new View('tmp_view_for_msgqueue') ;
+				$aController->addView($aTmpView) ;
 				$aController->messageQueue()->display(null,$this->device()) ;
 			}
 			
 			// 装配视图
-			ViewAssembler::singleton()->assemble() ;
+			ViewAssembler::singleton()->assemble($aController) ;
 			
 			// 显示视图
 			$aOutput = new OutputStreamBuffer() ;

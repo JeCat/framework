@@ -25,6 +25,10 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\view ;
 
+use org\jecat\framework\mvc\controller\Controller;
+
+use org\jecat\framework\util\EventManager;
+
 use org\jecat\framework\system\Application;
 use org\jecat\framework\io\IOutputStream;
 use org\jecat\framework\lang\Exception;
@@ -57,9 +61,25 @@ class ViewAssembler extends Object
 	const container_use_controller = 'controller' ;
 	const container_use_view = 'view' ;
 	
+	const assemble = 'assemble' ;
+	
 	/////////////
-	public function assemble()
+	public function assemble(Controller $aController)
 	{
+		// 触发事件
+		$arrEventArgvs = array($this,$aController) ;
+		if( $return=EventManager::singleton()->emitEvent(__CLASS__,self::assemble,$arrEventArgvs) )
+		{
+			$this->arrAssemblyListRepos = $return->returnValue() ;
+			
+// 			echo '<pre>' ;
+// 			print_r($return->returnValue()) ;
+// 			echo '</pre>' ;
+
+			return ;
+		}
+
+		// 正式执行操作
 		foreach( $this->arrAssemblyListRepos as $sId=>&$arrAssemblyList )
 		{
 			if( empty($arrAssemblyList['filter']) )
@@ -105,12 +125,12 @@ class ViewAssembler extends Object
 				}
 			}
 			
-			// 用完了
+			// 不在需要
 			unset($arrAssemblyList['filter']) ;
 		}
-		
-		// echo '<pre>' ;
-		/*$arrAssemblyListRepos = $this->arrAssemblyListRepos ;
+				
+		echo '<pre>' ;
+		$arrAssemblyListRepos = $this->arrAssemblyListRepos ;
 		foreach( $arrAssemblyListRepos as $sId=>&$arrAssemblyList )
 		{
 			if(empty($arrAssemblyList['items']))
@@ -125,8 +145,8 @@ class ViewAssembler extends Object
 				}
 			}
 		}
-		print_r($arrAssemblyListRepos) ;*/
-		// echo '</pre>' ;
+		print_r($arrAssemblyListRepos) ;
+		echo '</pre>' ;
 	}
 	
 	private function assembleView(& $arrAssemblyList, IView $aView)
@@ -137,19 +157,18 @@ class ViewAssembler extends Object
 		}
 		
 		// 视图已经装配过
-		if( isset($this->arrViewAssemblyRecords[$sViewId]) )
+		if( isset($this->arrViewAssemblyStat[$sViewId]) )
 		{
-			// echo "view {$sViewId} has assembled, pre priority: {$this->arrViewAssemblyRecords[$sViewId]['priority']}, this time priority: {$arrAssemblyList['filter']['priority']} <br />\r\n" ;
+			// echo "view {$sViewId} has assembled, pre priority: {$this->arrViewAssemblyStat[$sViewId]['priority']}, this time priority: {$arrAssemblyList['filter']['priority']} <br />\r\n" ;
 			
 			// 比较两个 slot 的优先级
-			if( $arrAssemblyList['filter']['priority'] > $this->arrViewAssemblyRecords[$sViewId]['priority'] )
+			if( $arrAssemblyList['filter']['priority'] > $this->arrViewAssemblyStat[$sViewId]['priority'] )
 			{
-				// echo "remove {$sViewId} --- <<< {$this->arrViewAssemblyRecords[$sViewId]['list']['id']} @ {$this->arrViewAssemblyRecords[$sViewId]['listpos']} <br />" ;
+				// echo "remove {$sViewId} --- <<< {$this->arrViewAssemblyStat[$sViewId]['list']['id']} @ {$this->arrViewAssemblyStat[$sViewId]['listpos']} <br />" ;
 				
 				// 从原装配单中清除
-				unset( $this->arrViewAssemblyRecords[$sViewId]['list']['items'][ $this->arrViewAssemblyRecords[$sViewId]['listpos'] ] ) ;
-				unset( $this->arrViewAssemblyRecords[$sViewId] ) ;
-				
+				unset( $this->arrViewAssemblyStat[$sViewId]['list']['items'][ $this->arrViewAssemblyStat[$sViewId]['listpos'] ] ) ;
+				unset( $this->arrViewAssemblyStat[$sViewId] ) ;
 			}
 			
 			else
@@ -168,7 +187,7 @@ class ViewAssembler extends Object
 		// 记录装配状态
 		end($arrAssemblyList['items']) ;
 		$nPos = key($arrAssemblyList['items']) ;
-		$this->arrViewAssemblyRecords[$sViewId] = array(
+		$this->arrViewAssemblyStat[$sViewId] = array(
 				'list' => &$arrAssemblyList ,
 				'listpos' => $nPos ,
 				'priority' => $arrAssemblyList['filter']['priority'] ,
@@ -202,7 +221,8 @@ class ViewAssembler extends Object
 	{
 		if( !isset($this->arrAssemblyListRepos[$sId]) )
 		{
-			throw new Exception("根据装配单显示视图时遇到了不存在的装配单ID:%s",$sId) ;
+			// throw new Exception("根据装配单显示视图时遇到了不存在的装配单ID:%s",$sId) ;
+			return ;
 		}
 		
 		$this->_displayAssemblyList($this->arrAssemblyListRepos[$sId],$aDevice) ;
@@ -311,13 +331,14 @@ class ViewAssembler extends Object
 	 *			'xpaths' => array() ,
 	 *		) ,
 	 *		'layout' => 'v/h' ,
-	 *		'items' => array() ,
 	 *		'object' => aView ,
+	 *		'items' => array(
+	 *		) ,
 	 * )
 	 */
 	private $arrAssemblyListRepos = array() ;
 	
-	private $arrViewAssemblyRecords = array() ;
+	private $arrViewAssemblyStat = array() ;
 	
 	
 }

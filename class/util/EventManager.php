@@ -17,14 +17,23 @@ class EventManager extends Object implements \Serializable
 		}
 		
 		$this->arrEventHandles[$sClass][$sEvent][$sourceObject][] = array($fnHandler,$arrCallbackArgvs) ;
+		
+		return $this ;
 	}
 	
+	/**
+	 * 触发一个事件，依次执行注册给该事件的所有回调函数
+	 * 如果没有任何一个回调函数提供返回值，则返回null
+	 * @return EventReturnValue
+	 */
 	public function emitEvent($sClass,$sEvent,array & $arrArgvs=array(),$sourceObject='*')
 	{
 		if( is_object($sourceObject) )
 		{
 			$sourceObject = spl_object_hash($sourceObject) ;
 		}
+		
+		$aReturnValue = null ;
 		
 		if(!empty($this->arrEventHandles[$sClass][$sEvent][$sourceObject]))
 		{
@@ -39,7 +48,7 @@ class EventManager extends Object implements \Serializable
 					}
 				}
 				
-				call_user_func_array($handler[0],$arrArgvs) ;
+				$return = call_user_func_array($handler[0],$arrArgvs) ;
 
 				// 清理注册时提供的参数
 				if( $handler[1] )
@@ -48,9 +57,22 @@ class EventManager extends Object implements \Serializable
 					{
 						array_pop($arrArgvs) ;
 					}
-				}				
+				}
+				
+				// 检查事件的返回值
+				if( $return instanceof EventReturnValue )
+				{
+					$aReturnValue = $return ;
+					
+					if($return->stopEvent())
+					{
+						break ;
+					}
+				}
 			}
 		}
+		
+		return $aReturnValue ;
 	}
 
 	public function unserialize($data)
