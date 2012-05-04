@@ -129,24 +129,24 @@ class ViewAssembler extends Object
 			unset($arrAssemblyList['filter']) ;
 		}
 				
-		echo '<pre>' ;
-		$arrAssemblyListRepos = $this->arrAssemblyListRepos ;
-		foreach( $arrAssemblyListRepos as $sId=>&$arrAssemblyList )
-		{
-			if(empty($arrAssemblyList['items']))
-			{
-				//unset($arrAssemblyListRepos[$sId]) ;
-			}
-			else
-			{
-				foreach($arrAssemblyList['items'] as &$arrItem)
-				{
-					unset($arrItem['object']) ;
-				}
-			}
-		}
-		print_r($arrAssemblyListRepos) ;
-		echo '</pre>' ;
+// 		echo '<pre>' ;
+// 		$arrAssemblyListRepos = $this->arrAssemblyListRepos ;
+// 		foreach( $arrAssemblyListRepos as $sId=>&$arrAssemblyList )
+// 		{
+// 			if(empty($arrAssemblyList['items']))
+// 			{
+// 				//unset($arrAssemblyListRepos[$sId]) ;
+// 			}
+// 			else
+// 			{
+// 				foreach($arrAssemblyList['items'] as &$arrItem)
+// 				{
+// 					unset($arrItem['object']) ;
+// 				}
+// 			}
+// 		}
+// 		print_r($arrAssemblyListRepos) ;
+// 		echo '</pre>' ;
 	}
 	
 	private function assembleView(& $arrAssemblyList, IView $aView)
