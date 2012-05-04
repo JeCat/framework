@@ -26,11 +26,11 @@
 
 namespace org\jecat\framework\lang ;
 
-use org\jecat\framework\locale\ILocale;
+use org\jecat\framework\locale\Locale;
 
 interface IException
 {
-	public function message(ILocale $aLocale=null) ;
+	public function message(Locale $aLocale=null) ;
 	
 	public function code() ;
 	

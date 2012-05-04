@@ -25,8 +25,7 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\lang ;
 
-use org\jecat\framework\locale\LocaleManager;
-use org\jecat\framework\locale\ILocale;
+use org\jecat\framework\locale\Locale ;
 use org\jecat\framework\System\Application;
 
 class Exception extends \Exception implements IException, IObject
@@ -44,11 +43,11 @@ class Exception extends \Exception implements IException, IObject
 		parent::__construct($this->message(), $nCode, $aCause) ;
 	}
 	
-	public function message(ILocale $aLocale=null)
+	public function message(Locale $aLocale=null)
 	{
-		if( !$aLocale and class_exists('LocaleManager'))
+		if( !$aLocale and class_exists('Locale'))
 		{
-			$aLocale = LocaleManager::singleton()->locale() ;
+			$aLocale = Locale::singleton() ;
 		}
 		
 		return $aLocale?

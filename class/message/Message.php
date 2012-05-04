@@ -27,7 +27,7 @@ namespace org\jecat\framework\message ;
 
 use org\jecat\framework\lang\Type;
 use org\jecat\framework\locale\LocaleManager;
-use org\jecat\framework\locale\ILocale;
+use org\jecat\framework\locale\Locale;
 use org\jecat\framework\lang\Object;
 
 class Message extends Object 
@@ -56,11 +56,11 @@ class Message extends Object
 		return $this->sType ;
 	}
 	
-	public function message(ILocale $aLocale=null)
+	public function message(Locale $aLocale=null)
 	{
 		if( !$aLocale )
 		{
-			$aLocale = LocaleManager::singleton()->locale() ;
+			$aLocale = Locale::singleton() ;
 		}
 		
 		return $aLocale->trans($this->sMessage,$this->arrMessageArgs) ;

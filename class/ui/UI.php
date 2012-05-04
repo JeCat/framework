@@ -26,7 +26,6 @@
 
 namespace org\jecat\framework\ui ;
 
-use org\jecat\framework\locale\LocaleManager;
 use org\jecat\framework\mvc\controller\Response;
 use org\jecat\framework\mvc\controller\Request;
 use org\jecat\framework\io\IInputStream;
@@ -257,7 +256,7 @@ class UI extends JcObject
 	 */
 	public function locale()
 	{
-		return LocaleManager::singleton()->locale() ;
+		return Locale::singleton() ;
 	}
 	
 	private $aSourceFileManager ;

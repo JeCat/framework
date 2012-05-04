@@ -24,25 +24,21 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*-- Project Introduce --*/
 
-namespace org\jecat\framework\lang ;
+namespace org\jecat\framework\locale ;
 
-class SentencePackage
+use org\jecat\framework\lang\Type;
+
+class SentenceLibrary
 {
-	public function __construct($sLocaleName,$sPackageName,$sPackagePath=null)
+	public function __construct($sLanguage,$sCountry,$sLibName,$sSavePackage=null)
 	{
-		$this->sLocaleName = $sLocaleName ;
-		$this->sPackageName = $sPackageName ;
-		
-		if($sPackagePath)
-		{
-			$this->loadCompiled($sPackagePath,$bCheckSyntax=true) ;
-		}
+		$this->sLanguage = $sLanguage ;
+		$this->sCountry = $sCountry ;
+				
+		$this->sLibName = $sLibName ;
+		$this->sSavePackage = $sSavePackage ;
 	}
-	public function __destruct()
-	{
-		//$this->compile() ;
-	}
-
+	
 	public function localeName()
 	{
 		return $this->sLocaleName ;
@@ -52,18 +48,23 @@ class SentencePackage
 		$this->sLocaleName = $sLocaleName ;
 	}
 
-	public function packageName()
+	public function name()
 	{
-		return $this->sPackageName ;
+		return $this->sLibName ;
 	}
-	public function setPackageName($sPackageName)
+	public function setName($sLibName)
 	{
-		$this->sPackageName = $sPackageName ;
+		$this->sLibName = $sLibName ;
 	}
-
-	public function packagePath()
+	
+	public function packageFilename()
 	{
-		return $this->sPackagePath ;
+		return "{$this->sLanguage}_{$this->sCountry}.{$this->sLibName}.spkg" ;
+	}
+	
+	public function sentenceKeys()
+	{
+		return array_keys($this->arrSentences) ;
 	}
 	
 	public function sentence($sKey) 
@@ -85,41 +86,73 @@ class SentencePackage
 	{
 		$this->arrSentences = array() ;
 	}
+
+	public function loadLibrary(LanguagePackageFolders $aFolders=null)
+	{
+		if(!$aFolders)
+		{
+			$aFolders = LanguagePackageFolders::singleton() ;
+		}
+	
+		foreach( $aFolders->packageIterator($this->sLanguage,$this->sCountry,$this->sLibName) as $sPackagePath )
+		{
+			$this->loadPackage($sPackagePath) ;
+		}
+	}
 	
 	public function loadPackage($sPath/*,$bCheckSyntax=true*/)
 	{
 		if( !is_file($sPath) or !is_readable($sPath) )
 		{
-			throw new Exception("语言包文件不存在(或无法访问)：%s", $sPath) ;
+			throw new \Exception("language package invalid：{$sPath}") ;
 		}
 		/*if( $bCheckSyntax and !php_check_syntax($sPath) )
 		{
 			throw new Exception("语言包文件内容无效：%s", $sPath) ;
 		}*/
 		
-		$this->clearSentence() ;
-		
-		$arrSentences = @include $sPath ;
-		foreach ($arrSentences as $sKey=>$sSentence)
-		{
-			$this->addSentence($sKey,$sSentence) ;
-		}
-		
-		$this->sPackagePath = $sPath ;
+		$this->arrSentences = array_merge($this->arrSentences,include $sPath) ;
 	}
-	
-	public function compile($sSavePath=null)
+
+	public function trans($sOriWords,$argvs=null)
 	{
-		
+		$arrArgvs = Type::toArray($argvs) ;
+		$sKey = md5($sOriWords) ;
+
+		if(!isset($this->arrSentences[$sKey]))
+		{
+			$sSentence = $sOriWords ;
+			$this->arrNewSentences[$sKey] = $sOriWords ;
+		}
+		else
+		{
+			$sSentence = $this->arrSentences[$sKey] ; 
+		}
+	
+		$sWord = call_user_func_array('sprintf', array_merge(array($sSentence),$arrArgvs)) ;
+		return $sWord ?: $sOriWords ;
+	}
+
+	/**
+	 * 返回未归档的语句
+	 * 语言库从语言包中加载语句，当向语言库请求一个语言包中不存在的语句时，语言库将该语句搜集在未归档语句数组中。
+	 * 该方法返回当前系统运行过程中，遇到的未归档语句数组。
+	 * 可用于保存到一个由系统维护的语言中
+	 */
+	public function & unarchiveSentences()
+	{
+		return $this->arrNewSentences ;
 	}
 	
-	private $sPackagePath ;
+	private $sLanguage ;
 	
-	private $sLocaleName ;
+	private $sCountry ;
 	
-	private $sPackageName ;
+	private $sLibName ;
 	
 	private $arrSentences = array() ;
+	
+	private $arrNewSentences = array() ;
 }
 
 

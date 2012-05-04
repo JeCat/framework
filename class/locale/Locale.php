@@ -26,96 +26,178 @@
 
 namespace org\jecat\framework\locale ;
 
+use org\jecat\framework\lang\Object;
 use org\jecat\framework\lang\Type;
-use org\jecat\framework\lang\SentencePackage;
 
-class Locale implements ILocale
+/**
+ * 这是一个还不完整的 Locale 类，目前只实现了语言翻译
+ */
+class Locale implements ITranslator, \Serializable
 {
-	public function __construct($sLocaleName)
+	/**
+	 * @return Locale
+	 */
+	static public function singleton($bCreateNew=true,$createArgvs=null,$sClass=null)
 	{
-		$this->sLocaleName = $sLocaleName ;
+		if(!self::$aSingleton)
+		{
+			self::$aSingleton = self::createSessionLocale() ;
+		}
+		return self::$aSingleton ;
+	}
+	/**
+	 * @return Locale
+	 */
+	static public function setSingleton(self $aLocal)
+	{
+		self::$aSingleton = $aLocal ;
+	}
+	/**
+	 * @return Locale
+	 */
+	static public function flyweight($sLanguage,$sCountry)
+	{
+		if(!isset(self::$arrFlyweights[$sLanguage][$sCountry]))
+		{
+			self::$arrFlyweights[$sLanguage][$sCountry] = new self($sLanguage,$sCountry) ;
+		}
+		return self::$arrFlyweights[$sLanguage][$sCountry] ;
+	}
+	/**
+	 * @return Locale
+	 */
+	static public function setFlyweight($sLanguage,$sCountry,$aLocale)
+	{
+		self::$arrFlyweights[$sLanguage][$sCountry] = $aLocale ;
+	}
+
+	/**
+	 * 根据当前会话的 locale 设置创建 Locale对像
+	 * locale设置 保存在cookie中
+	 */
+	static public function createSessionLocale($sDefaultLanguage='zh',$sDefaultCountry='CN',$bAsSingleton=true)
+	{
+		$sLanguage = empty($_COOKIE['JC_LC_LANG'])? $sDefaultLanguage: $_COOKIE['JC_LC_LANG'] ;
+		$sCountry = empty($_COOKIE['JC_LC_COUNTRY'])? $sDefaultCountry: $_COOKIE['JC_LC_COUNTRY'] ;
+
+		$aLocale = self::flyweight($sLanguage,$sCountry) ;
+		if($bAsSingleton)
+		{
+			self::setSingleton($aLocale) ;
+		}		
+		return $aLocale ;
+	}
+	
+	/**
+	 * 切换当前会话的 locale 
+	 * locale设置 保存在cookie中
+	 * 返回新的 Locale 对像
+	 * @return Locale
+	 */
+	static public function switchSessionLocale($sLanguage,$sCountry,$bReplaceSingleton=true)
+	{
+		$nExpire = time() + 60*60*24*365*10 ;
+		setcookie('JC_LC_LANG',$sLanguage,$nExpire) ;
+		setcookie('JC_LC_COUNTRY',$sCountry,$nExpire) ;
+		
+		$aLocale = self::flyweight($sLanguage, $sCountry) ;
+		
+		if($bReplaceSingleton)
+		{
+			self::setSingleton($aLocale) ;
+		}
+		
+		return $aLocale ;
+	}
+
+	/**
+	 * 返回当前会话的 language 设置
+	 * 保存在 cookie中
+	 */
+	static public function sessionLanguage($sDefaultLanguage='zh')
+	{
+		return empty($_COOKIE['JC_LC_LANG'])? $sDefaultLanguage: $_COOKIE['JC_LC_LANG'] ;
+	}
+	/**
+	 * 返回当前会话的 country 设置
+	 * 保存在 cookie中
+	 */
+	static public function sessionCountry($sDefaultCountry='CN')
+	{
+		return empty($_COOKIE['JC_LC_COUNTRY'])? $sDefaultCountry: $_COOKIE['JC_LC_COUNTRY'] ;
+	}
+	 
+	
+	public function __construct($sLanguage,$sCountry)
+	{
+		$this->sLanguage = $sLanguage ;
+		$this->sCountry = $sCountry ;
+		$this->sLocaleName = $sLanguage.'-'.$sCountry ;
 	}
 	
 	public function localeName()
 	{
 		return $this->sLocaleName ;
 	}
-	
-	
-	// for language
-	public function loadSentencePackage($sPath,$sPackageName)
+	/**
+	 * 返回国家/地区
+	 */
+	public function country()
 	{
-		$this->arrSentencePackages[$sPackageName][] = new SentencePackage($this->localeName(), $sPackageName,$sPath) ;
+		return $this->sCountry ;
 	}
-
-	public function sentencePackage($sName)
+	/**
+	 * 返回语言
+	 */
+	public function language()
 	{
-		return isset($this->arrSentencePackages[$sName])?end($this->arrSentencePackages[$sName]):null ;
+		return $this->sLanguage ;
 	}
 	
-	public function removePackage($sName,$bTotal=true)
+	/**
+	 * 返回 Locale对像中的语言库
+	 */	
+	public function sentenceLibrary($sLibName='base',$bAutoCreate=true)
 	{
-		if($bTotal)
+		if( !isset($this->arrSentenceLibs[$sLibName]) )
 		{
-			unset($this->arrSentencePackages[$sName]) ;
-		}
-		else 
-		{
-			array_pop($this->arrSentencePackages[$sName]) ;
-			if( empty($this->arrSentencePackages[$sName]) )
+			if($bAutoCreate)
 			{
-				unset($this->arrSentencePackages[$sName]) ;
+				$this->arrSentenceLibs[$sLibName] = new SentenceLibrary($this->language(),$this->country(),$sLibName) ;
+				$this->arrSentenceLibs[$sLibName]->loadLibrary() ;
 			}
-		}
-	}
-	
-	public function findSentence($sKey)
-	{
-		if(!$this->arrSentencePackages)
-		{
-			return null ;
-		}
-		
-		for(end($this->arrSentencePackages);$arrPackages=current($this->arrSentencePackages);prev($this->arrSentencePackages))
-		{
-			for(end($arrPackages);$aPackage=current($arrPackages);prev($arrPackages))
+			else
 			{
-				$sSentence = $aPackage->sentence($sKey) ;
-				if($sSentence!==null)
-				{
-					reset($this->arrSentencePackages) ;
-					return $sSentence ;
-				}
+				return null ;
 			}
 		}
 		
-		reset($this->arrSentencePackages) ;
-		return null ;
-	}
-	
-	public function trans($sOri,$argvs=null,$sSavePackageName=null)
-	{
-		$arrArgvs = Type::toArray($argvs) ;
-		
-		$sSentence = $this->findSentence($sOri) ;
-		
-		if($sSentence===null)
-		{
-			$sSentence = $sOri ;
-			
-			$aPackage = $this->sentencePackage($sSavePackageName) ;
-			if( $aPackage )
-			{
-				$aPackage->addSentence($sSentence,$sSentence) ;
-			}
-		}
-		
-		$sWord = call_user_func_array('sprintf', array_merge(array($sOri),$arrArgvs)) ;
-		return $sWord?: $sOri ;
+		return $this->arrSentenceLibs[$sLibName] ;
 	}
 
 	/**
-	 * @see org\jecat\framework\locale.ILocale::number()
+	 * 返回所有已经加载过的语言库名称
+	 */
+	public function loadedSentenceLibraryNames()
+	{
+		return array_keys($this->arrSentenceLibs) ;
+	}
+	/**
+	 * 返回所有已经加载过的语言库
+	 */
+	public function loadedSentenceLibraries()
+	{
+		return $this->arrSentenceLibs ;
+	}
+	
+	public function trans($sOriWords,$argvs=null,$sLibName='base')
+	{
+		$arrArgvs = Type::toArray($argvs) ;
+		return $this->sentenceLibrary($sLibName)->trans($sOriWords,$argvs) ;
+	}
+
+	/**
+	 * @see org\jecat\framework\locale.Locale::number()
 	 */
 	public function number($Number)
 	{
@@ -124,10 +206,49 @@ class Locale implements ILocale
 	
 	public function telNumber($Number)
 	{}
+
+
+	public function serialize ()
+	{
+		$arrData = array(
+				'sLanguage' => $this->sLanguage ,
+				'sCountry' => $this->sCountry ,
+				'sLocaleName' => $this->sLocaleName ,
+		) ;
+		
+		// 只序列化 base 语言库
+		if( isset($this->arrSentenceLibs['base']) )
+		{
+			$arrData['arrSentenceLibs']['base'] = $this->arrSentenceLibs['base'] ;
+		}
+		else
+		{
+			$arrData['arrSentenceLibs'] = array() ;
+		}
+		
+		return serialize($arrData) ;
+	}
 	
+	/**
+	 * @param serialized
+	 */
+	public function unserialize ($serialized)
+	{
+		$arrData = unserialize($serialized) ;
+		
+		$this->sLanguage = $arrData['sLanguage'] ;
+		$this->sCountry = $arrData['sCountry'] ;
+		$this->sLocaleName = $arrData['sLocaleName'] ;
+		$this->arrSentenceLibs = $arrData['arrSentenceLibs'] ;
+	}
+	
+	private $sLanguage ;
+	private $sCountry ;
 	private $sLocaleName ;
+	private $arrSentenceLibs = array() ;
 	
-	private $arrSentencePackages ;
+	static private $arrFlyweights = array() ;
+	static private $aSingleton ;
 }
 
 

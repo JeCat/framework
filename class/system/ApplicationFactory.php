@@ -32,7 +32,6 @@ use org\jecat\framework\mvc\model\db\orm\Prototype;
 use org\jecat\framework\setting\Setting;
 use org\jecat\framework\setting\imp\FsSetting;
 use org\jecat\framework\lang\Exception;
-use org\jecat\framework\locale\LocaleManager;
 use org\jecat\framework\lang\oop\ClassLoader;
 use org\jecat\framework\io\StdOutputFilterMgr;
 use org\jecat\framework\lang\Object;
@@ -86,9 +85,6 @@ abstract class ApplicationFactory extends Object
 		// AccessRouter
 		AccessRouter::setSingleton($this->createAccessRouter($aApp)) ;
 		
-		// LocalManager
-		LocaleManager::setSingleton($this->createLocaleManager($aApp)) ;
-		
 		// Request
 		Request::setSingleton( $this->createRequest($aApp) ) ;
 		
@@ -131,11 +127,6 @@ abstract class ApplicationFactory extends Object
 	public function createAccessRouter(Application $aApp)
 	{
 		return new AccessRouter() ;
-	}
-	
-	public function createLocaleManager(Application $aApp)
-	{
-		return new LocaleManager('cn') ;
 	}
 	
 	abstract public function createRequest(Application $aApp) ;
