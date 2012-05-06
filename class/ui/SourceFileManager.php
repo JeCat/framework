@@ -26,6 +26,8 @@
 
 namespace org\jecat\framework\ui ;
 
+use org\jecat\framework\locale\Locale;
+
 use org\jecat\framework\fs\File;
 use org\jecat\framework\resrc\ResourceManager;
 
@@ -55,7 +57,7 @@ class SourceFileManager extends ResourceManager implements \Serializable
 	 */
 	public function findCompiled($sSourceFile,$sNamespace,$bAutoCreate=false)
 	{
-		$sPath = $this->compiledFolderPath() . '/' . $this->compileStrategySignture() . '/' . $sNamespace . '/' . $sSourceFile . '.php' ;
+		$sPath = $this->compiledFolderPath() . '/' . $this->compileStrategySignture() . '/' . Locale::singleton()->localeName() . '/' . $sNamespace . '/' . $sSourceFile . '.php' ;
 		$aFile = new File($sPath) ;
 		
 		if( $bAutoCreate and !$aFile->exists() )

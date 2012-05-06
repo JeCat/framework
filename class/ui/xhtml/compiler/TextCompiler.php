@@ -25,6 +25,7 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\ui\xhtml\compiler ;
 
+use org\jecat\framework\locale\Locale;
 use org\jecat\framework\lang\Assert;
 use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\CompilerManager;
@@ -39,7 +40,15 @@ class TextCompiler extends BaseCompiler
 		{
 			Assert::type("org\\jecat\\framework\\ui\\xhtml\\Text",$aObject,'aObject') ;
 
-			$aDev->output($aObject->source()) ;
+			$sText = $aObject->source() ;
+			
+			// locale translate
+			if( trim($sText) )
+			{
+				$sText = Locale::singleton()->trans($sText,null,'ui') ;
+			}
+			
+			$aDev->output($sText) ;
 		}
 		
 		else 

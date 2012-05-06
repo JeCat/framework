@@ -295,9 +295,9 @@ class ViewAssembler extends Object
 		{
 			$arrAssemblyItem['classes'] = array() ;
 		}
-		if(empty($arrAssemblyItem['styles']))
+		if(empty($arrAssemblyItem['style']))
 		{
-			$arrAssemblyItem['styles'] = array() ;
+			$arrAssemblyItem['style'] = '' ;
 		}
 		
 		$arrAssemblyItem['classes'][] = 'jc-layout' ;
@@ -317,9 +317,8 @@ class ViewAssembler extends Object
 		}
 		
 		$sClasses = implode(' ',$arrAssemblyItem['classes']) ;
-		$sStyles = implode(' ',$arrAssemblyItem['styles']) ;
 		
-		return "<div id=\"{$arrAssemblyItem['id']}\" class=\"$sClasses\" style=\"$sStyles\">\r\n" ;
+		return "<div id=\"{$arrAssemblyItem['id']}\" class=\"$sClasses\" style=\"{$arrAssemblyItem['style']}\">\r\n" ;
 	}
 
 	/**
