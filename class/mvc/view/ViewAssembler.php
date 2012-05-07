@@ -291,32 +291,33 @@ class ViewAssembler extends Object
 	
 	public function htmlWrapper(array $arrAssemblyItem,$sLayout=null)
 	{
-		if(empty($arrAssemblyItem['classes']))
+		if(empty($arrAssemblyItem['cssClass']))
 		{
-			$arrAssemblyItem['classes'] = array() ;
+			$sClass = empty($arrAssemblyItem['object'])? null: $arrAssemblyItem['object']->cssClass() ;
+			$arrAssemblyItem['cssClass'] = $sClass? array($sClass): array() ;
 		}
 		if(empty($arrAssemblyItem['style']))
 		{
 			$arrAssemblyItem['style'] = '' ;
 		}
 		
-		$arrAssemblyItem['classes'][] = 'jc-layout' ;
+		$arrAssemblyItem['cssClass'][] = 'jc-layout' ;
 		if($sLayout)
 		{
-			$arrAssemblyItem['classes'][] = self::$mapLayoutItemStyles[$sLayout] ;
+			$arrAssemblyItem['cssClass'][] = self::$mapLayoutItemStyles[$sLayout] ;
 		}
 		
 		if( $arrAssemblyItem['type']==='frame' )
 		{
-			$arrAssemblyItem['classes'][] = 'jc-frame' ;
-			$arrAssemblyItem['classes'][] = self::$mapLayoutFrameStyles[$arrAssemblyItem['layout']] ;
+			$arrAssemblyItem['cssClass'][] = 'jc-frame' ;
+			$arrAssemblyItem['cssClass'][] = self::$mapLayoutFrameStyles[$arrAssemblyItem['layout']] ;
 		}
 		else 
 		{
-			$arrAssemblyItem['classes'][] = 'jc-view' ;
+			$arrAssemblyItem['cssClass'][] = 'jc-view' ;
 		}
 		
-		$sClasses = implode(' ',$arrAssemblyItem['classes']) ;
+		$sClasses = implode(' ',$arrAssemblyItem['cssClass']) ;
 		
 		return "<div id=\"{$arrAssemblyItem['id']}\" class=\"$sClasses\" style=\"{$arrAssemblyItem['style']}\">\r\n" ;
 	}
