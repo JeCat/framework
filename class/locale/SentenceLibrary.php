@@ -129,8 +129,7 @@ class SentenceLibrary
 			$sSentence = $this->arrSentences[$sKey] ; 
 		}
 	
-		$sWord = call_user_func_array('sprintf', array_merge(array($sSentence),$arrArgvs)) ;
-		return $sWord ?: $sOriWords ;
+		return $arrArgvs? call_user_func_array('sprintf',array_merge(array($sSentence),$arrArgvs)): $sSentence ;
 	}
 
 	/**
