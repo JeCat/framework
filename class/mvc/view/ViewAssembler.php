@@ -252,7 +252,8 @@ class ViewAssembler extends Object
 					
 					if( !$arrAssemblyItem['object'] = View::findRegisteredView($arrAssemblyItem['id']) )
 					{
-						throw new Exception("在根据装配单输出视图时，无法根据提供的视图ID找到视图对像：%s，该视图可能不存在或未注册。",$arrAssemblyItem['id']) ;	
+						//throw new Exception("在根据装配单输出视图时，无法根据提供的视图ID找到视图对像：%s，该视图可能不存在或未注册。",$arrAssemblyItem['id']) ;
+						continue ;	
 					}
 				}
 
