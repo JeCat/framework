@@ -4,7 +4,7 @@ jc = {
 			widget : {
 				menu : {
 					base : {
-						timer : -1,
+						timer : -1
 					},
 					fun : {
 						onload : {
@@ -18,15 +18,15 @@ jc = {
 									fun() ;
 								}
 							},
-							loadList : [] ,
+							loadList : []
 						}
 					},
 					objectList : {
 						sItemClassName : 'jc-widget-menu-item' ,
 						sMenuClassName : 'jc-widget-menu' ,
 						itemList : [] ,
-						menuList : [] ,
-					},
+						menuList : [] 
+					}
 				}
 			}
 		}
@@ -41,6 +41,9 @@ jc.mvc.view.widget.menu.fun.onload.addOnLoad(function(){
 	
 	function containsClassName( o , sClassName ){
 		var i ;
+		if(!o.classList){
+			return false;
+		}
 		for( i=0 ; i<o.classList.length ; ++i ){
 			if( sClassName == o.classList[i] ){
 				return true;
