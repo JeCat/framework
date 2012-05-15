@@ -31,7 +31,7 @@ class FSCache extends Cache
 {
 	public function __construct($sFolder)
 	{
-		$this->sFolderPrefix = trim($sFolder,'/').'/' ;
+		$this->sFolderPrefix = rtrim($sFolder,'/').'/' ;
 	}
 	
 	public function item($sDataPath)
@@ -79,7 +79,7 @@ class FSCache extends Cache
 		}
 		
 		$sDataFolder = dirname($sFilePath) ;
-		if( !is_dir($sDataFolder) and !Folder::createInstance($sDataFolder)->create() )
+		if( !is_dir($sDataFolder) and !Folder::mkdir($sDataFolder,0775,true) )
 		{
 			return ;
 		}
@@ -89,7 +89,7 @@ class FSCache extends Cache
 		// create time
 		if($fCreateTimeMicroSec<0)
 		{
-			$fCreateTimeMicroSec = microtime(true) ;
+			$fCreateTimeMicroSec = microtime(true)+600 ;
 		}
 		
 		// expire time
