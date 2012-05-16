@@ -76,15 +76,16 @@ class Locale implements ITranslator, \Serializable
 	 * locale设置 保存在cookie中
 	 */
 	static public function createSessionLocale($sDefaultLanguage='zh',$sDefaultCountry='CN',$bAsSingleton=true)
-	{
+	{	
 		$sLanguage = empty($_COOKIE['JC_LC_LANG'])? $sDefaultLanguage: $_COOKIE['JC_LC_LANG'] ;
 		$sCountry = empty($_COOKIE['JC_LC_COUNTRY'])? $sDefaultCountry: $_COOKIE['JC_LC_COUNTRY'] ;
-
+		
 		$aLocale = self::flyweight($sLanguage,$sCountry) ;
 		if($bAsSingleton)
 		{
 			self::setSingleton($aLocale) ;
 		}		
+		
 		return $aLocale ;
 	}
 	
@@ -106,7 +107,6 @@ class Locale implements ITranslator, \Serializable
 		{
 			self::setSingleton($aLocale) ;
 		}
-		
 		return $aLocale ;
 	}
 
