@@ -252,7 +252,8 @@ class ViewAssembler extends Object
 					
 					if( !$arrAssemblyItem['object'] = View::findRegisteredView($arrAssemblyItem['id']) )
 					{
-						throw new Exception("在根据装配单输出视图时，无法根据提供的视图ID找到视图对像：%s，该视图可能不存在或未注册。",$arrAssemblyItem['id']) ;	
+						//throw new Exception("在根据装配单输出视图时，无法根据提供的视图ID找到视图对像：%s，该视图可能不存在或未注册。",$arrAssemblyItem['id']) ;
+						continue ;	
 					}
 				}
 
@@ -291,32 +292,33 @@ class ViewAssembler extends Object
 	
 	public function htmlWrapper(array $arrAssemblyItem,$sLayout=null)
 	{
-		if(empty($arrAssemblyItem['classes']))
+		if(empty($arrAssemblyItem['cssClass']))
 		{
-			$arrAssemblyItem['classes'] = array() ;
+			$sClass = empty($arrAssemblyItem['object'])? null: $arrAssemblyItem['object']->cssClass() ;
+			$arrAssemblyItem['cssClass'] = $sClass? array($sClass): array() ;
 		}
 		if(empty($arrAssemblyItem['style']))
 		{
 			$arrAssemblyItem['style'] = '' ;
 		}
 		
-		$arrAssemblyItem['classes'][] = 'jc-layout' ;
+		$arrAssemblyItem['cssClass'][] = 'jc-layout' ;
 		if($sLayout)
 		{
-			$arrAssemblyItem['classes'][] = self::$mapLayoutItemStyles[$sLayout] ;
+			$arrAssemblyItem['cssClass'][] = self::$mapLayoutItemStyles[$sLayout] ;
 		}
 		
 		if( $arrAssemblyItem['type']==='frame' )
 		{
-			$arrAssemblyItem['classes'][] = 'jc-frame' ;
-			$arrAssemblyItem['classes'][] = self::$mapLayoutFrameStyles[$arrAssemblyItem['layout']] ;
+			$arrAssemblyItem['cssClass'][] = 'jc-frame' ;
+			$arrAssemblyItem['cssClass'][] = self::$mapLayoutFrameStyles[$arrAssemblyItem['layout']] ;
 		}
 		else 
 		{
-			$arrAssemblyItem['classes'][] = 'jc-view' ;
+			$arrAssemblyItem['cssClass'][] = 'jc-view' ;
 		}
 		
-		$sClasses = implode(' ',$arrAssemblyItem['classes']) ;
+		$sClasses = implode(' ',$arrAssemblyItem['cssClass']) ;
 		
 		return "<div id=\"{$arrAssemblyItem['id']}\" class=\"$sClasses\" style=\"{$arrAssemblyItem['style']}\">\r\n" ;
 	}

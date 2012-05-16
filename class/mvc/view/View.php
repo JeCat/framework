@@ -172,6 +172,12 @@ class View extends NamableComposite implements IView, IBean
 	 * |无
 	 * |可选
 	 * |用于初始化视图对象的参数,以参数名为键,参数值为值
+	 * |-- --
+	 * |css
+	 * |string
+	 * |无
+	 * |可选
+	 * |显示视图时，套上一层 div wrapper，用在 div wrapper 上的 css class 名称
 	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
@@ -227,6 +233,12 @@ class View extends NamableComposite implements IView, IBean
     		{
     			$aVariables->set($sName,$variable) ;
     		}
+    	}
+    	
+    	// 
+    	if(!empty($arrConfig['cssClass']))
+    	{
+    		$this->setCssClass($arrConfig['cssClass']) ;
     	}
     	
     	$this->arrBeanConfig = $arrConfig ;
@@ -737,6 +749,15 @@ class View extends NamableComposite implements IView, IBean
 		
 		$aOutput->write("\r\n</pre>");
     }
+
+    public function setCssClass($sClass)
+    {
+    	$this->sCssClass = $sClass ;
+    }
+    public function cssClass()
+    {
+    	return $this->sCssClass ;
+    }
     
     static public function registerView(IView $aView)
     {
@@ -778,6 +799,7 @@ class View extends NamableComposite implements IView, IBean
     private $arrBeanConfig ;
     private $aController ;
     private $sId ;
+    private $sCssClass ;
 	protected $bRendered = false ;
 	
 	// 是否使用装配单收容浏览视图
