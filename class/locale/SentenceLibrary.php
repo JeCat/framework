@@ -131,7 +131,34 @@ class SentenceLibrary
 	
 		return $arrArgvs? call_user_func_array('sprintf',array_merge(array($sSentence),$arrArgvs)): $sSentence ;
 	}
-
+	
+	//后添加获得sentence方法
+	public function arrSentences()
+	{
+		return $this->arrSentences;
+	}
+	
+	public function arrNewSentences()
+	{
+		return $this->arrNewSentences;
+	}
+	
+	//后添加
+	public function setSentence($sKey,$sValue)
+	{
+		$this->arrSentences[$sKey]=$sValue;
+	}
+	
+	public function language()
+	{
+		return $this->sLanguage;
+	}
+	
+	public function country()
+	{
+		return $this->sCountry;
+	}
+	
 	/**
 	 * 返回未归档的语句
 	 * 语言库从语言包中加载语句，当向语言库请求一个语言包中不存在的语句时，语言库将该语句搜集在未归档语句数组中。
