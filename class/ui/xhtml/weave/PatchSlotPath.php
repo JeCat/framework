@@ -94,14 +94,13 @@ class PatchSlotPath
 	static public function reflectXPath(IObject $aParentObject,$sParentXPath='')
 	{
 		$arrChildIdxies = array() ;
-		echo __METHOD__ ;
 		foreach($aParentObject->iterator() as $aChildObject)
 		{
-			echo $sType = PatchSlotPathSegment::xpathType($aChildObject) ;
+			$sType = PatchSlotPathSegment::xpathType($aChildObject) ;
 			if( !isset($arrChildIdxies[$sType]) )
 			{
 				$arrChildIdxies[$sType] = 0 ;
-			}echo $arrChildIdxies[$sType] ;
+			}
 				
 			$sXPath = $sParentXPath.'/'.$sType.'@'.($arrChildIdxies[$sType]++) ;
 			$aChildObject->properties()->set('xpath',$sXPath) ;
