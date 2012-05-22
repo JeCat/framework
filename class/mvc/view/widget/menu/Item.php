@@ -138,7 +138,17 @@ class Item extends AbstractBase
 					}
 				}
 			}
-		}
+		}else if(!empty($arrConfig['link'])){
+            if($aView=$this->view()){
+                if( $aController = $aView->controller() ){
+                    $aParams = $aController->params();
+                    
+                    if( DataSrc::compare( $aParams , substr($arrConfig['link'],1) ) ){
+                        $this->setActive(true);
+                    }
+                }
+            }
+        }
 		
 		if( array_key_exists('active',$arrConfig) )
 		{
