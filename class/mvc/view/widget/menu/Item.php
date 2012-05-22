@@ -95,7 +95,18 @@ class Item extends AbstractBase
     {
 		parent::buildBean($arrConfig,$sNamespace);
 		
-		if( !empty($arrConfig['menu'])){
+		/*
+			判断是否有下级菜单，看是否有item:xxx项
+		*/
+		$bIsMenu = false;
+		foreach($arrConfig as $key => $value){
+			$sPrefix = substr($key,0,5);
+			if($sPrefix === 'item:' ){
+				$bIsMenu = true;
+				break;
+			}
+		}
+		if($bIsMenu){
 			$this->buildSubMenu($arrConfig);
 		}
 		
