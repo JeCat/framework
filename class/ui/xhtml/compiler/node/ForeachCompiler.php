@@ -123,14 +123,13 @@ class ForeachCompiler extends NodeCompiler {
 		
 		$aDev->write ( "\r\n// foreach start ") ;
 		$aDev->write ( "{$sForAutoName} = {$sForUserExp};
-if(!empty({$sForAutoName})){
 \$aStackForLoopIsEnableToRun->put(false);
-	{$sIdxAutoName} = -1;
-	foreach({$sForAutoName} as {$sKeyAutoName}=>{$sItemRef}{$sItemAutoName}){");
+{$sIdxAutoName} = -1;
+foreach({$sForAutoName} as {$sKeyAutoName}=>{$sItemRef}{$sItemAutoName}){");
 
-		$aDev->write ( "\$bLoopIsEnableToRun = & \$aStackForLoopIsEnableToRun->getRef();
-			\$bLoopIsEnableToRun = true;
-			{$sIdxAutoName}++;" );
+	$aDev->write ( "\$bLoopIsEnableToRun = & \$aStackForLoopIsEnableToRun->getRef();
+	\$bLoopIsEnableToRun = true;
+	{$sIdxAutoName}++;" );
 		
 		if( !empty($sKeyUserName) )
 		{
@@ -149,7 +148,7 @@ if(!empty({$sForAutoName})){
 		if(!$aObject->headTag()->isSingle()){
 			//循环体，可能会包含foreach:else标签
 			$this->compileChildren($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
-			$aDev->write("\t}\r\n}\r\n") ; // end if   (如果foreach的内容包含foreach:else标签,则此处为foreach:else的end)
+			$aDev->write("}\r\n") ; // end if   (如果foreach的内容包含foreach:else标签,则此处为foreach:else的end)
 		}
 	}
 }
