@@ -142,6 +142,8 @@ class DB extends Object
 	
 	private function makeSql($inputSql,$factors=null,SqlCompiler $aSqlCompiler=null)
 	{
+		return $inputSql ;
+		/*
 		if( is_string($inputSql) )
 		{
 			$aSql = SQL::make($inputSql,$factors) ;
@@ -168,7 +170,7 @@ class DB extends Object
 		else
 		{
 			return $inputSql ;
-		}		
+		}*/
 	}
 	
 	public function queryCount(Select $aSelect,$sColumn='*',SqlCompiler $aSqlCompiler=null)

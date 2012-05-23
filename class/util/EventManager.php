@@ -39,26 +39,40 @@ class EventManager extends Object implements \Serializable
 		{
 			foreach($this->arrEventHandles[$sClass][$sEvent][$sourceObject] as &$handler)
 			{
-				// 合并注册时提供的参数
-				if( $handler[1] )
+				if( is_array($handler[0]) )
 				{
-					foreach($handler[1] as &$callbackArgv)
-					{
-						$arrArgvs[] =& $callbackArgv ;
-					}
+					$sCallCode = "\$return = \$handler[0][0]".(is_string($handler[0][0])? '::': '->')."\$handler[0][1](" ;
+					
 				}
-				
-				$return = call_user_func_array($handler[0],$arrArgvs) ;
+				else
+				{
+					$sCallCode = "\$return = \$handler[0](" ;
+				}
+				for($nIdx=0;$nIdx<count($arrArgvs);$nIdx++)
+				{
+					if($nIdx)
+					{
+						$sCallCode.= ',' ;
+					}
+					$sCallCode.= "\$arrArgvs[{$nIdx}]" ;
+				}
 
-				// 清理注册时提供的参数
 				if( $handler[1] )
 				{
-					for($i=count($handler[1]);$i>0;$i--)
+					for($nIdx=0;$nIdx<count($handler[1]);$nIdx++)
 					{
-						array_pop($arrArgvs) ;
+						if($nIdx)
+						{
+							$sCallCode.= ',' ;
+						}
+						$sCallCode.= "\$handler[1][{$nIdx}]" ;
 					}
 				}
 				
+				$sCallCode.= ') ;' ;
+
+				eval($sCallCode) ;
+								
 				// 检查事件的返回值
 				if( $return instanceof EventReturnValue )
 				{
