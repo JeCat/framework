@@ -346,7 +346,7 @@ class Menu extends AbstractBase
 		
 		foreach($this->arrItems as $aItem)
 		{
-			if( $aItem->isActive() and $sSubMenu=$aItem->subMenu() )
+			if( ( $aItem->isActive() or $aItem->isBubblingActive() ) and $sSubMenu=$aItem->subMenu() )
 			{
 				return $sSubMenu->findActiveSubMenu($nDepth-1) ;
 			}
@@ -410,6 +410,15 @@ class Menu extends AbstractBase
 		}
 		
 		return false ;
+	}
+	
+	public function isBubblingActive(){
+		foreach($this->arrItems as $aItem){
+			if( $aItem->isBubblingActive() ){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public function isRenderAll(){

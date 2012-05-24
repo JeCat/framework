@@ -145,9 +145,9 @@ class Item extends AbstractBase
 			$this->setActive($arrConfig['active']);
 		}
 		
-		if( $aSubMenu=$this->subMenu() and $aSubMenu->isActive() )
+		if( $aSubMenu=$this->subMenu() and ( $aSubMenu->isActive() or $aSubMenu->isBubblingActive() ) )
 		{
-			$this->setActive(true);
+			$this->setBubblingActive(true);
 		}
 	}
 	
@@ -294,6 +294,14 @@ class Item extends AbstractBase
 		$this->sHtml = $sHtml ;
 	}
 	
+	public function setBubblingActive($bBa){
+		$this->bBubblingActive = $bBa?true:false;
+	}
+	
+	public function isBubblingActive(){
+		return $this->bBubblingActive ;
+	}
+	
     private $parentMenu = null;
     private $subMenu = null;
     
@@ -301,6 +309,8 @@ class Item extends AbstractBase
     private $sLink ;
     private $sOnClick ;
     private $sHtml ;
+	
+	private $bBubblingActive = false ;
 }
 
 
