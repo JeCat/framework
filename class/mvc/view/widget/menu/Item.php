@@ -143,8 +143,7 @@ class Item extends AbstractBase
                 if( $aController = $aView->controller() ){
                     $aParams = $aController->params();
                     
-                    if( substr($arrConfig['link'],0,1) and
-                        DataSrc::compare( $aParams , substr($arrConfig['link'],1) ) ){
+                    if( DataSrc::compare( $aParams , substr($arrConfig['link'],1) ) ){
                         $this->setActive(true);
                     }
                 }
