@@ -95,7 +95,18 @@ class Item extends AbstractBase
     {
 		parent::buildBean($arrConfig,$sNamespace);
 		
-		if( !empty($arrConfig['menu'])){
+		/*
+			判断是否有下级菜单，看是否有item:xxx项
+		*/
+		$bIsMenu = false;
+		foreach($arrConfig as $key => $value){
+			$sPrefix = substr($key,0,5);
+			if($sPrefix === 'item:' ){
+				$bIsMenu = true;
+				break;
+			}
+		}
+		if($bIsMenu){
 			$this->buildSubMenu($arrConfig);
 		}
 		
@@ -127,7 +138,18 @@ class Item extends AbstractBase
 					}
 				}
 			}
-		}
+		}else if(!empty($arrConfig['link'])){
+            if($aView=$this->view()){
+                if( $aController = $aView->controller() ){
+                    $aParams = $aController->params();
+                    
+                    if( substr( $arrConfig['link'],0,1) === '?' 
+                        and DataSrc::compare( $aParams , substr($arrConfig['link'],1) ) ){
+                        $this->setActive(true);
+                    }
+                }
+            }
+        }
 		
 		if( array_key_exists('active',$arrConfig) )
 		{

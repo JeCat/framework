@@ -27,7 +27,7 @@ namespace org\jecat\framework\db\reflecter;
 
 abstract class AbStractTableReflecter extends DBStructReflecter
 {
-	abstract function __construct($aDBReflecterFactory ,$sTable, $sDBName=null);
+	abstract function __construct(AbstractReflecterFactory $aDBReflecterFactory ,$sTable, $sDBName=null);
 	
 	/**
 	 * @return string 如果主键不存在返回null

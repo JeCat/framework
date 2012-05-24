@@ -87,7 +87,7 @@ class Container extends Object implements IContainer, \Serializable
 	
 	public function add($object,$sName=null,$bTakeover=true)
 	{
-		if( $object==$this )
+		if( $object===$this )
 		{
 			return ;
 		}
