@@ -1,5 +1,17 @@
 <li	id='{=$theWidget->id()}' {=$theWidget->getCssClassString()}>
-	{=$theWidget->html()}
+	<if '$theWidget->isActive()'>
+		<div class="jc-widget-menu-item-div-active">
+			{=$theWidget->html()}
+		</div>
+	<elseif '$theWidget->isBubblingActive()' />
+		<div class="jc-widget-menu-item-div-bubblingactive">
+			{=$theWidget->html()}
+		</div>
+	<else/>
+		<div>
+			{=$theWidget->html()}
+		</div>
+	</if>
 	
 	<if "$theWidget->isDisplaySubMenu()" >
 		<widget instance="$theWidget->subMenu()"  />
