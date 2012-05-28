@@ -35,7 +35,7 @@ class EventManager extends Object implements \Serializable
 		
 		$aReturnValue = null ;
 
-		foreach( array('*',$sourceObject) as $sObjectKey )
+		foreach( ($sourceObject!=='*'? array('*',$sourceObject): array('*')) as $sObjectKey )
 		{
 			if(!empty($this->arrEventHandles[$sClass][$sEvent][$sObjectKey]))
 			{
