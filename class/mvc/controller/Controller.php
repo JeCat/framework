@@ -234,7 +234,7 @@ class Controller extends NamableComposite implements IBean
     	EventManager::singleton()->emitEvent(
     			__CLASS__
     			, self::beforeBuildBean
-    			, $arrArgvs=array($this,&$arrConfig,&$sNamespac,&$aBeanFactory)
+    			, $arrArgvs=array($this,&$arrConfig,&$sNamespace,&$aBeanFactory)
     			, get_class($this)
     	) ;
     	
