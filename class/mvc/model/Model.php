@@ -2,9 +2,7 @@
 namespace org\jecat\framework\mvc\model ;
 
 use org\jecat\framework\mvc\model\executor\Selecter;
-
 use org\jecat\framework\db\DB;
-
 use org\jecat\framework\lang\Exception;
 
 class Model
@@ -26,13 +24,6 @@ class Model
 
 		//$this->sDataPrefix = $this->aPrototype->name() . '.' ;
 		//$this->nDataPrefixLength = strlen($this->sDataPrefix) ;
-	}
-	/**
-	 * @return Model
-	 */
-	static public function create($sTable,$sPrototypeName=null,$primaryKeys=null,$columns=null)
-	{
-		return new self($sTable,$sPrototypeName,$primaryKeys,$columns) ;
 	}
 	/**
 	 * @alias org\jecat\framework\mvc\model\Prototype::addOrder
@@ -217,6 +208,15 @@ class Model
 	{
 		
 	}
+
+	public function insert(array $arrData,$sChildName=null)
+	{
+	
+	}
+	public function update(array $arrData,$sChildName=null)
+	{
+		
+	}
 	
 	/**
 	 * 执行删除操作，
@@ -310,9 +310,13 @@ class Model
 				if( !empty($arrParentRow[$sChildName]) )
 				{
 					prev($arrParentRow[$sChildName]) ;
-					if( each($arrParentRow[$sChildName])!==false )
+					if( each($arrParentRow[$sChildName])===false )
 					{
 						next($arrParentRow[$sChildName]) ;
+						return true ;
+					}
+					else
+					{
 						return true ;
 					}
 				}
@@ -325,7 +329,26 @@ class Model
 	 */
 	public function next($sChildName=null)
 	{
-	
+		if( $arrParentRow=&$this->localeRow($sChildName,$this->arrData) )
+		{
+			if( $this->isSheet($arrParentRow,$sChildName) )
+			{
+				if( !empty($arrParentRow[$sChildName]) )
+				{
+					next($arrParentRow[$sChildName]) ;
+					if( each($arrParentRow[$sChildName])===false )
+					{
+						prev($arrParentRow[$sChildName]) ;
+						return false ;
+					}
+					else
+					{
+						return true ;
+					}
+				}
+			}
+		}
+		return false ;
 	}
 	
 

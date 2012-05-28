@@ -6,6 +6,51 @@ use org\jecat\framework\lang\Object;
 
 abstract class Executor extends Object
 {
+	protected function joinTables(array & $arrPrototype,array & $arrSqlStat)
+	{
+		// *被*多对多关联 的桥接表
+		if( !empty($arrPrototype['assoc']) and $arrPrototype['assoc']==Prototype::hasAndBelongsToMany )
+		{
+			$sSqlClauseFrom.= " LEFT JOIN (`{$arrPrototype['bridge']}` AS `{$arrPrototype['bridgeTableAlias']}`" ;
+
+			$arrClauseOn ;
+			foreach($arrAssoc['fromBridgeKeys'] as $nIdx=>$sFromBridgeKey)
+			{
+				$arrClauseOn[] = "`{$arrPrototype['bridgeTableAlias']}`.`{$sFromBridgeKey}` = `{$arrAssoc['tableAlias']}`.`{$arrAssoc['toKeys'][$nIdx]}`" ;
+			}
+			$sSqlClauseFrom.= ") ON (".implode(' AND ',$arrClauseOn).")" ;
+		}
+		
+		if(empty($arrPrototype['associations']))
+		{
+			return ;
+		}
+		
+		foreach($arrPrototype['associations'] as $arrAssoc)
+		{
+			if( $arrAssoc['assoc']&Prototype::oneToOne )
+			{
+				
+				// join table
+				$arrSqlStat['from'].= " LEFT JOIN (`{$arrAssoc['table']}` AS `".addslashes($arrAssoc['tableAlias'])."`" ;
+				
+				$this->joinTables($arrAssoc,$arrSqlStat) ;
+				
+				// join table on
+				$arrClauseOn ;
+				foreach($arrAssoc['fromKeys'] as $nIdx=>$sFromKey)
+				{
+					$arrClauseOn[] = "`{$arrPrototype['tableAlias']}`.`{$sFromKey}` = `{$arrAssoc['tableAlias']}`.`{$arrAssoc['toKeys'][$nIdx]}`" ;
+				}
+				$arrSqlStat['from'].= ") ON (".implode(' AND ',$arrClauseOn).")" ;
+			}
+			else
+			{
+				$arrSqlStat['multiAssocs'][] =& $arrAssoc ;
+			}
+		}
+	}
+	
 	protected function makeFromClause(array & $arrPrototype)
 	{
 		return " FROM `{$arrPrototype['table']}` AS `" . addslashes($arrPrototype['tableAlias']) . '`' ;

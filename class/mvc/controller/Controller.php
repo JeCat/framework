@@ -261,23 +261,23 @@ class Controller extends NamableComposite implements IBean
     	
     	// 将 model:xxxx 转换成 models[] 结构
     	$aBeanFactory->_typeKeyStruct($arrConfig,array(
-    				'model:'=>'models' ,
+    				//'model:'=>'models' ,
     				'view:'=>'views' ,
     				'controller:'=>'controllers' ,
     	)) ;
     	
     	// model=>models(model), view=>views(view)
-    	if( !empty($arrConfig['model']) and is_array($arrConfig['model']) and empty($arrConfig['models']['model']) )
+    	/*if( !empty($arrConfig['model']) and is_array($arrConfig['model']) and empty($arrConfig['models']['model']) )
     	{
     		$arrConfig['models']['model'] =& $arrConfig['model'] ;
-    	}
+    	}*/
     	if( array_key_exists('view',$arrConfig) and is_array($arrConfig['view']) )
     	{
     		$arrConfig['views']['view'] =& $arrConfig['view'] ;
     	}
     	
     	// models --------------------
-    	$aModelContainer = $this->modelContainer() ;
+    	/*$aModelContainer = $this->modelContainer() ;
     	if( !empty($arrConfig['models']) )
     	{
     		foreach($arrConfig['models'] as $key=>&$arrBeanConf)
@@ -288,7 +288,7 @@ class Controller extends NamableComposite implements IBean
     			$aBean = $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ;
     			$aModelContainer->add( $aBean, $aBean->name() ) ;
     		}
-    	}
+    	}*/
     	
     	// views --------------------
     	if( !empty($arrConfig['views']) )
@@ -306,14 +306,14 @@ class Controller extends NamableComposite implements IBean
 				
 				$aBean->buildBean($arrBeanConf,$sNamespace) ;
 				
-				if(!empty($arrBeanConf['model']))
+				/*if(!empty($arrBeanConf['model']))
 				{
 					if( !$aModel=$aModelContainer->getByName($arrBeanConf['model']) )
 		    		{
 		    			throw new BeanConfException("视图(%s)的Bean配置属性 model 无效，没有指定的模型：%s",array($aBean->name(),$arrBeanConf['model'])) ;
 		    		}
 		    		$aBean->setModel($aModel) ;
-				}
+				}*/
     		}
     	}
     	

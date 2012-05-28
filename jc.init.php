@@ -63,6 +63,9 @@ require_once CLASSPATH."/lang/aop/AOP.php" ;
 require_once CLASSPATH."/lang/compile/Compiler.php" ;
 require_once CLASSPATH."/lang/compile/CompilerFactory.php" ;
 
+// functions
+require_once PATH."/functions.php" ;
+
 
 // 处理未捕获的异常
 set_exception_handler(function(\Exception $aException)
