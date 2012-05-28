@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\model ;
 
+use org\jecat\framework\mvc\model\db\orm\Inserter;
+
 use org\jecat\framework\mvc\model\executor\Selecter;
 use org\jecat\framework\db\DB;
 use org\jecat\framework\lang\Exception;
@@ -96,7 +98,7 @@ class Model
 	public function hasOne($toTable,$fromKeys=null,$toKeys=null,$sAssocName=null)
 	{
 		$this->aPrototype->addAssociation(array(
-				'assoc' => Prototype::hasOne ,
+				'type' => Prototype::hasOne ,
 				'table' => $toTable ,
 				'name' => $sAssocName ,
 				'fromKeys' => $fromKeys ,
@@ -110,7 +112,7 @@ class Model
 	public function belongsTo($toTable,$fromKeys=null,$toKeys=null,$sAssocName=null)
 	{
 		$this->aPrototype->addAssociation(array(
-				'assoc' => Prototype::belongsTo ,
+				'type' => Prototype::belongsTo ,
 				'table' => $toTable ,
 				'name' => $sAssocName ,
 				'fromKeys' => $fromKeys ,
@@ -124,7 +126,7 @@ class Model
 	public function hasMany($toTable,$fromKeys=null,$toKeys=null,$sAssocName=null)
 	{
 		$this->aPrototype->addAssociation(array(
-				'assoc' => Prototype::hasMany ,
+				'type' => Prototype::hasMany ,
 				'table' => $toTable ,
 				'name' => $sAssocName ,
 				'fromKeys' => $fromKeys ,
@@ -138,7 +140,7 @@ class Model
 	public function hasAndBelongsToMany($toTable,$sBridgeTableName,$fromKeys=null,$toBridgeKeys=null,$fromBridgeKeys=null,$toKeys=null,$sAssocName=null)
 	{
 		$this->aPrototype->addAssociation(array(
-				'assoc' => Prototype::hasAndBelongsToMany ,
+				'type' => Prototype::hasAndBelongsToMany ,
 				'table' => $toTable ,
 				'name' => $sAssocName ,
 				'fromKeys' => $fromKeys ,
@@ -152,14 +154,9 @@ class Model
 	/**
 	 * @return Model
 	 */
-	public function assoc(array $arrOptions)
+	public function ass(array $arrOptions)
 	{
 		$this->aPrototype->addAssociation($arrOptions) ;
-		return $this ;
-	}
-	public function back($step=1)
-	{
-		$this->aPrototype->back($step) ;
 		return $this ;
 	}
 	
@@ -211,7 +208,16 @@ class Model
 
 	public function insert(array $arrData,$sChildName=null)
 	{
-		
+		// insert 所有表
+		if($sChildName===null)
+		{
+			Inserter::singleton()->execute($this->aPrototype->refRaw(),$this->arrData,$arrData) ;
+		}
+		// insert 指定表
+		else
+		{
+			$this->localeRow($sName, $arrSheet) ;
+		}
 		
 		return $this ;
 	}
@@ -243,6 +249,12 @@ class Model
 	public function prototype()
 	{
 		return $this->aPrototype ;
+	}
+
+	public function switchPrototype($sPrototypeName='$')
+	{
+		$this->aPrototype->switchPrototype($sPrototypeName) ;
+		return $this ;
 	}
 	
 	/**

@@ -53,7 +53,6 @@ class VFSWrapper
 	 */
 	public function __construct()
 	{}
-	
 
 	public function stream_open($sUrl,$sMode,$options,&$opened_path)
 	{

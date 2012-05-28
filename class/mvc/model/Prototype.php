@@ -393,7 +393,18 @@ class Prototype
 		$sFromXPath = $this->xpath() ;
 		$sFromTableAlias = $this->tableAlias() ;
 		
-		if( empty($arrAssociation['assoc']) or !in_array($arrAssociation['assoc'],self::$arrAssociations) )
+		if( empty($arrAssociation['assoc']) )
+		{
+			if( !empty($arrAssociation['type']) )
+			{
+				$arrAssociation['assoc'] = $arrAssociation['type'] ;
+			}
+			else
+			{
+				throw new Exception("Model关联缺少 type 属性：%s",var_export($arrAssociation,true)) ;
+			}
+		}
+		if( !in_array($arrAssociation['assoc'],self::$arrAssociations) )
 		{
 			throw new Exception("Model关联无效：%s",@$arrAssociation['assoc']) ;
 		}
@@ -507,9 +518,6 @@ class Prototype
 				$arrAssociation['fromBridgeKeys'] = (array) $arrAssociation['fromBridgeKeys'] ;
 			}
 		}
-		
-		// 切换到新添加的关联原型上
-		$this->switchChild($arrAssociation['xpath']) ;
 				
 		return $this ;
 	}
@@ -519,14 +527,14 @@ class Prototype
 		return $this->arrPrototypeShortcut[$sXPath] ;
 	}
 	
-	public function switchChild($sXPath=null)
+	public function switchPrototype($sXPath=null)
 	{
 		if( !isset($this->arrPrototypeShortcut[$sXPath]) )
 		{
 			throw new Exception("指定的原型：%s不存在，无法完成原型切换",$sXPath) ;
 		}
 		
-		$this->arrSwitchStack[] =& $this->arrPrototype ;
+		//$this->arrSwitchStack[] =& $this->arrPrototype ;
 		$arrOriFullname = $this->arrPrototype['xpath'] ;
 		
 		$this->arrPrototype =& $this->arrPrototypeShortcut[$sXPath] ;
@@ -534,7 +542,7 @@ class Prototype
 		return $arrOriFullname ;
 	}
 	
-	public function back($step=1)
+	/*public function back($step=1)
 	{
 		if(is_int($step))
 		{
@@ -559,7 +567,7 @@ class Prototype
 			$this->arrSwitchStack = array() ;
 		}
 		return $this ;
-	}
+	}*/
 	
 	/*public function transDataName(&$sDataName)
 	{
