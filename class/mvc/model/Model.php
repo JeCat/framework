@@ -211,7 +211,9 @@ class Model
 
 	public function insert(array $arrData,$sChildName=null)
 	{
-	
+		
+		
+		return $this ;
 	}
 	public function update(array $arrData,$sChildName=null)
 	{
@@ -224,6 +226,11 @@ class Model
 	 * @return Model
 	 */
 	public function delete()
+	{
+		
+	}
+	
+	public function aff($sChildName=null)
 	{
 		
 	}
@@ -402,6 +409,21 @@ class Model
 			}
 		}
 	}
+	public function rowNum($sChildName=null)
+	{
+		if($sChildName===null)
+		{
+			return count($this->arrData) ;
+		}
+		else if( $arrParentRow=&$this->localeRow($sChildName,$this->arrData) and $this->isSheet($arrParentRow,$sChildName) )
+		{
+			return count($arrParentRow[$sChildName]) ;
+		}
+		else
+		{
+			return -1 ;
+		}
+	}
 	
 	private function & currentRow(array & $arrSheet)
 	{
@@ -462,6 +484,8 @@ class Model
 	private $arrData = array() ;
 	private $sDataPrefix ;
 	private $nDataPrefixLength ;
+	
+	private $arrLastAffecteds = array() ;
 	
 	static private $null = null ;
 }
