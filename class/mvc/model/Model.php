@@ -95,7 +95,7 @@ class Model
 	/**
 	 * @return Model
 	 */
-	public function hasOne($toTable,$fromKeys=null,$toKeys=null,$sAssocName=null)
+	public function hasOne($toTable,$fromKeys=null,$toKeys=null,$sAssocName=null,$sFromPrototype='$')
 	{
 		$this->aPrototype->addAssociation(array(
 				'type' => Prototype::hasOne ,
@@ -103,13 +103,13 @@ class Model
 				'name' => $sAssocName ,
 				'fromKeys' => $fromKeys ,
 				'toKeys' => $toKeys ,
-		)) ;
+		),$sFromPrototype) ;
 		return $this ;
 	}
 	/**
 	 * @return Model
 	 */
-	public function belongsTo($toTable,$fromKeys=null,$toKeys=null,$sAssocName=null)
+	public function belongsTo($toTable,$fromKeys=null,$toKeys=null,$sAssocName=null,$sFromPrototype='$')
 	{
 		$this->aPrototype->addAssociation(array(
 				'type' => Prototype::belongsTo ,
@@ -117,13 +117,13 @@ class Model
 				'name' => $sAssocName ,
 				'fromKeys' => $fromKeys ,
 				'toKeys' => $toKeys ,
-		)) ;
+		),$sFromPrototype) ;
 		return $this ;
 	}
 	/**
 	 * @return Model
 	 */
-	public function hasMany($toTable,$fromKeys=null,$toKeys=null,$sAssocName=null)
+	public function hasMany($toTable,$fromKeys=null,$toKeys=null,$sAssocName=null,$sFromPrototype='$')
 	{
 		$this->aPrototype->addAssociation(array(
 				'type' => Prototype::hasMany ,
@@ -131,13 +131,13 @@ class Model
 				'name' => $sAssocName ,
 				'fromKeys' => $fromKeys ,
 				'toKeys' => $toKeys ,
-		)) ;
+		),$sFromPrototype) ;
 		return $this ;
 	}
 	/**
 	 * @return Model
 	 */
-	public function hasAndBelongsToMany($toTable,$sBridgeTableName,$fromKeys=null,$toBridgeKeys=null,$fromBridgeKeys=null,$toKeys=null,$sAssocName=null)
+	public function hasAndBelongsToMany($toTable,$sBridgeTableName,$fromKeys=null,$toBridgeKeys=null,$fromBridgeKeys=null,$toKeys=null,$sAssocName=null,$sFromPrototype='$')
 	{
 		$this->aPrototype->addAssociation(array(
 				'type' => Prototype::hasAndBelongsToMany ,
@@ -148,15 +148,15 @@ class Model
 				'bridge' => $sBridgeTableName ,
 				'toBridgeKeys' => $toBridgeKeys ,
 				'fromBridgeKeys' => $fromBridgeKeys ,
-		)) ;
+		),$sFromPrototype) ;
 		return $this ;
 	}
 	/**
 	 * @return Model
 	 */
-	public function ass(array $arrOptions)
+	public function ass(array $arrOptions,$sFromPrototype='$')
 	{
-		$this->aPrototype->addAssociation($arrOptions) ;
+		$this->aPrototype->addAssociation($arrOptions,$sFromPrototype) ;
 		return $this ;
 	}
 	

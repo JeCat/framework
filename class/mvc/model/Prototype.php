@@ -388,8 +388,15 @@ class Prototype
 	
 	
 	// association
-	public function addAssociation(array $arrAssociation)
+	public function addAssociation(array $arrAssociation,$sFromPrototype='$')
 	{
+		if( !isset($this->arrPrototypeShortcut[$sFromPrototype]) )
+		{
+			throw new Exception("指定的数据表原型不存在：%s，无法在其上添加数据表关联：%s",array(
+					$sFromPrototype, var_export($arrAssociation,true)
+			)) ;
+		}
+		
 		$sFromXPath = $this->xpath() ;
 		$sFromTableAlias = $this->tableAlias() ;
 		
@@ -443,7 +450,7 @@ class Prototype
 		}
 		
 		// 添加关联
-		$this->arrPrototype['associations'][$arrAssociation['name']] =& $arrAssociation ;
+		$this->arrPrototypeShortcut[$sFromPrototype]['associations'][$arrAssociation['name']] =& $arrAssociation ;
 		$this->arrPrototypeShortcut[$arrAssociation['xpath']] =& $arrAssociation ;
 		
 		// 用 from property 的主键做为关联的 from keys
