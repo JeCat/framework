@@ -22,4 +22,5 @@ li.jc-mvc-view-widget-menu-direction-h{
 .jc-widget-menu-item-active{
 	
 }
-.jc-widget-menu-depth-1 .jc-widget-menu-item-active a{ background:#1C7BB6; border-radius:13px;}
+.jc-widget-menu-depth-1 .jc-widget-menu-item-div-active a{ background:#1C7BB6; border-radius:13px;}
+.jc-widget-menu-depth-1 .jc-widget-menu-item-div-bubblingactive a{ background:#1C7BB6; border-radius:13px;}

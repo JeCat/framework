@@ -105,8 +105,9 @@ class IncludeCompiler extends NodeCompiler
 			if( substr($sName,0,4)=='var.' and $sVarName=substr($sName,4) )
 			{
 				$sVarName = '"'. addslashes($sVarName) . '"' ;
-				$sValue = ExpressionCompiler::compileExpression($aValue->source(),$aObjectContainer->variableDeclares()) ;
-				$aDev->write("\$__include_aVariables{$sVarName}={$sValue} ; \r\n");
+				//$sValue = ExpressionCompiler::compileExpression($aValue->source(),$aObjectContainer->variableDeclares()) ;
+				$sValue = $aAttributes->get($sName) ;
+				$aDev->write("\$__include_aVariables->set({$sVarName},{$sValue}) ; \r\n");
 			}
 		}
 		
