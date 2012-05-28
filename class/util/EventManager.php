@@ -34,53 +34,24 @@ class EventManager extends Object implements \Serializable
 		}
 		
 		$aReturnValue = null ;
-		
-		if(!empty($this->arrEventHandles[$sClass][$sEvent][$sourceObject]))
+
+		foreach( array('*',$sourceObject) as $sObjectKey )
 		{
-			foreach($this->arrEventHandles[$sClass][$sEvent][$sourceObject] as &$handler)
+			if(!empty($this->arrEventHandles[$sClass][$sEvent][$sObjectKey]))
 			{
-				if( is_array($handler[0]) )
+				foreach($this->arrEventHandles[$sClass][$sEvent][$sObjectKey] as &$handler)
 				{
-					$sCallCode = "\$return = \$handler[0][0]".(is_string($handler[0][0])? '::': '->')."\$handler[0][1](" ;
+					// 检查事件的返回值
+					$return = $this->runHandler($handler) ;
 					
-				}
-				else
-				{
-					$sCallCode = "\$return = \$handler[0](" ;
-				}
-				for($nIdx=0;$nIdx<count($arrArgvs);$nIdx++)
-				{
-					if($nIdx)
+					if( $return instanceof EventReturnValue )
 					{
-						$sCallCode.= ',' ;
-					}
-					$sCallCode.= "\$arrArgvs[{$nIdx}]" ;
-				}
-
-				if( $handler[1] )
-				{
-					for($nIdx=0;$nIdx<count($handler[1]);$nIdx++)
-					{
-						if($nIdx)
+						$aReturnValue = $return ;
+						
+						if($return->stopEvent())
 						{
-							$sCallCode.= ',' ;
+							return $aReturnValue ;
 						}
-						$sCallCode.= "\$handler[1][{$nIdx}]" ;
-					}
-				}
-				
-				$sCallCode.= ') ;' ;
-
-				eval($sCallCode) ;
-								
-				// 检查事件的返回值
-				if( $return instanceof EventReturnValue )
-				{
-					$aReturnValue = $return ;
-					
-					if($return->stopEvent())
-					{
-						break ;
 					}
 				}
 			}
@@ -88,6 +59,46 @@ class EventManager extends Object implements \Serializable
 		
 		return $aReturnValue ;
 	}
+	
+	private function runHandler(& $fnHandler)
+	{
+		if( is_array($fnHandler[0]) )
+		{
+			$sCallCode = "\$return = \$fnHandler[0][0]".(is_string($fnHandler[0][0])? '::': '->')."\$fnHandler[0][1](" ;
+				
+		}
+		else
+		{
+			$sCallCode = "\$return = \$fnHandler[0](" ;
+		}
+		for($nIdx=0;$nIdx<count($arrArgvs);$nIdx++)
+		{
+			if($nIdx)
+			{
+				$sCallCode.= ',' ;
+			}
+			$sCallCode.= "\$arrArgvs[{$nIdx}]" ;
+		}
+		
+		if( $fnHandler[1] )
+		{
+			for($nIdx=0;$nIdx<count($fnHandler[1]);$nIdx++)
+			{
+				if($nIdx)
+				{
+					$sCallCode.= ',' ;
+				}
+				$sCallCode.= "\$fnHandler[1][{$nIdx}]" ;
+			}
+		}
+				
+		$sCallCode.= ') ;' ;
+		
+		eval($sCallCode) ;
+				
+		// 检查事件的返回值
+		return $return ;
+	} 
 
 	public function unserialize($data)
 	{
