@@ -41,7 +41,8 @@ class EventManager extends Object implements \Serializable
 			{
 				foreach($this->arrEventHandles[$sClass][$sEvent][$sObjectKey] as &$handler)
 				{
-					$return = $this->runHandler($handler) ;
+					// 检查事件的返回值
+					$return = $this->runHandler($handler,$arrArgvs) ;
 					
 					if( $return instanceof EventReturnValue )
 					{
@@ -59,7 +60,7 @@ class EventManager extends Object implements \Serializable
 		return $aReturnValue ;
 	}
 	
-	private function runHandler(& $fnHandler)
+	private function runHandler(& $fnHandler,& $arrArgvs)
 	{
 		if( is_array($fnHandler[0]) )
 		{
