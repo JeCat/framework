@@ -161,7 +161,7 @@ class Paginator extends FormWidget implements IModelChangeObserver
      * [example php frameworktest template/test-mvc/testviewwindow/TestPaginaterWidget.html 15 16]
      */
     public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
-    {
+    {	
     	parent::buildBean($arrConfig,$sNamespace) ;
     	
     	if( !empty($arrConfig['count']) )
