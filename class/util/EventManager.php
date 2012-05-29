@@ -15,7 +15,6 @@ class EventManager extends Object implements \Serializable
 		{
 			$sourceObject = spl_object_hash($sourceObject) ;
 		}
-		
 		$this->arrEventHandles[$sClass][$sEvent][$sourceObject][] = array($fnHandler,$arrCallbackArgvs) ;
 		
 		return $this ;
