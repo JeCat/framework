@@ -370,19 +370,26 @@ class Prototype
 	{
 		$aTableReflecter = self::tableReflecter($arrPrototype,$aDB) ;
 	
+		// 字段名
 		if( empty($arrPrototype['columns']) or $arrPrototype['columns']=='*' )
 		{
 			$arrPrototype['columns'] = $aTableReflecter->columns() ;
 		}
 	
+		// 设备主键
+		$arrPrototype['devicePrimaryKey'] = $aTableReflecter->primaryName() ;
+		
+		// 逻辑主键
 		if( empty($arrPrototype['keys']) )
-		{
-			$arrPrototype['keys'] = $aTableReflecter->primaryName() ;
-				
-			if( $arrPrototype['keys'] )
+		{				
+			if( $arrPrototype['devicePrimaryKey'] )
 			{
-				$arrPrototype['keys'] = (array) $arrPrototype['keys'] ;
+				$arrPrototype['keys'] = $arrPrototype['devicePrimaryKey'] ;
 			}
+		}
+		if($arrPrototype['keys'])
+		{
+			$arrPrototype['keys'] = (array) $arrPrototype['keys'] ;
 		}
 	}
 	
@@ -428,7 +435,7 @@ class Prototype
 		
 		// table/name trans evetn 
 		EventManager::singleton()->emitEvent(__CLASS__,self::transTable,$arrArgv=array(&$arrAssociation['table'],&$arrAssociation['name'])) ;
-		echo $arrAssociation['name'] ;
+
 		if(!$arrAssociation['name'])
 		{
 			$arrAssociation['name'] = $arrAssociation['table'] ;

@@ -1,8 +1,7 @@
 <?php
 namespace org\jecat\framework\mvc\model ;
 
-use org\jecat\framework\mvc\model\db\orm\Inserter;
-
+use org\jecat\framework\mvc\model\executor\Inserter;
 use org\jecat\framework\mvc\model\executor\Selecter;
 use org\jecat\framework\db\DB;
 use org\jecat\framework\lang\Exception;
@@ -190,7 +189,7 @@ class Model
 			}
 		}
 		
-		Selecter::singleton()->execute( $this->aPrototype->refRaw(), $this->arrData, $sTmpWhere, $this->db() ) ;
+		Selecter::singleton()->execute( $this, $this->aPrototype->refRaw(), $this->arrData, $sTmpWhere, $this->db() ) ;
 
 		print_r($this->arrData) ;
 		
@@ -206,21 +205,61 @@ class Model
 		
 	}
 
-	public function insert(array $arrData,$sChildName=null)
+	public function insert(array $arrData=null,$sChildName=null)
 	{
-		// insert 所有表
-		if($sChildName===null)
+		$aInserter = Inserter::singleton() ;
+		$arrPrototype =& $this->aPrototype->refRaw($sChildName?:'$') ;
+		$bRecursively = $sChildName? false: true ;
+
+		// insert 整个 list
+		if($arrData)
 		{
-			Inserter::singleton()->execute($this->aPrototype->refRaw(),$this->arrData,$arrData) ;
+			reset($arrData) ;
+			if( is_int(key($arrData)) )
+			{
+				$aInserter->execute( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
+				return $this ;
+			}
 		}
-		// insert 指定表
-		else
+
+		// insert 单行
+		if( empty($arrData) )
 		{
-			$this->localeRow($sName, $arrSheet) ;
+			$arrData =& $this->rowRef($sChildName) ;
 		}
+		$aInserter->insertRow( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
 		
 		return $this ;
 	}
+	public function insertRows(array $arrRows=null,$sChildName=null)
+	{
+		$aInserter = Inserter::singleton() ;
+		$arrPrototype =& $this->aPrototype->refRaw($sChildName?:'$') ;
+		$bRecursively = $sChildName? true: false ;
+		
+		if($arrData)
+		{
+			reset($arrData) ;
+			
+			// 输入的 $arrData 不是一行数据，而是一个 list
+			// insert 一个 list
+			if( is_int(key($arrData)) )
+			{
+				Inserter::singleton()->execute( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
+				return $this ;
+			}
+		}
+		
+		// insert 单行
+		if( empty($arrData) )
+		{
+			$arrData =& $this->rowRef($sChildName) ;
+		}
+		$aInserter->insert( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
+		
+		return $this ;
+	}
+	
 	public function update(array $arrData,$sChildName=null)
 	{
 		
@@ -436,19 +475,77 @@ class Model
 			return -1 ;
 		}
 	}
+	public function addRow($arrRow=null,$sChildName=null)
+	{
+		// 针对主表
+		if( $sChildName===null or $sChildName==='$' )
+		{
+			$this->arrData[] = $arrRow ?: array() ;
+			end($this->arrData);
+		}
+		// 指定表
+		else
+		{
+			$arrSheet =& $this->arrData ;
+			$sXPath = '' ;			
+			foreach( explode('.',$sChildName) as $sName )
+			{				
+				$sXPath.= ($sXPath?'.':'') . $sName ;
+				$arrPrototype =& $this->aPrototype->refRaw($sXPath) ;
+				
+				// 多属关联，建立并切换到下级表
+				if( !($arrPrototype['type']&Prototype::oneToOne) )
+				{
+					$arrSheet =& $this->buildSheet(
+							$sXPath
+							, $this->currentRow($arrSheet,true) // 上级表的当前行（没有则建立一行做为当前行）
+							, true
+					) ;
+				}
+			}
+			
+			$arrSheet[] = array() ;
+			end($arrSheet) ;
+		}
+	}
 	
-	private function & currentRow(array & $arrSheet)
+	public function & buildSheet($sXPath,array & $arrParentRow)
+	{
+		if( !isset($arrSheet[$sXPath]) or !is_array($arrSheet[$sXPath]) )
+		{
+			$arrSheet[$sXPath] = array() ;
+			$arrSheet[$sXPath.chr(0).'sheet'] = true ;
+		}
+		
+		return $arrSheet[$sXPath] ;
+	}
+	
+	private function & currentRow(array & $arrSheet,$bCreateRowIfNotExists=false)
 	{
 		if(empty($arrSheet))
 		{
-			return self::$null ;
+			if($bCreateRowIfNotExists)
+			{
+				$arrSheet[] = array() ;
+			}
+			else
+			{
+				return self::$null ;
+			}
 		}
 
 		$nRow = key($arrSheet) ;
 		
 		if( !is_array($arrSheet[$nRow]) )
 		{
-			return self::$null ;
+			if($bCreateRowIfNotExists)
+			{
+				$arrSheet[$nRow] = array() ;
+			}
+			else
+			{
+				return self::$null ;
+			}
 		}
 		
 		return $arrSheet[$nRow] ;
