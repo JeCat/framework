@@ -233,30 +233,44 @@ class Prototype
 	 * @param $columns	string,array	可以字符串类型表示一个字段，或数组类型表示多个字段；当传入数组类型时，可以用数组的键名表示字段名，值以bool类型表示是否为 desc 顺序，也可以只提供字符串类型元素值表示字段名
 	 * @return Prototype
 	 */
-	public function addOrder($columns,$bDesc=true)
+	public function addOrder($columns,$bDesc=true,$sTable)
 	{
-		if( is_string($columns) )
-		{
-			unset($this->arrPrototype['orderBy'][$columns]) ;
-			$this->arrPrototype['orderBy'][$columns] = $bDesc ;
-		}
-		else if( is_array($columns) )
+	    if(!empty($sTable))
+	    {
+	        $arrPrototype = & $this->refRaw($sTable);
+	    }else {
+	        $arrPrototype = & $this->arrPrototype;
+	    }
+	    
+	    if (is_string($columns))
+	    {
+	        $columns =  array($columns);
+	    }
+	    
+		if( is_array($columns) )
 		{
 			foreach($columns as $key=>&$item)
 			{
+			    $aItem = explode(".", $item);
+			    if(count($aItem) == 2){
+			        $arrPrototype = & $this->refRaw($aItem[0]);
+			        $item = $aItem[1];
+			    }else {
+			        $arrPrototype = & $this->arrPrototype;
+			    }
+			    
 				if( is_int($key) )
 				{
-					unset($this->arrPrototype['orderBy'][$item]) ;
-					$this->arrPrototype['orderBy'][$item] = $bDesc ;
+					unset($arrPrototype['orderBy'][$item]) ;
+					$arrPrototype['orderBy'][$item] = $bDesc ;
 				}
 				else
 				{
-					unset($this->arrPrototype['orderBy'][$key]) ;
-					$this->arrPrototype['orderBy'][$key] = $item? true: false ;
+					unset($arrPrototype['orderBy'][$key]) ;
+					$arrPrototype['orderBy'][$key] = $item? true: false ;
 				}
 			}
-		}
-		else
+		}else
 		{
 			throw new Exception("Prototype::addOrder() 传入的参数 \$columns 类型错误，必须为 string 或 array 类型。") ;
 		}
@@ -297,9 +311,34 @@ class Prototype
 	 * 设置一组 where 条件
 	 * @return Prototype
 	 */
-	public function addWhere($where)
+	public function addWhere($where,$sTable)
 	{
-		$this->arrPrototype['where'][] = $where ;
+	    
+	    if(!empty($sTable))
+	    {
+	        $arrPrototype = & $this->refRaw($sTable);
+	    }else {
+	        $arrPrototype = & $this->arrPrototype;
+	    }
+	    
+	    if (is_string($where))
+	    {
+	        $where = array($where);
+	    }
+	    if(is_array($where))
+	    {
+	        for($i = 0; $i < sizeof($where); $i++){
+	            $aWhere = explode(".", $where[$i]);
+	            if(count($aWhere) == 2){
+	                $arrPrototype = & $this->refRaw($aWhere[0]);
+	                $arrPrototype['where'][] = $aWhere[1] ;
+	            }else {
+	                $arrPrototype = & $this->arrPrototype;
+	                $arrPrototype['where'][] = $where[$i] ;
+	            }
+	        }
+	    }
+	    
 		return $this ;
 	}
 	public function rawWhere()
@@ -310,10 +349,17 @@ class Prototype
 	/**
 	 * @return Prototype
 	 */
-	public function setLimit($nLen,$from=null)
+	public function setLimit($nLen,$from=null,$sTable)
 	{
-		$this->arrPrototype['limitLen'] = $nLen ;
-		$this->arrPrototype['limitFrom'] = $from ;
+	    if(!empty($sTable))
+	    {
+	        $arrPrototype = & $this->refRaw($sTable);
+	    }else {
+	        $arrPrototype = & $this->arrPrototype;
+	    }
+	    
+		$arrPrototype['limitLen'] = $nLen ;
+		$arrPrototype['limitFrom'] = $from ;
 		return $this ;
 	}
 	
@@ -370,19 +416,26 @@ class Prototype
 	{
 		$aTableReflecter = self::tableReflecter($arrPrototype,$aDB) ;
 	
+		// 字段名
 		if( empty($arrPrototype['columns']) or $arrPrototype['columns']=='*' )
 		{
 			$arrPrototype['columns'] = $aTableReflecter->columns() ;
 		}
 	
+		// 设备主键
+		$arrPrototype['devicePrimaryKey'] = $aTableReflecter->primaryName() ;
+		
+		// 逻辑主键
 		if( empty($arrPrototype['keys']) )
-		{
-			$arrPrototype['keys'] = $aTableReflecter->primaryName() ;
-				
-			if( $arrPrototype['keys'] )
+		{				
+			if( $arrPrototype['devicePrimaryKey'] )
 			{
-				$arrPrototype['keys'] = (array) $arrPrototype['keys'] ;
+				$arrPrototype['keys'] = $arrPrototype['devicePrimaryKey'] ;
 			}
+		}
+		if($arrPrototype['keys'])
+		{
+			$arrPrototype['keys'] = (array) $arrPrototype['keys'] ;
 		}
 	}
 	
@@ -428,7 +481,6 @@ class Prototype
 		
 		// table/name trans evetn 
 		EventManager::singleton()->emitEvent(__CLASS__,self::transTable,$arrArgv=array(&$arrAssociation['table'],&$arrAssociation['name'])) ;
-		echo $arrAssociation['name'] ;
 		if(!$arrAssociation['name'])
 		{
 			$arrAssociation['name'] = $arrAssociation['table'] ;
@@ -489,8 +541,6 @@ class Prototype
 		// bridge
 		if( $arrAssociation['assoc']==self::hasAndBelongsToMany )
 		{
-			$arrAssociation['bridgeTableAlias'] = $arrAssociation['tableAlias'] . '#bridge' ;
-			
 			if( empty($arrAssociation['bridge']) )
 			{
 				throw new Exception(
@@ -498,6 +548,13 @@ class Prototype
 						, $arrAssociation['xpath']
 				) ;
 			}
+			
+			EventManager::singleton()->emitEvent(
+							__CLASS__
+							, self::transTable
+							, $arrArgv=array(&$arrAssociation['bridge'],&$arrAssociation['bridgeTableAlias'])
+			) ;
+			$arrAssociation['bridgeTableAlias'] = $arrAssociation['tableAlias'] . '#bridge' ;
 
 			if( empty($arrAssociation['toBridgeKeys']) )
 			{
