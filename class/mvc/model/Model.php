@@ -136,7 +136,7 @@ class Model
 	/**
 	 * @return Model
 	 */
-	public function hasAndBelongsToMany($toTable,$sBridgeTableName,$fromKeys=null,$toBridgeKeys=null,$fromBridgeKeys=null,$toKeys=null,$sAssocName=null,$sFromPrototype='$')
+	public function hasAndBelongsToMany($toTable,$sBridgeTableName,$fromKeys=null,$toKeys=null,$toBridgeKeys=null,$fromBridgeKeys=null,$sAssocName=null,$sFromPrototype='$')
 	{
 		$this->aPrototype->addAssociation(array(
 				'type' => Prototype::hasAndBelongsToMany ,
@@ -191,7 +191,7 @@ class Model
 		
 		Selecter::singleton()->execute( $this, $this->aPrototype->refRaw(), $this->arrData, $sTmpWhere, $this->db() ) ;
 
-		print_r($this->arrData) ;
+		//echo "<pre>";print_r($this->arrData);echo "</pre>";
 		
 		return $this ;
 	}
@@ -218,6 +218,7 @@ class Model
 			if( is_int(key($arrData)) )
 			{
 				$aInserter->execute( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
+		print_r($this->arrData) ;
 				return $this ;
 			}
 		}
@@ -228,34 +229,8 @@ class Model
 			$arrData =& $this->rowRef($sChildName) ;
 		}
 		$aInserter->insertRow( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
-		
-		return $this ;
-	}
-	public function insertRows(array $arrRows=null,$sChildName=null)
-	{
-		$aInserter = Inserter::singleton() ;
-		$arrPrototype =& $this->aPrototype->refRaw($sChildName?:'$') ;
-		$bRecursively = $sChildName? true: false ;
-		
-		if($arrData)
-		{
-			reset($arrData) ;
-			
-			// 输入的 $arrData 不是一行数据，而是一个 list
-			// insert 一个 list
-			if( is_int(key($arrData)) )
-			{
-				Inserter::singleton()->execute( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
-				return $this ;
-			}
-		}
-		
-		// insert 单行
-		if( empty($arrData) )
-		{
-			$arrData =& $this->rowRef($sChildName) ;
-		}
-		$aInserter->insert( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
+
+		print_r($this->arrData) ;
 		
 		return $this ;
 	}
@@ -428,11 +403,11 @@ class Model
 			return $arrRow[$sName] = $value ;
 		}
 	}
-	private function & rowRef($sChildName=null)
+	private function & rowRef($sChildName=null,$bCreateRowIfNotExists=false)
 	{
 		if($sChildName===null)
 		{
-			return $this->currentRow($this->arrData) ;
+			return $this->currentRow($this->arrData,$bCreateRowIfNotExists) ;
 		}
 		else
 		{
@@ -451,13 +426,29 @@ class Model
 		return $this->rowRef($sChildName) ;
 	}
 	public function setRow($arrDatas,$sChildName=null)
-	{		
-		if($arrRow=&$this->rowRef($sChildName))
+	{
+		$arrSheet =& $this->buildSheet($sChildName) ;
+		$arrRow =& $this->currentRow($arrSheet,true) ;
+
+		foreach($arrDatas as $key=>&$value)
 		{
-			foreach($arrDatas as $key=>&$value)
-			{
-				$arrRow[$key] = $value ;
-			}
+			$arrRow[$key] = $value ;
+		}
+	}
+	public function addRow($arrRow=null,$sChildName=null)
+	{
+		// 针对主表
+		if( $sChildName===null or $sChildName==='$' )
+		{
+			$this->arrData[] = $arrRow ?: array() ;
+			end($this->arrData);
+		}
+		// 指定表
+		else
+		{
+			$arrSheet =& $this->buildSheet($sChildName) ;
+			$arrSheet[] = array() ;
+			end($arrSheet) ;
 		}
 	}
 	public function rowNum($sChildName=null)
@@ -475,49 +466,42 @@ class Model
 			return -1 ;
 		}
 	}
-	public function addRow($arrRow=null,$sChildName=null)
-	{
-		// 针对主表
-		if( $sChildName===null or $sChildName==='$' )
-		{
-			$this->arrData[] = $arrRow ?: array() ;
-			end($this->arrData);
-		}
-		// 指定表
-		else
-		{
-			$arrSheet =& $this->arrData ;
-			$sXPath = '' ;			
-			foreach( explode('.',$sChildName) as $sName )
-			{				
-				$sXPath.= ($sXPath?'.':'') . $sName ;
-				$arrPrototype =& $this->aPrototype->refRaw($sXPath) ;
-				
-				// 多属关联，建立并切换到下级表
-				if( !($arrPrototype['type']&Prototype::oneToOne) )
-				{
-					$arrSheet =& $this->buildSheet(
-							$sXPath
-							, $this->currentRow($arrSheet,true) // 上级表的当前行（没有则建立一行做为当前行）
-							, true
-					) ;
-				}
-			}
-			
-			$arrSheet[] = array() ;
-			end($arrSheet) ;
-		}
-	}
 	
-	public function & buildSheet($sXPath,array & $arrParentRow)
+	public function & buildSheet($sChildName)
 	{
-		if( !isset($arrSheet[$sXPath]) or !is_array($arrSheet[$sXPath]) )
+		if($sChildName===null)
 		{
-			$arrSheet[$sXPath] = array() ;
-			$arrSheet[$sXPath.chr(0).'sheet'] = true ;
+			return $this->arrData ;
 		}
 		
-		return $arrSheet[$sXPath] ;
+		$arrSheet =& $this->arrData ;
+		$sXPath = '' ;
+		foreach( explode('.',$sChildName) as $sName )
+		{
+			$sXPath.= ($sXPath?'.':'') . $sName ;
+			$arrPrototype =& $this->aPrototype->refRaw($sXPath) ;
+		
+			// 多属关联，建立并切换到下级表
+			if( !($arrPrototype['type']&Prototype::oneToOne) )
+			{
+				$arrSheet =& $this->makeSheet(
+						$this->currentRow($arrSheet,true) // 上级表的当前行（没有则建立一行做为当前行）
+						, $sXPath
+				) ;
+			}
+		}
+		return $arrSheet ;
+	}
+	
+	private function & makeSheet(array & $arrParentRow,$sXPath)
+	{
+		if( !isset($arrParentRow[$sXPath]) or !is_array($arrParentRow[$sXPath]) )
+		{
+			$arrParentRow[$sXPath] = array() ;
+			$arrParentRow[$sXPath.chr(0).'sheet'] = true ;
+		}
+		
+		return $arrParentRow[$sXPath] ;
 	}
 	
 	private function & currentRow(array & $arrSheet,$bCreateRowIfNotExists=false)
@@ -576,7 +560,7 @@ class Model
 		}
 	}
 	
-	private function isSheet(array & $arrRow,$sDataName)
+	public function isSheet(array & $arrRow,$sDataName)
 	{
 		return array_key_exists($sDataName,$arrRow) and !empty($arrRow[$sDataName.chr(0).'sheet']) ;
 	}

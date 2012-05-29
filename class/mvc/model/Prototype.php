@@ -435,7 +435,6 @@ class Prototype
 		
 		// table/name trans evetn 
 		EventManager::singleton()->emitEvent(__CLASS__,self::transTable,$arrArgv=array(&$arrAssociation['table'],&$arrAssociation['name'])) ;
-
 		if(!$arrAssociation['name'])
 		{
 			$arrAssociation['name'] = $arrAssociation['table'] ;
@@ -496,8 +495,6 @@ class Prototype
 		// bridge
 		if( $arrAssociation['assoc']==self::hasAndBelongsToMany )
 		{
-			$arrAssociation['bridgeTableAlias'] = $arrAssociation['tableAlias'] . '#bridge' ;
-			
 			if( empty($arrAssociation['bridge']) )
 			{
 				throw new Exception(
@@ -505,6 +502,13 @@ class Prototype
 						, $arrAssociation['xpath']
 				) ;
 			}
+			
+			EventManager::singleton()->emitEvent(
+							__CLASS__
+							, self::transTable
+							, $arrArgv=array(&$arrAssociation['bridge'],&$arrAssociation['bridgeTableAlias'])
+			) ;
+			$arrAssociation['bridgeTableAlias'] = $arrAssociation['tableAlias'] . '#bridge' ;
 
 			if( empty($arrAssociation['toBridgeKeys']) )
 			{

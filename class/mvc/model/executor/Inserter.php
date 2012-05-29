@@ -14,7 +14,7 @@ class Inserter extends Executor
 	{
 		foreach($arrDataSheet as &$arrDataRow)
 		{
-			$aModel->addRow($arrPrototype['xpath']) ;
+			$aModel->addRow(null,$arrPrototype['xpath']) ;
 			
 			$this->insertRow($aModel, $arrPrototype, $arrDataRow, $bRecursively, $aDB) ;
 		}
@@ -26,7 +26,18 @@ class Inserter extends Executor
 		$arrColumns = array() ;
 		$arrValues = array() ;
 		$arrNewRow = array() ;
-			
+
+		if( $arrPrototype['xpath'] )
+		{
+			$sDataNamePrefix = $arrPrototype['xpath'].'.' ;
+		}
+		else
+		{
+			$sDataNamePrefix = $arrPrototype['xpath'] ;
+		}
+		
+		$sBeAssociatedPrefix = substr($arrPrototype['xpath'],0,-strlen($arrPrototype['name'])) ;
+		
 		foreach( $arrPrototype['columns'] as $sColumn )
 		{
 			if( strlen($sColumn)>=2 and substr($sColumn,0,2)==='e:' )
@@ -39,15 +50,7 @@ class Inserter extends Executor
 				$bExpression = false ;
 			}
 
-			if( $arrPrototype['xpath'] )
-			{
-				$sDataNamePrefix = $arrPrototype['xpath'].'.' ;
-			}
-			else
-			{
-				$sDataNamePrefix = $arrPrototype['xpath'] ;
-			}
-			$sDataName = $sDataNamePrefix.$sDataName ;
+			$sDataName = $sDataNamePrefix.$sColumn ;
 		
 			if( array_key_exists($sDataName,$arrDataRow) )
 			{
@@ -64,33 +67,57 @@ class Inserter extends Executor
 				}
 			}
 		}
+
 		
-		
-		echo $sSql = "INSERT INTO `{$arrPrototype['table']}` (\r\n\t"
-						. implode("\r\n\t, ", $arrColumns)
-						. "\r\n) VALUES (\r\n\t"
-						. implode("\r\n\t, ", $arrValues)
-						. "\r\n) ;\r\n" ;
-		
-		$aDB->execute($sSql) ;
-		
-		// 新插入的主键值
-		if( $arrPrototype['devicePrimaryKey'] )
+		// 设置根据外键，从左表拿到数据
+		if( !empty($arrPrototype['assoc']) )
 		{
-			$nNewPrimaryValue = $aDB->lastInsertId() ;
-			if($nNewPrimaryValue!==null)
+			// 不在这里处理 多对多关联
+			if($arrPrototype['assoc']!==Prototype::hasAndBelongsToMany)
 			{
-				$arrNewRow[$sDataNamePrefix.$arrPrototype['devicePrimaryKey']] = $nNewPrimaryValue ;
+				foreach($arrPrototype['toKeys'] as $nIdx=>$sToKeys)
+				{
+					$value = $aModel->data( $sBeAssociatedPrefix.$arrPrototype['fromKeys'][$nIdx]) ;
+					$arrValues[] = self::escValue($value) ;
+					$arrNewRow[$sDataNamePrefix.$sToKeys] = $value;
+
+					$arrColumns[] = '`'.$sToKeys.'`' ;
+				}
 			}
 		}
-
-		// 将新建的数据设置到系统中
-		if(!empty($arrNewRow))
+		
+		// 执行 insert
+		if( !empty($arrColumns) )
 		{
-			$aModel->setRow($arrNewRow,$arrPrototype['xpath']) ;
+			echo $sSql = $this->makeSql($arrPrototype['table'],$arrColumns,$arrValues) ;
+			
+			$aDB->execute($sSql) ;
+			
+			// 新插入的主键值
+			if( $arrPrototype['devicePrimaryKey'] )
+			{
+				$nNewPrimaryValue = $aDB->lastInsertId() ;
+				if($nNewPrimaryValue!==null)
+				{
+					$arrNewRow[$sDataNamePrefix.$arrPrototype['devicePrimaryKey']] = $nNewPrimaryValue ;
+				}
+			}
+	
+			// 将新建的数据设置到系统中
+			if(!empty($arrNewRow))
+			{
+				$aModel->setRow($arrNewRow,$arrPrototype['xpath']) ;
+			}
 		}
 		
-		// 处理关联表
+		// 自动写入桥接表（在这里处理多对多关联）
+		// 根据左右两个表的值，插入中间表
+		if( !empty($arrPrototype['assoc']) and $arrPrototype['assoc']===Prototype::hasAndBelongsToMany )
+		{
+			$this->insertBridgeRow($aModel,$arrPrototype,$sBeAssociatedPrefix,$sDataNamePrefix,$aDB) ;
+		}
+		
+		// 处理下级关联
 		if( $bRecursively and !empty($arrPrototype['associations']) )
 		{
 			foreach($arrPrototype['associations'] as & $arrAssoc)
@@ -111,6 +138,40 @@ class Inserter extends Executor
 				}
 			}
 		}
+	}
+	
+	/**
+	 * 根据左右两个表的值，插入中间表
+	 */
+	private function insertBridgeRow(Model $aModel,array & $arrAssoc,$sFromPrefix,$sToPrefix,$aDB)
+	{
+		// 字段/值
+		$arrColumns = array() ;
+		$arrValues = array() ;
+
+		foreach($arrAssoc['fromKeys'] as $nIdx=>$sFromKey)
+		{
+			$arrValues[] = self::escValue( $aModel->data($sFromPrefix.$sFromKey) ) ;
+			$arrColumns[] = $arrAssoc['toBridgeKeys'][$nIdx] ;
+		}
+		foreach($arrAssoc['toKeys'] as $nIdx=>$sToKey)
+		{
+			$arrValues[] = self::escValue( $aModel->data($sToPrefix.$sToKey) ) ;
+			$arrColumns[] = $arrAssoc['fromBridgeKeys'][$nIdx] ;
+		}
+
+		echo $sSql = $this->makeSql($arrAssoc['bridge'],$arrColumns,$arrValues) ;
+		
+		$aDB->execute($sSql) ;
+	}
+	
+	private function makeSql($sTable,&$arrColumns,&$arrValues)
+	{
+		return "INSERT INTO `{$sTable}` (\r\n\t"
+				. implode("\r\n\t, ", $arrColumns)
+				. "\r\n) VALUES (\r\n\t"
+				. implode("\r\n\t, ", $arrValues)
+				. "\r\n) ;\r\n" ;
 	}
 	
 	static function escValue(& $value)
