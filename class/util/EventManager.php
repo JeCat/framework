@@ -34,39 +34,24 @@ class EventManager extends Object implements \Serializable
 		}
 		
 		$aReturnValue = null ;
-		
-		if(!empty($this->arrEventHandles[$sClass][$sEvent][$sourceObject]))
-		{
-			foreach($this->arrEventHandles[$sClass][$sEvent][$sourceObject] as &$handler)
-			{
-				// 合并注册时提供的参数
-				if( $handler[1] )
-				{
-					foreach($handler[1] as &$callbackArgv)
-					{
-						$arrArgvs[] =& $callbackArgv ;
-					}
-				}
-				
-				$return = call_user_func_array($handler[0],$arrArgvs) ;
 
-				// 清理注册时提供的参数
-				if( $handler[1] )
+		foreach( ($sourceObject!=='*'? array('*',$sourceObject): array('*')) as $sObjectKey )
+		{
+			if(!empty($this->arrEventHandles[$sClass][$sEvent][$sObjectKey]))
+			{
+				foreach($this->arrEventHandles[$sClass][$sEvent][$sObjectKey] as &$handler)
 				{
-					for($i=count($handler[1]);$i>0;$i--)
-					{
-						array_pop($arrArgvs) ;
-					}
-				}
-				
-				// 检查事件的返回值
-				if( $return instanceof EventReturnValue )
-				{
-					$aReturnValue = $return ;
+					// 检查事件的返回值
+					$return = $this->runHandler($handler,$arrArgvs) ;
 					
-					if($return->stopEvent())
+					if( $return instanceof EventReturnValue )
 					{
-						break ;
+						$aReturnValue = $return ;
+						
+						if($return->stopEvent())
+						{
+							return $aReturnValue ;
+						}
 					}
 				}
 			}
@@ -74,6 +59,46 @@ class EventManager extends Object implements \Serializable
 		
 		return $aReturnValue ;
 	}
+	
+	private function runHandler(& $fnHandler,& $arrArgvs)
+	{
+		if( is_array($fnHandler[0]) )
+		{
+			$sCallCode = "\$return = \$fnHandler[0][0]".(is_string($fnHandler[0][0])? '::': '->')."\$fnHandler[0][1](" ;
+				
+		}
+		else
+		{
+			$sCallCode = "\$return = \$fnHandler[0](" ;
+		}
+		for($nIdx=0;$nIdx<count($arrArgvs);$nIdx++)
+		{
+			if($nIdx)
+			{
+				$sCallCode.= ',' ;
+			}
+			$sCallCode.= "\$arrArgvs[{$nIdx}]" ;
+		}
+		
+		if( $fnHandler[1] )
+		{
+			for($nIdx=0;$nIdx<count($fnHandler[1]);$nIdx++)
+			{
+				if($nIdx)
+				{
+					$sCallCode.= ',' ;
+				}
+				$sCallCode.= "\$fnHandler[1][{$nIdx}]" ;
+			}
+		}
+				
+		$sCallCode.= ') ;' ;
+		
+		eval($sCallCode) ;
+				
+		// 检查事件的返回值
+		return $return ;
+	} 
 
 	public function unserialize($data)
 	{

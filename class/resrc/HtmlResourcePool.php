@@ -39,7 +39,6 @@ class HtmlResourcePool extends Object
 		parent::__construct() ;
 		
 		$this->aResourceManager = $aResourceManager? $aResourceManager: Application::singleton()->publicFolders() ;
-
 		$this->addRequire('org.jecat.framework:style/style.css',self::RESRC_CSS) ;
 	}
 

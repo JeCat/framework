@@ -36,6 +36,7 @@ use org\jecat\framework\util\HashTable;
 use org\jecat\framework\io\IOutputStream;
 use org\jecat\framework\util\IHashTable;
 use org\jecat\framework\lang\Object as JcObject;
+use org\jecat\framework\locale\Locale;
 
 class UI extends JcObject
 {
