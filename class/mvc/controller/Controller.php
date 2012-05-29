@@ -498,8 +498,7 @@ class Controller extends NamableComposite implements IBean
     	$this->response()->respond($this) ;
     	
     	// 触发事件
-    	$arrEventParams = array($this);
-    	EventManager::singleton()->emitEvent(__CLASS__,self::afterMainRun, $arrEventParams) ;
+    	EventManager::singleton()->emitEvent(__CLASS__,self::afterMainRun, array($this)) ;
     }
     
     static protected function processController(Controller $aController)
