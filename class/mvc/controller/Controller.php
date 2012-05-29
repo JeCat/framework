@@ -26,7 +26,6 @@
 namespace org\jecat\framework\mvc\controller ;
 
 use org\jecat\framework\util\EventManager;
-
 use org\jecat\framework\auth\IdManager;
 use org\jecat\framework\auth\AuthenticationException;
 use org\jecat\framework\auth\Authorizer;
@@ -231,14 +230,6 @@ class Controller extends NamableComposite implements IBean
      */
     public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {
-    	// 触发事件
-    	EventManager::singleton()->emitEvent(
-    			__CLASS__
-    			, self::beforeBuildBean
-    			, $arrArgvs=array($this,&$arrConfig,&$sNamespac,&$aBeanFactory)
-    			, get_class($this)
-    	) ;
-    	
     	if( isset($arrConfig['name']) )
     	{
     		$this->setName($arrConfig['name']) ;
