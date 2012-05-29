@@ -27,22 +27,35 @@ class Model
 		//$this->sDataPrefix = $this->aPrototype->name() . '.' ;
 		//$this->nDataPrefixLength = strlen($this->sDataPrefix) ;
 	}
+	
+	/**
+	 * new model
+	 * @param unknown_type $sTable
+	 * @param unknown_type $sPrototypeName
+	 * @param unknown_type $primaryKeys
+	 * @param unknown_type $columns
+	 */
+	public static function Create($sTable,$sPrototypeName=null,$primaryKeys=null,$columns=null)
+	{
+	    return new self($sTable,$sPrototypeName,$primaryKeys,$columns) ;
+	}
+	
 	/**
 	 * @alias org\jecat\framework\mvc\model\Prototype::addOrder
 	 * @return Model
 	 */
-	public function order($columns,$bDesc=true)
+	public function order($columns,$bDesc=true,$sTable=NULL)
 	{
-		$this->aPrototype->addOrder($columns,$bDesc) ;
+		$this->aPrototype->addOrder($columns,$bDesc,$sTable) ;
 		return $this ;
 	}
 	/**
 	 * 设置 limit
 	 * @return Model
 	 */
-	public function limit($nLen,$pos=null)
+	public function limit($nLen,$pos=null,$sTable=NULL)
 	{
-		$this->aPrototype->setLimit($nLen,$pos) ;
+		$this->aPrototype->setLimit($nLen,$pos,$sTable) ;
 		return $this ;
 	}
 	/**
@@ -58,9 +71,9 @@ class Model
 	 * 设置一组 where 条件
 	 * @return Model
 	 */
-	public function where($sWhere)
+	public function where($sWhere,$sTable=NULL)
 	{
-		$this->aPrototype->addWhere($sWhere) ;
+		$this->aPrototype->addWhere($sWhere,$sTable) ;
 		return $this ;
 	}
 	/**
