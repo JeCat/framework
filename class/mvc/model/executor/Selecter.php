@@ -10,6 +10,9 @@ class Selecter extends Executor
 {
 	public function execute(array & $arrPrototype,array & $arrDataSheet,$sWhere=null,DB $aDB=null)
 	{
+	    //判断xpath是否需要加点。
+	    $sXpath = empty($arrPrototype['xpath'])?"":$arrPrototype['xpath'].".";
+	    
 		// 为所有一对一关联建立 sql
 		$arrMultiAssocs = array() ;
 		
@@ -31,7 +34,7 @@ class Selecter extends Executor
 					$arrClauseWhere = array() ;
 					foreach($arrAssoc['toKeys'] as $nIdx=>$sToKey)
 					{
-						$arrClauseOn[] = "`{$arrAssoc['xpath']}`.`{$sToKey}` = '". addslashes($arrRow["{$arrPrototype['xpath']}.{$arrAssoc['fromKeys'][$nIdx]}"]) . "'" ;
+						$arrClauseWhere[] = "`{$arrAssoc['tableAlias']}`.`{$sToKey}` = '". addslashes($arrRow["{$sXpath}{$arrAssoc['fromKeys'][$nIdx]}"]) . "'" ;
 					}
 					$sClauseWhere = implode(' AND ',$arrClauseWhere) ;
 				}
@@ -40,7 +43,7 @@ class Selecter extends Executor
 					$arrClauseWhere = array() ;
 					foreach($arrAssoc['toBridgeKeys'] as $nIdx=>$sToBridgeKey)
 					{
-						$arrClauseOn[] = "`{$arrAssoc['xpath']}#bridge`.`{$sToBridgeKey}` = '". addslashes($arrRow["{$arrPrototype['xpath']}.{$arrAssoc['fromKeys'][$nIdx]}"]) . "'" ;
+						$arrClauseWhere[] = "`{$arrAssoc['tableAlias']}#bridge`.`{$sToBridgeKey}` = '". addslashes($arrRow["{$sXpath}{$arrAssoc['fromKeys'][$nIdx]}"]) . "'" ;
 					}
 					$sClauseWhere = implode(' AND ',$arrClauseWhere) ;
 				}

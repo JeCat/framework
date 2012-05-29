@@ -428,7 +428,6 @@ class Prototype
 		
 		// table/name trans evetn 
 		EventManager::singleton()->emitEvent(__CLASS__,self::transTable,$arrArgv=array(&$arrAssociation['table'],&$arrAssociation['name'])) ;
-		echo $arrAssociation['name'] ;
 		if(!$arrAssociation['name'])
 		{
 			$arrAssociation['name'] = $arrAssociation['table'] ;

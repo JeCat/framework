@@ -192,7 +192,7 @@ class Model
 		
 		Selecter::singleton()->execute( $this->aPrototype->refRaw(), $this->arrData, $sTmpWhere, $this->db() ) ;
 
-		print_r($this->arrData) ;
+		//echo "<pre>";print_r($this->arrData);echo "</pre>";
 		
 		return $this ;
 	}
