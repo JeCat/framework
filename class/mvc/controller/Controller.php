@@ -85,6 +85,7 @@ use org\jecat\framework\pattern\composite\NamableComposite;
 class Controller extends NamableComposite implements IBean
 {
 	const beforeBuildBean = 'beforeBuildBean' ;
+	const afterMainRun = 'afterMainRun' ;
 	
     function __construct ($params=null,$sName=null,$bBuildAtonce=true)
     {
@@ -499,6 +500,9 @@ class Controller extends NamableComposite implements IBean
     	}
     	
     	$this->response()->respond($this) ;
+    	
+    	// 触发事件
+    	EventManager::singleton()->emitEvent(__CLASS__,self::afterMainRun, array($this)) ;
     }
     
     static protected function processController(Controller $aController)
