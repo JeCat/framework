@@ -237,7 +237,6 @@ class Controller extends NamableComposite implements IBean
     			, $arrArgvs=array($this,&$arrConfig,&$sNamespace,&$aBeanFactory)
     			, get_class($this)
     	) ;
-    	
     	if( isset($arrConfig['name']) )
     	{
     		$this->setName($arrConfig['name']) ;
@@ -296,7 +295,6 @@ class Controller extends NamableComposite implements IBean
     		{
     			// 自动配置缺少的 class, name 属性
     			$aBeanFactory->_typeProperties( $arrBeanConf, 'model', is_int($key)?null:$key, 'name' ) ;
-    			
     			$aBean = $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ;
     			$aModelContainer->add( $aBean, $aBean->name() ) ;
     		}
@@ -336,7 +334,6 @@ class Controller extends NamableComposite implements IBean
     		{
     			// 自动配置缺少的 class, name 属性
     			$aBeanFactory->_typeProperties( $arrBeanConf, 'controller', is_int($key)?null:$key, 'name' ) ;
-    			
     			$this->add( $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ) ;
     		}
     	}
@@ -648,7 +645,6 @@ class Controller extends NamableComposite implements IBean
 		{
 			throw new Exception("名称为：%s 的子控制器在控制器 %s 中已经存在，无法添加同名的子控制器",array($sName,$this->name())) ;
 		}
-		
 		// 接管子类的视图
 		$this->takeOverView($object,$sName) ;
 
