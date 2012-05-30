@@ -226,7 +226,10 @@ class Model
 			if( is_int(key($arrData)) )
 			{
 				$aInserter->execute( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
+<<<<<<< HEAD
 
+=======
+>>>>>>> 58c6467ec239dea77e05681fceaa19a2e88083d3
 				return $this ;
 			}
 		}
