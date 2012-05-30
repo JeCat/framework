@@ -124,5 +124,20 @@ abstract class Executor extends Object
 			}
 		}
 	}
+	static function escValue(& $value)
+	{
+		if( is_int($value) or is_float($value) or is_double($value) or is_bool($value) )
+		{
+			return $value ;
+		}
+		else if( is_string($value) )
+		{
+			return "'".addslashes($value)."'" ;
+		}
+		else if($value===null)
+		{
+			return 'NULL' ;
+		}
+	}
 }
 

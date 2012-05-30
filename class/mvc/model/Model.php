@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\model ;
 
+use org\jecat\framework\mvc\model\executor\Updater;
+
 use org\jecat\framework\mvc\model\executor\Inserter;
 use org\jecat\framework\mvc\model\executor\Selecter;
 use org\jecat\framework\db\DB;
@@ -208,15 +210,6 @@ class Model
 		
 		return $this ;
 	}
-	
-	/**
-	 * 执行 insert/update 操作
-	 * @return Model
-	 */
-	public function save()
-	{
-		
-	}
 
 	public function insert(array $arrData=null,$sChildName=null)
 	{
@@ -231,7 +224,6 @@ class Model
 			if( is_int(key($arrData)) )
 			{
 				$aInserter->execute( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
-		print_r($this->arrData) ;
 				return $this ;
 			}
 		}
@@ -243,14 +235,34 @@ class Model
 		}
 		$aInserter->insertRow( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
 
-		print_r($this->arrData) ;
-		
 		return $this ;
 	}
 	
-	public function update(array $arrData,$sChildName=null)
+	public function update(array $arrData=null,$sWhere=null,$sChildName=null)
 	{
-		
+		if($arrData===null)
+		{
+			if( $sChildName )
+			{
+				if( !$arrParentRow=&$this->localeRow($sChildName) or empty($arrParentRow[$sChildName]) )
+				{
+					return ;
+				}
+				$arrData =& $arrParentRow[$sChildName] ;
+			}
+			else
+			{
+				if( !$arrData=&$this->currentRow($this->arrData) )
+				{
+					return ;
+				}
+			}
+		}
+		if( !$arrPrototype=&$this->aPrototype->refRaw($sChildName?:'$') )
+		{
+			throw new Exception("出入 Model::update 方法的参数无效:%s",$sChildName) ;
+		}
+		Updater::singleton()->execute( $this, $arrPrototype, $arrData, $sWhere, $this->db() ) ;
 	}
 	
 	/**
