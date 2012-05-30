@@ -1,8 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\model ;
 
+use org\jecat\framework\mvc\model\executor\Deleter;
 use org\jecat\framework\mvc\model\executor\Updater;
-
 use org\jecat\framework\mvc\model\executor\Inserter;
 use org\jecat\framework\mvc\model\executor\Selecter;
 use org\jecat\framework\db\DB;
@@ -260,7 +260,7 @@ class Model
 		}
 		if( !$arrPrototype=&$this->aPrototype->refRaw($sChildName?:'$') )
 		{
-			throw new Exception("出入 Model::update 方法的参数无效:%s",$sChildName) ;
+			throw new Exception("传入 Model::update 方法的参数\$sChildName无效:%s",$sChildName) ;
 		}
 		Updater::singleton()->execute( $this, $arrPrototype, $arrData, $sWhere, $this->db() ) ;
 	}
@@ -270,9 +270,13 @@ class Model
 	 * 仅仅删除数据库中的记录，Model对像中的数据仍然保留，并且可以在 delete() 以后立即执行 save()
 	 * @return Model
 	 */
-	public function delete()
+	public function delete($sWhere=null,$sChildName=null)
 	{
-		
+		if( !$arrPrototype=&$this->aPrototype->refRaw($sChildName?:'$') )
+		{
+			throw new Exception("传入 Model::update 方法的参数\$sChildName无效:%s",$sChildName) ;
+		}
+		Deleter::singleton()->execute( $arrPrototype, $sWhere, $this->db() ) ;
 	}
 	
 	public function aff($sChildName=null)

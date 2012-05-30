@@ -11,7 +11,7 @@ class Updater extends Executor
 	public function execute(Model $aModel,array & $arrPrototype,array & $arrDataRow,$sWhere=null,DB $aDB=null)
 	{
 		$arrSqlStat['from'] = $this->makeFromClause($arrPrototype) ;
-		$this->joinTables($arrPrototype,$arrSqlStat) ;
+		$this->joinTables($arrPrototype,$arrSqlStat,Prototype::oneToOne) ;
 		
 		$arrClauseSet = array() ;
 		foreach($arrDataRow as $column=>&$value)
