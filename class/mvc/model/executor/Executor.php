@@ -6,7 +6,7 @@ use org\jecat\framework\lang\Object;
 
 abstract class Executor extends Object
 {
-	protected function joinTables(array & $arrPrototype,array & $arrSqlStat)
+	protected function joinTables(array & $arrPrototype,array & $arrSqlStat,$nAssocType=Prototype::total)
 	{
 		// *被*多对多关联 的桥接表
 		if( !empty($arrPrototype['assoc']) and $arrPrototype['assoc']==Prototype::hasAndBelongsToMany )
@@ -28,13 +28,17 @@ abstract class Executor extends Object
 		
 		foreach($arrPrototype['associations'] as $arrAssoc)
 		{
+			if( !($arrAssoc['assoc']&$nAssocType) )
+			{
+				continue ;
+			}
+			
 			if( $arrAssoc['assoc']&Prototype::oneToOne )
 			{
-				
 				// join table
 				$arrSqlStat['from'].= " LEFT JOIN (`{$arrAssoc['table']}` AS `".addslashes($arrAssoc['tableAlias'])."`" ;
 				
-				$this->joinTables($arrAssoc,$arrSqlStat) ;
+				$this->joinTables($arrAssoc,$arrSqlStat,$nAssocType) ;
 				
 				// join table on
 				$arrClauseOn ;
@@ -122,6 +126,21 @@ abstract class Executor extends Object
 			{
 				return "\r\nLIMIT\r\n\t" . $arrPrototype['limitFrom'] . ', ' . $arrPrototype['limitLen'] ;
 			}
+		}
+	}
+	static function escValue(& $value)
+	{
+		if( is_int($value) or is_float($value) or is_double($value) or is_bool($value) )
+		{
+			return $value ;
+		}
+		else if( is_string($value) )
+		{
+			return "'".addslashes($value)."'" ;
+		}
+		else if($value===null)
+		{
+			return 'NULL' ;
 		}
 	}
 }
