@@ -11,14 +11,14 @@ abstract class Executor extends Object
 		// *被*多对多关联 的桥接表
 		if( !empty($arrPrototype['assoc']) and $arrPrototype['assoc']==Prototype::hasAndBelongsToMany )
 		{
-			$sSqlClauseFrom.= " LEFT JOIN (`{$arrPrototype['bridge']}` AS `{$arrPrototype['bridgeTableAlias']}`" ;
+			$arrSqlStat['from'].= " LEFT JOIN (`{$arrPrototype['bridge']}` AS `{$arrPrototype['bridgeTableAlias']}`" ;
 
 			$arrClauseOn ;
-			foreach($arrAssoc['fromBridgeKeys'] as $nIdx=>$sFromBridgeKey)
+			foreach($arrPrototype['fromBridgeKeys'] as $nIdx=>$sFromBridgeKey)
 			{
-				$arrClauseOn[] = "`{$arrPrototype['bridgeTableAlias']}`.`{$sFromBridgeKey}` = `{$arrAssoc['tableAlias']}`.`{$arrAssoc['toKeys'][$nIdx]}`" ;
+				$arrClauseOn[] = "`{$arrPrototype['bridgeTableAlias']}`.`{$sFromBridgeKey}` = `{$arrPrototype['tableAlias']}`.`{$arrPrototype['toKeys'][$nIdx]}`" ;
 			}
-			$sSqlClauseFrom.= ") ON (".implode(' AND ',$arrClauseOn).")" ;
+			$arrSqlStat['from'].= ") ON (".implode(' AND ',$arrClauseOn).")" ;
 		}
 		
 		if(empty($arrPrototype['associations']))

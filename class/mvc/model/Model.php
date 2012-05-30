@@ -149,7 +149,7 @@ class Model
 	/**
 	 * @return Model
 	 */
-	public function hasAndBelongsToMany($toTable,$sBridgeTableName,$fromKeys=null,$toKeys=null,$toBridgeKeys=null,$fromBridgeKeys=null,$sAssocName=null,$sFromPrototype='$')
+	public function hasAndBelongsToMany($toTable,$sBridgeTableName,$fromKeys=null,$toBridgeKeys=null,$fromBridgeKeys=null,$toKeys=null,$sAssocName=null,$sFromPrototype='$')
 	{
 		$this->aPrototype->addAssociation(array(
 				'type' => Prototype::hasAndBelongsToMany ,
@@ -222,6 +222,8 @@ class Model
 	{
 		$aInserter = Inserter::singleton() ;
 		$arrPrototype =& $this->aPrototype->refRaw($sChildName?:'$') ;
+		
+		
 		$bRecursively = $sChildName? false: true ;
 
 		// insert 整个 list
@@ -231,7 +233,7 @@ class Model
 			if( is_int(key($arrData)) )
 			{
 				$aInserter->execute( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
-		print_r($this->arrData) ;
+				// echo "<pre>";print_r($this->arrData);echo "</pre>";
 				return $this ;
 			}
 		}
@@ -243,8 +245,7 @@ class Model
 		}
 		$aInserter->insertRow( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
 
-		print_r($this->arrData) ;
-		
+		// echo "<pre>";print_r($this->arrData);echo "</pre>";
 		return $this ;
 	}
 	
@@ -489,6 +490,7 @@ class Model
 		
 		$arrSheet =& $this->arrData ;
 		$sXPath = '' ;
+		
 		foreach( explode('.',$sChildName) as $sName )
 		{
 			$sXPath.= ($sXPath?'.':'') . $sName ;
@@ -533,7 +535,8 @@ class Model
 
 		$nRow = key($arrSheet) ;
 		
-		if( !is_array($arrSheet[$nRow]) )
+		if(empty($arrSheet[$nRow])) $arrSheet[$nRow] = array();
+		if(!is_array($arrSheet[$nRow]) )
 		{
 			if($bCreateRowIfNotExists)
 			{
