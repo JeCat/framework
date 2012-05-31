@@ -12,7 +12,7 @@ class Deleter extends Executor
 {	
 	public function execute(array & $arrPrototype,$sWhere=true,DB $aDB=null)
 	{
-		$arrSqlStat['from'] = $this->makeFromClause($arrPrototype) ;
+		$arrSqlStat['from'] = preg_replace("/AS .*/", "", $this->makeFromClause($arrPrototype));
 		
 		// 删除记录时，不对 belongsTo 自动关联操作
 		$this->joinTables($arrPrototype,$arrSqlStat,Prototype::total^Prototype::belongsTo) ;
@@ -23,7 +23,8 @@ class Deleter extends Executor
 		$aDB->execute($sSql) ;
 		
 		// 删除下级多属关联
- 		foreach($arrSqlStat['multiAssocs'] as &$arrAssoc)
+		if (empty($arrPrototype['multiAssocs'])) $arrPrototype['multiAssocs'] = array();
+ 		foreach($arrPrototype['multiAssocs'] as &$arrAssoc)
 		{
 			$this->execute($arrAssoc,null,$aDB) ;
 		}

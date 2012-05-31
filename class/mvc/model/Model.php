@@ -264,6 +264,8 @@ class Model
 		{
 			throw new Exception("传入 Model::update 方法的参数\$sChildName无效:%s",$sChildName) ;
 		}
+		
+		
 		Updater::singleton()->execute( $this, $arrPrototype, $arrData, $sWhere, $this->db() ) ;
 	}
 	
@@ -278,6 +280,7 @@ class Model
 		{
 			throw new Exception("传入 Model::update 方法的参数\$sChildName无效:%s",$sChildName) ;
 		}
+		
 		Deleter::singleton()->execute( $arrPrototype, $sWhere, $this->db() ) ;
 	}
 	
