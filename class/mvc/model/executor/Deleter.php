@@ -15,7 +15,7 @@ class Deleter extends Executor
 		$arrSqlStat['from'] = preg_replace("/AS .*/", "", $this->makeFromClause($arrPrototype));
 		
 		// 删除记录时，不对 belongsTo 自动关联操作
-		$this->joinTables($arrPrototype,$arrSqlStat,Prototype::total^Prototype::belongsTo) ;
+		//$this->joinTables($arrPrototype,$arrSqlStat,Prototype::total^Prototype::belongsTo) ;
 
 		echo $sSql = "DELETE " . $arrSqlStat['from']
 					. $this->makeWhereClause($arrPrototype,$sWhere) . " ; \r\n" ;
@@ -23,11 +23,13 @@ class Deleter extends Executor
 		$aDB->execute($sSql) ;
 		
 		// 删除下级多属关联
+		/*
 		if (empty($arrPrototype['multiAssocs'])) $arrPrototype['multiAssocs'] = array();
  		foreach($arrPrototype['multiAssocs'] as &$arrAssoc)
 		{
 			$this->execute($arrAssoc,null,$aDB) ;
 		}
+		*/
 	}
 	
 	
