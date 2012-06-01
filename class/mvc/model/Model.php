@@ -274,14 +274,14 @@ class Model
 	 * 仅仅删除数据库中的记录，Model对像中的数据仍然保留，并且可以在 delete() 以后立即执行 save()
 	 * @return Model
 	 */
-	public function delete($sWhere=null,$sChildName=null)
+	public function delete($sWhere=null , $sOrder=null ,$sLimit=null,$sChildName=null)
 	{
 		if( !$arrPrototype=&$this->aPrototype->refRaw($sChildName?:'$') )
 		{
 			throw new Exception("传入 Model::update 方法的参数\$sChildName无效:%s",$sChildName) ;
 		}
 		
-		Deleter::singleton()->execute( $arrPrototype, $sWhere, $this->db() ) ;
+		Deleter::singleton()->execute( $arrPrototype, $sWhere ,$sOrder , $sLimit, $this->db() ) ;
 	}
 	
 	public function aff($sChildName=null)

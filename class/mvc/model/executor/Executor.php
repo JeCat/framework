@@ -6,7 +6,7 @@ use org\jecat\framework\lang\Object;
 
 abstract class Executor extends Object
 {
-	protected function joinTables(array & $arrPrototype,array & $arrSqlStat,$nAssocType=Prototype::total)
+	protected function joinTables(array & $arrPrototype,array & $arrSqlStat,$nAssocType=Prototype::total , $isAshes = true)
 	{
 		// *被*多对多关联 的桥接表
 		if( !empty($arrPrototype['assoc']) and $arrPrototype['assoc']==Prototype::hasAndBelongsToMany )
@@ -35,18 +35,34 @@ abstract class Executor extends Object
 			
 			if( $arrAssoc['assoc']&Prototype::oneToOne )
 			{
-				// join table
-				$arrSqlStat['from'].= " LEFT JOIN (`{$arrAssoc['table']}` AS `".addslashes($arrAssoc['tableAlias'])."`" ;
-				
-				$this->joinTables($arrAssoc,$arrSqlStat,$nAssocType) ;
-				
-				// join table on
-				$arrClauseOn ;
-				foreach($arrAssoc['fromKeys'] as $nIdx=>$sFromKey)
-				{
-					$arrClauseOn[] = "`{$arrPrototype['tableAlias']}`.`{$sFromKey}` = `{$arrAssoc['tableAlias']}`.`{$arrAssoc['toKeys'][$nIdx]}`" ;
-				}
-				$arrSqlStat['from'].= ") ON (".implode(' AND ',$arrClauseOn).")" ;
+			    if($isAshes)
+			    {
+			        // join table
+			        $arrSqlStat['from'].= " LEFT JOIN (`{$arrAssoc['table']}` AS `".addslashes($arrAssoc['tableAlias'])."`" ;
+			        
+			        $this->joinTables($arrAssoc,$arrSqlStat,$nAssocType) ;
+			        
+			        // join table on
+			        $arrClauseOn ;
+			        foreach($arrAssoc['fromKeys'] as $nIdx=>$sFromKey)
+			        {
+			            $arrClauseOn[] = "`{$arrPrototype['tableAlias']}`.`{$sFromKey}` = `{$arrAssoc['tableAlias']}`.`{$arrAssoc['toKeys'][$nIdx]}`" ;
+			        }
+			        $arrSqlStat['from'].= ") ON (".implode(' AND ',$arrClauseOn).")" ;
+			    }else{
+			        // join table
+			        $arrSqlStat['from'].= " LEFT JOIN `{$arrAssoc['table']}` " ;
+			        
+			        $this->joinTables($arrAssoc,$arrSqlStat,$nAssocType) ;
+			        
+			        // join table on
+			        $arrClauseOn ;
+			        foreach($arrAssoc['fromKeys'] as $nIdx=>$sFromKey)
+			        {
+			            $arrClauseOn[] = "`{$arrPrototype['table']}`.`{$sFromKey}` = `{$arrAssoc['table']}`.`{$arrAssoc['toKeys'][$nIdx]}`" ;
+			        }
+			        $arrSqlStat['from'].= " ON ".implode(' AND ',$arrClauseOn)."" ;
+			    }
 			}
 			else
 			{
