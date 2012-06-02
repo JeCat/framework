@@ -15,7 +15,6 @@ class EventManager extends Object implements \Serializable
 		{
 			$sourceObject = spl_object_hash($sourceObject) ;
 		}
-		
 		$this->arrEventHandles[$sClass][$sEvent][$sourceObject][] = array($fnHandler,$arrCallbackArgvs) ;
 		
 		return $this ;
@@ -71,21 +70,21 @@ class EventManager extends Object implements \Serializable
 		{
 			$sCallCode = "\$return = \$fnHandler[0](" ;
 		}
-		$arrArgvs = array() ;
+		$arrEvalArgvs = array() ;
 		for($nIdx=0;$nIdx<count($arrArgvs);$nIdx++)
 		{
-			$arrArgvs[] = "\$arrArgvs[{$nIdx}]" ;
+			$arrEvalArgvs[] = "\$arrArgvs[{$nIdx}]" ;
 		}
 		
 		if( $fnHandler[1] )
 		{
 			for($nIdx=0;$nIdx<count($fnHandler[1]);$nIdx++)
 			{
-				$arrArgvs[] = "\$fnHandler[1][{$nIdx}]" ;
+				$arrEvalArgvs[] = "\$fnHandler[1][{$nIdx}]" ;
 			}
 		}
 				
-		$sCallCode.= implode(',',$arrArgvs).') ;' ;
+		$sCallCode.= implode(',',$arrEvalArgvs).") ;" ;
 		
 		eval($sCallCode) ;
 				
