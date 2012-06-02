@@ -22,6 +22,7 @@ class Inserter extends Executor
 	
 	public function insertRow(Model $aModel,array & $arrPrototype,array & $arrDataRow,$bRecursively=true,DB $aDB=null)
 	{
+	    
 		// 字段/值
 		$arrColumns = array() ;
 		$arrValues = array() ;
@@ -85,11 +86,11 @@ class Inserter extends Executor
 				}
 			}
 		}
-		
+
 		// 执行 insert
 		if( !empty($arrColumns) )
 		{
-			echo $sSql = $this->makeSql($arrPrototype['table'],$arrColumns,$arrValues) ;
+			$sSql = $this->makeSql($arrPrototype['table'],$arrColumns,$arrValues) ;
 			
 			$aDB->execute($sSql) ;
 			

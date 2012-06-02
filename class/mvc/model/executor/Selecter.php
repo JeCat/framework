@@ -18,6 +18,7 @@ class Selecter extends Executor
 		
 		$sSql = $this->makeSql($arrPrototype,$arrMultiAssocs,$sWhere) ;
 
+		
 		// 查询
 		$aPdoRecordset = $aDB->query( $sSql ) ;
 		
@@ -51,7 +52,7 @@ class Selecter extends Executor
 				$this->execute(
 						$aModel
 						, $arrAssoc
-						, $aModel->buildSheet($arrRow,$arrAssoc['xpath']) // 
+						, $aModel->buildSheet($arrAssoc['xpath']) // 
 						, $sClauseWhere
 						, $aDB
 				) ;

@@ -10,7 +10,8 @@ class Updater extends Executor
 {
 	public function execute(Model $aModel,array & $arrPrototype,array & $arrDataRow,$sWhere=null,DB $aDB=null)
 	{
-		$arrSqlStat['from'] = $this->makeFromClause($arrPrototype) ;
+		$arrSqlStat['from'] = preg_replace("/^ FROM/", "", $this->makeFromClause($arrPrototype));
+		
 		$this->joinTables($arrPrototype,$arrSqlStat,Prototype::oneToOne) ;
 		
 		$arrClauseSet = array() ;
@@ -32,18 +33,20 @@ class Updater extends Executor
 				{
 					$sTableAlias = $arrPrototype['name'] ;
 				}
-				$arrClauseSet[] = "`{$sTableAlias}`.`{$column}`='" . self::escValue($value) . "'" ;
+				
+				$arrClauseSet[] = "`{$sTableAlias}`.`{$column}`=" . self::escValue($value) ;
 			}
 		}
-	
 		if( !empty($arrClauseSet) )
 		{
-			echo $sSql = "UPDATE SET\r\n\t" . implode("\r\n\t, ",$arrClauseSet)."\r\n"
+			$sSql = "UPDATE "
 								. $arrSqlStat['from']
+			                    . " SET\r\n\t" . implode("\r\n\t, ",$arrClauseSet)."\r\n"
 								. $this->makeWhereClause($arrPrototype,$sWhere)
 								. $this->makeGroupByClause($arrPrototype)
 								. $this->makeOrderByClause($arrPrototype) . " ; \r\n" ;
 			
+			//echo "<pre>";print_r($sSql);echo "</pre>";
 			$aDB->execute($sSql) ;
 		}
 	}

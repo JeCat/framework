@@ -151,7 +151,7 @@ class Model
 	/**
 	 * @return Model
 	 */
-	public function hasAndBelongsToMany($toTable,$sBridgeTableName,$fromKeys=null,$toKeys=null,$toBridgeKeys=null,$fromBridgeKeys=null,$sAssocName=null,$sFromPrototype='$')
+	public function hasAndBelongsToMany($toTable,$sBridgeTableName,$fromKeys=null,$toBridgeKeys=null,$fromBridgeKeys=null,$toKeys=null,$sAssocName=null,$sFromPrototype='$')
 	{
 		$this->aPrototype->addAssociation(array(
 				'type' => Prototype::hasAndBelongsToMany ,
@@ -215,6 +215,8 @@ class Model
 	{
 		$aInserter = Inserter::singleton() ;
 		$arrPrototype =& $this->aPrototype->refRaw($sChildName?:'$') ;
+		
+		
 		$bRecursively = $sChildName? false: true ;
 
 		// insert 整个 list
@@ -262,6 +264,8 @@ class Model
 		{
 			throw new Exception("传入 Model::update 方法的参数\$sChildName无效:%s",$sChildName) ;
 		}
+		
+		
 		Updater::singleton()->execute( $this, $arrPrototype, $arrData, $sWhere, $this->db() ) ;
 	}
 	
@@ -270,13 +274,14 @@ class Model
 	 * 仅仅删除数据库中的记录，Model对像中的数据仍然保留，并且可以在 delete() 以后立即执行 save()
 	 * @return Model
 	 */
-	public function delete($sWhere=null,$sChildName=null)
+	public function delete($sWhere=null , $sOrder=null ,$sLimit=null,$sChildName=null)
 	{
 		if( !$arrPrototype=&$this->aPrototype->refRaw($sChildName?:'$') )
 		{
 			throw new Exception("传入 Model::update 方法的参数\$sChildName无效:%s",$sChildName) ;
 		}
-		Deleter::singleton()->execute( $arrPrototype, $sWhere, $this->db() ) ;
+		
+		Deleter::singleton()->execute( $arrPrototype, $sWhere ,$sOrder , $sLimit, $this->db() ) ;
 	}
 	
 	/**
@@ -500,6 +505,7 @@ class Model
 		
 		$arrSheet =& $this->arrData ;
 		$sXPath = '' ;
+		
 		foreach( explode('.',$sChildName) as $sName )
 		{
 			$sXPath.= ($sXPath?'.':'') . $sName ;
@@ -544,7 +550,8 @@ class Model
 
 		$nRow = key($arrSheet) ;
 		
-		if( !is_array($arrSheet[$nRow]) )
+		if(empty($arrSheet[$nRow])) $arrSheet[$nRow] = array();
+		if(!is_array($arrSheet[$nRow]) )
 		{
 			if($bCreateRowIfNotExists)
 			{
