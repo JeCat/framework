@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -25,110 +25,183 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\ui ;
 
+use org\jecat\framework\ui\xhtml\Expression;
+
 use org\jecat\framework\io\OutputStreamBuffer;
 use org\jecat\framework\io\IOutputStream;
 
-class TargetCodeOutputStream extends OutputStreamBuffer implements IOutputStream
+class TargetCodeOutputStream extends \org\jecat\framework\lang\Object
 {
-	public function start($bIntact=true)
+	public function __construct($sTemplateSignature)
 	{
-		$this->write("<?php") ;
-		$this->write("use org\\jecat\\framework as jc ;\r\n") ;
-
-		$this->write("// 预处理 ---------") ;
-		$this->write("if(!empty(\$bPreProcess))") ;
-		$this->write("{") ;
-		
-		$this->aPreprocessStream = new self() ;
-		$this->write($this->aPreprocessStream) ;
-		
-		$this->write("}") ;
-		$this->write("if(!empty(\$bRendering))") ;
-		$this->write("{") ;
+		$this->sTemplateSignature = $sTemplateSignature ;
 	}
-	
-	public function finish()
-	{
-		$this->write("\r\n\r\n}") ;
-	}
-	
-	/**
-	 * @return TargetCodeOutputStream
-	 */
-	public function preprocessStream()
-	{
-		return $this->aPreprocessStream ;
-	}
-	
+			
 	public function bufferBytes($bClear=true)
 	{
-		$this->generateOutputCode() ;
+		return $this->generateCompiled() ;
+	}
+	
 
-		return parent::bufferBytes($bClear) ;
+	public function output($bytes,$sSubTempName=null)
+	{
+		$sSubTempName = $sSubTempName?:$this->sDefaultSubTemplate ;
+		
+		if(!isset($this->arrOutputBuffers[$sSubTempName]))
+		{
+			$this->arrOutputBuffers[$sSubTempName] = '' ;
+		}
+		$this->arrOutputBuffers[$sSubTempName].= $bytes ;
+	}
+	
+	public function putCode($source,$sSubTempName=null)
+	{
+		$sSubTempName = $sSubTempName?:$this->sDefaultSubTemplate ;
+		
+		$this->generateOutputCode($sSubTempName) ;
+
+		if($source instanceof Expression)
+		{
+			$source->generate($this,$sSubTempName) ;
+		}
+		else
+		{
+			$this->arrCompileds[$sSubTempName].= $source . "\r\n" ;
+		}
 	}
 	
 	public function write($sBytes,$nLen=null,$bFlush=false)
 	{
-		$this->generateOutputCode() ;
+		trigger_error('正在访问一个过时的方法：TargetCodeOutputStream::write() 方法已经改名为: putCode()',E_USER_DEPRECATED ) ;
+		$this->putCode($sBytes) ;
+	}
+	
+	protected function generateOutputCode($sSubTempName=null)
+	{
+		$sSubTempName = $sSubTempName?:$this->sDefaultSubTemplate ;
 		
-		parent::write($sBytes) ;
-		parent::write("\r\n") ;
-	}
-	
-	
-	public function output($sBytes)
-	{
-		$this->sOutputContents.= $sBytes ; 
-	}
-	
-	protected function generateOutputCode()
-	{
-		if(!$this->sOutputContents)
+		if(!isset($this->arrCompileds[$sSubTempName]))
+		{
+			$this->arrCompileds[$sSubTempName] = '' ;
+		}
+		
+		if(empty($this->arrOutputBuffers[$sSubTempName]))
 		{
 			return ;
 		}
+
+		$this->arrCompileds[$sSubTempName].= "\r\n// output text content -------------\r\n" ;
 		
-		
-		// 收拢纯空白字符串
-		if( !trim($this->sOutputContents) )
+		// 只有空白字符
+		if( !trim($this->arrOutputBuffers[$sSubTempName]) )
 		{
-			$this->sOutputContents = str_replace("\n","\\n",$this->sOutputContents) ;
-			$this->sOutputContents = str_replace("\r","\\r",$this->sOutputContents) ;
-			$this->sOutputContents = str_replace("\t","\\t",$this->sOutputContents) ;
+			// 收拢纯空白字符串
+			$this->arrOutputBuffers[$sSubTempName] = str_replace("\n","\\n",$this->arrOutputBuffers[$sSubTempName]) ;
+			$this->arrOutputBuffers[$sSubTempName] = str_replace("\r","\\r",$this->arrOutputBuffers[$sSubTempName]) ;
+			$this->arrOutputBuffers[$sSubTempName] = str_replace("\t","\\t",$this->arrOutputBuffers[$sSubTempName]) ;
 			
-			parent::write("\r\n// output text content -------------\r\n") ;
-			parent::write("\$aDevice->write(\"{$this->sOutputContents}\") ;\r\n") ;
-			parent::write("// ---------------------------------\r\n") ;
+			$this->arrCompileds[$sSubTempName].= "\$aDevice->write(\"{$this->arrOutputBuffers[$sSubTempName]}\") ;\r\n" ;
 		}
 		
+		// 正常html输出
 		else
 		{
-			parent::write("\r\n// output text content -------------\r\n") ;
 			if($this->bUseHereDoc)
 			{
 				// 转义 \ 和 $
-				$this->sOutputContents = addcslashes($this->sOutputContents, '\\') ;
-				$this->sOutputContents = str_replace('$','\\$',$this->sOutputContents) ;
+				$this->arrOutputBuffers[$sSubTempName] = addcslashes($this->arrOutputBuffers[$sSubTempName], '\\') ;
+				$this->arrOutputBuffers[$sSubTempName] = str_replace('$','\\$',$this->arrOutputBuffers[$sSubTempName]) ;
 				
-				parent::write("\$aDevice->write(<<<OUTPUT\r\n{$this->sOutputContents}\r\nOUTPUT\r\n) ;") ;
+				$this->arrCompileds[$sSubTempName].= "\$aDevice->write(<<<OUTPUT\r\n{$this->arrOutputBuffers[$sSubTempName]}\r\nOUTPUT\r\n) ;" ;
 			}
 			else
 			{
-				$sOutputContents = addslashes($this->sOutputContents) ;
-				parent::write("\$aDevice->write(\"{$sOutputContents}\") ;") ;
+				$sOutputBuffer = addslashes($this->arrOutputBuffers[$sSubTempName]) ;
+				$this->arrCompileds[$sSubTempName].= "\$aDevice->write(\"{$sOutputBuffer}\") ;" ;
 			}
-			parent::write("") ;
-			parent::write("// ---------------------------------\r\n") ;
 		}
-		$this->sOutputContents = '' ;
+		
+		$this->arrCompileds[$sSubTempName].= "// ---------------------------------\r\n" ;
+		
+		$this->arrOutputBuffers[$sSubTempName] = '' ;
+	}
+	
+	public function generateCompiled()
+	{
+		$sTemplateCompiled = "<?php\r\n" ;
+		$sTemplateCompiled.= "use org\\jecat\\framework as jc ;\r\n" ;
+		
+		$sTemplateCompiled.= "\r\n" ;
+		$sTemplateCompiled.= "define('{$this->sTemplateSignature}',__FILE__) ;\r\n" ;
+		
+		foreach($this->arrCompileds as $sSubTemplate=>&$sCompiled)
+		{
+			$this->generateOutputCode($sSubTemplate) ;
+			
+			$sTemplateCompiled.= "function _{$this->sTemplateSignature}_{$sSubTemplate}(\\org\\jecat\\framework\\ui\\UI \$aUI,\\org\\jecat\\framework\\util\\IHashTable \$aVariables,\\org\\jecat\\framework\\io\\IOutputStream \$aDevice)\r\n" ;
+			$sTemplateCompiled.= "{\r\n" ;
+			
+			// variables declare
+			if(!empty($this->arrDeclareVariables[$sSubTemplate]))
+			{
+				$sTemplateCompiled.= "	// declare variables\r\n" ;
+				foreach($this->arrDeclareVariables[$sSubTemplate] as $sVarName=>&$sInitExpression)
+				{
+					if($sInitExpression!==null)
+					{
+						$sTemplateCompiled.= "	\${$sVarName} = {$sInitExpression} ;\r\n" ;
+					}
+					else
+					{
+						$sTemplateCompiled.= "	\${$sVarName} ;\r\n" ;
+					}
+				}
+				$sTemplateCompiled.= "\r\n" ;
+			}
+			
+			
+			$sTemplateCompiled.= $sCompiled ;
+			$sTemplateCompiled.= "}\r\n" ;
+		}
+		
+		return $sTemplateCompiled ;
 	}
 	
 	public function useHereDoc($bUseHereDoc=true)
 	{
 		$this->bUseHereDoc = $bUseHereDoc ;
 	}
+
+	public function declareVarible($sVarName,$sInitExpression=null,$sSubTempName=null)
+	{
+		$sSubTempName = $sSubTempName?:$this->sDefaultSubTemplate ;
+		
+		$this->arrDeclareVariables[$sSubTempName][$sVarName] = $sInitExpression ;
+	}
 	
-	private $sOutputContents ;
+	public function hasDeclared($sVarName,$sSubTempName=null)
+	{
+		$sSubTempName = $sSubTempName?:$this->sDefaultSubTemplate ;
+		
+		return array_key_exists($sVarName,$this->arrDeclareVariables) ;
+	}
+	
+	public function setDefaultSubTemplate($sDefaultSubTemplate)
+	{
+		$this->sDefaultSubTemplate = $sDefaultSubTemplate ;
+	}
+	public function defaultSubTemplate()
+	{
+		return $this->sDefaultSubTemplate ;
+	}
+
+	private $arrCompileds = array() ;
+	private $arrOutputBuffers = array() ;
+	private $arrDeclareVariables = array() ;
+	
+	private $sTemplateSignature ;
+
+	private $sDefaultSubTemplate = 'render' ;
 	
 	private $bUseHereDoc = true ;
 }

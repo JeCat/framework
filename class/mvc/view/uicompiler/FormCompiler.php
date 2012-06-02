@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -41,23 +41,23 @@ class FormCompiler extends NodeCompiler
 		
 		if( $aTailTag = $aObject->tailTag() )
 		{
-			$aDev->write("if( !(\$aVariables->get('theView') instanceof \\org\\jecat\\framework\\mvc\\view\\IFormView) or \$aVariables->get('theView')->isShowForm() )\r\n{\r\n") ;
+			$aDev->putCode("if( !(\$aVariables->get('theView') instanceof \\org\\jecat\\framework\\mvc\\view\\IFormView) or \$aVariables->get('theView')->isShowForm() )\r\n{\r\n") ;
 			
 			$this->compileTag($aObject->headTag(), $aObjectContainer, $aDev, $aCompilerManager) ;
 			
-			$aDev->write("\tif(\$aVariables->get('theView') instanceof \\org\\jecat\\framework\\mvc\\view\\IFormView){\r\n") ;
-			$aDev->write("\t\t") ;
+			$aDev->putCode("\tif(\$aVariables->get('theView') instanceof \\org\\jecat\\framework\\mvc\\view\\IFormView){\r\n") ;
+			$aDev->putCode("\t\t") ;
 			$aDev->output('<input type="hidden" name="') ;
-			$aDev->write("\t\t\$aDevice->write( \$aVariables->get('theView')->htmlFormSignature() ) ;\r\n") ;
+			$aDev->putCode("\t\t\$aDevice->write( \$aVariables->get('theView')->htmlFormSignature() ) ;\r\n") ;
 			$aDev->output('" value="1" />') ;
 			$aDev->output('<input type="hidden" name="act" value="submit" />') ;
-			$aDev->write("\t}\r\n") ;
+			$aDev->putCode("\t}\r\n") ;
 
 			$this->compileChildren($aObject, $aObjectContainer, $aDev, $aCompilerManager) ;
 			
 			$this->compileTag($aTailTag, $aObjectContainer, $aDev, $aCompilerManager) ;
 			
-			$aDev->write("}\r\n") ;
+			$aDev->putCode("}\r\n") ;
 		}
 		
 		else

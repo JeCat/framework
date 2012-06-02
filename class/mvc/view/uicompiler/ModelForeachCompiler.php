@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -65,32 +65,32 @@ class ModelForeachCompiler extends NodeCompiler
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject,'aObject') ;
-		if( !$aObjectContainer->variableDeclares()->hasDeclared('aStackForLoopIsEnableToRun') )
+		if( !$aDev->hasDeclared('aStackForLoopIsEnableToRun') )
 		{
-			$aObjectContainer->variableDeclares()->declareVarible('aStackForLoopIsEnableToRun','new \\org\\jecat\\framework\\util\\Stack()') ;
+			$aDev->declareVarible('aStackForLoopIsEnableToRun','new \\org\\jecat\\framework\\util\\Stack()') ;
 		}
 		$aAttrs = $aObject->attributes();
 		$sIdx = $aAttrs->has ( 'idx' ) ? $aAttrs->string ( 'idx' ) : '' ;
 		$sItem = $aAttrs->has ( 'item' ) ? $aAttrs->string ( 'item' ) : 'theModel' ;
 		$sFor = $aAttrs->has ( 'for' ) ? $aAttrs->get ( 'for' ) : "\$aVariables->get('theModel')" ;
 		
-		$aDev->write("if(\$aForModel={$sFor}){\r\n") ;
+		$aDev->putCode("if(\$aForModel={$sFor}){\r\n") ;
 		
 		if($sIdx)
 		{
-			$aDev->write("\t\${$sIdx}=0;\r\n") ;
+			$aDev->putCode("\t\${$sIdx}=0;\r\n") ;
 		}
 		
-		$aDev->write("\t\$aStackForLoopIsEnableToRun->put(false);") ;
+		$aDev->putCode("\t\$aStackForLoopIsEnableToRun->put(false);") ;
 		
-		$aDev->write("\t\tforeach(\$aForModel->childIterator() as \$__aChildModel){\r\n") ;
-		$aDev->write("\t\t\t\$aVariables->set('{$sItem}',\$__aChildModel) ;
+		$aDev->putCode("\t\tforeach(\$aForModel->childIterator() as \$__aChildModel){\r\n") ;
+		$aDev->putCode("\t\t\t\$aVariables->set('{$sItem}',\$__aChildModel) ;
 		\$bLoopIsEnableToRun = & \$aStackForLoopIsEnableToRun->getRef();
 		\$bLoopIsEnableToRun = true;\r\n") ;
 	
 		if($sIdx)
 		{
-			$aDev->write("\t\t\t\$aVariables->set('{$sIdx}',\${$sIdx}++) ;\r\n") ;
+			$aDev->putCode("\t\t\t\$aVariables->set('{$sIdx}',\${$sIdx}++) ;\r\n") ;
 		}
 		
 		
@@ -99,7 +99,7 @@ class ModelForeachCompiler extends NodeCompiler
 			
 			$this->compileChildren($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
 
-			$aDev->write("\t}\r\n}\r\n") ;
+			$aDev->putCode("\t}\r\n}\r\n") ;
 		}
 	}
 }

@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -92,7 +92,7 @@ class PathMacroCompiler extends MacroCompiler
 		
 		if( $sContents=='*.uri' )
 		{
-			$aDev->write( "\$aDevice->write(\$aVariables->get('theRequest')->uri()) ;" ) ;
+			$aDev->putCode( "\$aDevice->write(\$aVariables->get('theRequest')->uri()) ;" ) ;
 		}
 		else if( substr($sContents,0,5)=='*.url' )
 		{
@@ -102,23 +102,23 @@ class PathMacroCompiler extends MacroCompiler
 			switch($sPart)
 			{
 			case '' :
-				$aDev->write( "\$aDevice->write(\$aVariables->get('theRequest')->url()) ;" ) ;
+				$aDev->putCode( "\$aDevice->write(\$aVariables->get('theRequest')->url()) ;" ) ;
 				break ;
 				
 			case '.scheme' :
-				$aDev->write( "\$aDevice->write(\$aVariables->get('theRequest')->urlScheme()) ;" ) ;
+				$aDev->putCode( "\$aDevice->write(\$aVariables->get('theRequest')->urlScheme()) ;" ) ;
 				break ;
 				
 			case '.host' :
-				$aDev->write( "\$aDevice->write(\$aVariables->get('theRequest')->urlHost()) ;" ) ;
+				$aDev->putCode( "\$aDevice->write(\$aVariables->get('theRequest')->urlHost()) ;" ) ;
 				break ;
 				
 			case '.path' :
-				$aDev->write( "\$aDevice->write(\$aVariables->get('theRequest')->urlPath()) ;" ) ;
+				$aDev->putCode( "\$aDevice->write(\$aVariables->get('theRequest')->urlPath()) ;" ) ;
 				break ;
 				
 			case '.query' :
-				$aDev->write( "\$aDevice->write(\$aVariables->get('theRequest')->urlQuery()) ;" ) ;
+				$aDev->putCode( "\$aDevice->write(\$aVariables->get('theRequest')->urlQuery()) ;" ) ;
 				break ;
 				
 			default :

@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -31,6 +31,8 @@
  *
  */
 namespace org\jecat\framework\ui\xhtml\compiler\node;
+
+use org\jecat\framework\ui\xhtml\Expression;
 
 use org\jecat\framework\ui\xhtml\compiler\ExpressionCompiler;
 use org\jecat\framework\lang\Type;
@@ -66,28 +68,29 @@ class WhileCompiler extends NodeCompiler {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) {
 		Type::check ( "org\\jecat\\framework\\ui\\xhtml\\Node", $aObject );
 		
-		if( !$aObjectContainer->variableDeclares()->hasDeclared('aStackForLoopIsEnableToRun') )
+	
+		if( !$aDev->hasDeclared('aStackForLoopIsEnableToRun') )
 		{
-			$aObjectContainer->variableDeclares()->declareVarible('aStackForLoopIsEnableToRun','new \\org\\jecat\\framework\\util\\Stack()') ;
+			$aDev->declareVarible('aStackForLoopIsEnableToRun','new \\org\\jecat\\framework\\util\\Stack()') ;
 		}
 		
 		$sIdxUserName = $aObject->attributes()->has ( 'idx' ) ? $aObject->attributes()->string ( 'idx' ) : '' ;
 		$sIdxAutoName = NodeCompiler::assignVariableName ( '$__while_idx_' ) ;
 		if( !empty($sIdxUserName) ){
-			$aDev->write ( "  {$sIdxAutoName} = -1;  \$aStackForLoopIsEnableToRun->put(false); " );
+			$aDev->putCode ( "  {$sIdxAutoName} = -1;  \$aStackForLoopIsEnableToRun->put(false); " );
 		}
-		$aDev->write ( " while(" );
-		$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes ()->anonymous()->source (), $aObjectContainer->variableDeclares() ) );
-		$aDev->write ( "){  \$bLoopIsEnableToRun = & \$aStackForLoopIsEnableToRun->getRef();
+		$aDev->putCode ( " while(" );
+		$aDev->putCode ( new Expression ( $aObject->attributes ()->anonymous()->source () ) );
+		$aDev->putCode ( "){  \$bLoopIsEnableToRun = & \$aStackForLoopIsEnableToRun->getRef();
 			\$bLoopIsEnableToRun = true;" );
 		if( !empty($sIdxUserName) ){
-			$aDev->write ( " {$sIdxAutoName}++; 
+			$aDev->putCode ( " {$sIdxAutoName}++; 
 							\$aVariables->{$sIdxUserName}={$sIdxAutoName};   ");
 		}
 		
 		if(!$aObject->headTag()->isSingle()){
 			$this->compileChildren ( $aObject, $aObjectContainer, $aDev, $aCompilerManager );
-			$aDev->write ( " }   " );
+			$aDev->putCode ( " }   " );
 		}
 	}
 }

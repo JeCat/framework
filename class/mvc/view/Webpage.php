@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -29,14 +29,9 @@ use org\jecat\framework\ui\UI;
 
 class Webpage extends View
 {
-	public function __construct($sName=null,UI $aUI=null)
-	{
-		if(!$sName)
-		{
-			$sName = 'webpage' ;
-		}
-		
-		parent::__construct($sName,'org.jecat.framework:Webpage.template.html',false,$aUI) ;
+	public function __construct(UI $aUI=null)
+	{		
+		parent::__construct('org.jecat.framework:Webpage.template.html',false,$aUI) ;
 	}
 
 	public function title()

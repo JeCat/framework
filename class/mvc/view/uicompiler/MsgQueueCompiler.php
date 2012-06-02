@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -79,23 +79,25 @@ class MsgQueueCompiler extends NodeCompiler
 	{
 		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject,'aObject') ;
 		
-		$aDev->write("\r\n// display message queue -------------------------------------") ;
+		$aDev->putCode("\r\n// display message queue -------------------------------------") ;
 		
 		// 确定需要display的 MessageQueue 对像 
 		// ----------------------
 		if( $aObject->attributes()->has('for') )
 		{
-			$aDev->write("\$__ui_msgqueue = ".$aObject->attributes()->expression('for')." ;") ;
+			$aDev->putCode("\$__ui_msgqueue = ") ;
+			$aDev->putCode($aObject->attributes()->expression('for')) ;
+			$aDev->putCode(" ;") ;
 		}
 		else 
 		{
-			$aDev->write("\$__ui_msgqueue = \$aVariables->get('theController')? \$aVariables->get('theController')->messageQueue(): null ;") ;
+			$aDev->putCode("\$__ui_msgqueue = \$aVariables->get('theController')? \$aVariables->get('theController')->messageQueue(): null ;") ;
 		}
-		$aDev->write("if( \$__ui_msgqueue instanceof \\org\\jecat\\framework\\message\\IMessageQueueHolder ){") ;
-		$aDev->write("	\$__ui_msgqueue = \$__ui_msgqueue->messageQueue() ;") ;
-		$aDev->write("}") ;
+		$aDev->putCode("if( \$__ui_msgqueue instanceof \\org\\jecat\\framework\\message\\IMessageQueueHolder ){") ;
+		$aDev->putCode("	\$__ui_msgqueue = \$__ui_msgqueue->messageQueue() ;") ;
+		$aDev->putCode("}") ;
 		
-		$aDev->write("\\org\\jecat\\framework\\lang\\Assert::type( '\\\\org\\jecat\\framework\\\\message\\\\IMessageQueue',\$__ui_msgqueue);") ;
+		$aDev->putCode("\\org\\jecat\\framework\\lang\\Assert::type( '\\\\org\\jecat\\framework\\\\message\\\\IMessageQueue',\$__ui_msgqueue);") ;
 		
 		
 		// 确定使用的 template 
@@ -111,9 +113,9 @@ class MsgQueueCompiler extends NodeCompiler
 			$aDev->properties()->set('nMessageQueueSubtemplateIndex',$nSubtemplateIndex) ;
 			$sSubTemplateName = '__subtemplate_for_messagequeue_'.$nSubtemplateIndex ;
 			
-			$aDev->write("if(!function_exists('$sSubTemplateName')){function {$sSubTemplateName}(\$aVariables,\$aDevice){") ;
+			$aDev->putCode("if(!function_exists('$sSubTemplateName')){function {$sSubTemplateName}(\$aVariables,\$aDevice){") ;
 			$this->compileChildren($aTemplate,$aObjectContainer,$aDev,$aCompilerManager) ;
-			$aDev->write("}}") ;
+			$aDev->putCode("}}") ;
 			
 			$sTemplate = "'{$sSubTemplateName}'" ;
 			$sIsSubtemplate = 'true' ;
@@ -124,36 +126,36 @@ class MsgQueueCompiler extends NodeCompiler
 		switch( $aObject->attributes()->has('mode')? strtolower($aObject->attributes()->string('mode')): 'soft' )
 		{
 			case 'hard' :
-				$aDev->write("// display message queue by HARD mode") ;
-				$aDev->write("if( !\$__device_for_msgqueue = \$__ui_msgqueue->properties()->get('aDisplayDevice') ){") ;
-				$aDev->write("	\$__device_for_msgqueue = new \\org\\jecat\\framework\\io\\OutputStreamBuffer() ;") ;
-				$aDev->write("	\$__ui_msgqueue->properties()->set('aDisplayDevice',\$__device_for_msgqueue) ;") ;
-				$aDev->write("}") ;
-				$aDev->write("\$__device_for_msgqueue->redirect(\$aDevice) ;") ;
+				$aDev->putCode("// display message queue by HARD mode") ;
+				$aDev->putCode("if( !\$__device_for_msgqueue = \$__ui_msgqueue->properties()->get('aDisplayDevice') ){") ;
+				$aDev->putCode("	\$__device_for_msgqueue = new \\org\\jecat\\framework\\io\\OutputStreamBuffer() ;") ;
+				$aDev->putCode("	\$__ui_msgqueue->properties()->set('aDisplayDevice',\$__device_for_msgqueue) ;") ;
+				$aDev->putCode("}") ;
+				$aDev->putCode("\$__device_for_msgqueue->redirect(\$aDevice) ;") ;
 				$sCancelDisplay = ' and $__device_for_msgqueue->isEmpty()' ;
 				break ;
 				
 			case 'force' :
-				$aDev->write("// display message queue by FORCE mode") ;
-				$aDev->write("\$__device_for_msgqueue = \$aDevice ;") ;
+				$aDev->putCode("// display message queue by FORCE mode") ;
+				$aDev->putCode("\$__device_for_msgqueue = \$aDevice ;") ;
 				$sCancelDisplay = '' ;
 				break ;
 				
 			default:	// soft
-				$aDev->write("// display message queue by SOFT mode") ;
-				$aDev->write("if( !\$__device_for_msgqueue = \$__ui_msgqueue->properties()->get('aDisplayDevice') ){") ;
-				$aDev->write("	\$__device_for_msgqueue = new \\org\\jecat\\framework\\io\\OutputStreamBuffer() ;") ;
-				$aDev->write("	\$__ui_msgqueue->properties()->set('aDisplayDevice',\$__device_for_msgqueue) ;") ;
-				$aDev->write("}") ;
-				$aDev->write("\$aDevice->write(\$__device_for_msgqueue) ;") ;
+				$aDev->putCode("// display message queue by SOFT mode") ;
+				$aDev->putCode("if( !\$__device_for_msgqueue = \$__ui_msgqueue->properties()->get('aDisplayDevice') ){") ;
+				$aDev->putCode("	\$__device_for_msgqueue = new \\org\\jecat\\framework\\io\\OutputStreamBuffer() ;") ;
+				$aDev->putCode("	\$__ui_msgqueue->properties()->set('aDisplayDevice',\$__device_for_msgqueue) ;") ;
+				$aDev->putCode("}") ;
+				$aDev->putCode("\$aDevice->write(\$__device_for_msgqueue) ;") ;
 				$sCancelDisplay = ' and $__device_for_msgqueue->isEmpty()' ;
 				break ;
 		}
 		
-		$aDev->write("if( \$__ui_msgqueue->count(){$sCancelDisplay} ){ ") ;
-		$aDev->write("	\$__ui_msgqueue->display(\$this,\$__device_for_msgqueue,{$sTemplate},{$sIsSubtemplate}) ;") ;
-		$aDev->write("}") ;
-		$aDev->write("// -------------------------------------\r\n") ;
+		$aDev->putCode("if( \$__ui_msgqueue->count(){$sCancelDisplay} ){ ") ;
+		$aDev->putCode("	\$__ui_msgqueue->display(\$this,\$__device_for_msgqueue,{$sTemplate},{$sIsSubtemplate}) ;") ;
+		$aDev->putCode("}") ;
+		$aDev->putCode("// -------------------------------------\r\n") ;
 	}
 }
 

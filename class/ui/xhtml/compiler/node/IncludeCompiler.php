@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -86,17 +86,17 @@ class IncludeCompiler extends NodeCompiler
 		$bExtendParentVars = $aAttributes->has("vars")? $aAttributes->bool('vars'): true ;
 		
 		// start
-		$aDev->write("\r\n");
+		$aDev->putCode("\r\n");
 		
 		// variables
 		if(!$bExtendParentVars)
 		{
-			$aDev->write("\$__include_aVariables = new \\org\\jecat\\framework\\util\\DataSrc() ; \r\n");
-			$aDev->write("\$__include_aVariables->addChild(\$aVariables) ;");
+			$aDev->putCode("\$__include_aVariables = new \\org\\jecat\\framework\\util\\DataSrc() ; \r\n");
+			$aDev->putCode("\$__include_aVariables->addChild(\$aVariables) ;");
 		}
 		else
 		{
-			$aDev->write("\$__include_aVariables = \$aVariables ; \r\n");
+			$aDev->putCode("\$__include_aVariables = \$aVariables ; \r\n");
 		}
 		
 		// other variables
@@ -105,13 +105,12 @@ class IncludeCompiler extends NodeCompiler
 			if( substr($sName,0,4)=='var.' and $sVarName=substr($sName,4) )
 			{
 				$sVarName = '"'. addslashes($sVarName) . '"' ;
-				//$sValue = ExpressionCompiler::compileExpression($aValue->source(),$aObjectContainer->variableDeclares()) ;
 				$sValue = $aAttributes->get($sName) ;
-				$aDev->write("\$__include_aVariables->set({$sVarName},{$sValue}) ; \r\n");
+				$aDev->putCode("\$__include_aVariables->set({$sVarName},{$sValue}) ; \r\n");
 			}
 		}
 		
-		$aDev->write("\$this->display({$sFileName},\$__include_aVariables,\$aDevice) ; ") ;		
+		$aDev->putCode("\$this->display({$sFileName},\$__include_aVariables,\$aDevice) ; ") ;		
 	}
 }
 

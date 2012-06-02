@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -141,28 +141,14 @@ class ViewCompiler extends NodeCompiler
 			$nNodeViewId ++ ;
 		}
 		
-		$sViewAssemblyListId = "\$this->id().'-pos{$nNodeViewId}'" ;
-		
-		// 视图的预处理
-		$aDev->preprocessStream()->write("\r\n// define view assembly list -------------------") ;
-		$aDev->preprocessStream()->write("if( empty(\$this) or !(\$this instanceof jc\\mvc\\view\\IView) )") ;
-		$aDev->preprocessStream()->write("{") ;
-		$aDev->preprocessStream()->write("	throw new jc\\lang\\Exception('UI标签 <view> 必须用于视图类。') ;") ;
-		$aDev->preprocessStream()->write("}") ;
-
-		$aDev->preprocessStream()->write("jc\\mvc\\view\\ViewAssembler::singleton()->defineAssemblyList(
-		{$sViewAssemblyListId}
-		, '{$sLayout}'
-		, array(
-			'priority' => {$nMode},
-			'xpaths' => {$arrViewXPaths},
-			'view' => \$this ,
-		)
-) ;") ;
-
-		$aDev->write("\r\n// display views ") ;
-		$sViewAssemblyListId = "\$aVariables->theView->id().'-pos{$nNodeViewId}'" ;
-		$aDev->write("jc\\mvc\\view\\ViewAssembler::singleton()->displayAssemblyList({$sViewAssemblyListId},\$aDevice) ;") ;
+		$aDev->putCode("\r\n// display child views ") ;
+		$aDev->putCode("\$aView = \$aVariables->get('theView') ;") ;
+		$aDev->putCode("\$aFrame = new jc\\mvc\\view\\View() ;") ;
+		$aDev->putCode("foreach( \$aView->assembledIterator() as \$aAssembledView )") ;
+		$aDev->putCode("{");
+		$aDev->putCode("	\$aFrame->assemble(\$aAssembledView) ;");
+		$aDev->putCode("}");
+		$aDev->putCode("\$aFrame->show(\$aDevice) ;");
 		
 		return ;
 		

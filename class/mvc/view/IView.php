@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -33,7 +33,7 @@ use org\jecat\framework\mvc\model\IModel;
 use org\jecat\framework\mvc\view\widget\IWidgetContainer;
 use org\jecat\framework\pattern\composite\IContainer;
 
-interface IView extends IContainer, IMessageQueueHolder, IWidgetContainer
+interface IView extends IMessageQueueHolder, IWidgetContainer
 {
 	
 	/**
@@ -63,11 +63,53 @@ interface IView extends IContainer, IMessageQueueHolder, IWidgetContainer
 	/**
 	 * @return org\jecat\framework\mvc\controller\IContainer
 	 */
-	public function controller() ;
+	public function controller($bTrace=false) ;
 	
 	public function setController(Controller $aController=null) ;
     
     public function id() ;
+
+    public function template() ;
+    
+    /**
+     * @return IView
+     */
+    public function setTemplate($sTemplate) ;
+    
+    // view container
+    /**
+     * @return IVew
+     */
+    public function addView($sName,IView $aView) ;
+    /**
+     * @return IVew
+     */
+    public function viewByName($sName) ;
+    /**
+     * @return IVew
+     */
+    public function removeView(View $aView) ;
+    /**
+     * @return IVew
+     */
+    public function clearViews() ;
+    /**
+     * @return IIterator
+     */
+    public function viewIterator() ;
+    /**
+     * @return array
+     */
+    public function viewNames() ;
+
+    /**
+     * @return IVew
+     */
+    public function parent() ;
+    /**
+     * @return IVew
+     */
+    public function setParent(IView $aIView=null) ;
     
 }
 
