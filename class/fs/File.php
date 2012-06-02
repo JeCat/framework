@@ -175,7 +175,7 @@ class File extends FSO
 		if( $this->perms()!=$nMask and $this->canWrite() )
 		{
 			$nOldMark = umask(0) ;
-			chmod( $sLocalPath, $nMask ) ;
+			@chmod( $sLocalPath, $nMask ) ;
 			umask($nOldMark) ;
 		}
 		
