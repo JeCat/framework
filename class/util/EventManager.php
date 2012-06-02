@@ -71,28 +71,21 @@ class EventManager extends Object implements \Serializable
 		{
 			$sCallCode = "\$return = \$fnHandler[0](" ;
 		}
+		$arrArgvs = array() ;
 		for($nIdx=0;$nIdx<count($arrArgvs);$nIdx++)
 		{
-			if($nIdx)
-			{
-				$sCallCode.= ',' ;
-			}
-			$sCallCode.= "\$arrArgvs[{$nIdx}]" ;
+			$arrArgvs[] = "\$arrArgvs[{$nIdx}]" ;
 		}
 		
 		if( $fnHandler[1] )
 		{
 			for($nIdx=0;$nIdx<count($fnHandler[1]);$nIdx++)
 			{
-				if($nIdx)
-				{
-					$sCallCode.= ',' ;
-				}
-				$sCallCode.= "\$fnHandler[1][{$nIdx}]" ;
+				$arrArgvs[] = "\$fnHandler[1][{$nIdx}]" ;
 			}
 		}
 				
-		$sCallCode.= ') ;' ;
+		$sCallCode.= implode(',',$arrArgvs).') ;' ;
 		
 		eval($sCallCode) ;
 				
