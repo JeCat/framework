@@ -284,11 +284,6 @@ class Model
 		Deleter::singleton()->execute( $arrPrototype, $sWhere ,$sOrder , $sLimit, $this->db() ) ;
 	}
 	
-	public function aff($sChildName=null)
-	{
-		
-	}
-	
 	/**
 	 * 返回一个“臭名昭著”的 prototype 对像
 	 * 真正维护 prototype 的，应该是 Prototype 类，Model类的 order,limit 等方法仅仅提供了简单的

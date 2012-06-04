@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -62,7 +62,7 @@ class WidgetCompiler extends NodeCompiler
 	}
 	
 	protected function writeTheWidget(TargetCodeOutputStream $aDev){
-		$aDev->write("\$theView = \$aVariables->get('theView') ;") ;
+		$aDev->putCode("\$theView = \$aVariables->get('theView') ;") ;
 	}
 	
 	protected function getVarName(){
@@ -82,20 +82,22 @@ class WidgetCompiler extends NodeCompiler
 			$sId = '' ;
 			$sInstanceOrigin=$aAttrs->string('ins') or $sInstanceOrigin=$aAttrs->string('instance') ;
 			
-			$aDev->write("\r\n//// ------- 显示 Widget Instance ---------------------") ;
-			$aDev->write("{$sWidgetVarName} = {$sInstanceExpress} ;") ;
+			$aDev->putCode("\r\n//// ------- 显示 Widget Instance ---------------------") ;
+			$aDev->putCode("{$sWidgetVarName} = ") ;
+			$aDev->putCode($sInstanceExpress) ;
+			$aDev->putCode(" ;\r\n") ;
 
-			$aDev->write("if( !{$sWidgetVarName} or !({$sWidgetVarName} instanceof \\org\\jecat\\framework\\mvc\\view\\widget\\IViewWidget) ){") ;
+			$aDev->putCode("if( !{$sWidgetVarName} or !({$sWidgetVarName} instanceof \\org\\jecat\\framework\\mvc\\view\\widget\\IViewWidget) ){") ;
 			$aDev->output("无效的widget对象：".$sInstanceOrigin ) ;
-			$aDev->write("} else {") ;
+			$aDev->putCode("} else {") ;
 				
 			if( $aAttrs->bool('instance.autoAddToView') or $aAttrs->bool('ins.autoAddToView')
 				or (!$aAttrs->has('instance.autoAddToView') and !$aAttrs->has('ins.autoAddToView')) )
 			{
-				$aDev->write("	// ins.autoAddToView=true") ;
-				$aDev->write("	if( \$theView and {$sWidgetVarName}->view()===\$theView ){") ;
-				$aDev->write("		\$theView->addWidget({$sWidgetVarName}) ;") ;
-				$aDev->write("	}") ;
+				$aDev->putCode("	// ins.autoAddToView=true") ;
+				$aDev->putCode("	if( \$theView and {$sWidgetVarName}->view()===\$theView ){") ;
+				$aDev->putCode("		\$theView->addWidget({$sWidgetVarName}) ;") ;
+				$aDev->putCode("	}") ;
 			}			
 		}
 	
@@ -103,30 +105,30 @@ class WidgetCompiler extends NodeCompiler
 		else if( $aAttrs->has('id') )
 		{
 			$sId = $aAttrs->get('id') ;
-			$aDev->write("\r\n//// ------- 显示 Widget: {$sId} ---------------------") ;		
-			$aDev->write("{$sWidgetVarName} = \$theView->widget({$sId}) ;") ;
+			$aDev->putCode("\r\n//// ------- 显示 Widget: {$sId} ---------------------") ;		
+			$aDev->putCode("{$sWidgetVarName} = \$theView->widget({$sId}) ;") ;
 				
-			$aDev->write("if(!{$sWidgetVarName}){") ;
+			$aDev->putCode("if(!{$sWidgetVarName}){") ;
 			$aDev->output("缺少 widget (id:{$sId})") ;
-			$aDev->write("}else{") ;
+			$aDev->putCode("}else{") ;
 		}
 		
 		// 通过 new 属性现场创建 widget 对象
-		else if( $sInstanceExpress=$aAttrs->expression('new') )
+		else if( $aAttrs->has('new') )
 		{
 			$sClassName = $aAttrs->get('new') ;
 			
-			$aDev->write("\r\n//// ------- 创建并显示widget: {$sClassName} ---------------------") ;
+			$aDev->putCode("\r\n//// ------- 创建并显示widget: {$sClassName} ---------------------") ;
 			
-			$aDev->write("\$__widget_class = \\org\\jecat\\framework\\bean\\BeanFactory::singleton()->beanClassNameByAlias({$sClassName})?: $sClassName ;") ;
-			$aDev->write("if( !class_exists(\$__widget_class) ){") ;
+			$aDev->putCode("\$__widget_class = \\org\\jecat\\framework\\bean\\BeanFactory::singleton()->beanClassNameByAlias({$sClassName})?: $sClassName ;") ;
+			$aDev->putCode("if( !class_exists(\$__widget_class) ){") ;
 			$aDev->output("缺少 widget (class:{$sClassName})") ;
-			$aDev->write("}else{") ;
-			$aDev->write("	{$sWidgetVarName} = new \$__widget_class ;") ;
+			$aDev->putCode("}else{") ;
+			$aDev->putCode("	{$sWidgetVarName} = new \$__widget_class ;") ;
 		}
 		else 
 		{
-			$aDev->write("\$aDevice->write(\$this->locale()->trans('&lt;widget&gt;标签缺少必要属性:id,instance 或 new')) ;") ;
+			$aDev->putCode("\$aDevice->write(\$aUI->locale()->trans('&lt;widget&gt;标签缺少必要属性:id,instance 或 new')) ;") ;
 			return false;
 		}
 		return true ;
@@ -147,7 +149,7 @@ class WidgetCompiler extends NodeCompiler
 
 			$sVarName = '"'. addslashes($sName) . '"' ;
 			$sValue = $aAttrs->get($sInputName) ;
-			$aDev->write("	{$sWidgetVarName}->setAttribute({$sVarName},{$sValue}) ;") ;
+			$aDev->putCode("	{$sWidgetVarName}->setAttribute({$sVarName},{$sValue}) ;") ;
 		}
 	}
 	
@@ -158,7 +160,7 @@ class WidgetCompiler extends NodeCompiler
 			{
 				$sVarName = '"'. addslashes($sVarName) . '"' ;
 				$sValue = $aAttrs->get($sName) ;
-				$aDev->write("	{$sWidgetVarName}->setAttribute({$sVarName},{$sValue}) ;") ;
+				$aDev->putCode("	{$sWidgetVarName}->setAttribute({$sVarName},{$sValue}) ;") ;
 			}
 		}
 	}
@@ -169,10 +171,10 @@ class WidgetCompiler extends NodeCompiler
 			$arrBean = BeanConfXml::singleton()->xmlSourceToArray( $aBean->source() ) ;
 			$strVarExport = var_export($arrBean,true);
 			
-			$aDev->write("	\$arrFormer = {$sWidgetVarName}->beanConfig(); ");
-			$aDev->write("	\$arrBean = $strVarExport ;");
-			$aDev->write("	\\org\\jecat\\framework\\bean\\BeanFactory::mergeConfig(\$arrFormer, \$arrBean); ");
-			$aDev->write("	{$sWidgetVarName}->buildBean( \$arrFormer ); ");
+			$aDev->putCode("	\$arrFormer = {$sWidgetVarName}->beanConfig(); ");
+			$aDev->putCode("	\$arrBean = $strVarExport ;");
+			$aDev->putCode("	\\org\\jecat\\framework\\bean\\BeanFactory::mergeConfig(\$arrFormer, \$arrBean); ");
+			$aDev->putCode("	{$sWidgetVarName}->buildBean( \$arrFormer ); ");
 			
 			$aObject->remove($aBean);
 		}
@@ -182,10 +184,10 @@ class WidgetCompiler extends NodeCompiler
 		// template
 		if($aAttrs->has('subtemplate') ){
 			$sFunName = $aAttrs->string('subtemplate') ;
-			$aDev->write("	{$sWidgetVarName}->setSubTemplateName('__subtemplate_{$sFunName}') ;") ;
+			$aDev->putCode("	{$sWidgetVarName}->setSubTemplateName('__subtemplate_{$sFunName}') ;") ;
 		}else if($aAttrs->has('template') ){
 			$sTemplateName = $aAttrs->string('template');
-			$aDev->write("	{$sWidgetVarName}->setTemplateName('{$sTemplateName}') ;") ;
+			$aDev->putCode("	{$sWidgetVarName}->setTemplateName('{$sTemplateName}') ;") ;
 		}else
 		if( $aTemplate=$aObject->getChildNodeByTagName('template') ){
 			$aAttributes = $aTemplate->headTag()->attributes();
@@ -198,7 +200,7 @@ class WidgetCompiler extends NodeCompiler
 			
 			$aAttributes->set('name' , $sFunName ) ;
 			$aTemplate->headTag()->setAttributes($aAttributes) ;
-			$aDev->write("	{$sWidgetVarName}->setSubTemplateName('__subtemplate_{$sFunName}') ;") ;
+			$aDev->putCode("	{$sWidgetVarName}->setSubTemplateName('__subtemplate_{$sFunName}') ;") ;
 		}
 	}
 	
@@ -206,13 +208,13 @@ class WidgetCompiler extends NodeCompiler
 		// display
 		if( !$aAttrs->has('display') 
 			or $aAttrs->bool('display') ){
-			$aDev->write("	{$sWidgetVarName}->display(\$aVariables->theUI,new \\org\\jecat\\framework\\util\\DataSrc(),\$aDevice) ;") ;
+			$aDev->putCode("	{$sWidgetVarName}->display(\$aVariables->theUI,new \\org\\jecat\\framework\\util\\DataSrc(),\$aDevice) ;") ;
 		}
 	}
 	
 	protected function writeEnd(TargetCodeOutputStream $aDev){
-		$aDev->write("}") ;
-		$aDev->write("//// ---------------xxx------------------------------------\r\n") ;
+		$aDev->putCode("}") ;
+		$aDev->putCode("//// ---------------xxx------------------------------------\r\n") ;
 	}
 }
 

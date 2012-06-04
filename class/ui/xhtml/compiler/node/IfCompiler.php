@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -24,6 +24,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*-- Project Introduce --*/
 namespace org\jecat\framework\ui\xhtml\compiler\node;
+
+use org\jecat\framework\ui\xhtml\Expression;
 
 use org\jecat\framework\ui\ObjectContainer;
 use org\jecat\framework\ui\xhtml\compiler\ExpressionCompiler;
@@ -82,7 +84,9 @@ class IfCompiler extends NodeCompiler {
 		//把<if>标签转换成php代码,也就是"if("
 		//获得<if>标签中的条件语句,原封不动的放到if后面的括号中充当条件
 		//但是这里并没有给代码块结尾,因为结尾在别的编译器中了,对于if标签来说,它的结尾工作放在</if>编译器那里了.是的,if标签是至少需要两个编译器才能完整编译
-		$aDev->write ( 'if(' . ExpressionCompiler::compileExpression ( $aObject->attributes ()->anonymous()->source (), $aObjectContainer->variableDeclares() ) . '){' );
+		$aDev->putCode ( 'if(' ) ;
+		$aDev->putCode ( new Expression($aObject->attributes()->anonymous()->source()) ) ;
+		$aDev->putCode ( '){' );
 		
 		/* 
 		 * 处理单行标签.单行格式是为了解决跨模板文件问题
@@ -98,7 +102,7 @@ class IfCompiler extends NodeCompiler {
 		
 		if (!$aObject->headTag()->isSingle()) {
 			$this->compileChildren ( $aObject, $aObjectContainer, $aDev, $aCompilerManager );
-			$aDev->write ( "} " );
+			$aDev->putCode ( "} " );
 		}
 	}
 }

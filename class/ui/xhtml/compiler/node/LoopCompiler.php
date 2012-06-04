@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -90,45 +90,51 @@ class LoopCompiler extends NodeCompiler
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Assert::type ( "org\\jecat\\framework\\ui\\xhtml\\Node", $aObject, 'aObject' );
-		if( !$aObjectContainer->variableDeclares()->hasDeclared('aStackForLoopIsEnableToRun') )
+		if( !$aDev->hasDeclared('aStackForLoopIsEnableToRun') )
 		{
-			$aObjectContainer->variableDeclares()->declareVarible('aStackForLoopIsEnableToRun','new \\org\\jecat\\framework\\util\\Stack()') ;
+			$aDev->declareVarible('aStackForLoopIsEnableToRun','new \\org\\jecat\\framework\\util\\Stack()') ;
 		}
 		$aAttrs = $aObject->attributes ();
-		$sStartValue = $aAttrs->has ( "start" ) ? $aAttrs->expression ( "start" ) : '0';
-		$sEndValue = $aAttrs->expression ( "end" );
-		$sStepValue = $aAttrs->has ( "step" ) ? $aAttrs->expression ( "step" ) : '1';
+		$aStartValue = $aAttrs->has ( "start" ) ? $aAttrs->expression ( "start" ) : '0';
+		$aEndValue = $aAttrs->expression ( "end" );
+		$aStepValue = $aAttrs->has ( "step" ) ? $aAttrs->expression ( "step" ) : '1';
 		
 		$sVarAutoName = NodeCompiler::assignVariableName ( '$__loop_var_' );
 		$sIdxAutoName = NodeCompiler::assignVariableName ( '$__loop_idx_' );
 		$sEndName = NodeCompiler::assignVariableName ( '$__loop_end_' );
 		$sStepName = NodeCompiler::assignVariableName ( '$__loop_step_' );
 		
-		$aDev->write ( "		{$sEndName}  = {$sEndValue} ; 
-								{$sStepName}  = {$sStepValue}  ;
-								{$sIdxAutoName} = 0;
-								\$aStackForLoopIsEnableToRun->put(false);
-								for( {$sVarAutoName} = {$sStartValue} ; {$sVarAutoName} <= {$sEndName} ; {$sVarAutoName} += {$sStepName} ){
-								\$bLoopIsEnableToRun = & \$aStackForLoopIsEnableToRun->getRef();
-								\$bLoopIsEnableToRun = true;  
-						" );
+		$aDev->putCode ("{$sEndName}  = ");
+		$aDev->putCode ($aEndValue);
+		$aDev->putCode (" ;\r\n") ;
+		$aDev->putCode ("{$sStepName}  = ");
+		$aDev->putCode ($aStepValue);
+		$aDev->putCode (" ;\r\n") ;
+		$aDev->putCode ("{$sIdxAutoName} = 0;
+\$aStackForLoopIsEnableToRun->put(false);
+for( {$sVarAutoName} = ") ;
+		$aDev->putCode ($aStartValue) ;
+		$aDev->putCode (" ; {$sVarAutoName} <= {$sEndName} ; {$sVarAutoName} += {$sStepName} ){
+\$bLoopIsEnableToRun = & \$aStackForLoopIsEnableToRun->getRef();
+\$bLoopIsEnableToRun = true;  
+" );
 		if ($aAttrs->has ( "var" ))
 		{
 			$sVarUserName = $aAttrs->string ( "var" );
-			$aDev->write ( "			\$aVariables->{$sVarUserName} = {$sVarAutoName} ;" );
+			$aDev->putCode ( "			\$aVariables->{$sVarUserName} = {$sVarAutoName} ;" );
 		}
 		if ($aAttrs->has ( "idx" ))
 		{
 			$sIdxUserName = $aAttrs->string ( "idx" );
-			$aDev->write ( "			\$aVariables->{$sIdxUserName} = $sIdxAutoName ;
+			$aDev->putCode ( "			\$aVariables->{$sIdxUserName} = $sIdxAutoName ;
 										{$sIdxAutoName}++;" );
 		}
-// 		$aDev->write ( "\$bLoopIsEnableToRun = & \$aStackForLoopIsEnableToRun->getRef();
+// 		$aDev->putCode ( "\$bLoopIsEnableToRun = & \$aStackForLoopIsEnableToRun->getRef();
 // 			\$bLoopIsEnableToRun = true;" );
 		
 		if(!$aObject->headTag()->isSingle()){
 			$this->compileChildren ( $aObject, $aObjectContainer, $aDev, $aCompilerManager );
-			$aDev->write ( '} ' );
+			$aDev->putCode ( '} ' );
 		}
 	}
 }

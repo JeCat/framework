@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -25,6 +25,8 @@
 /*-- Project Introduce --*/
 
 namespace org\jecat\framework\ui ;
+
+use org\jecat\framework\locale\Locale;
 
 use org\jecat\framework\mvc\controller\Response;
 use org\jecat\framework\mvc\controller\Request;
@@ -141,70 +143,80 @@ class UI extends JcObject
 	/**
 	 * @return org\jecat\framework\fs\File
 	 */
-	public function compileSourceFile($sSourceFile)
+	public function loadCompiled($sSourceFile)
 	{
 		// 定位文件
 		$aSrcMgr = $this->sourceFileManager() ;
 		list($sNamespace,$sSourceFile) = $aSrcMgr->detectNamespace($sSourceFile) ;
-		$aSourceFile = $aSrcMgr->find($sSourceFile,$sNamespace) ;
-		if(!$aSourceFile)
-		{
-			throw new Exception("无法找到指定的源文件：%s:%s",array($sNamespace,$sSourceFile)) ;
-		}
-		$aCompiledFile = $this->sourceFileManager()->findCompiled($sSourceFile,$sNamespace) ;
 		
-		// 检查编译文件是否有效
-		if( !$aCompiledFile or !$this->sourceFileManager()->isCompiledValid($aSourceFile,$aCompiledFile) )
+		// 模板指纹
+		$sTemplateSignature = self::makeTemplateSignature($sSourceFile,$sNamespace) ;
+		
+		if( !defined($sTemplateSignature) )
 		{
-			if(!$aCompiledFile)
+			$aSourceFile = $aSrcMgr->find($sSourceFile,$sNamespace) ;
+			if(!$aSourceFile)
 			{
-				if( !$aCompiledFile = $this->sourceFileManager()->findCompiled($sSourceFile,$sNamespace,true) )
+				throw new Exception("无法找到指定的源文件：%s:%s",array($sNamespace,$sSourceFile)) ;
+			}
+			$aCompiledFile = $this->sourceFileManager()->findCompiled($sSourceFile,$sNamespace) ;
+			
+			// 检查编译文件是否有效
+			if( !$aCompiledFile or !$this->sourceFileManager()->isCompiledValid($aSourceFile,$aCompiledFile) )
+			{
+				if(!$aCompiledFile)
 				{
-					throw new Exception("UI引擎在编译模板文件时遇到了错误，无法创建编译文件：%s",$aSourceFile->path()) ;
+					if( !$aCompiledFile = $this->sourceFileManager()->findCompiled($sSourceFile,$sNamespace,true) )
+					{
+						throw new Exception("UI引擎在编译模板文件时遇到了错误，无法创建编译文件：%s",$aSourceFile->path()) ;
+					}
+				}
+				
+				$aObjectContainer = new ObjectContainer($sSourceFile,$sNamespace,$sTemplateSignature) ;
+				
+				try{
+					$this->compile($aSourceFile->openReader(),$aCompiledFile->openWriter(),$aObjectContainer) ;
+				}
+				catch (\Exception $e)
+				{
+					throw new Exception("UI引擎在编译模板文件时遇到了错误: %s",$aSourceFile->path(),$e) ;
 				}
 			}
 			
-			$aObjectContainer = new ObjectContainer($sSourceFile,$sNamespace) ;
-			
-			try{
-				$this->compile($aSourceFile->openReader(),$aCompiledFile->openWriter(),$aObjectContainer) ;
-			}
-			catch (\Exception $e)
-			{
-				throw new Exception("UI引擎在编译模板文件时遇到了错误: %s",$aSourceFile->path(),$e) ;
-			}
+			// 加载编译文件
+			require_once $aCompiledFile->path() ;
 		}
 		
-		return $aCompiledFile ;
+		return $sTemplateSignature ;
 	}
 	
 	public function compile(IInputStream $aSourceInput,IOutputStream $aCompiledOutput,ObjectContainer $aObjectContainer=null,$bIntact=true)
 	{
-		if(!$aObjectContainer)
+		/*if(!$aObjectContainer)
 		{
 			$aObjectContainer = new ObjectContainer() ;
-		}
+		}*/
 		
 		// 解析
 		$this->interpreters()->parse($aSourceInput,$aObjectContainer,$this) ;
 		
 		// 编译
-		$aTargetCodeStream = new TargetCodeOutputStream() ;
+		$aTargetCodeStream = new TargetCodeOutputStream($aObjectContainer->templateSignature()) ;
 		if($bIntact)
 		{
-			$aTargetCodeStream->start() ;
+			// $aTargetCodeStream->start() ;
 		}
 		
 		$this->compilers()->compile($aObjectContainer,$aTargetCodeStream) ;
 
 		if($bIntact)
 		{
-			$aTargetCodeStream->finish() ;
+			// $aTargetCodeStream->finish() ;
 		}
 		$aCompiledOutput->write($aTargetCodeStream->bufferBytes(true)) ;
 	}
 	
-	public function render(File $aCompiledFile,IHashTable $aVariables=null,IOutputStream $aDevice=null,$bPreProcess=true,$bRendering=true)
+	public function render($sTemplateSignature,IHashTable $aVariables=null,IOutputStream $aDevice=null,$sSubTemplate='render')
 	{
 		if(!$aVariables)
 		{
@@ -232,7 +244,11 @@ class UI extends JcObject
 		$aVariables->set('theDevice',$aDevice) ;
 		$aVariables->set('theUI',$this);
 		
-		include $aCompiledFile->path()  ;
+		$sFunc = '_'.$sTemplateSignature.'_'.$sSubTemplate ;
+		if( function_exists($sFunc) )
+		{
+			return $sFunc($this,$aVariables,$aDevice) ;
+		}
 	}
 	
 	public function display($sSourceFile,$aVariables=null,IOutputStream $aDevice=null)
@@ -245,10 +261,10 @@ class UI extends JcObject
 		}
 		
 		// compile
-		$aCompiledFile = $this->compileSourceFile($sSourceFile) ;
+		$sTemplateSignature = $this->loadCompiled($sSourceFile) ;
 		
 		// render
-		$this->render($aCompiledFile,$aVariables,$aDevice) ;
+		$this->render($sTemplateSignature,$aVariables,$aDevice) ;
 	}
 	
 	/**
@@ -258,6 +274,11 @@ class UI extends JcObject
 	{
 		return Locale::singleton() ;
 	}
+	
+	static public function makeTemplateSignature($sTemplate,$sNamespace=null)
+	{
+		return $sNamespace? md5($sNamespace.':'.$sTemplate): md5($sNamespace) ;
+	} 
 	
 	private $aSourceFileManager ;
 	

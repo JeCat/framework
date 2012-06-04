@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -24,6 +24,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*-- Project Introduce --*/
 namespace org\jecat\framework\ui\xhtml\compiler\node;
+
+use org\jecat\framework\ui\xhtml\Expression;
 
 use org\jecat\framework\lang\Exception;
 use org\jecat\framework\ui\TargetCodeOutputStream;
@@ -89,7 +91,7 @@ class SubTemplateCallCompiler extends NodeCompiler
 		
 		$sSubTemplateFuncName = '__subtemplate_' . $sSubTemplateName ;
 		
-		$aDev->write("\r\n// -- call subtemplate:{$sSubTemplateName} start---------------------") ;
+		$aDev->putCode("\r\n// -- call subtemplate:{$sSubTemplateName} start---------------------") ;
 		
 		// 是否继承父模板中的变量
 		$bExtendParentVars = $aAttributes->has("vars")? $aAttributes->bool('vars'): false ;
@@ -97,12 +99,12 @@ class SubTemplateCallCompiler extends NodeCompiler
 		// variables
 		if(!$bExtendParentVars)
 		{
-			$aDev->write("\$__subtemplate_aVariables = new \\org\\jecat\\framework\\util\\DataSrc() ;");
-			$aDev->write("\$__subtemplate_aVariables->addChild(\$aVariables) ;");
+			$aDev->putCode("\$__subtemplate_aVariables = new \\org\\jecat\\framework\\util\\DataSrc() ;");
+			$aDev->putCode("\$__subtemplate_aVariables->addChild(\$aVariables) ;");
 		}
 		else
 		{
-			$aDev->write("\$__subtemplate_aVariables = \$aVariables ;");
+			$aDev->putCode("\$__subtemplate_aVariables = \$aVariables ;");
 		}
 		
 		// other variables
@@ -110,21 +112,21 @@ class SubTemplateCallCompiler extends NodeCompiler
 		{
 			if( substr($sName,0,4)=='var.' and $sVarName=substr($sName,4) )
 			{
-				$sVarName = '"'. addslashes($sVarName) . '"' ;
-				$sValue = ExpressionCompiler::compileExpression($aValue->source(),$aObjectContainer->variableDeclares()) ;
-				$aDev->write("\$__subtemplate_aVariables->set({$sVarName},{$sValue}) ;");
+				$aDev->putCode('$__subtemplate_aVariables->set("'. addslashes($sVarName) . '",') ;
+				$aDev->putCode(new Expression($aValue->source()));
+				$aDev->putCode(') ;');
 			}
 		}
 		
 		
 		
-		$aDev->write("if( !function_exists('{$sSubTemplateFuncName}') ){") ;
-		$aDev->write("\t\$aDevice->write(\"正在调用无效的子模板：{$sSubTemplateName}\") ;") ;
-		$aDev->write("} else {") ;
-		$aDev->write("\tcall_user_func_array('{$sSubTemplateFuncName}',array(\$__subtemplate_aVariables,\$aDevice)) ;") ;
-		$aDev->write("}") ;
+		$aDev->putCode("if( !function_exists('{$sSubTemplateFuncName}') ){") ;
+		$aDev->putCode("\t\$aDevice->write(\"正在调用无效的子模板：{$sSubTemplateName}\") ;") ;
+		$aDev->putCode("} else {") ;
+		$aDev->putCode("\tcall_user_func_array('{$sSubTemplateFuncName}',array(\$__subtemplate_aVariables,\$aDevice)) ;") ;
+		$aDev->putCode("}") ;
 		
-		$aDev->write("// -- call subtemplate:{$sSubTemplateName} end ---------------------\r\n\r\n") ;
+		$aDev->putCode("// -- call subtemplate:{$sSubTemplateName} end ---------------------\r\n\r\n") ;
 	}
 
 }

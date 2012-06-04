@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -50,19 +50,19 @@ class CodeCompiler extends NodeCompiler
 			// 设置代码"上色器"
 			$sVarName = parent::assignVariableName() ;
 			
-			$aDev->write("\r\n") ;
-			$aDev->write("\${$sVarName} = new \\org\\jecat\\framework\\ui\\xhtml\\compiler\\node\\CodeColor() ;\r\n") ;
-			$aDev->write("\\org\\jecat\\framework\\io\\StdOutputFilterMgr::singleton()->add(array(\${$sVarName},'outputFilter')) ;\r\n") ;
-			$aDev->write("") ;
+			$aDev->putCode("\r\n") ;
+			$aDev->putCode("\${$sVarName} = new \\org\\jecat\\framework\\ui\\xhtml\\compiler\\node\\CodeColor() ;\r\n") ;
+			$aDev->putCode("\\org\\jecat\\framework\\io\\StdOutputFilterMgr::singleton()->add(array(\${$sVarName},'outputFilter')) ;\r\n") ;
+			$aDev->putCode("") ;
 			
 			// 编译 node body
 			$this->compileChildren($aObject, $aObjectContainer, $aDev, $aCompilerManager) ;
 			
 			// 输出代码
-			$aDev->write("\r\n") ;
-			$aDev->write("\\org\\jecat\\framework\\io\\StdOutputFilterMgr::singleton()->remove( array(\${$sVarName},'outputFilter') ) ;\r\n") ;
-			$aDev->write("\${$sVarName}->output(\$aDevice) ;") ;
-			$aDev->write("") ;
+			$aDev->putCode("\r\n") ;
+			$aDev->putCode("\\org\\jecat\\framework\\io\\StdOutputFilterMgr::singleton()->remove( array(\${$sVarName},'outputFilter') ) ;\r\n") ;
+			$aDev->putCode("\${$sVarName}->output(\$aDevice) ;") ;
+			$aDev->putCode("") ;
 			
 			// 编译尾标签
 			$this->compileTag($aTailTag, $aObjectContainer, $aDev, $aCompilerManager) ;

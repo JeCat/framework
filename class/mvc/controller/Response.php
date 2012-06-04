@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -167,7 +167,7 @@ class Response extends Object
 		case 'view.inframe' :
 			if( $aFrame = $aController->frame() )
 			{
-				$aMainView = $aFrame->mainView() ;
+				$aMainView = $aFrame->view() ;
 			}
 			// 没有 break ，进入下面的 case 
 		case 'noframe' :
@@ -175,28 +175,20 @@ class Response extends Object
 			
 			if(empty($aMainView))
 			{
-				$aMainView = $aController->mainView() ;
+				$aMainView = $aController->view() ;
 			}
 			
-			// 控制器没有有效视图
-			$nValidViews = 0 ;
-			foreach($aController->viewIterator() as $aView)
-			{
-				if($aView->isEnable())
-				{
-					$nValidViews ++ ;
-				}
-			}
-			if(!$nValidViews)
+			// 控制器的视图不可用
+			if(!$aController->view()->isEnable())
 			{
 				// 临时提供一个仅显示消息队列的视图
-				$aTmpView = new View('tmp_view_for_msgqueue') ;
+				/*$aTmpView = new View('tmp_view_for_msgqueue') ;
 				$aController->addView($aTmpView) ;
-				$aController->messageQueue()->display(null,$this->device()) ;
+				$aController->messageQueue()->display(null,$this->device()) ;*/
 			}
 			
 			// 装配视图
-			ViewAssembler::singleton()->assemble($aController) ;
+			// ViewAssembler::singleton()->assemble($aController) ;
 			
 			// 显示视图
 			$aOutput = new OutputStreamBuffer() ;

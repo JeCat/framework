@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -46,6 +46,8 @@ namespace org\jecat\framework\ui\xhtml\compiler\node ;
  *  [example php frameworktest template/test-template/node/IfCase.html 7 11]
  */
 
+use org\jecat\framework\ui\xhtml\Expression;
+
 use org\jecat\framework\ui\xhtml\compiler\ExpressionCompiler;
 use org\jecat\framework\lang\Type;
 use org\jecat\framework\ui\TargetCodeOutputStream;
@@ -61,14 +63,14 @@ class ElseCompiler extends NodeCompiler
 		Type::check("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject) ;
 		
 		if( $aObject->attributes ()->anonymous() ){
-			$aDev->write("
+			$aDev->putCode("
 					}elseif( ");
-			$aDev->write ( ExpressionCompiler::compileExpression ( $aObject->attributes()->anonymous()->source(), $aObjectContainer->variableDeclares() ) );
-			$aDev->write("){
+			$aDev->putCode ( new Expression( $aObject->attributes()->anonymous()->source() ) );
+			$aDev->putCode("){
 					");
 			
 		}else{
-			$aDev->write("
+			$aDev->putCode("
 					}else{
 					");
 		}

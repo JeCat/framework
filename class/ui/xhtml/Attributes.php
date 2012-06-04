@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -171,19 +171,17 @@ class Attributes extends HashTable
 		
 		return ($aText=parent::get($sName))?floatval($aText->source()):0 ;
 	}
+	/**
+	 * @return Expression
+	 */
 	public function expression($sName)
 	{
 		if( !$aText=parent::get($sName) )
 		{
 			return null ;
 		}
-		
-		if( !$aObContainer = $aText->objectContainer() )
-		{
-			throw new Exception('AttributeVar::objectContainer() 返回空') ;
-		}
-		
-		return ExpressionCompiler::compileExpression($aText->source(),$aObContainer->variableDeclares()) ;
+				
+		return new Expression($aText->source()) ;
 	}
 	public function object($sName)
 	{

@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -69,7 +69,7 @@ class CycleMacroCompiler extends MacroCompiler
 				$sObjName = '$' . substr($sSource, 1, $nEqual-1);
 				$arrStrings = $this->getElementsBySource(substr($sSource, $nEqual+1));
 				$sArrName = '$' . NodeCompiler::assignVariableName ( 'arrChangByLoopIndex' );
-				$aDev->write ( "{$sArrName} = " . var_export ( $arrStrings, true ) . ";
+				$aDev->putCode ( "{$sArrName} = " . var_export ( $arrStrings, true ) . ";
 								if(!isset({$sObjName}))
 								{
 									{$sObjName} = new org\\jecat\\framework\\ui\\xhtml\\compiler\\macro\\Cycle({$sArrName});
@@ -79,7 +79,7 @@ class CycleMacroCompiler extends MacroCompiler
 			}else{
 				//这是调用
 				$sObjName = '$' . substr($sSource, 1);
-				$aDev->write ( "
+				$aDev->putCode ( "
 								if(isset({$sObjName}))
 								{
 									{$sObjName}->printArr(\$aDevice);
@@ -94,7 +94,7 @@ class CycleMacroCompiler extends MacroCompiler
 			$sArrName = '$' . NodeCompiler::assignVariableName ( 'arrChangByLoopIndex' );
 			$sObjName = '$' . NodeCompiler::assignVariableName ( 'aStrChangByLoopIndex' );
 			
-			$aDev->write ( "{$sArrName} = " . var_export ( $this->getElementsBySource($sSource), true ) . ";
+			$aDev->putCode ( "{$sArrName} = " . var_export ( $this->getElementsBySource($sSource), true ) . ";
 				if(!isset({$sObjName}))
 				{
 					{$sObjName} = new org\\jecat\\framework\\ui\\xhtml\\compiler\\macro\\Cycle({$sArrName});

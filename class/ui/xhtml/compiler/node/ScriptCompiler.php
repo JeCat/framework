@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -24,6 +24,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*-- Project Introduce --*/
 namespace org\jecat\framework\ui\xhtml\compiler\node;
+
+use org\jecat\framework\ui\xhtml\Expression;
 
 use org\jecat\framework\ui\xhtml\AttributeValue;
 use org\jecat\framework\ui\TargetCodeOutputStream;
@@ -84,9 +86,7 @@ class ScriptCompiler extends NodeCompiler
 				{
 					continue ;
 				}
-				$aDev->write(
-					ExpressionCompiler::compileExpression($aChild->source(), $aObjectContainer->variableDeclares(),false,true)
-				) ;
+				$aDev->putCode ( new Expression( $aChild->source(), false, true ) );
 			}
 		}
 		
@@ -96,7 +96,7 @@ class ScriptCompiler extends NodeCompiler
 			if( $aAttrs->has('src') and !$aAttrs->bool('ignore') )
 			{
 				$sSrc = $aAttrs->get('src') ;
-				$aDev->preprocessStream()->write("\\org\\jecat\\framework\\resrc\\HtmlResourcePool::singleton()->addRequire({$sSrc},\\org\\jecat\\framework\\resrc\\HtmlResourcePool::RESRC_JS) ;") ;
+				$aDev->putCode("\\org\\jecat\\framework\\resrc\\HtmlResourcePool::singleton()->addRequire({$sSrc},\\org\\jecat\\framework\\resrc\\HtmlResourcePool::RESRC_JS) ;",'preprocess') ;
 			
 				// 清除后文中的空白字符
 				ClearCompiler::clearAfterWhitespace($aObject) ;
