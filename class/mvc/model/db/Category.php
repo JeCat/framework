@@ -452,6 +452,23 @@ class Category extends Object
 	}
 	
 	/**
+	 *
+	 * @param Model $aModel 子分类的model
+	 * @return ModelList 所有子分类的model,排序高级分类在前，子分类在后
+	 */
+	static public function getChildren(Model $aModel )
+	{
+		if(!$aModel){
+			return;
+		}
+		$aPrototype = clone $aModel->prototype();
+		$aPrototype->addOrderBy('lft');
+		$aParentsModelList = $aPrototype->createModel(true);
+		$aParentsModelList->loadSql("lft < @1 and rgt > @2" , $aModel->lft , $aModel->rgt);
+		return $aParentsModelList;
+	}
+	
+	/**
 	 * @return Model
 	 */
 	public function model()
