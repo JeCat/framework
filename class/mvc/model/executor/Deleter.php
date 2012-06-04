@@ -15,8 +15,9 @@ class Deleter extends Executor
 		$arrSqlStat['from'] = preg_replace("/AS .*/", "", $this->makeFromClause($arrPrototype));
 		
 		// 删除记录时，不对 belongsTo 自动关联操作
-		$this->joinTables($arrPrototype,$arrSqlStat,Prototype::hasOne, false) ;
+		//$this->joinTables($arrPrototype,$arrSqlStat,Prototype::hasOne, false) ;
         
+		/*
 		$joinTableNames = '';
 		if (!empty($arrPrototype['associations'])) {
 		    
@@ -34,10 +35,10 @@ class Deleter extends Executor
     			}
     		}
 		}
-		
+		*/
 		
 		$sSql = "DELETE " 
-		            . $joinTableNames
+		            //. $joinTableNames
 		            . $arrSqlStat['from'];
 			
 		if($sWhere)
