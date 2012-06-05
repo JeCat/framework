@@ -78,24 +78,20 @@ abstract class Executor extends Object
 	protected function makeWhereClause(array & $arrPrototype,$sTmpWhere=null)
 	{
 		$arrWhere = isset($arrPrototype['where'])? $arrPrototype['where']: array() ;
-		        
-        if (!is_array($arrWhere)) {
-            $arrWhereList = array($arrWhere) ;
-        }else{
-            $arrWhereList = $arrWhere ;
-        }
+		
 		if( $sTmpWhere )
 		{
-		    $arrWhereList[] = $sTmpWhere ;
+			$arrWhere[] = $sTmpWhere ;
 		}
-		switch( count($arrWhereList) )
+		
+		switch( count($arrWhere) )
 		{
 			case 0 :
 				return '' ;
 			case 1 :
-				return "\r\nWHERE\r\n\t" . implode(' AND ',$arrWhereList) ;
+				return "\r\nWHERE\r\n\t" . implode(' AND ',$arrWhere) ;
 			default :
-				return "\r\nWHERE\r\n\t(" . implode(') AND (',$arrWhereList) . ')' ;
+				return "\r\nWHERE\r\n\t(" . implode(') AND (',$arrWhere) . ')' ;
 		}
 	}
 	protected function makeOrderByClause(array & $arrPrototype)

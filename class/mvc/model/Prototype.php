@@ -502,6 +502,16 @@ class Prototype
 			) ;
 		}
 		
+		//强制改变where为数组
+		if (!empty($arrAssociation['where']) && is_string($arrAssociation['where'])){
+		    $arrAssociation['where'] = array($arrAssociation['where']);
+		}
+		
+		if (!empty($arrAssociation['order'])){
+		    
+		    $arrAssociation['orderBy'] = array($arrAssociation['where']);
+		}
+		
 		// 添加关联
 		$this->arrPrototypeShortcut[$sFromPrototype]['associations'][$arrAssociation['name']] =& $arrAssociation ;
 		$this->arrPrototypeShortcut[$arrAssociation['xpath']] =& $arrAssociation ;

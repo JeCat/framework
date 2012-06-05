@@ -10,6 +10,7 @@ class Selecter extends Executor
 {
 	public function execute(Model $aModel,array & $arrPrototype,array & $arrDataSheet,$sWhere=null,DB $aDB=null)
 	{
+	    
 	    //判断xpath是否需要加点。
 	    $sXpath = empty($arrPrototype['xpath'])?"":$arrPrototype['xpath'].".";
 	    

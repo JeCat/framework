@@ -203,6 +203,7 @@ class Model
 				$sTmpWhere = $this->makeSqlFind($values,$columns) ;
 			}
 		}
+		
 		Selecter::singleton()->execute( $this, $this->aPrototype->refRaw(), $this->arrData, $sTmpWhere, $this->db() ) ;
 
 		//echo "<pre>";print_r($this->arrData);echo "</pre>";
