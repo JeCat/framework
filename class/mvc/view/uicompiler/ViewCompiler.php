@@ -25,7 +25,7 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\view\uicompiler ;
 
-use org\jecat\framework\mvc\view\ViewAssembler;
+use org\jecat\framework\mvc\view\IAssemblable;
 use org\jecat\framework\lang\Assert;
 use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\CompilerManager;
@@ -88,6 +88,14 @@ use org\jecat\framework\ui\ObjectContainer;
 
 class ViewCompiler extends NodeCompiler
 {
+	static private $mapModeName = array(
+			'weak' => IAssemblable::weak ,
+			'soft' => IAssemblable::soft ,
+			'hard' => IAssemblable::hard ,
+			'xhard' => IAssemblable::xhard ,
+			'zhard' => IAssemblable::zhard ,
+	) ;
+	
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject,'aObject') ;
@@ -119,18 +127,20 @@ class ViewCompiler extends NodeCompiler
 			$bUseXpath = false ;
 		}
 		
-		$sLayout = $aAttrs->string('layout')?: ViewAssembler::layout_vertical ;
+		// $sLayout = $aAttrs->string('layout')?: ViewAssembler::layout_vertical ;
 				
-		// model
+		// mode
 		if($aAttrs->has('mode'))
 		{
-			$nMode = ViewAssembler::filterModeToPriority($aAttrs->string('mode')) ;
+			$sModel = $aAttrs->string('mode') ;
+			$nMode = isset(self::$mapModeName[$sModel])? self::$mapModeName[$sModel]: IAssemblable::hard ;
 		}
 		else
 		{
-			$nMode = $bUseXpath? ViewAssembler::hard: ViewAssembler::soft ;
+			$nMode = $bUseXpath? IAssemblable::xhard: IAssemblable::hard ;
 		}
 		
+		// frame view name
 		$nNodeViewId =& $aDev->properties(true)->getRef('node.view.id') ;
 		if( $nNodeViewId===null )
 		{
@@ -141,12 +151,16 @@ class ViewCompiler extends NodeCompiler
 			$nNodeViewId ++ ;
 		}
 		
+		// 创建 frame 视图
+		$aDev->putCode("\r\n// create frame view",'preprocess') ;
+		$aDev->putCode("\$aVariables->get('theView')->addView('frame-pos-{$nNodeViewId}',new jc\\mvc\\view\\View(),false) ;",'preprocess') ;
+		
 		$aDev->putCode("\r\n// display child views ") ;
 		$aDev->putCode("\$aView = \$aVariables->get('theView') ;") ;
-		$aDev->putCode("\$aFrame = new jc\\mvc\\view\\View() ;") ;
+		$aDev->putCode("\$aFrame = \$aView->viewByName('frame-pos-{$nNodeViewId}') ;") ;
 		$aDev->putCode("foreach( \$aView->assembledIterator() as \$aAssembledView )") ;
 		$aDev->putCode("{");
-		$aDev->putCode("	\$aFrame->assemble(\$aAssembledView) ;");
+		$aDev->putCode("	\$aFrame->assemble(\$aAssembledView,{$nMode}) ;");
 		$aDev->putCode("}");
 		$aDev->putCode("\$aFrame->show(\$aDevice) ;");
 		

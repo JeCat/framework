@@ -838,7 +838,7 @@ class View implements IView, IBean, IAssemblable
     /**
      * @return IView
      */
-    public function assemble(IView $aView)
+    public function assemble(IAssemblable $aView,$nLevel=IAssemblable::soft)
     {
     	if( $this->arrAssembleList and in_array($aView,$this->arrAssembleList) )
     	{
@@ -846,14 +846,26 @@ class View implements IView, IBean, IAssemblable
     	}
     	if( $aParent=$aView->assembledParent() )
     	{
-    		$aParent->unassemble($aView) ;
+    		if( $aView->assembledLevel()<$nLevel )
+    		{
+    			$aParent->unassemble($aView) ;
+    		}
+    		else
+    		{
+    			return ;
+    		}
     	}
+    	
+    	$aView->setAssembledParent($this) ;
+    	$aView->setAssembledLevel($nLevel) ;
+    	
     	$this->arrAssembleList[] = $aView ;
     	
     	return $this ;
     }
     /**
      * @return IView
+     * 
      */
     public function assembledParent()
     {
@@ -862,13 +874,35 @@ class View implements IView, IBean, IAssemblable
     /**
      * @return IView
      */
-    public function unassemble(IView $aView)
+    public function setAssembledParent(IAssemblable $aView=null)
     {
-    	$pos = array_search($aView,$this->aAssembledParent) ;
+    	$this->aAssembledParent = $aView ;
+    	return $this ;
+    }
+    public function assembledLevel()
+    {
+    	return $this->nAssembledLevel ;
+    }
+    /**
+     * @return IView
+     */
+    public function setAssembledLevel($nLevel)
+    {
+    	$this->nAssembledLevel = $nLevel ;
+    	return $this ;
+    }
+    /**
+     * @return IView
+     */
+    public function unassemble(IAssemblable $aView)
+    {
+    	$pos = array_search($aView,$this->arrAssembleList) ;
     	if( $pos!==false )
     	{
-    		unset($this->aAssembledParent[$pos]) ;
+    		unset($this->arrAssembleList[$pos]) ;
     	}
+    	$aView->setAssembledParent(null) ;
+    	$aView->setAssembledLevel(IAssemblable::free) ;
     	return $this ;
     }
     /**
@@ -887,6 +921,7 @@ class View implements IView, IBean, IAssemblable
 	private $arrAssembleList ;
 	private $aParent ;
 	private $aAssembledParent ;
+	private $nAssembledLevel = 0 ;
 	private $aUI ;
 	private $aOutputStream ;
 	private $aVariables ;
