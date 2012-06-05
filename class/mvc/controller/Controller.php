@@ -333,8 +333,13 @@ class Controller extends NamableComposite implements IBean
     		foreach($arrConfig['controllers'] as $key=>&$arrBeanConf)
     		{
     			// 自动配置缺少的 class, name 属性
+<<<<<<< HEAD
     			$aBeanFactory->_typeProperties( $arrBeanConf, 'controller', is_int($key)?null:$key, 'name' ) ;
     			$this->add( $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ) ;
+=======
+    			$aBeanFactory->_typeProperties( $arrBeanConf, 'controller', is_int($key)?null:$key, 'name' ) ;
+    			$this->add( $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ) ;
+>>>>>>> 0.7
     		}
     	}
     	
