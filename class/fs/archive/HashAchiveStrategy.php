@@ -44,10 +44,10 @@ class HashAchiveStrategy extends IAchiveStrategy
 	/**
 	 * @return org\jecat\framework\fs\IFile
 	 */
-	public function makeFilePath(array $arrUploadedFile,IFolder $aToDir) 
+	public function makeFilePath(array $arrUploadedFile) 
 	{
 		$sFileHash = md5($arrUploadedFile['tmp_name']) ;
-		$sToPath = $aToDir->path() ;
+		$sToPath = '';
 		
 		for($i=0;$i<$this->nDepth;$i++)
 		{

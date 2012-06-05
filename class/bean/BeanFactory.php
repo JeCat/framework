@@ -98,7 +98,7 @@ class BeanFactory extends Object implements \Serializable
 	 * @return org\jecat\framework\bean\IBean
 	 */
 	public function createBean(array &$arrConfig,$sNamespace='*',$bAutoBuild=true) 
-	{
+	{	
 		if( $sNamespace=='*' and !empty($arrConfig['namespace']) )
 		{
 			$sNamespace = $arrConfig['namespace'] ;
