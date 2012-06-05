@@ -479,6 +479,8 @@ class Model
 			$arrSheet[] = array() ;
 			end($arrSheet) ;
 		}
+		
+		return $this;
 	}
 	public function rowNum($sChildName=null)
 	{
