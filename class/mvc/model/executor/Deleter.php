@@ -54,7 +54,7 @@ class Deleter extends Executor
 		    $sSql .= ' LIMIT '.$sLimit;
 		}
 		
-		echo $sSql;
+		//echo $sSql;
 		$aDB->execute($sSql) ;
 		
 		// 删除下级多属关联

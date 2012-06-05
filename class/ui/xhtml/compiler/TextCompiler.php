@@ -25,6 +25,10 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\ui\xhtml\compiler ;
 
+use org\jecat\framework\ui\xhtml\Node;
+
+use org\jecat\framework\ui\xhtml\AttributeValue;
+
 use org\jecat\framework\locale\Locale;
 use org\jecat\framework\lang\Assert;
 use org\jecat\framework\ui\TargetCodeOutputStream;
@@ -43,11 +47,30 @@ class TextCompiler extends BaseCompiler
 			$sText = $aObject->source() ;
 			
 			// locale translate
-			if( trim($sText) )
-			{
+			do{
+				if( !trim($sText) )
+				{
+					break ;
+				}
+				// 排除 script/style 等标签中的内容
+				if( $aParent=$aObject->parent() and ($aParent instanceof Node) and in_array(strtolower($aParent->tagName()),array('script','style')) )
+				{
+					break ;
+				}
+				// 仅 title alt 等属性
+				if( $aObject instanceof AttributeValue and !in_array(strtolower($aObject->name()),array('title','alt')) )
+				{
+					break ;	
+				}
+				// 过滤 注释 和 doctype 声明
+				if( preg_match('/^\\s*<\\!.*>\\s*$/',$sText) )
+				{
+					break ;
+				}
+				
 				$sText = Locale::singleton()->trans($sText,null,'ui') ;
-			}
 			
+			} while(0) ;
 			$aDev->output($sText) ;
 		}
 		

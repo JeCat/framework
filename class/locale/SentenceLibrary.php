@@ -110,8 +110,10 @@ class SentenceLibrary
 		{
 			throw new Exception("语言包文件内容无效：%s", $sPath) ;
 		}*/
-		
-		$this->arrSentences = array_merge($this->arrSentences,include $sPath) ;
+		if( $arrSentences = (include $sPath) and is_array($arrSentences) )
+		{
+			$this->arrSentences = array_merge($this->arrSentences,$arrSentences) ;
+		}
 	}
 
 	public function trans($sOriWords,$argvs=null)
