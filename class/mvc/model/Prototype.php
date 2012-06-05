@@ -464,6 +464,7 @@ class Prototype
 				throw new Exception("Model关联缺少 type 属性：%s",var_export($arrAssociation,true)) ;
 			}
 		}
+		
 		if( !in_array($arrAssociation['assoc'],self::$arrAssociations) )
 		{
 			throw new Exception("Model关联无效：%s",@$arrAssociation['assoc']) ;
@@ -582,7 +583,6 @@ class Prototype
 				$arrAssociation['fromBridgeKeys'] = (array) $arrAssociation['fromBridgeKeys'] ;
 			}
 		}
-				
 		return $this ;
 	}
 	

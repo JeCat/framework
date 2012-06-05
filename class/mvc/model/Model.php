@@ -203,7 +203,6 @@ class Model
 				$sTmpWhere = $this->makeSqlFind($values,$columns) ;
 			}
 		}
-		
 		Selecter::singleton()->execute( $this, $this->aPrototype->refRaw(), $this->arrData, $sTmpWhere, $this->db() ) ;
 
 		//echo "<pre>";print_r($this->arrData);echo "</pre>";
@@ -514,6 +513,7 @@ class Model
 			$arrPrototype =& $this->aPrototype->refRaw($sXPath) ;
 		
 			// 多属关联，建立并切换到下级表
+			if(empty($arrPrototype['type'])) $arrPrototype['type'] = "";
 			if( !($arrPrototype['type']&Prototype::oneToOne) )
 			{
 				$arrSheet =& $this->makeSheet(
