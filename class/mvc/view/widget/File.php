@@ -150,18 +150,19 @@ class File extends FormWidget
 		return $this->bFullPath;
 	}
 	
-	public function setFullPath($bFullPath){
+	public function setFullPath($bFullPath)
+	{
 		$this->bFullPath = (bool)$bFullPath;
 	}
 	
 	public function getFileUrl()
 	{
-		if ($this->value () instanceof File)
-		{
+		if ($this->value () instanceof \org\jecat\framework\fs\File)
+		{	
 			return $this->value ()->httpURL ();
 		}
 		else
-		{
+		{	
 			return '#';
 		}
 	}
@@ -243,10 +244,12 @@ class File extends FormWidget
 		}
 		
 		// 保存文件
-		$sSavedFile = $this->aAchiveStrategy->makeFilePath ( $this->arrUploadedFile, $this->aStoreFolder );
+		$sSavedFile = $this->aAchiveStrategy->makeFilePath ( $this->arrUploadedFile );
+		
+		$sSavedFolderPath = $this->aStoreFolder->path().$sSavedFile;
 		
 		// 创建保存目录
-		$aFolderOfSavedFile = new Folder( $sSavedFile ) ;
+		$aFolderOfSavedFile = new Folder( $sSavedFolderPath ) ;
 		if( ! $aFolderOfSavedFile->exists() ){
 			if (! $aFolderOfSavedFile->create() )
 			{
@@ -254,11 +257,14 @@ class File extends FormWidget
 			}
 		}
 		
-		$sSavedFile = $sSavedFile . $this->aAchiveStrategy->makeFilename ( $this->arrUploadedFile ) ;
+		$sFileName = $this->aAchiveStrategy->makeFilename ( $this->arrUploadedFile ) ;
 		
-		move_uploaded_file($this->arrUploadedFile['tmp_name'],$sSavedFile);
+		$sSavedFullPath = $this->aStoreFolder->path().$sSavedFile . $sFileName ;
 		
-		$aSavedFile = new FsFile($sSavedFile) ;
+		move_uploaded_file($this->arrUploadedFile['tmp_name'],$sSavedFullPath);
+		
+		$aSavedFile = new FsFile($sSavedFullPath) ;
+		$aSavedFile->setHttpUrl( $this->aStoreFolder->httpUrl().$sSavedFile.$sFileName);
 		
 		$this->setValue ( $aSavedFile );
 		
