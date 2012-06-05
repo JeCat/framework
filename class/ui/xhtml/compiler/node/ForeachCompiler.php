@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -94,9 +94,9 @@ use org\jecat\framework\ui\ObjectContainer;
 class ForeachCompiler extends NodeCompiler {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager) {
 		
-		if( !$aObjectContainer->variableDeclares()->hasDeclared('aStackForLoopIsEnableToRun') )
+		if( !$aDev->hasDeclared('aStackForLoopIsEnableToRun') )
 		{
-			$aObjectContainer->variableDeclares()->declareVarible('aStackForLoopIsEnableToRun','new \\org\\jecat\\framework\\util\\Stack()') ;
+			$aDev->declareVarible('aStackForLoopIsEnableToRun','new \\org\\jecat\\framework\\util\\Stack()') ;
 		}
 		
 		Type::check("org\\jecat\\framework\\ui\\xhtml\\Node", $aObject );
@@ -104,7 +104,7 @@ class ForeachCompiler extends NodeCompiler {
 		$aAttrs = $aObject->attributes();
 		
 		if( $aAttrs->has ( 'for' ) ){
-			$sForUserExp = $aAttrs->expression ( 'for' );
+			$aForUserExp = $aAttrs->expression ( 'for' );
 		}else{
 			throw new Exception("foreach tag can not run without 'for' attribute");
 		}
@@ -121,34 +121,35 @@ class ForeachCompiler extends NodeCompiler {
 		$sItemRef = $bItemRef? '&': '' ;
 		
 		
-		$aDev->write ( "\r\n// foreach start ") ;
-		$aDev->write ( "{$sForAutoName} = {$sForUserExp};
-\$aStackForLoopIsEnableToRun->put(false);
+		$aDev->putCode ( "\r\n// foreach start ") ;
+		$aDev->putCode ( "{$sForAutoName} = " ) ;
+		$aDev->putCode ( $aForUserExp ) ;
+		$aDev->putCode ( ";\r\n\$aStackForLoopIsEnableToRun->put(false);
 {$sIdxAutoName} = -1;
 foreach({$sForAutoName} as {$sKeyAutoName}=>{$sItemRef}{$sItemAutoName}){");
 
-	$aDev->write ( "\$bLoopIsEnableToRun = & \$aStackForLoopIsEnableToRun->getRef();
+	$aDev->putCode ( "\$bLoopIsEnableToRun = & \$aStackForLoopIsEnableToRun->getRef();
 	\$bLoopIsEnableToRun = true;
 	{$sIdxAutoName}++;" );
 		
 		if( !empty($sKeyUserName) )
 		{
-			$aDev->write ( "		\$aVariables[{$sKeyUserName}]={$sKeyAutoName}; ");
+			$aDev->putCode ( "		\$aVariables[{$sKeyUserName}]={$sKeyAutoName}; ");
 		}
 		if( !empty($sItemUserName) )
 		{
-			$aDev->write ( "		\$aVariables[{$sItemUserName}]={$sItemAutoName}; ");
+			$aDev->putCode ( "		\$aVariables[{$sItemUserName}]={$sItemAutoName}; ");
 		}
 		if( !empty($sIdxUserName) )
 		{
-			$aDev->write ( "		\$aVariables[{$sIdxUserName}]={$sIdxAutoName}; ");
+			$aDev->putCode ( "		\$aVariables[{$sIdxUserName}]={$sIdxAutoName}; ");
 		}
 		
 		//是否是单行标签?
 		if(!$aObject->headTag()->isSingle()){
 			//循环体，可能会包含foreach:else标签
 			$this->compileChildren($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
-			$aDev->write("}\r\n") ; // end if   (如果foreach的内容包含foreach:else标签,则此处为foreach:else的end)
+			$aDev->putCode("}\r\n") ; // end if   (如果foreach的内容包含foreach:else标签,则此处为foreach:else的end)
 		}
 	}
 }

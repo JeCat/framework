@@ -6,19 +6,19 @@ use org\jecat\framework\lang\Object;
 
 abstract class Executor extends Object
 {
-	protected function joinTables(array & $arrPrototype,array & $arrSqlStat)
+	protected function joinTables(array & $arrPrototype,array & $arrSqlStat,$nAssocType=Prototype::total , $isAshes = true)
 	{
 		// *被*多对多关联 的桥接表
 		if( !empty($arrPrototype['assoc']) and $arrPrototype['assoc']==Prototype::hasAndBelongsToMany )
 		{
-			$sSqlClauseFrom.= " LEFT JOIN (`{$arrPrototype['bridge']}` AS `{$arrPrototype['bridgeTableAlias']}`" ;
+			$arrSqlStat['from'].= " LEFT JOIN (`{$arrPrototype['bridge']}` AS `{$arrPrototype['bridgeTableAlias']}`" ;
 
 			$arrClauseOn ;
-			foreach($arrAssoc['fromBridgeKeys'] as $nIdx=>$sFromBridgeKey)
+			foreach($arrPrototype['fromBridgeKeys'] as $nIdx=>$sFromBridgeKey)
 			{
-				$arrClauseOn[] = "`{$arrPrototype['bridgeTableAlias']}`.`{$sFromBridgeKey}` = `{$arrAssoc['tableAlias']}`.`{$arrAssoc['toKeys'][$nIdx]}`" ;
+				$arrClauseOn[] = "`{$arrPrototype['bridgeTableAlias']}`.`{$sFromBridgeKey}` = `{$arrPrototype['tableAlias']}`.`{$arrPrototype['toKeys'][$nIdx]}`" ;
 			}
-			$sSqlClauseFrom.= ") ON (".implode(' AND ',$arrClauseOn).")" ;
+			$arrSqlStat['from'].= ") ON (".implode(' AND ',$arrClauseOn).")" ;
 		}
 		
 		if(empty($arrPrototype['associations']))
@@ -28,21 +28,41 @@ abstract class Executor extends Object
 		
 		foreach($arrPrototype['associations'] as $arrAssoc)
 		{
+			if( !($arrAssoc['assoc']&$nAssocType) )
+			{
+				continue ;
+			}
+			
 			if( $arrAssoc['assoc']&Prototype::oneToOne )
 			{
-				
-				// join table
-				$arrSqlStat['from'].= " LEFT JOIN (`{$arrAssoc['table']}` AS `".addslashes($arrAssoc['tableAlias'])."`" ;
-				
-				$this->joinTables($arrAssoc,$arrSqlStat) ;
-				
-				// join table on
-				$arrClauseOn ;
-				foreach($arrAssoc['fromKeys'] as $nIdx=>$sFromKey)
-				{
-					$arrClauseOn[] = "`{$arrPrototype['tableAlias']}`.`{$sFromKey}` = `{$arrAssoc['tableAlias']}`.`{$arrAssoc['toKeys'][$nIdx]}`" ;
-				}
-				$arrSqlStat['from'].= ") ON (".implode(' AND ',$arrClauseOn).")" ;
+			    if($isAshes)
+			    {
+			        // join table
+			        $arrSqlStat['from'].= " LEFT JOIN (`{$arrAssoc['table']}` AS `".addslashes($arrAssoc['tableAlias'])."`" ;
+			        
+			        $this->joinTables($arrAssoc,$arrSqlStat,$nAssocType) ;
+			        
+			        // join table on
+			        $arrClauseOn ;
+			        foreach($arrAssoc['fromKeys'] as $nIdx=>$sFromKey)
+			        {
+			            $arrClauseOn[] = "`{$arrPrototype['tableAlias']}`.`{$sFromKey}` = `{$arrAssoc['tableAlias']}`.`{$arrAssoc['toKeys'][$nIdx]}`" ;
+			        }
+			        $arrSqlStat['from'].= ") ON (".implode(' AND ',$arrClauseOn).")" ;
+			    }else{
+			        // join table
+			        $arrSqlStat['from'].= " LEFT JOIN `{$arrAssoc['table']}` " ;
+			        
+			        $this->joinTables($arrAssoc,$arrSqlStat,$nAssocType) ;
+			        
+			        // join table on
+			        $arrClauseOn ;
+			        foreach($arrAssoc['fromKeys'] as $nIdx=>$sFromKey)
+			        {
+			            $arrClauseOn[] = "`{$arrPrototype['table']}`.`{$sFromKey}` = `{$arrAssoc['table']}`.`{$arrAssoc['toKeys'][$nIdx]}`" ;
+			        }
+			        $arrSqlStat['from'].= " ON ".implode(' AND ',$arrClauseOn)."" ;
+			    }
 			}
 			else
 			{
@@ -122,6 +142,21 @@ abstract class Executor extends Object
 			{
 				return "\r\nLIMIT\r\n\t" . $arrPrototype['limitFrom'] . ', ' . $arrPrototype['limitLen'] ;
 			}
+		}
+	}
+	static function escValue(& $value)
+	{
+		if( is_int($value) or is_float($value) or is_double($value) or is_bool($value) )
+		{
+			return $value ;
+		}
+		else if( is_string($value) )
+		{
+			return "'".addslashes($value)."'" ;
+		}
+		else if($value===null)
+		{
+			return 'NULL' ;
 		}
 	}
 }

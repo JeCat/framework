@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -47,22 +47,10 @@ use org\jecat\framework\io\OutputStreamBuffer;
 use org\jecat\framework\pattern\composite\NamableComposite;
 use org\jecat\framework\ui\UI;
 
-class View extends NamableComposite implements IView, IBean
+class View implements IView, IBean, IAssemblable
 {
-	public function __construct($sName=null,$sTemplate=null,$bVagrantContainer=true,UI $aUI=null)
-	{		
-		parent::__construct("org\\jecat\\framework\\mvc\\view\\IView") ;
-		
-		if(!$sName)
-		{
-			if(!$sTemplate)
-			{
-				throw new Exception("创建视图时必须提供 \$sName 或 \$sTemplate") ;
-			}
-			$sName = $sTemplate ;
-		}
-		$this->setName($sName) ;
-		
+	public function __construct($sTemplate=null,$bVagrantContainer=true,UI $aUI=null)
+	{
 		// 用于收容”流浪“视图的装配单
 		if( $bVagrantContainer )
 		{
@@ -105,12 +93,7 @@ class View extends NamableComposite implements IView, IBean
 	}
 	
 	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
-	{
-    	if( empty($arrConfig['name']) )
-    	{
-    		throw new BeanConfException("View bean对象的配置数组缺少必要的属性 name") ;
-    	}
-    	
+	{    	
     	if( !empty($arrConfig['template']) )
     	{
     		// 在文件名前 加上命名空间
@@ -120,13 +103,8 @@ class View extends NamableComposite implements IView, IBean
     		}
     	}
     	
-    	if(!isset($arrConfig['vagrantContainer']))
-    	{
-    		$arrConfig['vagrantContainer'] = true ;
-    	}
-    	
 		$sClass = get_called_class() ;
-		$aBean = new $sClass( $arrConfig['name'], $arrConfig['template'], $arrConfig['vagrantContainer'] ) ;
+		$aBean = new $sClass( $arrConfig['template'] ) ;
 		if($bBuildAtOnce)
 		{
 			$aBean->buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
@@ -250,45 +228,6 @@ class View extends NamableComposite implements IView, IBean
 	}
 	
 	/**
-	 *
-	 * @param unknown_type $sTemplate
-	 * @wiki /MVC模式/视图/视图的组合模式
-	 * 
-	 * view可以是一个，也可以是多个，也就是说view可以是一个容易，是多个view的集合，通过<views/>标签，可以将view遍历显示出来.
-	 *
-	 */
-	
- 	public function add($object,$sName=null,$bTakeover=true)
-	{
-		if( !($object instanceof IView) )
-		{
-			throw new Exception("参数 \$object 必须为 IView 对像，传入的类型为:%s",Type::reflectType($object)) ;
-		}
-		
-		if(!$sName)
-		{
-			$sName = $object->name() ;
-		}
-		
-		if( $this->hasName($sName) )
-		{
-			throw new Exception("名称为：%s 的子视图在视图 %s 中已经存在，无法添加同名的子视图",array($sName,$this->name())) ;
-		}
-		
-		if($bTakeover)
-		{
-			$this->messageQueue()->addChildHolder($object) ;
-		}
-		
-		parent::add($object,$sName,$bTakeover) ;
-	}
-	public function remove($object)
-	{
-		$this->messageQueue()->removeChildHolder($object) ;
-		
-		parent::add($object) ;
-	}
-	/**
 	 * @return IModel
 	 */
 	public function model()
@@ -311,9 +250,24 @@ class View extends NamableComposite implements IView, IBean
 	/**
 	 * @return org\jecat\framework\mvc\controller\IContainer
 	 */
-	public function controller()
+	public function controller($bTrace=false)
 	{
-		return $this->aController ;
+		if($bTrace)
+		{
+			$aView = $this ;
+			
+			do{
+				if($aController=$aView->controller(false))
+				{
+					return $aController ;
+				}
+			} while($aView=$aView->parent()) ;
+			return null ;
+		}
+		else
+		{
+			return $this->aController ;
+		}
 	}
 	
 	public function setController(Controller $aController=null)
@@ -354,12 +308,10 @@ class View extends NamableComposite implements IView, IBean
 			}
 		
 			// compile
-			$this->aTemplateCompiledFile = $this->ui()->compileSourceFile($sTemplate) ;
+			$this->sTemplateSingature = $this->ui()->loadCompiled($sTemplate) ;
 			
 			// 预处理
-			$bPreProcess = true ;
-			$bRendering = false ;
-			include $this->aTemplateCompiledFile->path()  ;
+			$this->ui()->render($this->sTemplateSingature,$this->variables(),null,'preprocess') ;
 		}
 
 		$this->sSourceFile = $sTemplate ;
@@ -375,6 +327,7 @@ class View extends NamableComposite implements IView, IBean
 		if(!$this->aVariables)
 		{
 			$this->aVariables = new HashTable() ;
+			$this->aVariables->set('theView',$this) ;
 		}
 		return $this->aVariables ;
 	}
@@ -410,11 +363,10 @@ class View extends NamableComposite implements IView, IBean
 			return ;
 		}
 		
-		if( $this->aTemplateCompiledFile )
+		if( $this->sTemplateSingature )
 		{
 			// render myself
 			$aVars = $this->variables() ;
-			$aVars->set('theView',$this) ;
 			$aVars->set('theModel',$this->model()) ;
 			$aVars->set('theController',$this->aController) ;
 			if( $this->aController )
@@ -444,13 +396,16 @@ class View extends NamableComposite implements IView, IBean
 			}
 		
 			// render
-			$this->ui()->render($this->aTemplateCompiledFile,$aVars,$aDevice,false,true) ;
+			$this->ui()->render($this->sTemplateSingature,$aVars,$aDevice) ;
 		}
 		
-		// 显示流浪视图
-		if( $this->sVagrantViewsAssemlyListId )
+		// 显示装配视图
+		if($this->arrAssembleList)
 		{
-			ViewAssembler::singleton()->displayAssemblyList( $this->sVagrantViewsAssemlyListId, $aDevice ) ;
+			foreach( $this->arrAssembleList as $aView )
+			{
+				$aView->render($aDevice) ;
+			}
 		}
 		
 		$this->bRendered = true ;
@@ -666,23 +621,27 @@ class View extends NamableComposite implements IView, IBean
      */
     public function xpath($bAbsolute=true)
     {
-    	$sXPath = '' ;
+    	$arrXPath = array() ;
     	$aView = $this ;
-    	do {
-    		if($sXPath)
-    		{
-    			$sXPath = '/' . $sXPath ;
-    		}
-    		$sXPath = $aView->name() . $sXPath ;
-    		
+    	
+    	while($aParent=$aView->parent())
+    	{
     		if( $bAbsolute and $aView->controller() )
     		{
     			break ;
     		}
+
+    		$arrXPath[] = $aParent->viewName($aView) ;
     		
-    	}while( $aView = $aView->parent() ) ;
+    		$aView = $aParent ;
+    	} ;
     	
-    	return $sXPath ;
+    	if( $aController=$aView->controller() )
+    	{
+    		$arrXPath[] = $aController->name() ;
+    	}
+    	
+    	return implode('/',$arrXPath) ;
     }
     
     /**
@@ -761,7 +720,7 @@ class View extends NamableComposite implements IView, IBean
     
     static public function registerView(IView $aView)
     {
-    	$sName = $aView->name() ;
+    	$sName = $aView->template() ;
     	
     	if( !isset(self::$arrAssignedId[$sName]) )
     	{
@@ -785,10 +744,149 @@ class View extends NamableComposite implements IView, IBean
     	return isset(self::$arrRegisteredViews[$sId])? self::$arrRegisteredViews[$sId]: null ; 
     }
     
+
+
+    /**
+     * @return IVew
+     */
+    public function parent()
+    {
+    	return $this->aParent ;
+    }
+    /**
+     * @return IVew
+     */
+    public function setParent(IView $aIView=null)
+    {
+    	$this->aParent = $aIView ;
+    	return $this ;
+    }
+
+    /**
+     * @return IVew
+     */
+    public function addView($sName,IView $aView,$bAssemble=true)
+    {
+    	if($aOriParent=$aView->parent())
+    	{
+    		$aOriParent->removeView($aView) ;
+    	}
+    	$this->removeView($aView) ;
+    	
+    	$this->arrChildren[$sName] = $aView ;
+    	$aView->setParent($this) ;
+    	
+    	if($bAssemble)
+    	{
+    		$this->assemble($aView) ;
+    	}
+    	
+    	return $this ;
+    }
+    /**
+     * @return IVew
+     */
+    public function viewByName($sName)
+    {
+    	return isset($this->arrChildren[$sName])? $this->arrChildren[$sName]: null ; 
+    }
+    /**
+     * @return string
+     */
+    public function viewName($aView)
+    {
+    	return ($name=array_search($aView,$this->arrChildren,true))===false? null: $name ;
+    }
+    /**
+     * @return IVew
+     */
+    public function removeView(View $aView)
+    {
+    	if($this->arrChildren)
+    	{
+	    	$pos = array_search($aView,$this->arrChildren,true) ;
+	    	if( $pos!==false )
+	    	{
+	    		unset($this->arrChildren[$pos]) ;
+	    	}
+    	}
+    	return $this ;
+    }
+    /**
+     * @return IVew
+     */
+    public function clearViews()
+    {
+    	$this->arrChildren = array() ;
+    	return $this ;
+    }
+    /**
+     * @return array
+     */
+    public function viewNames()
+    {
+    	return $this->arrChildren? array_keys($this->arrChildren): null ;
+    }
+    /**
+     * @return IIterator
+     */
+    public function viewIterator()
+    {
+    	return $this->aAssembledParent? new \ArrayIterator($this->arrChildren): new \EmptyIterator() ;	
+    }
+
+    /**
+     * @return IView
+     */
+    public function assemble(IView $aView)
+    {
+    	if( $this->arrAssembleList and in_array($aView,$this->arrAssembleList) )
+    	{
+    		return ;
+    	}
+    	if( $aParent=$aView->assembledParent() )
+    	{
+    		$aParent->unassemble($aView) ;
+    	}
+    	$this->arrAssembleList[] = $aView ;
+    	
+    	return $this ;
+    }
+    /**
+     * @return IView
+     */
+    public function assembledParent()
+    {
+    	return $this->aAssembledParent ;
+    }
+    /**
+     * @return IView
+     */
+    public function unassemble(IView $aView)
+    {
+    	$pos = array_search($aView,$this->aAssembledParent) ;
+    	if( $pos!==false )
+    	{
+    		unset($this->aAssembledParent[$pos]) ;
+    	}
+    	return $this ;
+    }
+    /**
+     * @return IIterator
+     */
+    public function assembledIterator()
+    {
+    	return $this->arrAssembleList? new \ArrayIterator($this->arrAssembleList): new \EmptyIterator() ;	
+    }
+    
 	private $aModel ;
 	private $aWidgets ;
 	private $sSourceFile ;
-	private $aTemplateCompiledFile ;
+	private $sTemplateSingature ;
+	private $arrChildren ;
+	private $arrAssembleList ;
+	private $aParent ;
+	private $aAssembledParent ;
 	private $aUI ;
 	private $aOutputStream ;
 	private $aVariables ;

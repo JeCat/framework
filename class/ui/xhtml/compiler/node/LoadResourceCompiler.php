@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -57,7 +57,7 @@ class LoadResourceCompiler extends NodeCompiler
 {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		$aDev->write("\$aDevice->write(\\org\\jecat\\framework\\resrc\\HtmlResourcePool::singleton()) ;\r\n") ;
+		$aDev->putCode("\$aDevice->write(\\org\\jecat\\framework\\resrc\\HtmlResourcePool::singleton()) ;\r\n") ;
 	}
 }
 

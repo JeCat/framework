@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -86,6 +86,7 @@ class Controller extends NamableComposite implements IBean
 {
 	const beforeBuildBean = 'beforeBuildBean' ;
 	const afterMainRun = 'afterMainRun' ;
+	const defaultViewTemplate = 'defaultViewTemplate' ;
 	
     function __construct ($params=null,$sName=null,$bBuildAtonce=true)
     {
@@ -96,10 +97,10 @@ class Controller extends NamableComposite implements IBean
 		$this->buildParams($params) ;
 		
 		// auto build bean config
-    	if( $bBuildAtonce and $arrConfig = $this->createBeanConfig() )
-    	{
-    		$this->buildBean($arrConfig) ;
-    	}
+		if( $bBuildAtonce and property_exists($this, 'arrConfig') )
+		{
+			$this->buildBean($this->arrConfig) ;
+		}
     	
 		$this->init() ;
     }
@@ -275,7 +276,6 @@ class Controller extends NamableComposite implements IBean
     	// 将 model:xxxx 转换成 models[] 结构
     	$aBeanFactory->_typeKeyStruct($arrConfig,array(
     				//'model:'=>'models' ,
-    				'view:'=>'views' ,
     				'controller:'=>'controllers' ,
     	)) ;
     	
@@ -284,10 +284,6 @@ class Controller extends NamableComposite implements IBean
     	{
     		$arrConfig['models']['model'] =& $arrConfig['model'] ;
     	}*/
-    	if( array_key_exists('view',$arrConfig) and is_array($arrConfig['view']) )
-    	{
-    		$arrConfig['views']['view'] =& $arrConfig['view'] ;
-    	}
     	
     	// models --------------------
     	/*$aModelContainer = $this->modelContainer() ;
@@ -304,30 +300,33 @@ class Controller extends NamableComposite implements IBean
     	}*/
     	
     	// views --------------------
-    	if( !empty($arrConfig['views']) )
+    	if( !empty($arrConfig['view']) )
     	{
-    		foreach($arrConfig['views'] as $key=>&$arrBeanConf)
+    		if( is_string($arrConfig['view']) )
     		{
-    			// 自动配置缺少的 class, name 属性
-    			$aBeanFactory->_typeProperties( $arrBeanConf, 'view', is_int($key)?null:$key, 'name' ) ;
-    			
-    			// 创建对象
-				$aBean = $aBeanFactory->createBean($arrBeanConf,$sNamespace,false) ;
-				$aBean->setName($arrBeanConf['name']) ;
-				
-				$this->addView( $aBean ) ;
-				
-				$aBean->buildBean($arrBeanConf,$sNamespace) ;
-				
-				/*if(!empty($arrBeanConf['model']))
-				{
-					if( !$aModel=$aModelContainer->getByName($arrBeanConf['model']) )
-		    		{
-		    			throw new BeanConfException("视图(%s)的Bean配置属性 model 无效，没有指定的模型：%s",array($aBean->name(),$arrBeanConf['model'])) ;
-		    		}
-		    		$aBean->setModel($aModel) ;
-				}*/
+    			$arrConfig['view'] = array( 'template'=>$arrConfig['view'] ) ;
     		}
+    		if(empty($arrConfig['view']['class']))
+    		{
+    			$arrConfig['view']['class'] = 'view' ;
+    		}
+    			
+    		// 创建对象
+			$aBean = $aBeanFactory->createBean($arrConfig['view'],$sNamespace,false) ;
+			// $aBean->setName($arrBeanConf['name']) ;
+				
+			$this->setView( $aBean ) ;
+				
+			$aBean->buildBean($arrConfig['view'],$sNamespace) ;
+				
+			/*if(!empty($arrBeanConf['model']))
+			{
+				if( !$aModel=$aModelContainer->getByName($arrBeanConf['model']) )
+		    	{
+		    		throw new BeanConfException("视图(%s)的Bean配置属性 model 无效，没有指定的模型：%s",array($aBean->name(),$arrBeanConf['model'])) ;
+		    	}
+		    	$aBean->setModel($aModel) ;
+			}*/
     	}
     	
     	// controllers --------------------
@@ -410,76 +409,49 @@ class Controller extends NamableComposite implements IBean
     	return $this->addModel(new $sClass($aPrototype,$bAgg),$sName) ;    	
     }
     
-    /**
-     * @param $formview		该参数可以为：true 则创建一个 FormView 类型的视图; false 则创建一个 View 普通视图; 或是其他视图的类名 
-     * @return IView
-     */
-    public function createView($sName=null,$sSourceFile=null,$formview='org\\jecat\\framework\\mvc\\view\\View')
-    {
-		if( is_string($formview) and class_exists($formview) )
-	    {
-	    	$sClass = $formview ;
-	    }
-	    else
-	    {
-	    	$sClass = $formview? 'org\\jecat\\framework\\mvc\\view\\FormView': 'org\\jecat\\framework\\mvc\\view\\View' ;
-	    }
-	    
-	    if( !$sName )
-	    {
-	    	$sName = $this->name() ;
-	    }
-	    
-	    if( !$sSourceFile )
-	    {
-	    	$sSourceFile = $sName . '.html' ;
-	    }
-    	
-    	
-    	$aView = new $sClass($sName,$sSourceFile) ;
-    	$this->addView($aView,$sName) ;
-    	
-    	return $aView ;
-    }
-    
-    public function createFormView($sName=null,$sSourceFile=null)
-    {
-    	return $this->createView($sName,$sSourceFile,'org\\jecat\\framework\\mvc\\view\\FormView') ;
-    }
 
     /**
      * @wiki /MVC模式/控制器/主视图(mainView)
      * 
-     * 每个控制器都有一个”隐藏“的主视图(main view)，控制器所拥有的视图，实际上都存放在这个主视图里（[see /MVC模式/视图/视图的组合模式]），它是管理控制器所有视图的”容器“。
+     * 每个控制器都有一个视图(view)，
      * 
      * 把一个控制器B做为”子控制器“添加给另一个控制器A的时候，B的主视图，会自动成为A的一个普通视图。这样一来，当控制器组合到一起的时候，他们的视图也自动完成了组合。
      * 
-     * [s]主视图是一个特殊的视图类 org\jecat\framework\mvc\view\TransparentViewContainer，它在视图的组合结构中，是透明存在的。[/s]
-     * 
      * @return IView
      */
-    public function mainView()
+    public function view()
     {
-    	if( !$this->aMainView )
+    	if( !$this->aView )
     	{
-    		$this->setMainView( new View($this->name(),null) ) ;
+    		$sTemplateName = str_replace('\\','.',get_class($this)).'.html' ;
+    		EventManager::singleton()->emitEvent(__CLASS__,self::defaultViewTemplate,$arrArgv=array($this,&$sTemplateName)) ;
+    		
+    		$this->setView( new View($sTemplateName) ) ;
     	}
-
-    	return $this->aMainView ;
+    	return $this->aView ;
     }
-    
-    public function setMainView(IView $aView)
+    public function setView(IView $aView)
     {
-    	if($this->aMainView)
+    	if($this->aView)
     	{
-    		$this->messageQueue()->removeChildHolder($this->aMainView) ;
+    		$this->messageQueue()->removeChildHolder($this->aView) ;
     	}
     	$this->messageQueue()->addChildHolder($aView) ;
     	
-    	$this->aMainView = $aView ;
+    	$this->aView = $aView ;
     	$aView->setController($this) ;
     }
-        
+
+    public function mainView()
+    {
+		trigger_error('正在访问一个过时的方法：Controller::mainView() 方法已经改名为: view()',E_USER_DEPRECATED ) ;
+    	return $this->view() ;
+    }
+    public function setMainView(IView $aView)
+    {
+		trigger_error('正在访问一个过时的方法：Controller::setMainView() 方法已经改名为: setView()',E_USER_DEPRECATED ) ;
+    	return $this->setView($aView) ;
+    }
     /**
      * @wiki /MVC模式/控制器/控制器执行
      * 
@@ -666,7 +638,7 @@ class Controller extends NamableComposite implements IBean
 	 */
 	protected function takeOverView(Controller $aChild,$sChildName=null)
 	{
-		$this->mainView()->add( $aChild->mainView(), $sChildName?:$aChild->name(), true )  ;
+		$this->view()->addView( $sChildName?:$aChild->name(), $aChild->view() )  ;
 	} 
 	
 	public function remove($object)
@@ -803,15 +775,15 @@ class Controller extends NamableComposite implements IBean
     }
     
     public function __get($sName)
-    {
+    {    	
     	// view
-    	if($child=$this->mainView()->getByName($sName))
+    	if( $sName=='view' )
     	{
-    		return $child ;
+    		return $this->view() ;
     	}
     	
     	// model
-    	else if($child=$this->modelContainer()->getByName($sName))
+    	if($child=$this->modelContainer()->getByName($sName))
     	{
     		return $child ;
     	}
@@ -830,14 +802,8 @@ class Controller extends NamableComposite implements IBean
     	
     	// ----------------
     	$nNameLen = strlen($sName) ;
-    	
-    	if( $nNameLen>4 and substr($sName,0,4)=='view' )
-    	{
-    		$sViewName = substr($sName,4) ;
-    		return $this->mainView()->getByName($sViewName)?: $this->mainView()->getByName(lcfirst($sViewName)) ;
-    	}
 
-    	else if( $nNameLen>5 and substr($sName,0,5)=='model' )
+    	if( $nNameLen>5 and substr($sName,0,5)=='model' )
     	{
     		$sModelName = substr($sName,5) ;
     		return $this->modelContainer()->getByName($sModelName)?: $this->modelContainer()->getByName(lcfirst($sModelName)) ;
@@ -884,7 +850,8 @@ class Controller extends NamableComposite implements IBean
 
 	    	$this->aFrame->buildBean($this->arrBeanConfig['frame']) ;
 	    	
-    		$this->aFrame->takeOverView($this) ;
+    		//$this->view()->unassemble($this->aFrame->view()) ;
+    		$this->aFrame->viewContainer()->assemble($this->view()) ;
     	}
     	
     	return $this->aFrame ;
@@ -917,40 +884,6 @@ class Controller extends NamableComposite implements IBean
     public function clearModels()
     {
     	$this->modelContainer()->clear() ;
-    	return $this ;
-    }
-    
-    
-    public function addView(IView $aView,$sName=null)
-    {
-    	if( $aOrController = $aView->controller() )
-    	{
-    		$aOrController->removeView($aView) ;
-    	}
-    	
-    	$aView->setController($this) ;
-    	return $this->mainView()->add( $aView, $sName, true ) ;
-    }
-    public function removeView(IView $aView)
-    {
-    	$aView->setController(null) ;
-    	$this->mainView()->remove($aView) ;
-    	return $this ;
-    }
-    /**
-	 * @return org\jecat\framework\mvc\view\IView
-     */
-    public function viewByName($sName)
-    {
-    	return $this->mainView()->getByName($sName) ;
-    }
-    public function viewIterator()
-    {
-    	return $this->mainView()->iterator() ;
-    }
-    public function clearViews()
-    {
-    	$this->mainView()->clear() ;
     	return $this ;
     }
     
@@ -1107,7 +1040,7 @@ class Controller extends NamableComposite implements IBean
 
     private $aResponse = null ;
     
-    private $aMainView = null ;
+    private $aView = null ;
     
     private $aMsgQueue = null ;
     

@@ -8,7 +8,7 @@
 //  JeCat PHP框架 的正式全名是：Jellicle Cat PHP Framework。
 //  “Jellicle Cat”出自 Andrew Lloyd Webber的音乐剧《猫》（《Prologue:Jellicle Songs for Jellicle Cats》）。
 //  JeCat 是一个开源项目，它像音乐剧中的猫一样自由，你可以毫无顾忌地使用JCAT PHP框架。JCAT 由中国团队开发维护。
-//  正在使用的这个版本是：0.7.1
+//  正在使用的这个版本是：0.8
 //
 //
 //
@@ -36,7 +36,7 @@ class WebpageFrame extends Controller
 	
 	public function __construct($params=null,$sName=null,$bBuildAtonce=true)
 	{
-		$this->setMainView(WebpageFactory::singleton()->create()) ;
+		$this->setView(WebpageFactory::singleton()->create()) ;
 		
 		parent::__construct($params,$sName,$bBuildAtonce) ;
 	}
@@ -105,9 +105,9 @@ class WebpageFrame extends Controller
 				
 				// 创建对象
 				$aBean = $aBeanFactory->createBean($arrBeanConf,$sNamespace,false) ;
-				$aBean->setName($arrBeanConf['name']) ;
+				// $aBean->setName($arrBeanConf['name']) ;
 		
-				$this->addFrameView( $aBean ) ;
+				$this->addFrameView( $arrBeanConf['name'], $aBean ) ;
 				
 				$aBean->buildBean($arrBeanConf,$sNamespace) ;
 		
@@ -136,20 +136,12 @@ class WebpageFrame extends Controller
 	/**
 	 * 接管子控制器的视图
 	 */
-	protected function takeOverView(Controller $aChild,$sChildName=null)
+	/*protected function takeOverView(Controller $aChild,$sChildName)
 	{
-		if(!$sChildName)
-		{
-			$sChildName = $aChild->name() ;
-		}
-		$this->viewContainer()->add( $aChild->mainView(), $sChildName, true )  ;
-		if( $this->viewContainer()!=$this->mainView() )
-		{
-			$this->mainView()->add( $aChild->mainView(), $sChildName, false )  ;
-		}
-	}
+		$this->viewContainer()->assemble( $sChildName, $aChild->view() )  ;
+	}*/
 	
-	public function addFrameView(IView $aFrameView)
+	public function addFrameView($sName,IView $aFrameView)
 	{
 		if( $aOrController = $aFrameView->controller() )
 		{
@@ -158,14 +150,14 @@ class WebpageFrame extends Controller
 		$aFrameView->setController($this) ;
 	
 		
-		$this->viewContainer()->add( $aFrameView ) ;
+		$this->viewContainer()->addView( $sName, $aFrameView ) ;
 	
 		$this->setViewContainer($aFrameView) ;
 	}
     
-    public function setMainView(IView $aView)
+    public function setView(IView $aView)
     {    	
-    	parent::setMainView($aView) ;
+    	parent::setView($aView) ;
     	$aView->setController($this) ;
     
     	if( !$this->aViewContainer )
@@ -193,7 +185,7 @@ class WebpageFrame extends Controller
     	$this->aViewContainer = $aViewContainer ;
     	
     	// 记录所有的frame 视图
-    	$this->arrFrameViews[$aViewContainer->name()] = $aViewContainer ;
+    	// $this->arrFrameViews[$aViewContainer->name()] = $aViewContainer ;
     }
     
     public function frame()
