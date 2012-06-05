@@ -133,6 +133,11 @@ class TargetCodeOutputStream extends \org\jecat\framework\lang\Object
 		
 		$sTemplateCompiled.= "\r\n" ;
 		$sTemplateCompiled.= "define('{$this->sTemplateSignature}',__FILE__) ;\r\n" ;
+
+		foreach(array_keys($this->arrOutputBuffers) as $sSubTempName)
+		{
+			$this->generateOutputCode($sSubTempName) ;
+		}
 		
 		foreach($this->arrCompileds as $sSubTemplate=>&$sCompiled)
 		{
