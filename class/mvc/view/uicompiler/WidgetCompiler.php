@@ -42,18 +42,32 @@ class WidgetCompiler extends NodeCompiler
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		$this->checkType( $aObject ) ;
-		$this->writeTheWidget($aDev) ;
+		
 		$sWidgetVarName = $this->getVarName() ;
 		$aAttrs = $this->getAttrs($aObject) ;
-		if( false === $this->writeObject($aAttrs , $aDev , $sWidgetVarName) ){
+		
+		if( $aAttrs->has('ignore') or
+			(  $aObject->tagName() === 'input' and $aAttrs->string('type') === 'submit' )
+		){
+			return parent::compile(
+				$aObject
+				, $aObjectContainer
+				, $aDev
+				, $aCompilerManager
+			);
+		}
+		
+		$this->writeTheView($aDev) ;
+		
+		$sId = $this->writeObject($aAttrs , $aObjectContainer , $aDev , $sWidgetVarName);
+		if( false === $sId ){
 			return false;
 		}
-		$this->writeHtmlAttr($aAttrs , $aDev , $sWidgetVarName);
-		$this->writeWidgetAttr($aAttrs , $aDev , $sWidgetVarName);
+		$this->writeAttr($aAttrs , $aDev , $sWidgetVarName);
 		$this->writeBean($aObject ,  $aDev , $sWidgetVarName) ;
 		$this->writeTemplate($aObject , $aAttrs , $aObjectContainer , $aDev , $aCompilerManager , $sWidgetVarName) ;
 		$this->compileChildren($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
-		$this->writeDisplay($aAttrs , $aDev , $sWidgetVarName) ;
+		$this->writeDisplay($aAttrs , $aDev , $sWidgetVarName , $sId) ;
 		$this->writeEnd($aDev);
 	}
 	
@@ -61,8 +75,9 @@ class WidgetCompiler extends NodeCompiler
 		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject,'aObject') ;
 	}
 	
-	protected function writeTheWidget(TargetCodeOutputStream $aDev){
-		$aDev->putCode("\$theView = \$aVariables->get('theView') ;") ;
+	protected function writeTheView(TargetCodeOutputStream $aDev){
+		$aDev->putCode("\$theView = \$aVariables->get('theView') ;",'preprocess') ;
+		$aDev->putCode("\$theView = \$aVariables->get('theView') ;",'render') ;
 	}
 	
 	protected function getVarName(){
@@ -75,94 +90,74 @@ class WidgetCompiler extends NodeCompiler
 		return $aAttrs ;
 	}
 	
-	protected function writeObject(Attributes $aAttrs , TargetCodeOutputStream $aDev , $sWidgetVarName){
-		// 通过 表达式 取得 widget 对象
-		if( $sInstanceExpress=$aAttrs->expression('ins') or $sInstanceExpress=$aAttrs->expression('instance')  )
-		{
-			$sId = '' ;
-			$sInstanceOrigin=$aAttrs->string('ins') or $sInstanceOrigin=$aAttrs->string('instance') ;
+	protected function writeObject(Attributes $aAttrs , ObjectContainer $aObjectContainer , TargetCodeOutputStream $aDev , $sWidgetVarName){
+		if( $aAttrs->has('type') ){
+			$sClassName = $aAttrs->get('type') ;
 			
-			$aDev->putCode("\r\n//// ------- 显示 Widget Instance ---------------------") ;
-			$aDev->putCode("{$sWidgetVarName} = ") ;
-			$aDev->putCode($sInstanceExpress) ;
-			$aDev->putCode(" ;\r\n") ;
-
-			$aDev->putCode("if( !{$sWidgetVarName} or !({$sWidgetVarName} instanceof \\org\\jecat\\framework\\mvc\\view\\widget\\IViewWidget) ){") ;
-			$aDev->output("无效的widget对象：".$sInstanceOrigin ) ;
-			$aDev->putCode("} else {") ;
+			$aDev->putCode("\r\n//// ------- 创建 widget: {$sClassName} ---------------------",'preprocess') ;
+			
+			$aDev->putCode("\$__widget_class = \\org\\jecat\\framework\\bean\\BeanFactory::singleton()->beanClassNameByAlias({$sClassName})?: $sClassName ;",'preprocess') ;
+			$aDev->putCode("if( !class_exists(\$__widget_class) ){",'preprocess') ;
+			$aDev->output("缺少 widget (class:{$sClassName})",'preprocess') ;
+			$aDev->putCode("}else{",'preprocess') ;
+			$aDev->putCode("	{$sWidgetVarName} = new \$__widget_class ;",'preprocess') ;
+			
+			if( $aAttrs->has('id') ){
+				$sId = $aAttrs->get('id');
+			}else{
+				$nAutoCreateId = $aObjectContainer->properties()->get('autoCreateId');
+				if( null === $nAutoCreateId ){
+					$nAutoCreateId = 0 ;
+				}
+				$sId = '"autoCreateId'.$nAutoCreateId.'"';
 				
-			if( $aAttrs->bool('instance.autoAddToView') or $aAttrs->bool('ins.autoAddToView')
-				or (!$aAttrs->has('instance.autoAddToView') and !$aAttrs->has('ins.autoAddToView')) )
-			{
-				$aDev->putCode("	// ins.autoAddToView=true") ;
-				$aDev->putCode("	if( \$theView and {$sWidgetVarName}->view()===\$theView ){") ;
-				$aDev->putCode("		\$theView->addWidget({$sWidgetVarName}) ;") ;
-				$aDev->putCode("	}") ;
-			}			
+				$aObjectContainer->properties()->set('autoCreateId',$nAutoCreateId + 1 );
+			}
+			
+			$aDev->putCode("	{$sWidgetVarName}->setId( $sId );",'preprocess') ;
+			$aDev->putCode("	\$theView->addWidget({$sWidgetVarName});",'preprocess') ;
+			
+			return $sId ;
+		}else{
+			if( $aAttrs->has('id') ){
+				$sId = $aAttrs->get('id');
+				
+				$aDev->putCode("\r\n//// ------- 寻找 Widget: {$sId} ---------------------",'preprocess') ;
+				$aDev->putCode("{$sWidgetVarName} = \$theView->widget({$sId}) ;",'preprocess') ;
+				
+				$aDev->putCode("if(!{$sWidgetVarName}){",'preprocess') ;
+				$aDev->putCode("}else{",'preprocess') ;
+				
+				return $sId ;
+			}else{
+				$aDev->putCode("\$aDevice->write(\$aUI->locale()->trans('&lt;widget&gt;标签缺少必要属性:id或type')) ;",'preprocess') ;
+				return false;
+			}
 		}
+	}
 	
-		// 通过 id 获得 widget 对象
-		else if( $aAttrs->has('id') )
-		{
-			$sId = $aAttrs->get('id') ;
-			$aDev->putCode("\r\n//// ------- 显示 Widget: {$sId} ---------------------") ;		
-			$aDev->putCode("{$sWidgetVarName} = \$theView->widget({$sId}) ;") ;
+	protected function writeAttr(Attributes $aAttrs , TargetCodeOutputStream $aDev , $sWidgetVarName){
+		$arrAttr = array();
+		foreach($aAttrs as $sName=>$aValue){
+			$arrNamePart = explode('.',$sName);
+			
+			$arrSubAttr = &$arrAttr ;
+			foreach($arrNamePart as $sNamePart){
+				if( !isset( $arrSubAttr[$sNamePart] ) ){
+					$arrSubAttr[$sNamePart] = array();
+				}
 				
-			$aDev->putCode("if(!{$sWidgetVarName}){") ;
-			$aDev->output("缺少 widget (id:{$sId})") ;
-			$aDev->putCode("}else{") ;
+				$arrSubAttr = & $arrSubAttr[$sNamePart];
+			}
+			$arrSubAttr = trim($aAttrs->get($sName) ,'"');
+			
+			unset($arrSubAttr);
 		}
 		
-		// 通过 new 属性现场创建 widget 对象
-		else if( $aAttrs->has('new') )
-		{
-			$sClassName = $aAttrs->get('new') ;
-			
-			$aDev->putCode("\r\n//// ------- 创建并显示widget: {$sClassName} ---------------------") ;
-			
-			$aDev->putCode("\$__widget_class = \\org\\jecat\\framework\\bean\\BeanFactory::singleton()->beanClassNameByAlias({$sClassName})?: $sClassName ;") ;
-			$aDev->putCode("if( !class_exists(\$__widget_class) ){") ;
-			$aDev->output("缺少 widget (class:{$sClassName})") ;
-			$aDev->putCode("}else{") ;
-			$aDev->putCode("	{$sWidgetVarName} = new \$__widget_class ;") ;
-		}
-		else 
-		{
-			$aDev->putCode("\$aDevice->write(\$aUI->locale()->trans('&lt;widget&gt;标签缺少必要属性:id,instance 或 new')) ;") ;
-			return false;
-		}
-		return true ;
-	}
-	
-	protected function writeHtmlAttr(Attributes $aAttrs , TargetCodeOutputStream $aDev , $sWidgetVarName){
-		// 常规 html attr
-		foreach(array('css'=>'class','name','title','style') as $sInputName=>$sName)
-		{
-			if(!is_int($sInputName))
-			{
-				$sInputName = $sName ;
-			}
-			if( !$aAttrs->has($sInputName) )
-			{
-				continue ;
-			}
-
-			$sVarName = '"'. addslashes($sName) . '"' ;
-			$sValue = $aAttrs->get($sInputName) ;
-			$aDev->putCode("	{$sWidgetVarName}->setAttribute({$sVarName},{$sValue}) ;") ;
-		}
-	}
-	
-	protected function writeWidgetAttr(Attributes $aAttrs , TargetCodeOutputStream $aDev , $sWidgetVarName){
-		foreach($aAttrs as $sName=>$aValue)
-		{
-			if( substr($sName,0,5)=='attr.' and $sVarName=substr($sName,5) )
-			{
-				$sVarName = '"'. addslashes($sVarName) . '"' ;
-				$sValue = $aAttrs->get($sName) ;
-				$aDev->putCode("	{$sWidgetVarName}->setAttribute({$sVarName},{$sValue}) ;") ;
-			}
-		}
+		$strAttrExport = var_export( $arrAttr , true );
+		$aDev->putCode("	\$arrBean = $strAttrExport ;",'preprocess');
+		$aDev->putCode("	\$arrBean = $strAttrExport ;",'render');
+		$aDev->putCode("	{$sWidgetVarName}->buildBean( \$arrBean ); ",'preprocess');
 	}
 	
 	protected function writeBean(IObject $aObject , TargetCodeOutputStream $aDev , $sWidgetVarName){
@@ -171,25 +166,31 @@ class WidgetCompiler extends NodeCompiler
 			$arrBean = BeanConfXml::singleton()->xmlSourceToArray( $aBean->source() ) ;
 			$strVarExport = var_export($arrBean,true);
 			
-			$aDev->putCode("	\$arrFormer = {$sWidgetVarName}->beanConfig(); ");
-			$aDev->putCode("	\$arrBean = $strVarExport ;");
-			$aDev->putCode("	\\org\\jecat\\framework\\bean\\BeanFactory::mergeConfig(\$arrFormer, \$arrBean); ");
-			$aDev->putCode("	{$sWidgetVarName}->buildBean( \$arrFormer ); ");
+			$aDev->putCode("	\$arrFormer = {$sWidgetVarName}->beanConfig(); ",'preprocess');
+			$aDev->putCode("	\$arrBean = $strVarExport ;",'preprocess');
+			$aDev->putCode("	\\org\\jecat\\framework\\bean\\BeanFactory::mergeConfig(\$arrFormer, \$arrBean); ",'preprocess');
+			$aDev->putCode("	{$sWidgetVarName}->buildBean( \$arrFormer ); ",'preprocess');
 			
 			$aObject->remove($aBean);
 		}
 	}
 	
-	protected function writeTemplate(IObject $aObject ,Attributes $aAttrs ,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager , $sWidgetVarName){
+	protected function writeTemplate(
+		IObject $aObject 
+		,Attributes $aAttrs 
+		,ObjectContainer $aObjectContainer
+		,TargetCodeOutputStream $aDev
+		,CompilerManager $aCompilerManager
+		,$sWidgetVarName
+	){
 		// template
 		if($aAttrs->has('subtemplate') ){
 			$sFunName = $aAttrs->string('subtemplate') ;
-			$aDev->putCode("	{$sWidgetVarName}->setSubTemplateName('__subtemplate_{$sFunName}') ;") ;
+			$aDev->putCode("	{$sWidgetVarName}->setSubTemplateName('__subtemplate_{$sFunName}') ;",'preprocess') ;
 		}else if($aAttrs->has('template') ){
 			$sTemplateName = $aAttrs->string('template');
-			$aDev->putCode("	{$sWidgetVarName}->setTemplateName('{$sTemplateName}') ;") ;
-		}else
-		if( $aTemplate=$aObject->getChildNodeByTagName('template') ){
+			$aDev->putCode("	{$sWidgetVarName}->setTemplateName('{$sTemplateName}') ;",'preprocess') ;
+		}else if( $aTemplate=$aObject->getChildNodeByTagName('template') ){
 			$aAttributes = $aTemplate->headTag()->attributes();
 			
 			if($aAttributes->has('name') ){
@@ -200,21 +201,29 @@ class WidgetCompiler extends NodeCompiler
 			
 			$aAttributes->set('name' , $sFunName ) ;
 			$aTemplate->headTag()->setAttributes($aAttributes) ;
-			$aDev->putCode("	{$sWidgetVarName}->setSubTemplateName('__subtemplate_{$sFunName}') ;") ;
+			$aDev->putCode("	{$sWidgetVarName}->setSubTemplateName('__subtemplate_{$sFunName}') ;",'preprocess') ;
 		}
 	}
 	
-	protected function writeDisplay(Attributes $aAttrs , TargetCodeOutputStream $aDev , $sWidgetVarName){
+	protected function writeDisplay(Attributes $aAttrs , TargetCodeOutputStream $aDev , $sWidgetVarName,$sId){
 		// display
 		if( !$aAttrs->has('display') 
-			or $aAttrs->bool('display') ){
-			$aDev->putCode("	{$sWidgetVarName}->display(\$aVariables->theUI,new \\org\\jecat\\framework\\util\\DataSrc(),\$aDevice) ;") ;
+			or $aAttrs->bool('display')
+		){
+			$aDev->putCode("\r\n//// ------- 寻找 Widget: {$sId} ---------------------",'render') ;
+			$aDev->putCode("{$sWidgetVarName} = \$theView->widget({$sId}) ;",'render') ;
+			
+			$aDev->putCode("if(!{$sWidgetVarName}){",'render') ;
+			$aDev->output("render 缺少 widget (id:{$sId})",'render') ;
+			$aDev->putCode("}else{",'render') ;
+			$aDev->putCode("	{$sWidgetVarName}->display(\$aVariables->theUI,new \\org\\jecat\\framework\\util\\DataSrc(\$arrBean),\$aDevice) ;",'render') ;
+			$aDev->putCode("}",'render') ;
 		}
 	}
 	
 	protected function writeEnd(TargetCodeOutputStream $aDev){
-		$aDev->putCode("}") ;
-		$aDev->putCode("//// ---------------xxx------------------------------------\r\n") ;
+		$aDev->putCode("}",'preprocess') ;
+		$aDev->putCode("//// ---------------xxx------------------------------------\r\n",'preprocess') ;
 	}
 }
 
