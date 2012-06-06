@@ -72,6 +72,10 @@ class UIFactory extends UIFactoryBase
 		$aNodeCompilers->addSubCompiler('menu',__NAMESPACE__."\\uicompiler\\MenuCompiler") ;
 		$aNodeCompilers->addSubCompiler('item',__NAMESPACE__."\\uicompiler\\MenuCompiler") ;
 		
+		$aNodeCompilers->addSubCompiler('input',__NAMESPACE__."\\uicompiler\\WidgetCompiler") ;
+		$aNodeCompilers->addSubCompiler('textarea',__NAMESPACE__."\\uicompiler\\WidgetCompiler") ;
+		$aNodeCompilers->addSubCompiler('select',__NAMESPACE__."\\uicompiler\\WidgetCompiler") ;
+		
 		return $aNodeCompilers ;
 	}
 	
