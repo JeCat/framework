@@ -27,10 +27,9 @@ class Selecter extends Executor
 		
 		
 		// 处理多属关联
-		foreach ($arrDataSheet as &$arrRow)
+		for( reset($arrDataSheet); ($row=key($arrDataSheet))!==null; next($arrDataSheet) )
 		{
-		    //print_r($arrRow) ;
-		   // continue ;
+			$arrRow =& $arrDataSheet[$row] ;
 		    
 			foreach($arrMultiAssocs as &$arrAssoc)
 			{
@@ -63,6 +62,7 @@ class Selecter extends Executor
 				) ;
 			}
 		}
+		
 		// 初始化数据表的行指针
 		reset($arrDataSheet) ;
 	}
