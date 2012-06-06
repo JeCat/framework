@@ -8,7 +8,7 @@ use org\jecat\framework\mvc\model\executor\Selecter;
 use org\jecat\framework\db\DB;
 use org\jecat\framework\lang\Exception;
 
-class Model
+class Model implements \Iterator
 {
 	public function __construct($table,$sPrototypeName,$primaryKeys=null,$columns=null)
 	{
@@ -205,9 +205,8 @@ class Model
 		}
 		
 		Selecter::singleton()->execute( $this, $this->aPrototype->refRaw(), $this->arrData, $sTmpWhere, $this->db() ) ;
-
-		//echo "<pre>";print_r($this->arrData);echo "</pre>";
 		
+		// echo "<pre>";print_r($this->arrData);echo "</pre>";
 		return $this ;
 	}
 
@@ -389,6 +388,7 @@ class Model
 	/**
 	 * @return bool
 	 */
+	/*
 	public function next($sChildName=null)
 	{
 		if( $arrParentRow=&$this->localeRow($sChildName,$this->arrData) )
@@ -412,7 +412,7 @@ class Model
 		}
 		return false ;
 	}
-	
+	*/
 
 	public function data($sName)
 	{
@@ -597,6 +597,73 @@ class Model
 	public function isSheet(array & $arrRow,$sDataName)
 	{
 		return array_key_exists($sDataName,$arrRow) and !empty($arrRow[$sDataName.chr(0).'sheet']) ;
+	}
+	
+	/////////////////// 迭代器实现方法 //////////////////
+	
+	function rewind($sChildName = null)
+	{
+	    if($sChildName == null)
+	    {
+	        reset($this->arrData) ;
+	    }else{
+	        $arrSheet =& $this->buildSheet($sChildName) ;
+	        reset($arrSheet) ;
+	    }
+	}
+	
+	function current($sChildName = null)
+	{
+	    if($sChildName == null)
+	    {
+	        return current($this->arrData);
+	    }else{
+	        $arrSheet =& $this->buildSheet($sChildName) ;
+	        return current($arrSheet);
+	    }
+	    //return $this;
+	    //return $this->valid()? $this: null ;
+	}
+	
+	function key($sChildName = null)
+	{
+	    if($sChildName == null)
+	    {
+	        return key($this->arrData) ;
+	    }else{
+	        $arrSheet =& $this->buildSheet($sChildName) ;
+	        return key($arrSheet) ;
+	    }
+	}
+	
+	function next($sChildName = null)
+	{
+	    if($sChildName == null)
+	    {
+	        next($this->arrData) ;
+	    }else{
+	        $arrSheet =& $this->buildSheet($sChildName) ;
+	        next($arrSheet) ;
+	    }
+	}
+	
+	function valid($sChildName = null)
+	{
+	    if($sChildName == null)
+	    {
+	        if(each($this->arrData)!==false)
+	        {
+	            prev($this->arrData) ;
+	            return true ;
+	        }
+	        else 
+	       {
+	            return false ;
+	        }
+	    }else{
+	        $arrSheet =& $this->buildSheet($sChildName) ;
+	        return each($arrSheet)!==false ;
+	    }
 	}
 	
 	const ignore = '~-+ignore this arg+-~' ;

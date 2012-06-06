@@ -25,9 +25,13 @@ class Selecter extends Executor
 		
 		$arrDataSheet = $aPdoRecordset->fetchAll(\PDO::FETCH_ASSOC) ;
 		
+		
 		// 处理多属关联
 		foreach ($arrDataSheet as &$arrRow)
 		{
+		    //print_r($arrRow) ;
+		   // continue ;
+		    
 			foreach($arrMultiAssocs as &$arrAssoc)
 			{
 				// 多属关联条件
@@ -59,7 +63,6 @@ class Selecter extends Executor
 				) ;
 			}
 		}
-		
 		// 初始化数据表的行指针
 		reset($arrDataSheet) ;
 	}
