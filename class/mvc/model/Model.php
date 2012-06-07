@@ -206,7 +206,7 @@ class Model implements \Iterator
 		
 		Selecter::singleton()->execute( $this, $this->aPrototype->refRaw(), $this->arrData, $sTmpWhere, $this->db() ) ;
 		
-		// echo "<pre>";print_r($this->arrData);echo "</pre>";
+		//echo "<pre>";print_r($this->arrData);echo "</pre>";
 		return $this ;
 	}
 
