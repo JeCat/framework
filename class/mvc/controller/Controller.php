@@ -86,7 +86,7 @@ class Controller extends NamableComposite implements IBean
 {
 	const beforeBuildBean = 'beforeBuildBean' ;
 	const afterMainRun = 'afterMainRun' ;
-	const defaultViewTemplate = 'defaultViewTemplate' ;
+	const createDefaultView = 'createDefaultView' ;
 	
     function __construct ($params=null,$sName=null,$bBuildAtonce=true)
     {
@@ -423,10 +423,8 @@ class Controller extends NamableComposite implements IBean
     {
     	if( !$this->aView )
     	{
-    		$sTemplateName = str_replace('\\','.',get_class($this)).'.html' ;
-    		EventManager::singleton()->emitEvent(__CLASS__,self::defaultViewTemplate,$arrArgv=array($this,&$sTemplateName)) ;
-    		
-    		$this->setView( new View($sTemplateName) ) ;
+    		$this->aView = EventManager::singleton()->emitEvent(__CLASS__,self::createDefaultView,$arrArgv=array($this)) ?: new View() ;
+    		$this->setView( $this->aView ) ;
     	}
     	return $this->aView ;
     }
