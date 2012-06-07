@@ -629,7 +629,7 @@ class Model implements \Iterator
 	{
 	    if($sChildName == null)
 	    {
-	        return key($this->arrData) ;
+	        return key($this->arrData);
 	    }else{
 	        $arrSheet =& $this->buildSheet($sChildName) ;
 	        return key($arrSheet) ;
@@ -651,18 +651,10 @@ class Model implements \Iterator
 	{
 	    if($sChildName == null)
 	    {
-	        if(each($this->arrData)!==false)
-	        {
-	            prev($this->arrData) ;
-	            return true ;
-	        }
-	        else 
-	       {
-	            return false ;
-	        }
+	        return key($this->arrData) !== null ;
 	    }else{
 	        $arrSheet =& $this->buildSheet($sChildName) ;
-	        return each($arrSheet)!==false ;
+	        return key($arrSheet) !== null ;
 	    }
 	}
 	
