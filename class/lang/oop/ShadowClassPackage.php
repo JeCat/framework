@@ -71,8 +71,22 @@ class ShadowClassPackage extends Package implements \Serializable
 		$aWriter->write( "namespace {$sNamespace};\r\n"  ) ;
 		$aWriter->write( "class ".basename(str_replace('\\','/',$sNamespace.'\\'.$sShortClass))." extends \\{$this->sParentClass}\r\n"  ) ;
 		$aWriter->write( "{\r\n"  ) ;
+		
+		$arrMethods = array();
+		
+		foreach($aClassRef->getMethods() as $aMethodRef){
+			$sMethodName = $aMethodRef->getName();
+			
+			if( isset( $arrMethods[$sMethodName] ) ){
+				if( $aMethodRef->getDeclaringClass()->isSubclassOf( $arrMethods[$sMethodName]->getDeclaringClass()->getName() ) ){
+					$arrMethods[$sMethodName] = $aMethodRef ;
+				}
+			}else{
+				$arrMethods[$sMethodName] = $aMethodRef ;
+			}
+		}
 	
-		foreach($aClassRef->getMethods() as $aMethodRef)
+		foreach($arrMethods as $aMethodRef)
 		{
 			if( $aMethodRef->isFinal() or $aMethodRef->isAbstract() or $aMethodRef->isPrivate() )
 			{
