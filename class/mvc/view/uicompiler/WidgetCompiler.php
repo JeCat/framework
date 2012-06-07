@@ -91,6 +91,10 @@ class WidgetCompiler extends NodeCompiler
 	}
 	
 	protected function writeObject(Attributes $aAttrs , ObjectContainer $aObjectContainer , TargetCodeOutputStream $aDev , $sWidgetVarName){
+		if( $aAttrs->has('instance') ){
+			$aDev->putCode("{",'preprocess') ;
+			return 'CreateByInstance';
+		}
 		if( $aAttrs->has('type') ){
 			$sClassName = $aAttrs->get('type') ;
 			
@@ -206,6 +210,23 @@ class WidgetCompiler extends NodeCompiler
 	}
 	
 	protected function writeDisplay(Attributes $aAttrs , TargetCodeOutputStream $aDev , $sWidgetVarName,$sId){
+		
+		if( $sInstanceExpress=$aAttrs->expression('instance')  )
+		{
+			$sInstanceOrigin=$aAttrs->string('instance') ;
+			
+			$aDev->putCode("\r\n//// ------- 显示 Widget Instance ---------------------",'render') ;
+			$aDev->putCode("{$sWidgetVarName} = ",'render');
+			$aDev->putCode($sInstanceExpress,'render');
+			$aDev->putCode(";",'render') ;
+
+			$aDev->putCode("if( !{$sWidgetVarName} or !({$sWidgetVarName} instanceof \\org\\jecat\\framework\\mvc\\view\\widget\\IViewWidget) ){",'render') ;
+			$aDev->output("无效的widget对象：".$sInstanceOrigin ,'render') ;
+			$aDev->putCode("} else {",'render') ;
+			$aDev->putCode("	{$sWidgetVarName}->display(\$aVariables->theUI,new \\org\\jecat\\framework\\util\\DataSrc(\$arrBean),\$aDevice) ;",'render') ;
+			$aDev->putCode("}",'render') ;
+		}
+		else
 		// display
 		if( !$aAttrs->has('display') 
 			or $aAttrs->bool('display')
