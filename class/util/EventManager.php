@@ -25,7 +25,7 @@ class EventManager extends Object implements \Serializable
 	 * 如果没有任何一个回调函数提供返回值，则返回null
 	 * @return EventReturnValue
 	 */
-	public function emitEvent($sClass,$sEvent,array & $arrArgvs=array(),$sourceObject='*')
+	public function & emitEvent($sClass,$sEvent,array & $arrArgvs=array(),$sourceObject='*')
 	{
 		if( is_object($sourceObject) )
 		{
@@ -56,7 +56,14 @@ class EventManager extends Object implements \Serializable
 			}
 		}
 		
-		return $aReturnValue ;
+		if($aReturnValue)
+		{
+			return $aReturnValue->returnValue() ;
+		}
+		else
+		{
+			return $aReturnValue ;
+		}
 	}
 	
 	private function runHandler(& $fnHandler,& $arrArgvs)
