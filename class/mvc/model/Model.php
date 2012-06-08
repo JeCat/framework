@@ -8,7 +8,7 @@ use org\jecat\framework\mvc\model\executor\Selecter;
 use org\jecat\framework\db\DB;
 use org\jecat\framework\lang\Exception;
 
-class Model implements \Iterator
+class Model implements \Iterator, \ArrayAccess
 {
 	public function __construct($table,$sPrototypeName,$primaryKeys=null,$columns=null)
 	{
@@ -36,7 +36,7 @@ class Model implements \Iterator
 	 * @param unknown_type $primaryKeys
 	 * @param unknown_type $columns
 	 */
-	public static function Create($sTable,$sPrototypeName=null,$primaryKeys=null,$columns=null)
+	public static function create($sTable,$sPrototypeName=null,$primaryKeys=null,$columns=null)
 	{
 	    return new self($sTable,$sPrototypeName,$primaryKeys,$columns) ;
 	}
@@ -599,6 +599,43 @@ class Model implements \Iterator
 		return array_key_exists($sDataName,$arrRow) and !empty($arrRow[$sDataName.chr(0).'sheet']) ;
 	}
 	
+	//
+	public function __get($sName)
+	{
+		return $this->data($sName);
+	}
+	public function __set($sName,$value)
+	{
+		$this->setData($sName,$value) ;
+		return $this ;
+	}
+
+	/////////////////// ArrayAccess 实现方法 //////////////////
+	public function offsetExists ($offset)
+	{
+		if( !$this->arrData )
+		{
+			return false ;
+		}
+		return array_key_exists($offset,$this->arrData[key($this->arrData)]) ;
+	}
+	public function offsetGet ($offset)
+	{
+		return $this->data($offset) ;
+	}
+	public function offsetSet ($offset,$value)
+	{
+		$this->setData($offset,$value) ;
+		return $this ;
+	}
+	/**
+	 * @param offset
+	 */
+	public function offsetUnset($offset)
+	{
+		unset( $this->arrData[key($this->arrData)][$offset] ) ;
+		return $this ;
+	}
 	/////////////////// 迭代器实现方法 //////////////////
 	
 	function rewind($sChildName = null)

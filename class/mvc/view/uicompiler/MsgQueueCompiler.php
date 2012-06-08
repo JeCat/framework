@@ -153,7 +153,7 @@ class MsgQueueCompiler extends NodeCompiler
 		}
 		
 		$aDev->putCode("if( \$__ui_msgqueue->count(){$sCancelDisplay} ){ ") ;
-		$aDev->putCode("	\$__ui_msgqueue->display(\$this,\$__device_for_msgqueue,{$sTemplate},{$sIsSubtemplate}) ;") ;
+		$aDev->putCode("	\$__ui_msgqueue->display(\$aUI,\$__device_for_msgqueue,{$sTemplate},{$sIsSubtemplate}) ;") ;
 		$aDev->putCode("}") ;
 		$aDev->putCode("// -------------------------------------\r\n") ;
 	}

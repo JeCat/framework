@@ -86,7 +86,7 @@ class ViewMsgQueueCompiler extends NodeCompiler
 		else 
 		{
 			$aDev->putCode("if( \$aVariables->get('theView')->messageQueue()->count() ){ \r\n") ;
-			$aDev->putCode("	\$aVariables->get('theView')->messageQueue()->display(\$this,\$aDevice) ;\r\n") ;
+			$aDev->putCode("	\$aVariables->get('theView')->messageQueue()->display(\$aUI,\$aDevice) ;\r\n") ;
 			$aDev->putCode("}\r\n") ;
 		}
 	}

@@ -86,6 +86,7 @@ class Controller extends NamableComposite implements IBean
 {
 	const beforeBuildBean = 'beforeBuildBean' ;
 	const afterMainRun = 'afterMainRun' ;
+	const defaultName = 'defaultName' ;
 	const createDefaultView = 'createDefaultView' ;
 	
     function __construct ($params=null,$sName=null,$bBuildAtonce=true)
@@ -109,11 +110,17 @@ class Controller extends NamableComposite implements IBean
     {
     	if(($sName=parent::name())===null)
     	{
-    		$sName = get_class($this) ;
-    		if( ($nLastSlashPos=strrpos($sName,"\\"))!==false )
+    		EventManager::singleton()->emitEvent(__CLASS__,self::defaultName,$arrArgv=array($this,&$sName)) ;
+    		
+    		if($sName===null)
     		{
-    			$sName = substr($sName,$nLastSlashPos+1) ;
+	    		$sName = get_class($this) ;
+	    		if( ($nLastSlashPos=strrpos($sName,"\\"))!==false )
+	    		{
+	    			$sName = substr($sName,$nLastSlashPos+1) ;
+	    		}
     		}
+    		
     		parent::setName($sName) ;
     	}
     	return $sName;
@@ -427,7 +434,7 @@ class Controller extends NamableComposite implements IBean
     		$this->setView( $this->aView ) ;
     	}
     	return $this->aView ;
-    }
+	}
     public function setView(IView $aView)
     {
     	if($this->aView)
@@ -496,8 +503,8 @@ class Controller extends NamableComposite implements IBean
 			{
 				$aController->checkPermissions() ;
 			}
-		
-    		$aController->process() ;
+
+			$aController->doActions() ;
     	}
     	catch(_ExceptionRelocation $aRelocation)
     	{}
@@ -595,10 +602,6 @@ class Controller extends NamableComposite implements IBean
     	if($this->fnProcess)
     	{
     		$this->fnProcess($this) ;
-    	}
-    	else
-    	{
-    		$this->doActions() ;
     	}
     }
     
@@ -736,40 +739,75 @@ class Controller extends NamableComposite implements IBean
     	return true ;
     }
     
-    public function doActions($sActParamName=null)
+    public function doActions($sActParamName='a')
     {
-    	if(!$sActParamName)
+    	if( !$arrActions=self::buildActionParam($this->params,$sActParamName,$this->xpath()) )
     	{
-    		$sActParamName = 'act' ;
+    		$arrActions[] = 'process' ;
     	}
-    	
-    	if( !$this->params->has($sActParamName) )
+    	foreach($arrActions as $sAction)
     	{
-    		return false ;
+    		if( method_exists($this,$sAction) )
+    		{
+    			call_user_func(array($this,$sAction)) ;
+    		}
     	}
-    	
-    	$sAct = $this->params[$sActParamName] ;
-    	$sMethod = 'action' . $sAct ;
-    	
-    	if( !method_exists($this,$sMethod) )
-    	{
-    		return false ;
-    	}
-    	
-    	$this->actionReturn = null ;
-    	
-    	call_user_func(array($this,$sMethod)) ;
-    	
-    	return true ;
     }
-
-    public function setActionReturn(&$val)
+    
+    public function makeActionQuery($sActionName,$sActParamName='a')
     {
-    	$this->actionReturn =& $val ;
+    	if( $sActParamName===false )
+    	{
+    		return $this->xpath() . '::' . $sActionName ;
+    	}
+    	else 
+    	{
+    		return $sActParamName.'[]=' . $this->xpath() . '::' . $sActionName ;
+    	}
     }
-    public function & actionReturn()
+    
+    static public function buildActionParam(IDataSrc $aParams,$sActParamName='a',$sCtrlXPathFilter=null)
     {
-    	return $this->actionReturn ;
+    	$arrReturn = array() ;
+    	if( !$actions=&$aParams->getRef($sActParamName) )
+    	{
+    		return $arrReturn ;
+    	}
+    	
+    	if( !is_array($actions) )
+    	{
+    		$actions = array(strval($actions)) ;
+    	}
+    	
+   		foreach($actions as &$oneAction)
+   		{
+   			if( is_string($oneAction) )
+   			{
+   				if(strpos($oneAction,'::')!==false)
+   				{
+   					$oneAction = explode('::',$oneAction,2) ;
+   					if( $oneAction[0] and $oneAction[0][0]!=='/' )
+   					{
+   						$oneAction[0] = '/'.$oneAction[0] ;
+   					}
+   				}
+   			}
+   			
+   			if( $sCtrlXPathFilter!==null and $oneAction[0]===$sCtrlXPathFilter )
+   			{
+   				$arrReturn[] = $oneAction[1] ;
+   			}
+   		}
+    		
+   		return $arrReturn ;
+    }
+    
+    public function actionSubmitForm()
+    {
+    	if( $sFromName=$this->params->get('formName') and method_exists($this,$sFromName) )
+    	{
+    		$this->$sFromName() ;
+    	}
     }
     
     public function __get($sName)
@@ -924,8 +962,6 @@ class Controller extends NamableComposite implements IBean
     				$this->aResponse = BeanFactory::singleton()->createBean($this->arrBeanConfig['rspn'],'*',false) ;
     			}
     		}
-    		
-    		
     	}
     	return $this->aResponse ;
     }
@@ -956,6 +992,18 @@ class Controller extends NamableComposite implements IBean
    			$this->sId = ++self::$nAssignedId ;
    		}
    		return $this->sId ;
+   	}
+   	
+   	public function xpath()
+   	{
+   		if( $aParent=$this->parent() )
+   		{
+   			return $aParent->xpath() . '/' . $this->name() ;
+   		}
+   		else
+   		{
+   			return '/' . $this->name() ;
+   		}
    	}
    	
    	
@@ -1037,12 +1085,13 @@ class Controller extends NamableComposite implements IBean
     protected $params = null ;
 
     private $aResponse = null ;
-    
+
+    /**
+     * @var org\jecat\framework\mvc\view\IView
+     */
     private $aView = null ;
     
     private $aMsgQueue = null ;
-    
-    private $actionReturn = null ;
     
     private $aModelContainer = null ;
     

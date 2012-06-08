@@ -38,19 +38,35 @@ class FormCompiler extends NodeCompiler
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
 		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject,'aObject') ;
-		
+
 		if( $aTailTag = $aObject->tailTag() )
 		{
-			$aDev->putCode("if( !(\$aVariables->get('theView') instanceof \\org\\jecat\\framework\\mvc\\view\\IFormView) or \$aVariables->get('theView')->isShowForm() )\r\n{\r\n") ;
+			$aAttributes = $aObject->attributes() ;
+			if(!$aAttributes->has('name'))
+			{
+				$sFormName = 'form' ;
+				if( $nFormIndex = ($aObjectContainer->properties()->getRef('default-form-name-index') ?: 0) )
+				{
+					$sFormName.= $nFormIndex ;
+				}
+				$nFormIndex++ ;
+				$aAttributes->set('name',$sFormName) ;
+			}
+			else
+			{
+				$sFormName = $aAttributes->string('name') ;
+			}
+		
+			$aDev->putCode("if( (\$aVariables->get('theView') ) and \$aVariables->get('theView')->isShowForm(\"{$sFormName}\") )\r\n{\r\n") ;
 			
 			$this->compileTag($aObject->headTag(), $aObjectContainer, $aDev, $aCompilerManager) ;
 			
-			$aDev->putCode("\tif(\$aVariables->get('theView') instanceof \\org\\jecat\\framework\\mvc\\view\\IFormView){\r\n") ;
+			$aDev->putCode("\tif(\$aVariables->get('theView')){\r\n") ;
 			$aDev->putCode("\t\t") ;
-			$aDev->output('<input type="hidden" name="') ;
-			$aDev->putCode("\t\t\$aDevice->write( \$aVariables->get('theView')->htmlFormSignature() ) ;\r\n") ;
-			$aDev->output('" value="1" />') ;
-			$aDev->output('<input type="hidden" name="act" value="submit" />') ;
+			$aDev->output('<input type="hidden" name="formName" value="'.addslashes($sFormName).'" />') ;
+			$aDev->output('<input type="hidden" name="a" value="') ;
+			$aDev->putCode("\t\tif(\$aVariables->get('theController'))\$aDevice->write( \$aVariables->get('theController')->makeActionQuery('actionSubmitForm',false) ) ;\r\n") ;
+			$aDev->output('" />') ;
 			$aDev->putCode("\t}\r\n") ;
 
 			$this->compileChildren($aObject, $aObjectContainer, $aDev, $aCompilerManager) ;

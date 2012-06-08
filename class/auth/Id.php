@@ -28,7 +28,7 @@ namespace org\jecat\framework\auth ;
 use org\jecat\framework\mvc\controller\HttpRequest;
 use org\jecat\framework\mvc\controller\Request;
 use org\jecat\framework\lang\Exception;
-use org\jecat\framework\mvc\model\IModel;
+use org\jecat\framework\mvc\model\Model;
 use org\jecat\framework\lang\Object;
 
 class Id extends Object implements IIdentity, \Serializable
@@ -37,7 +37,7 @@ class Id extends Object implements IIdentity, \Serializable
 	const COOKIE_KEY_LOGINTIME = 'jc_id_logintime' ;
 	const COOKIE_KEY_SIGNTURE = 'jc_id_signture' ;
 	
-	public function __construct( IModel $aModel )
+	public function __construct( Model $aModel )
 	{
 		parent::__construct() ;
 		
@@ -97,7 +97,7 @@ class Id extends Object implements IIdentity, \Serializable
 		setcookie(self::COOKIE_KEY_SIGNTURE,'',$nCookieExpire,$sPath) ;
 	}
 	
-	static public function makeCookieSignture(IModel $aUserModel)
+	static public function makeCookieSignture(Model $aUserModel)
 	{
 		return md5($aUserModel->data('username').$aUserModel->data('password').$aUserModel->data('lastLoginTime')) ;
 	}
@@ -109,7 +109,7 @@ class Id extends Object implements IIdentity, \Serializable
 				and !empty($_COOKIE[self::COOKIE_KEY_SIGNTURE]) ) ;
 	}
 	
-	static public function restoreFromCookie(IModel $aUserModel)
+	static public function restoreFromCookie(Model $aUserModel)
 	{
 		// load model
 		if( !$aUserModel->load($_COOKIE[self::COOKIE_KEY_USERNAME],'username') )
@@ -255,19 +255,19 @@ class Id extends Object implements IIdentity, \Serializable
 
 	
 	/**
-	 * @return org\jecat\framework\mvc\model\IModel
+	 * @return org\jecat\framework\mvc\model\Model
 	 */
 	public function model()
 	{
 		return $this->aModel ;
 	}
 	
-	public function setModel(IModel $aModel)
+	public function setModel(Model $aModel)
 	{
 		$this->aModel = $aModel ;
 	}
 	
-	static public function displayName(IModel $aUserModel)
+	static public function displayName(Model $aUserModel)
 	{
 		$sUsername = $aUserModel->data('username') ;
 	

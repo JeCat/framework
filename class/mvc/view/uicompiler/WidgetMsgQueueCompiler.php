@@ -98,7 +98,7 @@ class WidgetMsgQueueCompiler extends NodeCompiler
 		else 
 		{
 			$aDev->putCode("	if( \$__ui_widget->messageQueue()->count() ){ \r\n") ;
-			$aDev->putCode("		\$__ui_widget->messageQueue()->display(\$this,\$aDevice) ;\r\n") ;
+			$aDev->putCode("		\$__ui_widget->messageQueue()->display(\$aUI,\$aDevice) ;\r\n") ;
 			$aDev->putCode("	}\r\n") ;
 		}
 		

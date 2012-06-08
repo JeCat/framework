@@ -55,7 +55,7 @@ use org\jecat\framework\db\DB;
  * 所有的Model的创建方法的实现都是原型创建出来的，原型是和数据表结合最近的环节。
  *
  */
-class Prototype
+class Prototype implements \Serializable
 {
 	const hasOne = 1;
 	const belongsTo = 2;
@@ -608,7 +608,6 @@ class Prototype
 			throw new Exception("指定的原型：%s不存在，无法完成原型切换",$sXPath) ;
 		}
 		
-		//$this->arrSwitchStack[] =& $this->arrPrototype ;
 		$arrOriFullname = $this->arrPrototype['xpath'] ;
 		
 		$this->arrPrototype =& $this->arrPrototypeShortcut[$sXPath] ;
@@ -616,48 +615,38 @@ class Prototype
 		return $arrOriFullname ;
 	}
 	
-	/*public function back($step=1)
+	// implements \Serializable
+	public function serialize()
 	{
-		if(is_int($step))
-		{
-			if( $this->arrSwitchStack )
-			{
-				end($this->arrSwitchStack) ;
-				while($step--)
-				{
-					$sKey = key($this->arrSwitchStack) ;
-					$this->arrPrototype =& $this->arrSwitchStack[$sKey] ;
-					unset($this->arrSwitchStack[$sKey]) ;
-				}
-			}
-		}
-		else 
-		{
-			if( !isset($this->arrPrototypeShortcut[$step]) )
-			{
-				throw new Exception("指定的原型：%s不存在，无法完成原型切换",$step) ;
-			}
-			$this->arrPrototype =& $this->arrPrototypeShortcut[$step] ;
-			$this->arrSwitchStack = array() ;
-		}
-		return $this ;
-	}*/
-	
-	/*public function transDataName(&$sDataName)
+		return serialize($this->arrPrototype) ;
+	}
+	/**
+	 * @param serialized
+	 */
+	public function unserialize($serialized)
 	{
-		if( substr($sDataName,0,$this->nDataPrefixLength) !== $this->sDataPrefix )
-		{
-			$sDataName = $this->sDataPrefix . $sDataName ;
-		} 
+		$this->arrPrototype = unserialize($serialized) ;
+
+		// 恢复 $arrPrototypeShortcut 属性
+		$this->arrPrototypeShortcut = array(
+			'$' => &$this->arrPrototype
+		) ;
+		$this->buildPrototypeShortcut($this->arrPrototype) ;
+	}
+
+	private function buildPrototypeShortcut(&$arrPrototype)
+	{
+		$this->arrPrototypeShortcut[$arrPrototype['xpath']] =& $arrPrototype ;
 		
-	}*/
-	
+		foreach($arrPrototype['assoc'] as &$arrAssoc)
+		{
+			$this->buildPrototypeShortcut($arrAssoc) ;
+		}
+	}
 	
 	private $arrPrototype = array() ;
 	
 	private $arrPrototypeShortcut = array() ;
-	
-	private $arrSwitchStack ;
 	
 	
 	// 共享状态

@@ -25,7 +25,7 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\auth ;
 
-use org\jecat\framework\mvc\model\IModel;
+use org\jecat\framework\mvc\model\Model;
 
 interface IIdentity 
 {	
@@ -58,10 +58,10 @@ interface IIdentity
 	
 	
 	/**
-	 * @return org\jecat\framework\mvc\model\IModel
+	 * @return org\jecat\framework\mvc\model\Model
 	 */
 	public function model() ;
-	public function setModel(IModel $aModel) ;
+	public function setModel(Model $aModel) ;
 	
 	
 }

@@ -25,6 +25,8 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\view ;
 
+use org\jecat\framework\util\IDataSrc;
+
 use org\jecat\framework\mvc\controller\Controller;
 use org\jecat\framework\message\IMessageQueueHolder;
 use org\jecat\framework\io\IOutputStream;
@@ -110,6 +112,17 @@ interface IView extends IMessageQueueHolder, IWidgetContainer
      * @return IVew
      */
     public function setParent(IView $aIView=null) ;
+    
+
+    public function loadWidgets(IDataSrc $aDataSrc=null,$bVerify=true) ;
+    
+    public function verifyWidgets() ;
+    
+    public function isSubmit(IDataSrc $aDataSrc=null) ;
+    
+    public function hideForm($bHide=true,$sFormName='form') ;
+    
+    public function isShowForm($sFormName='form') ;
     
 }
 

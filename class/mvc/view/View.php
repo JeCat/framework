@@ -25,6 +25,8 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\view ;
 
+use org\jecat\framework\mvc\view\widget\IViewFormWidget;
+use org\jecat\framework\util\IDataSrc;
 use org\jecat\framework\system\Application;
 use org\jecat\framework\lang\Type;
 use org\jecat\framework\pattern\composite\IContainer;
@@ -217,6 +219,11 @@ class View implements IView, IBean, IAssemblable
     	if(!empty($arrConfig['cssClass']))
     	{
     		$this->setCssClass($arrConfig['cssClass']) ;
+    	}
+
+    	if( isset($arrConfig['hideForm']) )
+    	{
+    		$this->hideForm( $arrConfig['hideForm']?true:false ) ;
     	}
     	
     	$this->arrBeanConfig = $arrConfig ;
@@ -912,6 +919,84 @@ class View implements IView, IBean, IAssemblable
     {
     	return $this->arrAssembleList? new \ArrayIterator($this->arrAssembleList): new \EmptyIterator() ;	
     }
+
+    public function loadWidgets(IDataSrc $aDataSrc=null,$bVerify=true)
+    {
+    	if( !$aDataSrc )
+    	{
+    		if( !$aController=$this->controller() )
+    		{
+    			throw new Exception("FormView::loadWidgets()的参数\$aDataSrc为空，并且该 FormView 对像没有被添加给一个控制器，因此无法得到数据。") ;
+    		}
+    		$aDataSrc = $aController->params() ;
+    	}
+    
+    	// 加载数据
+    	foreach($this->widgets() as $aWidget)
+    	{
+    		$aWidget->setDataFromSubmit($aDataSrc) ;
+    	}
+    
+    	// for children
+    	foreach($this->viewIterator() as $aChild)
+    	{
+    		$aChild->loadWidgets($aDataSrc) ;
+    	}
+    
+    	// 校验数据
+    	return !$bVerify or $this->verifyWidgets() ;
+    }
+    
+    public function verifyWidgets()
+    {
+    	$bRet = true ;
+    
+    	foreach($this->widgets() as $aWidget)
+    	{
+    		if( ($aWidget instanceof IViewFormWidget) and !$aWidget->verifyData() )
+    		{
+    			$bRet = false ;
+    		}
+    	}
+    
+    	// for children
+    	foreach($this->viewIterator() as $aChild)
+    	{
+    		if( !$aChild->verifyWidgets() )
+    		{
+    			$bRet = false ;
+    		}
+    	}
+    
+    	return $bRet ;
+    }
+    
+    public function isSubmit(IDataSrc $aDataSrc=null)
+    {
+    	if(!$aDataSrc)
+    	{
+    		$aController = $this->controller() ;
+    		if(!$aController)
+    		{
+    			return false ;
+    		}
+    		$aDataSrc = $aController->params() ;
+    	}
+    	return $aDataSrc->get('viewXPath')===$this->xpath(true) ;
+    }
+    public function isShowForm($sFormName='form')
+    {
+    	if(!isset($this->arrShowForm[$sFormName]))
+    	{
+    		$this->arrShowForm[$sFormName] = true ;
+    	}
+    	return $this->arrShowForm[$sFormName] ;
+    }
+    
+    public function hideForm($bHide=true,$sFormName='form')
+    {
+    	$this->arrShowForm[$sFormName] = $bHide? false: true ;
+    }
     
 	private $aModel ;
 	private $aWidgets ;
@@ -940,6 +1025,9 @@ class View implements IView, IBean, IAssemblable
 
 	static private $arrAssignedId = array() ;
     static private $arrRegisteredViews = array() ;
+    
+    
+    private $arrShowForm ;
 }
 
 
