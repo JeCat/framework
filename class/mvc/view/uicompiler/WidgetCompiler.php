@@ -157,7 +157,7 @@ class WidgetCompiler extends NodeCompiler
 			$arrNamePart = explode('.',$sName);
 			
 			// expression
-			if( count($arrNamePart) >0 and end($arrNamePart) ==='type' ){
+			if( count($arrNamePart) >1 and end($arrNamePart) ==='type' ){
 				continue;
 			}
 			
