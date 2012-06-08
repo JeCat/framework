@@ -52,15 +52,21 @@ interface IView extends IMessageQueueHolder, IWidgetContainer
 	public function enable($bEnalbe=true) ;
 	
 	public function isEnable() ;
-	
+
+	/**
+	 * @return IVew
+	 */
 	public function exchangeData($nWay=DataExchanger::MODEL_TO_WIDGET) ;
 	
 	/**
-	 * @return org\jecat\framework\mvc\model\IModel
+	 * @return org\jecat\framework\mvc\model\Model
 	 */
 	public function model() ;
-	
-	public function setModel(IModel $aModel) ;
+
+	/**
+	 * @return IView
+	 */
+	public function setModel($model,$sPrototypeName=null,$primaryKeys=null,$columns=null) ;
 	
 	/**
 	 * @return org\jecat\framework\mvc\controller\IContainer
@@ -120,7 +126,7 @@ interface IView extends IMessageQueueHolder, IWidgetContainer
     
     public function isSubmit(IDataSrc $aDataSrc=null) ;
     
-    public function hideForm($bHide=true,$sFormName='form') ;
+    public function hideForm($sFormName='form',$bHide=true) ;
     
     public function isShowForm($sFormName='form') ;
     

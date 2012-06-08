@@ -25,6 +25,8 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\view ;
 
+use org\jecat\framework\mvc\model\Model;
+
 use org\jecat\framework\mvc\view\widget\IViewFormWidget;
 use org\jecat\framework\util\IDataSrc;
 use org\jecat\framework\system\Application;
@@ -245,12 +247,25 @@ class View implements IView, IBean, IAssemblable
 	/**
 	 * @return IView
 	 */
-	public function setModel(IModel $aModel)
+	public function setModel($model,$sPrototypeName=null,$primaryKeys=null,$columns=null)
 	{
-		$this->aModel = $aModel ;
+		if( is_string($model) )
+		{
+			$this->aModel = Model::create($model,$sPrototypeName,$primaryKeys,$columns) ;
+		}
+		else if( $model instanceof Model )
+		{
+			$this->aModel = $model ;
+		}
+		else
+		{
+			throw new Exception("View::setModel() 的参数 \$model 类型必须是代表数据表名的字符串 或 Model 对像") ;
+		}
+		
 		foreach($this->arrObserver as $aObserver){
 		    $aObserver->onModelChanging($this);
 		}
+		
 		return $this ;
 	}
 	
@@ -454,8 +469,12 @@ class View implements IView, IBean, IAssemblable
 		$this->widgets()->set($aWidget->id(),$aWidget) ;
 		$aWidget->setView($this) ;
 		
-		if( $sExchangeName )
+		if( $sExchangeName!==false )
 		{
+			if($sExchangeName===null)
+			{
+				$sExchangeName = $aWidget->formName() ;
+			}
 			$this->dataExchanger()->link($aWidget->id(), $sExchangeName) ;
 		}
 		
@@ -522,10 +541,12 @@ class View implements IView, IBean, IAssemblable
 		}
 	
 		// for children
-		foreach($this->iterator() as $aChild)
+		foreach($this->viewIterator() as $aChild)
 		{
 			$aChild->exchangeData($nWay) ;
 		}
+		
+		return $this ;
 	}
 
 	/**
@@ -993,7 +1014,7 @@ class View implements IView, IBean, IAssemblable
     	return $this->arrShowForm[$sFormName] ;
     }
     
-    public function hideForm($bHide=true,$sFormName='form')
+    public function hideForm($sFormName='form',$bHide=true)
     {
     	$this->arrShowForm[$sFormName] = $bHide? false: true ;
     }

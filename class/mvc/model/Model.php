@@ -427,16 +427,17 @@ class Model implements \Iterator, \ArrayAccess, \Serializable
 	}
 	public function setData($sName,$value)
 	{
-		if( $arrRow =& $this->localeRow($sName,$this->arrData) )
+		$arrRow =& $this->localeRow($sName,$this->arrData,-1,true) ;
+		if( $arrRow!==null )
 		{
 			return $arrRow[$sName] = $value ;
 		}
 	}
-	private function & rowRef($sChildName=null,$bCreateRowIfNotExists=false)
+	private function & rowRef($sChildName=null,$bCreateNewRow=false)
 	{
 		if($sChildName===null)
 		{
-			return $this->currentRow($this->arrData,$bCreateRowIfNotExists) ;
+			return $this->currentRow($this->arrData,$bCreateNewRow) ;
 		}
 		else
 		{
@@ -454,6 +455,9 @@ class Model implements \Iterator, \ArrayAccess, \Serializable
 	{
 		return $this->rowRef($sChildName) ;
 	}
+	/**
+	 * @return Model
+	 */
 	public function setRow($arrDatas,$sChildName=null)
 	{
 		$arrSheet =& $this->buildSheet($sChildName) ;
@@ -463,6 +467,7 @@ class Model implements \Iterator, \ArrayAccess, \Serializable
 		{
 			$arrRow[$key] = $value ;
 		}
+		return $this ;
 	}
 	public function addRow($arrRow=null,$sChildName=null)
 	{
@@ -537,11 +542,11 @@ class Model implements \Iterator, \ArrayAccess, \Serializable
 		return $arrParentRow[$sXPath] ;
 	}
 	
-	private function & currentRow(array & $arrSheet,$bCreateRowIfNotExists=false)
+	private function & currentRow(array & $arrSheet,$bCreateNewRow=false)
 	{
 		if(empty($arrSheet))
 		{
-			if($bCreateRowIfNotExists)
+			if($bCreateNewRow)
 			{
 				$arrSheet[] = array() ;
 			}
@@ -556,7 +561,7 @@ class Model implements \Iterator, \ArrayAccess, \Serializable
 		if(empty($arrSheet[$nRow])) $arrSheet[$nRow] = array();
 		if(!is_array($arrSheet[$nRow]) )
 		{
-			if($bCreateRowIfNotExists)
+			if($bCreateNewRow)
 			{
 				$arrSheet[$nRow] = array() ;
 			}
@@ -569,29 +574,28 @@ class Model implements \Iterator, \ArrayAccess, \Serializable
 		return $arrSheet[$nRow] ;
 	}
 	
-	private function & localeRow($sName,array & $arrSheet,$pos=-1)
+	private function & localeRow($sName,array & $arrSheet,$pos=-1,$bCreateNewRow=false)
 	{
-		if( !$arrRow=&$this->currentRow($arrSheet) )
+		$arrRow = &$this->currentRow($arrSheet,$bCreateNewRow) ;
+		if( $arrRow===null )
 		{
 			return self::$null ;
 		}
 		
-		if( array_key_exists($sName,$arrRow) )
-		{
-			return $arrRow ;
-		}
-		else
+		// 尝试定位下级表
+		if( !array_key_exists($sName,$arrRow) )
 		{
 			while( ($pos=strpos($sName,'.',$pos+1))!==false )
 			{
 				$sSubName = substr($sName,0,$pos) ;
 				if( $this->isSheet($arrRow,$sSubName) )
 				{
-					return $this->localeRow($sName,$arrRow[$sSubName],$pos) ;
+					return $this->localeRow($sName,$arrRow[$sSubName],$pos,$bCreateNewRow) ;
 				} 
 			}
-			return self::$null ;
 		}
+
+		return $arrRow ;
 	}
 	
 	public function isSheet(array & $arrRow,$sDataName)

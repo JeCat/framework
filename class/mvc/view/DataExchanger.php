@@ -78,11 +78,11 @@ class DataExchanger
 
 	public function exchange(IView $aView,$nWay=self::MODEL_TO_WIDGET)
 	{
-		if( !$aView->model() )
+		if( !$aModel=$aView->model() )
 		{
 			throw new Exception("视图尚未设置模型，无法进行数据交换") ;
 		}
-		
+				
 		foreach(array_keys($this->arrLinks) as $sWidgetId)
 		{
 			$this->exchangeWidget($aView,$sWidgetId,$nWay) ;
