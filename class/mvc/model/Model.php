@@ -8,7 +8,7 @@ use org\jecat\framework\mvc\model\executor\Selecter;
 use org\jecat\framework\db\DB;
 use org\jecat\framework\lang\Exception;
 
-class Model implements \Iterator, \ArrayAccess
+class Model implements \Iterator, \ArrayAccess, \Serializable
 {
 	public function __construct($table,$sPrototypeName,$primaryKeys=null,$columns=null)
 	{
@@ -693,6 +693,30 @@ class Model implements \Iterator, \ArrayAccess
 	        $arrSheet =& $this->buildSheet($sChildName) ;
 	        return key($arrSheet) !== null ;
 	    }
+	}
+	
+	// implements \Serializable
+	public function serialize()
+	{
+		return serialize(array(
+			$this->aPrototype ,
+			$this->arrData ,
+			$this->sDataPrefix ,
+			$this->nDataPrefixLength ,
+		)) ;
+	}
+	
+	/**
+	 * @param serialized
+	 */
+	public function unserialize($serialized)
+	{
+		list(
+			$this->aPrototype
+			, $this->arrData
+			, $this->sDataPrefix
+			, $this->nDataPrefixLength
+		) = unserialize($serialized) ;
 	}
 	
 	const ignore = '~-+ignore this arg+-~' ;

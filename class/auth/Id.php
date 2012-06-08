@@ -162,14 +162,12 @@ class Id extends Object implements IIdentity, \Serializable
 	
 	public function serialize ()
 	{
-		$arrData['model'] =& $this->aModel ;
-		return serialize( $arrData ) ;
+		return serialize( $this->aModel ) ;
 	}
 
 	public function unserialize ($sSerialized)
 	{
-		$arrData = unserialize($sSerialized) ;
-		$this->aModel =& $arrData['model'] ;
+		$this->aModel = unserialize($sSerialized) ;
 	}
 	
 	public function userId()
