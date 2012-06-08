@@ -450,7 +450,7 @@ class Category extends Object
 		$aParentsModelList->loadSql("lft < @1 and rgt > @2" , $aModel->lft , $aModel->rgt);
 		return $aParentsModelList;
 	}
-	
+
 	/**
 	 *
 	 * @param Model $aModel 子分类的model
