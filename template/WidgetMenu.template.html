@@ -6,7 +6,7 @@
 	showOnMouseOver="{=$theWidget->isShowOnMouseOver()?'on':'off'}"
 	showDepth="{=$theWidget->showDepths()}" >
 <foreach for='$theWidget->itemIterator()' item='aItem'>
-	<widget instance='$aItem' />
+	<widget instance='$aItem' attr.showDepths="$attr['showDepths']" attr.showDepths.type="expression" />
 </foreach>
 <li class="clear"></li>
 </ul>

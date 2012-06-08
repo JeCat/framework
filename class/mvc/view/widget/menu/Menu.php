@@ -30,6 +30,7 @@ use org\jecat\framework\bean\BeanFactory;
 use org\jecat\framework\ui\UI;
 use org\jecat\framework\io\IOutputStream;
 use org\jecat\framework\util\IHashTable;
+use org\jecat\framework\util\HashTable;
 
 HtmlResourcePool::singleton()->addRequire('org.jecat.framework:style/widget/menu.css',HtmlResourcePool::RESRC_CSS) ;
 HtmlResourcePool::singleton()->addRequire('org.jecat.framework:js/mvc/view/widget/menu.js',HtmlResourcePool::RESRC_JS) ;
@@ -357,27 +358,30 @@ class Menu extends AbstractBase
 	
 	public function display(UI $aUI,IHashTable $aVariables=null,IOutputStream $aDevice=null)
 	{
-		if(($depth=$this->attribute('depth'))!==null)
+		$arrAttr = $aVariables->get('attr');
+		if( isset($arrAttr['depth']) and $depth = $arrAttr['depth'] )
 		{
 			if( $aMenu = $this->findActiveSubMenu((int)$depth) )
 			{
+				unset($arrAttr['depth']);
+				$aVariables->set('attr',$arrAttr);
 				$aMenu->display($aUI,$aVariables,$aDevice);
 			}
 		}
-		else if(($xpath=$this->attribute('xpath'))!==null)
+		else if( isset( $arrAttr['xpath']) and $xpath=$arrAttr['xpath'] )
 		{
 			if( $aMenu = $this ->getMenuByPath($xpath) )
 			{
 				$aMenu->display($aUI,$aVariables,$aDevice);
 			}
 		}
-		
-		else
+		else if( isset( $arrAttr['showDepths'] ) and $showDepths = (int)$arrAttr['showDepths'] and $showDepths > 0)
 		{
-			if($this->showDepths()!=0 || $this->isRenderAll() )
-			{
-				parent::display($aUI,$aVariables,$aDevice) ;
-			}
+			$arrAttr['showDepths'] = $showDepths -1 ;
+			$aVariables->set('attr',$arrAttr);
+			parent::display($aUI,$aVariables,$aDevice) ;
+		}else if( !isset( $arrAttr['showDepths'] ) ){
+			parent::display($aUI,$aVariables,$aDevice) ;
 		}
 	}
 	

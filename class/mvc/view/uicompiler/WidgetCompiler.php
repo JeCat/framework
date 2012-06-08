@@ -33,6 +33,7 @@ use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\ObjectContainer;
 use org\jecat\framework\bean\BeanConfXml;
 use org\jecat\framework\ui\xhtml\Attributes;
+use org\jecat\framework\ui\xhtml\Expression;
 
 /**
  * 
@@ -143,7 +144,23 @@ class WidgetCompiler extends NodeCompiler
 	protected function writeAttr(Attributes $aAttrs , TargetCodeOutputStream $aDev , $sWidgetVarName){
 		$arrAttr = array();
 		foreach($aAttrs as $sName=>$aValue){
+			if(
+				in_array(
+					$sName ,
+					array(
+						'instance'
+					)
+				)
+			){
+				continue;
+			}
 			$arrNamePart = explode('.',$sName);
+			
+			// expression
+			if( count($arrNamePart) >1 and end($arrNamePart) ==='type' ){
+				continue;
+			}
+			
 			
 			$arrSubAttr = &$arrAttr ;
 			foreach($arrNamePart as $sNamePart){
@@ -153,15 +170,41 @@ class WidgetCompiler extends NodeCompiler
 				
 				$arrSubAttr = & $arrSubAttr[$sNamePart];
 			}
-			$arrSubAttr = trim($aAttrs->get($sName) ,'"');
+			$arrSubAttr = $aAttrs->get($sName) ;
 			
 			unset($arrSubAttr);
 		}
 		
-		$strAttrExport = var_export( $arrAttr , true );
-		$aDev->putCode("	\$arrBean = $strAttrExport ;",'preprocess');
-		$aDev->putCode("	\$arrBean = $strAttrExport ;",'render');
+		$aDev->putCode("	\$arrBean = ",'preprocess');
+		$this->writeAttrPri( $arrAttr , $aDev , 1 , 'preprocess' );
+		$aDev->putCode("	;",'preprocess');
 		$aDev->putCode("	{$sWidgetVarName}->buildBean( \$arrBean ); ",'preprocess');
+		
+		$aDev->putCode("	\$arrBean = ",'render');
+		$this->writeAttrPri( $arrAttr , $aDev , 1 , 'render' );
+		$aDev->putCode("	;",'render');
+	}
+	
+	private function writeAttrPri(array $arrAttr,TargetCodeOutputStream $aDev , $nTabCount , $sSubTemplateName){
+		$aDev->putCode(str_repeat('	',$nTabCount)." array(" , $sSubTemplateName );
+		
+		foreach($arrAttr as $key => $value){
+			if( is_string( $value ) or is_int( $value ) ){
+				$aDev->putCode( str_repeat('	',$nTabCount).'"'.$key.'"'.' => '.$value.' ,' , $sSubTemplateName );
+			}else
+			if( is_array( $value ) ){
+				$aDev->putCode( str_repeat('	',$nTabCount).'"'.$key.'"'.' => ', $sSubTemplateName );
+				$this->writeAttrPri( $value , $aDev , $nTabCount+1 , $sSubTemplateName );
+				$aDev->putCode( ' , ', $sSubTemplateName );
+			}else if( $value instanceof Expression ){
+				//echo 'expression:';var_dump($value);
+				$aDev->putCode( str_repeat('	',$nTabCount).'"'.$key.'"'.' => ', $sSubTemplateName );
+				$aDev->putCode( $value , $sSubTemplateName );
+				$aDev->putCode( ' , ', $sSubTemplateName );
+			}
+		}
+		
+		$aDev->putCode(str_repeat('	',$nTabCount)." )",$sSubTemplateName);
 	}
 	
 	protected function writeBean(IObject $aObject , TargetCodeOutputStream $aDev , $sWidgetVarName){
