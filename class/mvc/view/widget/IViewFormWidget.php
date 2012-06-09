@@ -60,6 +60,7 @@ interface IViewFormWidget extends IViewWidget
 	public function isDisabled();
 	
 	public function setDisabled($bDisabled);
-
+    
+    public function formName();
 }
 

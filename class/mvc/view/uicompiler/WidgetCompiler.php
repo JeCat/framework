@@ -34,6 +34,8 @@ use org\jecat\framework\ui\ObjectContainer;
 use org\jecat\framework\bean\BeanConfXml;
 use org\jecat\framework\ui\xhtml\Attributes;
 use org\jecat\framework\ui\xhtml\Expression;
+use org\jecat\framework\ui\xhtml\Node;
+use org\jecat\framework\ui\xhtml\Text;
 
 /**
  * 
@@ -48,7 +50,7 @@ class WidgetCompiler extends NodeCompiler
 		$aAttrs = $this->getAttrs($aObject) ;
 		
 		if( $aAttrs->has('ignore') or
-			(  $aObject->tagName() === 'input' and $aAttrs->string('type') === 'submit' )
+			( $aObject->tagName() === 'input' and in_array( $aAttrs->string('type') , array( 'submit' ,'reset','button','image') ) )
 		){
 			return parent::compile(
 				$aObject
@@ -60,7 +62,7 @@ class WidgetCompiler extends NodeCompiler
 		
 		$this->writeTheView($aDev) ;
 		
-		$sId = $this->writeObject($aAttrs , $aObjectContainer , $aDev , $sWidgetVarName);
+		$sId = $this->writeObject($aAttrs , $aObject , $aObjectContainer , $aDev , $sWidgetVarName);
 		if( false === $sId ){
 			return false;
 		}
@@ -91,17 +93,56 @@ class WidgetCompiler extends NodeCompiler
 		return $aAttrs ;
 	}
 	
-	protected function writeObject(Attributes $aAttrs , ObjectContainer $aObjectContainer , TargetCodeOutputStream $aDev , $sWidgetVarName){
+	protected function writeObject(Attributes $aAttrs , Node $aNode , ObjectContainer $aObjectContainer , TargetCodeOutputStream $aDev , $sWidgetVarName){
 		if( $aAttrs->has('instance') ){
 			$aDev->putCode("{",'preprocess') ;
 			return 'CreateByInstance';
 		}
-		if( $aAttrs->has('type') ){
-			$sClassName = $aAttrs->get('type') ;
+		$sClassName = null ;
+		$sType = null ;
+		switch( $aNode->tagName() ){
+		case 'widget':
+			if( $aAttrs->has('type') ){
+				$sClassName = $aAttrs->string('type') ;
+			}
+			break;
+		case 'input':
+			if( $aAttrs->has('type') ){
+				switch( $aAttrs->string('type') ){
+				case 'password':
+				case 'hidden':
+				case 'text':
+					$sClassName = 'text';
+					$sType = $aAttrs->string('type') ;
+					break;
+				case 'checkbox':
+				case 'file':
+				case 'radio':
+					$sClassName = $aAttrs->string('type') ;
+					break;
+				}
+			}else{
+				$sClassName = $sType = 'text';
+			}
+			break;
+		case 'textarea':
+			$sClassName = 'text';
+			$sType = 'multiple';
+			break;
+		case 'select':
+			$sClassName = 'select';
+			break;
+		}
+		
+		if( $sType !== null ){
+			$aAttrs->set('bean.type',$sType);
+		}
+		
+		if( $sClassName !== null  ){
 			
 			$aDev->putCode("\r\n//// ------- 创建 widget: {$sClassName} ---------------------",'preprocess') ;
 			
-			$aDev->putCode("\$__widget_class = \\org\\jecat\\framework\\bean\\BeanFactory::singleton()->beanClassNameByAlias({$sClassName})?: $sClassName ;",'preprocess') ;
+			$aDev->putCode("\$__widget_class = \\org\\jecat\\framework\\bean\\BeanFactory::singleton()->beanClassNameByAlias(\"{$sClassName}\")?: $sClassName ;",'preprocess') ;
 			$aDev->putCode("if( !class_exists(\$__widget_class) ){",'preprocess') ;
 			$aDev->output("缺少 widget (class:{$sClassName})",'preprocess') ;
 			$aDev->putCode("}else{",'preprocess') ;
@@ -143,24 +184,34 @@ class WidgetCompiler extends NodeCompiler
 	
 	protected function writeAttr(Attributes $aAttrs , TargetCodeOutputStream $aDev , $sWidgetVarName){
 		$arrAttr = array();
+		
+		// default as
+		foreach( self::$arrDefaultAs as $key => $value){
+			if( ! $aAttrs->has($key) and $aAttrs->has($value) ){
+				$aAttrs->set( $key , $aAttrs->get($value) );
+			}
+		}
+		
+		// attr to array
 		foreach($aAttrs as $sName=>$aValue){
 			if(
 				in_array(
 					$sName ,
-					array(
-						'instance'
-					)
+					self::$arrEscapeAttr
 				)
 			){
 				continue;
 			}
+			
+			if( isset( self::$arrAttrAlias[$sName] ) ){
+				$sName = self::$arrAttrAlias[$sName] ;
+			}
 			$arrNamePart = explode('.',$sName);
 			
 			// expression
-			if( count($arrNamePart) >1 and end($arrNamePart) ==='type' ){
+			if( count($arrNamePart) >1 and $arrNamePart[0] !=='bean' and end($arrNamePart) ==='type' ){
 				continue;
 			}
-			
 			
 			$arrSubAttr = &$arrAttr ;
 			foreach($arrNamePart as $sNamePart){
@@ -175,11 +226,21 @@ class WidgetCompiler extends NodeCompiler
 			unset($arrSubAttr);
 		}
 		
-		$aDev->putCode("	\$arrBean = ",'preprocess');
-		$this->writeAttrPri( $arrAttr , $aDev , 1 , 'preprocess' );
-		$aDev->putCode("	;",'preprocess');
-		$aDev->putCode("	{$sWidgetVarName}->buildBean( \$arrBean ); ",'preprocess');
+		if( isset( $arrAttr['bean'] ) ){
+			$aDev->putCode("	\$arrBean = ",'preprocess');
+			$this->writeAttrPri( $arrAttr['bean'] , $aDev , 1 , 'preprocess' );
+			$aDev->putCode("	;",'preprocess');
+			$aDev->putCode("	{$sWidgetVarName}->buildBean( \$arrBean ); ",'preprocess');
+		}
 		
+		$arrIgnoreForRender = array(
+			'bean',
+			'display',
+			'define',
+		);
+		foreach($arrIgnoreForRender as $sIgnore){
+			unset($arrAttr[$sIgnore]);
+		}
 		$aDev->putCode("	\$arrBean = ",'render');
 		$this->writeAttrPri( $arrAttr , $aDev , 1 , 'render' );
 		$aDev->putCode("	;",'render');
@@ -197,7 +258,6 @@ class WidgetCompiler extends NodeCompiler
 				$this->writeAttrPri( $value , $aDev , $nTabCount+1 , $sSubTemplateName );
 				$aDev->putCode( ' , ', $sSubTemplateName );
 			}else if( $value instanceof Expression ){
-				//echo 'expression:';var_dump($value);
 				$aDev->putCode( str_repeat('	',$nTabCount).'"'.$key.'"'.' => ', $sSubTemplateName );
 				$aDev->putCode( $value , $sSubTemplateName );
 				$aDev->putCode( ' , ', $sSubTemplateName );
@@ -211,14 +271,42 @@ class WidgetCompiler extends NodeCompiler
 		// bean
 		if( $aBean = $aObject->getChildNodeByTagName('bean') ){
 			$arrBean = BeanConfXml::singleton()->xmlSourceToArray( $aBean->source() ) ;
+			$aObject->remove($aBean);
+		}else{
+			$arrBean = array() ;
+		}
+		
+		if($aObject->tagName() === 'select' ){
+			$arrBean['options'] = array() ;
+			foreach($aObject->childElementsIterator() as $aChild)
+			{
+				if( ($aChild instanceof Node) and ($aChild->tagName()=='option') )
+				{
+					$sText = '';
+					$sValue = $aChild->attributes()->get('value');
+					$sSelect = $aChild->attributes()->string('selected');
+					foreach( $aChild->childElementsIterator() as $aChildChild){
+						if( $aChildChild instanceof Text ){
+							$sText .= $aChildChild->source();
+						}
+					}
+					$arrBean['options'][] = array(
+						0 => $sText ,
+						1 => $sValue ,
+						2 => ( $sSelect === 'selected' ),
+					);
+					$aObject->remove($aChild);
+				}
+			}
+		}
+		
+		if( count($arrBean) > 0 ){
 			$strVarExport = var_export($arrBean,true);
 			
 			$aDev->putCode("	\$arrFormer = {$sWidgetVarName}->beanConfig(); ",'preprocess');
 			$aDev->putCode("	\$arrBean = $strVarExport ;",'preprocess');
 			$aDev->putCode("	\\org\\jecat\\framework\\bean\\BeanFactory::mergeConfig(\$arrFormer, \$arrBean); ",'preprocess');
 			$aDev->putCode("	{$sWidgetVarName}->buildBean( \$arrFormer ); ",'preprocess');
-			
-			$aObject->remove($aBean);
 		}
 	}
 	
@@ -289,5 +377,18 @@ class WidgetCompiler extends NodeCompiler
 		$aDev->putCode("}",'preprocess') ;
 		$aDev->putCode("//// ---------------xxx------------------------------------\r\n",'preprocess') ;
 	}
+	
+	static private $arrEscapeAttr = array(
+		'instance' ,
+	);
+	
+	static private $arrAttrAlias = array(
+		'min' => 'bean.verifiers.length.min' ,
+		'max' => 'bean.verifiers.length.max' ,
+	);
+	
+	static private $arrDefaultAs = array(
+		'bean.title' => 'title' ,
+	);
 }
 

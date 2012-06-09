@@ -64,9 +64,6 @@ class BeanFactory extends Object implements \Serializable
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\view\\widget\\menu\\Menu",'menu') ;
 			
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\view\\widget\\RadioGroup",'radio') ;
-			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\view\\widget\\Text",'hidden') ;
-			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\view\\widget\\Text",'password') ;
-			
 			
 			// verifyers
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\verifier\\Email",'email') ;

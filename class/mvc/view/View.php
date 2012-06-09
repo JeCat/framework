@@ -469,7 +469,7 @@ class View implements IView, IBean, IAssemblable
 		$this->widgets()->set($aWidget->id(),$aWidget) ;
 		$aWidget->setView($this) ;
 		
-		if( $sExchangeName!==false )
+		if( $sExchangeName!==false and $aWidget instanceof IViewFormWidget)
 		{
 			if($sExchangeName===null)
 			{

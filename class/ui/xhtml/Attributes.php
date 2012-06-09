@@ -45,6 +45,13 @@ class Attributes extends HashTable
 	
 	public function add(AttributeValue $aVal)
 	{
+		if( $sName = $aVal->name() and substr($sName,0,2) === 'e:' ){
+			$sRealName = substr($sName,2);
+			$aVal->setName( $sRealName );
+			
+			$this->set( $sRealName.'.type' , 'expression' );
+		}
+		
 		if( $aVal->name() )
 		{
 			parent::set($aVal->name(),$aVal) ;
