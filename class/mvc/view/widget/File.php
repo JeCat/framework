@@ -35,7 +35,7 @@ use org\jecat\framework\fs\archive\IAchiveStrategy;
 use org\jecat\framework\fs\archive\DateAchiveStrategy;
 use org\jecat\framework\fs\File as FsFile;
 
-class File extends FormWidget
+class File extends FormWidget implements IShortableBean
 {
 	
 	public function __construct($sId = null, $sTitle = null, Folder $aFolder = null, IAchiveStrategy $aAchiveStrategy = null, IView $aView = null)
@@ -106,11 +106,22 @@ class File extends FormWidget
 		
 		if (array_key_exists ( 'folder', $arrConfig ))
 		{
-			$this->aStoreFolder = Folder::singleton()->findFolder($arrConfig['folder'],Folder::FIND_AUTO_CREATE);
+			$folder = $arrConfig['folder'] ;
+			if( $folder instanceof Folder ){
+				$this->aStoreFolder = $folder ;
+			}else{
+				$this->aStoreFolder = Folder::singleton()->findFolder($arrConfig['folder'],Folder::FIND_AUTO_CREATE);
+			}
 		}
 		if (array_key_exists ( 'fullpath', $arrConfig ))
 		{
 			$this->setFullPath($arrConfig['fullpath']);
+		}
+		if (array_key_exists( 'strategy' , $arrConfig ) ){
+			$sStrategyClass = 'org\jecat\framework\fs\archive\\'.$arrConfig['strategy'].'AchiveStrategy';
+			if( class_exists( $sStrategyClass ) ){
+				$this->aAchiveStrategy = $sStrategyClass::singleton ( );
+			}
 		}
 	}
 	
@@ -324,6 +335,14 @@ class File extends FormWidget
 		{
 			return true;
 		}
+	}
+	
+	static public function beanAliases(){
+		return array(
+			'folder' => 'bean.folder' ,
+			'httpurl' => 'bean.httpurl' ,
+			'strategy' => 'bean.strategy' ,
+		);
 	}
 	
 	private $aAchiveStrategy;

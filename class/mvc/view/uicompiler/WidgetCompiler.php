@@ -66,7 +66,7 @@ class WidgetCompiler extends NodeCompiler
 		if( false === $sId ){
 			return false;
 		}
-		$this->writeAttr($aAttrs , $aDev , $sWidgetVarName);
+		$this->writeAttr($aAttrs , $aObjectContainer , $aDev , $sWidgetVarName);
 		$this->writeBean($aObject ,  $aDev , $sWidgetVarName) ;
 		$this->writeTemplate($aObject , $aAttrs , $aObjectContainer , $aDev , $aCompilerManager , $sWidgetVarName) ;
 		$this->compileChildren($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
@@ -98,6 +98,10 @@ class WidgetCompiler extends NodeCompiler
 			$aDev->putCode("{",'preprocess') ;
 			return 'CreateByInstance';
 		}
+		if( $aAttrs->has('define') and ! $aAttrs->bool('define') ){
+			$aDev->putCode("{",'preprocess') ;
+			return $aAttrs->get('id');
+		}
 		$sClassName = null ;
 		$sType = null ;
 		switch( $aNode->tagName() ){
@@ -116,8 +120,11 @@ class WidgetCompiler extends NodeCompiler
 					$sType = $aAttrs->string('type') ;
 					break;
 				case 'checkbox':
-				case 'file':
 				case 'radio':
+					$sClassName = 'checkbox';
+					$sType = $aAttrs->string('type') ;
+					break;
+				case 'file':
 					$sClassName = $aAttrs->string('type') ;
 					break;
 				}
@@ -142,11 +149,12 @@ class WidgetCompiler extends NodeCompiler
 			
 			$aDev->putCode("\r\n//// ------- 创建 widget: {$sClassName} ---------------------",'preprocess') ;
 			
-			$aDev->putCode("\$__widget_class = \\org\\jecat\\framework\\bean\\BeanFactory::singleton()->beanClassNameByAlias(\"{$sClassName}\")?: $sClassName ;",'preprocess') ;
-			$aDev->putCode("if( !class_exists(\$__widget_class) ){",'preprocess') ;
+			$__widget_class = \org\jecat\framework\bean\BeanFactory::singleton()->beanClassNameByAlias($sClassName)?: $sClassName ;
+			
+			$aDev->putCode("if( !class_exists('$__widget_class') ){",'preprocess') ;
 			$aDev->output("缺少 widget (class:{$sClassName})",'preprocess') ;
 			$aDev->putCode("}else{",'preprocess') ;
-			$aDev->putCode("	{$sWidgetVarName} = new \$__widget_class ;",'preprocess') ;
+			$aDev->putCode("	{$sWidgetVarName} = new $__widget_class ;",'preprocess') ;
 			
 			if( $aAttrs->has('id') ){
 				$sId = $aAttrs->get('id');
@@ -163,6 +171,15 @@ class WidgetCompiler extends NodeCompiler
 			$aDev->putCode("	{$sWidgetVarName}->setId( $sId );",'preprocess') ;
 			$aDev->putCode("	\$theView->addWidget({$sWidgetVarName});",'preprocess') ;
 			
+			
+			$arrWidgetClass = $aObjectContainer->properties()->get('arrWidgetClass');
+			if( null === $arrWidgetClass ){
+				$arrWidgetClass = array() ;
+			}
+			
+			$arrWidgetClass[ $sWidgetVarName ] = $__widget_class ;
+			
+			$aObjectContainer->properties()->set('arrWidgetClass',$arrWidgetClass );
 			return $sId ;
 		}else{
 			if( $aAttrs->has('id') ){
@@ -182,13 +199,24 @@ class WidgetCompiler extends NodeCompiler
 		}
 	}
 	
-	protected function writeAttr(Attributes $aAttrs , TargetCodeOutputStream $aDev , $sWidgetVarName){
+	protected function writeAttr(Attributes $aAttrs , ObjectContainer $aObjectContainer , TargetCodeOutputStream $aDev , $sWidgetVarName){
 		$arrAttr = array();
 		
 		// default as
 		foreach( self::$arrDefaultAs as $key => $value){
 			if( ! $aAttrs->has($key) and $aAttrs->has($value) ){
-				$aAttrs->set( $key , $aAttrs->get($value) );
+				$aAttrs->set( $key , $aAttrs->string($value) );
+			}
+		}
+		
+		$arrShortableBeanAttrAlias = array() ;
+		if( $arrWidgetClass = $aObjectContainer->properties()->get('arrWidgetClass') and isset($arrWidgetClass[$sWidgetVarName] ) ){
+			$__widget_class = $arrWidgetClass[ $sWidgetVarName ] ;
+			
+			$arrImplements = class_implements( $__widget_class );
+			
+			if( in_array( 'org\jecat\framework\mvc\view\widget\IShortableBean' , $arrImplements ) ){
+				$arrShortableBeanAttrAlias = $__widget_class::beanAliases() ;
 			}
 		}
 		
@@ -203,10 +231,16 @@ class WidgetCompiler extends NodeCompiler
 				continue;
 			}
 			
-			if( isset( self::$arrAttrAlias[$sName] ) ){
-				$sName = self::$arrAttrAlias[$sName] ;
+			$sBeanName = $sName ;
+			if( isset( self::$arrAttrAlias[$sBeanName] ) ){
+				$sBeanName = self::$arrAttrAlias[$sBeanName] ;
 			}
-			$arrNamePart = explode('.',$sName);
+			
+			if( isset( $arrShortableBeanAttrAlias[$sBeanName] ) ){
+				$sBeanName = $arrShortableBeanAttrAlias[$sBeanName] ;
+			}
+			
+			$arrNamePart = explode('.',$sBeanName);
 			
 			// expression
 			if( count($arrNamePart) >1 and $arrNamePart[0] !=='bean' and end($arrNamePart) ==='type' ){
@@ -252,8 +286,9 @@ class WidgetCompiler extends NodeCompiler
 		foreach($arrAttr as $key => $value){
 			if( is_string( $value ) or is_int( $value ) ){
 				$aDev->putCode( str_repeat('	',$nTabCount).'"'.$key.'"'.' => '.$value.' ,' , $sSubTemplateName );
-			}else
-			if( is_array( $value ) ){
+			}else if( is_bool( $value ) ){
+				$aDev->putCode( str_repeat('	',$nTabCount).'"'.$key.'"'.' => '.var_export($value,true).' ,' , $sSubTemplateName );
+			}else if( is_array( $value ) ){
 				$aDev->putCode( str_repeat('	',$nTabCount).'"'.$key.'"'.' => ', $sSubTemplateName );
 				$this->writeAttrPri( $value , $aDev , $nTabCount+1 , $sSubTemplateName );
 				$aDev->putCode( ' , ', $sSubTemplateName );
@@ -291,7 +326,7 @@ class WidgetCompiler extends NodeCompiler
 						}
 					}
 					$arrBean['options'][] = array(
-						0 => $sText ,
+						0 => '"'.$sText.'"' ,
 						1 => $sValue ,
 						2 => ( $sSelect === 'selected' ),
 					);
@@ -301,10 +336,11 @@ class WidgetCompiler extends NodeCompiler
 		}
 		
 		if( count($arrBean) > 0 ){
-			$strVarExport = var_export($arrBean,true);
 			
 			$aDev->putCode("	\$arrFormer = {$sWidgetVarName}->beanConfig(); ",'preprocess');
-			$aDev->putCode("	\$arrBean = $strVarExport ;",'preprocess');
+			$aDev->putCode("	\$arrBean = ",'preprocess');
+			$this->writeAttrPri( $arrBean , $aDev , 1 , 'preprocess' );
+			$aDev->putCode("	;",'preprocess');
 			$aDev->putCode("	\\org\\jecat\\framework\\bean\\BeanFactory::mergeConfig(\$arrFormer, \$arrBean); ",'preprocess');
 			$aDev->putCode("	{$sWidgetVarName}->buildBean( \$arrFormer ); ",'preprocess');
 		}
@@ -389,6 +425,8 @@ class WidgetCompiler extends NodeCompiler
 	
 	static private $arrDefaultAs = array(
 		'bean.title' => 'title' ,
+		'bean.formName' => 'name' ,
+		'bean.value' => 'value' ,
 	);
 }
 

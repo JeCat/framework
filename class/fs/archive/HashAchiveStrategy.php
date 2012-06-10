@@ -25,7 +25,7 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\fs\archive ;
 
-use org\jecat\framework\fs\IFolder;
+use org\jecat\framework\fs\Folder;
 
 /**
  * 按照文件内容的哈希值生成归档路径
@@ -44,7 +44,7 @@ class HashAchiveStrategy extends IAchiveStrategy
 	/**
 	 * @return org\jecat\framework\fs\IFile
 	 */
-	public function makeFilePath(array $arrUploadedFile,IFolder $aToDir) 
+	public function makeFilePath(array $arrUploadedFile,Folder $aToDir) 
 	{
 		$sFileHash = md5($arrUploadedFile['tmp_name']) ;
 		$sToPath = $aToDir->path() ;
