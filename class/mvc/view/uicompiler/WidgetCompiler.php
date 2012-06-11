@@ -102,12 +102,30 @@ class WidgetCompiler extends NodeCompiler
 			$aDev->putCode("{",'preprocess') ;
 			return $aAttrs->get('id');
 		}
-		$sClassName = null ;
+		$sClassName = 'text' ;
 		$sType = null ;
 		switch( $aNode->tagName() ){
 		case 'widget':
 			if( $aAttrs->has('type') ){
-				$sClassName = $aAttrs->string('type') ;
+				switch( $aAttrs->string('type') ){
+				case 'password':
+				case 'hidden':
+					$sClassName = 'text';
+					$sType = $aAttrs->string('type') ;
+					break;
+				case 'checkbox':
+				case 'radio':
+					$sClassName = 'checkbox';
+					$sType = $aAttrs->string('type') ;
+					break;
+				case 'textarea':
+					$sClassName = 'text';
+					$sType = 'multiple';
+					break;
+				default:
+					$sClassName = $aAttrs->string('type') ;
+					break;
+				}
 			}
 			break;
 		case 'input':
