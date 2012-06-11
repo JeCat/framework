@@ -328,6 +328,17 @@ class Widget extends Object implements IViewWidget, IBean
 		return $sRet ;
 	}
 	
+	public function htmlId(){
+		if( $this->sHtmlId === null ){
+			$this->sHtmlId = $this->id() ;
+		}
+		return $this->sHtmlId ;
+	}
+	
+	public function setHtmlId($sHtmlId){
+		$this->sHtmlId = $sHtmlId ;
+	}
+	
 	static private $nAutoIncreaseId=0;
 	
 	private $aView ;
@@ -345,5 +356,7 @@ class Widget extends Object implements IViewWidget, IBean
 	private $arrAttributes ;
 	
     private $arrBeanConfig ;
+
+    private $sHtmlId = null ;
 }
 

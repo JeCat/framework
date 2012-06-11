@@ -174,21 +174,50 @@ class WidgetCompiler extends NodeCompiler
 			$aDev->putCode("}else{",'preprocess') ;
 			$aDev->putCode("	{$sWidgetVarName} = new $__widget_class ;",'preprocess') ;
 			
+			$sWidgetId = null ;
+			$sHtmlId = null ;
+			$sName = null ;
 			if( $aAttrs->has('id') ){
-				$sId = $aAttrs->get('id');
-			}else{
-				$nAutoCreateId = $aObjectContainer->properties()->get('autoCreateId');
-				if( null === $nAutoCreateId ){
-					$nAutoCreateId = 0 ;
-				}
-				$sId = '"autoCreateId'.$nAutoCreateId.'"';
+				$sHtmlId = $aAttrs->get('id') ;
 				
-				$aObjectContainer->properties()->set('autoCreateId',$nAutoCreateId + 1 );
+				if( $aAttrs->has('wid') ){
+					$sWidgetId = $aAttrs->get('wid') ;
+				}else{
+					$sWidgetId = $sHtmlId ;
+				}
+				
+				if( $aAttrs->has('name') ){
+					$sName = $aAttrs->get('name') ;
+				}else{
+					$sName = $sHtmlId ;
+				}
+			}else{
+				if( $aAttrs->has('wid') ){
+					$sWidgetId = $aAttrs->get('wid') ;
+					$sHtmlId = $aAttrs->get('wid') ;
+					
+					if( $aAttrs->has('name') ){
+						$sName = $aAttrs->get('name') ;
+					}else{
+						$sName = $aAttrs->get('wid') ;
+					}
+				}else{
+					if( $aAttrs->has('name') ){
+						$sName = $aAttrs->get('name') ;
+						$sWidgetId = $aAttrs->get('name') ;
+						$sHtmlId = $aAttrs->get('name') ;
+					}else{
+					}
+				}
 			}
 			
-			$aDev->putCode("	{$sWidgetVarName}->setId( $sId );",'preprocess') ;
-			$aDev->putCode("	\$theView->addWidget({$sWidgetVarName});",'preprocess') ;
-			
+			if( null === $sWidgetId ){
+				$aDev->output("如下属性需要至少存在一个：id,wid,name : ".htmlspecialchars($aNode->source()) ,'preprocess') ;
+			}else{
+				$aDev->putCode("	{$sWidgetVarName}->setId( $sWidgetId );",'preprocess') ;
+				$aDev->putCode("	{$sWidgetVarName}->setHtmlId( $sHtmlId );",'preprocess') ;
+				$aDev->putCode("	{$sWidgetVarName}->setFormName( $sName );",'preprocess') ;
+			}
 			
 			$arrWidgetClass = $aObjectContainer->properties()->get('arrWidgetClass');
 			if( null === $arrWidgetClass ){
@@ -198,18 +227,18 @@ class WidgetCompiler extends NodeCompiler
 			$arrWidgetClass[ $sWidgetVarName ] = $__widget_class ;
 			
 			$aObjectContainer->properties()->set('arrWidgetClass',$arrWidgetClass );
-			return $sId ;
+			return $sWidgetId ;
 		}else{
 			if( $aAttrs->has('id') ){
 				$sId = $aAttrs->get('id');
 				
-				$aDev->putCode("\r\n//// ------- 寻找 Widget: {$sId} ---------------------",'preprocess') ;
-				$aDev->putCode("{$sWidgetVarName} = \$theView->widget({$sId}) ;",'preprocess') ;
+				$aDev->putCode("\r\n//// ------- 寻找 Widget: {$sWidgetId} ---------------------",'preprocess') ;
+				$aDev->putCode("{$sWidgetVarName} = \$theView->widget({$sWidgetId}) ;",'preprocess') ;
 				
 				$aDev->putCode("if(!{$sWidgetVarName}){",'preprocess') ;
 				$aDev->putCode("}else{",'preprocess') ;
 				
-				return $sId ;
+				return $sWidgetId ;
 			}else{
 				$aDev->putCode("\$aDevice->write(\$aUI->locale()->trans('&lt;widget&gt;标签缺少必要属性:id或type')) ;",'preprocess') ;
 				return false;
@@ -283,6 +312,7 @@ class WidgetCompiler extends NodeCompiler
 			$this->writeAttrPri( $arrAttr['bean'] , $aDev , 1 , 'preprocess' );
 			$aDev->putCode("	;",'preprocess');
 			$aDev->putCode("	{$sWidgetVarName}->buildBean( \$arrBean ); ",'preprocess');
+			$aDev->putCode("	\$theView->addWidget({$sWidgetVarName});",'preprocess') ;
 		}
 		
 		$arrIgnoreForRender = array(
