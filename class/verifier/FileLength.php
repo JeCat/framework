@@ -31,7 +31,7 @@ use org\jecat\framework\lang\Exception;
 use org\jecat\framework\lang\Object;
 use org\jecat\framework\fs\File;
 
-class FileSize extends Object implements IVerifier,IBean {
+class FileLength extends Object implements IVerifier,IBean {
 	public function __construct($nMinSize,$nMaxSize) {
 		$this->setMaxSize($nMaxSize);
 		$this->setMinSize($nMinSize);
@@ -76,14 +76,13 @@ class FileSize extends Object implements IVerifier,IBean {
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
-		echo "bulidBeandddddddddddddddddddddddddddddddddddddddddddddddddddddddd";
-		if (! empty ( $arrConfig ['nMaxSize'] ))
+		if (! empty ( $arrConfig ['nMaxLength'] ))
 		{
-			$this->setMaxSize($arrConfig ['nMaxSize']);
+			$this->setMaxSize($arrConfig ['nMaxLength']);
 		}
-		if (! empty ( $arrConfig ['nMinSize'] ))
+		if (! empty ( $arrConfig ['nMinLength'] ))
 		{
-			$this->setMinSize($arrConfig ['nMinSize']);
+			$this->setMinSize($arrConfig ['nMinLength']);
 		}
 		$this->arrBeanConfig = $arrConfig;
 	}

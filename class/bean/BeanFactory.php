@@ -71,7 +71,7 @@ class BeanFactory extends Object implements \Serializable
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\verifier\\Number",'number') ;
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\verifier\\Same",'same') ;
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\verifier\\FileExt",'extname') ;
-			$aSingleton->registerBeanClass("org\\jecat\\framework\\verifier\\FileSize",'filesize') ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\verifier\\FileLength",'filelen') ;
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\verifier\\ImageArea",'imagearea') ;
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\verifier\\ImageSize",'imagesize') ;
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\verifier\\NotEmpty",'notempty') ;

@@ -418,9 +418,27 @@ class WidgetCompiler extends NodeCompiler
 		'instance' ,
 	);
 	
+	/**
+	 * 
+	 * @var unknown_type
+	 */
 	static private $arrAttrAlias = array(
-		'min' => 'bean.verifiers.length.min' ,
-		'max' => 'bean.verifiers.length.max' ,
+		'v.min' => 'bean.verifiers.length.min' ,
+		'v.max' => 'bean.verifiers.length.max' ,
+		'v.email' => 'bean.verifiers.email.email' ,
+		'v.number' => 'bean.verifiers.number.type' ,			// default: int
+		'v.notempty' => 'bean.verifiers.notempty.notempty' ,
+		'v.file.max' => 'bean.verifiers.filelen.nMaxLength' ,
+		'v.file.min' => 'bean.verifiers.filelen.nMinLength' ,
+		'v.file.extname' => 'bean.verifiers.extname.exts' ,
+		'v.file.extname.allow' => 'bean.verifiers.extname.allow' ,
+		'v.img.w.min' => 'bean.verifiers.imagesize.mimWidth' ,
+		'v.img.w.max' => 'bean.verifiers.imagesize.maxWidth' ,
+		'v.img.h.min' => 'bean.verifiers.imagesize.minHeight' ,
+		'v.img.h.max' => 'bean.verifiers.imagesize.maxHeight' ,
+		'v.img.area.min' => 'bean.verifiers.imagearea.min' ,
+		'v.img.area.max' => 'bean.verifiers.imagearea.max' ,
+			
 	);
 	
 	static private $arrDefaultAs = array(
@@ -429,4 +447,3 @@ class WidgetCompiler extends NodeCompiler
 		'bean.value' => 'value' ,
 	);
 }
-

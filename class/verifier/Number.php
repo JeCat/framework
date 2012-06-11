@@ -73,9 +73,9 @@ class Number extends Object implements IVerifier, IBean
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
-		if (! empty ( $arrConfig['int'] ))
+		if (! empty ( $arrConfig['type'] ))
 		{
-			switch ($arrConfig['int'])
+			switch ($arrConfig['type'])
 			{
 				case "int" :
 					$this->nNumberType = self::int;
