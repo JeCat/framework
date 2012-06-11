@@ -312,8 +312,8 @@ class WidgetCompiler extends NodeCompiler
 			$this->writeAttrPri( $arrAttr['bean'] , $aDev , 1 , 'preprocess' );
 			$aDev->putCode("	;",'preprocess');
 			$aDev->putCode("	{$sWidgetVarName}->buildBean( \$arrBean ); ",'preprocess');
-			$aDev->putCode("	\$theView->addWidget({$sWidgetVarName});",'preprocess') ;
 		}
+		$aDev->putCode("	\$theView->addWidget({$sWidgetVarName});",'preprocess') ;
 		
 		$arrIgnoreForRender = array(
 			'bean',
