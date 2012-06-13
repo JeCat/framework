@@ -71,8 +71,8 @@ class ModelForeachCompiler extends NodeCompiler
 		}
 		$aAttrs = $aObject->attributes();
 		$sIdx = $aAttrs->has ( 'idx' ) ? $aAttrs->string ( 'idx' ) : '' ;
-		$sItem = $aAttrs->has ( 'item' ) ? $aAttrs->string ( 'item' ) : 'theModel' ;
 		$sFor = $aAttrs->has ( 'for' ) ? $aAttrs->get ( 'for' ) : "\$aVariables->get('theModel')" ;
+		$sXPath = $aAttrs->has ( 'xpath' ) ? $aAttrs->get( 'xpath' ) : "null" ;
 		
 		$aDev->putCode("if(\$aForModel={$sFor}){\r\n") ;
 		
@@ -83,16 +83,14 @@ class ModelForeachCompiler extends NodeCompiler
 		
 		$aDev->putCode("\t\$aStackForLoopIsEnableToRun->put(false);") ;
 		
-		$aDev->putCode("\t\tforeach(\$aForModel->childIterator() as \$__aChildModel){\r\n") ;
-		$aDev->putCode("\t\t\t\$aVariables->set('{$sItem}',\$__aChildModel) ;
-		\$bLoopIsEnableToRun = & \$aStackForLoopIsEnableToRun->getRef();
-		\$bLoopIsEnableToRun = true;\r\n") ;
+		$aDev->putCode("\tfor(\$aForModel->rewind({$sXPath});\$aForModel->valid({$sXPath});\$aForModel->next({$sXPath})){\r\n") ;
+		$aDev->putCode("\t\t\$bLoopIsEnableToRun = & \$aStackForLoopIsEnableToRun->getRef();") ;
+		$aDev->putCode("\t\t\$bLoopIsEnableToRun = true;\r\n") ;
 	
 		if($sIdx)
 		{
 			$aDev->putCode("\t\t\t\$aVariables->set('{$sIdx}',\${$sIdx}++) ;\r\n") ;
 		}
-		
 		
 		if(!$aObject->headTag()->isSingle())
 		{

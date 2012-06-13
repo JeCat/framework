@@ -1,6 +1,7 @@
 <?php
 namespace org\jecat\framework\mvc\model ;
 
+use org\jecat\framework\mvc\view\widget\paginator\IPaginal;
 use org\jecat\framework\mvc\model\executor\Deleter;
 use org\jecat\framework\mvc\model\executor\Updater;
 use org\jecat\framework\mvc\model\executor\Inserter;
@@ -8,7 +9,7 @@ use org\jecat\framework\mvc\model\executor\Selecter;
 use org\jecat\framework\db\DB;
 use org\jecat\framework\lang\Exception;
 
-class Model implements \Iterator, \ArrayAccess, \Serializable
+class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 {
 	public function __construct($table,$sPrototypeName,$primaryKeys=null,$columns=null)
 	{
@@ -697,6 +698,16 @@ class Model implements \Iterator, \ArrayAccess, \Serializable
 	        $arrSheet =& $this->buildSheet($sChildName) ;
 	        return key($arrSheet) !== null ;
 	    }
+	}
+	
+	// implements
+	public function totalCount()
+	{
+		return $this->rowNum() ;
+	}
+	public function setPagination($nPerPage,$nPageNum)
+	{
+		$this->limit($nPerPage,($nPageNum-1)*$nPerPage) ;
 	}
 	
 	// implements \Serializable

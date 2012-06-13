@@ -32,7 +32,6 @@ use org\jecat\framework\mvc\view\IModelChangeObserver;
 use org\jecat\framework\mvc\view\View;
 use org\jecat\framework\mvc\view\IView;
 use org\jecat\framework\mvc\view\widget\paginator\AbstractStrategy;
-use org\jecat\framework\mvc\model\IPaginal;
 use org\jecat\framework\util\IDataSrc;
 use org\jecat\framework\mvc\controller\HttpRequest;
 
@@ -168,9 +167,9 @@ class Paginator extends FormWidget implements IModelChangeObserver
     	{
     		$this->setPerPageCount($arrConfig['count']) ;
     	}
-    	if( !empty($arrConfig['nums']) )
+    	if( !empty($arrConfig['page']) )
     	{
-    		$this->setCurrentPageNum($arrConfig['nums']) ;
+    		$this->setCurrentPageNum($arrConfig['page']) ;
     	}
     
     	$this->setDataFromSubmit(Request::singleton()) ;
@@ -211,9 +210,9 @@ class Paginator extends FormWidget implements IModelChangeObserver
         }
     }
     
-    public function setCurrentPageNum($iNum){
+    public function setCurrentPageNum($iNum)
+    {
         $this->setValue($iNum);
-        $this->updatePaginal();
     }
     
     public function currentPageNum()
