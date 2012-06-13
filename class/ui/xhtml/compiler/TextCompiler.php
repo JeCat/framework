@@ -43,7 +43,7 @@ class TextCompiler extends BaseCompiler
 		if( $aObject instanceof \org\jecat\framework\ui\xhtml\ObjectBase and !$aObject->count() )
 		{
 			Assert::type("org\\jecat\\framework\\ui\\xhtml\\Text",$aObject,'aObject') ;
-
+			
 			$sText = $aObject->source() ;
 			
 			// locale translate
@@ -71,6 +71,7 @@ class TextCompiler extends BaseCompiler
 				$sText = Locale::singleton()->trans($sText,null,'ui') ;
 			
 			} while(0) ;
+			
 			$aDev->output($sText) ;
 		}
 		

@@ -110,7 +110,7 @@ class Attributes extends HashTable
 	 */
 	public function get($sName)
 	{
-		$sType = $this->has($sName.'.type')? $this->string($sName.'.type'): 'string' ;
+		$sType = $this->type($sName) ;
 		if( !in_array($sType,self::$arrAttributeTypes) )
 		{
 			throw new Exception(
@@ -130,6 +130,10 @@ class Attributes extends HashTable
 			default :
 				return $this->$sType($sName) ;
 		}
+	}
+	public function type($sName)
+	{
+		return $this->has($sName.'.type')? $this->string($sName.'.type'): 'string' ;
 	}
 	public function set($sName,$sValue,$sQuoteType='"',$nPosition=-1,$nLine=-1)
 	{

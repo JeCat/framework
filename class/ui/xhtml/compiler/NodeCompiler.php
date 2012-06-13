@@ -25,6 +25,8 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\ui\xhtml\compiler ;
 
+use org\jecat\framework\ui\xhtml\Expression;
+
 use org\jecat\framework\ui\xhtml\Tag;
 use org\jecat\framework\ui\xhtml\Node;
 use org\jecat\framework\lang\Assert;
@@ -74,36 +76,57 @@ class NodeCompiler extends BaseCompiler
 			$aDev->output(' ') ;
 			
 			// 具名属性
-			if($sName=$aAttrVal->name())
+			if( $sName=$aAttrVal->name() )
 			{
+				// xxx.type
+				if(substr($sName,-5)=='.type')
+				{
+					continue ;
+				}
+				
 				$aDev->output($sName) ;
 				$aDev->output('=') ;
 			}
-			
+
 			$aDev->output($aAttrVal->quoteType()) ;
-			if( $aAttrCompiler = $aCompilerManager->compiler($aAttrVal) )
+			
+			if( $aAttrs->type($sName)=='expression' )
 			{
-				$aAttrCompiler->compile($aAttrVal,$aObjectContainer,$aDev,$aCompilerManager) ;
-				get_class($aAttrCompiler) ;
-			}
-			else 
-			{
-				if($sName)
+				if( $sExpre=$aAttrVal->source() )
 				{
-					$aDev->output(
-						addcslashes($aAttrs->get($sName),$aAttrVal->quoteType().'\\')
-					) ;
+					$aDev->putCode("\$aDevice->write(") ;
+					$aDev->putCode(new Expression($sExpre)) ;
+					$aDev->putCode(") ;") ;
+				}
+			}
+			else
+			{
+				if( $aAttrCompiler = $aCompilerManager->compiler($aAttrVal) )
+				{
+					$aAttrCompiler->compile($aAttrVal,$aObjectContainer,$aDev,$aCompilerManager) ;
+					get_class($aAttrCompiler) ;
 				}
 				else 
 				{
-					$aDev->output(
-						addcslashes($aAttrs->source(),$aAttrVal->quoteType().'\\')
-					) ;
+					if($sName)
+					{
+						$aDev->output(
+							addcslashes($aAttrs->get($sName),$aAttrVal->quoteType().'\\')
+						) ;
+					}
+					else 
+					{
+						$aDev->output(
+							addcslashes($aAttrs->source(),$aAttrVal->quoteType().'\\')
+						) ;
+					}
 				}
 			}
-		
+			
 			$aDev->output($aAttrVal->quoteType()) ;
+		
 		}
+			
 		
 		if( $aTag->isSingle() )
 		{
