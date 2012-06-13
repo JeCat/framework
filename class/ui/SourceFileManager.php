@@ -110,14 +110,14 @@ class SourceFileManager extends ResourceManager implements \Serializable
 
 	static public function makeTemplateSignature($sTemplate,$sNamespace=null)
 	{
-		return $sNamespace? md5($sNamespace.':'.$sTemplate): md5($sNamespace) ;
+		return $sNamespace? md5($sNamespace.':'.$sTemplate): md5($sTemplate) ;
 	}
 	
 	private $sCompileStrategySignture ;
 	
 	private $sCompiledFolderPath ;
 	
-	private $bForceCompile = true ;
+	private $bForceCompile = false ;
 	
 }
 

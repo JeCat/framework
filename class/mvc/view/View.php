@@ -595,7 +595,7 @@ class View implements IView, IBean, IAssemblable
     	}
     	
     	// view
-    	if($aView=$this->getByName($sName))
+    	if($aView=$this->viewByName($sName))
     	{
     		return $aView ;
     	}
@@ -616,7 +616,7 @@ class View implements IView, IBean, IAssemblable
     		return $this->widgets()->get($sWidgetName)?: $this->widgets()->get(lcfirst($sWidgetName)) ;
     	}
     	
-		throw new Exception("正在访问视图 %s 中不存在的属性: %s",array($this->name(),$sName)) ;
+		throw new Exception("正在访问视图中不存在的属性: %s",array($sName)) ;
     }
     
     public function addModelObserver(IModelChangeObserver $aObserver){

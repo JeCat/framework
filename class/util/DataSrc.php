@@ -34,18 +34,22 @@ use org\jecat\framework\lang\Type;
  */
 class DataSrc extends HashTable implements IDataSrc, \ArrayAccess, \Iterator
 {
-	public function __construct(array &$arrDatas=null,$bByRef=false)
+	public function __construct(& $datas=null,$bByRef=false)
 	{
-		if($arrDatas!==null)
+		if( is_array($datas) )
 		{
 			if($bByRef)
 			{
-				$this->arrDatas = &$arrDatas ;
+				$this->arrDatas = &$datas ;
 			}
 			else
 			{
-				$this->arrDatas = $arrDatas ;
+				$this->arrDatas = $datas ;
 			}
+		}
+		else if( $datas instanceof IHashTable )
+		{
+			$this->addChild($datas) ;
 		}
 	}
 	
