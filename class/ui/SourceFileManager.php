@@ -107,6 +107,11 @@ class SourceFileManager extends ResourceManager implements \Serializable
 		$this->sCompileStrategySignture = $arrData['sCompileStrategySignture'] ;
 		$this->sCompiledFolderPath = $arrData['sCompiledFolderPath'] ;
 	}
+
+	static public function makeTemplateSignature($sTemplate,$sNamespace=null)
+	{
+		return $sNamespace? md5($sNamespace.':'.$sTemplate): md5($sNamespace) ;
+	}
 	
 	private $sCompileStrategySignture ;
 	

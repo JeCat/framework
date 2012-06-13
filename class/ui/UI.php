@@ -145,15 +145,15 @@ class UI extends JcObject
 	 */
 	public function loadCompiled($sSourceFile)
 	{
-		// 定位文件
-		$aSrcMgr = $this->sourceFileManager() ;
-		list($sNamespace,$sSourceFile) = $aSrcMgr->detectNamespace($sSourceFile) ;
-		
 		// 模板指纹
-		$sTemplateSignature = self::makeTemplateSignature($sSourceFile,$sNamespace) ;
-		
+		$sTemplateSignature = SourceFileManager::makeTemplateSignature($sSourceFile) ;
+
 		if( !defined($sTemplateSignature) )
 		{
+			// 定位文件
+			$aSrcMgr = $this->sourceFileManager() ;
+			list($sNamespace,$sSourceFile) = $aSrcMgr->detectNamespace($sSourceFile) ;
+		
 			$aSourceFile = $aSrcMgr->find($sSourceFile,$sNamespace) ;
 			if(!$aSourceFile)
 			{
@@ -279,10 +279,6 @@ class UI extends JcObject
 		return Locale::singleton() ;
 	}
 	
-	static public function makeTemplateSignature($sTemplate,$sNamespace=null)
-	{
-		return $sNamespace? md5($sNamespace.':'.$sTemplate): md5($sNamespace) ;
-	} 
 	
 	private $aSourceFileManager ;
 	
