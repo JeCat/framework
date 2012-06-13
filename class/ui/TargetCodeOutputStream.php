@@ -199,7 +199,10 @@ class TargetCodeOutputStream extends \org\jecat\framework\lang\Object
 	{
 		return $this->sDefaultSubTemplate ;
 	}
-
+	public function templateSignature()
+	{
+		return $this->sTemplateSignature ;
+	}
 	private $arrCompileds = array() ;
 	private $arrOutputBuffers = array() ;
 	private $arrDeclareVariables = array() ;

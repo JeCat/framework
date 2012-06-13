@@ -244,11 +244,15 @@ class UI extends JcObject
 		$aVariables->set('theDevice',$aDevice) ;
 		$aVariables->set('theUI',$this);
 		
-		$sFunc = '_'.$sTemplateSignature.'_'.$sSubTemplate ;
+		$sFunc = $this->subtemplateFunctionName($sTemplateSignature,$sSubTemplate) ;
 		if( function_exists($sFunc) )
 		{
 			return $sFunc($this,$aVariables,$aDevice) ;
 		}
+	}
+	public function subtemplateFunctionName($sTemplateSignature,$sSubTemplate='render') 
+	{
+		return '_'.$sTemplateSignature.'_'.$sSubTemplate ;
 	}
 	
 	public function display($sSourceFile,$aVariables=null,IOutputStream $aDevice=null)

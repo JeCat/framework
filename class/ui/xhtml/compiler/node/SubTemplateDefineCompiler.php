@@ -83,7 +83,7 @@ class SubTemplateDefineCompiler extends NodeCompiler
 		}
 		
 		$aDev->putCode("\r\n\r\n// -- subtemplate start ----------------------") ;
-		$aDev->putCode("function __subtemplate_{$sSubTemplateName}(\$aVariables,\$aDevice){ ") ;
+		//$aDev->putCode("function __subtemplate_{$sSubTemplateName}(\$aVariables,\$aDevice){ ") ;
 		
 		// 切换默认的子模型
 		$sOriginDefaultSubTemp = $aDev->defaultSubTemplate() ;
@@ -96,7 +96,7 @@ class SubTemplateDefineCompiler extends NodeCompiler
 		$aDev->setDefaultSubTemplate($sOriginDefaultSubTemp) ;		
 		
 		
-		$aDev->putCode("}// -- subtemplate end ----------------------\r\n\r\n") ;
+		$aDev->putCode("// -- subtemplate end ----------------------\r\n\r\n") ;
 	}
 
 }

@@ -94,7 +94,7 @@ class SubTemplateCallCompiler extends NodeCompiler
 		$aDev->putCode("\r\n// -- call subtemplate:{$sSubTemplateName} start---------------------") ;
 		
 		// 是否继承父模板中的变量
-		$bExtendParentVars = $aAttributes->has("vars")? $aAttributes->bool('vars'): false ;
+		$bExtendParentVars = $aAttributes->has("vars")? $aAttributes->bool('vars'): true ;
 	
 		// variables
 		if(!$bExtendParentVars)
@@ -118,12 +118,12 @@ class SubTemplateCallCompiler extends NodeCompiler
 			}
 		}
 		
+		$sTemplateSignature = $aDev->templateSignature() ;
 		
-		
-		$aDev->putCode("if( !function_exists('{$sSubTemplateFuncName}') ){") ;
+		$aDev->putCode("if( !function_exists(\$aUI->subtemplateFunctionName('{$sTemplateSignature}','{$sSubTemplateName}')) ){") ;
 		$aDev->putCode("\t\$aDevice->write(\"正在调用无效的子模板：{$sSubTemplateName}\") ;") ;
 		$aDev->putCode("} else {") ;
-		$aDev->putCode("\tcall_user_func_array('{$sSubTemplateFuncName}',array(\$__subtemplate_aVariables,\$aDevice)) ;") ;
+		$aDev->putCode("	\$aUI->render('{$sTemplateSignature}',\$__subtemplate_aVariables,\$aDevice,'{$sSubTemplateName}') ;") ;
 		$aDev->putCode("}") ;
 		
 		$aDev->putCode("// -- call subtemplate:{$sSubTemplateName} end ---------------------\r\n\r\n") ;

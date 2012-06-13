@@ -91,8 +91,7 @@ class VerifierManager extends Object
 	}
 	
 	public function verify($value,$bThrowExcetion=false)
-	{		
-		$aVerifyFailed = new VerifyFailed(''); 
+	{
 		foreach($this->arrVerifiers as $nIdx=>$aVerifier)
 		{
 			try{
