@@ -441,20 +441,16 @@ class WidgetCompiler extends NodeCompiler
 		}
 		else
 		// display
-		if( $sId && 
-			(
-				!$aAttrs->has('display') 
-				or $aAttrs->bool('display')
-			)
-		){
-			$aDev->putCode("\r\n//// ------- 寻找 Widget: {$sId} ---------------------",'render') ;
+		if( $sId &&( !$aAttrs->has('display') or $aAttrs->bool('display') ) )
+		{
+			$aDev->putCode("\r\n//// ------- Display Widget: {$sId} ---------------------",'render') ;
 			$aDev->putCode("{$sWidgetVarName} = \$theView->widget({$sId}) ;",'render') ;
 			
 			$aDev->putCode("if(!{$sWidgetVarName}){",'render') ;
 			$aDev->output("render 缺少 widget (id:{$sId})",'render') ;
 			$aDev->putCode("}else{",'render') ;
 			
-			$sTemplateSignature = $aDev->templateSignature() ;
+			$sTemplateSignature = 'null';
 			$sSubTemplate = 'null';
 			$sTemplate = 'null' ;
 			
@@ -464,6 +460,7 @@ class WidgetCompiler extends NodeCompiler
 				if($aTemAttr->has('name') ){
 					$sSubTemplate = $aTemAttr->get('name');
 				}
+				$sTemplateSignature = "'".$aDev->templateSignature()."'" ;
 			}
 			if( $aAttrs->has('template') ){
 				$sTemplate = $aAttrs->get('template') ;
@@ -473,7 +470,7 @@ class WidgetCompiler extends NodeCompiler
 				\$aVariables->theUI,
 				new \\org\\jecat\\framework\\util\\DataSrc(\$arrBean),
 				\$aDevice,
-				'$sTemplateSignature',
+				$sTemplateSignature,
 				$sSubTemplate,
 				$sTemplate) ;",'render') ;
 			$aDev->putCode("}",'render') ;
