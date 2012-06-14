@@ -179,51 +179,27 @@ class WidgetCompiler extends NodeCompiler
 			$aDev->putCode("}else{",'preprocess') ;
 			$aDev->putCode("	{$sWidgetVarName} = new $__widget_class ;",'preprocess') ;
 			
-			$sWidgetId = null ;
-			$sHtmlId = null ;
-			$sName = null ;
-			if( $aAttrs->has('id') ){
-				$sHtmlId = $aAttrs->object('id')->source() ;
+
+			// wid, id, formName			
+			$sWidgetId = $aAttrs->object('wid')->string() ;
+			$sHtmlId =$aAttrs->object('id')->string() ;
+			$sName = $aAttrs->object('name')->string() ;
+
+			if(!$sWidgetId)
+				$sWidgetId = $sHtmlId ?: $sName ;
+			if(!$sHtmlId)
+				$sHtmlId = $sWidgetId ?: $sName ;
+			if(!$sName)
+				$sName = $sWidgetId ?: $sWidgetId ;
+			
+			// auto id
+			if(!$sWidgetId)
+			{
+				$nAutoId = $aObjectContainer->properties()->get('autoCreateId') ?: 0 ;
+				$aObjectContainer->properties()->set('autoCreateId',$nAutoId+1);
 				
-				if( $aAttrs->has('wid') ){
-					$sWidgetId = $aAttrs->object('wid')->source() ;
-				}else{
-					$sWidgetId = $sHtmlId ;
-				}
-				
-				if( $aAttrs->has('name') ){
-					$sName = $aAttrs->object('name')->source() ;
-				}else{
-					$sName = $sHtmlId ;
-				}
-			}else{
-				if( $aAttrs->has('wid') ){
-					$sWidgetId = $aAttrs->object('wid')->source() ;
-					$sHtmlId = $aAttrs->object('wid')->source() ;
-					
-					if( $aAttrs->has('name') ){
-						$sName = $aAttrs->object('name')->source() ;
-					}else{
-						$sName = $aAttrs->object('wid')->source() ;
-					}
-				}else{
-					if( $aAttrs->has('name') ){
-						$sName = $aAttrs->object('name')->source() ;
-						$sWidgetId = $aAttrs->object('name')->source() ;
-						$sHtmlId = $aAttrs->object('name')->source() ;
-					}else{
-						$nAutoCreateId = $aObjectContainer->properties()->get('autoCreateId');
-						if( null === $nAutoCreateId ){
-							$nAutoCreateId = 0 ;
-						}
-						$sAutoId = ''.$sClassName.'_AutoCreateId'.$nAutoCreateId.'';
-						$aObjectContainer->properties()->set('autoCreateId',$nAutoCreateId + 1 );
-						
-						$sName = $sAutoId ;
-						$sWidgetId = $sAutoId ;
-						$sHtmlId = $sAutoId ;
-					}
-				}
+				$sWidgetId = $sHtmlId = $sName
+						= str_replace('\\','_',$sClassName).( $nAutoCreateId ?: '' ) ;
 			}
 			
 			/*
