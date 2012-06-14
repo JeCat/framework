@@ -311,15 +311,10 @@ class Widget extends Object implements IViewWidget, IBean
 		$this->arrAttributes = null ;
 	}
 	
-	public function displayInputAttributes()
+	public function displayInputAttributes(array $arrAttrs)
 	{
-		if(!$this->arrAttributes)
-		{
-			return '' ;
-		}
-		
 		$sRet = '' ;
-		foreach($this->arrAttributes as $sName=>$sValue)
+		foreach($arrAttrs as $sName=>$sValue)
 		{
 			$sRet.= ' ' . $sName . '="' . addcslashes($sValue,'"\\') . '"' ;
 		}
