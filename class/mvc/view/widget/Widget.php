@@ -208,37 +208,60 @@ class Widget extends Object implements IViewWidget, IBean
 		$this->nTemplateType = self::TEMPLATETYPE_Function ;
 	}
 
-	public function display(UI $aUI,IHashTable $aVariables=null,IOutputStream $aDevice=null)
+	public function display(
+		UI $aUI
+		,IHashTable $aVariables=null
+		,IOutputStream $aDevice=null
+		,$sTemplateSignature =null
+		,$sSubTemplate = null
+		,$sTemplate = null )
 	{
-		$sTemplateName = $this->templateName() ;
-		$sSubTemplateName = $this->subTemplateName() ;
-		if(!$sTemplateName and !$sSubTemplateName )
-		{
-			throw new Exception("显示UI控件时遇到错误，UI控件尚未设置模板文件",$this->id()) ;
-		}
-		
 		if(!$aVariables)
 		{
 			$aVariables = new HashTable() ;
 		}
-
 		$oldWidget=$aVariables->get('theWidget');
 		$aVariables->set('theWidget',$this);
 		$aVariables->set('theUI',$aUI);
 		
-		if($sTemplateName){
-			$aUI->display($sTemplateName,$aVariables,$aDevice) ;
-		}else{
-			if( !function_exists( $sSubTemplateName ) ){
+		// 1.使用 display 时的 template 子标签（函数）
+		if( null !== $sSubTemplate ){
+			$sFunName = '_'.$sTemplateSignature.'_'.$sSubTemplate ;
+			
+			if( !function_exists( $sFunName ) ){
 				throw new Exception(
 					"正在调用无效的子模板：%s %s",
 					array(
-						$sSubTemplateName ,
+						$sFunName ,
 						$this->id() 
 					)
 				);
 			}
-			call_user_func_array( $sSubTemplateName , array( $aVariables ,$aDevice) ) ;
+			call_user_func_array( $sFunName , array( $aUI , $aVariables ,$aDevice) ) ;
+		}
+		// 2.使用 display 时的 template 属性（文件）
+		else if( null !== $sTemplate ){
+			$aUI->display($sTemplateName,$aVariables,$aDevice) ;
+		}
+		// 3.使用 $this->subTemplateName()
+		else if( $sSubTemplateName = $this->subTemplateName() ){
+			$sFunName = '_'.$sTemplateSignature.'_'.$sSubTemplateName ;
+			if( !function_exists( $sFunName ) ){
+				throw new Exception(
+					"正在调用无效的子模板：%s %s",
+					array(
+						$sFunName ,
+						$this->id() 
+					)
+				);
+			}
+			call_user_func_array( $sFunName , array( $aUI , $aVariables ,$aDevice) ) ;
+		}
+		// 4.使用 $this->templateName() （文件）
+		else if( $sTemplateName = $this->templateName() ){
+			$aUI->display($sTemplateName,$aVariables,$aDevice) ;
+		}else{
+			throw new Exception("显示UI控件时遇到错误，UI控件尚未设置模板文件",$this->id()) ;
 		}
 		
 		$aVariables->set('theWidget',$oldWidget);
