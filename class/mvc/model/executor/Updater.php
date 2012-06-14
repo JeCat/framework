@@ -39,7 +39,7 @@ class Updater extends Executor
 		}
 		if( !empty($arrClauseSet) )
 		{
-			echo $sSql = "UPDATE "
+			$sSql = "UPDATE "
 								. $arrSqlStat['from']
 			                    . " SET\r\n\t" . implode("\r\n\t, ",$arrClauseSet)."\r\n"
 								. $this->makeWhereClause($arrPrototype,$sWhere)

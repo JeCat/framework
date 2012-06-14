@@ -300,6 +300,29 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 		return $this ;
 	}
 	
+	public function sortChildren($field,$sort_type = SORT_ASC)
+	{
+	    foreach ($this->arrData as $row){
+	        if(! is_array($row)) return FALSE;
+	        $arr_field[] = $row[$field];
+	    }
+	    array_multisort($arr_field,$sort_type,$this->arrData);
+	}
+	
+	/*
+	public function shareModel()
+	{
+	    if( !$this->aShareModel and $aPrototype=$this->prototype() )
+	    {
+	        $this->aShareModel = $aPrototype->createModel(false) ;
+	        $this->segmentalizeChild($this->aShareModel) ;
+	        $this->aShareModel->data('__belongsModelList',$this) ;
+	    }
+	
+	    return $this->aShareModel ;
+	}
+	*/
+	
 	/**
 	 * @return org\jecat\framework\db\DB
 	 */
@@ -415,24 +438,40 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 	}
 	*/
 
-	public function data($sName)
+	public function data($sName ,$nModelIdx=null)
 	{
-		if( $arrRow =& $this->localeRow($sName,$this->arrData) )
-		{
-			return $arrRow[$sName] ;
-		}
-		else 
-		{
-			return null ;
-		}
+	    if($nModelIdx===null)
+	    {
+    		if( $arrRow =& $this->localeRow($sName,$this->arrData) )
+    		{
+    			return $arrRow[$sName] ;
+    		}
+    		else 
+    		{
+    			return null ;
+    		}
+	    }
+	    else
+	   {
+	       return isset($this->arrData[$nModelIdx][$sName])?
+				$this->arrData[$nModelIdx][$sName]: null ;
+	    }
 	}
-	public function setData($sName,$value)
+	public function setData($sName,$value,$nModelIdx=null)
 	{
-		$arrRow =& $this->localeRow($sName,$this->arrData,-1,true) ;
-		if( $arrRow!==null )
+		if($nModelIdx===null)
 		{
-			return $arrRow[$sName] = $value ;
+    		$arrRow =& $this->localeRow($sName,$this->arrData,-1,true) ;
+    		if( $arrRow!==null )
+    		{
+    			return $arrRow[$sName] = $value ;
+    		}
 		}
+		else
+		{
+		    $this->arrData[$nModelIdx][$sName] = $value ;
+		}
+		
 	}
 	private function & rowRef($sChildName=null,$bCreateNewRow=false)
 	{
@@ -658,7 +697,8 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 	{
 	    if($sChildName == null)
 	    {
-	        return current($this->arrData);
+	        //return current($this->arrData);
+	        return $this;
 	    }else{
 	        $arrSheet =& $this->buildSheet($sChildName) ;
 	        return current($arrSheet);

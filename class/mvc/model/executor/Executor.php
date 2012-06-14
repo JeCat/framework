@@ -6,6 +6,7 @@ use org\jecat\framework\lang\Object;
 
 abstract class Executor extends Object
 {
+    
 	protected function joinTables(array & $arrPrototype,array & $arrSqlStat,$nAssocType=Prototype::total , $isAshes = true)
 	{
 		// *被*多对多关联 的桥接表
@@ -159,5 +160,6 @@ abstract class Executor extends Object
 			return 'NULL' ;
 		}
 	}
+	
 }
 
