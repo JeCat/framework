@@ -178,70 +178,68 @@ class Widget extends Object implements IViewWidget, IBean
 		$this->sId = $sId ;
 	}
 
-	const TEMPLATETYPE_Template = 0x981 ;
-	const TEMPLATETYPE_Function = 0x982 ;
 	public function templateName()
 	{
-		if( self::TEMPLATETYPE_Template === $this->nTemplateType ){
-			return $this->sTemplateName ;
-		}else{
-			return null ;
-		}
+		return $this->sTemplateName ;
 	}
 
 	public function setTemplateName($sTemplateName)
 	{
 		$this->sTemplateName = $sTemplateName ;
-		$this->nTemplateType = self::TEMPLATETYPE_Template ;
 	}
 	
-	public function subTemplateName(){
-		if( self::TEMPLATETYPE_Function === $this->nTemplateType ){
+	public function subTemplateName()
+	{
 			return $this->sSubTemplateName ;
-		}else{
-			return null ;
-		}
 	}
 	
-	public function setSubTemplateName($sSubTemplateName){
+	public function setSubTemplateName($sSubTemplateName)
+	{
 		$this->sSubTemplateName = $sSubTemplateName ;
-		$this->nTemplateType = self::TEMPLATETYPE_Function ;
 	}
 
-	public function display(UI $aUI,IHashTable $aVariables=null,IOutputStream $aDevice=null)
+	public function display(
+		UI $aUI
+		,IHashTable $aVariables=null
+		,IOutputStream $aDevice=null
+		,$sTemplateSignature =null
+		,$sSubTemplate = null
+		,$sTemplate = null )
 	{
-		$sTemplateName = $this->templateName() ;
-		$sSubTemplateName = $this->subTemplateName() ;
-		if(!$sTemplateName and !$sSubTemplateName )
-		{
-			throw new Exception("显示UI控件时遇到错误，UI控件尚未设置模板文件",$this->id()) ;
-		}
-		
 		if(!$aVariables)
 		{
 			$aVariables = new HashTable() ;
 		}
-
+		
+		// 设置 theWidget
 		$oldWidget=$aVariables->get('theWidget');
 		$aVariables->set('theWidget',$this);
-		$aVariables->set('theUI',$aUI);
 		
-		if($sTemplateName){
-			$aUI->display($sTemplateName,$aVariables,$aDevice) ;
-		}else{
-			if( !function_exists( $sSubTemplateName ) ){
-				throw new Exception(
-					"正在调用无效的子模板：%s %s",
-					array(
-						$sSubTemplateName ,
-						$this->id() 
-					)
-				);
+		// 确定 template / subtemplate
+		if( !$sTemplateSignature )
+		{
+			if( !$sTemplate )
+			{
+				if( !$sTemplate=$this->templateName() )
+				{
+					throw new Exception("显示UI控件时遇到错误，UI控件尚未设置模板文件",$this->id()) ;
+				}
 			}
-			call_user_func_array( $sSubTemplateName , array( $aVariables ,$aDevice) ) ;
+			$sTemplateSignature = $aUI->loadCompiled($sTemplate) ;
+		}
+		if( !$sSubTemplate )
+		{
+			$sSubTemplate = $this->subTemplateName() ;
 		}
 		
-		$aVariables->set('theWidget',$oldWidget);
+		// 执行 render
+		$aUI->render($sTemplateSignature,$aVariables,$aDevice,$sSubTemplate) ;
+
+		// 恢复 theWidget
+		if($oldWidget)
+		{
+			$aVariables->set('theWidget',$oldWidget);
+		}
 	}
 
 	/**
@@ -313,15 +311,10 @@ class Widget extends Object implements IViewWidget, IBean
 		$this->arrAttributes = null ;
 	}
 	
-	public function displayInputAttributes()
+	public function displayInputAttributes(array $arrAttrs)
 	{
-		if(!$this->arrAttributes)
-		{
-			return '' ;
-		}
-		
 		$sRet = '' ;
-		foreach($this->arrAttributes as $sName=>$sValue)
+		foreach($arrAttrs as $sName=>$sValue)
 		{
 			$sRet.= ' ' . $sName . '="' . addcslashes($sValue,'"\\') . '"' ;
 		}
@@ -346,8 +339,7 @@ class Widget extends Object implements IViewWidget, IBean
 	private $sId ;
 	
 	private $sTemplateName ;
-	private $sSubTemplateName ;
-	private $nTemplateType ;
+	private $sSubTemplateName = 'render' ;
 	
 	private $aMsgQueue ;
 

@@ -98,9 +98,24 @@ class Controller extends NamableComposite implements IBean
 		$this->buildParams($params) ;
 		
 		// auto build bean config
-		if( $bBuildAtonce and property_exists($this, 'arrConfig') )
+		if( $bBuildAtonce )
 		{
-			$this->buildBean($this->arrConfig) ;
+			
+			if( property_exists($this, 'arrConfig') )
+			{
+				$arrConfig =& $this->arrConfig ;
+			}
+			else
+			{
+				$arrConfig = array() ;
+			}
+			
+			if( method_exists($this,'createBeanConfig') )
+			{
+				$this->createBeanConfig($arrConfig) ;
+			}
+				
+			$this->buildBean($arrConfig) ;
 		}
     	
 		$this->init() ;
@@ -339,12 +354,17 @@ class Controller extends NamableComposite implements IBean
     	// controllers --------------------
     	if( !empty($arrConfig['controllers']) )
     	{
-    		foreach($arrConfig['controllers'] as $key=>&$arrBeanConf)
+    		foreach($arrConfig['controllers'] as $key=>&$beanConf)
     		{
-    			// 自动配置缺少的 class, name 属性
-    			$aBeanFactory->_typeProperties( $arrBeanConf, 'controller', is_int($key)?null:$key, 'name' ) ;
+    			if( is_string($beanConf) )
+    			{
+    				$beanConf = array('class'=>$beanConf) ;
+    			}
     			
-    			$this->add( $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ) ;
+    			// 自动配置缺少的 class, name 属性
+    			$aBeanFactory->_typeProperties( $beanConf, 'controller', is_int($key)?null:$key, 'name' ) ;
+    			
+    			$this->add( $aBeanFactory->createBean($beanConf,$sNamespace,true) ) ;
     		}
     	}
     	
@@ -741,16 +761,21 @@ class Controller extends NamableComposite implements IBean
     
     public function doActions($sActParamName='a')
     {
-    	if( !$arrActions=self::buildActionParam($this->params,$sActParamName,$this->xpath()) )
-    	{
-    		$arrActions[] = 'process' ;
-    	}
+    	$arrActions = self::buildActionParam($this->params,$sActParamName,$this->xpath()) ;
+		$nExecutedActions = 0 ;
+		
     	foreach($arrActions as $sAction)
     	{
     		if( method_exists($this,$sAction) )
     		{
     			call_user_func(array($this,$sAction)) ;
+    			$nExecutedActions ++ ;
     		}
+    	}
+
+    	if( !$nExecutedActions )
+    	{
+    		$this->process() ;
     	}
     }
     
@@ -800,14 +825,6 @@ class Controller extends NamableComposite implements IBean
    		}
     		
    		return $arrReturn ;
-    }
-    
-    public function actionSubmitForm()
-    {
-    	if( $sFromName=$this->params->get('formName') and method_exists($this,$sFromName) )
-    	{
-    		$this->$sFromName() ;
-    	}
     }
     
     public function __get($sName)

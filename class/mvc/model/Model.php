@@ -86,11 +86,16 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 		$this->aPrototype->where( $this->makeSqlFind($values,$columns) ) ;
 		return $this ;
 	}
-	private function makeSqlFind($values,$columns=null)
+	private function makeSqlFind($values,$columns=self::primaryKeys)
 	{
-		if($columns===null)
+		if($columns===self::primaryKeys)
 		{
-			$columns = $this->aPrototype->keys() ;
+			$columns = array() ;
+			$sTable = $this->prototype()->tableAlias() ;
+			foreach($this->aPrototype->keys() as $sCol)
+			{
+				$columns[] = "`{$sTable}`.`{$sCol}`" ;
+			}
 		}
 		else
 		{
@@ -409,34 +414,6 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 		}
 		return false ;
 	}
-	/**
-	 * @return bool
-	 */
-	/*
-	public function next($sChildName=null)
-	{
-		if( $arrParentRow=&$this->localeRow($sChildName,$this->arrData) )
-		{
-			if( $this->isSheet($arrParentRow,$sChildName) )
-			{
-				if( !empty($arrParentRow[$sChildName]) )
-				{
-					next($arrParentRow[$sChildName]) ;
-					if( each($arrParentRow[$sChildName])===false )
-					{
-						prev($arrParentRow[$sChildName]) ;
-						return false ;
-					}
-					else
-					{
-						return true ;
-					}
-				}
-			}
-		}
-		return false ;
-	}
-	*/
 
 	public function data($sName ,$nModelIdx=null)
 	{
@@ -444,7 +421,7 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 	    {
     		if( $arrRow =& $this->localeRow($sName,$this->arrData) )
     		{
-    			return $arrRow[$sName] ;
+    			return isset($arrRow[$sName])? $arrRow[$sName]: null ;
     		}
     		else 
     		{
