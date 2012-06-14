@@ -181,9 +181,9 @@ class WidgetCompiler extends NodeCompiler
 			
 
 			// wid, id, formName			
-			$sWidgetId = $aAttrs->object('wid')->string() ;
-			$sHtmlId =$aAttrs->object('id')->string() ;
-			$sName = $aAttrs->object('name')->string() ;
+			$sWidgetId = $aAttrs->string('wid') ;
+			$sHtmlId =$aAttrs->string('id') ;
+			$sName = $aAttrs->string('name') ;
 
 			if(!$sWidgetId)
 				$sWidgetId = $sHtmlId ?: $sName ;
