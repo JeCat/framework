@@ -49,7 +49,7 @@ class SourceFileManager extends ResourceManager implements \Serializable
 			return false ;
 		} 
 		
-		return $aCompiledFile->exists() and $aSourceFile->modifyTime()<=$aCompiledFile->modifyTime() ;
+		return $aCompiledFile->exists() and $aCompiledFile->length() and $aSourceFile->modifyTime()<=$aCompiledFile->modifyTime() ;
 	}
 
 	/**
