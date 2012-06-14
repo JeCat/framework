@@ -86,11 +86,16 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 		$this->aPrototype->where( $this->makeSqlFind($values,$columns) ) ;
 		return $this ;
 	}
-	private function makeSqlFind($values,$columns=null)
+	private function makeSqlFind($values,$columns=self::primaryKeys)
 	{
-		if($columns===null)
+		if($columns===self::primaryKeys)
 		{
-			$columns = $this->aPrototype->keys() ;
+			$columns = array() ;
+			$sTable = $this->prototype()->tableAlias() ;
+			foreach($this->aPrototype->keys() as $sCol)
+			{
+				$columns[] = "`{$sTable}`.`{$sCol}`" ;
+			}
 		}
 		else
 		{
