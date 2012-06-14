@@ -761,16 +761,21 @@ class Controller extends NamableComposite implements IBean
     
     public function doActions($sActParamName='a')
     {
-    	if( !$arrActions=self::buildActionParam($this->params,$sActParamName,$this->xpath()) )
-    	{
-    		$arrActions[] = 'process' ;
-    	}
+    	$arrActions = self::buildActionParam($this->params,$sActParamName,$this->xpath()) ;
+		$nExecutedActions = 0 ;
+		
     	foreach($arrActions as $sAction)
     	{
     		if( method_exists($this,$sAction) )
     		{
     			call_user_func(array($this,$sAction)) ;
+    			$nExecutedActions ++ ;
     		}
+    	}
+
+    	if( !$nExecutedActions )
+    	{
+    		$this->process() ;
     	}
     }
     
@@ -820,14 +825,6 @@ class Controller extends NamableComposite implements IBean
    		}
     		
    		return $arrReturn ;
-    }
-    
-    public function actionSubmitForm()
-    {
-    	if( $sFromName=$this->params->get('formName') and method_exists($this,$sFromName) )
-    	{
-    		$this->$sFromName() ;
-    	}
     }
     
     public function __get($sName)

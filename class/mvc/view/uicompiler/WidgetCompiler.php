@@ -58,7 +58,7 @@ class WidgetCompiler extends NodeCompiler
 			);
 		}
 		
-		$this->writeTheView($aAttrs , $aDev) ;
+		$this->writeTheView($aDev) ;
 		
 		$sId = $this->writeObject($aAttrs , $aObject , $aObjectContainer , $aDev , $sWidgetVarName);
 		if( false === $sId ){
@@ -76,13 +76,9 @@ class WidgetCompiler extends NodeCompiler
 		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject,'aObject') ;
 	}
 	
-	protected function writeTheView(Attributes $aAttrs , TargetCodeOutputStream $aDev){
-		if( ! $aAttrs->has('define') or $aAttrs->bool('define') ){
-			$aDev->putCode("\$theView = \$aVariables->get('theView') ;",'preprocess') ;
-		}
-		if( ! $aAttrs->has('display') or $aAttrs->bool('display') ){
-			$aDev->putCode("\$theView = \$aVariables->get('theView') ;",'render') ;
-		}
+	protected function writeTheView(TargetCodeOutputStream $aDev){
+		$aDev->putCode("\$theView = \$aVariables->get('theView') ;",'preprocess') ;
+		$aDev->putCode("\$theView = \$aVariables->get('theView') ;",'render') ;
 	}
 	
 	protected function getVarName(){
@@ -206,6 +202,15 @@ class WidgetCompiler extends NodeCompiler
 						= str_replace('\\','_',$sClassName).( $nAutoId ?: '' ) ;
 			}
 			
+			/*
+			if( null === $sWidgetId ){
+				$aDev->output("如下属性需要至少存在一个：id,wid,name : ".htmlspecialchars($aNode->source()) .'<br />','preprocess') ;
+			}else{
+				$aDev->putCode("	{$sWidgetVarName}->setId( $sWidgetId );",'preprocess') ;
+				$aDev->putCode("	{$sWidgetVarName}->setHtmlId( $sHtmlId );",'preprocess') ;
+				$aDev->putCode("	{$sWidgetVarName}->setFormName( $sName );",'preprocess') ;
+			}
+			*/
 			$aAttrs->set('bean.id',$sWidgetId);
 			$aAttrs->set('bean.htmlId',$sHtmlId);
 			$aAttrs->set('bean.formName',$sName);
@@ -309,12 +314,17 @@ class WidgetCompiler extends NodeCompiler
 			$aDev->putCode("	\$theView->addWidget({$sWidgetVarName});",'preprocess') ;
 		}
 		
-		$aDev->putCode("	\$arrAttributes = ",'render');
-		if( isset( $arrAttr['attr'] ) ){
-			$this->writeAttrPri( array( 'attr' => $arrAttr['attr'] ) , $aDev , 1 , 'render' );
-		}else{
-			$aDev->putCode("	array( 'attr' => array() ) ",'render');
+		
+		$arrIgnoreForRender = array(
+			'bean',
+			'display',
+			'define',
+		);
+		foreach($arrIgnoreForRender as $sIgnore){
+			unset($arrAttr[$sIgnore]);
 		}
+		$aDev->putCode("	\$arrBean = ",'render');
+		$this->writeAttrPri( $arrAttr , $aDev , 1 , 'render' );
 		$aDev->putCode("	;",'render');
 	}
 	
@@ -409,6 +419,7 @@ class WidgetCompiler extends NodeCompiler
 			}
 			
 			$aTemplate->headTag()->setAttributes($aTemAttr) ;
+			//$aDev->putCode("	{$sWidgetVarName}->setSubTemplateName('{$sTemName}') ;",'preprocess') ;
 		}
 	}
 	
@@ -425,7 +436,7 @@ class WidgetCompiler extends NodeCompiler
 			$aDev->putCode("if( !{$sWidgetVarName} or !({$sWidgetVarName} instanceof \\org\\jecat\\framework\\mvc\\view\\widget\\IViewWidget) ){",'render') ;
 			$aDev->output("无效的widget对象：".$sInstanceOrigin ,'render') ;
 			$aDev->putCode("} else {",'render') ;
-			$aDev->putCode("	{$sWidgetVarName}->display(\$aVariables->theUI,new \\org\\jecat\\framework\\util\\DataSrc(\$arrAttributes),\$aDevice) ;",'render') ;
+			$aDev->putCode("	{$sWidgetVarName}->display(\$aVariables->theUI,new \\org\\jecat\\framework\\util\\DataSrc(\$arrBean),\$aDevice) ;",'render') ;
 			$aDev->putCode("}",'render') ;
 		}
 		else
@@ -457,7 +468,7 @@ class WidgetCompiler extends NodeCompiler
 			
 			$aDev->putCode("	{$sWidgetVarName}->display(
 				\$aVariables->theUI,
-				new \\org\\jecat\\framework\\util\\DataSrc(\$arrAttributes),
+				new \\org\\jecat\\framework\\util\\DataSrc(\$arrBean),
 				\$aDevice,
 				$sTemplateSignature,
 				$sSubTemplate,
@@ -497,8 +508,7 @@ class WidgetCompiler extends NodeCompiler
 		'v.img.h.max' => 'bean.verifiers.imagesize.maxHeight' ,
 		'v.img.area.min' => 'bean.verifiers.imagearea.min' ,
 		'v.img.area.max' => 'bean.verifiers.imagearea.max' ,
-		'onchange' => 'attr.onchange',
-		'onclick' => 'attr.onclick',
+			
 	);
 	
 	static private $arrDefaultAs = array(

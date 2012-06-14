@@ -73,10 +73,6 @@ class SourceFileManager extends ResourceManager implements \Serializable
 	} 
 	public function compileStrategySignture()
 	{
-		if(!$this->sCompileStrategySignture)
-		{
-			$this->sCompileStrategySignture = md5(__CLASS__) ;
-		}
 		return $this->sCompileStrategySignture ;
 	}
 	
@@ -113,7 +109,7 @@ class SourceFileManager extends ResourceManager implements \Serializable
 		return $sNamespace? md5($sNamespace.':'.$sTemplate): md5($sTemplate) ;
 	}
 	
-	private $sCompileStrategySignture ;
+	private $sCompileStrategySignture = '2012-6-14 17:08' ;
 	
 	private $sCompiledFolderPath ;
 	
