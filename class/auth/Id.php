@@ -178,7 +178,6 @@ class Id extends Object implements IIdentity, \Serializable
 	{
 		$this->setDataFromModel('uid',$id) ;
 	}
-	
 	public function username()
 	{
 		return (string)$this->getDataFromModel('username') ;
@@ -265,18 +264,9 @@ class Id extends Object implements IIdentity, \Serializable
 		$this->aModel = $aModel ;
 	}
 	
-	static public function displayName(Model $aUserModel)
+	public function displayName()
 	{
-		$sUsername = $aUserModel->data('username') ;
-	
-		if( $sNickname = $aUserModel->data('info.nickname') )
-		{
-			return "{$sNickname}({$sUsername})" ;
-		}
-		else
-		{
-			return $sUsername ;
-		}
+		return $this->nickname() ?: $this->username() ;
 	}
 	
 	private function getDataFromModel($sProp)

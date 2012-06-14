@@ -391,40 +391,12 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 		}
 		return false ;
 	}
-	/**
-	 * @return bool
-	 */
-	/*
-	public function next($sChildName=null)
-	{
-		if( $arrParentRow=&$this->localeRow($sChildName,$this->arrData) )
-		{
-			if( $this->isSheet($arrParentRow,$sChildName) )
-			{
-				if( !empty($arrParentRow[$sChildName]) )
-				{
-					next($arrParentRow[$sChildName]) ;
-					if( each($arrParentRow[$sChildName])===false )
-					{
-						prev($arrParentRow[$sChildName]) ;
-						return false ;
-					}
-					else
-					{
-						return true ;
-					}
-				}
-			}
-		}
-		return false ;
-	}
-	*/
 
 	public function data($sName)
 	{
 		if( $arrRow =& $this->localeRow($sName,$this->arrData) )
 		{
-			return $arrRow[$sName] ;
+			return isset($arrRow[$sName])? $arrRow[$sName]: null ;
 		}
 		else 
 		{
