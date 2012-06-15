@@ -100,22 +100,7 @@ class Controller extends NamableComposite implements IBean
 		// auto build bean config
 		if( $bBuildAtonce )
 		{
-			
-			if( property_exists($this, 'arrConfig') )
-			{
-				$arrConfig =& $this->arrConfig ;
-			}
-			else
-			{
-				$arrConfig = array() ;
-			}
-			
-			if( method_exists($this,'createBeanConfig') )
-			{
-				$this->createBeanConfig($arrConfig) ;
-			}
-				
-			$this->buildBean($arrConfig) ;
+			$this->buildBean($arrConfig=array()) ;
 		}
     	
 		$this->init() ;
@@ -254,6 +239,27 @@ class Controller extends NamableComposite implements IBean
      */
     public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {
+		if( property_exists($this, 'arrConfig') )
+		{
+			$arrDefaultConfig = $this->arrConfig ;
+		}
+		else
+		{
+			$arrDefaultConfig = array() ;
+		}
+		
+		if( method_exists($this,'createBeanConfig') )
+		{
+			$this->createBeanConfig($arrDefaultConfig) ;
+		}
+		
+		if( $arrDefaultConfig )
+		{
+			BeanFactory::mergeConfig($arrDefaultConfig,$arrConfig) ;
+			$arrConfig =& $arrDefaultConfig ;
+		}
+		
+			
     	// 触发事件
     	EventManager::singleton()->emitEvent(
     			__CLASS__
