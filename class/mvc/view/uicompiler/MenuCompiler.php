@@ -31,6 +31,7 @@ use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\xhtml\AttributeValue;
 use org\jecat\framework\ui\xhtml\Node;
+use org\jecat\framework\ui\xhtml\Attributes;
 
 /**
  * @wiki /MVC模式/视图/模板标签
@@ -71,19 +72,19 @@ class MenuCompiler extends WidgetCompiler
 			);
 		}
 		
-		$this->writeTheView($aDev) ;
+		$this->writeTheView($aAttrs , $aDev) ;
 		
 		$sId = $this->writeObject($aAttrs , $aObject , $aObjectContainer , $aDev , $sWidgetVarName);
 		if( false === $sId ){
 			return false;
 		}
 		$this->writeAttr($aAttrs , $aObjectContainer , $aDev , $sWidgetVarName);
-		$this->writeBean($aObject ,  $aDev , $sWidgetVarName) ;
+		$this->writeBean($aObject , $aObjectContainer , $aDev , $aCompilerManager , $sWidgetVarName) ;
 		$this->writeTemplate($aObject , $aAttrs , $aObjectContainer , $aDev , $aCompilerManager , $sWidgetVarName) ;
-		$this->writeSubMenu($aObject , $aObjectContainer , $aDev , $aCompilerManager , $sWidgetVarName , $sId ) ;
+		//$this->writeSubMenu($aObject , $aObjectContainer , $aDev , $aCompilerManager , $sWidgetVarName , $sId ) ;
 		$this->compileChildren($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
-		$this->writeDisplay($aAttrs , $aDev , $sWidgetVarName , $sId) ;
-		$this->writeEnd($aDev);
+		$this->writeDisplay($aObject,$aAttrs , $aDev , $sWidgetVarName , $sId) ;
+		$this->writeEnd($aAttrs , $aDev);
 	}
 	
 	protected function writeObject(Attributes $aAttrs , Node $aNode , ObjectContainer $aObjectContainer , TargetCodeOutputStream $aDev , $sWidgetVarName){

@@ -113,6 +113,11 @@ class Menu extends AbstractBase
 				}
 			}
 		}
+		if( isset( $arrConfig['item'] ) and is_array( $arrConfig['item'] ) ){
+			foreach($arrConfig['item'] as $item){
+				$this->buildItemFromBean($item);
+			}
+		}
 		if(!empty($arrConfig['direction'])){
 			$this->setDirection($arrConfig['direction']);
 		}
@@ -356,8 +361,15 @@ class Menu extends AbstractBase
 		return null ;
 	}
 	
-	public function display(UI $aUI,IHashTable $aVariables=null,IOutputStream $aDevice=null)
-	{
+	//public function display(UI $aUI,IHashTable $aVariables=null,IOutputStream $aDevice=null)
+	public function display(
+		UI $aUI
+		,IHashTable $aVariables=null
+		,IOutputStream $aDevice=null
+		,$sTemplateSignature =null
+		,$sSubTemplate = null
+		,$sTemplate = null
+	){
 		$arrAttr = $aVariables->get('attr');
 		if( isset($arrAttr['depth']) and $depth = $arrAttr['depth'] )
 		{
@@ -365,23 +377,51 @@ class Menu extends AbstractBase
 			{
 				unset($arrAttr['depth']);
 				$aVariables->set('attr',$arrAttr);
-				$aMenu->display($aUI,$aVariables,$aDevice);
+				$aMenu->display(
+					$aUI
+					,$aVariables
+					,$aDevice
+					,$sTemplateSignature
+					,$sSubTemplate
+					,$sTemplate = null
+				);
 			}
 		}
 		else if( isset( $arrAttr['xpath']) and $xpath=$arrAttr['xpath'] )
 		{
 			if( $aMenu = $this ->getMenuByPath($xpath) )
 			{
-				$aMenu->display($aUI,$aVariables,$aDevice);
+				$aMenu->display(
+					$aUI
+					,$aVariables
+					,$aDevice
+					,$sTemplateSignature
+					,$sSubTemplate
+					,$sTemplate = null
+				);
 			}
 		}
 		else if( isset( $arrAttr['showDepths'] ) and $showDepths = (int)$arrAttr['showDepths'] and $showDepths > 0)
 		{
 			$arrAttr['showDepths'] = $showDepths -1 ;
 			$aVariables->set('attr',$arrAttr);
-			parent::display($aUI,$aVariables,$aDevice) ;
+			parent::display(
+				$aUI
+				,$aVariables
+				,$aDevice
+				,$sTemplateSignature
+				,$sSubTemplate
+				,$sTemplate = null
+			);
 		}else if( !isset( $arrAttr['showDepths'] ) ){
-			parent::display($aUI,$aVariables,$aDevice) ;
+			parent::display(
+				$aUI
+				,$aVariables
+				,$aDevice
+				,$sTemplateSignature
+				,$sSubTemplate
+				,$sTemplate = null
+			);
 		}
 	}
 	

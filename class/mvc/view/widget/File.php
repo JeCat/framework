@@ -35,7 +35,7 @@ use org\jecat\framework\fs\archive\IAchiveStrategy;
 use org\jecat\framework\fs\archive\DateAchiveStrategy;
 use org\jecat\framework\fs\File as FsFile;
 
-class File extends FormWidget implements IShortableBean
+class File extends FormWidget
 {
 	
 	public function __construct($sId = null, $sTitle = null, Folder $aFolder = null, IAchiveStrategy $aAchiveStrategy = null, IView $aView = null)
@@ -338,10 +338,13 @@ class File extends FormWidget implements IShortableBean
 	}
 	
 	static public function beanAliases(){
-		return array(
-			'folder' => 'bean.folder' ,
-			'httpurl' => 'bean.httpurl' ,
-			'strategy' => 'bean.strategy' ,
+		return array_merge(
+			parent::beanAliases(),
+			array(
+				'folder' => 'bean.folder' ,
+				'httpurl' => 'bean.httpurl' ,
+				'strategy' => 'bean.strategy' ,
+			)
 		);
 	}
 	
