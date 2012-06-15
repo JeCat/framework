@@ -1,7 +1,7 @@
 <?php
 namespace org\jecat\framework\mvc\model ;
 
-use org\jecat\framework\mvc\model\db\Model;
+use org\jecat\framework\mvc\model\Model;
 
 use org\jecat\framework\mvc\view\widget\paginator\IPaginal;
 use org\jecat\framework\mvc\model\executor\Deleter;

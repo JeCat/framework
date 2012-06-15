@@ -208,7 +208,7 @@ class Category extends Object
 		{
 			for(; ($nParentIdx=$aParentStack->get())!==false; $aParentStack->out() )
 			{
-				if( $aModel->data('lft',$nParentIdx) < $aModel['rgt'] and $aModel->data('rgt',$nParentIdx) > $aModel['rgt'] )
+				if( $aModelList->data('lft',$nParentIdx) < $aModel['rgt'] and $aModelList->data('rgt',$nParentIdx) > $aModel['rgt'] )
 				{
 					break ;
 				}
