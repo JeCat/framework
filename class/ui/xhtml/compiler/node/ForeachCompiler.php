@@ -114,7 +114,6 @@ class ForeachCompiler extends NodeCompiler {
 		$bItemRef = $aAttrs->has ( 'item.ref' ) ? $aAttrs->bool('item.ref') : false ;
 		$sIdxUserName = $aAttrs->has ( 'idx' ) ? $aAttrs->get ( 'idx' ) : '' ;
 		
-		$sForAutoName = NodeCompiler::assignVariableName ( '$__foreach_Arr_' );
 		$sItemAutoName = NodeCompiler::assignVariableName ( '$__foreach_item_' ) ;
 		$sKeyAutoName = NodeCompiler::assignVariableName ( '$__foreach_key_' ) ;
 		$sIdxAutoName = NodeCompiler::assignVariableName ( '$__foreach_idx_' ) ;
@@ -122,13 +121,13 @@ class ForeachCompiler extends NodeCompiler {
 		
 		
 		$aDev->putCode ( "\r\n// foreach start ") ;
-		$aDev->putCode ( "{$sForAutoName} = " ) ;
-		$aDev->putCode ( $aForUserExp ) ;
-		$aDev->putCode ( ";\r\n\$aStackForLoopIsEnableToRun->put(false);
+		$aDev->putCode ( "\$aStackForLoopIsEnableToRun->put(false);
 {$sIdxAutoName} = -1;
-foreach({$sForAutoName} as {$sKeyAutoName}=>{$sItemRef}{$sItemAutoName}){");
+foreach(",null,false) ;
+		$aDev->putCode ($aForUserExp,null,false) ;
+		$aDev->putCode (" as {$sKeyAutoName}=>{$sItemRef}{$sItemAutoName}){");
 
-	$aDev->putCode ( "\$bLoopIsEnableToRun = & \$aStackForLoopIsEnableToRun->getRef();
+		$aDev->putCode ( "\$bLoopIsEnableToRun = & \$aStackForLoopIsEnableToRun->getRef();
 	\$bLoopIsEnableToRun = true;
 	{$sIdxAutoName}++;" );
 		
