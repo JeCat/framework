@@ -1,6 +1,8 @@
 <?php
 namespace org\jecat\framework\mvc\model ;
 
+use org\jecat\framework\mvc\model\db\Model;
+
 use org\jecat\framework\mvc\view\widget\paginator\IPaginal;
 use org\jecat\framework\mvc\model\executor\Deleter;
 use org\jecat\framework\mvc\model\executor\Updater;
@@ -37,9 +39,9 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 	 * @param unknown_type $primaryKeys
 	 * @param unknown_type $columns
 	 */
-	public static function create($sTable,$sPrototypeName=null,$primaryKeys=null,$columns=null)
+	public static function create($table,$sPrototypeName=null,$primaryKeys=null,$columns=null)
 	{
-	    return new self($sTable,$sPrototypeName,$primaryKeys,$columns) ;
+	    return new self($table,$sPrototypeName,$primaryKeys,$columns) ;
 	}
 	
 	/**
@@ -348,6 +350,13 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 		return $this ;
 	}
 	
+	/**
+	 * 将当前行单独做为一个 model 对像
+	 */
+	public function alone($sXPath=null)
+	{
+		return self::create($this->prototype())->addRow( $this->rowRef($sXPath), $sXPath ) ;
+	}
 	
 	
 	// 数据操作 /////////////////////////////
