@@ -27,7 +27,7 @@ namespace org\jecat\framework\mvc\model ;
 
 use org\jecat\framework\lang\Object;
 use org\jecat\framework\util\Stack;
-use org\jecat\framework\mvc\model\db\orm\Prototype;
+use org\jecat\framework\mvc\model\Prototype;
 use org\jecat\framework\db\sql\Update;
 use org\jecat\framework\db\DB;
 
@@ -165,7 +165,7 @@ class Category extends Object
 	 */
 	public function delete()
 	{
-		if( !$aOrmPrototype = $this->aModel->prototype() )
+		if( !$aOrmPrototype = $this->aModel )
 		{
 			throw new CategoryPointException("尚未为临接表模型设置原型，无法完成操作") ;
 		}
@@ -175,7 +175,7 @@ class Category extends Object
 		$sLftClm = self::leftColumn($aOrmPrototype) ;
 		$sRgtClm = self::rightColumn($aOrmPrototype) ;
 		
-		DB::singleton()->execute("delete from ".$aOrmPrototype->tableName()." where {$sLftClm}>={$nOriLft} and {$sRgtClm}<={$nOriRgt}") ;
+		DB::singleton()->execute("delete from ".$aOrmPrototype->prototype()->tableName()." where {$sLftClm}>={$nOriLft} and {$sRgtClm}<={$nOriRgt}") ;
 		
 		$nMove = $nOriRgt-$nOriLft+1 ;
 		$aUpdate = new Update($aOrmPrototype->tableName()) ;
@@ -409,13 +409,15 @@ class Category extends Object
 		return (int)$aModel->data('rgt') ;
 	}
 	
-	static public function leftColumn(Prototype $aPrototype)
+	static public function leftColumn(Model $aPrototype)
 	{
-		return ($aPrototype->getColumnByAlias('lft')?:'lft') ;
+		return 'lft' ;
+		//return ($aPrototype->getColumnByAlias('lft')?:'lft') ;
 	}
-	static public function rightColumn(Prototype $aPrototype)
+	static public function rightColumn(Model $aPrototype)
 	{
-		return ($aPrototype->getColumnByAlias('rgt')?:'rgt') ;
+		return 'rgt' ;
+		//return ($aPrototype->getColumnByAlias('rgt')?:'rgt') ;
 	}
 	
 	/**
