@@ -674,8 +674,8 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 	{
 	    if($sChildName == null)
 	    {
-	        //return current($this->arrData);
-	        return $this;
+	        return current($this->arrData);
+	        //return $this;
 	    }else{
 	        $arrSheet =& $this->buildSheet($sChildName) ;
 	        return current($arrSheet);
