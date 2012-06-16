@@ -106,6 +106,9 @@ class Item extends AbstractBase
 				break;
 			}
 		}
+		if( isset($arrConfig['item']) ){
+			$bIsMenu = true ;
+		}
 		if($bIsMenu){
 			$this->buildSubMenu($arrConfig);
 		}

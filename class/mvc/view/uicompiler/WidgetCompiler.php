@@ -36,6 +36,7 @@ use org\jecat\framework\ui\xhtml\Attributes;
 use org\jecat\framework\ui\xhtml\Expression;
 use org\jecat\framework\ui\xhtml\Node;
 use org\jecat\framework\ui\xhtml\Text;
+use org\jecat\framework\pattern\composite\Composite;
 
 /**
  * 
@@ -65,7 +66,7 @@ class WidgetCompiler extends NodeCompiler
 			return false;
 		}
 		$this->writeAttr($aAttrs , $aObjectContainer , $aDev , $sWidgetVarName);
-		$this->writeBean($aObject ,  $aDev , $sWidgetVarName) ;
+		$this->writeBean($aObject , $aObjectContainer , $aDev , $aCompilerManager , $sWidgetVarName) ;
 		$this->writeTemplate($aObject , $aAttrs , $aObjectContainer , $aDev , $aCompilerManager , $sWidgetVarName) ;
 		$this->compileChildren($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
 		$this->writeDisplay($aObject,$aAttrs , $aDev , $sWidgetVarName , $sId) ;
@@ -270,9 +271,6 @@ class WidgetCompiler extends NodeCompiler
 			}
 			
 			$sBeanName = $sName ;
-			if( isset( self::$arrAttrAlias[$sBeanName] ) ){
-				$sBeanName = self::$arrAttrAlias[$sBeanName] ;
-			}
 			
 			if( isset( $arrShortableBeanAttrAlias[$sBeanName] ) ){
 				$sBeanName = $arrShortableBeanAttrAlias[$sBeanName] ;
@@ -329,7 +327,7 @@ class WidgetCompiler extends NodeCompiler
 			}else if( is_array( $value ) ){
 				$aDev->putCode( str_repeat('	',$nTabCount).'"'.$key.'"'.' => ', $sSubTemplateName );
 				$this->writeAttrPri( $value , $aDev , $nTabCount+1 , $sSubTemplateName );
-				$aDev->putCode( ' , ', $sSubTemplateName );
+				$aDev->putCode( str_repeat('	',$nTabCount).' , ', $sSubTemplateName );
 			}else if( $value instanceof Expression ){
 				$aDev->putCode( str_repeat('	',$nTabCount).'"'.$key.'"'.' => ', $sSubTemplateName );
 				$aDev->putCode( $value , $sSubTemplateName );
@@ -340,37 +338,17 @@ class WidgetCompiler extends NodeCompiler
 		$aDev->putCode(str_repeat('	',$nTabCount)." )",$sSubTemplateName);
 	}
 	
-	protected function writeBean(IObject $aObject , TargetCodeOutputStream $aDev , $sWidgetVarName){
+	protected function writeBean(IObject $aObject ,ObjectContainer $aObjectContainer , TargetCodeOutputStream $aDev ,CompilerManager $aCompilerManager , $sWidgetVarName){
 		// bean
+		$arrBean = $this->writeBeanPri( $aObject , $aObjectContainer , $aDev , $aCompilerManager );
+		
 		if( $aBean = $aObject->getChildNodeByTagName('bean') ){
-			$arrBean = BeanConfXml::singleton()->xmlSourceToArray( $aBean->source() ) ;
+			$arrBean = array_merge(
+				$arrBean,
+				BeanConfXml::singleton()->xmlSourceToArray( $aBean->source() )
+			);
 			$aObject->remove($aBean);
 		}else{
-			$arrBean = array() ;
-		}
-		
-		if($aObject->tagName() === 'select' ){
-			$arrBean['options'] = array() ;
-			foreach($aObject->childElementsIterator() as $aChild)
-			{
-				if( ($aChild instanceof Node) and ($aChild->tagName()=='option') )
-				{
-					$sText = '';
-					$sValue = $aChild->attributes()->get('value');
-					$sSelect = $aChild->attributes()->string('selected');
-					foreach( $aChild->childElementsIterator() as $aChildChild){
-						if( $aChildChild instanceof Text ){
-							$sText .= $aChildChild->source();
-						}
-					}
-					$arrBean['options'][] = array(
-						0 => '"'.$sText.'"' ,
-						1 => $sValue ,
-						2 => ( $sSelect === 'selected' ),
-					);
-					$aObject->remove($aChild);
-				}
-			}
 		}
 		
 		if( count($arrBean) > 0 ){
@@ -381,6 +359,57 @@ class WidgetCompiler extends NodeCompiler
 			$aDev->putCode("	\\org\\jecat\\framework\\bean\\BeanFactory::mergeConfig(\$arrFormer, \$arrBean); ",'preprocess');
 			$aDev->putCode("	{$sWidgetVarName}->buildBean( \$arrFormer ); ",'preprocess');
 		}
+	}
+	
+	static private $arrEscapeTagName = array(
+		'template',
+	);
+	private function writeBeanPri( Node $aNode ,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager){
+		$arrRtn = array() ;
+		foreach( $aNode->childElementsIterator() as $aChild ){
+			if( $aChild instanceof Node ){
+				$sTagName = $aChild->tagName() ;
+				
+				if( ! in_array( $sTagName , self::$arrEscapeTagName ) ){
+					$arrChildBean = $this->writeBeanPri( $aChild , $aObjectContainer , $aDev , $aCompilerManager ) ;
+					
+					$aChildAttr = $aChild->attributes() ;
+					foreach( $aChildAttr as $sName => $aValue ){
+						$arrChildBean[$sName] = $aChildAttr->get($sName) ;
+					}
+					
+					$sSubTemName = $this->writeTemplatePri( $aChild );
+					if( $sSubTemName ){
+						$arrChildBean['subtemplate'] = '"'.$sSubTemName.'"' ;
+						$arrChildBean['template'] = '"'.$aObjectContainer->ns().':'.$aObjectContainer->templateName().'"';
+					}
+					
+					$arrRtn[$sTagName][] = $arrChildBean ;
+					
+					$aNode->remove($aChild);
+				}else{
+					$aCompiler = $aCompilerManager->compiler(
+						$aChild
+					);
+					$aCompiler->compile(
+						$aChild
+						, $aObjectContainer
+						, $aDev
+						, $aCompilerManager
+					);
+				}
+			}else if( $aChild instanceof Text){
+				$sText = trim($aChild->source()) ;
+				
+				if( ! empty($sText) ){
+					$arrRtn['text'] = '"'.$sText.'"' ;
+				}
+				
+				$aNode->remove($aChild);
+			}
+		}
+		
+		return $arrRtn ;
 	}
 	
 	protected function writeTemplate(
@@ -406,10 +435,34 @@ class WidgetCompiler extends NodeCompiler
 			}else{
 				$sTemName = '__subtemplate_'.md5(rand()) ;
 				$aTemAttr->set('name' , $sTemName ) ;
+				$aTemplate->headTag()->setAttributes($aTemAttr) ;
 			}
-			
+		}
+	}
+	
+	/**
+	 * 返回 subtemplate name
+	 * 没有返回 null
+	 */
+	private function writeTemplatePri(
+			Node $aNode
+	){
+		$aTemplate = $aNode->getChildNodeByTagName('template');
+		if( ! $aTemplate ){
+			return null ;
+		}
+		
+		$aTemAttr = $aTemplate->headTag()->attributes();
+		
+		if($aTemAttr->has('name') ){
+			$sTemName = $aTemAttr->string('name');
+		}else{
+			$sTemName = '__subtemplate_'.md5(rand()) ;
+			$aTemAttr->set('name' , $sTemName ) ;
 			$aTemplate->headTag()->setAttributes($aTemAttr) ;
 		}
+		
+		return $sTemName ;
 	}
 	
 	protected function writeDisplay(IObject $aObject , Attributes $aAttrs , TargetCodeOutputStream $aDev , $sWidgetVarName,$sId){
@@ -475,30 +528,6 @@ class WidgetCompiler extends NodeCompiler
 	
 	static private $arrEscapeAttr = array(
 		'instance' ,
-	);
-	
-	/**
-	 * 
-	 * @var unknown_type
-	 */
-	static private $arrAttrAlias = array(
-		'v.min' => 'bean.verifiers.length.min' ,
-		'v.max' => 'bean.verifiers.length.max' ,
-		'v.email' => 'bean.verifiers.email.email' ,
-		'v.number' => 'bean.verifiers.number.type' ,			// default: int
-		'v.notempty' => 'bean.verifiers.notempty.notempty' ,
-		'v.file.max' => 'bean.verifiers.filelen.nMaxLength' ,
-		'v.file.min' => 'bean.verifiers.filelen.nMinLength' ,
-		'v.file.extname' => 'bean.verifiers.extname.exts' ,
-		'v.file.extname.allow' => 'bean.verifiers.extname.allow' ,
-		'v.img.w.min' => 'bean.verifiers.imagesize.mimWidth' ,
-		'v.img.w.max' => 'bean.verifiers.imagesize.maxWidth' ,
-		'v.img.h.min' => 'bean.verifiers.imagesize.minHeight' ,
-		'v.img.h.max' => 'bean.verifiers.imagesize.maxHeight' ,
-		'v.img.area.min' => 'bean.verifiers.imagearea.min' ,
-		'v.img.area.max' => 'bean.verifiers.imagearea.max' ,
-		'onchange' => 'attr.onchange',
-		'onclick' => 'attr.onclick',
 	);
 	
 	static private $arrDefaultAs = array(

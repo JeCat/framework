@@ -39,12 +39,12 @@ class Updater extends Executor
 		}
 		if( !empty($arrClauseSet) )
 		{
-			$sSql = "UPDATE "
-					. $arrSqlStat['from']
-                    . " SET\r\n\t" . implode("\r\n\t, ",$arrClauseSet)."\r\n"
-					. $this->makeWhereClause($arrPrototype,$sWhere)
-					. $this->makeGroupByClause($arrPrototype)
-					. $this->makeOrderByClause($arrPrototype) . " ; \r\n" ;
+			echo $sSql = "UPDATE "
+								. $arrSqlStat['from']
+			                    . " SET\r\n\t" . implode("\r\n\t, ",$arrClauseSet)."\r\n"
+								. $this->makeWhereClause($arrPrototype,$sWhere)
+								. $this->makeGroupByClause($arrPrototype)
+								. $this->makeOrderByClause($arrPrototype) . " ; \r\n" ;
 			
 			return $aDB->execute($sSql) ;
 		}

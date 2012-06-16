@@ -73,7 +73,7 @@ class Category extends Object
 	 */
 	public function insertCategoryToPoint($nTarget=self::end)
 	{
-		if( !$aOrmPrototype = $this->aModel->prototype() )
+		if( !$aOrmPrototype = $this->aModel )
 		{
 			throw new CategoryPointException("尚未为临接表模型设置原型，无法完成操作") ;
 		}
@@ -102,7 +102,7 @@ class Category extends Object
 		// 检查当前分类的左右点是否有效
 		$this->checkPoints($nOriLft,$nOriRgt) ;
 
-		$aUpdate = new Update($aOrmPrototype->tableName()) ;
+		$aUpdate = new Update($aOrmPrototype->prototype()->tableName()) ;
 		$aUpdate->criteria()->setLimit(-1) ;
 			
 		// 移动已经存在的记录
@@ -154,9 +154,12 @@ class Category extends Object
 			// 移动 rgt
 			$this->moveFeet( $aUpdate,$sRgtClm,2,$nTarget-1,null) ;	
 			
-			$this->aModel->setData('lft', $nTarget) ;
-			$this->aModel->setData('rgt', $nTarget+1) ;
-			$this->aModel->save() ;
+			$this->aModel->update(array(
+			        'lft'=>$nTarget,
+			        'rgt'=>$nTarget+1
+	            ),
+			    "cid ='".$this->aModel['cid']."'"
+	        ) ;
 		}
 	}
 	
@@ -205,7 +208,7 @@ class Category extends Object
 		{
 			for(; ($nParentIdx=$aParentStack->get())!==false; $aParentStack->out() )
 			{
-				if( $aModel->data('lft',$nParentIdx) < $aModel['rgt'] and $aModel->data('rgt',$nParentIdx) > $aModel['rgt'] )
+				if( $aModelList->data('lft',$nParentIdx) < $aModel['rgt'] and $aModelList->data('rgt',$nParentIdx) > $aModel['rgt'] )
 				{
 					break ;
 				}
