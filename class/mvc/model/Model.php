@@ -1,8 +1,6 @@
 <?php
 namespace org\jecat\framework\mvc\model ;
 
-use org\jecat\framework\mvc\model\db\Model;
-
 use org\jecat\framework\mvc\view\widget\paginator\IPaginal;
 use org\jecat\framework\mvc\model\executor\Deleter;
 use org\jecat\framework\mvc\model\executor\Updater;
@@ -232,7 +230,7 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 			reset($arrData) ;
 			if( is_int(key($arrData)) )
 			{
-				$aInserter->execute( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
+				$this->arrLastAffecteds[$sChildName] = $aInserter->execute( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
 				return $this ;
 			}
 		}
@@ -242,7 +240,7 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 		{
 			$arrData =& $this->rowRef($sChildName) ;
 		}
-		$aInserter->insertRow( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
+		$this->arrLastAffecteds[$sChildName] = $aInserter->insertRow( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
 
 		return $this ;
 	}
@@ -272,8 +270,7 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 			throw new Exception("传入 Model::update 方法的参数\$sChildName无效:%s",$sChildName) ;
 		}
 		
-		
-		Updater::singleton()->execute( $this, $arrPrototype, $arrData, $sWhere, $this->db() ) ;
+		$this->arrLastAffecteds[$sChildName] = Updater::singleton()->execute( $this, $arrPrototype, $arrData, $sWhere, $this->db() ) ;
 	}
 	
 	/**
@@ -288,7 +285,7 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 			throw new Exception("传入 Model::update 方法的参数\$sChildName无效:%s",$sChildName) ;
 		}
 		
-		Deleter::singleton()->execute( $arrPrototype, $sWhere ,$sOrder , $sLimit, $this->db() ) ;
+		$this->arrLastAffecteds[$sChildName] = Deleter::singleton()->execute( $arrPrototype, $sWhere ,$sOrder , $sLimit, $this->db() ) ;
 	}
 	
 	/**
@@ -735,6 +732,12 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 	{
 		$this->limit($nPerPage,($nPageNum-1)*$nPerPage) ;
 	}
+	
+	public function affected($sXPath=null)
+	{
+		return isset($this->arrLastAffecteds[$sXPath])? $this->arrLastAffecteds[$sXPath]: null ;
+	}
+	
 	
 	// implements \Serializable
 	public function serialize()
