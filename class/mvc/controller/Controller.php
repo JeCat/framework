@@ -98,9 +98,9 @@ class Controller extends NamableComposite implements IBean
 		$this->buildParams($params) ;
 		
 		// auto build bean config
-		if( $bBuildAtonce and property_exists($this, 'arrConfig') )
+		if( $bBuildAtonce )
 		{
-			$this->buildBean($this->arrConfig) ;
+			$this->buildBean($arrConfig=array()) ;
 		}
     	
 		$this->init() ;
@@ -239,6 +239,27 @@ class Controller extends NamableComposite implements IBean
      */
     public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {
+		if( property_exists($this, 'arrConfig') )
+		{
+			$arrDefaultConfig = $this->arrConfig ;
+		}
+		else
+		{
+			$arrDefaultConfig = array() ;
+		}
+		
+		if( method_exists($this,'createBeanConfig') )
+		{
+			$this->createBeanConfig($arrDefaultConfig) ;
+		}
+		
+		if( $arrDefaultConfig )
+		{
+			BeanFactory::mergeConfig($arrDefaultConfig,$arrConfig) ;
+			$arrConfig =& $arrDefaultConfig ;
+		}
+		
+			
     	// 触发事件
     	EventManager::singleton()->emitEvent(
     			__CLASS__
@@ -339,12 +360,17 @@ class Controller extends NamableComposite implements IBean
     	// controllers --------------------
     	if( !empty($arrConfig['controllers']) )
     	{
-    		foreach($arrConfig['controllers'] as $key=>&$arrBeanConf)
+    		foreach($arrConfig['controllers'] as $key=>&$beanConf)
     		{
-    			// 自动配置缺少的 class, name 属性
-    			$aBeanFactory->_typeProperties( $arrBeanConf, 'controller', is_int($key)?null:$key, 'name' ) ;
+    			if( is_string($beanConf) )
+    			{
+    				$beanConf = array('class'=>$beanConf) ;
+    			}
     			
-    			$this->add( $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ) ;
+    			// 自动配置缺少的 class, name 属性
+    			$aBeanFactory->_typeProperties( $beanConf, 'controller', is_int($key)?null:$key, 'name' ) ;
+    			
+    			$this->add( $aBeanFactory->createBean($beanConf,$sNamespace,true) ) ;
     		}
     	}
     	
@@ -522,6 +548,7 @@ class Controller extends NamableComposite implements IBean
     
     public function location($sUrl,$nFlashSec=3)
     {
+<<<<<<< HEAD
 		// 禁用所有视图
 		$this->view()->disable() ;
 
@@ -532,6 +559,18 @@ class Controller extends NamableComposite implements IBean
 		$aViewRelocater->variables()->set('flashSec',$nFlashSec) ;
 		$aViewRelocater->variables()->set('url',$sUrl) ;
 
+=======
+		// 禁用所有视图
+		$this->view()->disable() ;
+				
+		// 建立 relocation 视图
+		$aViewRelocater = new View("org.jecat.framework:Relocater.html") ;
+		$this->view()->addView('relocater',$aViewRelocater) ;
+		
+		$aViewRelocater->variables()->set('flashSec',$nFlashSec) ;
+		$aViewRelocater->variables()->set('url',$sUrl) ;
+		
+>>>>>>> 162652b2bd2d39ef6d01072b527229a0d75d2966
 		throw new _ExceptionRelocation ;
     }
 
@@ -738,16 +777,21 @@ class Controller extends NamableComposite implements IBean
     
     public function doActions($sActParamName='a')
     {
-    	if( !$arrActions=self::buildActionParam($this->params,$sActParamName,$this->xpath()) )
-    	{
-    		$arrActions[] = 'process' ;
-    	}
+    	$arrActions = self::buildActionParam($this->params,$sActParamName,$this->xpath()) ;
+		$nExecutedActions = 0 ;
+		
     	foreach($arrActions as $sAction)
     	{
     		if( method_exists($this,$sAction) )
     		{
     			call_user_func(array($this,$sAction)) ;
+    			$nExecutedActions ++ ;
     		}
+    	}
+
+    	if( !$nExecutedActions )
+    	{
+    		$this->process() ;
     	}
     }
     
@@ -797,14 +841,6 @@ class Controller extends NamableComposite implements IBean
    		}
     		
    		return $arrReturn ;
-    }
-    
-    public function actionSubmitForm()
-    {
-    	if( $sFromName=$this->params->get('formName') and method_exists($this,$sFromName) )
-    	{
-    		$this->$sFromName() ;
-    	}
     }
     
     public function __get($sName)

@@ -992,19 +992,6 @@ class View implements IView, IBean, IAssemblable
     	return $bRet ;
     }
     
-    public function isSubmit(IDataSrc $aDataSrc=null)
-    {
-    	if(!$aDataSrc)
-    	{
-    		$aController = $this->controller() ;
-    		if(!$aController)
-    		{
-    			return false ;
-    		}
-    		$aDataSrc = $aController->params() ;
-    	}
-    	return $aDataSrc->get('viewXPath')===$this->xpath(true) ;
-    }
     public function isShowForm($sFormName='form')
     {
     	if(!isset($this->arrShowForm[$sFormName]))

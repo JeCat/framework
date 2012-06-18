@@ -45,9 +45,8 @@ class BeanFactory extends Object implements \Serializable
 			
 			// mvc
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\controller\\Controller","controller") ;
-			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\controller\\WebpageFrame","frame") ;
+			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\controller\\WebpageFrame","webframe") ;
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\view\\View",'view') ;
-			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\view\\FormView",'form') ;
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\model\\db\\Model",'model') ;
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\model\\db\\orm\\Prototype",'prototype') ;
 			$aSingleton->registerBeanClass("org\\jecat\\framework\\mvc\\model\\db\\orm\\Association",'association') ;
@@ -239,11 +238,6 @@ class BeanFactory extends Object implements \Serializable
 				if( strpos($sKey,$sKeyPrefix)===0 )
 				{
 					$sName = substr($sKey,strlen($sKeyPrefix)) ;
-					
-					if( !is_array($item) )
-					{
-						throw new BeanConfException("视图Bean配置的 %s 必须是一个数组",$sKey) ;
-					}
 					
 					$arrConfig[$sContainerName][$sName] = &$item ;
 				}

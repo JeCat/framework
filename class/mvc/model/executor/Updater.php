@@ -46,7 +46,11 @@ class Updater extends Executor
 								. $this->makeGroupByClause($arrPrototype)
 								. $this->makeOrderByClause($arrPrototype) . " ; \r\n" ;
 			
-			$aDB->execute($sSql) ;
+			return $aDB->execute($sSql) ;
+		}
+		else
+		{
+			return 0 ;
 		}
 	}
 }

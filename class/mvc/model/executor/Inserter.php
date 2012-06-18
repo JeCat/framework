@@ -12,16 +12,19 @@ class Inserter extends Executor
 {	
 	public function execute(Model $aModel,array & $arrPrototype,array & $arrDataSheet,$bRecursively=true,DB $aDB=null)
 	{
+		$nAff = 0 ;
 		foreach($arrDataSheet as &$arrDataRow)
 		{
 			$aModel->addRow(null,$arrPrototype['xpath']) ;
 			
-			$this->insertRow($aModel, $arrPrototype, $arrDataRow, $bRecursively, $aDB) ;
+			$nAff+= $this->insertRow($aModel, $arrPrototype, $arrDataRow, $bRecursively, $aDB) ;
 		}
+		return $nAff ;
 	}
 	
 	public function insertRow(Model $aModel,array & $arrPrototype,array & $arrDataRow,$bRecursively=true,DB $aDB=null)
 	{
+		$nAff = 0 ;
 	    
 		// 字段/值
 		$arrColumns = array() ;
@@ -92,7 +95,7 @@ class Inserter extends Executor
 		{
 			$sSql = $this->makeSql($arrPrototype['table'],$arrColumns,$arrValues) ;
 			
-			$aDB->execute($sSql) ;
+			$nAff+= $aDB->execute($sSql) ;
 			
 			// 新插入的主键值
 			if( $arrPrototype['devicePrimaryKey'] )
@@ -115,7 +118,7 @@ class Inserter extends Executor
 		// 根据左右两个表的值，插入中间表
 		if( !empty($arrPrototype['assoc']) and $arrPrototype['assoc']===Prototype::hasAndBelongsToMany )
 		{
-			$this->insertBridgeRow($aModel,$arrPrototype,$sBeAssociatedPrefix,$sDataNamePrefix,$aDB) ;
+			$nAff+= $this->insertBridgeRow($aModel,$arrPrototype,$sBeAssociatedPrefix,$sDataNamePrefix,$aDB) ;
 		}
 		
 		// 处理下级关联
@@ -126,7 +129,7 @@ class Inserter extends Executor
 				// 单属关联
 				if( $arrAssoc['assoc']&Prototype::oneToOne )
 				{
-					$this->insertRow($aModel,$arrAssoc,$arrDataRow,$bRecursively,$aDB) ;
+					$nAff+= $this->insertRow($aModel,$arrAssoc,$arrDataRow,$bRecursively,$aDB) ;
 				}
 				
 				// 多属关联
@@ -134,11 +137,13 @@ class Inserter extends Executor
 				{
 					if( !empty($arrDataRow[$arrAssoc['name']]) )
 					{
-						$this->execute($aModel,$arrAssoc,$arrDataRow[$arrAssoc['name']],$bRecursively,$aDB) ;
+						$nAff+= $this->execute($aModel,$arrAssoc,$arrDataRow[$arrAssoc['name']],$bRecursively,$aDB) ;
 					}
 				}
 			}
 		}
+		
+		return $nAff ;
 	}
 	
 	/**
@@ -161,9 +166,9 @@ class Inserter extends Executor
 			$arrColumns[] = $arrAssoc['fromBridgeKeys'][$nIdx] ;
 		}
 
-		echo $sSql = $this->makeSql($arrAssoc['bridge'],$arrColumns,$arrValues) ;
+		$sSql = $this->makeSql($arrAssoc['bridge'],$arrColumns,$arrValues) ;
 		
-		$aDB->execute($sSql) ;
+		return $aDB->execute($sSql) ;
 	}
 	
 	private function makeSql($sTable,&$arrColumns,&$arrValues)

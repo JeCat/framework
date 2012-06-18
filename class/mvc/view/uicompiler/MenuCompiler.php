@@ -31,6 +31,7 @@ use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\xhtml\AttributeValue;
 use org\jecat\framework\ui\xhtml\Node;
+use org\jecat\framework\ui\xhtml\Attributes;
 
 /**
  * @wiki /MVC模式/视图/模板标签
@@ -58,25 +59,74 @@ class MenuCompiler extends WidgetCompiler
 {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager){
 		$this->checkType( $aObject ) ;
-		$this->writeTheWidget($aDev) ;
+		
 		$sWidgetVarName = $this->getVarName() ;
 		$aAttrs = $this->getAttrs($aObject) ;
-		if( false === $this->writeObject($aAttrs , $aDev , $sWidgetVarName) ){
+		
+		if( $this->isIgnore( $aObject , $aAttrs ) ){
+			return parent::compile(
+				$aObject
+				, $aObjectContainer
+				, $aDev
+				, $aCompilerManager
+			);
+		}
+		
+		$this->writeTheView($aAttrs , $aDev) ;
+		
+		$sId = $this->writeObject($aAttrs , $aObject , $aObjectContainer , $aDev , $sWidgetVarName);
+		if( false === $sId ){
 			return false;
 		}
-		$this->writeHtmlAttr($aAttrs , $aDev , $sWidgetVarName);
-		$this->writeWidgetAttr($aAttrs , $aDev , $sWidgetVarName);
-		$this->writeBean($aObject ,  $aDev , $sWidgetVarName) ;
+		$this->writeAttr($aAttrs , $aObjectContainer , $aDev , $sWidgetVarName);
+		$this->writeBean($aObject , $aObjectContainer , $aDev , $aCompilerManager , $sWidgetVarName) ;
 		$this->writeTemplate($aObject , $aAttrs , $aObjectContainer , $aDev , $aCompilerManager , $sWidgetVarName) ;
-		$this->writeSubMenu($aObject , $aObjectContainer , $aDev , $aCompilerManager , $sWidgetVarName ) ;
-		$this->writeDisplay($aAttrs , $aDev , $sWidgetVarName) ;
-		$this->writeEnd($aDev);
+		//$this->writeSubMenu($aObject , $aObjectContainer , $aDev , $aCompilerManager , $sWidgetVarName , $sId ) ;
+		$this->compileChildren($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
+		$this->writeDisplay($aObject,$aAttrs , $aDev , $sWidgetVarName , $sId) ;
+		$this->writeEnd($aAttrs , $aDev);
+	}
+	
+	protected function writeObject(Attributes $aAttrs , Node $aNode , ObjectContainer $aObjectContainer , TargetCodeOutputStream $aDev , $sWidgetVarName){
+		/*
+		if( $aAttrs->has('instance') ){
+			$aDev->putCode("{",'preprocess') ;
+			return 'CreateByInstance';
+		}
+		if( $aAttrs->has('define') and ! $aAttrs->bool('define') ){
+			$aDev->putCode("{",'preprocess') ;
+			return $aAttrs->get('id');
+		}
+		*/
+		$sClassName = 'menu' ;
+		$aDev->putCode("\r\n//// ------- 创建 widget: {$sClassName} ---------------------",'preprocess') ;
+		
+		$__widget_class = \org\jecat\framework\bean\BeanFactory::singleton()->beanClassNameByAlias($sClassName)?: $sClassName ;
+		
+		$aDev->putCode("if( !class_exists('$__widget_class') ){",'preprocess') ;
+		$aDev->output("缺少 widget (class:{$sClassName})",'preprocess') ;
+		$aDev->putCode("}else{",'preprocess') ;
+		$aDev->putCode("	{$sWidgetVarName} = new $__widget_class ;",'preprocess') ;
+		
+		if( $aAttrs->has('id') ){
+			$sWidgetId = $aAttrs->get('wid') ;
+		}else{
+			$nAutoCreateId = $aObjectContainer->properties()->get('autoCreateId');
+			if( null === $nAutoCreateId ){
+				$nAutoCreateId = 0 ;
+			}
+			$sWidgetId = '"menuAutoCreateId'.$nAutoCreateId.'"';
+			$aObjectContainer->properties()->set('autoCreateId',$nAutoCreateId + 1 );
+		}
+		$aDev->putCode("	{$sWidgetVarName}->setId( $sWidgetId );",'preprocess') ;
+		
+		return $sWidgetId ;
 	}
 	
 	/**
 	 * @param sPath string 前后都没有/
 	 */
-	protected function writeSubMenu(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager , $sWidgetVarName  ){
+	protected function writeSubMenu(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager , $sWidgetVarName ,$sId ){
 		$arrTagName = array('menu','item') ;
 		foreach($aObject->childElementsIterator() as $aChild)
 		{

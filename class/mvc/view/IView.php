@@ -124,8 +124,6 @@ interface IView extends IMessageQueueHolder, IWidgetContainer
     
     public function verifyWidgets() ;
     
-    public function isSubmit(IDataSrc $aDataSrc=null) ;
-    
     public function hideForm($sFormName='form',$bHide=true) ;
     
     public function isShowForm($sFormName='form') ;

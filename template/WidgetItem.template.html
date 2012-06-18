@@ -14,6 +14,6 @@
 	</if>
 	
 	<if "$theWidget->isDisplaySubMenu()" >
-		<widget instance="$theWidget->subMenu()" attr.showDepths="$attr['showDepths']" attr.showDepths.type="expression" />
+		<widget instance="$theWidget->subMenu()" e:attr.showDepths="$attr['showDepths']" />
 	</if>
 </li>

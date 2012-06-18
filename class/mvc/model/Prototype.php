@@ -433,7 +433,7 @@ class Prototype implements \Serializable
 				$arrPrototype['keys'] = $arrPrototype['devicePrimaryKey'] ;
 			}
 		}
-		if($arrPrototype['keys'])
+		if( !empty($arrPrototype['keys']) )
 		{
 			$arrPrototype['keys'] = (array) $arrPrototype['keys'] ;
 		}

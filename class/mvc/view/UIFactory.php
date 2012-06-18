@@ -42,7 +42,7 @@ class UIFactory extends UIFactoryBase
 		ParserStateTag::singleton()->addTagNames(
 				'views', 'view', 'widget', 'form', 'msgqueue', 'view:msgqueue', 'widget:msgqueue', 'resrc', 'link', 'css', 'script'
 				, 'js', 'model:foreach', 'model:foreach:end', 'model:data', 'data', 'template', 'model:foreach:else'
-				, 'bean' , 'menu' , 'item'
+				, 'menu' , 'item'
 		) ;
 		
 		return $aInterpreters ;
@@ -70,7 +70,7 @@ class UIFactory extends UIFactoryBase
 		$aNodeCompilers->addSubCompiler('data',__NAMESPACE__."\\uicompiler\\ModelDataCompiler") ;
 		
 		$aNodeCompilers->addSubCompiler('menu',__NAMESPACE__."\\uicompiler\\MenuCompiler") ;
-		$aNodeCompilers->addSubCompiler('item',__NAMESPACE__."\\uicompiler\\MenuCompiler") ;
+		//$aNodeCompilers->addSubCompiler('item',__NAMESPACE__."\\uicompiler\\MenuCompiler") ;
 		
 		//$aNodeCompilers->addSubCompiler('input',__NAMESPACE__."\\uicompiler\\WidgetCompiler") ;
 		//$aNodeCompilers->addSubCompiler('textarea',__NAMESPACE__."\\uicompiler\\WidgetCompiler") ;

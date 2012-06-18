@@ -37,9 +37,9 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 	 * @param unknown_type $primaryKeys
 	 * @param unknown_type $columns
 	 */
-	public static function create($sTable,$sPrototypeName=null,$primaryKeys=null,$columns=null)
+	public static function create($table,$sPrototypeName=null,$primaryKeys=null,$columns=null)
 	{
-	    return new self($sTable,$sPrototypeName,$primaryKeys,$columns) ;
+	    return new self($table,$sPrototypeName,$primaryKeys,$columns) ;
 	}
 	
 	/**
@@ -86,11 +86,16 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 		$this->aPrototype->where( $this->makeSqlFind($values,$columns) ) ;
 		return $this ;
 	}
-	private function makeSqlFind($values,$columns=null)
+	private function makeSqlFind($values,$columns=self::primaryKeys)
 	{
-		if($columns===null)
+		if($columns===self::primaryKeys)
 		{
-			$columns = $this->aPrototype->keys() ;
+			$columns = array() ;
+			$sTable = $this->prototype()->tableAlias() ;
+			foreach($this->aPrototype->keys() as $sCol)
+			{
+				$columns[] = "`{$sTable}`.`{$sCol}`" ;
+			}
 		}
 		else
 		{
@@ -225,7 +230,7 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 			reset($arrData) ;
 			if( is_int(key($arrData)) )
 			{
-				$aInserter->execute( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
+				$this->arrLastAffecteds[$sChildName] = $aInserter->execute( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
 				return $this ;
 			}
 		}
@@ -235,7 +240,7 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 		{
 			$arrData =& $this->rowRef($sChildName) ;
 		}
-		$aInserter->insertRow( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
+		$this->arrLastAffecteds[$sChildName] = $aInserter->insertRow( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
 
 		return $this ;
 	}
@@ -265,8 +270,7 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 			throw new Exception("传入 Model::update 方法的参数\$sChildName无效:%s",$sChildName) ;
 		}
 		
-		
-		Updater::singleton()->execute( $this, $arrPrototype, $arrData, $sWhere, $this->db() ) ;
+		$this->arrLastAffecteds[$sChildName] = Updater::singleton()->execute( $this, $arrPrototype, $arrData, $sWhere, $this->db() ) ;
 	}
 	
 	/**
@@ -281,7 +285,7 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 			throw new Exception("传入 Model::update 方法的参数\$sChildName无效:%s",$sChildName) ;
 		}
 		
-		Deleter::singleton()->execute( $arrPrototype, $sWhere ,$sOrder , $sLimit, $this->db() ) ;
+		$this->arrLastAffecteds[$sChildName] = Deleter::singleton()->execute( $arrPrototype, $sWhere ,$sOrder , $sLimit, $this->db() ) ;
 	}
 	
 	/**
@@ -299,6 +303,29 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 		$this->aPrototype->switchPrototype($sPrototypeName) ;
 		return $this ;
 	}
+	
+	public function sortChildren($field,$sort_type = SORT_ASC)
+	{
+	    foreach ($this->arrData as $row){
+	        if(! is_array($row)) return FALSE;
+	        $arr_field[] = $row[$field];
+	    }
+	    array_multisort($arr_field,$sort_type,$this->arrData);
+	}
+	
+	/*
+	public function shareModel()
+	{
+	    if( !$this->aShareModel and $aPrototype=$this->prototype() )
+	    {
+	        $this->aShareModel = $aPrototype->createModel(false) ;
+	        $this->segmentalizeChild($this->aShareModel) ;
+	        $this->aShareModel->data('__belongsModelList',$this) ;
+	    }
+	
+	    return $this->aShareModel ;
+	}
+	*/
 	
 	/**
 	 * @return org\jecat\framework\db\DB
@@ -320,6 +347,13 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 		return $this ;
 	}
 	
+	/**
+	 * 将当前行单独做为一个 model 对像
+	 */
+	public function alone($sXPath=null)
+	{
+		return self::create($this->prototype())->addRow( $this->rowRef($sXPath), $sXPath ) ;
+	}
 	
 	
 	// 数据操作 /////////////////////////////
@@ -386,53 +420,41 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 		}
 		return false ;
 	}
-	/**
-	 * @return bool
-	 */
-	/*
-	public function next($sChildName=null)
-	{
-		if( $arrParentRow=&$this->localeRow($sChildName,$this->arrData) )
-		{
-			if( $this->isSheet($arrParentRow,$sChildName) )
-			{
-				if( !empty($arrParentRow[$sChildName]) )
-				{
-					next($arrParentRow[$sChildName]) ;
-					if( each($arrParentRow[$sChildName])===false )
-					{
-						prev($arrParentRow[$sChildName]) ;
-						return false ;
-					}
-					else
-					{
-						return true ;
-					}
-				}
-			}
-		}
-		return false ;
-	}
-	*/
 
-	public function data($sName)
+	public function data($sName ,$nModelIdx=null)
 	{
-		if( $arrRow =& $this->localeRow($sName,$this->arrData) )
-		{
-			return $arrRow[$sName] ;
-		}
-		else 
-		{
-			return null ;
-		}
+	    if($nModelIdx===null)
+	    {
+    		if( $arrRow =& $this->localeRow($sName,$this->arrData) )
+    		{
+    			return isset($arrRow[$sName])? $arrRow[$sName]: null ;
+    		}
+    		else 
+    		{
+    			return null ;
+    		}
+	    }
+	    else
+	   {
+	       return isset($this->arrData[$nModelIdx][$sName])?
+				$this->arrData[$nModelIdx][$sName]: null ;
+	    }
 	}
-	public function setData($sName,$value)
+	public function setData($sName,$value,$nModelIdx=null)
 	{
-		$arrRow =& $this->localeRow($sName,$this->arrData,-1,true) ;
-		if( $arrRow!==null )
+		if($nModelIdx===null)
 		{
-			return $arrRow[$sName] = $value ;
+    		$arrRow =& $this->localeRow($sName,$this->arrData,-1,true) ;
+    		if( $arrRow!==null )
+    		{
+    			return $arrRow[$sName] = $value ;
+    		}
 		}
+		else
+		{
+		    $this->arrData[$nModelIdx][$sName] = $value ;
+		}
+		
 	}
 	private function & rowRef($sChildName=null,$bCreateNewRow=false)
 	{
@@ -659,6 +681,7 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 	    if($sChildName == null)
 	    {
 	        return current($this->arrData);
+	        //return $this;
 	    }else{
 	        $arrSheet =& $this->buildSheet($sChildName) ;
 	        return current($arrSheet);
@@ -709,6 +732,12 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 	{
 		$this->limit($nPerPage,($nPageNum-1)*$nPerPage) ;
 	}
+	
+	public function affected($sXPath=null)
+	{
+		return isset($this->arrLastAffecteds[$sXPath])? $this->arrLastAffecteds[$sXPath]: null ;
+	}
+	
 	
 	// implements \Serializable
 	public function serialize()

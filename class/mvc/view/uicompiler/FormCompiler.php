@@ -61,11 +61,12 @@ class FormCompiler extends NodeCompiler
 			
 			$this->compileTag($aObject->headTag(), $aObjectContainer, $aDev, $aCompilerManager) ;
 			
+			$sFormName = addslashes($sFormName) ;
+			
 			$aDev->putCode("\tif(\$aVariables->get('theView')){\r\n") ;
-			$aDev->putCode("\t\t") ;
-			$aDev->output('<input type="hidden" name="formName" value="'.addslashes($sFormName).'" />') ;
-			$aDev->output('<input type="hidden" name="a" value="') ;
-			$aDev->putCode("\t\tif(\$aVariables->get('theController'))\$aDevice->write( \$aVariables->get('theController')->makeActionQuery('actionSubmitForm',false) ) ;\r\n") ;
+			$aDev->output("\t\t<input type=\"hidden\" name=\"formname\" value=\"{$sFormName}\" />\r\n") ;
+			$aDev->output("\t\t<input type=\"hidden\" name=\"a\" value=\"") ;
+			$aDev->putCode("\t\tif(\$aVariables->get('theController'))\$aDevice->write( \$aVariables->get('theController')->makeActionQuery('{$sFormName}',false) ) ;\r\n") ;
 			$aDev->output('" />') ;
 			$aDev->putCode("\t}\r\n") ;
 

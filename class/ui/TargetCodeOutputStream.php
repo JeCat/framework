@@ -54,7 +54,7 @@ class TargetCodeOutputStream extends \org\jecat\framework\lang\Object
 		$this->arrOutputBuffers[$sSubTempName].= $bytes ;
 	}
 	
-	public function putCode($source,$sSubTempName=null)
+	public function putCode($source,$sSubTempName=null,$bNewLine=true)
 	{
 		$sSubTempName = $sSubTempName?:$this->sDefaultSubTemplate ;
 		
@@ -66,7 +66,11 @@ class TargetCodeOutputStream extends \org\jecat\framework\lang\Object
 		}
 		else
 		{
-			$this->arrCompileds[$sSubTempName].= $source . "\r\n" ;
+			$this->arrCompileds[$sSubTempName].= $source ;
+			if($bNewLine)
+			{
+				$this->arrCompileds[$sSubTempName].= "\r\n" ;
+			}
 		}
 	}
 	
