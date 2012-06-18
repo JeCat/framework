@@ -443,6 +443,12 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 				$this->arrData[$nModelIdx][$sName]: null ;
 	    }
 	}
+	
+	public function alldata()
+	{
+	    return $this->arrData;
+	}
+	
 	public function setData($sName,$value,$nModelIdx=null)
 	{
 		if($nModelIdx===null)

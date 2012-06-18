@@ -291,7 +291,7 @@ class Category extends Object
 	
 	static public function depth(Model $aModel)
 	{
-		return (int) $aModel->data('__category_depth') ;
+		return (int) $aModel['__category_depth'] ;
 	}
 	static public function setDepth(Model $aModel,$nDepth)
 	{
