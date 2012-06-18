@@ -548,18 +548,6 @@ class Controller extends NamableComposite implements IBean
     
     public function location($sUrl,$nFlashSec=3)
     {
-<<<<<<< HEAD
-		// 禁用所有视图
-		$this->view()->disable() ;
-
-		// 建立 relocation 视图
-		$aViewRelocater = new View("org.jecat.framework:Relocater.html") ;
-		$this->view()->addView('relocater',$aViewRelocater) ;
-
-		$aViewRelocater->variables()->set('flashSec',$nFlashSec) ;
-		$aViewRelocater->variables()->set('url',$sUrl) ;
-
-=======
 		// 禁用所有视图
 		$this->view()->disable() ;
 				
@@ -570,7 +558,6 @@ class Controller extends NamableComposite implements IBean
 		$aViewRelocater->variables()->set('flashSec',$nFlashSec) ;
 		$aViewRelocater->variables()->set('url',$sUrl) ;
 		
->>>>>>> 162652b2bd2d39ef6d01072b527229a0d75d2966
 		throw new _ExceptionRelocation ;
     }
 
