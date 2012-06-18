@@ -71,7 +71,7 @@ class Category extends Object
 	 * @param int $nTarget 目标位置
 	 * @throws CategoryPointException
 	 */
-	public function insertCategoryToPoint($nTarget=self::end , $title = '' , $dec = '')
+	public function insertCategoryToPoint($nTarget=self::end)
 	{
 		if( !$aOrmPrototype = $this->aModel )
 		{
@@ -154,13 +154,9 @@ class Category extends Object
 			// 移动 rgt
 			$this->moveFeet( $aUpdate,$sRgtClm,2,$nTarget-1,null) ;	
 			
-			$this->aModel->insert(array(
-			        'lft'=>$nTarget,
-			        'rgt'=>$nTarget+1,
-			        'title'=>$title,
-			        'description'=>$dec,
-	            )
-	        ) ;
+			$this->aModel[$sLftClm] = $nTarget ;
+			$this->aModel[$sRgtClm] = $nTarget+1 ;
+			$this->aModel->insert() ;
 		}
 	}
 	
