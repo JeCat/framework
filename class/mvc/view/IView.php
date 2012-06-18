@@ -54,9 +54,16 @@ interface IView extends IMessageQueueHolder, IWidgetContainer
 	public function isEnable() ;
 
 	/**
+	 * 将关联模型中的数据设置到 widget 上
 	 * @return IVew
 	 */
-	public function exchangeData($nWay=DataExchanger::MODEL_TO_WIDGET) ;
+	public function update() ;
+
+	/**
+	 * 从 widget 中获取用户输入的数据，保存到关联模型中 
+	 * @return IVew
+	 */
+	public function fetch() ;
 	
 	/**
 	 * @return org\jecat\framework\mvc\model\Model
@@ -120,6 +127,8 @@ interface IView extends IMessageQueueHolder, IWidgetContainer
     public function setParent(IView $aIView=null) ;
     
 
+    public function isSubmit($sFormName='form',IDataSrc $aParams=null) ;
+    
     public function loadWidgets(IDataSrc $aDataSrc=null,$bVerify=true) ;
     
     public function verifyWidgets() ;

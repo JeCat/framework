@@ -533,8 +533,13 @@ class View implements IView, IBean, IAssemblable
 		return $this->aDataExchanger ;
 	}
 	
-	public function exchangeData($nWay=DataExchanger::MODEL_TO_WIDGET)
+	public function exchangeData($nWay=DataExchanger::MODEL_TO_WIDGET,$__=1)
 	{
+		if($__===1)
+		{
+			trigger_error('正在访问一个过时的方法：View::update()/fetch() 方法已经替代了 View::exchangeData() ；',E_USER_DEPRECATED ) ;
+		}
+		
 		if($this->aDataExchanger)
 		{
 			$this->aDataExchanger->exchange($this,$nWay) ;
@@ -547,6 +552,25 @@ class View implements IView, IBean, IAssemblable
 		}
 		
 		return $this ;
+	}
+
+	/**
+	 * 将关联模型中的数据设置到 widget 上
+	 * @return IVew
+	 */
+	public function update()
+	{
+		$this->exchangeData(DataExchanger::MODEL_TO_WIDGET,0) ;
+		return $this ;
+	}
+	/**
+	 * 从 widget 中获取用户输入的数据，保存到关联模型中 
+	 * @return IVew
+	 */
+	public function fetch()
+	{
+		$this->exchangeData(DataExchanger::WIDGET_TO_MODEL,0) ;
+		return $this ;		
 	}
 
 	/**
@@ -1004,6 +1028,21 @@ class View implements IView, IBean, IAssemblable
     public function hideForm($sFormName='form',$bHide=true)
     {
     	$this->arrShowForm[$sFormName] = $bHide? false: true ;
+    	return $this ;
+    }
+    
+    public function isSubmit($sFormName='form',IDataSrc $aParams=null)
+    {
+    	if( !$aParams )
+    	{
+    		if( !$aController=$this->controller() )
+    		{
+    			throw new Exception("FormView::loadWidgets()的参数\$aDataSrc为空，并且该 FormView 对像没有被添加给一个控制器，因此无法得到数据。") ;
+    		}
+    		$aParams = $aController->params() ;
+    	}
+    	
+    	return $aParams->get('formname') === $sFormName ;
     }
     
 	private $aModel ;
