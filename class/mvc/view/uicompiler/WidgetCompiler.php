@@ -37,6 +37,7 @@ use org\jecat\framework\ui\xhtml\Expression;
 use org\jecat\framework\ui\xhtml\Node;
 use org\jecat\framework\ui\xhtml\Text;
 use org\jecat\framework\pattern\composite\Composite;
+use org\jecat\framework\lang\Exception;
 
 /**
  * 
@@ -369,25 +370,39 @@ class WidgetCompiler extends NodeCompiler
 		foreach( $aNode->childElementsIterator() as $aChild ){
 			if( $aChild instanceof Node ){
 				$sTagName = $aChild->tagName() ;
+				$aAttrs = $aChild->attributes() ;
 				
 				if( ! in_array( $sTagName , self::$arrEscapeTagName ) ){
 					$arrChildBean = $this->writeBeanPri( $aChild , $aObjectContainer , $aDev , $aCompilerManager ) ;
 					
-					$aChildAttr = $aChild->attributes() ;
-					foreach( $aChildAttr as $sName => $aValue ){
-						$arrChildBean[$sName] = $aChildAttr->get($sName) ;
-					}
-					
 					$sSubTemName = $this->writeTemplatePri( $aChild );
+					if( ! $sSubTemName ){
+						if( $aAttrs->has('subtemplate') ){
+							$sSubTemName = $aAttrs->string('subtemplate') ;
+						}
+					}
 					if( $sSubTemName ){
 						$arrChildBean['subtemplate'] = '"'.$sSubTemName.'"' ;
 						$arrChildBean['template'] = '"'.$aObjectContainer->ns().':'.$aObjectContainer->templateName().'"';
+					}
+					
+					foreach( $aAttrs as $sName => $aValue ){
+						$arrChildBean[$sName] = $aAttrs->get($sName) ;
 					}
 					
 					$arrRtn[$sTagName][] = $arrChildBean ;
 					
 					$aNode->remove($aChild);
 				}else{
+					switch( $sTagName ){
+					case 'template':
+						if( ! $aAttrs->has('name') ){
+							$sTemName = '__subtemplate_'.md5(rand()) ;
+							$aAttrs->set('name' , $sTemName ) ;
+							$aChild->headTag()->setAttributes($aAttrs) ;
+						}
+						break;
+					}
 					$aCompiler = $aCompilerManager->compiler(
 						$aChild
 					);
@@ -424,19 +439,12 @@ class WidgetCompiler extends NodeCompiler
 		if($aAttrs->has('subtemplate') ){
 			$sFunName = $aAttrs->string('subtemplate') ;
 			$aDev->putCode("	{$sWidgetVarName}->setSubTemplateName('{$sFunName}') ;",'preprocess') ;
-		}else if($aAttrs->has('template') ){
+			$sTemplateName = $aObjectContainer->ns().':'.$aObjectContainer->templateName() ;
+			$aDev->putCode("	{$sWidgetVarName}->setTemplateName('{$sFunName}') ;",'preprocess') ;
+		}
+		if($aAttrs->has('template') ){
 			$sTemplateName = $aAttrs->string('template');
 			$aDev->putCode("	{$sWidgetVarName}->setTemplateName('{$sTemplateName}') ;",'preprocess') ;
-		}else if( $aTemplate=$aObject->getChildNodeByTagName('template') ){
-			$aTemAttr = $aTemplate->headTag()->attributes();
-			
-			if($aTemAttr->has('name') ){
-				$sTemName = $aTemAttr->string('name');
-			}else{
-				$sTemName = '__subtemplate_'.md5(rand()) ;
-				$aTemAttr->set('name' , $sTemName ) ;
-				$aTemplate->headTag()->setAttributes($aTemAttr) ;
-			}
 		}
 	}
 	
