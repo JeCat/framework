@@ -38,7 +38,7 @@ use org\jecat\framework\lang\Exception;
 use org\jecat\framework\util\IHashTable;
 use org\jecat\framework\lang\Object;
 
-class Widget extends Object implements IViewWidget, IBean
+class Widget extends Object implements IViewWidget, IBean , IShortableBean
 {	
 	public function __construct($sId=null,$sTemplateName=null,$sTitle=null,IView $aView=null)
 	{
@@ -116,6 +116,10 @@ class Widget extends Object implements IViewWidget, IBean
 		if( !empty($arrConfig['template']) )
 		{
 			$this->setTemplateName($arrConfig['template']) ;
+		}
+		if( !empty($arrConfig['subtemplate']) )
+		{
+			$this->setSubTemplateName($arrConfig['subtemplate']) ;
 		}
 		
 		if( isset($arrConfig['style']) and !isset($arrConfig['attr.style']) )
@@ -330,6 +334,13 @@ class Widget extends Object implements IViewWidget, IBean
 	
 	public function setHtmlId($sHtmlId){
 		$this->sHtmlId = $sHtmlId ;
+	}
+	
+	static public function beanAliases(){
+		return array(
+			'onchange' => 'attr.onchange',
+			'onclick' => 'attr.onclick',
+		);
 	}
 	
 	static private $nAutoIncreaseId=0;

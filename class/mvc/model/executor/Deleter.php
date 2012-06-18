@@ -55,7 +55,7 @@ class Deleter extends Executor
 		}
 		
 		//echo $sSql;
-		$aDB->execute($sSql) ;
+		return $aDB->execute($sSql) ;
 		
 		// 删除下级多属关联
 		/*
