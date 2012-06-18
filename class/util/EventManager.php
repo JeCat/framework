@@ -26,7 +26,7 @@ class EventManager extends Object implements \Serializable
 	 * @return EventReturnValue
 	 */
 	public function & emitEvent($sClass,$sEvent,array & $arrArgvs=array(),$sourceObject='*')
-	{
+	{	
 		if( is_object($sourceObject) )
 		{
 			$sourceObject = spl_object_hash($sourceObject) ;

@@ -509,7 +509,7 @@ class View implements IView, IBean, IAssemblable
 	 * @return IViewWidget
 	 */
 	public function widget($sId)
-	{
+	{	
 		return $this->widgets()->get($sId) ;
 	}
 	
@@ -606,7 +606,7 @@ class View implements IView, IBean, IAssemblable
     	if( $nNameLen>4 and strpos($sName,'view')===0 )
     	{
     		$sViewName = substr($sName,4) ;
-    		return $this->getByName($sViewName)?: $this->getByName(lcfirst($sViewName)) ;
+    		return $this->viewByName($sViewName)?: $this->viewByName(lcfirst($sViewName)) ;
     	}
     	
     	// widgetXXXX
@@ -675,7 +675,7 @@ class View implements IView, IBean, IAssemblable
     /**
      * @return IView
      */
-    static public function findXPath(IContainer $aViewContainer,$sViewXPath)
+    static public function findXPath(IView $aViewContainer,$sViewXPath)
     {
     	$arrPath = explode('/',$sViewXPath) ;
     	$aView = $aViewContainer ;
@@ -685,7 +685,7 @@ class View implements IView, IBean, IAssemblable
     		{
     			continue ;
     		}
-    		if( !$aView = $aViewContainer->getByName($sViewName) )
+    		if( !$aView = $aViewContainer->viewByName($sViewName) )
     		{
     			return null ;
     		}
@@ -723,7 +723,7 @@ class View implements IView, IBean, IAssemblable
 			{
 				$aOutput->write( "{$sIndent}\tchild:\"{$aChildName}\" => " );
 				
-				if($aChild = $this->getByName($aChildName))
+				if($aChild = $this->viewByName($aChildName))
 				{
 					$aChild->printStruct($aOutput,$nDepth+1) ;
 				}
