@@ -193,7 +193,7 @@ class Category extends Object
 	 * $aModelList 中的子元素必须拥有 lft 字段值
 	 * 
 	 * 改造参数$aModelList中的元素,将元素间的关系保存在元素的属性中,$aModelList的迭代顺序依然不变
-	 * 如果 $bReturnTopModels=true 则返回一个包含所有 第一层分类的数组
+	 * 如果 $bReturnTopModels=true 则返回一个包含所有 第一层分类的数组，否则返回 $aModelList
 	 */
 	static public function buildTree(Model & $aModelList,$bReturnTopModels=false)
 	{
@@ -205,11 +205,11 @@ class Category extends Object
 		// 按照 lft 排序
 		$aModelList->sortChildren('lft') ;
 		
-		foreach($aModelList as $nIdx=>$aModel)
+		foreach($aModelList as $nIdx=>$arrRow)
 		{
 			for(; ($nParentIdx=$aParentStack->get())!==false; $aParentStack->out() )
 			{
-				if( $aModelList->data('lft',$nParentIdx) < $aModel['rgt'] and $aModelList->data('rgt',$nParentIdx) > $aModel['rgt'] )
+				if( $aModelList->data('lft',$nParentIdx) < $arrRow['rgt'] and $aModelList->data('rgt',$nParentIdx) > $arrRow['rgt'] )
 				{
 					break ;
 				}
@@ -232,7 +232,7 @@ class Category extends Object
 			$aParentStack->put($nIdx) ;
 		}
 		//echo "<pre>";print_r($aModelList);echo "</pre>";
-		return $bReturnTopModels? new ModelListIterator($aModelList,$arrTopCategories): null ;
+		return $bReturnTopModels? new ModelListIterator($aModelList,$arrTopCategories): $aModelList ;
 	}
 	
 	/**
