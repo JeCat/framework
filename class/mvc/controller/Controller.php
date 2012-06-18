@@ -529,7 +529,7 @@ class Controller extends NamableComposite implements IBean
 			{
 				$aController->checkPermissions() ;
 			}
-
+			
 			$aController->doActions() ;
     	}
     	catch(_ExceptionRelocation $aRelocation)
@@ -761,9 +761,17 @@ class Controller extends NamableComposite implements IBean
     	
     	return true ;
     }
+
+    protected function startup()
+    {}
+    protected function finally()
+    {}
     
     public function doActions($sActParamName='a')
     {
+    	// startup 事件
+		$this->startup() ;
+			
     	$arrActions = self::buildActionParam($this->params,$sActParamName,$this->xpath()) ;
 		$nExecutedActions = 0 ;
 		
@@ -780,6 +788,9 @@ class Controller extends NamableComposite implements IBean
     	{
     		$this->process() ;
     	}
+
+    	// finally 事件
+    	$this->finally() ;
     }
     
     public function makeActionQuery($sActionName,$sActParamName='a')
