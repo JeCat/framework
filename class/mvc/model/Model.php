@@ -271,6 +271,8 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 		}
 		
 		$this->arrLastAffecteds[$sChildName] = Updater::singleton()->execute( $this, $arrPrototype, $arrData, $sWhere, $this->db() ) ;
+		
+		return !empty($this->arrLastAffecteds[$sChildName]) ? :  false ;
 	}
 	
 	/**
@@ -286,6 +288,7 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 		}
 		
 		$this->arrLastAffecteds[$sChildName] = Deleter::singleton()->execute( $arrPrototype, $sWhere ,$sOrder , $sLimit, $this->db() ) ;
+		return !empty($this->arrLastAffecteds[$sChildName]) ? :  false ;
 	}
 	
 	/**
