@@ -741,15 +741,25 @@ class Controller extends NamableComposite implements IBean
     	return $this->params ;
     }
     
+    /**
+     * 执行所有请求的 action 
+     * 返回一个bool类型的值，表示是否执行过 action 函数
+     * @return boolean
+     */
     public function doActions($sActParamName='a')
     {
+    	$bExecuted = false ;
+    	
     	foreach(self::buildActionParam($this->params,$sActParamName,$this->xpath()) as $sAction)
     	{
     		if( method_exists($this,$sAction) and !method_exists(__CLASS__,$sAction) )
     		{
     			call_user_func(array($this,$sAction)) ;
+    			$bExecuted = true ;
     		}
     	}
+    	
+    	return $bExecuted ;
     }
     
     public function makeActionQuery($sActionName,$sActParamName='a')
