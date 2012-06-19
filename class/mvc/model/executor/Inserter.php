@@ -114,6 +114,7 @@ class Inserter extends Executor
 			}
 		}
 		
+		
 		// 自动写入桥接表（在这里处理多对多关联）
 		// 根据左右两个表的值，插入中间表
 		if( !empty($arrPrototype['assoc']) and $arrPrototype['assoc']===Prototype::hasAndBelongsToMany )
