@@ -305,7 +305,12 @@ class WidgetCompiler extends NodeCompiler
 		}
 		
 		if( !$aAttrs->has('instance') and ( !$aAttrs->has('define') or $aAttrs->bool('define') ) ){
-			$aDev->putCode("	\$theView->addWidget({$sWidgetVarName});",'preprocess') ;
+			if( $aAttrs->has('exchange') ){
+				$sExchangeName = $aAttrs->get('exchange') ;
+				$aDev->putCode("	\$theView->addWidget({$sWidgetVarName},{$sExchangeName});",'preprocess') ;
+			}else{
+				$aDev->putCode("	\$theView->addWidget({$sWidgetVarName});",'preprocess') ;
+			}
 		}
 		
 		$aDev->putCode("	\$arrAttributes = ",'render');

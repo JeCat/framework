@@ -25,6 +25,8 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\model ;
 
+use org\jecat\framework\mvc\model\Model;
+
 use org\jecat\framework\lang\Object;
 use org\jecat\framework\util\Stack;
 use org\jecat\framework\mvc\model\Prototype;
@@ -430,10 +432,11 @@ class Category extends Object
 		if(!$aModel){
 			return;
 		}
-		$aPrototype = clone $aModel->prototype();
-		$aPrototype->addOrderBy('lft');
-		$aParentsModelList = $aPrototype->createModel(true);
-		$aParentsModelList->loadSql("lft < @1 and rgt > @2" , $aModel->lft , $aModel->rgt);
+		
+		$aParentsModelList = Model::create($aModel->prototype());
+		$aParentsModelList->order('lft');
+		$aParentsModelList->where("lft < {$aModel['lft']} and rgt > {$aModel['rgt']}");
+		$aParentsModelList->load();
 		return $aParentsModelList;
 	}
 
@@ -447,10 +450,10 @@ class Category extends Object
 		if(!$aModel){
 			return;
 		}
-		$aPrototype = clone $aModel->prototype();
-		$aPrototype->addOrderBy('lft');
-		$aParentsModelList = $aPrototype->createModel(true);
-		$aParentsModelList->loadSql("lft < @1 and rgt > @2" , $aModel->lft , $aModel->rgt);
+		$aParentsModelList = Model::create($aModel->prototype());
+		$aParentsModelList->order('lft');
+		$aParentsModelList->where("lft < {$aModel['lft']} and rgt > {$aModel['rgt']}");
+		$aParentsModelList->load();
 		return $aParentsModelList;
 	}
 	
