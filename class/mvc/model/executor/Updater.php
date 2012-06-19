@@ -26,20 +26,23 @@ class Updater extends Executor
 				$pos=strrpos($column,'0') ;
 				if($pos!==false)
 				{
-					$sTableAlias = $arrPrototype['name'].'.'.substr($column,0,$pos);
+					$sTableAlias = $arrPrototype['tableAlias'].'.'.substr($column,0,$pos);
 					$column = substr($column,$pos+1);
 				}
 				else 
 				{
-					$sTableAlias = $arrPrototype['name'] ;
+					$sTableAlias = $arrPrototype['tableAlias'] ;
 				}
 				
-				$arrClauseSet[] = "`{$sTableAlias}`.`{$column}`=" . self::escValue($value) ;
+    			if( in_array($column,$arrPrototype['columns']) ){
+    			    $arrClauseSet[] = "`{$sTableAlias}`.`{$column}`=" . self::escValue($value) ;
+    			}
 			}
 		}
+		
 		if( !empty($arrClauseSet) )
 		{
-			$sSql = "UPDATE "
+			echo $sSql = "UPDATE "
 								. $arrSqlStat['from']
 			                    . " SET\r\n\t" . implode("\r\n\t, ",$arrClauseSet)."\r\n"
 								. $this->makeWhereClause($arrPrototype,$sWhere)
