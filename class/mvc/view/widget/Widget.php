@@ -339,6 +339,8 @@ class Widget extends Object implements IViewWidget, IBean , IShortableBean
 	
 	static public function beanAliases(){
 		return array(
+			'class' => 'attr.class',
+			'style' => 'attr.style',
 			'onchange' => 'attr.onchange',
 			'onclick' => 'attr.onclick',
 		);
