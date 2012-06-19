@@ -11,7 +11,7 @@ use org\jecat\framework\lang\Exception;
 
 class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 {
-	public function __construct($table,$sPrototypeName,$primaryKeys=null,$columns=null)
+	public function __construct($table,$sPrototypeName=null,$primaryKeys=null,$columns=null)
 	{
 		if( is_string($table) )
 		{

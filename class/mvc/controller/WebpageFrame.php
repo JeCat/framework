@@ -61,7 +61,6 @@ class WebpageFrame extends Controller
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{		
 		$aBeanFactory = BeanFactory::singleton() ;
-    	$aModelContainer = $this->modelContainer() ;
     	
     	foreach($arrConfig as $sKey=>&$item)
     	{
@@ -113,11 +112,7 @@ class WebpageFrame extends Controller
 		
 				if(!empty($arrBeanConf['model']))
 				{
-					if( !$aModel=$aModelContainer->getByName($arrBeanConf['model']) )
-					{
-						throw new BeanConfException("视图(%s)的Bean配置属性 model 无效，没有指定的模型：%s",array($aBean->name(),$arrBeanConf['model'])) ;
-					}
-					$aBean->setModel($aModel) ;
+					$aBean->setModel($arrBeanConf['model']) ;
 				}
 			}
 		}

@@ -73,7 +73,7 @@ interface IView extends IMessageQueueHolder, IWidgetContainer
 	/**
 	 * @return IView
 	 */
-	public function setModel($model,$sPrototypeName=null,$primaryKeys=null,$columns=null) ;
+	public function setModel($model) ;
 	
 	/**
 	 * @return org\jecat\framework\mvc\controller\IContainer

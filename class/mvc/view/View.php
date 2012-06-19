@@ -248,11 +248,18 @@ class View implements IView, IBean, IAssemblable
 	/**
 	 * @return IView
 	 */
-	public function setModel($model,$sPrototypeName=null,$primaryKeys=null,$columns=null)
+	public function setModel($model)
 	{
 		if( is_string($model) )
 		{
-			$this->aModel = Model::create($model,$sPrototypeName,$primaryKeys,$columns) ;
+			if($aController=$this->controller())
+			{
+				$this->aModel = $aController->model($model) ;
+			}
+			else 
+			{
+				throw new Exception("View还没有添加个控制器，无法使用模型名称，从控制器取得模型") ;
+			}
 		}
 		else if( $model instanceof Model )
 		{
@@ -1057,9 +1064,9 @@ class View implements IView, IBean, IAssemblable
 	private $aWidgets ;
 	private $sSourceFile ;
 	private $sTemplateSingature ;
+	private $aParent ;
 	private $arrChildren ;
 	private $arrAssembleList ;
-	private $aParent ;
 	private $aAssembledParent ;
 	private $nAssembledLevel = 0 ;
 	private $aUI ;
@@ -1075,8 +1082,6 @@ class View implements IView, IBean, IAssemblable
     private $sCssClass ;
 	protected $bRendered = false ;
 	
-	// 是否使用装配单收容浏览视图
-	private $sVagrantViewsAssemlyListId ;
 
 	static private $arrAssignedId = array() ;
     static private $arrRegisteredViews = array() ;

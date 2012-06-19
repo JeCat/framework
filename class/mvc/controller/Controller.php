@@ -25,6 +25,8 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\controller ;
 
+use org\jecat\framework\mvc\model\Model;
+
 use org\jecat\framework\util\EventManager;
 
 use org\jecat\framework\auth\IdManager;
@@ -36,13 +38,10 @@ use org\jecat\framework\mvc\controller\Response;
 use org\jecat\framework\bean\BeanConfException;
 use org\jecat\framework\bean\BeanFactory;
 use org\jecat\framework\bean\IBean;
-use org\jecat\framework\mvc\model\IModel;
 use org\jecat\framework\pattern\composite\Container;
 use org\jecat\framework\mvc\view\DataExchanger;
 use org\jecat\framework\mvc\view\IFormView;
 use org\jecat\framework\util\match\RegExp;
-use org\jecat\framework\mvc\model\db\orm\Prototype;
-use org\jecat\framework\mvc\model\db\orm\PrototypeAssociationMap;
 use org\jecat\framework\message\IMessageQueue;
 use org\jecat\framework\message\MessageQueue;
 use org\jecat\framework\util\DataSrc;
@@ -412,35 +411,6 @@ class Controller extends NamableComposite implements IBean
 	{
 		return $this->arrBeanConfig ;
 	}
-	
-    public function createModel($prototype,array $arrProperties=array(),$bAgg=false,$sName=null,$sClass='org\\jecat\\framework\\mvc\\model\\db\\Model')
-    {
-    	if( $prototype instanceof Prototype )
-    	{
-    		$aPrototype = $prototype ;
-    	}
-    	else
-    	{
-    		$aPrototype = PrototypeAssociationMap::singleton()->fragment($prototype,$arrProperties) ;
-    	}
-    	
-    	if(!$sName)
-    	{
-	    	$sName = $aPrototype->name() ;
-	    	
-	    	$aResSet=self::regexpModelName()->match($sName) ;
-	    	
-	    	for( $aResSet->end(); $aRes=$aResSet->current(); $aResSet->prev() )
-	    	{	    		
-	    		// 删除单词分隔符
-	    		$sName = substr_replace($sName,'',$aRes->position(),1) ;
-	    	}
-    	}
-    	
-    	$sName = strtolower($sName) ;
-    	
-    	return $this->addModel(new $sClass($aPrototype,$bAgg),$sName) ;    	
-    }
     
 
     /**
@@ -793,9 +763,9 @@ class Controller extends NamableComposite implements IBean
     	}
     	
     	// model
-    	if($child=$this->modelContainer()->getByName($sName))
+    	if(isset($this->arrModels[$sName]))
     	{
-    		return $child ;
+    		return $this->arrModels[$sName] ;
     	}
     	
     	// controller
@@ -816,7 +786,7 @@ class Controller extends NamableComposite implements IBean
     	if( $nNameLen>5 and substr($sName,0,5)=='model' )
     	{
     		$sModelName = substr($sName,5) ;
-    		return $this->modelContainer()->getByName($sModelName)?: $this->modelContainer()->getByName(lcfirst($sModelName)) ;
+    		return isset($this->arrModels[$$sModelName])? $this->arrModels[$sModelName]: null ;
     	}
     	
     	else if( $nNameLen>10 and substr($sName,0,10)=='controller' )
@@ -867,35 +837,7 @@ class Controller extends NamableComposite implements IBean
     	return $this->aFrame ;
     }
     
-    public function addModel(IModel $aModel,$sName=null)
-    {
-    	return $this->modelContainer()->add($aModel,$sName) ;
-    }
-    public function removeModel(IModel $aModel)
-    {
-    	$this->modelContainer()->remove($aModel) ;
-    	return $this ;
-    }
-    /**
-	 * @return org\jecat\framework\mvc\model\IModel
-     */
-    public function modelByName($sName)
-    {
-    	return $this->modelContainer()->getByName($sName) ;
-    }
-    public function modelIterator()
-    {
-    	return $this->modelContainer()->iterator() ;
-    }
-    public function modelNameIterator()
-    {
-    	return $this->modelContainer()->nameIterator() ;
-    }
-    public function clearModels()
-    {
-    	$this->modelContainer()->clear() ;
-    	return $this ;
-    }
+    
     
     /**
      * @return org\jecat\framework\auth\Authorizer
@@ -939,25 +881,6 @@ class Controller extends NamableComposite implements IBean
     	}
     	return $this->aResponse ;
     }
-    
-    protected function modelContainer()
-    {
-    	if(!$this->aModelContainer)
-    	{
-    		$this->aModelContainer = new Container("org\\jecat\\framework\\mvc\\model\\IModel") ;
-    	}
-    	
-    	return $this->aModelContainer ;
-    }
-    
-   	static private function regexpModelName()
-   	{
-   		if( !self::$aRegexpModelName )
-   		{
-   			self::$aRegexpModelName = new RegExp("/[^\da-zA-Z]/i");
-   		}
-   		return self::$aRegexpModelName ;
-   	}
    	
    	public function id()
    	{
@@ -996,6 +919,31 @@ class Controller extends NamableComposite implements IBean
    		}
    	}
    	
+   	/**
+   	 * @return org\jecat\framework\mvc\model\Model
+   	 */
+   	public function model($sTableName,$sModelName=null)
+   	{
+   		if( !isset($this->arrModels[$sTableName]) )
+   		{
+   			$this->arrModels[$sTableName] = new Model($sTableName) ;
+   			
+   			if($sModelName)
+   			{
+   				$this->arrModels[$sModelName] = $this->arrModels[$sTableName] ;
+   			}
+   		}
+   		
+   		return $this->arrModels[$sTableName] ;
+   	}
+   	
+   	/**
+   	 * @return self
+   	 */
+   	public function addModel($sModelName,Model $aModel)
+   	{
+   		$this->arrModels[$sModelName] = $aModel ;
+   	}
    	
    	// for webpage html head (is not belongs to Controller) ----------------------
    	public function title()
@@ -1047,9 +995,6 @@ class Controller extends NamableComposite implements IBean
    	{
    		$this->bCatchOutput = $bCatchOutput ;
    	}
-   	
-
-    static private $aRegexpModelName = null ;
     
     /**
      * Enter description here ...
@@ -1067,8 +1012,6 @@ class Controller extends NamableComposite implements IBean
     
     private $aMsgQueue = null ;
     
-    private $aModelContainer = null ;
-    
     private $aFrame = null ;
     
     private $arrBeanConfig ;
@@ -1078,6 +1021,8 @@ class Controller extends NamableComposite implements IBean
     private $aAuthorizer ;
     
     protected $fnProcess ;
+    
+    protected $arrModels ;
     
     private $bAutoCheckPermissions = true ;
     private $bCatchOutput = false ;
