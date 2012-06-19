@@ -178,20 +178,9 @@ class Response extends Object
 				$aMainView = $aController->view() ;
 			}
 			
-			// 控制器的视图不可用
-			if(!$aController->view()->isEnable())
-			{
-				// 临时提供一个仅显示消息队列的视图
-				/*$aTmpView = new View('tmp_view_for_msgqueue') ;
-				$aController->addView($aTmpView) ;
-				$aController->messageQueue()->display(null,$this->device()) ;*/
-			}
-			
-			// 装配视图
-			// ViewAssembler::singleton()->assemble($aController) ;
+			$aOutput = new OutputStreamBuffer() ;
 			
 			// 显示视图
-			$aOutput = new OutputStreamBuffer() ;
 			$aMainView->render($aOutput) ;
 			$this->device()->write($aOutput) ;
 

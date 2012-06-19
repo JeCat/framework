@@ -452,9 +452,9 @@ class Controller extends NamableComposite implements IBean
      * 
      * @return IView
      */
-    public function view()
+    public function view($bAutoCreate=true)
     {
-    	if( !$this->aView )
+    	if( $bAutoCreate and !$this->aView )
     	{
     		$this->aView = EventManager::singleton()->emitEvent(__CLASS__,self::createDefaultView,$arrArgv=array($this)) ?: new View() ;
     		$this->setView( $this->aView ) ;
@@ -696,32 +696,6 @@ class Controller extends NamableComposite implements IBean
 	public function createMessage($sType,$sMessage,$arrMessageArgs=null,$aPoster=null)
 	{
 		return $this->messageQueue()->create($sType,$sMessage,$arrMessageArgs,$aPoster) ;
-	}
-
-	/**
-	 * 在自己的 mainView 中显示一段字符串类型的内容
-	 */
-	public function renderString(& $sContent)
-	{
-		$aView = new View("anonymous",null,$this->mainView()->ui) ;
-		$this->mainView()->add($aView,null,true) ;
-		$this->response()->device()->write($sContent) ;
-	}
-	
-	/**
-	 * 在自己的 mainView 中渲染自己的消息队列
-	 */
-	public function renderMessageQueue($sTemplateFilename=null)
-	{
-		if( !$this->messageQueue()->count() )
-		{
-			return ;
-		}
-		
-		$aView = new View("anonymous",null,$this->mainView()->ui()) ;
-		$this->mainView()->add($aView,null,true) ;
-		
-		$this->messageQueue()->display($this->mainView()->ui(),$this->response()->device(),$sTemplateFilename) ;		
 	}
 	
     /**

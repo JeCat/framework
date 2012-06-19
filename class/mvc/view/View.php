@@ -25,8 +25,9 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\view ;
 
-use org\jecat\framework\mvc\model\Model;
+use org\jecat\framework\io\IRedirectableStream;
 
+use org\jecat\framework\mvc\model\Model;
 use org\jecat\framework\mvc\view\widget\IViewFormWidget;
 use org\jecat\framework\util\IDataSrc;
 use org\jecat\framework\system\Application;
@@ -380,6 +381,13 @@ class View implements IView, IBean, IAssemblable
 	 */
 	public function render(IOutputStream $aDevice)
 	{
+		// 做为控制器的直属视图，显示控制器的消息队列
+		if( $aController=$this->controller() and $aController->view(false)===$this and $aMsgQueue=$aController->messageQueue(false) )
+		{
+			// 在视图前面 显示消息队列
+			$aMsgQueue->display($this->ui(),$aDevice,IRedirectableStream::weak) ;
+		}
+
 		if(!$this->bEnable)
 		{
 			return ;

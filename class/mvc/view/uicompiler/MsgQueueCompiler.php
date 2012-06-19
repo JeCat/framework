@@ -25,6 +25,8 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\view\uicompiler ;
 
+use org\jecat\framework\lang\Exception;
+
 use org\jecat\framework\lang\Assert;
 use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\CompilerManager;
@@ -106,7 +108,6 @@ class MsgQueueCompiler extends NodeCompiler
 		$sTemplate = $aObject->attributes()->has('template')? $aObject->attributes()->get('template'): 'null' ;
 		
 		// <template> 内部字节点的模板内容
-		$sIsSubtemplate = 'false' ;
 		if( $aTemplate=$aObject->getChildNodeByTagName('template') )
 		{
 			$nSubtemplateIndex = (int)$aDev->properties()->get('nMessageQueueSubtemplateIndex') + 1 ;
@@ -123,38 +124,18 @@ class MsgQueueCompiler extends NodeCompiler
 		
 		// 显示模式
 		// -------------------------------
-		switch( $aObject->attributes()->has('mode')? strtolower($aObject->attributes()->string('mode')): 'soft' )
+		$sMode = $aObject->attributes()->has('mode')? strtolower($aObject->attributes()->string('mode')): 'soft' ;
+		if( !is_numeric($sMode) )
 		{
-			case 'hard' :
-				$aDev->putCode("// display message queue by HARD mode") ;
-				$aDev->putCode("if( !\$__device_for_msgqueue = \$__ui_msgqueue->properties()->get('aDisplayDevice') ){") ;
-				$aDev->putCode("	\$__device_for_msgqueue = new \\org\\jecat\\framework\\io\\OutputStreamBuffer() ;") ;
-				$aDev->putCode("	\$__ui_msgqueue->properties()->set('aDisplayDevice',\$__device_for_msgqueue) ;") ;
-				$aDev->putCode("}") ;
-				$aDev->putCode("\$__device_for_msgqueue->redirect(\$aDevice) ;") ;
-				$sCancelDisplay = ' and $__device_for_msgqueue->isEmpty()' ;
-				break ;
-				
-			case 'force' :
-				$aDev->putCode("// display message queue by FORCE mode") ;
-				$aDev->putCode("\$__device_for_msgqueue = \$aDevice ;") ;
-				$sCancelDisplay = '' ;
-				break ;
-				
-			default:	// soft
-				$aDev->putCode("// display message queue by SOFT mode") ;
-				$aDev->putCode("if( !\$__device_for_msgqueue = \$__ui_msgqueue->properties()->get('aDisplayDevice') ){") ;
-				$aDev->putCode("	\$__device_for_msgqueue = new \\org\\jecat\\framework\\io\\OutputStreamBuffer() ;") ;
-				$aDev->putCode("	\$__ui_msgqueue->properties()->set('aDisplayDevice',\$__device_for_msgqueue) ;") ;
-				$aDev->putCode("}") ;
-				$aDev->putCode("\$aDevice->write(\$__device_for_msgqueue) ;") ;
-				$sCancelDisplay = ' and $__device_for_msgqueue->isEmpty()' ;
-				break ;
+			$sMode = "org\\jecat\\framework\\io\\IRedirectableStream::{$sMode}" ;
+			
+			if( !defined($sMode) )
+			{
+				throw new Exception("无效的 <msgqueue /> mode 属性:%s",$sMode) ;
+			}
 		}
 		
-		$aDev->putCode("if( \$__ui_msgqueue->count(){$sCancelDisplay} ){ ") ;
-		$aDev->putCode("	\$__ui_msgqueue->display(\$aUI,\$__device_for_msgqueue,{$sTemplate},{$sIsSubtemplate}) ;") ;
-		$aDev->putCode("}") ;
+		$aDev->putCode("\$__ui_msgqueue->display(\$aUI,\$aDevice,{$sMode},{$sTemplate}) ;") ;
 		$aDev->putCode("// -------------------------------------\r\n") ;
 	}
 }

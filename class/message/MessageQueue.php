@@ -25,9 +25,12 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\message ;
 
+use org\jecat\framework\io\OutputStreamBuffer;
+
 use org\jecat\framework\lang\Assert;
 use org\jecat\framework\util\HashTable;
 use org\jecat\framework\io\IOutputStream;
+use org\jecat\framework\io\IRedirectableStream ;
 use org\jecat\framework\ui\xhtml\UIFactory;
 use org\jecat\framework\ui\UI;
 use org\jecat\framework\util\FilterMangeger;
@@ -156,29 +159,36 @@ class MessageQueue extends Object implements IMessageQueue
 		$this->aFilterManager = $aFilterManager ;
 	}
 	
-	public function display(UI $aUI=null,IOutputStream $aDevice=null,$sTemplate=null,$bSubTemplate=false)
+	public function display(UI $aUI=null,IOutputStream $aDevice=null,$nMode=IRedirectableStream::soft,$sTemplate=null,$sSubTemplate='render')
 	{
-		if( !$sTemplate )
+		if( !$this->count() )
 		{
-			$sTemplate = 'org.jecat.framework:MsgQueue.template.html' ;
+			return ;
 		}
 		
-		if( !$aUI )
+		
+		if( !$this->aDevice )
 		{
-			$aUI = UIFactory::singleton()->create() ;
+			$this->aDevice = new OutputStreamBuffer() ;
+
+			if( !$sTemplate )
+			{
+				$sTemplate = 'org.jecat.framework:MsgQueue.template.html' ;
+			}
+			if( !$aUI )
+			{
+				$aUI = UIFactory::singleton()->create() ;
+			}
+			
+			// compile
+			$sTemplateSignature = $aUI->loadCompiled($sTemplate) ;
+			
+			// render
+			$aUI->render($sTemplateSignature,new HashTable(array('aMsgQueue'=>$this)),$this->aDevice,$sSubTemplate) ;
 		}
 		
-		if( !$bSubTemplate )
-		{
-			$aUI->display($sTemplate,array('aMsgQueue'=>$this),$aDevice) ;
-		}
-		else
-		{
-			call_user_func_array($sTemplate,array(
-					new HashTable(array('aMsgQueue'=>$this))
-					, $aDevice
-			)) ;
-		}
+		
+		$this->aDevice->redirect($aDevice,$nMode) ;
 	}
 	
 	public function addChild(IMessageQueue $aMessageQueue)
@@ -216,6 +226,8 @@ class MessageQueue extends Object implements IMessageQueue
 	private $aFilterManager ;
 
 	private $arrChildren ;
+	
+	private $aDevice ;
 }
 
 

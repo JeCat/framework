@@ -27,6 +27,13 @@ namespace org\jecat\framework\io ;
 
 interface IRedirectableStream extends IOutputStream
 {
+	const free = 0 ;
+	const weak = 1 ;
+	const soft = 3 ;
+	const hard = 5 ;
+	const xhard = 7 ;
+	const zhard = 9 ;
+	
 	public function redirect(IOutputStream $aOutputStream=null) ;
 	
 	public function redirectionDev() ;

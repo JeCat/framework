@@ -51,9 +51,9 @@ interface IMessageQueue
 	
 	public function removeChild(IMessageQueue $aMessageQueue) ;
 	
-	public function addChildHolder(IMessageQueueHolder $aMessageQueue) ;
+	public function addChildHolder(IMessageQueueHolder $aMessageQueueHolder) ;
 	
-	public function removeChildHolder(IMessageQueueHolder $aMessageQueue) ;
+	public function removeChildHolder(IMessageQueueHolder $aMessageQueueHolder) ;
 }
 
 

@@ -30,10 +30,11 @@ namespace org\jecat\framework\io ;
 class OutputStreamBuffer extends OutputStream implements IRedirectableStream, IBuffRemovable
 {	
 	public function write($Content,$nLen=null,$bFlush=false)
-	{
-		$nIdx = count($this->arrBuffer)-1 ;
+	{		
+		end($this->arrBuffer) ;
+		$nIdx = key($this->arrBuffer) ;
 		
-		if( $nIdx>0 and !is_object($Content) and is_string($this->arrBuffer[$nIdx]) )
+		if( $nIdx!==null and !is_object($Content) and is_string($this->arrBuffer[$nIdx]) )
 		{
 			$this->arrBuffer[$nIdx].= strval($Content) ;
 		}
@@ -112,11 +113,17 @@ class OutputStreamBuffer extends OutputStream implements IRedirectableStream, IB
 		return $this->arrBuffer ;
 	}
 	
-	public function redirect(IOutputStream $aOutputStream=null)
+	public function redirect(IOutputStream $aOutputStream=null,$nMode=IRedirectableStream::soft)
 	{
-		// 从原来的重定向目标设备中解除
 		if( $this->aRedirectionDev and $this->aRedirectionDev instanceof IBuffRemovable )
 		{
+			// nothing todo
+			if($nMode<=$this->nRedirectionMode)
+			{
+				return ;
+			}
+
+			// 从原来的重定向目标设备中解除
 			$this->aRedirectionDev->removeBuff($this) ;
 		}
 		
@@ -125,7 +132,9 @@ class OutputStreamBuffer extends OutputStream implements IRedirectableStream, IB
 		{
 			$aOutputStream->write($this) ;
 		}
+		
 		$this->aRedirectionDev = $aOutputStream ;
+		$this->nRedirectionMode = $nMode ;
 	}
 	
 	public function redirectionDev()
@@ -134,8 +143,9 @@ class OutputStreamBuffer extends OutputStream implements IRedirectableStream, IB
 	}
 	
 	protected $arrBuffer = array() ;
-	
+
 	private $aRedirectionDev ;
+	private $nRedirectionMode ;
 }
 
 
