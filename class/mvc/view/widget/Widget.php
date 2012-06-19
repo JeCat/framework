@@ -315,11 +315,12 @@ class Widget extends Object implements IViewWidget, IBean , IShortableBean
 		$this->arrAttributes = null ;
 	}
 	
-	public function displayInputAttributes(array $arrAttrs)
+	public function displayInputAttributes(array $arrAttrs,array $arrEscape=array() )
 	{
 		$sRet = '' ;
 		foreach($arrAttrs as $sName=>$sValue)
 		{
+			if( in_array( $sName , $arrEscape ) ) continue ;
 			$sRet.= ' ' . $sName . '="' . addcslashes($sValue,'"\\') . '"' ;
 		}
 		return $sRet ;

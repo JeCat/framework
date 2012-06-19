@@ -75,6 +75,10 @@ class Select extends FormWidget {
 				}
 			}
 		}
+		
+		if( array_key_exists( 'option' , $arrConfig ) ){
+			$this->arrOptions = (array)$arrConfig['option'] ;
+		}
 	}
 	
 	
@@ -88,7 +92,11 @@ class Select extends FormWidget {
 	 */
 	public function addOption($sText, $sValue=null, $bSelected=false )
 	{
-		$this->arrOptions [] = Array ($sValue, $sText, $bSelected );
+		$this->arrOptions [] = array (
+			'value' => $sValue, 
+			'text' => $sText, 
+			'selected' => $bSelected 
+		);
 		return $this ;
 	}
 	
@@ -104,19 +112,19 @@ class Select extends FormWidget {
 			new Exception ( "调用" . __CLASS__ . "的" . __METHOD__ . "方法时使用了非法的nIndex参数(得到的nIndex参数是:%s)", array ($nIndex ) );
 		}
 		$this->unsetSelected();
-		$this->arrOptions[$nIndex][2] = true;
+		$this->arrOptions[$nIndex]['selected'] = true;
 	}
 	
 	public function unsetSelected(){
 		foreach($this->arrOptions as &$value){
-			$value[2] = false;
+			$value['selected'] = false;
 		}
 	}
 	
 	public function getSelected(){
 		$arrSelected = array();
 		foreach($this->arrOptions as &$value){
-			if($value[2] == true){
+			if($value['selected'] == true){
 				$arrSelected = $value;
 			}
 		}
@@ -129,10 +137,10 @@ class Select extends FormWidget {
 			new Exception ( "调用" . __CLASS__ . "的" . __METHOD__ . "方法时使用了非法的nIndex参数(得到的nIndex参数是:%s)", array ($nIndex ) );
 		}
 		if($sValue !== null){
-			$this->arrOptions[$nIndex][0] = (string)$sValue ;
+			$this->arrOptions[$nIndex]['value'] = (string)$sValue ;
 		}
 		if($sText !== null){
-			$this->arrOptions[$nIndex][1] = (string)$sText ;
+			$this->arrOptions[$nIndex]['text'] = (string)$sText ;
 		}
 	}
 	
@@ -156,14 +164,14 @@ class Select extends FormWidget {
 		if (! is_int ( $nIndex )) {
 			new Exception ( "调用" . __CLASS__ . "的" . __METHOD__ . "方法时使用了非法的nIndex参数(得到的nIndex参数是:%s)", array ($nIndex ) );
 		}
-		return $this->arrOptions[$nIndex][1];
+		return $this->arrOptions[$nIndex]['text'];
 	}
 	
 	public function getOptionValue($nIndex){
 		if (! is_int ( $nIndex )) {
 			new Exception ( "调用" . __CLASS__ . "的" . __METHOD__ . "方法时使用了非法的nIndex参数(得到的nIndex参数是:%s)", array ($nIndex ) );
 		}
-		return $this->arrOptions[$nIndex][0];
+		return $this->arrOptions[$nIndex]['value'];
 	}
 	/**
 	 * 
@@ -181,10 +189,10 @@ class Select extends FormWidget {
 		
 		foreach($this->arrOptions as $key => $option)
 		{
-			$this->arrOptions[$key][2] = false;
-			if((string)$option[0] == $data)
+			$this->arrOptions[$key]['selected'] = false;
+			if((string)$option['value'] == $data)
 			{
-				$this->arrOptions[$key][2] = true;
+				$this->arrOptions[$key]['selected'] = true;
 				return ;
 			}
 		}
