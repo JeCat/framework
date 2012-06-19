@@ -530,7 +530,7 @@ class Controller extends NamableComposite implements IBean
 				$aController->checkPermissions() ;
 			}
 			
-			$aController->doActions() ;
+			$aController->process() ;
     	}
     	catch(_ExceptionRelocation $aRelocation)
     	{}
@@ -553,7 +553,7 @@ class Controller extends NamableComposite implements IBean
 				
 		// 建立 relocation 视图
 		$aViewRelocater = new View("org.jecat.framework:Relocater.html") ;
-		$this->view()->addView('relocater',$aViewRelocater) ;
+		$this->setView($aViewRelocater) ;
 		
 		$aViewRelocater->variables()->set('flashSec',$nFlashSec) ;
 		$aViewRelocater->variables()->set('url',$sUrl) ;
@@ -625,6 +625,10 @@ class Controller extends NamableComposite implements IBean
     	if($this->fnProcess)
     	{
     		$this->fnProcess($this) ;
+    	}
+    	else
+    	{
+    		$this->doActions() ;
     	}
     }
     
@@ -737,60 +741,15 @@ class Controller extends NamableComposite implements IBean
     	return $this->params ;
     }
     
-    /**
-     * 当此方法负责常规的表单操作：
-     * 	1、加载控件数据；
-     * 	2、校验控件数据；
-     * 	3、将数据交换到文档；
-     * 
-     * 返回 true 的时候，传入的表单已经准备就绪。
-	 * @return bool
-     */
-    public function preprocessForm(IFormView $aView)
-    {
-    	// 加载视图控件数据
-    	$aView->loadWidgets($this->params) ;
-    	
-    	// 校验数据
-    	if( !$aView->verifyWidgets() )
-    	{
-    		return false ;
-    	}
-    	
-    	$aView->exchangeData(DataExchanger::WIDGET_TO_MODEL) ;
-    	
-    	return true ;
-    }
-
-    protected function startup()
-    {}
-    protected function finally()
-    {}
-    
     public function doActions($sActParamName='a')
     {
-    	// startup 事件
-		$this->startup() ;
-			
-    	$arrActions = self::buildActionParam($this->params,$sActParamName,$this->xpath()) ;
-		$nExecutedActions = 0 ;
-		
-    	foreach($arrActions as $sAction)
+    	foreach(self::buildActionParam($this->params,$sActParamName,$this->xpath()) as $sAction)
     	{
-    		if( method_exists($this,$sAction) )
+    		if( method_exists($this,$sAction) and !$sAction==='process' )
     		{
     			call_user_func(array($this,$sAction)) ;
-    			$nExecutedActions ++ ;
     		}
     	}
-
-    	if( !$nExecutedActions )
-    	{
-    		$this->process() ;
-    	}
-
-    	// finally 事件
-    	$this->finally() ;
     }
     
     public function makeActionQuery($sActionName,$sActParamName='a')
