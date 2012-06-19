@@ -178,7 +178,7 @@ class Category extends Object
 		DB::singleton()->execute("delete from ".$aOrmPrototype->prototype()->tableName()." where {$sLftClm}>={$nOriLft} and {$sRgtClm}<={$nOriRgt}") ;
 		
 		$nMove = $nOriRgt-$nOriLft+1 ;
-		$aUpdate = new Update($aOrmPrototype->tableName()) ;
+		$aUpdate = new Update($aOrmPrototype->prototype()->tableName()) ;
 		
 		$this->moveFeet($aUpdate,$sLftClm,-$nMove,$nOriLft) ;
 		$this->moveFeet($aUpdate,$sRgtClm,-$nMove,$nOriLft) ;

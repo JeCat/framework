@@ -745,7 +745,7 @@ class Controller extends NamableComposite implements IBean
     {
     	foreach(self::buildActionParam($this->params,$sActParamName,$this->xpath()) as $sAction)
     	{
-    		if( method_exists($this,$sAction) and !$sAction==='process' )
+    		if( method_exists($this,$sAction) and !method_exists(__CLASS__,$sAction) )
     		{
     			call_user_func(array($this,$sAction)) ;
     		}

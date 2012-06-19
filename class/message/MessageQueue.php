@@ -205,7 +205,7 @@ class MessageQueue extends Object implements IMessageQueue
 	}
 	public function removeChildHolder(IMessageQueueHolder $aMessageQueue)
 	{
-		if( $this->arrChildren and ($pos=array_pop($aMessageQueue,$this->arrChildren,true))!==false )
+		if( $this->arrChildren and ($pos=array_search($aMessageQueue,$this->arrChildren,true))!==false )
 		{
 			unset($this->arrChildren[$pos]) ;
 		}

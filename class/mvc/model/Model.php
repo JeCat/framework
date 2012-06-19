@@ -280,7 +280,7 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 	 * 仅仅删除数据库中的记录，Model对像中的数据仍然保留，并且可以在 delete() 以后立即执行 save()
 	 * @return Model
 	 */
-	public function delete($sWhere=null , $sOrder=null ,$sLimit=null,$sChildName=null)
+	public function delete($sWhere , $sOrder=null ,$sLimit=null,$sChildName=null)
 	{
 		if( !$arrPrototype=&$this->aPrototype->refRaw($sChildName?:'$') )
 		{
