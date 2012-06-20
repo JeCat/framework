@@ -313,7 +313,6 @@ class Prototype implements \Serializable
 	 */
 	public function addWhere($where,$sTable)
 	{
-	    
 	    if(!empty($sTable))
 	    {
 	        $arrPrototype = & $this->refRaw($sTable);
@@ -325,17 +324,22 @@ class Prototype implements \Serializable
 	    {
 	        $where = array($where);
 	    }
+	    
 	    if(is_array($where))
 	    {
 	        for($i = 0; $i < sizeof($where); $i++){
-	            $aWhere = explode(".", $where[$i]);
+	            
+	            $arrPrototype = & $this->arrPrototype;
+	            $arrPrototype['where'][] = $where[$i] ;
+	            
+	            /*$aWhere = explode(".", $where[$i]);
 	            if(count($aWhere) == 2){
 	                $arrPrototype = & $this->refRaw($aWhere[0]);
 	                $arrPrototype['where'][] = $aWhere[1] ;
 	            }else {
 	                $arrPrototype = & $this->arrPrototype;
 	                $arrPrototype['where'][] = $where[$i] ;
-	            }
+	            }*/
 	        }
 	    }
 	    
@@ -487,7 +491,9 @@ class Prototype implements \Serializable
 			$arrAssociation['name'] = $arrAssociation['table'] ;
 		}
 		
-		$arrAssociation['tableAlias'] = $sFromTableAlias . '.' . $arrAssociation['name'] ;
+		$arrAssociation['tableAlias'] = $arrAssociation['name'] ;
+		//$arrAssociation['tableAlias'] = $sFromTableAlias . '.' . $arrAssociation['name'] ; 
+		
 		$arrAssociation['xpath'] = ($sFromXPath? ($sFromXPath.'.'): '') . $arrAssociation['name'] ;
 
 		// 通过反射数据表获得 原型关键信息

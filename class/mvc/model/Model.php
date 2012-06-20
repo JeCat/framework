@@ -106,9 +106,15 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 		$arrWhere = '' ;
 		foreach($columns as $nIdx=>&$sColumn)
 		{
-			$arrWhere[] = $sColumn . "='" . addslashes($values[$nIdx]) . "'" ;
+		    $aColumn = explode('.', $sColumn);
+		    if(count($aColumn) == 1)
+		    {
+		        $arrWhere[] = '`'.$this->aPrototype->name() .'`.`'. $sColumn . "`='" . addslashes($values[$nIdx]) . "'" ;
+		    }else{
+		        $arrWhere[] = $sColumn . "='" . addslashes($values[$nIdx]) . "'" ;
+		    }
+			
 		}
-		
 		return implode(' AND ',$arrWhere) ;
 	}
 
@@ -209,7 +215,6 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 				$sTmpWhere = $this->makeSqlFind($values,$columns) ;
 			}
 		}
-		
 		Selecter::singleton()->execute( $this, $this->aPrototype->refRaw(), $this->arrData, $sTmpWhere, $this->db() ) ;
 		
 		//echo "<pre>";print_r($this->arrData);echo "</pre>";

@@ -17,7 +17,7 @@ abstract class Executor extends Object
 			$arrClauseOn ;
 			foreach($arrPrototype['fromBridgeKeys'] as $nIdx=>$sFromBridgeKey)
 			{
-				$arrClauseOn[] = "`{$arrPrototype['bridgeTableAlias']}`.`{$sFromBridgeKey}` = `{$arrPrototype['tableAlias']}`.`{$arrPrototype['toKeys'][$nIdx]}`" ;
+				$arrClauseOn[] = "`{$arrPrototype['bridgeTableAlias']}`.`{$sFromBridgeKey}` = `{$arrPrototype['name']}`.`{$arrPrototype['toKeys'][$nIdx]}`" ;
 			}
 			$arrSqlStat['from'].= ") ON (".implode(' AND ',$arrClauseOn).")" ;
 		}
@@ -39,7 +39,7 @@ abstract class Executor extends Object
 			    if($isAshes)
 			    {
 			        // join table
-			        $arrSqlStat['from'].= " LEFT JOIN (`{$arrAssoc['table']}` AS `".addslashes($arrAssoc['tableAlias'])."`" ;
+			        $arrSqlStat['from'].= " LEFT JOIN (`{$arrAssoc['table']}` AS `".addslashes($arrAssoc['name'])."`" ;
 			        
 			        $this->joinTables($arrAssoc,$arrSqlStat,$nAssocType) ;
 			        
@@ -47,7 +47,7 @@ abstract class Executor extends Object
 			        $arrClauseOn ;
 			        foreach($arrAssoc['fromKeys'] as $nIdx=>$sFromKey)
 			        {
-			            $arrClauseOn[] = "`{$arrPrototype['tableAlias']}`.`{$sFromKey}` = `{$arrAssoc['tableAlias']}`.`{$arrAssoc['toKeys'][$nIdx]}`" ;
+			            $arrClauseOn[] = "`{$arrPrototype['tableAlias']}`.`{$sFromKey}` = `{$arrAssoc['name']}`.`{$arrAssoc['toKeys'][$nIdx]}`" ;
 			        }
 			        $arrSqlStat['from'].= ") ON (".implode(' AND ',$arrClauseOn).")" ;
 			    }else{
@@ -60,7 +60,7 @@ abstract class Executor extends Object
 			        $arrClauseOn ;
 			        foreach($arrAssoc['fromKeys'] as $nIdx=>$sFromKey)
 			        {
-			            $arrClauseOn[] = "`{$arrPrototype['table']}`.`{$sFromKey}` = `{$arrAssoc['table']}`.`{$arrAssoc['toKeys'][$nIdx]}`" ;
+			            $arrClauseOn[] = "`{$arrPrototype['table']}`.`{$sFromKey}` = `{$arrAssoc['name']}`.`{$arrAssoc['toKeys'][$nIdx]}`" ;
 			        }
 			        $arrSqlStat['from'].= " ON ".implode(' AND ',$arrClauseOn)."" ;
 			    }
@@ -74,7 +74,7 @@ abstract class Executor extends Object
 	
 	protected function makeFromClause(array & $arrPrototype)
 	{
-		return " FROM `{$arrPrototype['table']}` AS `" . addslashes($arrPrototype['tableAlias']) . '`' ;
+		return " FROM `{$arrPrototype['table']}` AS `" . addslashes($arrPrototype['name']) . '`' ;
 	}
 	protected function makeWhereClause(array & $arrPrototype,$sTmpWhere=null)
 	{
@@ -84,7 +84,6 @@ abstract class Executor extends Object
 		{
 			$arrWhere[] = $sTmpWhere ;
 		}
-		
 		switch( count($arrWhere) )
 		{
 			case 0 :

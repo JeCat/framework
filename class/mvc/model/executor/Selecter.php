@@ -10,7 +10,6 @@ class Selecter extends Executor
 {
 	public function execute(Model $aModel,array & $arrPrototype,array & $arrDataSheet,$sWhere=null,DB $aDB=null)
 	{
-	    
 	    //判断xpath是否需要加点。
 	    $sXpath = empty($arrPrototype['xpath'])?"":$arrPrototype['xpath'].".";
 	    
@@ -19,7 +18,6 @@ class Selecter extends Executor
 		
 		$sSql = $this->makeSql($arrPrototype,$arrMultiAssocs,$sWhere) ;
 
-		
 		// 查询
 		$aPdoRecordset = $aDB->query( $sSql ) ;
 		
@@ -52,7 +50,6 @@ class Selecter extends Executor
 					}
 					$sClauseWhere = implode(' AND ',$arrClauseWhere) ;
 				}
-				
 				$this->execute(
 						$aModel
 						, $arrAssoc
@@ -75,12 +72,14 @@ class Selecter extends Executor
 
 		$this->joinTables($arrPrototype,$arrSqlStat) ;
 		
-		return $sSql = "SELECT \r\n\t" . $arrSqlStat['columnList']
+		 $sSql = "SELECT \r\n\t" . $arrSqlStat['columnList']
 					. $arrSqlStat['from']
 					. $this->makeWhereClause($arrPrototype,$sWhere)
 					. $this->makeGroupByClause($arrPrototype)
 					. $this->makeOrderByClause($arrPrototype)
 					. $this->makeLimitClause($arrPrototype) . " ; \r\n" ;
+		 
+		 return $sSql;
 	}
 
 	protected function joinTables(array & $arrPrototype,array & $arrSqlStat)
@@ -99,7 +98,7 @@ class Selecter extends Executor
 		
 		foreach($arrColunms as &$sColumn)
 		{
-			$sColumn = "`{$arrPrototype['tableAlias']}`.`{$sColumn}` as `{$sPrefix}{$sColumn}`" ;
+			$sColumn = "`{$arrPrototype['name']}`.`{$sColumn}` as `{$sPrefix}{$sColumn}`" ;
 		}
 		return implode("\r\n	, ",$arrColunms) ;
 	}
