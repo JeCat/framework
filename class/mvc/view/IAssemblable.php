@@ -10,6 +10,10 @@ interface IAssemblable
 	const xhard = 7 ;
 	const zhard = 9 ;
 	
+	const vertical = 'jc-frame-vertical' ;
+	const horizontal = 'jc-frame-horizontal' ;
+	const tap = 'jc-frame-tap' ;
+	
 	public function assemble(IAssemblable $aView,$nLevel=self::soft) ;
 
 	/**
@@ -39,4 +43,35 @@ interface IAssemblable
 	 */
 	public function setAssembledLevel($nLevel) ;
 	
+
+	/**
+	 * @return IView
+	 */
+	public function addWrapperClasses($sClass) ;
+	
+	/**
+	 * @return IView
+	 */
+	public function removeWrapperClasses($sClass) ;
+	
+	/**
+	 * @return IView
+	 */
+	public function clearWrapperClasses($sClass) ;
+	
+	/**
+	 * @return IView
+	 */
+	public function wrapperClasses() ;
+
+	/**
+	 * @return IView
+	 */
+	public function setWrapperStyle($sStyle) ;
+	
+	public function wrapperStyle() ;
+
+	public function setFrameType($sType) ;
+	
+	public function frameType() ;
 }

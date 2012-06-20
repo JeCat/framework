@@ -153,7 +153,9 @@ class ViewCompiler extends NodeCompiler
 		
 		// 创建 frame 视图
 		$aDev->putCode("\r\n// create frame view",'preprocess') ;
-		$aDev->putCode("\$aVariables->get('theView')->addView('frame-pos-{$nNodeViewId}',new jc\\mvc\\view\\View(),false) ;",'preprocess') ;
+		$aDev->putCode("\$__aFrame = new jc\\mvc\\view\\View() ;",'preprocess') ;
+		$aDev->putCode("\$__aFrame->setFrameType(jc\\mvc\\view\\IAssemblable::vertical) ;",'preprocess') ;
+		$aDev->putCode("\$aVariables->get('theView')->addView('frame-pos-{$nNodeViewId}',\$__aFrame,false) ;",'preprocess') ;
 		
 		$aDev->putCode("\r\n// display child views ") ;
 		$aDev->putCode("\$aView = \$aVariables->get('theView') ;") ;

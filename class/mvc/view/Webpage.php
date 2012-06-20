@@ -30,8 +30,10 @@ use org\jecat\framework\ui\UI;
 class Webpage extends View
 {
 	public function __construct(UI $aUI=null)
-	{		
-		parent::__construct('org.jecat.framework:Webpage.template.html',false,$aUI) ;
+	{	
+		$this->bDisableWrapper = true ;
+		
+		parent::__construct('org.jecat.framework:Webpage.template.html',$aUI) ;		
 	}
 
 	public function title()

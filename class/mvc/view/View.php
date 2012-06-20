@@ -54,23 +54,11 @@ use org\jecat\framework\ui\UI;
 
 class View implements IView, IBean, IAssemblable
 {
-	public function __construct($sTemplate=null,$bVagrantContainer=true,UI $aUI=null)
+	public function __construct($sTemplate=null,UI $aUI=null,$_=null)
 	{
-		// 用于收容”流浪“视图的装配单
-		if( $bVagrantContainer )
+		if( $_ instanceof UI )
 		{
-			$this->sVagrantViewsAssemlyListId = $this->id().'-vagrants' ;
-		
-			ViewAssembler::singleton()->defineAssemblyList(
-				$this->sVagrantViewsAssemlyListId
-				, ViewAssembler::layout_vertical
-				, array(
-					'container' => ViewAssembler::container_use_controller ,
-					'priority' => ViewAssembler::soft ,
-					'xpaths' => null ,
-					'view' => $this ,
-				)
-			) ;
+			trigger_error('正在访问一个过时的方法：View::__construct() 的参数顺序已经发生变化',E_USER_DEPRECATED ) ;
 		}
 		
 		$this->setTemplate($sTemplate) ;
@@ -371,15 +359,35 @@ class View implements IView, IBean, IAssemblable
 		return $this ;
 	}
 	
-	/**
-	 * @return View
-	 */
-	static public function findViewByStream(IOutputStream $aStream)
+	protected function renderHtmlWrapperHead(IOutputStream $aDevice)
 	{
-		if( $aStream instanceof OutputStreamBuffer and $aProperties=$this->aOutputStream->properties(false) )
+		if($this->bDisableWrapper)
 		{
-			return $aProperties->get('_view') ;
-		}		
+			return ;
+		}
+		
+		$sWrapperClasses = $this->arrWrapperClasses ? ' class="'.implode(' ', $this->arrWrapperClasses).'"': '' ;
+		$sWrapperStyle = $this->sWrapperStyle ?  " style=\"{$this->sWrapperStyle}\"": '' ;
+		$sXPath = $this->xpath(true) ;
+		$sId = $this->id() ;
+		
+		$aDevice->write("\r\n<div id=\"{$sId}\" xpath=\"{$sXPath}\" {$sWrapperClasses}{$sWrapperStyle}>\r\n") ;
+	}
+	protected function renderHtmlWrapperFoot(IOutputStream $aDevice)
+	{
+		if($this->bDisableWrapper)
+		{
+			return ;
+		}
+		
+		$aDevice->write("\r\n") ;
+		
+		if( $this->sFrameType===IAssemblable::horizontal )
+		{
+			$aDevice->write("<div class='jc-layout-item-end'>") ;
+		}
+		
+		$aDevice->write("</div>\r\n") ;
 	}
 	
 	/**
@@ -399,6 +407,9 @@ class View implements IView, IBean, IAssemblable
 		{
 			return ;
 		}
+
+		// wrapper header tag
+		$this->renderHtmlWrapperHead($aDevice) ;
 		
 		if( $this->sTemplateSingature )
 		{
@@ -444,6 +455,9 @@ class View implements IView, IBean, IAssemblable
 				$aView->render($aDevice) ;
 			}
 		}
+
+		// wrapper footer tag
+		$this->renderHtmlWrapperFoot($aDevice) ;
 		
 		$this->bRendered = true ;
 	}
@@ -775,19 +789,17 @@ class View implements IView, IBean, IAssemblable
 		
 		$aOutput->write("\r\n</pre>");
     }
-
-    public function setCssClass($sClass)
-    {
-    	$this->sCssClass = $sClass ;
-    }
-    public function cssClass()
-    {
-    	return $this->sCssClass ;
-    }
     
-    static public function registerView(IView $aView)
+    static public function registerView(View $aView)
     {
-    	$sName = $aView->template() ;
+    	if( $aView->frameType() )
+    	{
+    		$sName = 'frame' ;
+    	}
+    	else
+    	{
+    		$sName = $aView->template() ?: 'empty-view' ;
+    	}
     	
     	if( !isset(self::$arrAssignedId[$sName]) )
     	{
@@ -980,6 +992,83 @@ class View implements IView, IBean, IAssemblable
     	return $this->arrAssembleList? new \ArrayIterator($this->arrAssembleList): new \EmptyIterator() ;	
     }
 
+    /**
+     * @return IView
+     */
+    public function addWrapperClasses($sClass)
+    {
+    	if( !$this->arrWrapperClasses or in_array($sClass,$this->arrWrapperClasses) )
+    	{
+    		$this->arrWrapperClasses[] = $sClass ;
+    	}
+    	return $this ;
+    }
+    /**
+     * @return IView
+     */
+    public function removeWrapperClasses($sClass)
+    {
+    	if( $this->arrWrapperClasses and ($pos=array_search($sClass,$this->arrWrapperClasses))!==false )
+    	{
+    		unset($this->arrWrapperClasses[$pos]) ;
+    	}
+    	return $this ;
+    }
+    /**
+     * @return IView
+     */
+    public function clearWrapperClasses($sClass)
+    {
+    	$this->arrWrapperClasses = null ;
+    	return $this ;
+    }
+    /**
+     * @return IView
+     */
+    public function wrapperClasses()
+    {
+    	return $this->arrWrapperClasses ?: array() ;
+    }
+
+    /**
+     * @return IView
+     */
+    public function setWrapperStyle($sStyle)
+    {
+    	$this->sWrapperStyle = $sStyle ;
+    	return $this ;
+    }
+    public function wrapperStyle()
+    {
+    	return $this->sWrapperStyle ;
+    }
+
+	public function setFrameType($sType=null) 
+	{
+		
+		if( $sType )
+		{
+			$this->addWrapperClasses('jc-frame') ;
+			$this->addWrapperClasses($sType) ;
+			$this->removeWrapperClasses('jc-view') ;
+		}
+		else
+		{
+			$this->addWrapperClasses('jc-view') ;
+			$this->removeWrapperClasses('jc-frame') ;
+			$this->removeWrapperClasses($this->sFrameType) ;
+		}
+
+		$this->sFrameType = $sType ;
+		
+    	return $this ;
+	}
+	public function frameType()
+	{
+    	return $this->sFrameType ;
+	}
+    
+
     public function loadWidgets(IDataSrc $aDataSrc=null,$bVerify=true)
     {
     	if( !$aDataSrc )
@@ -1079,15 +1168,19 @@ class View implements IView, IBean, IAssemblable
     private $arrBeanConfig ;
     private $aController ;
     private $sId ;
-    private $sCssClass ;
+    
+    protected $bDisableWrapper = false ;
+    private $arrWrapperClasses = array('jc-layout','jc-view') ;
+    private $sWrapperStyle ;
+    private $sFrameType ;
 	protected $bRendered = false ;
+    private $arrShowForm ;
 	
 
 	static private $arrAssignedId = array() ;
     static private $arrRegisteredViews = array() ;
     
     
-    private $arrShowForm ;
 }
 
 
