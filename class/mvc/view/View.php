@@ -722,6 +722,8 @@ class View implements IView, IBean, IAssemblable
     		$arrXPath[] = $aController->name() ;
     	}
     	
+    	krsort($arrXPath) ;
+    	
     	return implode('/',$arrXPath) ;
     }
     
@@ -1045,7 +1047,6 @@ class View implements IView, IBean, IAssemblable
 
 	public function setFrameType($sType=null) 
 	{
-		
 		if( $sType )
 		{
 			$this->addWrapperClasses('jc-frame') ;
@@ -1174,6 +1175,7 @@ class View implements IView, IBean, IAssemblable
     private $sWrapperStyle ;
     private $sFrameType ;
 	protected $bRendered = false ;
+	
     private $arrShowForm ;
 	
 
