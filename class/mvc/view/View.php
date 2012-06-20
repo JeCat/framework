@@ -368,7 +368,7 @@ class View implements IView, IBean, IAssemblable
 		
 		$sWrapperClasses = $this->arrWrapperClasses ? ' class="'.implode(' ', $this->arrWrapperClasses).'"': '' ;
 		$sWrapperStyle = $this->sWrapperStyle ?  " style=\"{$this->sWrapperStyle}\"": '' ;
-		$sXPath = $this->xpath(true) ;
+		$sXPath = $this->xpath(false) ;
 		$sId = $this->id() ;
 		
 		$aDevice->write("\r\n<div id=\"{$sId}\" xpath=\"{$sXPath}\" {$sWrapperClasses}{$sWrapperStyle}>\r\n") ;
@@ -697,7 +697,7 @@ class View implements IView, IBean, IAssemblable
     
     /**
      * $bAbsolute == true : 从顶级view开始计算
-     * $bAbsolute == false : 从所属controller的mainView开始计算，即向上追溯，遇到一个隶属controller的view为止
+     * $bAbsolute == false : 从所属controller的 view 开始计算，即向上追溯，遇到一个隶属controller的view为止
      * @return IView
      */
     public function xpath($bAbsolute=true)
@@ -707,7 +707,7 @@ class View implements IView, IBean, IAssemblable
     	
     	while($aParent=$aView->parent())
     	{
-    		if( $bAbsolute and $aView->controller() )
+    		if( !$bAbsolute and $aView->controller() )
     		{
     			break ;
     		}
@@ -919,12 +919,13 @@ class View implements IView, IBean, IAssemblable
     /**
      * @return IView
      */
-    public function assemble(IAssemblable $aView,$nLevel=IAssemblable::soft)
+    public function assemble(IAssemblable $aView,$nLevel=IAssemblable::soft,$bDistroyLoop=false)
     {
     	if( $this->arrAssembleList and in_array($aView,$this->arrAssembleList) )
     	{
     		return ;
     	}
+    	
     	if( $aParent=$aView->assembledParent() )
     	{
     		if( $aView->assembledLevel()<$nLevel )
@@ -937,6 +938,21 @@ class View implements IView, IBean, IAssemblable
     		}
     	}
     	
+    	// 向上追溯，避免回环装配
+    	if($bDistroyLoop)
+    	{
+	    	$aParent = $this ;
+	    	do
+	    	{
+	    		if($aView->hasAssembled($aParent))
+	    		{
+	    			// 解除原装备关系
+	    			$aView->unassemble($aParent) ;
+	    		}
+	    	}while($aParent=$aParent->assembledParent()) ;
+    	}
+    	
+    	// 记录装配状态
     	$aView->setAssembledParent($this) ;
     	$aView->setAssembledLevel($nLevel) ;
     	
@@ -951,6 +967,10 @@ class View implements IView, IBean, IAssemblable
     public function assembledParent()
     {
     	return $this->aAssembledParent ;
+    }
+    public function hasAssembled(IAssemblable $aView)
+    {
+    	return $this->arrAssembleList and in_array($aView,$this->arrAssembleList,true) ;
     }
     /**
      * @return IView

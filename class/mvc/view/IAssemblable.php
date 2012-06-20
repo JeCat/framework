@@ -42,7 +42,8 @@ interface IAssemblable
 	 * @return IView
 	 */
 	public function setAssembledLevel($nLevel) ;
-	
+
+	public function hasAssembled(IAssemblable $aView) ;
 
 	/**
 	 * @return IView

@@ -45,6 +45,7 @@ class Response extends Object
 {
 	const beforeRespond = 'beforeRespond' ;
 	const afterRespond = 'afterRespond' ;
+	const beforeRenderViews = 'beforeRenderViews' ;
 	const afterRenderViews = 'afterRenderViews' ;
 	
 	public function __construct(PrintStream $aDevice=null)
@@ -179,13 +180,16 @@ class Response extends Object
 			}
 			
 			$aOutput = new OutputStreamBuffer() ;
+
+			// 触发事件
+			$arrEventArgvs2 = array($this,$aMainView,$aController) ;
+			$aEventManager->emitEvent(__CLASS__,self::beforeRenderViews,$arrEventArgvs2) ;
 			
 			// 显示视图
 			$aMainView->render($aOutput) ;
 			$this->device()->write($aOutput) ;
 
 			// 触发事件
-			$arrEventArgvs2 = array($this,$aMainView,$aController) ;
 			$aEventManager->emitEvent(__CLASS__,self::afterRenderViews,$arrEventArgvs2) ;
 			
 			break ;

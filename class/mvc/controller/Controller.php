@@ -464,14 +464,7 @@ class Controller extends NamableComposite implements IBean
     public function mainRun ()
     {
 		self::processController($this) ;
-			
-		// 处理 frame
-		// （先执行自己，后执行 frame）
-    	if( $aFrame=$this->frame() )
-    	{    		
-    		self::processController($aFrame) ;
-    	}
-    	
+		
     	$this->response()->respond($this) ;
     	
     	// 触发事件
@@ -479,13 +472,7 @@ class Controller extends NamableComposite implements IBean
     }
     
     static protected function processController(Controller $aController)
-    {    	
-    	// 执行子控制器
-		foreach($aController->iterator() as $aChild)
-		{
-			self::processController($aChild) ;
-		}
-
+    {
 		// 重定向输出
 		if( $aController->bCatchOutput )
 		{
@@ -513,6 +500,12 @@ class Controller extends NamableComposite implements IBean
     	if(!empty($e))
     	{
     		throw $e ;
+    	}
+
+    	// 执行子控制器
+    	foreach($aController->iterator() as $aChild)
+    	{
+    		self::processController($aChild) ;
     	}
     }
     
@@ -826,11 +819,12 @@ class Controller extends NamableComposite implements IBean
 	    	}
 	    	
 	    	$this->aFrame = BeanFactory::singleton()->createBean($this->arrBeanConfig['frame'],'*',false) ;
-	    	$this->aFrame->buildParams($this->params()) ;
+	    	$this->add($this->aFrame) ;
 
 	    	$this->aFrame->buildBean($this->arrBeanConfig['frame']) ;
-	    	
-    		//$this->view()->unassemble($this->aFrame->view()) ;
+
+	    	// 确立反向的视图装配关系
+	    	$this->view()->unassemble($this->aFrame->view()) ;
     		$this->aFrame->viewContainer()->assemble($this->view()) ;
     	}
     	
