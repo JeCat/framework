@@ -1031,7 +1031,7 @@ class View implements IView, IBean, IAssemblable
      */
     public function addWrapperClasses($sClass)
     {
-    	if( !$this->arrWrapperClasses or in_array($sClass,$this->arrWrapperClasses) )
+    	if( !$this->arrWrapperClasses or !in_array($sClass,$this->arrWrapperClasses) )
     	{
     		$this->arrWrapperClasses[] = $sClass ;
     	}
