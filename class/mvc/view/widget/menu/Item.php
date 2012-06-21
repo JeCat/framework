@@ -127,7 +127,7 @@ class Item extends AbstractBase
 		{
 			if($aView=$this->view())
 			{
-				if( $aController = $aView->controller() )
+				if( $aController = $aView->controller(true) )
 				{
 					$aParams = $aController->params() ;
 					

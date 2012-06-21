@@ -203,12 +203,19 @@ class Paginator extends FormWidget implements IModelChangeObserver
     }
     
     public function totalCount(){
+		if( null !== $this->iTotalCount ){
+			return $this->iTotalCount ;
+		}else
         if( $this->aPaginal ){
             return (int) $this->aPaginal->totalCount() ;
         }else{
             return 0 ;
         }
     }
+	
+	public function setTotalCount($iTotalCount){
+		$this->iTotalCount = $iTotalCount ;
+	}
     
     public function setCurrentPageNum($iNum)
     {
@@ -312,6 +319,7 @@ class Paginator extends FormWidget implements IModelChangeObserver
 		parent::setAttribute($sName,$value) ;
 	}
     
+	private $iTotalCount = null ;
     private $iCount;
     private $iCurrentPageNum;
     private $aPaginal;
