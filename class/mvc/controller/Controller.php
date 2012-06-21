@@ -463,6 +463,9 @@ class Controller extends NamableComposite implements IBean
      */
     public function mainRun ()
     {
+    	// 触发创建 frame 对像
+    	$aFrame = $this->frame() ;
+    	
 		self::processController($this) ;
 		
     	$this->response()->respond($this) ;
