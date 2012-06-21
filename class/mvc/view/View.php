@@ -934,9 +934,22 @@ class View implements IView, IBean, IAssemblable
      */
     public function assemble(IAssemblable $aView,$nLevel=IAssemblable::soft,$bDistroyLoop=false)
     {
-    	if( $this->arrAssembleList and in_array($aView,$this->arrAssembleList) )
+    	if( $this->arrAssembleList and in_array($aView,$this->arrAssembleList,true) )
     	{
     		return ;
+    	}
+    	
+    	// 向上追溯，解除回环装配
+    	if($bDistroyLoop)
+    	{
+	    	$aParent = $this ;
+	    	do{
+	    		if($aView->hasAssembled($aParent))
+	    		{
+	    			// 解除原装备关系
+	    			$aView->unassemble($aParent) ;
+	    		}
+	    	}while($aParent=$aParent->assembledParent()) ;
     	}
     	
     	if( $aParent=$aView->assembledParent() )
@@ -950,21 +963,7 @@ class View implements IView, IBean, IAssemblable
     			return ;
     		}
     	}
-    	
-    	// 向上追溯，避免回环装配
-    	if($bDistroyLoop)
-    	{
-	    	$aParent = $this ;
-	    	do
-	    	{
-	    		if($aView->hasAssembled($aParent))
-	    		{
-	    			// 解除原装备关系
-	    			$aView->unassemble($aParent) ;
-	    		}
-	    	}while($aParent=$aParent->assembledParent()) ;
-    	}
-    	
+    	    	
     	// 记录装配状态
     	$aView->setAssembledParent($this) ;
     	$aView->setAssembledLevel($nLevel) ;
