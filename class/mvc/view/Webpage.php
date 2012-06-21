@@ -83,11 +83,6 @@ class Webpage extends View
 		}
 	}
 	
-	protected function isRenderHtmlWrapper()
-	{
-		return false ;
-	}
-	
 	private $sContents = null ;
 	
 	private $sTitle = null ;

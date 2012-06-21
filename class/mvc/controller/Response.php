@@ -229,7 +229,7 @@ class Response extends Object
 		}
 		
 		// 打印模型结构
-		if( $aController->params()->has('rspn.debug.model.struct') )
+		if( $aController->params()->has('rspn.dbg.model') )
 		{
 			$sModelName = $aController->params()->get('rspn.debug.model.struct') ;
 			
@@ -259,6 +259,15 @@ class Response extends Object
 				$this->printDebugModelStruct($aController,$sModelName) ;
 			}
 		}
+		
+		// 打印视图结构
+		if( $aController->params()->has('rspn.dbg.view') )
+		{
+			$this->device()->write("\r\n<hr />\r\n") ;
+			$this->device()->write("<b>视图隶属结构：</b>") ;
+			$aController->view()->printStruct(false,$this->device()) ;
+		}
+		
 		
 		// 触发事件
 		$aEventManager->emitEvent(__CLASS__,self::afterRespond,$arrEventArgvs) ;

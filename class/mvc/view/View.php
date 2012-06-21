@@ -711,7 +711,7 @@ class View implements IView, IBean, IAssemblable
     		{
     			break ;
     		}
-
+    		
     		$arrXPath[] = $aParent->viewName($aView) ;
     		
     		$aView = $aParent ;
@@ -755,41 +755,52 @@ class View implements IView, IBean, IAssemblable
     	return $this->bRendered ;
     }
     
-    public function printStruct(IOutputStream $aOutput=null,$nDepth=0)
+    public function printStruct($bAssemble=false,IOutputStream $aOutput=null,$nDepth=0)
     {
 		if(!$aOutput)
 		{
 			$aOutput = Response::singleton()->printer();
 		}
-		
-		$aOutput->write ( "<pre>\r\n" );
 		$sIndent = str_repeat ( "\t", $nDepth ) ;
-		
-		$aOutput->write ( $sIndent."--- VIEW ---\r\n" );
-		$aOutput->write ( $sIndent."	name:	".$this->name()."\r\n" );
-		$aOutput->write ( $sIndent."	id:		".$this->id()."\r\n" );
-		$aOutput->write ( $sIndent."	class:	".get_class($this)."\r\n" );
-		$aOutput->write ( $sIndent."	tpl:	".$this->template()."\r\n" );
-		$aOutput->write ( $sIndent."	hash:	".spl_object_hash($this)."\r\n" );
-		
-		if( $this->count() )
+
+		if($nDepth===0)
 		{
-			foreach ( $this->nameIterator() as $aChildName )
-			{
-				$aOutput->write( "{$sIndent}\tchild:\"{$aChildName}\" => " );
-				
-				if($aChild = $this->viewByName($aChildName))
-				{
-					$aChild->printStruct($aOutput,$nDepth+1) ;
-				}
-				else 
-				{
-					$aOutput->write( "<miss>\r\n" );
-				}
-			}
+			$aOutput->write ( "<pre>\r\n" );
 		}
 		
-		$aOutput->write("\r\n</pre>");
+		// view properties
+		$aController = $this->controller(true) ;
+		$aOutput->write ( $sIndent."<b>--- VIEW ---</b>\r\n" );
+		$aOutput->write ( $sIndent."id:		".$this->id()."\r\n" );
+		$aOutput->write ( $sIndent."xpath(full):	".$this->xpath(true)."\r\n" );
+		$aOutput->write ( $sIndent."xpath:		".$this->xpath(false)."\r\n" );
+		$aOutput->write ( $sIndent."controller:	".($aController? get_class($aController): '')."\r\n" );
+		$aOutput->write ( $sIndent."class:		".get_class($this)."\r\n" );
+		$aOutput->write ( $sIndent."tpl:		".$this->template()."\r\n" );
+		$aOutput->write ( $sIndent."hash:		".spl_object_hash($this)."\r\n" );
+		
+		// widgets
+		foreach($this->widgitIterator() as $aWidget)
+		{
+			$aOutput->write( "\r\n{$sIndent}[widget]:\"".$aWidget->id()."\" => \r\n" );
+			$aOutput->write( "{$sIndent}\tclass:".get_class($aWidget)."\r\n" );
+			$aOutput->write( "{$sIndent}\ttitle:".$aWidget->title()."\r\n" );
+		}
+
+		$arrChildren = $bAssemble? 
+			($this->arrAssembleList?:array()) :
+			($this->arrChildren?:array()) ;
+
+		foreach ( $arrChildren?:array() as $aChildName=>$aChild )
+		{
+			$aOutput->write( "\r\n{$sIndent}[child]:\"{$aChildName}\" => \r\n" );
+			$aChild->printStruct($bAssemble,$aOutput,$nDepth+1) ;
+		}
+		
+		if($nDepth===0)
+		{
+			$aOutput->write("</pre>\r\n");
+		}
     }
     
     static public function registerView(View $aView)
@@ -802,6 +813,8 @@ class View implements IView, IBean, IAssemblable
     	{
     		$sName = $aView->template() ?: 'empty-view' ;
     	}
+    	
+    	$sName = preg_replace("[^\\w]",'_',$sName) ;
     	
     	if( !isset(self::$arrAssignedId[$sName]) )
     	{

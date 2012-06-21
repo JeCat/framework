@@ -142,8 +142,6 @@ class WebpageFrame extends Controller
 		{
 			$aOrController->removeView($aFrameView) ;
 		}
-		$aFrameView->setController($this) ;
-	
 		
 		$this->viewContainer()->addView( $sName, $aFrameView ) ;
 	
