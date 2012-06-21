@@ -814,7 +814,7 @@ class View implements IView, IBean, IAssemblable
     		$sName = $aView->template() ?: 'empty-view' ;
     	}
     	
-    	$sName = preg_replace("[^\\w]",'_',$sName) ;
+    	$sName = preg_replace("/[^\\w]/",'_',$sName) ;
     	
     	if( !isset(self::$arrAssignedId[$sName]) )
     	{
