@@ -209,7 +209,7 @@ class View implements IView, IBean, IAssemblable
     	// 
     	if(!empty($arrConfig['cssClass']))
     	{
-    		$this->setCssClass($arrConfig['cssClass']) ;
+    		$this->addWrapperClasses($arrConfig['cssClass']) ;
     	}
 
     	if( isset($arrConfig['hideForm']) )
