@@ -926,7 +926,7 @@ class View implements IView, IBean, IAssemblable
      */
     public function viewIterator()
     {
-    	return $this->aAssembledParent? new \ArrayIterator($this->arrChildren): new \EmptyIterator() ;	
+    	return $this->arrChildren? new \ArrayIterator($this->arrChildren): new \EmptyIterator() ;
     }
 
     /**
