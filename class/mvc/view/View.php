@@ -573,12 +573,6 @@ class View implements IView, IBean, IAssemblable
 		{
 			$this->aDataExchanger->exchange($this,$nWay) ;
 		}
-	
-		// for children
-		foreach($this->viewIterator() as $aChild)
-		{
-			$aChild->exchangeData($nWay) ;
-		}
 		
 		return $this ;
 	}
