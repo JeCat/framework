@@ -25,6 +25,8 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\message ;
 
+use org\jecat\framework\mvc\controller\Response;
+
 use org\jecat\framework\io\OutputStreamBuffer;
 
 use org\jecat\framework\lang\Assert;
@@ -187,8 +189,7 @@ class MessageQueue extends Object implements IMessageQueue
 			$aUI->render($sTemplateSignature,new HashTable(array('aMsgQueue'=>$this)),$this->aDevice,$sSubTemplate) ;
 		}
 		
-		
-		$this->aDevice->redirect($aDevice,$nMode) ;
+		$this->aDevice->redirect( $aDevice?:Response::singleton()->device(), $nMode ) ;
 	}
 	
 	public function addChild(IMessageQueue $aMessageQueue)
