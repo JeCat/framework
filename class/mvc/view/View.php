@@ -1116,7 +1116,9 @@ class View implements IView, IBean, IAssemblable
     	// 加载数据
     	foreach($this->widgets() as $aWidget)
     	{
-    		$aWidget->setDataFromSubmit($aDataSrc) ;
+    		if($aWidget instanceof IViewFormWidget){
+                $aWidget->setDataFromSubmit($aDataSrc) ;
+            }
     	}
     
     	// for children

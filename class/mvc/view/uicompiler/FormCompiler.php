@@ -57,7 +57,7 @@ class FormCompiler extends NodeCompiler
 				$sFormName = $aAttributes->string('name') ;
 			}
 		
-			$aDev->putCode("if( (\$aVariables->get('theView') ) and \$aVariables->get('theView')->isShowForm(\"{$sFormName}\") )\r\n{\r\n") ;
+			$aDev->putCode("if( (! \$aVariables->get('theView') ) or \$aVariables->get('theView')->isShowForm(\"{$sFormName}\") )\r\n{\r\n") ;
 			
 			$this->compileTag($aObject->headTag(), $aObjectContainer, $aDev, $aCompilerManager) ;
 			
