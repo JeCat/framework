@@ -926,7 +926,7 @@ class View implements IView, IBean, IAssemblable
      */
     public function viewIterator()
     {
-    	return $this->aAssembledParent? new \ArrayIterator($this->arrChildren): new \EmptyIterator() ;	
+    	return $this->arrChildren? new \ArrayIterator($this->arrChildren): new \EmptyIterator() ;
     }
 
     /**
@@ -1116,7 +1116,9 @@ class View implements IView, IBean, IAssemblable
     	// 加载数据
     	foreach($this->widgets() as $aWidget)
     	{
-    		$aWidget->setDataFromSubmit($aDataSrc) ;
+    		if($aWidget instanceof IViewFormWidget){
+                $aWidget->setDataFromSubmit($aDataSrc) ;
+            }
     	}
     
     	// for children
