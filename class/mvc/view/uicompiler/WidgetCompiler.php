@@ -186,7 +186,6 @@ class WidgetCompiler extends NodeCompiler
 				$aDev->putCode("}else if( \$theView->widget(",'preprocess');
 				$aDev->putCode( $aAttrs->get('id') ,'preprocess');
 				$aDev->putCode(") ){",'preprocess');
-				$aDev->output( $aAttrs->get('id') ,'preprocess');
 				$aDev->putCode("	//已经定义过了",'preprocess');
 			}
 			
