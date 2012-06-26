@@ -94,7 +94,7 @@ class Item extends AbstractBase
     public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {
 		parent::buildBean($arrConfig,$sNamespace);
-		
+		               
 		/*
 			判断是否有下级菜单，看是否有item:xxx项
 		*/
@@ -111,6 +111,18 @@ class Item extends AbstractBase
 		}
 		if($bIsMenu){
 			$this->buildSubMenu($arrConfig);
+		}
+		
+		if( !empty($arrConfig['controller']) )
+		{
+			if(empty($arrConfig['link']))
+			{
+				$arrConfig['link'] = '?c=' . $arrConfig['controller'] ;
+			}
+			if(empty($arrConfig['query']))
+			{
+				$arrConfig['query'] = '?c=' . $arrConfig['controller'] ;
+			}
 		}
 		
 		if( !empty( $arrConfig['link'])){
