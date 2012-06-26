@@ -60,7 +60,7 @@ class EvalMacroCompiler extends MacroCompiler
 {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		$aDev->putCode( new Expression($aObject->source(),false,false) ) ;
+		$aDev->putCode( new Expression($aObject->source(),false,true) ) ;
 	}
 }
 

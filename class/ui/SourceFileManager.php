@@ -109,7 +109,7 @@ class SourceFileManager extends ResourceManager implements \Serializable
 		return $sNamespace? md5($sNamespace.':'.$sTemplate): md5($sTemplate) ;
 	}
 	
-	private $sCompileStrategySignture = '2012-6-20 17:36' ;
+	private $sCompileStrategySignture = '2012-6-26 11:04' ;
 	
 	private $sCompiledFolderPath ;
 	

@@ -75,10 +75,11 @@ class Expression
 			}
 		}
 		
-		$sCompiled = implode(";", $arrLines) ;
 		
-		if( count($arrLines)>1 or $this->bForceEval )
+		if( $this->bForceEval )
 		{
+			$sCompiled = implode(";", $arrLines) ;
+		
 			// return 最后一行
 			$arrLines[] = 'return ' . array_pop($arrLines) ;
 				
@@ -97,6 +98,8 @@ class Expression
 		}
 		else
 		{
+			$sCompiled = implode(";\r\n", $arrLines) ;
+		
 			if($this->bAloneLine)
 			{
 				if( !preg_match("/;\\s*$/",$sCompiled) )
