@@ -433,7 +433,7 @@ class WidgetCompiler extends NodeCompiler
 				$sText = trim($aChild->source()) ;
 				
 				if( ! empty($sText) ){
-					$arrRtn['text'] = '"'.$sText.'"' ;
+					$arrRtn['text'] = '"'.addslashes($sText).'"' ;
 				}
 				
 				$aNode->remove($aChild);
