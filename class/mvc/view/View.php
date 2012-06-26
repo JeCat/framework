@@ -414,56 +414,79 @@ class View implements IView, IBean, IAssemblable
 			return ;
 		}
 
-		// wrapper header tag
-		$this->renderHtmlWrapperHead($aDevice) ;
-		
-		if( $this->sTemplateSingature )
+		// 做为 frame
+		if( $this->sFrameType )
 		{
-			// render myself
-			$aVars = $this->variables() ;
-			$aVars->set('theModel',$this->model()) ;
-			$aVars->set('theController',$this->aController) ;
-			if( $this->aController )
+			// wrapper header tag
+			$this->renderHtmlWrapperHead($aDevice) ;
+
+			// 显示装配视图
+			if($this->arrAssembleList)
 			{
-				$aVars->set('theParams',$this->aController->params()) ;
+				foreach( $this->arrAssembleList as $aView )
+				{
+					$aView->render($aDevice) ;
+				}
 			}
 			
-			// debug模式下，输出模板文件的路径
-			if( Application::singleton()->isDebugging() )
-			{
-				if( !$aUI=$this->ui() ) 
-				{
-					throw new Exception("无法取得 UI 对像。") ;
-				}
-				$aSrcMgr = $aUI->sourceFileManager() ;
-				list($sNamespace,$sSourceFile) = $aSrcMgr->detectNamespace($this->template()) ;
-				if( $aTemplateFile=$aSrcMgr->find($sSourceFile,$sNamespace) )
-				{
-					$sSourcePath = $aTemplateFile->path() ;
-				}
-				else 
-				{
-					$sSourcePath = "can not find template file: {$sNamespace}:{$sSourceFile}" ;
-				}
-				
-				$aDevice->write("\r\n\r\n<!-- Template: {$sSourcePath} -->\r\n") ;
-			}
-		
-			// render
-			$this->ui()->render($this->sTemplateSingature,$aVars,$aDevice) ;
+			// wrapper footer tag
+			$this->renderHtmlWrapperFoot($aDevice) ;
 		}
 		
-		// 显示装配视图
-		if($this->arrAssembleList)
+		// 普通视图
+		else
 		{
-			foreach( $this->arrAssembleList as $aView )
+			if( $this->sTemplateSingature )
 			{
-				$aView->render($aDevice) ;
+				// wrapper header tag
+				$this->renderHtmlWrapperHead($aDevice) ;
+			
+				// render myself
+				$aVars = $this->variables() ;
+				$aVars->set('theModel',$this->model()) ;
+				$aVars->set('theController',$this->aController) ;
+				if( $this->aController )
+				{
+					$aVars->set('theParams',$this->aController->params()) ;
+				}
+					
+				// debug模式下，输出模板文件的路径
+				if( Application::singleton()->isDebugging() )
+				{
+					if( !$aUI=$this->ui() )
+					{
+						throw new Exception("无法取得 UI 对像。") ;
+					}
+					$aSrcMgr = $aUI->sourceFileManager() ;
+					list($sNamespace,$sSourceFile) = $aSrcMgr->detectNamespace($this->template()) ;
+					if( $aTemplateFile=$aSrcMgr->find($sSourceFile,$sNamespace) )
+					{
+						$sSourcePath = $aTemplateFile->path() ;
+					}
+					else
+					{
+						$sSourcePath = "can not find template file: {$sNamespace}:{$sSourceFile}" ;
+					}
+			
+					$aDevice->write("\r\n\r\n<!-- Template: {$sSourcePath} -->\r\n") ;
+				}
+			
+				// render
+				$this->ui()->render($this->sTemplateSingature,$aVars,$aDevice) ;
+			
+				// wrapper footer tag
+				$this->renderHtmlWrapperFoot($aDevice) ;
+			}
+
+			// 显示装配视图
+			if($this->arrAssembleList)
+			{
+				foreach( $this->arrAssembleList as $aView )
+				{
+					$aView->render($aDevice) ;
+				}
 			}
 		}
-
-		// wrapper footer tag
-		$this->renderHtmlWrapperFoot($aDevice) ;
 		
 		$this->bRendered = true ;
 	}
