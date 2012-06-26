@@ -740,14 +740,9 @@ class View implements IView, IBean, IAssemblable
     		$aView = $aParent ;
     	} ;
     	
-    	if( $aController=$aView->controller() )
-    	{
-    		$arrXPath[] = $aController->name() ;
-    	}
-    	
     	krsort($arrXPath) ;
     	
-    	return implode('/',$arrXPath) ;
+    	return '/'.implode('/',$arrXPath) ;
     }
     
     /**
