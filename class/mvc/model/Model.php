@@ -319,7 +319,7 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 	        $arr_field[] = $row[$field];
 	    }
 	    
-	    if(is_array($arr_field) && is_array($this->arrData))
+	    if(!empty($arr_field))
 	    {
 	        array_multisort($arr_field,$sort_type,$this->arrData);
 	    }
