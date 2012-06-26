@@ -61,7 +61,9 @@ class View implements IView, IBean, IAssemblable
 			trigger_error('正在访问一个过时的方法：View::__construct() 的参数顺序已经发生变化',E_USER_DEPRECATED ) ;
 		}
 		
-		$this->setTemplate($sTemplate) ;
+		if($sTemplate){
+			$this->setTemplate($sTemplate) ;
+		}
 		$this->setUi( $aUI ) ;
 		
 		// 消息队列过滤器
@@ -86,18 +88,9 @@ class View implements IView, IBean, IAssemblable
 	}
 	
 	static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
-	{    	
-    	if( !empty($arrConfig['template']) )
-    	{
-    		// 在文件名前 加上命名空间
-    		if( $sNamespace!=='*' and strstr($arrConfig['template'],':')===false )
-    		{
-    			$arrConfig['template'] = $sNamespace.':'.$arrConfig['template'] ;
-    		}
-    	}
-    	
+	{
 		$sClass = get_called_class() ;
-		$aBean = new $sClass( $arrConfig['template'] ) ;
+		$aBean = new $sClass() ;
 		if($bBuildAtOnce)
 		{
 			$aBean->buildBean($arrConfig,$sNamespace,$aBeanFactory) ;
@@ -216,6 +209,19 @@ class View implements IView, IBean, IAssemblable
     	{
     		$this->hideForm( $arrConfig['hideForm']?true:false ) ;
     	}
+		
+		// template
+		if( !empty($arrConfig['template']) )
+		{
+			// 在文件名前 加上命名空间
+			if( $sNamespace!=='*' and strstr($arrConfig['template'],':')===false )
+			{
+				$arrConfig['template'] = $sNamespace.':'.$arrConfig['template'] ;
+			}
+			
+			$this->setTemplate( $arrConfig['template'] );
+		}
+
     	
     	$this->arrBeanConfig = $arrConfig ;
     }

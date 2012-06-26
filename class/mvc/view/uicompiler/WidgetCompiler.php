@@ -69,7 +69,6 @@ class WidgetCompiler extends NodeCompiler
 		$this->writeAttr($aAttrs , $aObjectContainer , $aDev , $sWidgetVarName);
 		$this->writeBean($aObject , $aObjectContainer , $aDev , $aCompilerManager , $sWidgetVarName) ;
 		$this->writeTemplate($aObject , $aAttrs , $aObjectContainer , $aDev , $aCompilerManager , $sWidgetVarName) ;
-		$this->compileChildren($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
 		$this->writeDisplay($aObject,$aAttrs , $aDev , $sWidgetVarName , $sId) ;
 		$this->writeEnd($aAttrs ,$aDev);
 	}
@@ -182,6 +181,16 @@ class WidgetCompiler extends NodeCompiler
 			
 			$aDev->putCode("if( !class_exists('$__widget_class') ){",'preprocess') ;
 			$aDev->output("缺少 widget (class:{$sClassName})",'preprocess') ;
+			
+			if( !$aAttrs->has('define') or !$aAttrs->bool('define') ){
+				$aDev->putCode("}else if( \$theView->widget(",'preprocess');
+				$aDev->putCode( $aAttrs->get('id') ,'preprocess');
+				$aDev->putCode(") ){",'preprocess');
+				$aDev->output( $aAttrs->get('id') ,'preprocess');
+				$aDev->putCode("	//已经定义过了",'preprocess');
+			}
+			
+			
 			$aDev->putCode("}else{",'preprocess') ;
 			$aDev->putCode("	{$sWidgetVarName} = new $__widget_class ;",'preprocess') ;
 			
@@ -405,7 +414,10 @@ class WidgetCompiler extends NodeCompiler
 							$sTemName = '__subtemplate_'.md5(rand()) ;
 							$aAttrs->set('name' , $sTemName ) ;
 							$aChild->headTag()->setAttributes($aAttrs) ;
+						}else{
+							$sTemName = $aAttrs->string('name');
 						}
+						$aNode->attributes()->set('subtemplate',$sTemName);
 						break;
 					}
 					$aCompiler = $aCompilerManager->compiler(
@@ -509,6 +521,9 @@ class WidgetCompiler extends NodeCompiler
 			$sSubTemplate = 'null';
 			$sTemplate = 'null' ;
 			
+			/*
+				如果<widget>标签有<template>子标签，
+				writeBeanPri()会在<widget>的attributes()中埋一个subtemplate属性。
 			if( $aTemplate=$aObject->getChildNodeByTagName('template') ){
 				$aTemAttr = $aTemplate->headTag()->attributes();
 				
@@ -517,6 +532,13 @@ class WidgetCompiler extends NodeCompiler
 				}
 				$sTemplateSignature = "'".$aDev->templateSignature()."'" ;
 			}
+			*/
+			if( $aAttrs->has('subtemplate') ){
+				$sSubTemplate = $aAttrs->get('subtemplate');
+				
+				$sTemplateSignature = "'".$aDev->templateSignature()."'" ;
+			}
+			
 			if( $aAttrs->has('template') ){
 				$sTemplate = $aAttrs->get('template') ;
 			}
