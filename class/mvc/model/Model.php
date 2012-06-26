@@ -318,7 +318,11 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 	        if(! is_array($row)) return FALSE;
 	        $arr_field[] = $row[$field];
 	    }
-	    array_multisort($arr_field,$sort_type,$this->arrData);
+	    
+	    if(is_array($arr_field) && is_array($this->arrData))
+	    {
+	        array_multisort($arr_field,$sort_type,$this->arrData);
+	    }
 	}
 	
 	/*

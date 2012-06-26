@@ -79,6 +79,7 @@ class Selecter extends Executor
 					. $this->makeOrderByClause($arrPrototype)
 					. $this->makeLimitClause($arrPrototype) . " ; \r\n" ;
 		 
+		 //echo "<pre>";print_r($sSql);echo "</pre>";
 		 return $sSql;
 	}
 
