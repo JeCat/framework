@@ -40,7 +40,11 @@ use org\jecat\framework\pattern\composite\Composite;
 use org\jecat\framework\lang\Exception;
 
 /**
- * 
+ * preprocess的步骤
+ *     -.new
+ *     -.setId
+ *     -.addWidget
+ *     -.buildBean
  */
 class WidgetCompiler extends NodeCompiler
 {
@@ -227,6 +231,15 @@ class WidgetCompiler extends NodeCompiler
 			$arrWidgetClass[ $sWidgetVarName ] = $__widget_class ;
 			
 			$aObjectContainer->properties()->set('arrWidgetClass',$arrWidgetClass );
+			
+			$aDev->putCode("	{$sWidgetVarName} ->setId(\"${sWidgetId}\");",'preprocess');
+			
+			if( $aAttrs->has('exchange') ){
+				$sExchangeName = $aAttrs->get('exchange') ;
+				$aDev->putCode("	\$theView->addWidget({$sWidgetVarName},{$sExchangeName});",'preprocess') ;
+			}else{
+				$aDev->putCode("	\$theView->addWidget({$sWidgetVarName},\"{$sName}\");",'preprocess') ;
+			}
 			return $aAttrs->get('bean.id') ;
 		}else{
 			if( $aAttrs->has('id') ){
@@ -311,14 +324,7 @@ class WidgetCompiler extends NodeCompiler
 			$aDev->putCode("	{$sWidgetVarName}->buildBean( \$arrBean ); ",'preprocess');
 		}
 		
-		if( !$aAttrs->has('instance') and ( !$aAttrs->has('define') or $aAttrs->bool('define') ) ){
-			if( $aAttrs->has('exchange') ){
-				$sExchangeName = $aAttrs->get('exchange') ;
-				$aDev->putCode("	\$theView->addWidget({$sWidgetVarName},{$sExchangeName});",'preprocess') ;
-			}else{
-				$aDev->putCode("	\$theView->addWidget({$sWidgetVarName});",'preprocess') ;
-			}
-		}
+		
 		
 		$aDev->putCode("	\$arrAttributes = ",'render');
 		if( isset( $arrAttr['attr'] ) ){
