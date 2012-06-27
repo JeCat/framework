@@ -864,7 +864,9 @@ class View implements IView, IBean, IAssemblable
     	return isset(self::$arrRegisteredViews[$sId])? self::$arrRegisteredViews[$sId]: null ; 
     }
     
-
+	public function setId($sId){
+    	$this->sId = $sId;
+    }
 
     /**
      * @return IVew
