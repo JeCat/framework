@@ -463,9 +463,27 @@ class Controller extends NamableComposite implements IBean
     public function mainRun ()
     {
     	// 触发创建 frame (控制器的执行过程可能需要frame)
-    	$this->frame() ;
+    	$aFrame = $this->frame() ;
     	
-		self::processController($this) ;
+    	try{
+			self::processController($this) ;
+    	}
+    	catch (ExceptionRelocation $e)
+    	{
+    		// 建立 relocation 视图
+    		$aViewRelocater = new View("org.jecat.framework:Relocater.html") ;
+    		$aViewRelocater->variables()->set('flashSec',$e->flashSec()) ;
+    		$aViewRelocater->variables()->set('url',$e->url()) ;
+    		
+    		if($aFrame)
+    		{
+    			$aFrame->viewContainer()
+	    				->unassemble($this->view())
+	    				->assemble($aViewRelocater) ;
+    		}
+    		
+    		$this->setView($aViewRelocater) ;
+    	}
 		
     	$this->response()->respond($this) ;
     	
@@ -491,8 +509,6 @@ class Controller extends NamableComposite implements IBean
 			
 			$aController->process() ;
     	}
-    	catch(_ExceptionRelocation $aRelocation)
-    	{}
     	catch(\Exception $e)
     	{}
     	if( $aController->bCatchOutput )
@@ -504,26 +520,16 @@ class Controller extends NamableComposite implements IBean
     		throw $e ;
     	}
 
-    	// 执行子控制器
-    	foreach($aController->iterator() as $aChild)
-    	{
-    		self::processController($aChild) ;
-    	}
+		// 执行子控制器
+		foreach($aController->iterator() as $aChild)
+		{
+			self::processController($aChild) ;
+		}
     }
     
     public function location($sUrl,$nFlashSec=3)
     {
-		// 禁用所有视图
-		$this->view()->disable() ;
-				
-		// 建立 relocation 视图
-		$aViewRelocater = new View("org.jecat.framework:Relocater.html") ;
-		$this->setView($aViewRelocater) ;
-		
-		$aViewRelocater->variables()->set('flashSec',$nFlashSec) ;
-		$aViewRelocater->variables()->set('url',$sUrl) ;
-		
-		throw new _ExceptionRelocation ;
+		throw new ExceptionRelocation($sUrl,$nFlashSec) ;
     }
 
     /**
@@ -804,6 +810,10 @@ class Controller extends NamableComposite implements IBean
     	return array('class'=>'org\\jecat\\framework\\mvc\\controller\\WebpageFrame') ;
     }
     
+    /**
+     * 
+     * @return WebpageFrame
+     */
     public function frame()
     {
     	if( !$this->aFrame and !$this->params->bool('noframe') )
@@ -1026,9 +1036,4 @@ class Controller extends NamableComposite implements IBean
     static private $nAssignedId = 0 ;
     
 }
-
-class _ExceptionRelocation extends \Exception
-{}
-
-
 
