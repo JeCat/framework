@@ -397,15 +397,11 @@ class Controller extends NamableComposite implements IBean
     		$this->bAutoCheckPermissions = $arrConfig['perms.autocheck']? true: false ;
     	}
     	
-    	
     	// process
     	if( !empty($arrConfig['process']) )
     	{
     		$this->fnProcess = $arrConfig['process'] ;
     	}
-    	
-    	// 创建 frame
-    	$this->frame() ;
     	
     	$this->arrBeanConfig = $arrConfig ;
     }
@@ -466,6 +462,9 @@ class Controller extends NamableComposite implements IBean
      */
     public function mainRun ()
     {
+    	// 触发创建 frame (控制器的执行过程可能需要frame)
+    	$this->frame() ;
+    	
 		self::processController($this) ;
 		
     	$this->response()->respond($this) ;
