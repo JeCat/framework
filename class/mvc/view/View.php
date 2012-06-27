@@ -165,6 +165,17 @@ class View implements IView, IBean, IAssemblable
     			$this->add( $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ) ;
     		}
     	}
+    	
+    	// template
+    	if( !empty($arrConfig['template']) )
+    	{
+    		// 在文件名前 加上命名空间
+    		if( $sNamespace!=='*' and strstr($arrConfig['template'],':')===false )
+    		{
+    			$arrConfig['template'] = $sNamespace.':'.$arrConfig['template'] ;
+    		}
+    		$this->setTemplate( $arrConfig['template'], false );
+    	}
     		
     	// widgets
     	if(!empty($arrConfig['widgets']))
@@ -209,19 +220,12 @@ class View implements IView, IBean, IAssemblable
     	{
     		$this->hideForm( $arrConfig['hideForm']?true:false ) ;
     	}
-		
-		// template
+
+    	// load template
 		if( !empty($arrConfig['template']) )
 		{
-			// 在文件名前 加上命名空间
-			if( $sNamespace!=='*' and strstr($arrConfig['template'],':')===false )
-			{
-				$arrConfig['template'] = $sNamespace.':'.$arrConfig['template'] ;
-			}
-			
-			$this->setTemplate( $arrConfig['template'] );
+			$this->loadTemplate() ;
 		}
-
     	
     	$this->arrBeanConfig = $arrConfig ;
     }
@@ -322,24 +326,28 @@ class View implements IView, IBean, IAssemblable
 	/**
 	 * @return IView
 	 */
-	public function setTemplate($sTemplate)
+	public function setTemplate($sTemplate,$bLoad=true)
 	{
-		if($sTemplate)
+		if( $this->sSourceFile=$sTemplate and $bLoad )
 		{
-			if( $this->sSourceFile )
-			{
-				throw new Exception("由于视图依赖模板文件的预处理过程完成视图的初始化，因此不能重复设置视图的模板文件") ;
-			}
-		
+			$this->loadTemplate() ;
+		}
+		return $this ;
+	}
+	public function loadTemplate()
+	{
+		if( $this->sTemplateSingature )
+		{
+			throw new Exception("由于视图依赖模板文件的预处理过程完成视图的初始化，因此不能重复设置视图的模板文件") ;
+		}
+		if( $this->sSourceFile )
+		{
 			// compile
-			$this->sTemplateSingature = $this->ui()->loadCompiled($sTemplate) ;
-			
+			$this->sTemplateSingature = $this->ui()->loadCompiled($this->sSourceFile) ;
+				
 			// 预处理
 			$this->ui()->render($this->sTemplateSingature,$this->variables(),null,'preprocess') ;
 		}
-
-		$this->sSourceFile = $sTemplate ;
-		
 		return $this ;
 	}
 
