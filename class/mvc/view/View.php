@@ -374,7 +374,7 @@ class View implements IView, IBean, IAssemblable
 		
 		$sWrapperClasses = $this->arrWrapperClasses ? ' class="'.implode(' ', $this->arrWrapperClasses).'"': '' ;
 		$sWrapperStyle = $this->sWrapperStyle ?  " style=\"{$this->sWrapperStyle}\"": '' ;
-		$sXPath = $this->xpath(false) ;
+		$sXPath = $this->xpath(true) ;
 		$sId = $this->id() ;
 		
 		$aDevice->write("\r\n<div id=\"{$sId}\" xpath=\"{$sXPath}\" {$sWrapperClasses}{$sWrapperStyle}>\r\n") ;
