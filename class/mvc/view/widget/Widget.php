@@ -25,6 +25,7 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\mvc\view\widget ;
 
+use org\jecat\framework\util\EventManager;
 use org\jecat\framework\bean\BeanFactory;
 use org\jecat\framework\bean\IBean;
 use org\jecat\framework\util\StopFilterSignal;
@@ -40,6 +41,8 @@ use org\jecat\framework\lang\Object;
 
 class Widget extends Object implements IViewWidget, IBean , IShortableBean
 {	
+	const beforeBuildBean = 'beforeBuildBean' ;
+	
 	public function __construct($sId=null,$sTemplateName=null,$sTitle=null,IView $aView=null)
 	{
 		parent::__construct() ;
@@ -105,6 +108,12 @@ class Widget extends Object implements IViewWidget, IBean , IShortableBean
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
+		// 触发事件
+		$sObjectId = ($aView=$this->view())? ($aView->template().'-'.$this->id()): '-'.$this->id() ;
+		$arrArgvs = array(&$arrConfig,&$sNamespace,$aBeanFactory) ;		
+		EventManager::singleton()->emitEvent(__CLASS__,self::beforeBuildBean,$arrArgvs,$sObjectId) ;
+		
+		
 		if( !empty($arrConfig['id']) )
 		{
 			$this->setId($arrConfig['id']) ;

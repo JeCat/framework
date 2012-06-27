@@ -180,7 +180,7 @@ class WidgetCompiler extends NodeCompiler
 			$__widget_class = \org\jecat\framework\bean\BeanFactory::singleton()->beanClassNameByAlias($sClassName)?: $sClassName ;
 			
 			$aDev->putCode("if( !class_exists('$__widget_class') ){",'preprocess') ;
-			$aDev->output("缺少 widget (class:{$sClassName})",'preprocess') ;
+			$aDev->output("无效的 widget 类:{$sClassName} (template:".$aObjectContainer->templateName().")",'preprocess') ;
 			
 			if( !$aAttrs->has('define') or !$aAttrs->bool('define') ){
 				$aDev->putCode("}else if( \$theView->widget(",'preprocess');
@@ -188,7 +188,6 @@ class WidgetCompiler extends NodeCompiler
 				$aDev->putCode(") ){",'preprocess');
 				$aDev->putCode("	//已经定义过了",'preprocess');
 			}
-			
 			
 			$aDev->putCode("}else{",'preprocess') ;
 			$aDev->putCode("	{$sWidgetVarName} = new $__widget_class ;",'preprocess') ;
