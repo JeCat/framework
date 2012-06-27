@@ -137,7 +137,7 @@ class Controller extends NamableComposite implements IBean
      * @example /Bean/合并Bean配置
      * @forwiki /Bean/合并Bean配置
      */
-    static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
+    static public function createBean(array & $arrConfig,$sNamespace='*',$bBuildAtOnce=true,\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
     {
 		$sClass = get_called_class() ;
 		$aBean = new $sClass(null,null,false) ;
