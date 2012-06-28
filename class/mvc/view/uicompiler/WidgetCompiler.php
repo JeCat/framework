@@ -171,6 +171,9 @@ class WidgetCompiler extends NodeCompiler
 		case 'select':
 			$sClassName = 'select';
 			break;
+		case 'menu':
+			$sClassName = 'menu';
+			break;
 		}
 		
 		if( $sType !== null ){
@@ -317,12 +320,14 @@ class WidgetCompiler extends NodeCompiler
 			unset($arrSubAttr);
 		}
 		
+		/*
 		if( isset( $arrAttr['bean'] ) ){
 			$aDev->putCode("	\$arrBean = ",'preprocess');
 			$this->writeAttrPri( $arrAttr['bean'] , $aDev , 1 , 'preprocess' );
 			$aDev->putCode("	;",'preprocess');
 			$aDev->putCode("	{$sWidgetVarName}->buildBean( \$arrBean ); ",'preprocess');
 		}
+		*/
 		
 		
 		
@@ -358,8 +363,17 @@ class WidgetCompiler extends NodeCompiler
 	}
 	
 	protected function writeBean(IObject $aObject ,ObjectContainer $aObjectContainer , TargetCodeOutputStream $aDev ,CompilerManager $aCompilerManager , $sWidgetVarName){
-		// bean
-		$arrBean = $this->writeBeanPri( $aObject , $aObjectContainer , $aDev , $aCompilerManager );
+		$sBeanSource = $this->transBeanSource($aObject,$aObjectContainer,$aDev,$aCompilerManager);
+		
+		$aXmlEle = simplexml_load_string($sBeanSource);
+		
+		if( !$aXmlEle ){
+			throw new Exception(
+				'xml文档格式错误'
+			);
+		}
+		
+		$arrBean = $this->transBeanArray($aXmlEle);
 		
 		if( $aBean = $aObject->getChildNodeByTagName('bean') ){
 			$arrBean = array_merge(
@@ -371,13 +385,104 @@ class WidgetCompiler extends NodeCompiler
 		}
 		
 		if( count($arrBean) > 0 ){
-			$aDev->putCode("	\$arrFormer = {$sWidgetVarName}->beanConfig(); ",'preprocess');
-			$aDev->putCode("	\$arrBean = ",'preprocess');
-			$this->writeAttrPri( $arrBean , $aDev , 1 , 'preprocess' );
-			$aDev->putCode("	;",'preprocess');
-			$aDev->putCode("	\\org\\jecat\\framework\\bean\\BeanFactory::mergeConfig(\$arrFormer, \$arrBean); ",'preprocess');
-			$aDev->putCode("	{$sWidgetVarName}->buildBean( \$arrFormer ); ",'preprocess');
+			$aDev->putCode("	\$arrBean = ".str_replace('---------',':',var_export($arrBean,true)).";",'preprocess');
+			$aDev->putCode("	{$sWidgetVarName}->buildBean( \$arrBean ); ",'preprocess');
 		}
+	}
+	
+	private function transBeanSource(Node $aNode,ObjectContainer $aObjectContainer , TargetCodeOutputStream $aDev ,CompilerManager $aCompilerManager){
+		$sSource = '' ;
+		$sSource.= $aNode->headTag()->source();
+		
+		foreach( $aNode->childElementsIterator() as $aChild ){
+			if( $aChild instanceof Node ){
+				$sTagName = $aChild->tagName() ;
+				$aAttrs = $aChild->attributes() ;
+				
+				switch($sTagName){
+				case 'template':
+					if( ! $aAttrs->has('name') ){
+						$sTemName = '__subtemplate_'.md5(rand()) ;
+						$aAttrs->set('name' , $sTemName ) ;
+						$aChild->headTag()->setAttributes($aAttrs) ;
+					}else{
+						$sTemName = $aAttrs->string('name');
+					}
+					
+					$sSource.= '<subtemplate bean.type="attr">'.$sTemName.'</subtemplate>';
+					$sSource.= '<template bean.type="attr">'.$aObjectContainer->ns().':'.$aObjectContainer->templateName().'</template>';
+					break;
+				default:
+					$sSource .= $this->transBeanSource($aChild,$aObjectContainer,$aDev,$aCompilerManager);
+					break;
+				}
+				$aCompiler = $aCompilerManager->compiler(
+					$aChild
+				);
+				$aCompiler->compile(
+					$aChild
+					, $aObjectContainer
+					, $aDev
+					, $aCompilerManager
+				);
+			}else{
+				$sSource .= $aChild->source() ;
+			}
+		}
+		
+		if( $aNode->tailTag() ){
+			$sSource.= $aNode->tailTag()->source();
+		}
+		
+		// replace '&' to '&amp;';
+		$sSource = str_replace(
+			array('&',':'),
+			array('&amp;','---------'),
+			$sSource
+		);
+		return $sSource;
+	}
+	
+	private function transBeanArray(\SimpleXMLElement $aXmlEle){
+		$arrRtn = array() ;
+		
+		$sText = trim((string)$aXmlEle);
+		if(! empty($sText) ){
+			$arrRtn['text'] = $sText ;
+		}
+		
+		// attributes
+		foreach($aXmlEle->attributes() as $key => $value ){
+			$arrRtn[ $key ] = (string)$value ;
+		}
+		
+		// children
+		foreach($aXmlEle->children() as $key => $value){
+			if( $value instanceof \SimpleXMLElement ){
+				$arrChildArray = $this->transBeanArray($value);
+				
+				if( isset($arrChildArray['bean.type'] ) ){
+					$sBeanType = $arrChildArray['bean.type'] ;
+					unset( $arrChildArray['bean.type'] );
+					switch($sBeanType){
+					case 'attr':
+						$arrRtn[ $key ] = $arrChildArray['text'];
+						break;
+					case 'array':
+						$arrRtn[ $key ] [] = $arrChildArray['text'];
+						break;
+					case 'optn':
+					default:
+						$arrRtn[ $key ][] = $arrChildArray;
+					}
+				}else{
+					$arrRtn[ $key ][] = $arrChildArray;
+				}
+			}else{
+			}
+		}
+		
+		return $arrRtn ;
 	}
 	
 	static private $arrEscapeTagName = array(
@@ -408,7 +513,27 @@ class WidgetCompiler extends NodeCompiler
 						$arrChildBean[$sName] = $aAttrs->get($sName) ;
 					}
 					
-					$arrRtn[$sTagName][] = $arrChildBean ;
+					if( isset( $arrChildBean['bean.type'] ) ){
+						
+						// 删除两边的引号
+						$sNodeType = trim( $arrChildBean['node.type'] , '"' );
+						unset( $arrChildBean['bean.type'] );
+						
+						switch( $sNodeType ){
+						case 'attr':
+							$arrRtn[$sTagName] = $arrChildBean['text'] ;
+							break;
+						case 'array':
+							$arrRtn[$sTagName][] = $arrChildBean['text'];
+							break;
+						case 'optn':
+						default:
+							$arrRtn[$sTagName][] = $arrChildBean ;
+							break;
+						}
+					}else{
+						$arrRtn[$sTagName][] = $arrChildBean ;
+					}
 					
 					$aNode->remove($aChild);
 				}else{
