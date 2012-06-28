@@ -403,8 +403,6 @@ class Menu extends AbstractBase
 		}
 		else if( isset( $arrAttr['showDepths'] ) and $showDepths = (int)$arrAttr['showDepths'] and $showDepths > 0)
 		{
-			$arrAttr['showDepths'] = $showDepths -1 ;
-			$aVariables->set('attr',$arrAttr);
 			parent::display(
 				$aUI
 				,$aVariables
@@ -425,22 +423,13 @@ class Menu extends AbstractBase
 		}
 	}
 	
-	public function showDepths()
+	public function showDepths(array $arrAttr)
 	{
-		$showDepths = $this->attribute('showDepths') ;
-		if($showDepths===null)
-		{
-			if( $aParentMenu = $this->parentMenu() )
-			{
-				return $aParentMenu->showDepths() - 1 ;
-			}
-			else
-			{
-				return 10000 ;
-			}
+		if( isset($arrAttr['showDepths'] ) ){
+			return (int) $arrAttr['showDepths'] ;
+		}else{
+			return 10000;
 		}
-		
-		return (int) $showDepths ;
 	}
 	
 	public function isActive()
@@ -475,8 +464,8 @@ class Menu extends AbstractBase
 		return $b ;
 	}
 	
-	public function isShowOnMouseOver(){
-		return $this->showDepths() > 0 ;
+	public function isShowOnMouseOver(array $arrAttr){
+		return $this->showDepths($arrAttr) >= 0 ;
 	}
 	
 	public function generateJsCode()

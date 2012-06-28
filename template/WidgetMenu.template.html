@@ -3,10 +3,10 @@
 	{=$theWidget->getCssClassString()}
 	tearoff="{=$theWidget->isTearoff()?'on':'off'}"
 	direction="{=$theWidget->getDirection()}"
-	showOnMouseOver="{=$theWidget->isShowOnMouseOver()?'on':'off'}"
-	showDepth="{=$theWidget->showDepths()}" >
+	showOnMouseOver="{=$theWidget->isShowOnMouseOver($attr)?'on':'off'}"
+	showDepth="{=$theWidget->showDepths($attr)}" >
 <foreach for='$theWidget->itemIterator()' item='aItem'>
-	<widget instance='$aItem' e:attr.showDepths="isset($attr['showDepths'])?$attr['showDepths']:null" />
+	<widget instance='$aItem' e:attr.showDepths="isset($attr['showDepths'])?$attr['showDepths']-1:null" />
 </foreach>
 <li class="clear"></li>
 </ul>

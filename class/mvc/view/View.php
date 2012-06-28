@@ -995,6 +995,19 @@ class View implements IView, IBean, IAssemblable
     	// 记录装配状态
     	$aView->setAssembledParent($this) ;
     	$aView->setAssembledLevel($nLevel) ;
+    	//纵向frame?
+    	if( in_array( 'jc-frame-vertical' ,$this->wrapperClasses()) )
+    	{
+    		$aView->removeWrapperClasses("jc-layout-item-horizontal");
+    		$aView->removeWrapperClasses('jc-layout-item-vertical');
+    		$aView->addWrapperClasses('jc-layout-item-vertical');
+    	}
+    	//横向frame?
+    	else if( in_array( 'jc-frame-horizontal' ,$this->wrapperClasses())) {
+    		$aView->removeWrapperClasses("jc-layout-item-horizontal");
+    		$aView->removeWrapperClasses('jc-layout-item-vertical');
+    		$aView->addWrapperClasses('jc-layout-item-horizontal');
+    	}
     	
     	$this->arrAssembleList[] = $aView ;
     	
@@ -1042,6 +1055,10 @@ class View implements IView, IBean, IAssemblable
     	{
     		unset($this->arrAssembleList[$pos]) ;
     	}
+    	
+    	$aView->removeWrapperClasses("jc-layout-item-horizontal");
+    	$aView->removeWrapperClasses('jc-layout-item-vertical');
+    	
     	$aView->setAssembledParent(null) ;
     	$aView->setAssembledLevel(IAssemblable::free) ;
     	return $this ;

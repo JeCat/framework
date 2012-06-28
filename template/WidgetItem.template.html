@@ -13,7 +13,7 @@
 		</div>
 	</if>
 	
-	<if "$theWidget->isDisplaySubMenu()" >
+	<if "$theWidget->subMenu() and $attr['showDepths'] > 0" >
 		<widget instance="$theWidget->subMenu()" e:attr.showDepths="$attr['showDepths']" />
 	</if>
 </li>

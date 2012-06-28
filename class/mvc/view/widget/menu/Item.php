@@ -119,10 +119,12 @@ class Item extends AbstractBase
 			{
 				$arrConfig['link'] = '?c=' . $arrConfig['controller'] ;
 			}
+			/*
 			if(empty($arrConfig['query']))
 			{
 				$arrConfig['query'] = '?c=' . $arrConfig['controller'] ;
 			}
+			*/
 		}
 		
 		if( !empty( $arrConfig['link'])){
@@ -284,6 +286,8 @@ class Item extends AbstractBase
 		if($this->isActive())
 		{
 			$arrClass[] = parent::CSS_CLASS_BASE.'-item-active' ;
+		}else if($this->isBubblingActive()){
+			$arrClass[] = parent::CSS_CLASS_BASE.'-item-bubblingactive' ;
 		}
 		return 'class ="'.implode(' ',$arrClass).'"';
 	}
