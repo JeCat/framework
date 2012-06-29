@@ -99,20 +99,13 @@ class Menu extends AbstractBase
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
 	{
 		parent::buildBean($arrConfig,$sNamespace);
-		foreach($arrConfig as $key=>$value){
-			if(
-				preg_match('`^item:(.*)$`',$key,$arrMatch) 
-				
-				// 用xml配置bean的时候不能使用冒号，只能用减号代替
-				or preg_match('`^item-(.*)$`',$key,$arrMatch)
-			){
-				$sItemName = $arrMatch[1] ;
-				
-				if( is_array( $value ) ){
-					$this->buildItemFromBean( $value , $sItemName );
-				}
-			}
-		}
+
+		$aBeanFactory = $aBeanFactory ?: BeanFactory::singleton() ;
+		
+		// items
+		$aBeanFactory->_typeKeyStruct($arrConfig,array(
+				'item:'=>'item' ,
+		)) ;
 		if( isset( $arrConfig['item'] ) and is_array( $arrConfig['item'] ) ){
 			foreach($arrConfig['item'] as $item){
 				$this->buildItemFromBean($item);
