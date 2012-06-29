@@ -398,7 +398,7 @@ class View implements IView, IBean, IAssemblable
 		
 		if( $this->sFrameType===IAssemblable::horizontal )
 		{
-			$aDevice->write("<div class='jc-layout-item-end'>") ;
+			$aDevice->write("<div class='jc-layout-item-end'></div>") ;
 		}
 		
 		$aDevice->write("</div>\r\n") ;
@@ -1126,17 +1126,21 @@ class View implements IView, IBean, IAssemblable
 	{
 		if( $sType )
 		{
+			$this->removeWrapperClasses('jc-frame-horizontal') ;
+			$this->removeWrapperClasses('jc-frame-vertical') ;
+			$this->removeWrapperClasses('jc-view') ;
+			
 			$this->addWrapperClasses('jc-frame') ;
 			$this->addWrapperClasses($sType) ;
-			$this->removeWrapperClasses('jc-view') ;
 		}
 		else
 		{
-			$this->addWrapperClasses('jc-view') ;
+			$this->removeWrapperClasses('jc-frame-horizontal') ;
+			$this->removeWrapperClasses('jc-frame-vertical') ;
 			$this->removeWrapperClasses('jc-frame') ;
-			$this->removeWrapperClasses($this->sFrameType) ;
+			
+			$this->addWrapperClasses('jc-view') ;
 		}
-
 		$this->sFrameType = $sType ;
 		
     	return $this ;
