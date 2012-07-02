@@ -427,7 +427,7 @@ class Folder extends FSO
 			if($res == '.' || $res == '..') continue;
 			
 			if(is_dir($source . '/' . $res)){
-				RecursiveCopy($source . '/' . $res, $dest, $diffDir . '/' . $res);
+				self::RecursiveCopy($source . '/' . $res, $dest, $diffDir . '/' . $res);
 			}else{
 				copy($source . '/' . $res, $dest . '/' . $diffDir . '/' . $res);
 			}
