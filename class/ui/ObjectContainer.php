@@ -28,7 +28,7 @@ namespace org\jecat\framework\ui ;
 
 class ObjectContainer extends Object
 {
-	public function __construct($sTemplateName=null,$sNamespace='*',$sTemplateSignature)
+	public function __construct($sTemplateName=null,$sNamespace='*',$sTemplateSignature=null)
 	{
 		$this->sTemplateName = $sTemplateName ;
 		$this->sNamespace = $sNamespace ;

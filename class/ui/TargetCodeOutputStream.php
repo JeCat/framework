@@ -32,9 +32,10 @@ use org\jecat\framework\io\IOutputStream;
 
 class TargetCodeOutputStream extends \org\jecat\framework\lang\Object
 {
-	public function __construct($sTemplateSignature)
+	public function __construct($sTemplateSignature,$bIntact)
 	{
 		$this->sTemplateSignature = $sTemplateSignature ;
+		$this->bIntact = $bIntact ;
 	}
 			
 	public function bufferBytes($bClear=true)
@@ -132,11 +133,18 @@ class TargetCodeOutputStream extends \org\jecat\framework\lang\Object
 	
 	public function generateCompiled()
 	{
-		$sTemplateCompiled = "<?php\r\n" ;
-		$sTemplateCompiled.= "use org\\jecat\\framework as jc ;\r\n" ;
-		
-		$sTemplateCompiled.= "\r\n" ;
-		$sTemplateCompiled.= "define('{$this->sTemplateSignature}',__FILE__) ;\r\n" ;
+		if( $this->bIntact )
+		{
+			$sTemplateCompiled = "<?php\r\n" ;
+			$sTemplateCompiled.= "use org\\jecat\\framework as jc ;\r\n" ;
+			
+			$sTemplateCompiled.= "\r\n" ;
+			$sTemplateCompiled.= "define('{$this->sTemplateSignature}',__FILE__) ;\r\n" ;
+		}
+		else
+		{
+			$sTemplateCompiled = "" ;
+		}
 
 		foreach(array_keys($this->arrOutputBuffers) as $sSubTempName)
 		{
@@ -212,6 +220,7 @@ class TargetCodeOutputStream extends \org\jecat\framework\lang\Object
 	private $arrDeclareVariables = array() ;
 	
 	private $sTemplateSignature ;
+	private $bIntact = true ;
 
 	private $sDefaultSubTemplate = 'render' ;
 	

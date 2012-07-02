@@ -190,29 +190,16 @@ class UI extends JcObject
 		return $sTemplateSignature ;
 	}
 	
-	public function compile(IInputStream $aSourceInput,IOutputStream $aCompiledOutput,ObjectContainer $aObjectContainer=null,$bIntact=true)
+	public function compile(IInputStream $aSourceInput,IOutputStream $aCompiledOutput,ObjectContainer $aObjectContainer,$bIntact=true)
 	{
-		/*if(!$aObjectContainer)
-		{
-			$aObjectContainer = new ObjectContainer() ;
-		}*/
-		
 		// 解析
 		$this->interpreters()->parse($aSourceInput,$aObjectContainer,$this) ;
 		
 		// 编译
-		$aTargetCodeStream = new TargetCodeOutputStream($aObjectContainer->templateSignature()) ;
-		if($bIntact)
-		{
-			// $aTargetCodeStream->start() ;
-		}
+		$aTargetCodeStream = new TargetCodeOutputStream($aObjectContainer->templateSignature(),$bIntact) ;
 		
 		$this->compilers()->compile($aObjectContainer,$aTargetCodeStream) ;
 
-		if($bIntact)
-		{
-			// $aTargetCodeStream->finish() ;
-		}
 		$aCompiledOutput->write($aTargetCodeStream->bufferBytes(true)) ;
 	}
 	

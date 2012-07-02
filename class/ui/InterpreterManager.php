@@ -49,7 +49,7 @@ class InterpreterManager extends Container
 	/**
 	 * @return IObject
 	 */
-	public function parse(IInputStream $aSourceInput,ObjectContainer $aObjectContainer,UI $aUI)
+	public function parse(IInputStream $aSourceInput,ObjectContainer $aObjectContainer,UI $aUI=null)
 	{
 		$aSource = new String ;
 		$aSourceInput->readInString($aSource) ;

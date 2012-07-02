@@ -99,7 +99,12 @@ class Patch
 		if( $this->nKind==self::code )
 		{
 			$aOutput = new OutputStreamBuffer() ;
-			$aUi->compile(new InputStreamCache($this->sCode),$aOutput,null,false) ;
+			$aUi->compile(
+					new InputStreamCache($this->sCode)
+					, $aOutput
+					, new ObjectContainer(null,'*',md5($this->sCode))
+					, false
+			) ;
 			
 			$this->aCompiled = new String($aOutput->bufferBytes()) ;
 		}
