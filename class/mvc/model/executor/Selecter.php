@@ -93,13 +93,18 @@ class Selecter extends Executor
 
 	private function makeColumnList(array & $arrPrototype)
 	{
-		$sPrefix = $arrPrototype['xpath']? ($arrPrototype['xpath'].'.'): '' ;
+	    if(!empty($arrPrototype['type']) && ( $arrPrototype['type'] == Prototype::hasMany || $arrPrototype['type'] == Prototype::hasAndBelongsToMany ))
+	    {
+	        $sPrefix = '' ;
+	    }else {
+    		$sPrefix = $arrPrototype['xpath']? ($arrPrototype['xpath'].'.'): '' ;
+	    }
 		
 		$arrColunms = $arrPrototype['columns'] ;
 		
 		foreach($arrColunms as &$sColumn)
 		{
-			$sColumn = "`{$arrPrototype['name']}`.`{$sColumn}` as `{$sColumn}`" ;
+			$sColumn = "`{$arrPrototype['name']}`.`{$sColumn}` as `{$sPrefix}{$sColumn}`" ;
 		}
 		return implode("\r\n	, ",$arrColunms) ;
 	}
