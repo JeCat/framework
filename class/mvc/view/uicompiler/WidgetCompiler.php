@@ -485,7 +485,12 @@ class WidgetCompiler extends NodeCompiler
 						}
 					}
 				}else{
-					$arrRtn[ $key ][] = $arrChildArray;
+					if( isset( $arrChildArray['id'] ) ){
+						$sId = (string) $arrChildArray['id'] ;
+						$arrRtn[ $key ] [ $sId ] = $arrChildArray;
+					}else{
+						$arrRtn[ $key ] [] = $arrChildArray;
+					}
 				}
 			}else{
 			}
