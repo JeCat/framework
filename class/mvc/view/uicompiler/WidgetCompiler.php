@@ -468,12 +468,21 @@ class WidgetCompiler extends NodeCompiler
 					case 'attr':
 						$arrRtn[ $key ] = $arrChildArray['text'];
 						break;
-					case 'array':
-						$arrRtn[ $key ] [] = $arrChildArray['text'];
+					case 'string':
+						if( isset( $arrChildArray['id'] ) ){
+							$sId = (string) $arrChildArray['id'] ;
+							$arrRtn[ $key ] [ $sId ] = $arrChildArray['text'];
+						}else{
+							$arrRtn[ $key ] [] = $arrChildArray['text'];
+						}
 						break;
-					case 'optn':
 					default:
-						$arrRtn[ $key ][] = $arrChildArray;
+						if( isset( $arrChildArray['id'] ) ){
+							$sId = (string) $arrChildArray['id'] ;
+							$arrRtn[ $key ] [ $sId ] = $arrChildArray;
+						}else{
+							$arrRtn[ $key ] [] = $arrChildArray;
+						}
 					}
 				}else{
 					$arrRtn[ $key ][] = $arrChildArray;
