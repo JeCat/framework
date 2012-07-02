@@ -414,7 +414,23 @@ class Folder extends FSO
 	{
 		return parent::singleton($bCreateNew,$createArgvs,$sClass?:__CLASS__) ;
 	}
-} 
-
-
-
+	
+	/**
+	 * @return bool
+	 */
+	static public function RecursiveCopy($source, $dest, $diffDir = ''){
+		$sourceHandle = opendir($source);
+		
+		@mkdir($dest . '/' . $diffDir,0755,true);
+		
+		while($res = readdir($sourceHandle)){
+			if($res == '.' || $res == '..') continue;
+			
+			if(is_dir($source . '/' . $res)){
+				RecursiveCopy($source . '/' . $res, $dest, $diffDir . '/' . $res);
+			}else{
+				copy($source . '/' . $res, $dest . '/' . $diffDir . '/' . $res);
+			}
+		}
+	}
+}
