@@ -99,7 +99,7 @@ class UIFactory extends UIFactoryBase
 			//foreach
 			$aNodeCompiler->addSubCompiler('foreach',__NAMESPACE__."\\compiler\\node\\ForeachCompiler") ;
 			//loopelse
-			$aNodeCompiler->addSubCompiler('foreach:else',__NAMESPACE__."\\compiler\\node\\LoopelseCompiler") ;
+			$aNodeCompiler->addSubCompiler('foreach:else',__NAMESPACE__."\\compiler\\node\\LoopElseCompiler") ;
 			$aNodeCompiler->addSubCompiler('while:else',__NAMESPACE__."\\compiler\\node\\LoopelseCompiler") ;
 			$aNodeCompiler->addSubCompiler('dowhile:else',__NAMESPACE__."\\compiler\\node\\LoopelseCompiler") ;
 			$aNodeCompiler->addSubCompiler('do:else',__NAMESPACE__."\\compiler\\node\\LoopelseCompiler") ;

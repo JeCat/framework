@@ -115,6 +115,7 @@ class LoopCompiler extends NodeCompiler
 for( {$sVarAutoName} = ") ;
 		$aDev->putCode ($aStartValue) ;
 		$aDev->putCode (" ; {$sVarAutoName} <= {$sEndName} ; {$sVarAutoName} += {$sStepName} ){
+	{ // 循环统一使用2层括号
 \$bLoopIsEnableToRun = & \$aStackForLoopIsEnableToRun->getRef();
 \$bLoopIsEnableToRun = true;  
 " );
