@@ -99,7 +99,7 @@ class Selecter extends Executor
 		
 		foreach($arrColunms as &$sColumn)
 		{
-			$sColumn = "`{$arrPrototype['name']}`.`{$sColumn}` as `{$sPrefix}{$sColumn}`" ;
+			$sColumn = "`{$arrPrototype['name']}`.`{$sColumn}` as `{$sColumn}`" ;
 		}
 		return implode("\r\n	, ",$arrColunms) ;
 	}
