@@ -276,7 +276,7 @@ class Response extends Object
 	private function printDebugModelStruct(Controller $aController,$sModelName)
 	{
 		$this->device()->write( "<div style='padding-top:10px'><h4>[模型：{$sModelName}]</h4>" ) ;
-		if( $aModel=$aController->modelByName($sModelName) )
+		if( $aModel=$aController->model($sModelName) )
 		{
 			$this->device()->write( "<pre>" ) ;
 			$aModel->printStruct($this->device()) ;

@@ -53,17 +53,17 @@ use org\jecat\framework\ui\ObjectContainer;
  *  [example php frameworktest template/test-template/node/LoopElseCase.html 1 6]
  */
 
-class LoopelseCompiler extends NodeCompiler 
+class LoopElseCompiler extends NodeCompiler 
 {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{		
 		Type::check("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject) ;
 
-		$aDev->putCode("
-					} 
-					if(!\$aStackForLoopIsEnableToRun->get())
-					{
-					");
+		// 循环统一使用2层括号
+		$aDev->putCode("\r\n\t}\r\n}
+if(!\$aStackForLoopIsEnableToRun->get())
+{
+	{");
 	}
 }
 

@@ -41,6 +41,16 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 	{
 	    return new self($table,$sPrototypeName,$primaryKeys,$columns) ;
 	}
+
+	/**
+	 * @alias org\jecat\framework\mvc\model\Prototype::setKeys
+	 * @return Model
+	 */
+	public function setKeys($keys)
+	{
+		$this->prototype()->setKeys($keys) ;
+		return $this ;
+	}
 	
 	/**
 	 * @alias org\jecat\framework\mvc\model\Prototype::addOrder
