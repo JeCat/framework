@@ -137,7 +137,7 @@ class Patch
 					$nPos = 0 ;
 					foreach($aPatchObjectContainer->iterator() as $aObject)
 					{
-						$aTargetObject->insertAfterByPosition($nPos++,$aObject) ;
+						$aTargetObject->insertBeforeByPosition($nPos++,$aObject) ;
 					}
 					break ;
 					
