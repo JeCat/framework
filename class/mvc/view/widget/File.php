@@ -106,12 +106,7 @@ class File extends FormWidget
 		
 		if (array_key_exists ( 'folder', $arrConfig ))
 		{
-			$folder = $arrConfig['folder'] ;
-			if( $folder instanceof Folder ){
-				$this->aStoreFolder = $folder ;
-			}else{
-				$this->aStoreFolder = Folder::singleton()->findFolder($arrConfig['folder'],Folder::FIND_AUTO_CREATE);
-			}
+			$this->setStoreFolder( $arrConfig['folder'] );
 		}
 		if (array_key_exists ( 'fullpath', $arrConfig ))
 		{
@@ -352,6 +347,14 @@ class File extends FormWidget
 				'strategy' => 'bean.strategy' ,
 			)
 		);
+	}
+	
+	public function setStoreFolder($folder){
+		if( $folder instanceof Folder ){
+			$this->aStoreFolder = $folder ;
+		}else{
+			$this->aStoreFolder = Folder::singleton()->findFolder($folder,Folder::FIND_AUTO_CREATE);
+		}
 	}
 	
 	private $aAchiveStrategy;
