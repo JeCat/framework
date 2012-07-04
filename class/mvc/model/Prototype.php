@@ -309,6 +309,7 @@ class Prototype implements \Serializable
 	}
 	/**
 	 * 设置一组 where 条件
+	 * 指定表名有两种方法。1、$sTable参数;2、$where条件中以aaa.bbb形式带入。第二种方式权重更高。
 	 * @return Prototype
 	 */
 	public function addWhere($where,$sTable)
@@ -328,18 +329,22 @@ class Prototype implements \Serializable
 	    if(is_array($where))
 	    {
 	        for($i = 0; $i < sizeof($where); $i++){
-	            
-	            $arrPrototype = & $this->arrPrototype;
-	            $arrPrototype['where'][] = $where[$i] ;
-	            
-	            /*$aWhere = explode(".", $where[$i]);
+	            $aWhere = explode(".", $where[$i]);
 	            if(count($aWhere) == 2){
 	                $arrPrototype = & $this->refRaw($aWhere[0]);
-	                $arrPrototype['where'][] = $aWhere[1] ;
+	                
+	                /**
+	                 * 特殊情况。如果指定的表名是顶层，就应用整个where条件。否则只应用字段部分。
+	                 */
+	                if(empty($arrPrototype['type']))
+	                {
+	                    $arrPrototype['where'][] = $where[$i] ;
+	                }else {
+	                    $arrPrototype['where'][] = $aWhere[1] ;
+	                }
 	            }else {
-	                $arrPrototype = & $this->arrPrototype;
 	                $arrPrototype['where'][] = $where[$i] ;
-	            }*/
+	            }
 	        }
 	    }
 	    
@@ -604,6 +609,10 @@ class Prototype implements \Serializable
 	
 	public function & refRaw($sXPath='$')
 	{
+	    if(preg_match("/`(.*?)`/", $sXPath,$aMatch))
+	    {
+	        $sXPath = $aMatch[1];
+	    }
 		return $this->arrPrototypeShortcut[$sXPath] ;
 	}
 	
