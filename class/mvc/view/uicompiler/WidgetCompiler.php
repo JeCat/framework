@@ -378,6 +378,7 @@ class WidgetCompiler extends NodeCompiler
 		}
 		
 		$arrBean = $this->transBeanArray($aXmlEle);
+		$arrBean['type'] = $aAttrs->string('bean.type');
 		
 		if( $aBean = $aObject->getChildNodeByTagName('bean') ){
 			$arrBean = array_merge(
