@@ -135,7 +135,7 @@ for( {$sVarAutoName} = ") ;
 		
 		if(!$aObject->headTag()->isSingle()){
 			$this->compileChildren ( $aObject, $aObjectContainer, $aDev, $aCompilerManager );
-			$aDev->putCode ( '} ' );
+			$aDev->putCode ( '}} ' );
 		}
 	}
 }
