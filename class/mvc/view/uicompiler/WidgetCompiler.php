@@ -363,6 +363,10 @@ class WidgetCompiler extends NodeCompiler
 	}
 	
 	protected function writeBean(IObject $aObject ,ObjectContainer $aObjectContainer , TargetCodeOutputStream $aDev ,CompilerManager $aCompilerManager , $sWidgetVarName){
+		$aAttrs = $aObject->attributes() ;
+		if( $aAttrs->has('define') and ! $aAttrs->bool('define') ){
+			return $aAttrs->get('id');
+		}
 		$sBeanSource = $this->transBeanSource($aObject,$aObjectContainer,$aDev,$aCompilerManager);
 		
 		$aXmlEle = simplexml_load_string($sBeanSource);
