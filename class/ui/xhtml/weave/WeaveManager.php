@@ -37,7 +37,7 @@ class WeaveManager extends Object
 	}
 	
 	public function registerCode($sSourceTemplateName,$sPatchSlot,$sPatchCode,$sType=Patch::insertAfter)
-	{
+	{	
 		$aPatchSlot = $this->patchSlot($sSourceTemplateName,$sPatchSlot) ;
 		$aPatchSlot->addPatch(Patch::codePatch($sPatchCode,$sType)) ;
 	}

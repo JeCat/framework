@@ -105,12 +105,13 @@ class IncludeCompiler extends NodeCompiler
 			if( substr($sName,0,4)=='var.' and $sVarName=substr($sName,4) )
 			{
 				$sVarName = '"'. addslashes($sVarName) . '"' ;
-				$sValue = $aAttributes->get($sName) ;
-				$aDev->putCode("\$__include_aVariables->set({$sVarName},{$sValue}) ; \r\n");
+				$aDev->putCode("\$__include_aVariables->set({$sVarName},") ;
+				$aDev->putCode($aAttributes->get($sName));
+				$aDev->putCode(") ; \r\n");
 			}
 		}
 		
-		$aDev->putCode("\$this->display({$sFileName},\$__include_aVariables,\$aDevice) ; ") ;		
+		$aDev->putCode("\$aUI->display({$sFileName},\$__include_aVariables,\$aDevice) ; ") ;		
 	}
 }
 

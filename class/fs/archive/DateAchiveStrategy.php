@@ -44,9 +44,9 @@ class DateAchiveStrategy extends IAchiveStrategy
 		$this->bHourly = $bHourly? true: false ;
 	}
 	
-	public function makeFilePath(array $arrUploadedFile,Folder $aToDir) 
+	public function makeFilePath(array $arrUploadedFile) 
 	{
-		$sToPath = $aToDir->path() ;
+		$sToPath = '' ;
 		
 		if($this->bYearly)
 		{

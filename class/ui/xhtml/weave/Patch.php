@@ -89,42 +89,41 @@ class Patch
 		return $aPatch ;
 	}
 	
-	public function compile(UI $aUi)
+	public function parse(ObjectContainer $aObjectContainer,UI $aUi)
 	{
 		if( $this->aCompiled )
 		{
 			return ;
 		}
+
+		$aPatchObjectContainer = new ObjectContainer(null,'*',$aObjectContainer->templateSignature()) ;
 		
 		if( $this->nKind==self::code )
 		{
-			$aOutput = new OutputStreamBuffer() ;
-			$aUi->compile(
-					new InputStreamCache($this->sCode)
-					, $aOutput
-					, new ObjectContainer(null,'*',md5($this->sCode))
-					, false
-			) ;
-			
-			$this->aCompiled = new String($aOutput->bufferBytes()) ;
+			$aUi->interpreters()->parse( new InputStreamCache($this->sCode) , $aPatchObjectContainer, $aUi ) ;
 		}
 		
 		else if( $this->nKind==self::template )
 		{
-			$this->aCompiled = new String("
-// 织入模板： {$this->sTemplate}----------------------
-\$aUI->display(\"{$this->sTemplate}\",\$aVariables,\$aDevice) ;
-// -------------------------------------------------------------------------
-") ;
+			$aSrcMgr = $aUi->sourceFileManager() ;
+			list($sNamespace,$sSourceFile) = $aSrcMgr->detectNamespace($this->sTemplate) ;
+			if( !$aSourceFile=$aSrcMgr->find($sSourceFile,$sNamespace) )
+			{
+				throw new Exception("处理模板编织时遇到错误，无法找到用于织入的模板文件：%s",$this->sTemplate) ;
+			}
+			
+			$aUi->interpreters()->parse( $aSourceFile->openReader(), $aPatchObjectContainer, $aUi ) ;
 		}
 		
 		else if( $this->nKind==self::filter )
 		{
 			// nothing todo
 		}
+		
+		return $aPatchObjectContainer ;
 	}
 	
-	public function apply(ObjectContainer $aObjectContainer,IObject &$aTargetObject)
+	public function apply(ObjectContainer $aObjectContainer,IObject &$aTargetObject,ObjectContainer $aPatchObjectContainer)
 	{
 		if( $this->nKind==self::filter )
 		{
@@ -132,16 +131,21 @@ class Patch
 		}
 		else
 		{
-			$aWeaveinObject = new WeaveinObject($this->aCompiled,$aTargetObject) ;
-			
 			switch ( $this->sType )
 			{
 				case self::insertBefore :
-					$aTargetObject->insertAfterByPosition(0,$aWeaveinObject) ;
+					$nPos = 0 ;
+					foreach($aPatchObjectContainer->iterator() as $aObject)
+					{
+						$aTargetObject->insertBeforeByPosition($nPos++,$aObject) ;
+					}
 					break ;
 					
 				case self::insertAfter :
-					$aTargetObject->add($aWeaveinObject) ;
+					foreach($aPatchObjectContainer->iterator() as $aObject)
+					{
+						$aTargetObject->add($aObject) ;
+					}
 					break ;
 					
 				case self::appendBefore :
@@ -149,8 +153,11 @@ class Patch
 					if(!$aParent)
 					{
 						throw new Exception("遇到错误，无法将内容织入指定的路径") ;
-					}
-					$aParent->insertBefore($aTargetObject,$aWeaveinObject) ;
+					}					
+					foreach($aPatchObjectContainer->iterator() as $aObject)
+					{
+						$aParent->insertBefore($aTargetObject,$aObject) ;
+					}					
 					break ;
 					
 				case self::appendAfter :
@@ -159,7 +166,10 @@ class Patch
 					{
 						throw new Exception("遇到错误，无法将内容织入指定的路径") ;
 					}
-					$aParent->insertAfter($aTargetObject,$aWeaveinObject) ;
+					foreach($aPatchObjectContainer->iterator() as $aObject)
+					{
+						$aParent->insertAfter($aTargetObject,$aObject) ;
+					}
 					break ;
 					
 				case self::replace :
@@ -168,8 +178,13 @@ class Patch
 					{
 						throw new Exception("遇到错误，无法将内容织入指定的路径") ;
 					}
-					$aParent->replace($aTargetObject,$aWeaveinObject) ;
-					$aTargetObject = $aWeaveinObject ;
+					
+					foreach($aPatchObjectContainer->iterator() as $aObject)
+					{
+						$aParent->insertAfter($aTargetObject,$aObject) ;
+					}
+					$aParent->remove($aTargetObject) ;
+					
 					break ;
 			}
 		}

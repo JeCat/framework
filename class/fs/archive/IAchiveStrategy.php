@@ -34,7 +34,7 @@ abstract class IAchiveStrategy extends Object
 	/**
 	 * @return org\jecat\framework\fs\IFile
 	 */
-	abstract public function makeFilePath(array $arrUploadedFile,Folder $aToDir) ;
+	abstract public function makeFilePath(array $arrUploadedFile) ;
 
 	public function restoreOriginalFilename(File $aAchiveFile)
 	{

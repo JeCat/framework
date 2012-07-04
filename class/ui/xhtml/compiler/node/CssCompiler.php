@@ -94,7 +94,7 @@ class CssCompiler extends NodeCompiler
 		if( strtolower($aAttrs->string('rel'))=='stylesheet' and !$aAttrs->bool('ignore') )
 		{
 			$sHref = $aAttrs->get('href') ;
-			$aDev->putCode("jc\\resrc\\HtmlResourcePool::singleton()->addRequire({$sHref},jc\\resrc\\HtmlResourcePool::RESRC_CSS) ;",'preprocess') ;
+			$aDev->putCode("jc\\resrc\\HtmlResourcePool::singleton()->addRequire({$sHref},jc\\resrc\\HtmlResourcePool::RESRC_CSS) ;") ;
 			
 			// 清除后文中的空白字符
 			ClearCompiler::clearAfterWhitespace($aObject) ;

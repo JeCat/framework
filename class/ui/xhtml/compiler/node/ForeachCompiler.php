@@ -119,11 +119,14 @@ class ForeachCompiler extends NodeCompiler {
 		$sIdxAutoName = NodeCompiler::assignVariableName ( '$__foreach_idx_' ) ;
 		$sItemRef = $bItemRef? '&': '' ;
 		
-		
+		// 循环统一使用2层括号
 		$aDev->putCode ( "\r\n// foreach start ") ;
 		$aDev->putCode ( "\$aStackForLoopIsEnableToRun->put(false);
 {$sIdxAutoName} = -1;
-foreach(",null,false) ;
+if(",null,false);
+		$aDev->putCode ($aForUserExp,null,false) ;
+		$aDev->putCode ("){
+	foreach(",null,false) ;
 		$aDev->putCode ($aForUserExp,null,false) ;
 		$aDev->putCode (" as {$sKeyAutoName}=>{$sItemRef}{$sItemAutoName}){");
 
@@ -148,7 +151,7 @@ foreach(",null,false) ;
 		if(!$aObject->headTag()->isSingle()){
 			//循环体，可能会包含foreach:else标签
 			$this->compileChildren($aObject,$aObjectContainer,$aDev,$aCompilerManager) ;
-			$aDev->putCode("}\r\n") ; // end if   (如果foreach的内容包含foreach:else标签,则此处为foreach:else的end)
+			$aDev->putCode("\t}\r\n}\r\n") ; // end if   (如果foreach的内容包含foreach:else标签,则此处为foreach:else的end)
 		}
 	}
 }

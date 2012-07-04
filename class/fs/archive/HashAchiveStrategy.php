@@ -47,7 +47,7 @@ class HashAchiveStrategy extends IAchiveStrategy
 	public function makeFilePath(array $arrUploadedFile,Folder $aToDir) 
 	{
 		$sFileHash = md5($arrUploadedFile['tmp_name']) ;
-		$sToPath = $aToDir->path() ;
+		$sToPath = '';
 		
 		for($i=0;$i<$this->nDepth;$i++)
 		{

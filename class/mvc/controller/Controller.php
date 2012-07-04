@@ -26,9 +26,7 @@
 namespace org\jecat\framework\mvc\controller ;
 
 use org\jecat\framework\mvc\model\Model;
-
 use org\jecat\framework\util\EventManager;
-
 use org\jecat\framework\auth\IdManager;
 use org\jecat\framework\auth\AuthenticationException;
 use org\jecat\framework\auth\Authorizer;
@@ -941,6 +939,11 @@ class Controller extends NamableComposite implements IBean
    		}
    		
    		return $this->arrModels[$sTableName] ;
+   	}
+   	
+   	public function modelNameIterator()
+   	{
+   		return $this->arrModels? new \EmptyIterator(): new \ArrayIterator( array_keys($this->arrModels) ) ;
    	}
    	
    	/**

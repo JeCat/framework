@@ -58,9 +58,9 @@ class PatchSlot
 		// 织入内容
 		foreach($this->arrPatchs as $aPatch)
 		{
-			$aPatch->compile($aUi) ;
+			$aPatchObjectContainer = $aPatch->parse($aObjectContainer,$aUi) ;
 			
-			$aPatch->apply($aObjectContainer,$aTargetObject) ;
+			$aPatch->apply($aObjectContainer,$aTargetObject,$aPatchObjectContainer) ;
 			
 		}
 	}
