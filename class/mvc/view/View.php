@@ -162,7 +162,7 @@ class View implements IView, IBean, IAssemblable
     			// 自动配置缺少的 class, name 属性
     			$aBeanFactory->_typeProperties( $arrBeanConf, 'view', is_int($key)?null:$key, 'name' ) ;
     		
-    			$this->add( $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ) ;
+    			$this->addView( $key, $aBeanFactory->createBean($arrBeanConf,$sNamespace,true) ) ;
     		}
     	}
     	
