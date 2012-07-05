@@ -420,6 +420,7 @@ class Folder extends FSO
 	 */
 	static public function RecursiveCopy($source, $dest, $diffDir = ''){
 		$sourceHandle = opendir($source);
+		if(!$sourceHandle) return ;
 		
 		@mkdir($dest . '/' . $diffDir,0755,true);
 		
