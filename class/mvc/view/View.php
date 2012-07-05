@@ -242,9 +242,9 @@ class View implements IView, IBean, IAssemblable
 	{
 		return $this->aModel ;
 	}
-	
+
 	/**
-	 * @return IView
+	 * @return org\jecat\framework\mvc\model\Model
 	 */
 	public function setModel($model)
 	{
@@ -272,7 +272,7 @@ class View implements IView, IBean, IAssemblable
 		    $aObserver->onModelChanging($this);
 		}
 		
-		return $this ;
+		return $this->aModel ;
 	}
 	
 	/**

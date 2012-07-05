@@ -257,7 +257,7 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 		}
 		$this->arrLastAffecteds[$sChildName] = $aInserter->insertRow( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
 
-		return $this ;
+		return $this->arrLastAffecteds[$sChildName] ;
 	}
 	
 	public function update(array $arrData=null,$sWhere=null,$sChildName=null)
@@ -287,7 +287,7 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 		
 		$this->arrLastAffecteds[$sChildName] = Updater::singleton()->execute( $this, $arrPrototype, $arrData, $sWhere, $this->db() ) ;
 		
-		return !empty($this->arrLastAffecteds[$sChildName]) ? :  false ;
+		return $this->arrLastAffecteds[$sChildName] ;
 	}
 	
 	/**
@@ -303,7 +303,7 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 		}
 		
 		$this->arrLastAffecteds[$sChildName] = Deleter::singleton()->execute( $arrPrototype, $sWhere ,$sOrder , $sLimit, $this->db() ) ;
-		return !empty($this->arrLastAffecteds[$sChildName]) ? :  false ;
+		return $this->arrLastAffecteds[$sChildName] ;
 	}
 	
 	/**

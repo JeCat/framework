@@ -939,6 +939,11 @@ class Controller extends NamableComposite implements IBean
 		{
 			$this->arrModels[$sTableName] = new Model($sTableName) ;
 			
+			if( $sModelName===null and ($pos=strpos($sTableName,':'))!==false )
+			{
+				$sModelName = substr($sTableName,$pos+1) ;
+			}
+			
 			if($sModelName)
 			{
 				$this->arrModels[$sModelName] = $this->arrModels[$sTableName] ;
