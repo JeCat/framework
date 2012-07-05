@@ -59,9 +59,11 @@ class WebpageFrame extends Controller
 	 * |}
 	 */
 	public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
-	{		
+	{
+		parent::buildBean($arrConfig,$sNamespace) ;
+		
 		$aBeanFactory = BeanFactory::singleton() ;
-    	
+		
     	foreach($arrConfig as $sKey=>&$item)
     	{
     		// 将 frameView:xxxx 转换成 frameViews[] 结构
@@ -116,9 +118,6 @@ class WebpageFrame extends Controller
 				}
 			}
 		}
-		
-		//
-		parent::buildBean($arrConfig,$sNamespace) ;
 	}
 
     public function mainRun ()
@@ -152,15 +151,7 @@ class WebpageFrame extends Controller
     {    	
     	parent::setView($aView) ;
     	$aView->setController($this) ;
-    
-    	if( !$this->aViewContainer )
-    	{
-    		$this->aViewContainer = $aView ;
-    	}
-    	else
-    	{
-    		$aView->add($this->aViewContainer) ;
-    	}
+    	$this->aViewContainer = $aView ;
     }
     
     public function viewContainer()

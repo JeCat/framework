@@ -330,15 +330,16 @@ class Prototype implements \Serializable
 	    {
 	        for($i = 0; $i < sizeof($where); $i++){
 	            $aWhere = explode(".", $where[$i]);
+	            
 	            if(count($aWhere) == 2){
 	                $arrPrototype = & $this->refRaw($aWhere[0]);
-	                
+
 	                /**
-	                 * 特殊情况。如果指定的表名是顶层，就应用整个where条件。否则只应用字段部分。
+	                 * 特殊情况。如果指定的表名是顶层或type是一对一，就应用整个where条件。否则只应用字段部分。
 	                 */
-	                if(empty($arrPrototype['type']))
+	                if(empty($arrPrototype['type']) || $arrPrototype['type'] == Prototype::hasOne || $arrPrototype['type'] == Prototype::belongsTo)
 	                {
-	                    $arrPrototype['where'][] = $where[$i] ;
+	                    $this->arrPrototype['where'][] = $where[$i] ;
 	                }else {
 	                    $arrPrototype['where'][] = $aWhere[1] ;
 	                }

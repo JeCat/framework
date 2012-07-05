@@ -147,6 +147,25 @@ class EventManager extends Object implements \Serializable
 		
 		return serialize($this->arrEventHandles) ;
 	}
+
+	public function registeredEventClasses()
+	{
+		return array_keys($this->arrEventHandles) ;
+	}
+	public function registeredEventNames($sClass)
+	{
+		return isset($this->arrEventHandles[$sClass])? array_keys($this->arrEventHandles[$sClass]): array() ;
+	}
+	public function registeredEventObjectIds($sClass,$sEventName)
+	{
+		return isset($this->arrEventHandles[$sClass][$sEventName])? array_keys($this->arrEventHandles[$sClass][$sEventName]): array() ;
+	}
+	public function registeredHandleIterator($sClass,$sEventName,$sObjectIds='*')
+	{
+		return isset($this->arrEventHandles[$sClass][$sEventName][$sObjectIds])?
+				new \ArrayIterator($this->arrEventHandles[$sClass][$sEventName][$sObjectIds]): 
+				new \EmptyIterator() ;
+	}
 	
 	private $arrEventHandles = array() ;
 }
