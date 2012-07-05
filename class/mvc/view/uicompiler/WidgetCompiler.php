@@ -31,12 +31,8 @@ use org\jecat\framework\ui\IObject;
 use org\jecat\framework\ui\CompilerManager;
 use org\jecat\framework\ui\TargetCodeOutputStream;
 use org\jecat\framework\ui\ObjectContainer;
-use org\jecat\framework\bean\BeanConfXml;
-use org\jecat\framework\ui\xhtml\Attributes;
 use org\jecat\framework\ui\xhtml\Expression;
 use org\jecat\framework\ui\xhtml\Node;
-use org\jecat\framework\ui\xhtml\Text;
-use org\jecat\framework\pattern\composite\Composite;
 use org\jecat\framework\lang\Exception;
 
 /**
@@ -50,12 +46,10 @@ class WidgetCompiler extends NodeCompiler
 {
 	public function compile(IObject $aObject,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager)
 	{
-		$this->checkType( $aObject ) ;
+		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject,'aObject') ;
+		$sWidgetVarName = '$' . parent::assignVariableName('_aWidget') ;
 		
-		$sWidgetVarName = $this->getVarName() ;
-		$aAttrs = $this->getAttrs($aObject) ;
-		
-		if( $this->isIgnore( $aObject , $aAttrs ) ){
+		if( $this->isIgnore( $aObject ) ){
 			return parent::compile(
 				$aObject
 				, $aObjectContainer
@@ -64,58 +58,44 @@ class WidgetCompiler extends NodeCompiler
 			);
 		}
 		
-		$this->writeTheView($aAttrs , $aDev) ;
+		$arrBaseInfo = $this->getBaseInfo($aObject,$aObjectContainer);
 		
-		$sId = $this->writeObject($aAttrs , $aObject , $aObjectContainer , $aDev , $sWidgetVarName);
-		if( false === $sId ){
+		if( false === $arrBaseInfo ){
 			return false;
 		}
-		$this->writeAttr($aAttrs , $aObjectContainer , $aDev , $sWidgetVarName);
-		$this->writeBean($aObject , $aObjectContainer , $aDev , $aCompilerManager , $sWidgetVarName) ;
-		$this->writeTemplate($aObject , $aAttrs , $aObjectContainer , $aDev , $aCompilerManager , $sWidgetVarName) ;
-		$this->writeDisplay($aObject,$aAttrs , $aDev , $sWidgetVarName , $sId) ;
-		$this->writeEnd($aAttrs ,$aDev);
-	}
-	
-	protected function checkType(IObject $aObject){
-		Assert::type("org\\jecat\\framework\\ui\\xhtml\\Node",$aObject,'aObject') ;
-	}
-	
-	protected function writeTheView(Attributes $aAttrs , TargetCodeOutputStream $aDev){
-		if( ! $aAttrs->has('define') or $aAttrs->bool('define') ){
-			$aDev->putCode("\$theView = \$aVariables->get('theView') ;",'preprocess') ;
-		}
-		if( ! $aAttrs->has('display') or $aAttrs->bool('display') ){
-			$aDev->putCode("\$theView = \$aVariables->get('theView') ;",'render') ;
-		}
-	}
-	
-	protected function getVarName(){
-		$sWidgetVarName = '$' . parent::assignVariableName('_aWidget') ;
-		return $sWidgetVarName ;
-	}
-	
-	protected function getAttrs(IObject $aObject){
+		$arrBeanFromAttr = $this->getBeanFromAttr($aObject,$aObjectContainer,$arrBaseInfo);
+		$this->compileTemplate($aObject,$aObjectContainer,$aDev,$aCompilerManager);
+		$arrBeanFromChild = $this->getBeanFromChild($aObject,$aObjectContainer);
+		
 		$aAttrs = $aObject->attributes() ;
-		return $aAttrs ;
+		if( ! $aAttrs->has('define') or $aAttrs->bool('define') ){
+			if( !$aAttrs->has('instance') ){
+				$this->writeTheView($aDev,$aObjectContainer,'preprocess');
+				$this->writeObject($arrBaseInfo,$aDev,$sWidgetVarName);
+				$this->writeBean($aDev,$sWidgetVarName,$arrBaseInfo,$arrBeanFromAttr,$arrBeanFromChild);
+				$aDev->putCode("}",'preprocess') ;
+			}
+		}
+		
+		if( ! $aAttrs->has('display') or $aAttrs->bool('display') ){
+			$this->writeTheView($aDev,$aObjectContainer,'render');
+			$this->writeAttr($aDev,$arrBaseInfo,$arrBeanFromAttr);
+			$this->writeDisplay($aObject,$aDev,$sWidgetVarName,$arrBaseInfo) ;
+		}
 	}
 	
-	protected function isIgnore(IObject $aObject,Attributes $aAttrs){
+	protected function isIgnore(Node $aNode){
+		$aAttrs = $aNode->attributes() ;
 		if( $aAttrs->has('ignore') or
-			( $aObject->tagName() === 'input' and in_array( $aAttrs->string('type') , array( 'submit' ,'reset','button','image') ) )
+			( $aNode->tagName() === 'input' and in_array( $aAttrs->string('type') , array( 'submit' ,'reset','button','image') ) )
 		){
 			return true;
 		}
 		return false;
 	}
 	
-	protected function writeObject(Attributes $aAttrs , Node $aNode , ObjectContainer $aObjectContainer , TargetCodeOutputStream $aDev , $sWidgetVarName){
-		if( $aAttrs->has('instance') ){
-			return 'CreateByInstance';
-		}
-		if( $aAttrs->has('define') and ! $aAttrs->bool('define') ){
-			return $aAttrs->get('id');
-		}
+	protected function getBaseInfo(Node $aNode,ObjectContainer $aObjectContainer){
+		$aAttrs = $aNode->attributes() ;
 		$sClassName = 'text' ;
 		$sType = null ;
 		switch( $aNode->tagName() ){
@@ -176,124 +156,67 @@ class WidgetCompiler extends NodeCompiler
 			break;
 		}
 		
-		if( $sType !== null ){
-			$aAttrs->set('bean.type',$sType);
+		$arrBaseInfo = array(
+			'classname' => $sClassName,
+		);
+		if($sType){
+			$arrBaseInfo['type'] = $sType ;
 		}
 		
-		if( $sClassName !== null  ){
-			
-			$aDev->putCode("\r\n//// ------- 创建 widget: {$sClassName} ---------------------",'preprocess') ;
-			
-			$__widget_class = \org\jecat\framework\bean\BeanFactory::singleton()->beanClassNameByAlias($sClassName)?: $sClassName ;
-			
-			$aDev->putCode("if( !class_exists('$__widget_class') ){",'preprocess') ;
-			$aDev->output("无效的 widget 类:{$sClassName} (template:".$aObjectContainer->templateName().")",'preprocess') ;
-			
-			if( !$aAttrs->has('define') or !$aAttrs->bool('define') ){
-				$aDev->putCode("}else if( \$theView->widget(",'preprocess');
-				$aDev->putCode( $aAttrs->get('id') ,'preprocess');
-				$aDev->putCode(") ){",'preprocess');
-				$aDev->putCode("	//已经定义过了",'preprocess');
-			}
-			
-			$aDev->putCode("}else{",'preprocess') ;
-			$aDev->putCode("	{$sWidgetVarName} = new $__widget_class ;",'preprocess') ;
-			
+		$__widget_class = \org\jecat\framework\bean\BeanFactory::singleton()->beanClassNameByAlias($sClassName)?: $sClassName ;
+		$arrBaseInfo['widgetclass'] = $__widget_class;
+		
+		$arrBaseInfo['aId'] = $aAttrs->get('id');
+		
+		// wid, id, formName
+		$sWidgetId = $aAttrs->string('wid') ;
+		$sHtmlId =$aAttrs->string('id') ;
+		$sName = $aAttrs->string('name') ;
+		
+		if(!$sWidgetId)
+			$sWidgetId = $sHtmlId ?: $sName ;
+		if(!$sHtmlId)
+			$sHtmlId = $sWidgetId ?: $sName ;
+		if(!$sName)
+			$sName = $sWidgetId ?: $sWidgetId ;
+		
+		// auto id
+		if(!$sWidgetId)
+		{
+			$nAutoId = $aObjectContainer->properties()->get('autoCreateId') ?: 0 ;
+			$aObjectContainer->properties()->set('autoCreateId',$nAutoId+1);
 
-			// wid, id, formName			
-			$sWidgetId = $aAttrs->string('wid') ;
-			$sHtmlId =$aAttrs->string('id') ;
-			$sName = $aAttrs->string('name') ;
-
-			if(!$sWidgetId)
-				$sWidgetId = $sHtmlId ?: $sName ;
-			if(!$sHtmlId)
-				$sHtmlId = $sWidgetId ?: $sName ;
-			if(!$sName)
-				$sName = $sWidgetId ?: $sWidgetId ;
-			
-			// auto id
-			if(!$sWidgetId)
-			{
-				$nAutoId = $aObjectContainer->properties()->get('autoCreateId') ?: 0 ;
-				$aObjectContainer->properties()->set('autoCreateId',$nAutoId+1);
-				
-				$sWidgetId = $sHtmlId = $sName
-						= str_replace('\\','_',$sClassName).( $nAutoId ?: '' ) ;
-			}
-			
-			$aAttrs->set('bean.id',$sWidgetId);
-			$aAttrs->set('bean.htmlId',$sHtmlId);
-			$aAttrs->set('bean.formName',$sName);
-			
-			$arrWidgetClass = $aObjectContainer->properties()->get('arrWidgetClass');
-			if( null === $arrWidgetClass ){
-				$arrWidgetClass = array() ;
-			}
-			
-			$arrWidgetClass[ $sWidgetVarName ] = $__widget_class ;
-			
-			$aObjectContainer->properties()->set('arrWidgetClass',$arrWidgetClass );
-			
-			$aDev->putCode("	{$sWidgetVarName} ->setId(\"${sWidgetId}\");",'preprocess');
-			
-			if( $aAttrs->has('exchange') ){
-				$sExchangeName = $aAttrs->get('exchange') ;
-				$aDev->putCode("	\$theView->addWidget({$sWidgetVarName},{$sExchangeName});",'preprocess') ;
-			}else{
-				$aDev->putCode("	\$theView->addWidget({$sWidgetVarName},\"{$sName}\");",'preprocess') ;
-			}
-			return $aAttrs->get('bean.id') ;
-		}else{
-			if( $aAttrs->has('id') ){
-				$sId = $aAttrs->get('id');
-				
-				$aDev->putCode("\r\n//// ------- 寻找 Widget: {$sWidgetId} ---------------------",'preprocess') ;
-				$aDev->putCode("{$sWidgetVarName} = \$theView->widget({$sWidgetId}) ;",'preprocess') ;
-				
-				$aDev->putCode("if(!{$sWidgetVarName}){",'preprocess') ;
-				$aDev->putCode("}else{",'preprocess') ;
-				
-				return $sWidgetId ;
-			}else{
-				$aDev->putCode("\$aDevice->write(\$aUI->locale()->trans('&lt;widget&gt;标签缺少必要属性:id或type')) ;",'preprocess') ;
-				return false;
-			}
+			$sWidgetId = $sHtmlId = $sName
+					= str_replace('\\','_',$sClassName).( $nAutoId ?: '' ) ;
 		}
+		$arrBaseInfo['sWidgetId'] = $sWidgetId ;
+		$arrBaseInfo['sHtmlId'] = $sHtmlId ;
+		$arrBaseInfo['sName'] = $sName ;
+		
+		if( $aAttrs->has('exchange') ){
+			$arrBaseInfo['exchange'] = $aAttrs->get('exchange') ;
+		}
+		
+		$arrBaseInfo['temname'] = $aObjectContainer->templateName() ;
+		
+		return $arrBaseInfo ;
 	}
 	
-	protected function writeAttr(Attributes $aAttrs , ObjectContainer $aObjectContainer , TargetCodeOutputStream $aDev , $sWidgetVarName){
+	protected function getBeanFromAttr(Node $aNode,ObjectContainer $aObjectContainer,array $arrBaseInfo){
+		$aAttrs = $aNode->attributes() ;
 		$arrAttr = array();
 		
-		// default as
-		foreach( self::$arrDefaultAs as $key => $value){
-			if( ! $aAttrs->has($key) and $aAttrs->has($value) ){
-				$aAttrs->set( $key , $aAttrs->string($value) );
-			}
-		}
-		
 		$arrShortableBeanAttrAlias = array() ;
-		if( $arrWidgetClass = $aObjectContainer->properties()->get('arrWidgetClass') and isset($arrWidgetClass[$sWidgetVarName] ) ){
-			$__widget_class = $arrWidgetClass[ $sWidgetVarName ] ;
-			
-			$arrImplements = class_implements( $__widget_class );
-			
-			if( in_array( 'org\jecat\framework\mvc\view\widget\IShortableBean' , $arrImplements ) ){
-				$arrShortableBeanAttrAlias = $__widget_class::beanAliases() ;
-			}
+		$__widget_class = $arrBaseInfo[ 'widgetclass' ] ;
+		
+		$arrImplements = class_implements( $__widget_class );
+		
+		if( in_array( 'org\jecat\framework\mvc\view\widget\IShortableBean' , $arrImplements ) ){
+			$arrShortableBeanAttrAlias = $__widget_class::beanAliases() ;
 		}
 		
 		// attr to array
 		foreach($aAttrs as $sName=>$aValue){
-			if(
-				in_array(
-					$sName ,
-					self::$arrEscapeAttr
-				)
-			){
-				continue;
-			}
-			
 			$sBeanName = $sName ;
 			
 			if( isset( $arrShortableBeanAttrAlias[$sBeanName] ) ){
@@ -320,24 +243,194 @@ class WidgetCompiler extends NodeCompiler
 			unset($arrSubAttr);
 		}
 		
-		/*
-		if( isset( $arrAttr['bean'] ) ){
-			$aDev->putCode("	\$arrBean = ",'preprocess');
-			$this->writeAttrPri( $arrAttr['bean'] , $aDev , 1 , 'preprocess' );
-			$aDev->putCode("	;",'preprocess');
-			$aDev->putCode("	{$sWidgetVarName}->buildBean( \$arrBean ); ",'preprocess');
+		return $arrAttr ;
+	}
+	
+	protected function compileTemplate(Node $aNode,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager){
+		foreach( $aNode->childElementsIterator() as $aChild ){
+			if( $aChild instanceof Node ){
+				$sTagName = $aChild->tagName() ;
+				$aAttrs = $aChild->attributes() ;
+				
+				switch($sTagName){
+				case 'template':
+					if( ! $aAttrs->has('name') ){
+						$sTemName = '__subtemplate_'.md5(rand()) ;
+						$aAttrs->set('name' , $sTemName ) ;
+						$aChild->headTag()->setAttributes($aAttrs) ;
+					}else{
+						$sTemName = $aAttrs->string('name');
+					}
+					break;
+				}
+				$aCompiler = $aCompilerManager->compiler(
+					$aChild
+				);
+				$aCompiler->compile(
+					$aChild
+					, $aObjectContainer
+					, $aDev
+					, $aCompilerManager
+				);
+			}
 		}
-		*/
+	}
+	
+	protected function getBeanFromChild(Node $aNode,ObjectContainer $aObjectContainer){
+		$sBeanSource = $this->transBeanSource($aNode,$aObjectContainer);
 		
+		$aXmlEle = simplexml_load_string($sBeanSource);
 		
+		if( !$aXmlEle ){
+			throw new Exception(
+				'xml文档格式错误'
+			);
+		}
 		
+		$arrBean = $this->transBeanArray($aXmlEle);
+		
+		return $arrBean;
+	}
+	
+	protected function writeTheView(TargetCodeOutputStream $aDev,ObjectContainer $aObjectContainer,$sTemName){
+		$arrWriteTheView = $aObjectContainer->properties()->get('writeTheView') ?: array() ;
+		if( ! isset($arrWriteTheView[$sTemName]) ){
+			$arrWriteTheView[$sTemName] = true;
+			$aDev->putCode("\$theView = \$aVariables->get('theView') ;",$sTemName) ;
+		}
+		$aObjectContainer->properties()->set('writeTheView',$arrWriteTheView);
+	}
+	
+	protected function writeObject(array $arrBaseInfo , TargetCodeOutputStream $aDev , $sWidgetVarName){
+		$sClassName = $arrBaseInfo['classname'] ;
+		$aDev->putCode("\r\n//// ------- 创建 widget: {$sClassName} ---------------------",'preprocess') ;
+		
+		$__widget_class = $arrBaseInfo['widgetclass'] ;
+		
+		$aDev->putCode("if( !class_exists('$__widget_class') ){",'preprocess') ;
+		
+		$sTemName = $arrBaseInfo['temname'] ;
+		$aDev->output("无效的 widget 类:{$sClassName} (template:".$sTemName.")",'preprocess') ;
+		
+		$aId = $arrBaseInfo['aId'] ;
+		$aDev->putCode("}else if( \$theView->widget(",'preprocess');
+		$aDev->putCode( $aId ,'preprocess');
+		$aDev->putCode(") ){",'preprocess');
+		$aDev->putCode("	//已经定义过了",'preprocess');
+		$aDev->putCode("}else{",'preprocess');
+		$aDev->putCode("	{$sWidgetVarName} = new $__widget_class ;",'preprocess');
+		
+		$sWidgetId = $arrBaseInfo['sWidgetId'];
+		$sName = $arrBaseInfo['sName'];
+		$aDev->putCode("	{$sWidgetVarName} ->setId(\"${sWidgetId}\");",'preprocess');
+		if( isset( $arrBaseInfo['exchange'] ) ){
+			$sExchangeName = $arrBaseInfo['exchange'] ;
+			$aDev->putCode("	\$theView->addWidget({$sWidgetVarName},{$sExchangeName});",'preprocess');
+		}else{
+			$aDev->putCode("	\$theView->addWidget({$sWidgetVarName},\"{$sName}\");",'preprocess');
+		}
+	}
+	
+	protected function writeBean(
+		TargetCodeOutputStream $aDev
+		, $sWidgetVarName 
+		, array $arrBaseInfo
+		, array $arrBeanFromAttr
+		, array $arrBeanFromChild
+	){
+		if( isset( $arrBaseInfo['type'] ) ){
+			$arrBeanFromChild['type'] = $arrBaseInfo['type'];
+		}
+		$aDev->putCode("	\$arrBeanFc = ".str_replace('__hide_colon__',':',var_export($arrBeanFromChild,true)).";",'preprocess' );
+		if( isset( $arrBeanFromAttr['bean'] ) ){
+			$aDev->putCode("	\$arrBeanAt = ",'preprocess');
+			$this->writeAttrPri( $arrBeanFromAttr['bean'] , $aDev , 1 , 'preprocess' );
+			$aDev->putCode("	;",'preprocess');
+			$aDev->putCode('	\org\jecat\framework\bean\BeanFactory::mergeConfig( $arrBeanFc , $arrBeanAt );','preprocess');
+		}
+		$aDev->putCode("	{$sWidgetVarName}->buildBean( \$arrBeanFc ); ",'preprocess');
+	}
+	
+	protected function writeAttr(
+		TargetCodeOutputStream $aDev
+		, array $arrBaseInfo
+		, array $arrBeanFromAttr
+	){
 		$aDev->putCode("	\$arrAttributes = ",'render');
-		if( isset( $arrAttr['attr'] ) ){
-			$this->writeAttrPri( array( 'attr' => $arrAttr['attr'] ) , $aDev , 1 , 'render' );
+		if( isset( $arrBeanFromAttr['attr'] ) ){
+			$this->writeAttrPri( array( 'attr' => $arrBeanFromAttr['attr'] ) , $aDev , 1 , 'render' );
 		}else{
 			$aDev->putCode("	array( 'attr' => array() ) ",'render');
 		}
 		$aDev->putCode("	;",'render');
+	}
+	
+	protected function writeDisplay(Node $aNode , TargetCodeOutputStream $aDev , $sWidgetVarName,array $arrBaseInfo){
+		$aAttrs = $aNode->attributes() ;
+		$sWidgetId = $arrBaseInfo['sWidgetId'] ;
+		if( $sInstanceExpress=$aAttrs->expression('instance')  )
+		{
+			$sInstanceOrigin=$aAttrs->string('instance') ;
+			
+			$aDev->putCode("//// ------- 显示 Widget Instance ---------------------",'render') ;
+			$aDev->putCode("{$sWidgetVarName} = ",'render');
+			$aDev->putCode($sInstanceExpress,'render');
+			$aDev->putCode(";",'render') ;
+
+			$aDev->putCode("if( !{$sWidgetVarName} or !({$sWidgetVarName} instanceof \\org\\jecat\\framework\\mvc\\view\\widget\\IViewWidget) ){",'render') ;
+			$aDev->output("无效的widget对象：".$sInstanceOrigin ,'render') ;
+			$aDev->putCode("} else {",'render') ;
+			$aDev->putCode("	{$sWidgetVarName}->display(\$aVariables->theUI,new \\org\\jecat\\framework\\util\\DataSrc(\$arrAttributes),\$aDevice) ;",'render') ;
+			$aDev->putCode("}",'render') ;
+		}
+		else
+		// display
+		if( $sWidgetId &&( !$aAttrs->has('display') or $aAttrs->bool('display') ) )
+		{
+			$aDev->putCode("//// ------- Display Widget: {$sWidgetId} ---------------------",'render') ;
+			$aDev->putCode("{$sWidgetVarName} = \$theView->widget('{$sWidgetId}') ;",'render') ;
+			
+			$aDev->putCode("if(!{$sWidgetVarName}){",'render') ;
+			$aDev->output("render 缺少 widget (id:{$sWidgetId})",'render') ;
+			$aDev->putCode("}else{",'render') ;
+			
+			$sTemplateSignature = 'null';
+			$sSubTemplate = 'null';
+			$sTemplate = 'null' ;
+			
+			/*
+				如果<widget>标签有<template>子标签，
+				writeBeanPri()会在<widget>的attributes()中埋一个subtemplate属性。
+			if( $aTemplate=$aObject->getChildNodeByTagName('template') ){
+				$aTemAttr = $aTemplate->headTag()->attributes();
+				
+				if($aTemAttr->has('name') ){
+					$sSubTemplate = $aTemAttr->get('name');
+				}
+				$sTemplateSignature = "'".$aDev->templateSignature()."'" ;
+			}
+			*/
+			if( $aAttrs->has('subtemplate') ){
+				$sSubTemplate = $aAttrs->get('subtemplate');
+				
+				if( ! $aAttrs->has('template') ){
+					$sTemplateSignature = "'".$aDev->templateSignature()."'" ;
+				}
+			}
+			
+			if( $aAttrs->has('template') ){
+				$sTemplate = $aAttrs->get('template') ;
+			}
+			
+			$aDev->putCode("	{$sWidgetVarName}->display(
+				\$aVariables->theUI,
+				new \\org\\jecat\\framework\\util\\DataSrc(\$arrAttributes),
+				\$aDevice,
+				$sTemplateSignature,
+				$sSubTemplate,
+				$sTemplate) ;",'render') ;
+			$aDev->putCode("}",'render') ;
+		}
 	}
 	
 	private function writeAttrPri(array $arrAttr,TargetCodeOutputStream $aDev , $nTabCount , $sSubTemplateName){
@@ -362,40 +455,7 @@ class WidgetCompiler extends NodeCompiler
 		$aDev->putCode(str_repeat('	',$nTabCount)." )",$sSubTemplateName);
 	}
 	
-	protected function writeBean(IObject $aObject ,ObjectContainer $aObjectContainer , TargetCodeOutputStream $aDev ,CompilerManager $aCompilerManager , $sWidgetVarName){
-		$aAttrs = $aObject->attributes() ;
-		if( $aAttrs->has('define') and ! $aAttrs->bool('define') ){
-			return $aAttrs->get('id');
-		}
-		$sBeanSource = $this->transBeanSource($aObject,$aObjectContainer,$aDev,$aCompilerManager);
-		
-		$aXmlEle = simplexml_load_string($sBeanSource);
-		
-		if( !$aXmlEle ){
-			throw new Exception(
-				'xml文档格式错误'
-			);
-		}
-		
-		$arrBean = $this->transBeanArray($aXmlEle);
-		$arrBean['type'] = $aAttrs->string('bean.type');
-		
-		if( $aBean = $aObject->getChildNodeByTagName('bean') ){
-			$arrBean = array_merge(
-				$arrBean,
-				BeanConfXml::singleton()->xmlSourceToArray( $aBean->source() )
-			);
-			$aObject->remove($aBean);
-		}else{
-		}
-		
-		if( count($arrBean) > 0 ){
-			$aDev->putCode("	\$arrBean = ".str_replace('---------',':',var_export($arrBean,true)).";",'preprocess');
-			$aDev->putCode("	{$sWidgetVarName}->buildBean( \$arrBean ); ",'preprocess');
-		}
-	}
-	
-	private function transBeanSource(Node $aNode,ObjectContainer $aObjectContainer , TargetCodeOutputStream $aDev ,CompilerManager $aCompilerManager){
+	private function transBeanSource(Node $aNode,ObjectContainer $aObjectContainer){
 		$sSource = '' ;
 		$sSource.= $aNode->headTag()->source();
 		
@@ -406,35 +466,19 @@ class WidgetCompiler extends NodeCompiler
 				
 				switch($sTagName){
 				case 'template':
-					if( ! $aAttrs->has('name') ){
-						$sTemName = '__subtemplate_'.md5(rand()) ;
-						$aAttrs->set('name' , $sTemName ) ;
-						$aChild->headTag()->setAttributes($aAttrs) ;
-					}else{
-						$sTemName = $aAttrs->string('name');
-					}
+					$sTemName = $aAttrs->string('name');
 					
 					$sSource.= '<subtemplate bean.type="attr">'.$sTemName.'</subtemplate>';
 					$sSource.= '<template bean.type="attr">'.$aObjectContainer->ns().':'.$aObjectContainer->templateName().'</template>';
 					break;
 				default:
-					$sSource .= $this->transBeanSource($aChild,$aObjectContainer,$aDev,$aCompilerManager);
+					$sSource .= $this->transBeanSource($aChild,$aObjectContainer);
 					break;
 				}
-				$aCompiler = $aCompilerManager->compiler(
-					$aChild
-				);
-				$aCompiler->compile(
-					$aChild
-					, $aObjectContainer
-					, $aDev
-					, $aCompilerManager
-				);
 			}else{
 				$sSource .= $aChild->source() ;
 			}
 		}
-		
 		if( $aNode->tailTag() ){
 			$sSource.= $aNode->tailTag()->source();
 		}
@@ -442,7 +486,7 @@ class WidgetCompiler extends NodeCompiler
 		// replace '&' to '&amp;';
 		$sSource = str_replace(
 			array('&',':'),
-			array('&amp;','---------'),
+			array('&amp;','__hide_colon__'),
 			$sSource
 		);
 		return $sSource;
@@ -503,219 +547,4 @@ class WidgetCompiler extends NodeCompiler
 		
 		return $arrRtn ;
 	}
-	
-	static private $arrEscapeTagName = array(
-		'template',
-	);
-	private function writeBeanPri( Node $aNode ,ObjectContainer $aObjectContainer,TargetCodeOutputStream $aDev,CompilerManager $aCompilerManager){
-		$arrRtn = array() ;
-		foreach( $aNode->childElementsIterator() as $aChild ){
-			if( $aChild instanceof Node ){
-				$sTagName = $aChild->tagName() ;
-				$aAttrs = $aChild->attributes() ;
-				
-				if( ! in_array( $sTagName , self::$arrEscapeTagName ) ){
-					$arrChildBean = $this->writeBeanPri( $aChild , $aObjectContainer , $aDev , $aCompilerManager ) ;
-					
-					$sSubTemName = $this->writeTemplatePri( $aChild );
-					if( ! $sSubTemName ){
-						if( $aAttrs->has('subtemplate') ){
-							$sSubTemName = $aAttrs->string('subtemplate') ;
-						}
-					}
-					if( $sSubTemName ){
-						$arrChildBean['subtemplate'] = '"'.$sSubTemName.'"' ;
-						$arrChildBean['template'] = '"'.$aObjectContainer->ns().':'.$aObjectContainer->templateName().'"';
-					}
-					
-					foreach( $aAttrs as $sName => $aValue ){
-						$arrChildBean[$sName] = $aAttrs->get($sName) ;
-					}
-					
-					if( isset( $arrChildBean['bean.type'] ) ){
-						
-						// 删除两边的引号
-						$sNodeType = trim( $arrChildBean['node.type'] , '"' );
-						unset( $arrChildBean['bean.type'] );
-						
-						switch( $sNodeType ){
-						case 'attr':
-							$arrRtn[$sTagName] = $arrChildBean['text'] ;
-							break;
-						case 'array':
-							$arrRtn[$sTagName][] = $arrChildBean['text'];
-							break;
-						case 'optn':
-						default:
-							$arrRtn[$sTagName][] = $arrChildBean ;
-							break;
-						}
-					}else{
-						$arrRtn[$sTagName][] = $arrChildBean ;
-					}
-					
-					$aNode->remove($aChild);
-				}else{
-					switch( $sTagName ){
-					case 'template':
-						if( ! $aAttrs->has('name') ){
-							$sTemName = '__subtemplate_'.md5(rand()) ;
-							$aAttrs->set('name' , $sTemName ) ;
-							$aChild->headTag()->setAttributes($aAttrs) ;
-						}else{
-							$sTemName = $aAttrs->string('name');
-						}
-						$aNode->attributes()->set('subtemplate',$sTemName);
-						break;
-					}
-					$aCompiler = $aCompilerManager->compiler(
-						$aChild
-					);
-					$aCompiler->compile(
-						$aChild
-						, $aObjectContainer
-						, $aDev
-						, $aCompilerManager
-					);
-				}
-			}else if( $aChild instanceof Text){
-				$sText = trim($aChild->source()) ;
-				
-				if( ! empty($sText) ){
-					$arrRtn['text'] = '"'.addslashes($sText).'"' ;
-				}
-				
-				$aNode->remove($aChild);
-			}
-		}
-		
-		return $arrRtn ;
-	}
-	
-	protected function writeTemplate(
-		IObject $aObject 
-		,Attributes $aAttrs 
-		,ObjectContainer $aObjectContainer
-		,TargetCodeOutputStream $aDev
-		,CompilerManager $aCompilerManager
-		,$sWidgetVarName
-	){
-		// template
-		if($aAttrs->has('subtemplate') ){
-			$sFunName = $aAttrs->string('subtemplate') ;
-			$aDev->putCode("	{$sWidgetVarName}->setSubTemplateName('{$sFunName}') ;",'preprocess') ;
-			$sTemplateName = $aObjectContainer->ns().':'.$aObjectContainer->templateName() ;
-			$aDev->putCode("	{$sWidgetVarName}->setTemplateName('{$sFunName}') ;",'preprocess') ;
-		}
-		if($aAttrs->has('template') ){
-			$sTemplateName = $aAttrs->string('template');
-			$aDev->putCode("	{$sWidgetVarName}->setTemplateName('{$sTemplateName}') ;",'preprocess') ;
-		}
-	}
-	
-	/**
-	 * 返回 subtemplate name
-	 * 没有返回 null
-	 */
-	private function writeTemplatePri(
-			Node $aNode
-	){
-		$aTemplate = $aNode->getChildNodeByTagName('template');
-		if( ! $aTemplate ){
-			return null ;
-		}
-		
-		$aTemAttr = $aTemplate->headTag()->attributes();
-		
-		if($aTemAttr->has('name') ){
-			$sTemName = $aTemAttr->string('name');
-		}else{
-			$sTemName = '__subtemplate_'.md5(rand()) ;
-			$aTemAttr->set('name' , $sTemName ) ;
-			$aTemplate->headTag()->setAttributes($aTemAttr) ;
-		}
-		
-		return $sTemName ;
-	}
-	
-	protected function writeDisplay(IObject $aObject , Attributes $aAttrs , TargetCodeOutputStream $aDev , $sWidgetVarName,$sId){
-		if( $sInstanceExpress=$aAttrs->expression('instance')  )
-		{
-			$sInstanceOrigin=$aAttrs->string('instance') ;
-			
-			$aDev->putCode("\r\n//// ------- 显示 Widget Instance ---------------------",'render') ;
-			$aDev->putCode("{$sWidgetVarName} = ",'render');
-			$aDev->putCode($sInstanceExpress,'render');
-			$aDev->putCode(";",'render') ;
-
-			$aDev->putCode("if( !{$sWidgetVarName} or !({$sWidgetVarName} instanceof \\org\\jecat\\framework\\mvc\\view\\widget\\IViewWidget) ){",'render') ;
-			$aDev->output("无效的widget对象：".$sInstanceOrigin ,'render') ;
-			$aDev->putCode("} else {",'render') ;
-			$aDev->putCode("	{$sWidgetVarName}->display(\$aVariables->theUI,new \\org\\jecat\\framework\\util\\DataSrc(\$arrAttributes),\$aDevice) ;",'render') ;
-			$aDev->putCode("}",'render') ;
-		}
-		else
-		// display
-		if( $sId &&( !$aAttrs->has('display') or $aAttrs->bool('display') ) )
-		{
-			$aDev->putCode("\r\n//// ------- Display Widget: {$sId} ---------------------",'render') ;
-			$aDev->putCode("{$sWidgetVarName} = \$theView->widget({$sId}) ;",'render') ;
-			
-			$aDev->putCode("if(!{$sWidgetVarName}){",'render') ;
-			$aDev->output("render 缺少 widget (id:{$sId})",'render') ;
-			$aDev->putCode("}else{",'render') ;
-			
-			$sTemplateSignature = 'null';
-			$sSubTemplate = 'null';
-			$sTemplate = 'null' ;
-			
-			/*
-				如果<widget>标签有<template>子标签，
-				writeBeanPri()会在<widget>的attributes()中埋一个subtemplate属性。
-			if( $aTemplate=$aObject->getChildNodeByTagName('template') ){
-				$aTemAttr = $aTemplate->headTag()->attributes();
-				
-				if($aTemAttr->has('name') ){
-					$sSubTemplate = $aTemAttr->get('name');
-				}
-				$sTemplateSignature = "'".$aDev->templateSignature()."'" ;
-			}
-			*/
-			if( $aAttrs->has('subtemplate') ){
-				$sSubTemplate = $aAttrs->get('subtemplate');
-				
-				$sTemplateSignature = "'".$aDev->templateSignature()."'" ;
-			}
-			
-			if( $aAttrs->has('template') ){
-				$sTemplate = $aAttrs->get('template') ;
-			}
-			
-			$aDev->putCode("	{$sWidgetVarName}->display(
-				\$aVariables->theUI,
-				new \\org\\jecat\\framework\\util\\DataSrc(\$arrAttributes),
-				\$aDevice,
-				$sTemplateSignature,
-				$sSubTemplate,
-				$sTemplate) ;",'render') ;
-			$aDev->putCode("}",'render') ;
-		}
-	}
-	
-	protected function writeEnd(Attributes $aAttrs , TargetCodeOutputStream $aDev){
-		if( !$aAttrs->has('instance') and ( !$aAttrs->has('define') or $aAttrs->bool('define') ) ){
-			$aDev->putCode("}",'preprocess') ;
-			$aDev->putCode("//// ---------------xxx------------------------------------\r\n",'preprocess') ;
-		}
-	}
-	
-	static private $arrEscapeAttr = array(
-		'instance' ,
-	);
-	
-	static private $arrDefaultAs = array(
-		'bean.title' => 'title' ,
-		'bean.formName' => 'name' ,
-		'bean.value' => 'value' ,
-	);
 }
