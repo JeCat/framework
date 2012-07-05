@@ -58,7 +58,7 @@ interface IAssemblable
 	/**
 	 * @return IView
 	 */
-	public function clearWrapperClasses($sClass) ;
+	public function clearWrapperClasses() ;
 	
 	/**
 	 * @return IView

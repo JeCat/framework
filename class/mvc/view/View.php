@@ -379,8 +379,7 @@ class View implements IView, IBean, IAssemblable
 		{
 			return ;
 		}
-		
-		$sWrapperClasses = $this->arrWrapperClasses ? ' class="'.implode(' ', $this->arrWrapperClasses).'"': '' ;
+		$sWrapperClasses = $this->arrWrapperClasses ? ' class="'.implode(' ', $this->wrapperClasses()).'"': '' ;
 		$sWrapperStyle = $this->sWrapperStyle ?  " style=\"{$this->sWrapperStyle}\"": '' ;
 		$sXPath = $this->xpath(true) ;
 		$sId = $this->id() ;
@@ -1096,7 +1095,7 @@ class View implements IView, IBean, IAssemblable
     /**
      * @return IView
      */
-    public function clearWrapperClasses($sClass)
+    public function clearWrapperClasses()
     {
     	$this->arrWrapperClasses = null ;
     	return $this ;
