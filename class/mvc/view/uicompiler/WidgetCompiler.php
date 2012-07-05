@@ -226,7 +226,7 @@ class WidgetCompiler extends NodeCompiler
 			$arrNamePart = explode('.',$sBeanName);
 			
 			// expression
-			if( count($arrNamePart) >1 and $arrNamePart[0] !=='bean' and end($arrNamePart) ==='type' ){
+			if( count($arrNamePart) >1 and end($arrNamePart) ==='type' ){
 				continue;
 			}
 			
