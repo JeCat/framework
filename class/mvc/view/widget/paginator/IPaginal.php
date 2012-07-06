@@ -27,7 +27,7 @@ namespace org\jecat\framework\mvc\view\widget\paginator;
 
 interface IPaginal
 {
-    public function totalCount();
+    public function paginationTotalCount();
     public function setPagination($nPerPage,$nPageNum);
 }
 

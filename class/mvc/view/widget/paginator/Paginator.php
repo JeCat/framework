@@ -207,7 +207,7 @@ class Paginator extends FormWidget implements IModelChangeObserver
 			return $this->iTotalCount ;
 		}else
         if( $this->aPaginal ){
-            return (int) $this->aPaginal->totalCount() ;
+            return (int) $this->aPaginal->paginationTotalCount() ;
         }else{
             return 0 ;
         }

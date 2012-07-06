@@ -14,7 +14,7 @@ abstract class Executor extends Object
 		{
 			$arrSqlStat['from'].= " LEFT JOIN (`{$arrPrototype['bridge']}` AS `{$arrPrototype['bridgeTableAlias']}`" ;
 
-			$arrClauseOn ;
+			$arrClauseOn = isset($arrPrototype['on']) ? array($arrPrototype['on']): array() ;
 			foreach($arrPrototype['fromBridgeKeys'] as $nIdx=>$sFromBridgeKey)
 			{
 				$arrClauseOn[] = "`{$arrPrototype['bridgeTableAlias']}`.`{$sFromBridgeKey}` = `{$arrPrototype['name']}`.`{$arrPrototype['toKeys'][$nIdx]}`" ;
@@ -36,6 +36,8 @@ abstract class Executor extends Object
 			
 			if( $arrAssoc['assoc']&Prototype::oneToOne )
 			{
+			    $arrClauseOn = isset($arrAssoc['on']) ? array($arrAssoc['on']): array() ;
+			        
 			    if($isAshes)
 			    {
 			        // join table
@@ -44,7 +46,6 @@ abstract class Executor extends Object
 			        $this->joinTables($arrAssoc,$arrSqlStat,$nAssocType) ;
 			        
 			        // join table on
-			        $arrClauseOn ;
 			        foreach($arrAssoc['fromKeys'] as $nIdx=>$sFromKey)
 			        {
 			            $arrClauseOn[] = "`{$arrPrototype['tableAlias']}`.`{$sFromKey}` = `{$arrAssoc['name']}`.`{$arrAssoc['toKeys'][$nIdx]}`" ;
@@ -57,7 +58,6 @@ abstract class Executor extends Object
 			        $this->joinTables($arrAssoc,$arrSqlStat,$nAssocType) ;
 			        
 			        // join table on
-			        $arrClauseOn ;
 			        foreach($arrAssoc['fromKeys'] as $nIdx=>$sFromKey)
 			        {
 			            $arrClauseOn[] = "`{$arrPrototype['table']}`.`{$sFromKey}` = `{$arrAssoc['name']}`.`{$arrAssoc['toKeys'][$nIdx]}`" ;

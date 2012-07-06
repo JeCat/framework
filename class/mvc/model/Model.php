@@ -25,9 +25,6 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 		{
 			throw new Exception("Model::__construct() 参数\$table类型错误") ;
 		}
-
-		//$this->sDataPrefix = $this->aPrototype->name() . '.' ;
-		//$this->nDataPrefixLength = strlen($this->sDataPrefix) ;
 	}
 	
 	/**
@@ -334,21 +331,6 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 	        array_multisort($arr_field,$sort_type,$this->arrData);
 	    }
 	}
-	
-	/*
-	public function shareModel()
-	{
-	    if( !$this->aShareModel and $aPrototype=$this->prototype() )
-	    {
-	        $this->aShareModel = $aPrototype->createModel(false) ;
-	        $this->segmentalizeChild($this->aShareModel) ;
-	        $this->aShareModel->data('__belongsModelList',$this) ;
-	    }
-	
-	    return $this->aShareModel ;
-	}
-	*/
-	
 	/**
 	 * @return org\jecat\framework\db\DB
 	 */
@@ -751,10 +733,19 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 	    }
 	}
 	
-	// implements
-	public function totalCount()
+	/**
+	 * 返回符合条件的记录数量
+	 * @see org\jecat\framework\mvc\view\widget\paginator.IPaginal::queryCount()
+	 */
+	public function queryCount($sWhere=null,$sChildName=null)
 	{
-		return $this->rowNum() ;
+		return Selecter::singleton()->queryCount( $this->aPrototype->refRaw($sChildName?:'$'), $sWhere, $this->db() ) ;
+	}
+	
+	// implements
+	public function paginationTotalCount()
+	{
+		return $this->queryCount() ;
 	}
 	public function setPagination($nPerPage,$nPageNum)
 	{

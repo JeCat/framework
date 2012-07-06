@@ -63,7 +63,6 @@ class Selecter extends Executor
 		// 初始化数据表的行指针
 		reset($arrDataSheet) ;
 	}
-	
 	private function makeSql(array & $arrPrototype,array & $arrMultiAssocs,$sWhere)
 	{
 		$arrSqlStat['columnList'] = $this->makeColumnList($arrPrototype) ;
@@ -72,15 +71,37 @@ class Selecter extends Executor
 
 		$this->joinTables($arrPrototype,$arrSqlStat) ;
 		
-		 $sSql = "SELECT \r\n\t" . $arrSqlStat['columnList']
+		$sSql = "SELECT \r\n\t" . $arrSqlStat['columnList']
 					. $arrSqlStat['from']
 					. $this->makeWhereClause($arrPrototype,$sWhere)
 					. $this->makeGroupByClause($arrPrototype)
 					. $this->makeOrderByClause($arrPrototype)
 					. $this->makeLimitClause($arrPrototype) . " ; \r\n" ;
 		 
-		 //echo "<pre>";print_r($sSql);echo "</pre>";
-		 return $sSql;
+		return $sSql;
+	}
+	
+	public function queryCount(array & $arrPrototype,$sWhere=null,DB $aDB=null)
+	{
+		$arrSqlStat['columnList'] = $this->makeColumnList($arrPrototype) ;
+		$arrSqlStat['from'] = $this->makeFromClause($arrPrototype) ;
+
+		$this->joinTables($arrPrototype,$arrSqlStat) ;
+
+		$sSql = "SELECT \r\n\t count(*) as len"
+					. $arrSqlStat['from']
+					. $this->makeWhereClause($arrPrototype,$sWhere) . " ; \r\n" ;
+		
+		// 查询
+		$aPdoRecordset = $aDB->query( $sSql ) ;
+		if( $row = $aPdoRecordset->fetch() )
+		{
+			return (int)$row['len'] ;
+		}
+		else
+		{
+			return 0 ;
+		}
 	}
 
 	protected function joinTables(array & $arrPrototype,array & $arrSqlStat)
