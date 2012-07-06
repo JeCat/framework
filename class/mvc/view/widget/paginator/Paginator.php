@@ -35,49 +35,6 @@ use org\jecat\framework\mvc\view\widget\paginator\AbstractStrategy;
 use org\jecat\framework\util\IDataSrc;
 use org\jecat\framework\mvc\controller\HttpRequest;
 
-/*!
-    attr.nums : int 显示几页（即分页器的宽度） 5
-    attr.showFirst
-    attr.showLast ： bool 是否显示“第一页”与“最后一页” true
-    attr.showTotal : bool 是否显示“共*页” true
-    attr.showPre
-    attr.showNext : bool 是否显示“上一页”与“下一页” true
-    attr.strategy : PaginatorStrategy 显示策略（显示哪些页码），可以是一个字符串（表示类名）或者一个对象（需要设置type为expression） new \org\jecat\framework\mvc\view\widget\paginatorstrategy\Middle
-    attr.onclick : string js代码，onclick事件 null
-    
-    pageNumList() 由 PaginatorStrategy 对象控制。目前只提供一个Middle策略。
-*/
-/*!
-    // example:
-    // code:
-    class TryPaginatorController extends Controller {
-        protected function init() {
-            $this->createFormView( "TryPaginator" );
-            $aPaginator = new Paginator( 'paginator' ,$this->params);
-            $this->viewTryPaginator->addWidget( $aPaginator );
-            $aModel = new Model('electronicnewspaper_newspaper',true);
-            $aPaginator -> setPerPageCount(2);
-            $this->viewTryPaginator->setModel==Bean配置数组==($aModel);
-            $aPaginator -> setPerPageCount(3);
-            $aModel->load();
-            $arrTitle = array();
-            foreach($aModel->childIterator() as $b){
-                $arrTitle[] = $b['title'];
-            }
-            $this->viewTryPaginator->variables()->set('arrTitle',$arrTitle);
-        }
-    }
-    // template:
-    <msgqueue />
-    <table border="1">
-        <foreach for='{=$arrTitle}' item='title'>
-            <tr><td>{=$title}</td></tr>
-        </foreach>
-    </table>
-    <form id="theform" method='post'>
-	    <widget id='paginator' attr.nums='7' attr.strategy.type='expression' attr.strategy='new \org\jecat\framework\mvc\view\widget\paginatorstrategy\Middle' attr.onclick='alert(\"hello\")' />
-    </form>
-*/
 class Paginator extends FormWidget implements IModelChangeObserver
 {
     public function __construct($sId =null ,IDataSrc $aDataSource = null , IView $aView = null) {
@@ -106,12 +63,6 @@ class Paginator extends FormWidget implements IModelChangeObserver
      * |10
      * |可选
      * |每页显示的条目数量
-     * |-- --
-     * |nums
-     * |int
-     * |5
-     * |可选
-     * |显示页码的个数
      * |}
      * ==模板属性配置==
      * {|
@@ -120,6 +71,12 @@ class Paginator extends FormWidget implements IModelChangeObserver
 	 * !默认值
 	 * !可选
 	 * !说明
+     * |-- --
+     * |attr.nums
+     * |int
+     * |5
+     * |可选
+     * |显示页码的个数
 	 * |-- --
      * |attr.showFirst
      * |mixed
@@ -207,7 +164,7 @@ class Paginator extends FormWidget implements IModelChangeObserver
 			return $this->iTotalCount ;
 		}else
         if( $this->aPaginal ){
-            return (int) $this->aPaginal->paginationTotalCount() ;
+            return $this->iTotalCount = (int) $this->aPaginal->paginationTotalCount() ;
         }else{
             return 0 ;
         }
