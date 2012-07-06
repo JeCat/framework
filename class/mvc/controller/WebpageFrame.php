@@ -28,7 +28,7 @@ namespace org\jecat\framework\mvc\controller ;
 use org\jecat\framework\bean\BeanConfException;
 use org\jecat\framework\bean\BeanFactory;
 use org\jecat\framework\mvc\view\IView;
-use org\jecat\framework\mvc\view\WebpageFactory;
+use org\jecat\framework\mvc\view\Webpage;
 use org\jecat\framework\mvc\controller\Controller;
 
 class WebpageFrame extends Controller
@@ -36,7 +36,7 @@ class WebpageFrame extends Controller
 	
 	public function __construct($params=null,$sName=null,$bBuildAtonce=true)
 	{
-		$this->setView(WebpageFactory::singleton()->create()) ;
+		$this->setView(new Webpage()) ;
 		
 		parent::__construct($params,$sName,$bBuildAtonce) ;
 	}
