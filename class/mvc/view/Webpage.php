@@ -42,7 +42,6 @@ class Webpage extends View
 		{
 			return null ;
 		}
-		$aController = $aController->parent() ?: $aController ;
 		return $aController->title() ;
 	}
 	
@@ -52,7 +51,6 @@ class Webpage extends View
 		{
 			return null ;
 		}
-		$aController = $aController->parent() ?: $aController ;
 		return $aController->keywords() ;
 	}
 	
@@ -62,7 +60,6 @@ class Webpage extends View
 		{
 			return null ;
 		}
-		$aController = $aController->parent() ?: $aController ;
 		return $aController->description() ;
 	}
 	

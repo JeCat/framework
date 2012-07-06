@@ -195,6 +195,42 @@ class WebpageFrame extends Controller
     	}
     }
     
+    
+
+    public function title()
+    {
+    	if( !$aController = $this->parent() )
+    	{
+    		return parent::title() ;
+    	}
+    	else 
+    	{
+    		return $aController->title() ;
+    	}
+    }    
+    public function description()
+    {
+    	if( !$aController = $this->parent() )
+    	{
+    		return parent::title() ;
+    	}
+    	else 
+    	{
+    		return $aController->description() ;
+    	}
+    }    
+    public function keywords($bImplode=true)
+    {
+    	if( !$aController = $this->parent() )
+    	{
+    		return parent::title() ;
+    	}
+    	else 
+    	{
+    		return $aController->keywords() ;
+    	}
+    }
+    
     private $aViewContainer = null ;
     
     private $arrFrameViews ;
