@@ -1049,7 +1049,7 @@ class View implements IView, IBean, IAssemblable
      */
     public function unassemble(IAssemblable $aView)
     {
-    	$pos = array_search($aView,$this->arrAssembleList) ;
+    	$pos = array_search($aView,$this->arrAssembleList,true) ;
     	if( $pos!==false )
     	{
     		unset($this->arrAssembleList[$pos]) ;
