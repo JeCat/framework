@@ -397,7 +397,8 @@ class View implements IView, IBean, IAssemblable
 		
 		if( $this->sFrameType===IAssemblable::horizontal )
 		{
-			$aDevice->write("<div class='jc-layout-item-end'></div>") ;
+			// 似乎在 ie7/8 下，需要遇到一个有确切高度的元素，才能彻底清除 float 效果
+			$aDevice->write("<div class='jc-layout-item-end' style='height:0px;'></div>") ;
 		}
 		
 		$aDevice->write("</div>\r\n") ;
