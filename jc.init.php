@@ -37,6 +37,7 @@ date_default_timezone_set('Asia/Shanghai') ;
 @header("Content-Type: text/html; charset=UTF-8") ;
 
 define( "org\\jecat\\framework\\VERSION", '0.8.0.0' ) ;
+define( "org\\jecat\\framework\\VERSIONCOMPAT", '=0.8' ) ;
 define( "org\\jecat\\framework\\PATH", __DIR__ ) ;
 define( "org\\jecat\\framework\\CLASSPATH", __DIR__.'/class' ) ;
 
