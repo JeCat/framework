@@ -9,7 +9,7 @@ class PackageIterator extends \FilterIterator
 		$this->sCountry = $sCountry ;
 		$this->sLibName = $sLibName ;
 
-		parent::__construct(new \DirectoryIterator($sFolderPath)) ;
+		parent::__construct(is_dir($sFolderPath)?new \DirectoryIterator($sFolderPath):new \EmptyIterator() ) ;
 	}
 
 	public function accept()
