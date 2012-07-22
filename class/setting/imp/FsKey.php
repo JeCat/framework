@@ -115,7 +115,10 @@ class FsKey extends Key implements \Serializable
 	 */
 	private function readItemFile(){
 		if( $aItemFile = $this->folder()->findFile(self::itemFilename)){
-			$this->arrItems = $aItemFile->includeFile(false,false) ;
+			$sContent = file_get_contents( $aItemFile->path() );
+			$sContent = substr( $sContent , strlen('<?php') + 1 );
+			$this->arrItems = eval( $sContent );
+			//$this->arrItems = $aItemFile->includeFile(false,false) ;
 			if(!is_array($this->arrItems))
 			{
 				$this->arrItems = array() ;
