@@ -10,19 +10,19 @@ use org\jecat\framework\lang\Object;
 
 class Inserter extends Executor
 {	
-	public function execute(Model $aModel,array & $arrPrototype,array & $arrDataSheet,$bRecursively=true,DB $aDB=null)
+	public function execute(Model $aModel,array & $arrPrototype,array & $arrDataSheet,$bRecursively=true,DB $aDB=null,$bReplace=false)
 	{
 		$nAff = 0 ;
 		foreach($arrDataSheet as &$arrDataRow)
 		{
 			$aModel->addRow(null,$arrPrototype['xpath']) ;
 			
-			$nAff+= $this->insertRow($aModel, $arrPrototype, $arrDataRow, $bRecursively, $aDB) ;
+			$nAff+= $this->insertRow($aModel, $arrPrototype, $arrDataRow, $bRecursively, $aDB, $bReplace) ;
 		}
 		return $nAff ;
 	}
 	
-	public function insertRow(Model $aModel,array & $arrPrototype,array & $arrDataRow,$bRecursively=true,DB $aDB=null)
+	public function insertRow(Model $aModel,array & $arrPrototype,array & $arrDataRow,$bRecursively=true,DB $aDB=null,$bReplace=false)
 	{
 		$nAff = 0 ;
 	    
@@ -93,7 +93,7 @@ class Inserter extends Executor
 		// 执行 insert
 		if( !empty($arrColumns) )
 		{
-			$sSql = $this->makeSql($arrPrototype['table'],$arrColumns,$arrValues) ;
+			$sSql = $this->makeSql($arrPrototype['table'],$arrColumns,$arrValues,$bReplace) ;
 			
 			$nAff+= $aDB->execute($sSql) ;
 			
@@ -167,14 +167,14 @@ class Inserter extends Executor
 			$arrColumns[] = $arrAssoc['fromBridgeKeys'][$nIdx] ;
 		}
 
-		$sSql = $this->makeSql($arrAssoc['bridge'],$arrColumns,$arrValues) ;
+		$sSql = $this->makeSql($arrAssoc['bridge'],$arrColumns,$arrValues,false) ;
 		
 		return $aDB->execute($sSql) ;
 	}
 	
-	private function makeSql($sTable,&$arrColumns,&$arrValues)
+	private function makeSql($sTable,&$arrColumns,&$arrValues,$bReplace)
 	{
-		return "INSERT INTO `{$sTable}` (\r\n\t"
+		return ($bReplace?"REPLACE":"INSERT")." INTO `{$sTable}` (\r\n\t"
 				. implode("\r\n\t, ", $arrColumns)
 				. "\r\n) VALUES (\r\n\t"
 				. implode("\r\n\t, ", $arrValues)

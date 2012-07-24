@@ -227,8 +227,18 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 		//echo "<pre>";print_r($this->arrData);echo "</pre>";
 		return $this ;
 	}
+	
+	public function select($sClause)
+	{
+		return $this->load($sClause,self::asWhereClause) ;	
+	}
+	
+	public function replace(array $arrData=null,$sChildName=null)
+	{
+		return $this->insert($arrData,$sChildName,true) ;
+	}
 
-	public function insert(array $arrData=null,$sChildName=null)
+	public function insert(array $arrData=null,$sChildName=null,$bReplace=false)
 	{
 		$aInserter = Inserter::singleton() ;
 		$arrPrototype =& $this->aPrototype->refRaw($sChildName?:'$') ;
@@ -242,7 +252,7 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 			reset($arrData) ;
 			if( is_int(key($arrData)) )
 			{
-				$this->arrLastAffecteds[$sChildName] = $aInserter->execute( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
+				$this->arrLastAffecteds[$sChildName] = $aInserter->execute( $this, $arrPrototype, $arrData, $bRecursively, $this->db(), $bReplace ) ;
 				return $this ;
 			}
 		}
@@ -252,7 +262,7 @@ class Model implements \Iterator, \ArrayAccess, \Serializable, IPaginal
 		{
 			$arrData =& $this->rowRef($sChildName) ;
 		}
-		$this->arrLastAffecteds[$sChildName] = $aInserter->insertRow( $this, $arrPrototype, $arrData, $bRecursively, $this->db() ) ;
+		$this->arrLastAffecteds[$sChildName] = $aInserter->insertRow( $this, $arrPrototype, $arrData, $bRecursively, $this->db(), $bReplace ) ;
 
 		return $this->arrLastAffecteds[$sChildName] ;
 	}
