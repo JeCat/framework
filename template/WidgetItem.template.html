@@ -1,4 +1,5 @@
-<li	id='{=$theWidget->id()}' {=$theWidget->getCssClassString()}>
+<if "$theWidget->isRender()" >
+<li id='{=$theWidget->id()}' {=$theWidget->getCssClassString()}>
 	<if '$theWidget->isActive()'>
 		<div class="jc-widget-menu-item-div-active">
 			{=$theWidget->html()}
@@ -17,3 +18,4 @@
 		<widget instance="$theWidget->subMenu()" e:attr.showDepths="$attr['showDepths']" />
 	</if>
 </li>
+</if>

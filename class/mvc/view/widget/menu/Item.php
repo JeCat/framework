@@ -27,6 +27,8 @@ namespace org\jecat\framework\mvc\view\widget\menu;
 
 use org\jecat\framework\util\DataSrc;
 use org\jecat\framework\bean\BeanFactory;
+use org\jecat\framework\auth\Authorizer;
+use org\jecat\framework\auth\IdManager;
 
 class Item extends AbstractBase
 {
@@ -91,7 +93,7 @@ class Item extends AbstractBase
      * |设置菜单是否可用
      * |}
      */
-    public function buildBean(array & $arrConfig,$sNamespace='*',\org\jecat\framework\bean\BeanFactory $aBeanFactory=null)
+    public function buildBean(array & $arrConfig,$sNamespace='*',BeanFactory $aBeanFactory=null)
     {
 		parent::buildBean($arrConfig,$sNamespace);
 		               
@@ -110,7 +112,7 @@ class Item extends AbstractBase
 			$bIsMenu = true ;
 		}
 		if($bIsMenu){
-			$this->buildSubMenu($arrConfig);
+			$this->buildSubMenu($arrConfig,$sNamespace,$aBeanFactory);
 		}
 		
 		if( !empty($arrConfig['controller']) )
@@ -153,6 +155,16 @@ class Item extends AbstractBase
 					}
 				}
 			}
+		}
+		
+		// authorizer --------------------
+		if( !empty($arrConfig['perms']) )
+		{
+			$arrAuthorConf = array(
+				'class' => 'authorizer' ,
+				'perms' => &$arrConfig['perms'] ,
+			) ;
+			$this->setAuthorizer( $aBeanFactory->createBean($arrAuthorConf,$sNamespace) ) ;
 		}
 		
 		if( array_key_exists('active',$arrConfig) )
@@ -249,16 +261,16 @@ class Item extends AbstractBase
     	return $this->bActive ;
     }
 	
-	private function buildSubMenu($subMenu){
+	private function buildSubMenu($subMenu,$sNamespace,BeanFactory $aBeanFactory){
 		if($subMenu instanceof Menu){
 			$this->setSubMenu($subMenu);
 		}else if(is_string($subMenu)){
 			$this->setSubMenu( new Menu($subMenu) );
 		}else if(is_array($subMenu)){
 			$subMenu['class'] = __NAMESPACE__.'\Menu';
-			$aMenu = BeanFactory::singleton()->createBean($subMenu,'*',false) ;
+			$aMenu = $aBeanFactory->createBean($subMenu,'*',false) ;
 			$this->setSubMenu($aMenu);
-			$aMenu->buildBean($subMenu) ;
+			$aMenu->buildBean($subMenu,$sNamespace,$aBeanFactory) ;
 		}
 	}
 	
@@ -319,6 +331,25 @@ class Item extends AbstractBase
 		return $this->bBubblingActive ;
 	}
 	
+	public function isRender(){
+		if( ! $this->checkPermissions() ){
+			return false;
+		}
+		return true;
+	}
+	
+	public function setAuthorizer(Authorizer $aAuthorizer){
+		$this->aAuthorizer = $aAuthorizer ;
+		return $this ;
+	}
+	
+	protected function checkPermissions(){
+		if( null === $this->aAuthorizer ){
+			return true;
+		}
+		return $this->aAuthorizer->check(IdManager::singleton());
+	}
+	
     private $parentMenu = null;
     private $subMenu = null;
     
@@ -328,6 +359,5 @@ class Item extends AbstractBase
     private $sHtml ;
 	
 	private $bBubblingActive = false ;
+	private $aAuthorizer = null;
 }
-
-

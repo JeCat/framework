@@ -108,7 +108,7 @@ class Menu extends AbstractBase
 		)) ;
 		if( isset( $arrConfig['item'] ) and is_array( $arrConfig['item'] ) ){
 			foreach($arrConfig['item'] as $item){
-				$this->buildItemFromBean($item);
+				$this->buildItemFromBean($item,null,$sNamespace,$aBeanFactory);
 			}
 		}
 		if(!empty($arrConfig['direction'])){
@@ -250,20 +250,20 @@ class Menu extends AbstractBase
 		}
     }
 	
-	private function buildItemFromBean(array $arrItemBean , $id=null ){
+	private function buildItemFromBean(array $arrItemBean , $id ,$sNamespace,BeanFactory $aBeanFactory){
 		$arrItemBean['class']=__NAMESPACE__.'\Item';
 		if(empty($arrItemBean['id']) && !is_int($id) ){
 			$arrItemBean['id'] = $id;
 		}
 		
-		$aItem = BeanFactory::singleton()->createBean($arrItemBean,'*',false) ;
+		$aItem = BeanFactory::singleton()->createBean($arrItemBean,$sNamespace,false,$aBeanFactory) ;
 		
 		// 在BuildBean中，通过query设置active需要先获得知道view()对象
 		if(!$aItem->view())
 		{
 			$aItem->setView($this->view()) ;
 		}
-		$aItem->buildBean($arrItemBean);
+		$aItem->buildBean($arrItemBean,$sNamespace,$aBeanFactory);
 		
 		// addItem时，为了避免重复，需要先知道id值，所以只能放在buildBean之后
 		$this->addItemPrivate($aItem);

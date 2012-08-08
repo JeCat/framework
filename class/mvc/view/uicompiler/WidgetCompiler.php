@@ -502,7 +502,14 @@ class WidgetCompiler extends NodeCompiler
 		
 		// attributes
 		foreach($aXmlEle->attributes() as $key => $value ){
-			$arrRtn[ $key ] = (string)$value ;
+			$arrKeyPart = explode( '.' , $key );
+			
+			$arrRef = &$arrRtn;
+			foreach($arrKeyPart as $sKeyPart){
+				$arrRef[ $sKeyPart ] = array();
+				$arrRef = & $arrRef[ $sKeyPart ];
+			}
+			$arrRef = (string)$value ;
 		}
 		
 		// children
