@@ -517,9 +517,9 @@ class WidgetCompiler extends NodeCompiler
 			if( $value instanceof \SimpleXMLElement ){
 				$arrChildArray = $this->transBeanArray($value);
 				
-				if( isset($arrChildArray['bean.type'] ) ){
-					$sBeanType = $arrChildArray['bean.type'] ;
-					unset( $arrChildArray['bean.type'] );
+				if( isset($arrChildArray['bean']) and isset($arrChildArray['bean']['type'] ) ){
+					$sBeanType = $arrChildArray['bean']['type'] ;
+					unset( $arrChildArray['bean'] );
 					switch($sBeanType){
 					case 'attr':
 						$arrRtn[ $key ] = $arrChildArray['text'];
