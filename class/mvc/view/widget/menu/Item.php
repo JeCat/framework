@@ -129,6 +129,13 @@ class Item extends AbstractBase
 			{
 				$arrConfig['query'][] = 'c=' . $arrConfig['controller'] ;
 			}
+			else if( is_string($arrConfig['query']) )
+			{
+				$arrConfig['query'] = array(
+					$arrConfig['query'] ,
+					'c=' . $arrConfig['controller'] ,
+				);
+			}
 		}
 		
 		if( !empty( $arrConfig['link'])){
