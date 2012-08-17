@@ -5,31 +5,35 @@ use org\jecat\framework\lang\Object;
 
 class NameMapper extends Object
 {
-	public function __construct($bRegister=true)
-	{
-		if($bRegister)
-		{
-			SqlNameCompiler::singleton()->registerTableNameTranslaters( array($this,'transTableName') ) ;
-		}
-	}
-	
 	public function mapTableName($sOriginTable,$sToTable)
 	{
+		static $isFirst = true;
+		if( $isFirst ){
+			$isFirst = false;
+			\org\jecat\framework\util\EventManager::singleton()->registerEventHandle(
+				'org\jecat\framework\mvc\model\Prototype'
+				, \org\jecat\framework\mvc\model\Prototype::transTable
+				, array(
+					__CLASS__,
+					'transTableEventHandler'
+				)
+			);
+		}
 		$this->arrTableMapping[$sOriginTable] = $sToTable ;
 		return $this ;
 	}
 	
-	public function transTableName($sTable,$sAlias,array & $arrToken,array & $arrTokenTree)
+	public function transTableName(&$sTableName,&$sPrototypeName)
 	{
-		// echo $sTable,'>>',@$this->arrTableMapping[$sTable], '<br />' ;
-		if( isset($this->arrTableMapping[$sTable]) )
+		if( isset($this->arrTableMapping[$sTableName]) )
 		{
-			$sTable = $this->arrTableMapping[$sTable] ;
+			$sTableName = $this->arrTableMapping[$sTableName] ;
 		}
-		return array( $sTable, $sAlias ) ;
+	}
+	
+	static public function transTableEventHandler(&$sTableName,&$sPrototypeName){
+		self::singleton()->transTableName($sTableName,$sPrototypeName);
 	}
 	
 	private $arrTableMapping = array() ;
 }
-
-
