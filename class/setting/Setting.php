@@ -139,6 +139,36 @@ abstract class Setting extends Object implements ISetting
 			$aKey->deleteKey() ;
 		}
 	}
+	
+	public function mount(ISetting $aSubSetting , $sMountPath){
+		if( isset( $this->arrMountMap[ $sMountPath ] ) ){
+			throw new Exception(
+				'Setting无法重复挂载：路径%s已经挂载了一个Setting',
+				$sMountPath
+			);
+		}else{
+			$this->arrMountMap[ $sMountPath ] = $aSubSetting ;
+		}
+	}
+	
+	protected function getMountSettingByPath($sMountPath){
+		return $this->arrMountMap[ $sMountPath ] ?:null;
+	}
+	
+	/**
+	 * @return string or null
+	 * 目前挂载的Setting对象不超过10个，因此直接循环找一遍就行。
+	 * 如果有一天，挂载超过100个甚至更多，可以考虑使用Trie树算法来提高效率。
+	 */
+	protected function findMount($sMountPath){
+		foreach($this->arrMountMap as $sPath => $aSubSetting){
+			$nPathLength = strlen( $sPath );
+			if( substr($sMountPath,0,$nPathLength) === $sPath ){
+				return $sPath;
+			}
+		}
+		return null;
+	}
+	
+	private $arrMountMap = array();
 }
-
-

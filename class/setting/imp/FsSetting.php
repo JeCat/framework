@@ -51,6 +51,14 @@ class FsSetting extends Setting implements \Serializable
 	public function key($sPath,$bAutoCreate=false)
 	{
 		$sKeyPath = self::transPath($sPath,false) ;
+		
+		$sFindMount = $this->findMount($sPath);
+		
+		if( null !== $sFindMount ){
+			$sInMountPath = substr($sPath,strlen($sFindMount));
+			return $this->getMountSettingByPath($sFindMount)->key($sInMountPath,$bAutoCreate);
+		}
+		
 		$sFlyweightKey = $this->aRootFolder->path() . '/' . $sKeyPath ;
 		
 		if( !$aKey=FsKey::flyweight($sFlyweightKey,false) )

@@ -112,6 +112,11 @@ interface ISetting
 	 * @return ISetting
 	 */
 	public function separate($sPath) ;
+	
+	/**
+	 * 在指定的路径上，挂载另一个 ISetting 对象
+	 * @param $aSubSetting ISetting
+	 * @param $sMountPath string 挂载路径
+	 */
+	public function mount(ISetting $aSubSetting , $sMountPath);
 }
-
-
