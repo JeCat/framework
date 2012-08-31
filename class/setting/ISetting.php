@@ -100,6 +100,32 @@ interface ISetting
 	public function deleteItem($sPath,$sName) ;
 	
 	/**
+	 * 获得项的值
+	 * @param string $sKey 键名
+	 * @param mixed $defaultValue 默认值 ,如果项不存在就取默认值,并且以默认值新建项
+	 */
+	public function value($sKey,$defaultValue=null);
+	
+	/**
+	 * 设置项的值
+	 * @param string $sKey 键名
+	 * @param mixed $value
+	 */
+	public function setValue($sKey,$value);
+	
+	/**
+	 * 检查项是否存在
+	 * @param string $sKey 键名
+	 */
+	public function hasValue($sKey);
+	
+	/**
+	 * 删除项
+	 * @param string $sKey 键名
+	 */
+	public function deleteValue($sKey);
+	
+	/**
 	 * 获得项的名字迭代器
 	 * @param string $sPath 键路径
 	 * @return \Iterator 

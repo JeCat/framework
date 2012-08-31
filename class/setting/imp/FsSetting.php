@@ -143,6 +143,39 @@ class FsSetting extends Setting implements \Serializable
 		$this->aRootFolder = new Folder($serialized,Folder::FIND_AUTO_CREATE) ;
 	}
 	
+	public function value($sKey,$defaultValue=null){
+		list($sPath,$sName) = self::keyToPathItem($sKey);
+		return $this->item($sPath,$sName,$defaultValue);
+	}
+	
+	public function setValue($sKey,$value){
+		list($sPath,$sName) = self::keyToPathItem($sKey);
+		return $this->setItem($sPath,$sName,$defaultValue);
+	}
+	
+	public function hasValue($sKey){
+		list($sPath,$sName) = self::keyToPathItem($sKey);
+		return $this->hasItem($sPath,$sName,$defaultValue);
+	}
+	
+	public function deleteValue($sKey){
+		list($sPath,$sName) = self::keyToPathItem($sKey);
+		return $this->deleteItem($sPath,$sName,$defaultValue);
+	}
+	
+	static private function keyToPathItem($sKey){
+		$pos = strrpos($sKey,'/');
+		if( $pos === false ){
+			$rtn = array('/',$sKey);
+		}else{
+			$rtn = array(
+				substr($sKey,0,$pos),
+				substr($sKey,$pos+1)
+			);
+		}
+		return $rtn ;
+	}
+	
 	/**
 	 * @var org\jecat\framework\fs\Folder
 	 */
