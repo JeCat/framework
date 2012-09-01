@@ -143,6 +143,27 @@ class FsSetting extends Setting implements \Serializable
 		$this->aRootFolder = new Folder($serialized,Folder::FIND_AUTO_CREATE) ;
 	}
 	
+	public function item($sPath,$sName='*',$defaultValue=null)
+	{
+		if (!$aKey=$this->key($sPath,$defaultValue!==null))
+		{
+			return null;
+		}
+		return $aKey->item($sName,$defaultValue) ;
+	}
+	
+	public function setItem($sPath, $sName, $value)
+	{
+		if (! $aKey = $this->key ( $sPath ))
+		{
+			if( !$aKey=$this->createKey($sPath) )
+			{
+				throw new Exception("无法保存配置建：%s",$sPath) ;
+			}
+		}
+		$aKey->setItem ( $sName, $value );
+	}
+	
 	public function value($sKey,$defaultValue=null){
 		list($sPath,$sName) = self::keyToPathItem($sKey);
 		return $this->item($sPath,$sName,$defaultValue);
@@ -150,7 +171,7 @@ class FsSetting extends Setting implements \Serializable
 	
 	public function setValue($sKey,$value){
 		list($sPath,$sName) = self::keyToPathItem($sKey);
-		return $this->setItem($sPath,$sName,$defaultValue);
+		return $this->setItem($sPath,$sName,$value);
 	}
 	
 	public function hasValue($sKey){
@@ -160,7 +181,7 @@ class FsSetting extends Setting implements \Serializable
 	
 	public function deleteValue($sKey){
 		list($sPath,$sName) = self::keyToPathItem($sKey);
-		return $this->deleteItem($sPath,$sName,$defaultValue);
+		return $this->deleteItem($sPath,$sName);
 	}
 	
 	static private function keyToPathItem($sKey){

@@ -90,6 +90,11 @@ abstract class Setting extends Object implements ISetting
 	
 	public function item($sPath,$sName='*',$defaultValue=null)
 	{
+		trigger_error('正在访问一个过时的方法：'.__METHOD__,E_USER_DEPRECATED ) ;
+		return $this->value(
+			self::formatKey($sPath).'/'.self::formatKey($sName),
+			$defaultValue
+		);
 		if (!$aKey=$this->key($sPath,$defaultValue!==null))
 		{
 			return null;
@@ -99,6 +104,11 @@ abstract class Setting extends Object implements ISetting
 	
 	public function setItem($sPath, $sName, $value)
 	{
+		trigger_error('正在访问一个过时的方法：'.__METHOD__,E_USER_DEPRECATED ) ;
+		return $this->setValue(
+			self::formatKey($sPath).'/'.self::formatKey($sName),
+			$value
+		);
 		if (! $aKey = $this->key ( $sPath ))
 		{
 			if( !$aKey=$this->createKey($sPath) )
@@ -111,6 +121,7 @@ abstract class Setting extends Object implements ISetting
 	
 	public function hasItem($sPath, $sName)
 	{
+		trigger_error('正在访问一个过时的方法：'.__METHOD__,E_USER_DEPRECATED ) ;
 		if (! $aKey = $this->key ( $sPath ))
 		{
 			return null;
@@ -120,6 +131,7 @@ abstract class Setting extends Object implements ISetting
 	
 	public function deleteItem($sPath, $sName)
 	{
+		trigger_error('正在访问一个过时的方法：'.__METHOD__,E_USER_DEPRECATED ) ;
 		if (! $aKey = $this->key ( $sPath ))
 		{
 			return;
@@ -138,6 +150,18 @@ abstract class Setting extends Object implements ISetting
 	
 			$aKey->deleteKey() ;
 		}
+	}
+	
+	static protected function formatKey($sKey){
+		// 去掉开头的'/'
+		if( substr($sKey,0,1) === '/' ){
+			$sKey = substr($sKey,1);
+		}
+		// 去掉结尾的'/'
+		if( substr($sKey,-1,1) === '/' ){
+			$sKey = substr($sKey,0,-1);
+		}
+		return $sKey ;
 	}
 	
 	public function mount(ISetting $aSubSetting , $sMountPath){

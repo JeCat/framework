@@ -32,21 +32,21 @@ interface ISetting
 	 * @param string $sPath 键路径
 	 * @return IKey 
 	 */
-	public function key($sPath,$bAutoCreate=false) ;
+	// public function key($sPath,$bAutoCreate=false) ;
 	
 	/**
 	 * 新建一个键
 	 * @param string $sPath 键路径
 	 * @return IKey 
 	 */
-	public function createKey($sPath) ;
+	//public function createKey($sPath) ;
 	
 	/**
 	 * 检查是否存在键 
 	 * @param string $sPath 键路径
 	 * @return boolen 如果存在返回true ,不存在返回false
 	 */
-	public function hasKey($sPath) ;
+	//public function hasKey($sPath) ;
 	
 	/**
 	 * 删除一个键
@@ -59,14 +59,14 @@ interface ISetting
 	 * 保存键
 	 * @param string $sPath 键路径
 	 */
-	public function saveKey($sPath) ;
+	//public function saveKey($sPath) ;
 	
 	/**
 	 * 获得子键的键名迭代器
 	 * @param string $sPath 键路径
 	 * @return \Iterator 
 	 */
-	public function keyIterator($sPath) ;
+	//public function keyIterator($sPath) ;
 	
 	/**
 	 * 获得项的值
@@ -90,14 +90,21 @@ interface ISetting
 	 * @param string $sName 项名
 	 * @return boolen 如果项存在就返回true,如果不存在返回false
 	 */
-	public function hasItem($sPath,$sName) ;
+	//public function hasItem($sPath,$sName) ;
 	
 	/**
 	 * 删除项 
 	 * @param string $sPath 键路径
 	 * @param string $sName 项名
 	 */
-	public function deleteItem($sPath,$sName) ;
+	//public function deleteItem($sPath,$sName) ;
+	
+	/**
+	 * 获得项的名字迭代器
+	 * @param string $sPath 键路径
+	 * @return \Iterator 
+	 */
+	//public function itemIterator($sPath) ;
 	
 	/**
 	 * 获得项的值
@@ -124,13 +131,6 @@ interface ISetting
 	 * @param string $sKey 键名
 	 */
 	public function deleteValue($sKey);
-	
-	/**
-	 * 获得项的名字迭代器
-	 * @param string $sPath 键路径
-	 * @return \Iterator 
-	 */
-	public function itemIterator($sPath) ;
 	
 	/**
 	 * 在指定的路径上，分离出一个setting

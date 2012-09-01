@@ -232,7 +232,7 @@ class Application extends Object implements \Serializable
 	{
 		if($this->bDebugging===null)
 		{
-			$this->bDebugging = (bool)Setting::singleton()->item('/service/debug','stat') ;
+			$this->bDebugging = (bool)Setting::singleton()->value('/service/debug/stat') ;
 		}
 		return $this->bDebugging ;
 	}
