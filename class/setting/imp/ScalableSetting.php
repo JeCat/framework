@@ -27,7 +27,7 @@ namespace org\jecat\framework\setting\imp;
 
 use org\jecat\framework\setting\Setting;
 
-class ScalableSetting extends Setting implements \Serializable{
+class ScalableSetting extends Setting{
 	public function __construct(Setting $aRealSetting){
 		$this->aRealSetting = $aRealSetting;
 		
@@ -87,14 +87,6 @@ class ScalableSetting extends Setting implements \Serializable{
 			$this,
 			self::formatKey($sPath)
 		);
-	}
-	
-	public function serialize (){
-		$this->aRealSetting->serialize();
-	}
-	
-	public function unserialize ($serialized){
-		$this->aRealSetting->unserialize($serialized);
 	}
 	
 	private function saveTightData(){
