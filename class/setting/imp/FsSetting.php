@@ -96,6 +96,15 @@ class FsSetting extends Setting implements \Serializable
 		return $aKey->keyIterator ();
 	}
 	
+	public function deleteItem($sPath, $sName)
+	{
+		if (! $aKey = $this->key ( $sPath ))
+		{
+			return;
+		}
+		$aKey->deleteItem ( $sName );
+	}
+	
 	static public function transPath($sPath,$bItemsPath=true)
 	{
 		// 去掉开头的 '/'
