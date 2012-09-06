@@ -131,9 +131,17 @@ class HashTable extends Object implements IHashTable, \ArrayAccess, \Iterator, \
 	 * 
 	 * @return mixed
 	 */
-	public function current ()
+	public function & current ()
 	{
-		return current($this->arrDatas) ;
+		$key = key($this->arrDatas) ;
+		if($key===false)
+		{
+			return $null = null ;
+		}
+		else
+		{
+			return $this->arrDatas[$key] ;
+		}
 	}
 
 	/**

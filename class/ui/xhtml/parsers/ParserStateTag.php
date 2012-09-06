@@ -62,7 +62,7 @@ class ParserStateTag extends ParserState
 		{
 			if( !($aParent instanceof Node) )
 			{
-				throw new Exception("错误类型") ;
+				throw new Exception("错误类型 %s") ;
 			}
 			
 			$aTag->setTagType(Tag::TYPE_TAIL) ;
