@@ -115,17 +115,17 @@ class ScalableSetting extends Setting{
 	}
 	
 	public function key($sPath,$bAutoCreate=false){
-		trigger_error('正在访问一个过时的方法：'.__METHOD__,E_USER_DEPRECATED ) ;
+		//trigger_error('正在访问一个过时的方法：'.__METHOD__,E_USER_DEPRECATED ) ;
 		return $this->aRealSetting->key($sPath,$bAutoCreate);
 	}
 	
 	public function createKey($sPath){
-		trigger_error('正在访问一个过时的方法：'.__METHOD__,E_USER_DEPRECATED ) ;
+		//trigger_error('正在访问一个过时的方法：'.__METHOD__,E_USER_DEPRECATED ) ;
 		return $this->key($sPath,true) ;
 	}
 	
 	public function hasKey($sPath){
-		trigger_error('正在访问一个过时的方法：'.__METHOD__,E_USER_DEPRECATED ) ;
+		//trigger_error('正在访问一个过时的方法：'.__METHOD__,E_USER_DEPRECATED ) ;
 		return $this->aRealSetting->hasKey($sPath);
 	}
 	
