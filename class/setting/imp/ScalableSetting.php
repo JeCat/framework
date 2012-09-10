@@ -40,9 +40,22 @@ class ScalableSetting extends Setting{
 	
 	public function value($sKey,$defaultValue=null){
 		$sKey = self::formatKey( $sKey );
-		if( isset( $this->arrTightData[$sKey] )
-				and $this->arrTightData[$sKey] !== self::SoftLink){
-			return $this->arrTightData[$sKey] ;
+		$arrExpKey = explode('/',$sKey) ;
+		$arr = $this->arrTightData;
+		foreach($arrExpKey as $sExpKey){
+			if( !is_array( $arr ) ){
+				return $defaultValue ;
+			}
+			if( !isset( $arr[$sExpKey] ) ){
+				return $defaultValue ;
+			}
+			$arr = $arr[$sExpKey] ;
+		}
+		if( $arr === null ){
+			return $defaultValue ;
+		}
+		if( $arr !== self::SoftLink){
+			return $arr ;
 		}
 		$value = $this->aRealSetting->value($sKey,$defaultValue);
 		if( self::isSimpleData($value) ){
@@ -55,10 +68,25 @@ class ScalableSetting extends Setting{
 	public function setValue($sKey,$value){
 		$sKey = self::formatKey( $sKey );
 		if( self::isSimpleData( $value ) ){
-			$this->arrTightData[$sKey] = $value ;
+			$arrExpKey = explode('/',$sKey) ;
+			$arr = & $this->arrTightData;
+			foreach($arrExpKey as $sExpKey){
+				if( !is_array( $arr ) ){
+					$arr = array() ;
+				}
+				if( !isset( $arr[$sExpKey] ) ){
+					$arr[$sExpKey] = array();
+				}
+				$arr = &$arr[$sExpKey] ;
+			}
+			$arr = $value ;
 			$this->saveTightData();
 		}else{
-			$this->arrTightData[$sKey] = self::SoftLink ;
+			$pValue = &self::getKeyPri(
+				$this->arrTightData,
+				explode('/',$sKey)
+			);
+			$pValue = self::SoftLink ;
 			$this->saveTightData();
 			return $this->aRealSetting->setValue($sKey,$value);
 		}
@@ -142,7 +170,7 @@ class ScalableSetting extends Setting{
 	}
 	
 	const SoftLink = 'SOFT_LINK';
-	const TightDataKey = 'tightdata';
+	const TightDataKey = '';
 	private $aRealSetting = null;
 	private $arrTightData = array();
 }
