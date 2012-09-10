@@ -32,8 +32,6 @@ use org\jecat\framework\io\IOutputStream;
 use org\jecat\framework\util\IHashTable;
 use org\jecat\framework\util\HashTable;
 
-HtmlResourcePool::singleton()->addRequire('org.jecat.framework:style/widget/menu.css',HtmlResourcePool::RESRC_CSS) ;
-HtmlResourcePool::singleton()->addRequire('org.jecat.framework:js/mvc/view/widget/menu.js',HtmlResourcePool::RESRC_JS) ;
 
 class Menu extends AbstractBase
 {
