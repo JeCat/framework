@@ -68,7 +68,7 @@ class SeparatedSetting extends Setting{
 	public function separate($sPath){
 		return self::create(
 			$this->aRealSetting,
-			$this->sSeparatePath.'/'.self::formatKey($sKey)
+			$this->sSeparatePath.'/'.self::formatKey($sPath)
 		);
 	}
 	
