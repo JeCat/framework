@@ -115,6 +115,10 @@ class Item extends AbstractBase
 			$this->buildSubMenu($arrConfig,$sNamespace,$aBeanFactory);
 		}
 		
+		if( !empty($arrConfig['target']) ){
+			$this->setTarget($arrConfig['target']);
+		}
+		
 		if( !empty($arrConfig['controller']) )
 		{
 			if(empty($arrConfig['link']))
@@ -324,7 +328,8 @@ class Item extends AbstractBase
 		{
 			$sLink = $this->link()?: 'javascript:void(0)' ;
 			$sOnClick = $this->eventOnClick() ;
-			$this->sHtml = "<a href=\"{$sLink}\" onclick=\"{$sOnClick}\">".$this->title()."</a>" ;
+			$sTargetCode = $this->target()?' target="'.$this->target().'" ':'';
+			$this->sHtml = "<a href=\"{$sLink}\" onclick=\"{$sOnClick}\" $sTargetCode>".$this->title()."</a>" ;
 		}
 		
 		return $this->sHtml ;
@@ -361,6 +366,14 @@ class Item extends AbstractBase
 		return $this->aAuthorizer->check(IdManager::singleton());
 	}
 	
+	public function setTarget($sTarget){
+		$this->sTarget = $sTarget ;
+	}
+	
+	public function target(){
+		return $this->sTarget;
+	}
+	
     private $parentMenu = null;
     private $subMenu = null;
     
@@ -371,4 +384,6 @@ class Item extends AbstractBase
 	
 	private $bBubblingActive = false ;
 	private $aAuthorizer = null;
+	
+	private $sTarget = null;
 }
