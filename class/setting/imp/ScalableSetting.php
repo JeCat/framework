@@ -82,12 +82,7 @@ class ScalableSetting extends Setting{
 			$arr = $value ;
 			$this->saveTightData();
 		}else{
-			$pValue = &self::getKeyPri(
-				$this->arrTightData,
-				explode('/',$sKey)
-			);
-			$pValue = self::SoftLink ;
-			$this->saveTightData();
+			$this->setValue($sKey,self::SoftLink);
 			return $this->aRealSetting->setValue($sKey,$value);
 		}
 	}
