@@ -38,7 +38,7 @@ class ScalableSetting extends Setting{
 		return new self($aRealSetting);
 	}
 	
-	public function value($sKey,$defaultValue=null){
+	public function valuePri($sKey,$defaultValue=null){
 		$sKey = self::formatKey( $sKey );
 		$arrExpKey = explode('/',$sKey) ;
 		$arr = $this->arrTightData;
@@ -57,15 +57,11 @@ class ScalableSetting extends Setting{
 		if( $arr !== self::SoftLink){
 			return $arr ;
 		}
-		$value = $this->aRealSetting->value($sKey,$defaultValue);
-		if( self::isSimpleData($value) ){
-			$this->aRealSetting->deleteValue($sKey);
-			$this->setValue( $sKey , $value );
-		}
+		$value = $this->aRealSetting->valuePri($sKey,$defaultValue);
 		return $value;
 	}
 	
-	public function setValue($sKey,$value){
+	public function setValuePri($sKey,$value){
 		$sKey = self::formatKey( $sKey );
 		if( self::isSimpleData( $value ) ){
 			$arrExpKey = explode('/',$sKey) ;
@@ -82,27 +78,47 @@ class ScalableSetting extends Setting{
 			$arr = $value ;
 			$this->saveTightData();
 		}else{
-			$this->setValue($sKey,self::SoftLink);
-			return $this->aRealSetting->setValue($sKey,$value);
+			$this->setValuePri($sKey,self::SoftLink);
+			return $this->aRealSetting->setValuePri($sKey,$value);
 		}
 	}
 	
-	public function hasValue($sKey){
+	public function hasValuePri($sKey){
 		$sKey = self::formatKey( $sKey );
-		if( isset ( $this->arrTightData[$sKey] ) ){
-			return true;
+		$arrExpKey = explode('/',$sKey) ;
+		$arr = $this->arrTightData;
+		foreach($arrExpKey as $sExpKey){
+			if( !is_array( $arr ) ){
+				return false ;
+			}
+			if( !isset( $arr[$sExpKey] ) ){
+				return false ;
+			}
+			$arr = $arr[$sExpKey] ;
 		}
-		return $this->aRealSetting->hasValue($sKey);
+		if( $arr === null ){
+			return $false ;
+		}
+		return true;
+		return $this->aRealSetting->hasValuePri($sKey);
 	}
 	
-	public function deleteValue($sKey){
+	public function deleteValuePri($sKey){
 		$sKey = self::formatKey( $sKey );
-		if( isset( $this->arrTightData[$sKey] ) ){
-			unset( $this->arrTightData[$sKey] );
-			$this->saveTightData();
-		}else{
-			$this->aRealSetting->deleteValue($sKey);
+		
+		$arrExpKey = explode('/',$sKey) ;
+		$arr = & $this->arrTightData;
+		foreach($arrExpKey as $sExpKey){
+			if( !is_array( $arr ) ){
+				return ;
+			}
+			if( !isset( $arr[$sExpKey] ) ){
+				return ;
+			}
+			$arr = &$arr[$sExpKey] ;
 		}
+		$arr = null;
+		$this->aRealSetting->deleteValue($sKey);
 	}
 	
 	public function separate($sPath){
@@ -153,15 +169,24 @@ class ScalableSetting extends Setting{
 	}
 	
 	public function deleteKey($sDelKey){
-		$sDelKey = self::formatKey( $sDelKey );
+		$sKey = self::formatKey( $sDelKey );
 		
-		foreach($this->arrTightData as $sKey=>$value){
-			if( substr( $sKey , 0 , strlen($sDelKey) ) == $sDelKey ){
-				$this->deleteValue( $sKey );
+		$arrExpKey = explode('/',$sKey) ;
+		$sLastKey = array_pop($arrExpKey);
+		$arr = & $this->arrTightData;
+		foreach($arrExpKey as $sExpKey){
+			if( !is_array( $arr ) ){
+				return ;
 			}
+			if( !isset( $arr[$sExpKey] ) ){
+				return ;
+			}
+			$arr = &$arr[$sExpKey] ;
 		}
+		unset($arr[$sLastKey]);
+		$this->saveTightData();
+		$this->aRealSetting->deleteKey($sKey);
 		
-		$this->aRealSetting->deleteKey($sDelKey);
 	}
 	
 	const SoftLink = 'SOFT_LINK';

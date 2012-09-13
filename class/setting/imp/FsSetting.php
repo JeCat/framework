@@ -52,13 +52,6 @@ class FsSetting extends Setting implements \Serializable
 	{
 		$sKeyPath = self::transPath($sPath,false) ;
 		
-		$sFindMount = $this->findMount($sPath);
-		
-		if( null !== $sFindMount ){
-			$sInMountPath = substr($sPath,strlen($sFindMount));
-			return $this->getMountSettingByPath($sFindMount)->key($sInMountPath,$bAutoCreate);
-		}
-		
 		$sFlyweightKey = $this->aRootFolder->path() . '/' . $sKeyPath ;
 		
 		if( !$aKey=FsKey::flyweight($sFlyweightKey,false) )
@@ -173,22 +166,22 @@ class FsSetting extends Setting implements \Serializable
 		$aKey->setItem ( $sName, $value );
 	}
 	
-	public function value($sKey,$defaultValue=null){
+	public function valuePri($sKey,$defaultValue=null){
 		list($sPath,$sName) = self::keyToPathItem($sKey);
 		return $this->item($sPath,$sName,$defaultValue);
 	}
 	
-	public function setValue($sKey,$value){
+	public function setValuePri($sKey,$value){
 		list($sPath,$sName) = self::keyToPathItem($sKey);
 		return $this->setItem($sPath,$sName,$value);
 	}
 	
-	public function hasValue($sKey){
+	public function hasValuePri($sKey){
 		list($sPath,$sName) = self::keyToPathItem($sKey);
-		return $this->hasItem($sPath,$sName,$defaultValue);
+		return $this->hasItem($sPath,$sName);
 	}
 	
-	public function deleteValue($sKey){
+	public function deleteValuePri($sKey){
 		list($sPath,$sName) = self::keyToPathItem($sKey);
 		return $this->deleteItem($sPath,$sName);
 	}

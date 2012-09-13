@@ -39,28 +39,28 @@ class SeparatedSetting extends Setting{
 		);
 	}
 	
-	public function value($sKey,$defaultValue=null){
-		return $this->aRealSetting->value(
+	protected function valuePri($sKey,$defaultValue=null){
+		return $this->aRealSetting->valuePri(
 			$this->sSeparatePath.'/'.self::formatKey($sKey),
 			$defaultValue
 		);
 	}
 	
-	public function setValue($sKey,$value){
-		return $this->aRealSetting->setValue(
+	protected function setValuePri($sKey,$value){
+		return $this->aRealSetting->setValuePri(
 			$this->sSeparatePath.'/'.self::formatKey($sKey),
 			$value
 		);
 	}
 	
-	public function hasValue($sKey){
-		return $this->aRealSetting->hasValue(
+	protected function hasValuePri($sKey){
+		return $this->aRealSetting->hasValuePri(
 			$this->sSeparatePath.'/'.self::formatKey($sKey)
 		);
 	}
 	
-	public function deleteValue($sKey){
-		return $this->aRealSetting->deleteValue(
+	protected function deleteValuePri($sKey){
+		return $this->aRealSetting->deleteValuePri(
 			$this->sSeparatePath.'/'.self::formatKey($sKey)
 		);
 	}

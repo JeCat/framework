@@ -42,7 +42,7 @@ class SaeMemcacheSetting extends Setting{
 		}
 	}
 	
-	public function value($sKey,$defaultValue=null){
+	public function valuePri($sKey,$defaultValue=null){
 		$aMemValue = memcache_get( self::$aSaeMemcache , $sKey );
 		if( false === $aMemValue ){
 			return $defaultValue;
@@ -51,11 +51,11 @@ class SaeMemcacheSetting extends Setting{
 		}
 	}
 	
-	public function setValue($sKey,$value){
+	public function setValuePri($sKey,$value){
 		memcache_set( self::$aSaeMemcache , $sKey , $value );
 	}
 	
-	public function hasValue($sKey){
+	public function hasValuePri($sKey){
 		$aMemValue = memcache_get( self::$aSaeMemcache , $sKey );
 		if( false === $aMemValue ){
 			return false;
@@ -64,7 +64,7 @@ class SaeMemcacheSetting extends Setting{
 		}
 	}
 	
-	public function deleteValue($sKey){
+	public function deleteValuePri($sKey){
 		memcache_delete( self::$aSaeMemcache , $sKey );
 	}
 	

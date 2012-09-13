@@ -164,6 +164,57 @@ abstract class Setting extends Object implements ISetting
 		return $sKey ;
 	}
 	
+	public function value($sKey,$defaultValue=null){
+		$sFindMount = $this->findMount($sKey);
+		
+		if( null !== $sFindMount ){
+			$sInMountPath = substr($sKey,strlen($sFindMount));
+			return $this->getMountSettingByPath($sFindMount)->value($sInMountPath,$defaultValue);
+		}
+		return $this->valuePri($sKey,$defaultValue);
+	}
+	
+	public function setValue($sKey,$value){
+		$sFindMount = $this->findMount($sKey);
+		
+		if( null !== $sFindMount ){
+			$sInMountPath = substr($sKey,strlen($sFindMount));
+			return $this->getMountSettingByPath($sFindMount)->setValue($sInMountPath,$value);
+		}
+		return $this->setValuePri($sKey,$value);
+	}
+	
+	public function hasValue($sKey){
+		$sFindMount = $this->findMount($sKey);
+		
+		if( null !== $sFindMount ){
+			$sInMountPath = substr($sKey,strlen($sFindMount));
+			return $this->getMountSettingByPath($sFindMount)->hasValue($sInMountPath);
+		}
+		return $this->hasValuePri($sKey);
+	}
+	
+	public function deleteValue($sKey){
+		$sFindMount = $this->findMount($sKey);
+		
+		if( null !== $sFindMount ){
+			$sInMountPath = substr($sKey,strlen($sFindMount));
+			return $this->getMountSettingByPath($sFindMount)->deleteValue($sInMountPath);
+		}
+		return $this->deleteValuePri($sKey);
+	}
+	
+	/**
+	 * value() , setValue() , hasValue() , deleteValue() 首先处理挂载。
+	 * 在将挂载全部处理完毕后，再调用
+	 * valuePri() , setValuePri() , hasValuePri() , deleteValuePri()
+	 * 子类在实现这四个函数时，不需要再考虑挂载问题。
+	 **/
+	abstract protected function valuePri($sKey,$defaultValue);
+	abstract protected function setValuePri($sKey,$value);
+	abstract protected function hasValuePri($sKey);
+	abstract protected function deleteValuePri($sKey);
+	
 	public function mount(ISetting $aSubSetting , $sMountPath){
 		if( isset( $this->arrMountMap[ $sMountPath ] ) ){
 			throw new Exception(
@@ -175,7 +226,7 @@ abstract class Setting extends Object implements ISetting
 		}
 	}
 	
-	protected function getMountSettingByPath($sMountPath){
+	private function getMountSettingByPath($sMountPath){
 		return $this->arrMountMap[ $sMountPath ] ?:null;
 	}
 	
@@ -184,7 +235,7 @@ abstract class Setting extends Object implements ISetting
 	 * 目前挂载的Setting对象不超过10个，因此直接循环找一遍就行。
 	 * 如果有一天，挂载超过100个甚至更多，可以考虑使用Trie树算法来提高效率。
 	 */
-	protected function findMount($sMountPath){
+	private function findMount($sMountPath){
 		foreach($this->arrMountMap as $sPath => $aSubSetting){
 			$nPathLength = strlen( $sPath );
 			if( substr($sMountPath,0,$nPathLength) === $sPath ){
