@@ -29,6 +29,7 @@ use org\jecat\framework\util\DataSrc;
 use org\jecat\framework\bean\BeanFactory;
 use org\jecat\framework\auth\Authorizer;
 use org\jecat\framework\auth\IdManager;
+use org\jecat\framework\locale\Locale;
 
 class Item extends AbstractBase
 {
@@ -329,7 +330,8 @@ class Item extends AbstractBase
 			$sLink = $this->link()?: 'javascript:void(0)' ;
 			$sOnClick = $this->eventOnClick() ;
 			$sTargetCode = $this->target()?' target="'.$this->target().'" ':'';
-			$this->sHtml = "<a href=\"{$sLink}\" onclick=\"{$sOnClick}\" $sTargetCode>".$this->title()."</a>" ;
+			$sTitle = Locale::singleton()->trans($this->title(),null,'ui') ;
+			$this->sHtml = "<a href=\"{$sLink}\" onclick=\"{$sOnClick}\" $sTargetCode>".$sTitle."</a>" ;
 		}
 		
 		return $this->sHtml ;
