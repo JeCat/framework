@@ -45,13 +45,13 @@ class PatchSlot
 			$aTargetObject = $this->aPath->localObject($aObjectContainer) ;
 			
 		} catch (Exception $e) {
-			throw new Exception(
+			/*throw new Exception(
 				"将内容织入模板文件 %s 时遇到错误:" . $e->getMessage() ,
 				array_merge(
 					array($aObjectContainer->templateName()) ,
 					$e->messageArgvs()
 				)
-			) ;
+			) ;*/
 		}
 		
 		// ----------
