@@ -138,8 +138,18 @@ class ScalableSetting extends Setting{
 	private function readTightData(){
 		$this->arrTightData = $this->aRealSetting->value(
 			self::TightDataKey,
-			array()
+			null
 		);
+		if( null === $this->arrTightData ){
+			$this->arrTightData = array();
+			$arrOldTight = $this->aRealSetting->value(
+				'tightdata',
+				array()
+			);
+			foreach($arrOldTight as $sKey => $sValue){
+				$this->setValue($sKey,$sValue);
+			}
+		}
 	}
 	
 	static private function isSimpleData($value){
