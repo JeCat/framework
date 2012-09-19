@@ -52,6 +52,8 @@ class PatchSlot
 					$e->messageArgvs()
 				)
 			) ;*/
+			// 暂时什么也不操作
+			return ;
 		}
 		
 		// ----------
