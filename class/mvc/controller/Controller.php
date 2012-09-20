@@ -439,8 +439,19 @@ class Controller extends NamableComposite implements IBean
 	{
 		if($this->aView)
 		{
+		    // 清理消息队列
 			$this->messageQueue()->removeChildHolder($this->aView) ;
+			
+			if($aOriViewAssembledParent=$this->aView->assembledParent())
+			{
+			    // 清理原始图装配关系
+			    $aOriViewAssembledParent->unassemble($this->view()) ;
+			    
+			    // 装配上新视图
+			    $aOriViewAssembledParent->assemble($aView) ;
+			}
 		}
+
 		$this->messageQueue()->addChildHolder($aView) ;
 		
 		$this->aView = $aView ;
