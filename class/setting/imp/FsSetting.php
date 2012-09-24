@@ -166,6 +166,15 @@ class FsSetting extends Setting implements \Serializable
 		$aKey->setItem ( $sName, $value );
 	}
 	
+	public function hasItem($sPath, $sName)
+	{
+		if (! $aKey = $this->key ( $sPath ))
+		{
+			return false;
+		}
+		return $aKey->hasItem ( $sName );
+	}
+	
 	public function valuePri($sKey,$defaultValue=null){
 		list($sPath,$sName) = self::keyToPathItem($sKey);
 		return $this->item($sPath,$sName,$defaultValue);
@@ -204,5 +213,3 @@ class FsSetting extends Setting implements \Serializable
 	 */
 	private $aRootFolder;
 }
-
-
