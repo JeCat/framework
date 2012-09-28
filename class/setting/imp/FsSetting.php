@@ -28,6 +28,7 @@ namespace org\jecat\framework\setting\imp;
 use org\jecat\framework\fs\FSO;
 use org\jecat\framework\fs\Folder;
 use org\jecat\framework\setting\Setting;
+use org\jecat\framework\setting\IKey;
 
 class FsSetting extends Setting implements \Serializable
 {
@@ -193,6 +194,45 @@ class FsSetting extends Setting implements \Serializable
 	public function deleteValuePri($sKey){
 		list($sPath,$sName) = self::keyToPathItem($sKey);
 		return $this->deleteItem($sPath,$sName);
+	}
+	
+	public function keyListPri($sPrefix){
+		$aKey = $this->key($sPrefix);
+		
+		if( ! $aKey ){
+			return array();
+		}
+		
+		return $this->keyListPriRec($aKey);
+	}
+	
+	private function keyListPriRec(IKey $aKey,$parentPath=''){
+		$arrSetting = array();
+		if( $aKey ){
+			// sub keys
+			foreach($aKey->keyIterator() as $aSubKey){
+				if( empty($parentPath) ){
+					$path = $aSubKey->name();
+				}else{
+					$path = $parentPath .'/'.$aSubKey->name();
+				}
+				
+				$arrSubSetting = $this->keyListPriRec($aSubKey,$path);
+				$arrSetting = array_merge( $arrSetting, $arrSubSetting);
+			}
+			
+			// items
+			foreach($aKey->itemIterator() as $itemName){
+				if( empty($parentPath) ){
+					$path = $itemName;
+				}else{
+					$path = $parentPath .'/'.$itemName;
+				}
+				
+				$arrSetting[] =  $path ;
+			}
+		}
+		return $arrSetting ;
 	}
 	
 	static private function keyToPathItem($sKey){

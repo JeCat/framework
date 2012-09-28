@@ -204,6 +204,15 @@ abstract class Setting extends Object implements ISetting
 		return $this->deleteValuePri($sKey);
 	}
 	
+	public function keyList($sPrefix){
+		$sFindMount = $this->findMount($sPrefix);
+		if( null !== $sFindMount ){
+			$sInMountPath = substr($sKey,strlen($sFindMount));
+			return $this->getMountSettingByPath($sFindMount)->keyList($sInMountPath);
+		}
+		return $this->keyListPri($sPrefix);
+	}
+	
 	/**
 	 * value() , setValue() , hasValue() , deleteValue() 首先处理挂载。
 	 * 在将挂载全部处理完毕后，再调用
