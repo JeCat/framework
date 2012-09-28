@@ -236,6 +236,7 @@ class FsSetting extends Setting implements \Serializable
 	}
 	
 	static private function keyToPathItem($sKey){
+		$sKey = self::formatKey($sKey);
 		$pos = strrpos($sKey,'/');
 		if( $pos === false ){
 			$rtn = array('/',$sKey);
