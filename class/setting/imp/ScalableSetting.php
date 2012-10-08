@@ -121,6 +121,31 @@ class ScalableSetting extends Setting{
 		$this->aRealSetting->deleteValue($sKey);
 	}
 	
+	protected function keyListPri($sPrefix){
+		$arrValue = $this->valuePri($sPrefix,array());
+		return $this->recKeyListPri($arrValue);
+	}
+	
+	private function recKeyListPri(array $arrValue,$sPrefix = ''){
+		$arrKeyList = array();
+		foreach($arrValue as $sKey => $value){
+			if( empty($sPrefix) ){
+				$sFullKey = $sKey;
+			}else{
+				$sFullKey = $sPrefix.'/'.$sKey;
+			}
+			if( is_array($value) ){
+				$arrKeyList = array_merge(
+					$arrKeyList,
+					$this->recKeyListPri($value,$sFullKey)
+				);
+			}else{
+				$arrKeyList [] = $sFullKey ;
+			}
+		}
+		return $arrKeyList;
+	}
+	
 	public function separate($sPath){
 		return SeparatedSetting::create(
 			$this,
