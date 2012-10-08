@@ -25,12 +25,13 @@
 /*-- Project Introduce --*/
 namespace org\jecat\framework\setting\imp;
 
+use org\jecat\framework\setting\ISetting;
 use org\jecat\framework\setting\Setting;
 
-class SeparatedSetting extends Setting{
+class SeparatedSetting implements ISetting{
 	public function __construct(Setting $aRealSetting,$sSeparatePath){
 		$this->aRealSetting = $aRealSetting;
-		$this->sSeparatePath = self::formatKey($sSeparatePath);
+		$this->sSeparatePath = Setting::formatKey($sSeparatePath);
 	}
 	
 	static public function create(Setting $aRealSetting,$sSeparatePath){
@@ -39,55 +40,80 @@ class SeparatedSetting extends Setting{
 		);
 	}
 	
-	protected function valuePri($sKey,$defaultValue=null){
-		return $this->aRealSetting->valuePri(
-			$this->sSeparatePath.'/'.self::formatKey($sKey),
+	public function value($sKey,$defaultValue=null){
+		return $this->aRealSetting->value(
+			$this->sSeparatePath.'/'.Setting::formatKey($sKey),
 			$defaultValue
 		);
 	}
 	
-	protected function setValuePri($sKey,$value){
-		return $this->aRealSetting->setValuePri(
-			$this->sSeparatePath.'/'.self::formatKey($sKey),
+	public function setValue($sKey,$value){
+		return $this->aRealSetting->setValue(
+			$this->sSeparatePath.'/'.Setting::formatKey($sKey),
 			$value
 		);
 	}
 	
-	protected function hasValuePri($sKey){
-		return $this->aRealSetting->hasValuePri(
-			$this->sSeparatePath.'/'.self::formatKey($sKey)
+	public function hasValue($sKey){
+		return $this->aRealSetting->hasValue(
+			$this->sSeparatePath.'/'.Setting::formatKey($sKey)
 		);
 	}
 	
-	protected function deleteValuePri($sKey){
-		return $this->aRealSetting->deleteValuePri(
-			$this->sSeparatePath.'/'.self::formatKey($sKey)
+	public function deleteValue($sKey){
+		return $this->aRealSetting->deleteValue(
+			$this->sSeparatePath.'/'.Setting::formatKey($sKey)
 		);
 	}
 	
 	public function keyList($sKey){
 		return $this->aRealSetting->keyList(
-			$this->sSeparatePath.'/'.self::formatKey($sKey)
+			$this->sSeparatePath.'/'.Setting::formatKey($sKey)
 		);
 	}
 	
 	public function separate($sPath){
 		return self::create(
 			$this->aRealSetting,
-			$this->sSeparatePath.'/'.self::formatKey($sPath)
+			$this->sSeparatePath.'/'.Setting::formatKey($sPath)
 		);
 	}
 	
 	public function deleteKey($sKey){
 		return $this->aRealSetting->deleteKey(
-			$this->sSeparatePath.'/'.self::formatKey($sKey)
+			$this->sSeparatePath.'/'.Setting::formatKey($sKey)
 		);
 	}
 	
 	public function key($sKey,$bAutoCreate=false){
 		return $this->aRealSetting->key(
-			$this->sSeparatePath.'/'.self::formatKey($sKey),
+			$this->sSeparatePath.'/'.Setting::formatKey($sKey),
 			$bAutoCreate
+		);
+	}
+	
+	public function item($sPath,$sName='*',$defaultValue=null)
+	{
+		trigger_error('正在访问一个过时的方法：'.__METHOD__,E_USER_DEPRECATED ) ;
+		return $this->value(
+			Setting::formatKey($sPath).'/'.Setting::formatKey($sName),
+			$defaultValue
+		);
+	}
+	
+	public function setItem($sPath, $sName, $value)
+	{
+		trigger_error('正在访问一个过时的方法：'.__METHOD__,E_USER_DEPRECATED ) ;
+		return $this->setValue(
+			Setting::formatKey($sPath).'/'.Setting::formatKey($sName),
+			$value
+		);
+	}
+	
+	public function mount(ISetting $aSubSetting , $sMountPath){
+		return $this->aRealSetting->mount(
+			$aSubSetting ,
+			$this->sSeparatePath.'/'.Setting::formatKey($sMountPath)
 		);
 	}
 	

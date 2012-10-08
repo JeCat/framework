@@ -152,7 +152,7 @@ abstract class Setting extends Object implements ISetting
 		}
 	}
 	
-	static protected function formatKey($sKey){
+	static public function formatKey($sKey){
 		// 去掉开头的'/'
 		if( substr($sKey,0,1) === '/' ){
 			$sKey = substr($sKey,1);
