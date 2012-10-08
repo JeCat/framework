@@ -171,7 +171,12 @@ abstract class Setting extends Object implements ISetting
 			$sInMountPath = substr($sKey,strlen($sFindMount));
 			return $this->getMountSettingByPath($sFindMount)->value($sInMountPath,$defaultValue);
 		}
-		return $this->valuePri($sKey,$defaultValue);
+		if( $this->hasValuePri($sKey) ){
+			return $this->valuePri($sKey,$defaultValue);
+		}else{
+			$this->setValuePri($sKey,$defaultValue);
+			return $defaultValue;
+		}
 	}
 	
 	public function setValue($sKey,$value){
@@ -202,6 +207,15 @@ abstract class Setting extends Object implements ISetting
 			return $this->getMountSettingByPath($sFindMount)->deleteValue($sInMountPath);
 		}
 		return $this->deleteValuePri($sKey);
+	}
+	
+	public function keyList($sPrefix){
+		$sFindMount = $this->findMount($sPrefix);
+		if( null !== $sFindMount ){
+			$sInMountPath = substr($sKey,strlen($sFindMount));
+			return $this->getMountSettingByPath($sFindMount)->keyList($sInMountPath);
+		}
+		return $this->keyListPri($sPrefix);
 	}
 	
 	/**

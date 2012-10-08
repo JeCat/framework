@@ -133,6 +133,11 @@ interface ISetting
 	public function deleteValue($sKey);
 	
 	/**
+	 * 返回以 prefix 开头的所有键名
+	 */
+	public function keyList($sPrefix);
+	
+	/**
 	 * 在指定的路径上，分离出一个setting
 	 * @param string $sPath 键路径
 	 * @return ISetting
