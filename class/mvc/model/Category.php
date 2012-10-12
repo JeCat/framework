@@ -454,7 +454,7 @@ class Category extends Object
 		}
 		$aParentsModelList = Model::create($aModel->prototype());
 		$aParentsModelList->order('lft');
-		$aParentsModelList->where("lft < {$aModel['lft']} and rgt > {$aModel['rgt']}");
+		$aParentsModelList->where("lft > {$aModel['lft']} and rgt < {$aModel['rgt']}");
 		$aParentsModelList->load();
 		return $aParentsModelList;
 	}
